@@ -21,11 +21,11 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
-import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.graph.index.StreetIndex;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
@@ -59,7 +59,7 @@ public class Graph implements Serializable {
   @Nullable
   private final OpeningHoursCalendarService openingHoursCalendarService;
 
-  private transient StreetVertexIndex streetIndex;
+  private transient StreetIndex streetIndex;
 
   //Envelope of all OSM and transit vertices. Calculated during build time
   private WorldEnvelope envelope = null;
@@ -305,7 +305,7 @@ public class Graph implements Serializable {
    */
   public void index(StopModel stopModel) {
     LOG.info("Index street model...");
-    streetIndex = new StreetVertexIndex(this, stopModel);
+    streetIndex = new StreetIndex(this, stopModel);
     LOG.info("Index street model complete.");
   }
 
@@ -318,7 +318,7 @@ public class Graph implements Serializable {
    * Get streetIndex, safe to use while routing, but do not use during graph build.
    * @see #getStreetIndexSafe(StopModel)
    */
-  public StreetVertexIndex getStreetIndex() {
+  public StreetIndex getStreetIndex() {
     return this.streetIndex;
   }
 
@@ -326,7 +326,7 @@ public class Graph implements Serializable {
    * Get streetIndex during graph build, both OSM street data and transit data must be loaded
    * before calling this.
    */
-  public StreetVertexIndex getStreetIndexSafe(StopModel stopModel) {
+  public StreetIndex getStreetIndexSafe(StopModel stopModel) {
     indexIfNotIndexed(stopModel);
     return this.streetIndex;
   }

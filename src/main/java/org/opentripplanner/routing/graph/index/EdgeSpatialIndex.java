@@ -1,13 +1,14 @@
-package org.opentripplanner.graph_builder.linking;
+package org.opentripplanner.routing.graph.index;
 
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.linking.Scope;
 
 /**
- * Manages street spatial indexes by scope. When linking vertices, visibility is as follows:
+ * Manages edge spatial indexes by scope. When linking vertices, visibility is as follows:
  * <p>
  * PERMANENT: Looks at the permanent index and inserts into the permanent index REALTIME: Looks and
  * the permanent index and inserts into the realtime index REQUEST: Looks at both the permanent and
@@ -29,50 +30,35 @@ import org.opentripplanner.routing.graph.Edge;
  * <p>
  * See #3351
  */
-class StreetSpatialIndex {
+public class EdgeSpatialIndex {
 
-  private final HashGridSpatialIndex<Edge> permanentIndex = new HashGridSpatialIndex<>();
+  private final HashGridSpatialIndex<Edge> permanentEdgeIndex = new HashGridSpatialIndex<>();
 
-  private final HashGridSpatialIndex<Edge> realTimeIndex = new HashGridSpatialIndex<>();
+  private final HashGridSpatialIndex<Edge> realTimeEdgeIndex = new HashGridSpatialIndex<>();
 
-  void insert(LineString lineString, Object obj, Scope scope) {
+  public void insert(LineString lineString, Object obj, Scope scope) {
     switch (scope) {
-      case PERMANENT:
-        permanentIndex.insert(lineString, obj);
-        break;
-      case REALTIME:
-        realTimeIndex.insert(lineString, obj);
-        break;
-      default:
-        throw new IllegalArgumentException();
+      case PERMANENT -> permanentEdgeIndex.insert(lineString, obj);
+      case REALTIME -> realTimeEdgeIndex.insert(lineString, obj);
+      case REQUEST -> throw new IllegalArgumentException();
     }
   }
 
-  void remove(Envelope envelope, final Object item, Scope scope) {
+  public void remove(Envelope envelope, final Object item, Scope scope) {
     switch (scope) {
-      case PERMANENT:
-        permanentIndex.remove(envelope, item);
-        return;
-      case REALTIME:
-        realTimeIndex.remove(envelope, item);
-        return;
-      default:
-        throw new IllegalArgumentException();
+      case PERMANENT -> permanentEdgeIndex.remove(envelope, item);
+      case REALTIME -> realTimeEdgeIndex.remove(envelope, item);
+      case REQUEST -> throw new IllegalArgumentException();
     }
   }
 
-  final Stream<Edge> query(Envelope envelope, Scope scope) {
-    switch (scope) {
-      case PERMANENT:
-      case REALTIME:
-        return permanentIndex.query(envelope).stream();
-      case REQUEST:
-        return Stream.concat(
-          permanentIndex.query(envelope).stream(),
-          realTimeIndex.query(envelope).stream()
-        );
-      default:
-        throw new IllegalArgumentException();
-    }
+  public final Stream<Edge> query(Envelope envelope, Scope scope) {
+    return switch (scope) {
+      case PERMANENT, REALTIME -> permanentEdgeIndex.query(envelope).stream();
+      case REQUEST -> Stream.concat(
+        permanentEdgeIndex.query(envelope).stream(),
+        realTimeEdgeIndex.query(envelope).stream()
+      );
+    };
   }
 }
