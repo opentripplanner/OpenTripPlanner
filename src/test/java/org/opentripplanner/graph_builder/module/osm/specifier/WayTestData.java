@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
-import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public class WayTestData {
@@ -47,6 +46,20 @@ public class WayTestData {
     way.addTag("rcn", "yes");
     way.addTag("lcn", "yes");
 
+    return way;
+  }
+
+  public static OSMWithTags fiveLanes() {
+    OSMWithTags way = new OSMWithTags();
+    way.addTag("highway", "primary");
+    way.addTag("lanes", "5");
+    return way;
+  }
+
+  public static OSMWithTags cycleway() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "residential");
+    way.addTag("cycleway", "lane");
     return way;
   }
 

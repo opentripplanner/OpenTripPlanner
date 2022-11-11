@@ -150,6 +150,9 @@ public class OSMWithTags {
     return null;
   }
 
+  /**
+   * Returns true if both key and value matches.
+   */
   public boolean matchesKeyValue(String key, String value) {
     return hasTag(key) && getTag(key).equals(value);
   }

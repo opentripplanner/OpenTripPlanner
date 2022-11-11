@@ -31,12 +31,32 @@ public sealed interface Operation {
     return match(way) == EXACT;
   }
 
-  boolean isWildcard();
+  default boolean isWildcard() {
+    return false;
+  }
 
+  /**
+   * Test to what degree the OSM entity matches with this operation when taking the regular tag keys
+   * into account.
+   */
   MatchResult match(OSMWithTags way);
 
+  /**
+   * Test to what degree the OSM entity matches with this operation when taking the ':left' key
+   * suffixes into account.
+   * <p>
+   * For example, it should not match a way with `cycleway:right=lane` when the `cycleway=lane` was
+   * required but `cycleway:left=lane` should match.
+   */
   MatchResult matchLeft(OSMWithTags way);
 
+  /**
+   * Test to what degree the OSM entity matches with this operation when taking the ':right' key
+   * suffixes into account.
+   * <p>
+   * For example, it should not match a way with `cycleway:left=lane` when the `cycleway=lane` was
+   * required but `cycleway:right=lane` should match.
+   */
   MatchResult matchRight(OSMWithTags way);
 
   enum MatchResult {
@@ -87,6 +107,49 @@ public sealed interface Operation {
       } else {
         return oneSideResult.ifNone(mainRes);
       }
+    }
+  }
+
+  record Absent(String key) implements Operation {
+    @Override
+    public MatchResult match(OSMWithTags way) {
+      if (way.hasTag(key)) {
+        return NONE;
+      } else {
+        return EXACT;
+      }
+    }
+
+    @Override
+    public MatchResult matchLeft(OSMWithTags way) {
+      throw new RuntimeException("Not implemented.");
+    }
+
+    @Override
+    public MatchResult matchRight(OSMWithTags way) {
+      throw new RuntimeException("Not implemented.");
+    }
+  }
+
+  record GreaterThan(String key, int value) implements Operation {
+    @Override
+    public MatchResult match(OSMWithTags way) {
+      var maybeInt = way.getTagAsInt(key, ignored -> {});
+      if (maybeInt.isPresent() && maybeInt.getAsInt() > value) {
+        return EXACT;
+      } else {
+        return NONE;
+      }
+    }
+
+    @Override
+    public MatchResult matchLeft(OSMWithTags way) {
+      throw new RuntimeException("Not implemented.");
+    }
+
+    @Override
+    public MatchResult matchRight(OSMWithTags way) {
+      throw new RuntimeException("Not implemented.");
     }
   }
 }
