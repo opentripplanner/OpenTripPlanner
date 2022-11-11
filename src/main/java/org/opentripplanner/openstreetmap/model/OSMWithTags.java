@@ -150,6 +150,10 @@ public class OSMWithTags {
     return null;
   }
 
+  public boolean matchesKeyValue(String key, String value) {
+    return hasTag(key) && getTag(key).equals(value);
+  }
+
   /**
    * Get tag and convert it to an integer. If the tag exist, but can not be parsed into a number,
    * then the error handler is called with the value witch failed to parse.

@@ -11,17 +11,13 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * How the scoring logic is implemented is the responsibility of the implementations.
  */
 public interface OsmSpecifier {
-  static boolean matchesWildcard(String value, String matchValue) {
-    return matchValue != null && value != null && value.equals("*");
-  }
-
   static List<Operation> parseOperations(String spec, String separator) {
     return Arrays
       .stream(spec.split(separator))
       .filter(p -> !p.isEmpty())
       .map(pair -> {
         var kv = pair.split("=");
-        return (Operation) new Operation.Equals(kv[0].toLowerCase(), kv[1].toLowerCase());
+        return (Operation) new Operation.LeftRightEquals(kv[0].toLowerCase(), kv[1].toLowerCase());
       })
       .toList();
   }

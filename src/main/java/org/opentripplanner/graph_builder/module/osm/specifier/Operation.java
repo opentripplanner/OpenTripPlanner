@@ -1,57 +1,79 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
+import javax.annotation.Nonnull;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public interface Operation {
-  boolean matches(OSMWithTags way);
-
-  default boolean matchesRight(OSMWithTags way) {
-    return matches(way);
+  @Nonnull
+  static MatchResult getMatchResult(OSMWithTags way, String opKey, String opValue) {
+    if (opValue.equals("*") && way.hasTag(opKey)) {
+      return MatchResult.WILDCARD;
+    } else if (way.matchesKeyValue(opKey, opValue)) {
+      return MatchResult.EXACT;
+    } else if (opValue.contains(":")) {
+      // treat cases like cobblestone:flattened as cobblestone if a more-specific match
+      // does not apply
+      var splitValue = opValue.split(":", 2)[0];
+      if (way.matchesKeyValue(opKey, splitValue)) {
+        return MatchResult.PREFIX;
+      } else {
+        return MatchResult.NONE;
+      }
+    } else {
+      return MatchResult.NONE;
+    }
   }
 
-  default boolean matchesLeft(OSMWithTags way) {
-    return matches(way);
+  default boolean matches(OSMWithTags way) {
+    return match(way) == MatchResult.EXACT;
   }
 
   boolean isWildcard();
 
-  String key();
+  MatchResult match(OSMWithTags way);
 
-  String value();
+  MatchResult matchLeft(OSMWithTags way);
 
-  record Equals(String key, String value) implements Operation {
-    @Override
-    public boolean matches(OSMWithTags way) {
-      return way.hasTag(key) && way.getTag(key).equals(value);
-    }
+  MatchResult matchRight(OSMWithTags way);
 
-    @Override
-    public boolean isWildcard() {
-      return value.equals("*");
+  enum MatchResult {
+    EXACT,
+    PREFIX,
+    WRONG_DIRECTION,
+    WILDCARD,
+
+    NONE;
+
+    public MatchResult ifNone(MatchResult ifNone) {
+      if (this.ordinal() == NONE.ordinal()) {
+        return ifNone;
+      } else {
+        return this;
+      }
     }
   }
 
   record LeftRightEquals(String key, String value) implements Operation {
     @Override
-    public boolean matches(OSMWithTags way) {
-      return way.hasTag(key) && way.getTag(key).equals(value);
-    }
-
-    @Override
     public boolean isWildcard() {
       return value.equals("*");
     }
 
     @Override
-    public boolean matchesLeft(OSMWithTags way) {
-      var leftKey = key + ":left";
-      return way.hasTag(leftKey) && way.getTag(leftKey).equals(value);
+    public MatchResult match(OSMWithTags way) {
+      return getMatchResult(way, key, value);
     }
 
     @Override
-    public boolean matchesRight(OSMWithTags way) {
+    public MatchResult matchLeft(OSMWithTags way) {
+      var leftKey = key + ":left";
+      return getMatchResult(way, leftKey, value);
+    }
+
+    @Override
+    public MatchResult matchRight(OSMWithTags way) {
       var rightKey = key + ":right";
-      return way.hasTag(rightKey) && way.getTag(rightKey).equals(value);
+      return getMatchResult(way, rightKey, value);
     }
   }
 }

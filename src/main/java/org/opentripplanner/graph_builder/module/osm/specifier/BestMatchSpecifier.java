@@ -32,25 +32,17 @@ public class BestMatchSpecifier implements OsmSpecifier {
     int leftScore = 0, rightScore = 0;
     int leftMatches = 0, rightMatches = 0;
 
-    for (var pair : operations) {
-      String tag = pair.key();
-      String value = pair.value();
-      var leftMatchValue = way.getTag(tag + ":left");
-      String rightMatchValue = way.getTag(tag + ":right");
-      String matchValue = way.getTag(tag);
-      if (leftMatchValue == null) {
-        leftMatchValue = matchValue;
-      }
-      if (rightMatchValue == null) {
-        rightMatchValue = matchValue;
-      }
+    for (var op : operations) {
+      var mainMatch = op.match(way);
+      var leftMatch = op.matchLeft(way).ifNone(mainMatch);
+      var rightMatch = op.matchRight(way).ifNone(mainMatch);
 
-      int leftTagScore = getTagScore(value, leftMatchValue);
+      int leftTagScore = toTagScore(leftMatch);
       leftScore += leftTagScore;
       if (leftTagScore > 0) {
         leftMatches++;
       }
-      int rightTagScore = getTagScore(value, rightMatchValue);
+      int rightTagScore = toTagScore(rightMatch);
       rightScore += rightTagScore;
       if (rightTagScore > 0) {
         rightMatches++;
@@ -69,10 +61,8 @@ public class BestMatchSpecifier implements OsmSpecifier {
     int score = 0;
     int matches = 0;
     for (var op : operations) {
-      String tag = op.key();
-      String value = op.value();
-      String matchValue = way.getTag(tag);
-      int tagScore = getTagScore(value, matchValue);
+      var matchValue = op.match(way);
+      int tagScore = toTagScore(matchValue);
       score += tagScore;
       if (tagScore > 0) {
         matches += 1;
@@ -93,25 +83,15 @@ public class BestMatchSpecifier implements OsmSpecifier {
    * points, and a wildcard match is worth only one point, to serve as a tiebreaker. A score of 0
    * means they do not match.
    */
-  private static int getTagScore(String value, String matchValue) {
-    // either this matches on a wildcard, or it matches exactly
-    if (OsmSpecifier.matchesWildcard(value, matchValue)) {
-      return 1; // wildcard matches are basically tiebreakers
-    } else if (value.equals(matchValue)) {
-      return EXACT_MATCH_SCORE;
-    } else {
-      if (value.contains(":")) {
-        // treat cases like cobblestone:flattened as cobblestone if a more-specific match
-        // does not apply
-        value = value.split(":", 2)[0];
-        if (value.equals(matchValue)) {
-          return 75;
-        } else {
-          return 0;
-        }
-      } else {
-        return 0;
-      }
-    }
+  private static int toTagScore(Operation.MatchResult res) {
+    return switch (res) {
+      case EXACT -> EXACT_MATCH_SCORE;
+      // wildcard matches are basically tiebreakers
+      case WILDCARD -> 1;
+      // if the op says surface=cobblestone:flattened but the way has surface=cobblestone
+      case PREFIX -> 75;
+      // no match means no score
+      case WRONG_DIRECTION, NONE -> 0;
+    };
   }
 }
