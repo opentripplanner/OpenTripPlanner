@@ -13,7 +13,6 @@ public class PortlandMapper implements OsmTagMapper {
   @Override
   public void populateProperties(WayPropertySet props) {
     props.setMixinProperties("footway=sidewalk", withModes(ALL).walkSafety(1.1));
-    props.setMixinProperties("footway=sidewalk", withModes(ALL).walkSafety(1.1));
     props.setMixinProperties(
       new ExactMatchSpecifier(new Absent("absent")),
       withModes(ALL).walkSafety(1.2)

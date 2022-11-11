@@ -49,6 +49,27 @@ public class WayTestData {
     return way;
   }
 
+  public static OSMWithTags southeastLaBonitaWay() {
+    // https://www.openstreetmap.org/way/5302874
+    var way = new OSMWithTags();
+    way.addTag("highway", "residential");
+    way.addTag("name", "Southeast la Bonita Way");
+    way.addTag("sidewalk", "both");
+
+    return way;
+  }
+
+  public static OSMWithTags southwestMayoStreet() {
+    //https://www.openstreetmap.org/way/425004690
+    var way = new OSMWithTags();
+    way.addTag("highway", "residential");
+    way.addTag("name", "Southwest Mayo Street");
+    way.addTag("maxspeed", "25 mph");
+    way.addTag("sidewalk", "left");
+
+    return way;
+  }
+
   public static OSMWithTags fiveLanes() {
     OSMWithTags way = new OSMWithTags();
     way.addTag("highway", "primary");
@@ -67,6 +88,38 @@ public class WayTestData {
     var way = new OSMWithTags();
     way.addTag("highway", "residential");
     way.addTag("cycleway:left", "lane");
+    return way;
+  }
+
+  public static OSMWithTags footwaySidewalk() {
+    var way = new OSMWithTags();
+    way.addTag("footway", "sidewalk");
+    return way;
+  }
+
+  public static OSMWithTags sidewalkBoth() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "both");
+    way.addTag("sidewalk", "both");
+    return way;
+  }
+
+  public static OSMWithTags highwayTrunk() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "trunk");
+    return way;
+  }
+
+  public static OSMWithTags highwayTertiary() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "tertiary");
+    return way;
+  }
+
+  public static OSMWithTags highwayTertiaryWithSidewalk() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "tertiary");
+    way.addTag("sidewalk", "both");
     return way;
   }
 
