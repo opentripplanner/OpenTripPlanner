@@ -91,7 +91,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
       // if the op says surface=cobblestone:flattened but the way has surface=cobblestone
       case PREFIX -> 75;
       // no match means no score
-      case WRONG_DIRECTION, NONE -> 0;
+      case PARTIAL, NONE -> 0;
     };
   }
 }

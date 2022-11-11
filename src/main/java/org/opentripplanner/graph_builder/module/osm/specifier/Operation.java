@@ -1,15 +1,19 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
+import static org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult.EXACT;
+import static org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult.NONE;
+import static org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult.PARTIAL;
+
 import javax.annotation.Nonnull;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public interface Operation {
+public sealed interface Operation {
   @Nonnull
   static MatchResult getMatchResult(OSMWithTags way, String opKey, String opValue) {
     if (opValue.equals("*") && way.hasTag(opKey)) {
       return MatchResult.WILDCARD;
     } else if (way.matchesKeyValue(opKey, opValue)) {
-      return MatchResult.EXACT;
+      return EXACT;
     } else if (opValue.contains(":")) {
       // treat cases like cobblestone:flattened as cobblestone if a more-specific match
       // does not apply
@@ -17,15 +21,15 @@ public interface Operation {
       if (way.matchesKeyValue(opKey, splitValue)) {
         return MatchResult.PREFIX;
       } else {
-        return MatchResult.NONE;
+        return NONE;
       }
     } else {
-      return MatchResult.NONE;
+      return NONE;
     }
   }
 
   default boolean matches(OSMWithTags way) {
-    return match(way) == MatchResult.EXACT;
+    return match(way) == EXACT;
   }
 
   boolean isWildcard();
@@ -39,21 +43,28 @@ public interface Operation {
   enum MatchResult {
     EXACT,
     PREFIX,
-    WRONG_DIRECTION,
+    PARTIAL,
     WILDCARD,
-
     NONE;
 
     public MatchResult ifNone(MatchResult ifNone) {
-      if (this.ordinal() == NONE.ordinal()) {
+      if (this == NONE) {
         return ifNone;
+      } else {
+        return this;
+      }
+    }
+
+    public MatchResult ifExact(MatchResult ifExact) {
+      if (this == EXACT) {
+        return ifExact;
       } else {
         return this;
       }
     }
   }
 
-  record LeftRightEquals(String key, String value) implements Operation {
+  record Equals(String key, String value) implements Operation {
     @Override
     public boolean isWildcard() {
       return value.equals("*");
@@ -67,13 +78,19 @@ public interface Operation {
     @Override
     public MatchResult matchLeft(OSMWithTags way) {
       var leftKey = key + ":left";
-      return getMatchResult(way, leftKey, value);
+      return foo(way, leftKey);
     }
 
     @Override
     public MatchResult matchRight(OSMWithTags way) {
       var rightKey = key + ":right";
-      return getMatchResult(way, rightKey, value);
+      return foo(way, rightKey);
+    }
+
+    private MatchResult foo(OSMWithTags way, String oneSideKey) {
+      var oneSideResult = getMatchResult(way, oneSideKey, value);
+      var mainRes = match(way).ifExact(PARTIAL);
+      return oneSideResult.ifNone(mainRes);
     }
   }
 }

@@ -17,7 +17,7 @@ public interface OsmSpecifier {
       .filter(p -> !p.isEmpty())
       .map(pair -> {
         var kv = pair.split("=");
-        return (Operation) new Operation.LeftRightEquals(kv[0].toLowerCase(), kv[1].toLowerCase());
+        return (Operation) new Operation.Equals(kv[0].toLowerCase(), kv[1].toLowerCase());
       })
       .toList();
   }
