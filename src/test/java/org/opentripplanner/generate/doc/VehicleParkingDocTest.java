@@ -10,7 +10,6 @@ import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSec
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.DocBuilder;
 import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;

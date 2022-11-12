@@ -37,11 +37,11 @@ public class BikelyUpdaterTest {
       first.getNote().toString(Locale.ENGLISH)
     );
     assertEquals(
-      "Første 4 time(r) er kr 0,00. Etter kr 10,00 per 1 time(r)",
+      "Første 4 time(r) er kr 0,00. Deretter kr 10,00 per 1 time(r)",
       first.getNote().toString(Locales.NORWEGIAN_BOKMAL)
     );
     assertEquals(
-      "Første 4 time(r) er kr 0,00. Etter kr 10,00 per 1 time(r)",
+      "Første 4 time(r) er kr 0,00. Deretter kr 10,00 per 1 time(r)",
       first.getNote().toString(Locales.NORWAY)
     );
     var availibility = first.getAvailability();
