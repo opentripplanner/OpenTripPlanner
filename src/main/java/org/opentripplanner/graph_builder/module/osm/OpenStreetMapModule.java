@@ -1,14 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import ch.poole.openinghoursparser.OpeningHoursParseException;
 import com.google.common.collect.Iterables;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.TLongList;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,9 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -28,22 +23,17 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.Issue;
 import org.opentripplanner.graph_builder.issues.Graphwide;
-import org.opentripplanner.graph_builder.issues.InvalidVehicleParkingCapacity;
-import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.model.calendar.openinghours.OHCalendar;
-import org.opentripplanner.openstreetmap.OSMOpeningHoursParser;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
@@ -53,17 +43,12 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.NamedArea;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
@@ -71,14 +56,10 @@ import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.LocalizedStringFormat;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -91,7 +72,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(OpenStreetMapModule.class);
 
-  private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
   private final Map<Vertex, Double> elevationData = new HashMap<>();
 
   // Private members that are only read or written internally.
@@ -99,15 +79,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    * Providers of OSM data.
    */
   private final List<OpenStreetMapProvider> providers;
-
-  private OSMOpeningHoursParser osmOpeningHoursParser;
-
   private final Set<String> boardingAreaRefTags;
+  private final DataImportIssueStore issueStore;
+  private final OsmTagMapper osmTagMapper;
+  private final Graph graph;
 
-  public boolean skipVisibility = false;
+  private final boolean areaVisibility;
   // Members that can be set by clients.
   public boolean platformEntriesLinking = false;
-
   /**
    * Allows for arbitrary custom naming of edges.
    */
@@ -127,29 +106,26 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    */
   public boolean staticBikeParkAndRide;
   public int maxAreaNodes = 500;
-
   /**
    * Whether ways tagged foot/bicycle=discouraged should be marked as inaccessible
    */
   public boolean banDiscouragedWalking = false;
   public boolean banDiscouragedBiking = false;
-  private final DataImportIssueStore issueStore;
-  private final OsmTagMapper osmTagMapper;
-
-  private final Graph graph;
 
   public OpenStreetMapModule(
     Collection<OpenStreetMapProvider> providers,
     Set<String> boardingAreaRefTags,
     Graph graph,
     DataImportIssueStore issueStore,
-    OsmTagMapper osmTagMapper
+    OsmTagMapper osmTagMapper,
+    boolean areaVisibility
   ) {
     this.providers = List.copyOf(providers);
     this.boardingAreaRefTags = boardingAreaRefTags;
     this.graph = graph;
     this.issueStore = issueStore;
     this.osmTagMapper = osmTagMapper;
+    this.areaVisibility = areaVisibility;
   }
 
   public OpenStreetMapModule(
@@ -164,10 +140,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       boardingAreaRefTags,
       graph,
       issueStore,
-      config.osmDefaults.osmOsmTagMapper
+      config.osmDefaults.osmOsmTagMapper,
+      config.areaVisibility
     );
     this.customNamer = config.customNamer;
-    this.skipVisibility = !config.areaVisibility;
     this.platformEntriesLinking = config.platformEntriesLinking;
     this.staticBikeParkAndRide = config.staticBikeParkAndRide;
     this.staticParkAndRide = config.staticParkAndRide;
@@ -178,9 +154,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    this.osmOpeningHoursParser =
-      new OSMOpeningHoursParser(graph.getOpeningHoursCalendarService(), issueStore);
-
     OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
     Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
@@ -198,15 +171,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     graph.calculateEnvelope();
   }
 
-  public Map<Vertex, Double> elevationDataOutput() {
-    return elevationData;
-  }
-
   @Override
   public void checkInputs() {
     for (OpenStreetMapProvider provider : providers) {
       provider.checkInputs();
     }
+  }
+
+  public Map<Vertex, Double> elevationDataOutput() {
+    return elevationData;
   }
 
   private Issue invalidDuration(OSMWithTags element, String v) {
@@ -247,11 +220,23 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     }
 
     public void buildGraph() {
+      var parkingProcessor = new ParkingProcessor(graph, issueStore, this::getVertexForOsmNode);
+
+      var parkingLots = new ArrayList<VehicleParking>();
+
       if (staticParkAndRide) {
-        processParkAndRideNodes(osmdb.getCarParkingNodes(), true);
+        var carParkingNodes = parkingProcessor.buildParkAndRideNodes(
+          osmdb.getCarParkingNodes(),
+          true
+        );
+        parkingLots.addAll(carParkingNodes);
       }
       if (staticBikeParkAndRide) {
-        processParkAndRideNodes(osmdb.getBikeParkingNodes(), false);
+        var bikeParkingNodes = parkingProcessor.buildParkAndRideNodes(
+          osmdb.getBikeParkingNodes(),
+          false
+        );
+        parkingLots.addAll(bikeParkingNodes);
       }
 
       for (Area area : Iterables.concat(
@@ -264,13 +249,23 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       initIntersectionNodes();
 
       buildBasicGraph();
-      buildWalkableAreas(skipVisibility, platformEntriesLinking);
+      buildWalkableAreas(!areaVisibility, platformEntriesLinking);
 
       if (staticParkAndRide) {
-        buildParkAndRideAreas();
+        List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
+        var carParkingAreas = parkingProcessor.buildParkAndRideAreas(areaGroups);
+        parkingLots.addAll(carParkingAreas);
+        LOG.info("Created {} car P+R areas.", carParkingAreas.size());
       }
       if (staticBikeParkAndRide) {
-        buildBikeParkAndRideAreas();
+        List<AreaGroup> areaGroups = groupAreas(osmdb.getBikeParkingAreas());
+        var bikeParkingAreas = parkingProcessor.buildBikeParkAndRideAreas(areaGroups);
+        parkingLots.addAll(bikeParkingAreas);
+        LOG.info("Created {} bike P+R areas", bikeParkingAreas.size());
+      }
+
+      if (!parkingLots.isEmpty()) {
+        graph.getVehicleParkingService().updateVehicleParking(parkingLots, List.of());
       }
 
       buildElevatorEdges(graph);
@@ -445,405 +440,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       return iv;
     }
 
-    private OptionalInt parseCapacity(OSMWithTags element) {
-      return parseCapacity(element, "capacity");
-    }
-
-    private OptionalInt parseCapacity(OSMWithTags element, String capacityTag) {
-      return element.getTagAsInt(
-        capacityTag,
-        v -> issueStore.add(new InvalidVehicleParkingCapacity(element.getId(), v))
-      );
-    }
-
     private OptionalInt parseDuration(OSMWithTags element) {
       return element.getTagAsInt("duration", v -> issueStore.add(invalidDuration(element, v)));
-    }
-
-    private void processParkAndRideNodes(Collection<OSMNode> nodes, boolean isCarParkAndRide) {
-      LOG.info("Processing {} P+R nodes.", isCarParkAndRide ? "car" : "bike");
-      int n = 0;
-      VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
-
-      List<VehicleParking> vehicleParkingToAdd = new ArrayList<>();
-
-      for (OSMNode node : nodes) {
-        n++;
-
-        I18NString creativeName = nameParkAndRideEntity(node);
-
-        VehicleParkingEntranceCreator entrance = builder ->
-          builder
-            .entranceId(
-              new FeedScopedId(
-                VEHICLE_PARKING_OSM_FEED_ID,
-                String.format("%s/%s/entrance", node.getClass().getSimpleName(), node.getId())
-              )
-            )
-            .name(creativeName)
-            .coordinate(new WgsCoordinate(node.getCoordinate()))
-            .walkAccessible(true)
-            .carAccessible(isCarParkAndRide);
-
-        var vehicleParking = createVehicleParkingObjectFromOsmEntity(
-          isCarParkAndRide,
-          node.getCoordinate(),
-          node,
-          creativeName,
-          List.of(entrance)
-        );
-
-        vehicleParkingToAdd.add(vehicleParking);
-
-        VehicleParkingEntranceVertex parkVertex = new VehicleParkingEntranceVertex(
-          graph,
-          vehicleParking.getEntrances().get(0)
-        );
-        new VehicleParkingEdge(parkVertex);
-      }
-
-      if (!vehicleParkingToAdd.isEmpty()) {
-        vehicleParkingService.updateVehicleParking(vehicleParkingToAdd, List.of());
-      }
-
-      LOG.info("Created {} {} P+R nodes.", n, isCarParkAndRide ? "car" : "bike");
-    }
-
-    private void buildBikeParkAndRideAreas() {
-      LOG.info("Building bike P+R areas");
-      List<AreaGroup> areaGroups = groupAreas(osmdb.getBikeParkingAreas());
-      List<VehicleParking> vehicleParkingToAdd = buildParkAndRideAreasForGroups(areaGroups, false);
-      if (!vehicleParkingToAdd.isEmpty()) {
-        graph.hasBikeRide = true;
-        VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
-        vehicleParkingService.updateVehicleParking(vehicleParkingToAdd, List.of());
-      }
-      LOG.info("Created {} bike P+R areas.", vehicleParkingToAdd.size());
-    }
-
-    private void buildParkAndRideAreas() {
-      LOG.info("Building car P+R areas");
-      List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
-      List<VehicleParking> vehicleParkingToAdd = buildParkAndRideAreasForGroups(areaGroups, true);
-      if (!vehicleParkingToAdd.isEmpty()) {
-        graph.hasParkRide = true;
-        VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
-        vehicleParkingService.updateVehicleParking(vehicleParkingToAdd, List.of());
-      }
-      LOG.info("Created {} car P+R areas.", vehicleParkingToAdd.size());
-    }
-
-    private List<VehicleParking> buildParkAndRideAreasForGroups(
-      List<AreaGroup> areaGroups,
-      boolean isCarParkAndRide
-    ) {
-      List<VehicleParking> vehicleParkingToAdd = new ArrayList<>();
-      for (AreaGroup group : areaGroups) {
-        var vehicleParking = buildParkAndRideAreasForGroup(group, isCarParkAndRide);
-        if (vehicleParking != null) {
-          vehicleParkingToAdd.add(vehicleParking);
-        }
-      }
-      return vehicleParkingToAdd;
-    }
-
-    private VehicleParking buildParkAndRideAreasForGroup(
-      AreaGroup group,
-      boolean isCarParkAndRide
-    ) {
-      Envelope envelope = new Envelope();
-      Set<VertexAndName> accessVertices = new HashSet<>();
-
-      OSMWithTags entity = null;
-
-      // Process all nodes from outer rings
-      // These are IntersectionVertices not OsmVertices because there can be both OsmVertices and TransitStopStreetVertices.
-      for (Area area : group.areas) {
-        entity = area.parent;
-
-        var areaAccessVertices = processVehicleParkingArea(area, envelope);
-        accessVertices.addAll(areaAccessVertices);
-      }
-
-      if (entity == null) {
-        return null;
-      }
-
-      var creativeName = nameParkAndRideEntity(entity);
-
-      // Check P+R accessibility by walking and driving.
-      boolean walkAccessibleIn = false;
-      boolean carAccessibleIn = false;
-      boolean walkAccessibleOut = false;
-      boolean carAccessibleOut = false;
-      for (VertexAndName access : accessVertices) {
-        var accessVertex = access.getVertex();
-        for (Edge incoming : accessVertex.getIncoming()) {
-          if (incoming instanceof StreetEdge streetEdge) {
-            if (streetEdge.canTraverse(TraverseMode.WALK)) {
-              walkAccessibleIn = true;
-            }
-            if (streetEdge.canTraverse(TraverseMode.CAR)) {
-              carAccessibleIn = true;
-            }
-          }
-        }
-        for (Edge outgoing : accessVertex.getOutgoing()) {
-          if (outgoing instanceof StreetEdge streetEdge) {
-            if (streetEdge.canTraverse(TraverseMode.WALK)) {
-              walkAccessibleOut = true;
-            }
-            if (streetEdge.canTraverse(TraverseMode.CAR)) {
-              carAccessibleOut = true;
-            }
-          }
-        }
-      }
-
-      if (walkAccessibleIn != walkAccessibleOut) {
-        LOG.error(
-          "P+R walk IN/OUT accessibility mismatch! Please have a look as this should not happen."
-        );
-      }
-
-      if (isCarParkAndRide) {
-        if (!walkAccessibleOut || !carAccessibleIn || !walkAccessibleIn || !carAccessibleOut) {
-          // This will prevent the P+R to be useful.
-          issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-          return null;
-        }
-      } else {
-        if (!walkAccessibleOut || !walkAccessibleIn) {
-          // This will prevent the P+R to be useful.
-          issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-          return null;
-        }
-      }
-
-      List<VehicleParking.VehicleParkingEntranceCreator> entrances = createParkingEntrancesFromAccessVertices(
-        accessVertices,
-        creativeName,
-        entity
-      );
-
-      var vehicleParking = createVehicleParkingObjectFromOsmEntity(
-        isCarParkAndRide,
-        envelope.centre(),
-        entity,
-        creativeName,
-        entrances
-      );
-
-      VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
-
-      return vehicleParking;
-    }
-
-    private VehicleParking createVehicleParkingObjectFromOsmEntity(
-      boolean isCarParkAndRide,
-      Coordinate coordinate,
-      OSMWithTags entity,
-      I18NString creativeName,
-      List<VehicleParking.VehicleParkingEntranceCreator> entrances
-    ) {
-      OptionalInt bicycleCapacity, carCapacity, wheelchairAccessibleCarCapacity;
-      if (isCarParkAndRide) {
-        carCapacity = parseCapacity(entity);
-        bicycleCapacity = parseCapacity(entity, "capacity:bike");
-        wheelchairAccessibleCarCapacity = parseCapacity(entity, "capacity:disabled");
-      } else {
-        bicycleCapacity = parseCapacity(entity);
-        carCapacity = OptionalInt.empty();
-        wheelchairAccessibleCarCapacity = OptionalInt.empty();
-      }
-
-      VehicleParkingSpaces vehicleParkingSpaces = null;
-      if (
-        bicycleCapacity.isPresent() ||
-        carCapacity.isPresent() ||
-        wheelchairAccessibleCarCapacity.isPresent()
-      ) {
-        vehicleParkingSpaces =
-          VehicleParkingSpaces
-            .builder()
-            .bicycleSpaces(bicycleCapacity.isPresent() ? bicycleCapacity.getAsInt() : null)
-            .carSpaces(carCapacity.isPresent() ? carCapacity.getAsInt() : null)
-            .wheelchairAccessibleCarSpaces(
-              wheelchairAccessibleCarCapacity.isPresent()
-                ? wheelchairAccessibleCarCapacity.getAsInt()
-                : null
-            )
-            .build();
-      }
-
-      var bicyclePlaces = !isCarParkAndRide || bicycleCapacity.orElse(0) > 0;
-      var carPlaces =
-        (isCarParkAndRide && wheelchairAccessibleCarCapacity.isEmpty() && carCapacity.isEmpty()) ||
-        carCapacity.orElse(0) > 0;
-      var wheelchairAccessibleCarPlaces = wheelchairAccessibleCarCapacity.orElse(0) > 0;
-
-      var openingHours = parseOpeningHours(entity);
-
-      var id = new FeedScopedId(
-        VEHICLE_PARKING_OSM_FEED_ID,
-        String.format("%s/%d", entity.getClass().getSimpleName(), entity.getId())
-      );
-
-      var tags = new ArrayList<String>();
-
-      tags.add(isCarParkAndRide ? "osm:amenity=parking" : "osm:amenity=bicycle_parking");
-
-      if (entity.isTagTrue("fee")) {
-        tags.add("osm:fee");
-      }
-      if (entity.hasTag("supervised") && !entity.isTagTrue("supervised")) {
-        tags.add("osm:supervised");
-      }
-      if (entity.hasTag("covered") && !entity.isTagFalse("covered")) {
-        tags.add("osm:covered");
-      }
-      if (entity.hasTag("surveillance") && !entity.isTagFalse("surveillance")) {
-        tags.add("osm:surveillance");
-      }
-
-      return VehicleParking
-        .builder()
-        .id(id)
-        .name(creativeName)
-        .coordinate(new WgsCoordinate(coordinate))
-        .tags(tags)
-        .detailsUrl(entity.getTag("website"))
-        .openingHoursCalendar(openingHours)
-        .bicyclePlaces(bicyclePlaces)
-        .carPlaces(carPlaces)
-        .wheelchairAccessibleCarPlaces(wheelchairAccessibleCarPlaces)
-        .capacity(vehicleParkingSpaces)
-        .entrances(entrances)
-        .build();
-    }
-
-    private OHCalendar parseOpeningHours(OSMWithTags entity) {
-      final var openingHoursTag = entity.getTag("opening_hours");
-      if (openingHoursTag != null) {
-        final ZoneId zoneId = entity.getOsmProvider().getZoneId();
-        final var id = entity.getId();
-        final var link = entity.getOpenStreetMapLink();
-        try {
-          return osmOpeningHoursParser.parseOpeningHours(
-            openingHoursTag,
-            String.valueOf(id),
-            link,
-            zoneId
-          );
-        } catch (OpeningHoursParseException e) {
-          issueStore.add(
-            "OSMOpeningHoursUnparsed",
-            "OSM object with id '%s' (%s) has an invalid opening_hours value, it will always be open",
-            id,
-            link
-          );
-        }
-      }
-      return null;
-    }
-
-    private I18NString nameParkAndRideEntity(OSMWithTags osmWithTags) {
-      // If there is an explicit name user that. The explicit name is used so that tag-based
-      // translations are used, which are not handled by "CreativeNamer"s.
-      I18NString creativeName = osmWithTags.getAssumedName();
-      if (creativeName == null) {
-        // ... otherwise resort to "CreativeNamer"s
-        creativeName =
-          osmWithTags.getOsmProvider().getWayPropertySet().getCreativeNameForWay(osmWithTags);
-      }
-      if (creativeName == null) {
-        creativeName =
-          new NonLocalizedString(
-            "Park & Ride (%s/%d)".formatted(
-                osmWithTags.getClass().getSimpleName(),
-                osmWithTags.getId()
-              )
-          );
-      }
-      return creativeName;
-    }
-
-    private List<VertexAndName> processVehicleParkingArea(Area area, Envelope envelope) {
-      return area.outermostRings
-        .stream()
-        .flatMap(ring -> processVehicleParkingArea(ring, area.parent, envelope).stream())
-        .collect(Collectors.toList());
-    }
-
-    private List<VertexAndName> processVehicleParkingArea(
-      Ring ring,
-      OSMWithTags entity,
-      Envelope envelope
-    ) {
-      List<VertexAndName> accessVertices = new ArrayList<>();
-      for (OSMNode node : ring.nodes) {
-        envelope.expandToInclude(new Coordinate(node.lon, node.lat));
-        var accessVertex = getVertexForOsmNode(node, entity);
-        if (accessVertex.getIncoming().isEmpty() || accessVertex.getOutgoing().isEmpty()) continue;
-        accessVertices.add(new VertexAndName(node.getAssumedName(), accessVertex));
-      }
-
-      accessVertices.addAll(
-        ring
-          .getHoles()
-          .stream()
-          .flatMap(innerRing -> processVehicleParkingArea(innerRing, entity, envelope).stream())
-          .collect(Collectors.toList())
-      );
-
-      return accessVertices;
-    }
-
-    private List<VehicleParking.VehicleParkingEntranceCreator> createParkingEntrancesFromAccessVertices(
-      Set<VertexAndName> accessVertices,
-      I18NString vehicleParkingName,
-      OSMWithTags entity
-    ) {
-      List<VehicleParking.VehicleParkingEntranceCreator> entrances = new ArrayList<>();
-      var sortedAccessVertices = accessVertices
-        .stream()
-        .sorted(Comparator.comparing(vn -> vn.getVertex().getLabel()))
-        .toList();
-
-      for (var access : sortedAccessVertices) {
-        I18NString suffix = null;
-        if (access.getName() != null) {
-          suffix = access.getName();
-        }
-
-        if (suffix == null) {
-          suffix = new NonLocalizedString(String.format("#%d", entrances.size() + 1));
-        }
-
-        var entranceName = new LocalizedStringFormat("%s (%s)", vehicleParkingName, suffix);
-
-        entrances.add(builder ->
-          builder
-            .entranceId(
-              new FeedScopedId(
-                VEHICLE_PARKING_OSM_FEED_ID,
-                String.format(
-                  "%s/%d/%s",
-                  entity.getClass().getSimpleName(),
-                  entity.getId(),
-                  access.getVertex().getLabel()
-                )
-              )
-            )
-            .name(entranceName)
-            .coordinate(new WgsCoordinate(access.getVertex().getCoordinate()))
-            .vertex(access.getVertex())
-            .walkAccessible(access.getVertex().isConnectedToWalkingEdge())
-            .carAccessible(access.getVertex().isConnectedToDriveableEdge())
-        );
-      }
-
-      return entrances;
     }
 
     private List<AreaGroup> groupAreas(Collection<Area> areas) {
