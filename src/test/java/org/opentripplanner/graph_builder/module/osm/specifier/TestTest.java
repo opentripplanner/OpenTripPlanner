@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult.EXACT;
-import static org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult.NONE;
+import static org.opentripplanner.graph_builder.module.osm.specifier.Test.MatchResult.EXACT;
+import static org.opentripplanner.graph_builder.module.osm.specifier.Test.MatchResult.NONE;
 import static org.opentripplanner.graph_builder.module.osm.specifier.WayTestData.carTunnel;
 import static org.opentripplanner.graph_builder.module.osm.specifier.WayTestData.cobblestones;
 import static org.opentripplanner.graph_builder.module.osm.specifier.WayTestData.cycleway;
@@ -14,20 +14,20 @@ import static org.opentripplanner.graph_builder.module.osm.specifier.WayTestData
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.graph_builder.module.osm.specifier.Operation.Absent;
-import org.opentripplanner.graph_builder.module.osm.specifier.Operation.Equals;
-import org.opentripplanner.graph_builder.module.osm.specifier.Operation.GreaterThan;
-import org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult;
+import org.opentripplanner.graph_builder.module.osm.specifier.Test.Absent;
+import org.opentripplanner.graph_builder.module.osm.specifier.Test.Equals;
+import org.opentripplanner.graph_builder.module.osm.specifier.Test.GreaterThan;
+import org.opentripplanner.graph_builder.module.osm.specifier.Test.MatchResult;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.test.support.VariableSource;
 
-class OperationTest {
+class TestTest {
 
-  static Operation cyclewayLane = new Equals("cycleway", "lane");
-  static Operation cyclewayTrack = new Equals("cycleway", "track");
+  static Test cyclewayLane = new Equals("cycleway", "lane");
+  static Test cyclewayTrack = new Equals("cycleway", "track");
 
-  static Operation cyclewayAbsent = new Absent("cycleway");
-  static Operation moreThanFourLanes = new GreaterThan("lanes", 4);
+  static Test cyclewayAbsent = new Absent("cycleway");
+  static Test moreThanFourLanes = new GreaterThan("lanes", 4);
 
   static Stream<Arguments> equalsCases = Stream.of(
     Arguments.of(cyclewayLeft(), cyclewayLane, EXACT, NONE),
@@ -39,7 +39,7 @@ class OperationTest {
   @VariableSource("equalsCases")
   void leftRight(
     OSMWithTags way,
-    Operation op,
+    Test op,
     MatchResult leftExpectation,
     MatchResult rightExpectation
   ) {
@@ -59,7 +59,7 @@ class OperationTest {
 
   @ParameterizedTest(name = "way {0} with op {1} should have a result {2}")
   @VariableSource("otherCases")
-  void otherOperations(OSMWithTags way, Operation op, MatchResult expectation) {
+  void otherTests(OSMWithTags way, Test op, MatchResult expectation) {
     assertEquals(expectation, op.match(way));
   }
 }

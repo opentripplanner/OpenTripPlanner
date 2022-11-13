@@ -20,10 +20,10 @@ public class BestMatchSpecifier implements OsmSpecifier {
    * @see ExactMatchSpecifier#MATCH_MULTIPLIER
    */
   public static final int EXACT_MATCH_SCORE = 100;
-  private final Operation[] operations;
+  private final Test[] tests;
 
   public BestMatchSpecifier(String spec) {
-    operations = OsmSpecifier.parseOperations(spec, ";");
+    tests = OsmSpecifier.parseEqualsTests(spec, ";");
   }
 
   @Override
@@ -31,7 +31,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
     int leftScore = 0, rightScore = 0;
     int leftMatches = 0, rightMatches = 0;
 
-    for (var op : operations) {
+    for (var op : tests) {
       var leftMatch = op.matchLeft(way);
       var rightMatch = op.matchRight(way);
 
@@ -47,9 +47,9 @@ public class BestMatchSpecifier implements OsmSpecifier {
       }
     }
 
-    int allMatchLeftBonus = (leftMatches == operations.length) ? 10 : 0;
+    int allMatchLeftBonus = (leftMatches == tests.length) ? 10 : 0;
     leftScore += allMatchLeftBonus;
-    int allMatchRightBonus = (rightMatches == operations.length) ? 10 : 0;
+    int allMatchRightBonus = (rightMatches == tests.length) ? 10 : 0;
     rightScore += allMatchRightBonus;
     return new Scores(leftScore, rightScore);
   }
@@ -58,21 +58,21 @@ public class BestMatchSpecifier implements OsmSpecifier {
   public int matchScore(OSMWithTags way) {
     int score = 0;
     int matches = 0;
-    for (var op : operations) {
-      var matchValue = op.match(way);
+    for (var test : tests) {
+      var matchValue = test.match(way);
       int tagScore = toTagScore(matchValue);
       score += tagScore;
       if (tagScore > 0) {
         matches += 1;
       }
     }
-    score += matches == operations.length ? 10 : 0;
+    score += matches == tests.length ? 10 : 0;
     return score;
   }
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(this.getClass()).addObj("ops", operations).toString();
+    return ToStringBuilder.of(this.getClass()).addObj("tests", tests).toString();
   }
 
   /**
@@ -81,7 +81,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
    * points, and a wildcard match is worth only one point, to serve as a tiebreaker. A score of 0
    * means they do not match.
    */
-  private static int toTagScore(Operation.MatchResult res) {
+  private static int toTagScore(Test.MatchResult res) {
     return switch (res) {
       case EXACT -> EXACT_MATCH_SCORE;
       // wildcard matches are basically tiebreakers

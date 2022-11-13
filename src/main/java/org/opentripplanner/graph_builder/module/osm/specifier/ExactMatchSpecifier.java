@@ -26,21 +26,21 @@ public class ExactMatchSpecifier implements OsmSpecifier {
    */
   public static final int MATCH_MULTIPLIER = 200;
   public static final int NO_MATCH_SCORE = 0;
-  private final List<Operation> operations;
+  private final List<Test> tests;
   private final int bestMatchScore;
 
   public ExactMatchSpecifier(String spec) {
-    this(OsmSpecifier.parseOperations(spec, ";"));
+    this(OsmSpecifier.parseEqualsTests(spec, ";"));
   }
 
-  public ExactMatchSpecifier(Operation... ops) {
-    operations = Arrays.asList(ops);
-    if (operations.stream().anyMatch(Operation::isWildcard)) {
+  public ExactMatchSpecifier(Test... ops) {
+    tests = Arrays.asList(ops);
+    if (tests.stream().anyMatch(Test::isWildcard)) {
       throw new IllegalArgumentException(
         "Wildcards are not allowed in %s".formatted(this.getClass().getSimpleName())
       );
     }
-    bestMatchScore = operations.size() * MATCH_MULTIPLIER;
+    bestMatchScore = tests.size() * MATCH_MULTIPLIER;
   }
 
   @Override
@@ -58,7 +58,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   }
 
   public boolean allTagsMatch(OSMWithTags way) {
-    return operations.stream().allMatch(o -> o.matches(way));
+    return tests.stream().allMatch(o -> o.matches(way));
   }
 
   public static ExactMatchSpecifier exact(String spec) {

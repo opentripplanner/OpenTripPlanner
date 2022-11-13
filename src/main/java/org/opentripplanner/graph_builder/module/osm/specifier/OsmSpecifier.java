@@ -10,15 +10,15 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * How the scoring logic is implemented is the responsibility of the implementations.
  */
 public interface OsmSpecifier {
-  static Operation[] parseOperations(String spec, String separator) {
+  static Test.Equals[] parseEqualsTests(String spec, String separator) {
     return Arrays
       .stream(spec.split(separator))
       .filter(p -> !p.isEmpty())
       .map(pair -> {
         var kv = pair.split("=");
-        return new Operation.Equals(kv[0].toLowerCase(), kv[1].toLowerCase());
+        return new Test.Equals(kv[0].toLowerCase(), kv[1].toLowerCase());
       })
-      .toArray(Operation[]::new);
+      .toArray(Test.Equals[]::new);
   }
 
   /**
