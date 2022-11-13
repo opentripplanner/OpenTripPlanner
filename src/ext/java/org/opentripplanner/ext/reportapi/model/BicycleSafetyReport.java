@@ -28,7 +28,7 @@ public class BicycleSafetyReport {
       .getWayProperties()
       .forEach(p -> {
         buf.addText(p.specifier().toString());
-        buf.addBoolean(p.safetyMixin());
+        buf.addBoolean(false);
         buf.addText(p.properties().getPermission().toString());
 
         var safetyProps = p.properties().getBicycleSafetyFeatures();

@@ -1,0 +1,51 @@
+package org.opentripplanner.graph_builder.module.osm;
+
+import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
+
+/**
+ * Builder for {@link WayProperties}. Bicycle and walk safety features are nullable, but they should
+ * be set before building the final {@link WayProperties} for a way.
+ */
+public class MixinPropertiesBuilder {
+
+  private SafetyFeatures bicycleSafety = new SafetyFeatures(1d, 1d);
+  private SafetyFeatures walkSafety = new SafetyFeatures(1d, 1d);
+
+  public static MixinPropertiesBuilder ofWalkSafety(Number safety) {
+    return new MixinPropertiesBuilder().walkSafety(safety.doubleValue());
+  }
+
+  public static MixinPropertiesBuilder ofBicycleSafety(Number safety) {
+    return new MixinPropertiesBuilder().bicycleSafety(safety.doubleValue(), safety.doubleValue());
+  }
+
+  public static MixinPropertiesBuilder ofBicycleSafety(Number forward, Number back) {
+    return new MixinPropertiesBuilder().bicycleSafety(forward.doubleValue(), back.doubleValue());
+  }
+
+  /**
+   * Sets the same safety value for normal and back edge.
+   * <p>
+   * Note that the safeties here will be adjusted such that the safest street has a safety value of
+   * 1, with all others scaled proportionately.
+   */
+  public MixinPropertiesBuilder bicycleSafety(double forward, double back) {
+    this.bicycleSafety = new SafetyFeatures(forward, back);
+    return this;
+  }
+
+  /**
+   * Sets the same safety value for normal and back edge.
+   * <p>
+   * Note that the safeties here will be adjusted such that the safest street has a safety value of
+   * 1, with all others scaled proportionately.
+   */
+  public MixinPropertiesBuilder walkSafety(double walkSafety) {
+    this.walkSafety = new SafetyFeatures(walkSafety, walkSafety);
+    return this;
+  }
+
+  public MixinProperties build(OsmSpecifier spec) {
+    return new MixinProperties(spec, walkSafety, bicycleSafety);
+  }
+}

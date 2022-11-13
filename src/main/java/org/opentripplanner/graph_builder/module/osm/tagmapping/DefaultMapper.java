@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
+import static org.opentripplanner.graph_builder.module.osm.MixinPropertiesBuilder.ofBicycleSafety;
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE_AND_CAR;
@@ -503,7 +504,7 @@ public class DefaultMapper implements OsmTagMapper {
     // this uses a OR since you don't want to apply the safety multiplier more than once.
     props.setMixinProperties(
       new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
-      withModes(ALL).bicycleSafety(0.7)
+      ofBicycleSafety(0.7)
     );
 
     /*
@@ -563,27 +564,27 @@ public class DefaultMapper implements OsmTagMapper {
      * running tracks are usually made of)
      */
 
-    props.setMixinProperties("surface=unpaved", withModes(ALL).bicycleSafety(1.18));
-    props.setMixinProperties("surface=compacted", withModes(ALL).bicycleSafety(1.18));
-    props.setMixinProperties("surface=wood", withModes(ALL).bicycleSafety(1.18));
+    props.setMixinProperties("surface=unpaved", ofBicycleSafety(1.18));
+    props.setMixinProperties("surface=compacted", ofBicycleSafety(1.18));
+    props.setMixinProperties("surface=wood", ofBicycleSafety(1.18));
 
-    props.setMixinProperties("surface=cobblestone", withModes(ALL).bicycleSafety(1.3));
-    props.setMixinProperties("surface=cobblestone:flattened", withModes(ALL).bicycleSafety(1.3));
-    props.setMixinProperties("surface=grass_paver", withModes(ALL).bicycleSafety(1.3));
-    props.setMixinProperties("surface=pebblestone", withModes(ALL).bicycleSafety(1.3));
+    props.setMixinProperties("surface=cobblestone", ofBicycleSafety(1.3));
+    props.setMixinProperties("surface=cobblestone:flattened", ofBicycleSafety(1.3));
+    props.setMixinProperties("surface=grass_paver", ofBicycleSafety(1.3));
+    props.setMixinProperties("surface=pebblestone", ofBicycleSafety(1.3));
     // Can be slick if wet, but otherwise not unfavorable to bikes
-    props.setMixinProperties("surface=metal", withModes(ALL).bicycleSafety(1.3));
-    props.setMixinProperties("surface=ground", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=dirt", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=earth", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=grass", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=mud", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=woodchip", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=gravel", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=artifical_turf", withModes(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("surface=metal", ofBicycleSafety(1.3));
+    props.setMixinProperties("surface=ground", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=dirt", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=earth", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=grass", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=mud", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=woodchip", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=gravel", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=artifical_turf", ofBicycleSafety(1.5));
 
     /* sand is deadly for bikes */
-    props.setMixinProperties("surface=sand", withModes(ALL).bicycleSafety(100));
+    props.setMixinProperties("surface=sand", ofBicycleSafety(100));
 
     /* Portland-local mixins */
 
@@ -596,27 +597,15 @@ public class DefaultMapper implements OsmTagMapper {
     /*
      * props.setProperties("RLIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
      */
-    props.setMixinProperties("RLIS:bicycle=caution_area", withModes(ALL).bicycleSafety(1.45));
-    props.setMixinProperties(
-      "RLIS:bicycle:right=caution_area",
-      withModes(ALL).bicycleSafety(1.45, 1)
-    );
-    props.setMixinProperties(
-      "RLIS:bicycle:left=caution_area",
-      withModes(ALL).bicycleSafety(1, 1.45)
-    );
+    props.setMixinProperties("RLIS:bicycle=caution_area", ofBicycleSafety(1.45));
+    props.setMixinProperties("RLIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
+    props.setMixinProperties("RLIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));
     /*
      * props.setProperties("CCGIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
      */
-    props.setMixinProperties("CCGIS:bicycle=caution_area", withModes(ALL).bicycleSafety(1.45));
-    props.setMixinProperties(
-      "CCGIS:bicycle:right=caution_area",
-      withModes(ALL).bicycleSafety(1.45, 1)
-    );
-    props.setMixinProperties(
-      "CCGIS:bicycle:left=caution_area",
-      withModes(ALL).bicycleSafety(1, 1.45)
-    );
+    props.setMixinProperties("CCGIS:bicycle=caution_area", ofBicycleSafety(1.45));
+    props.setMixinProperties("CCGIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
+    props.setMixinProperties("CCGIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));
 
     populateNotesAndNames(props);
 

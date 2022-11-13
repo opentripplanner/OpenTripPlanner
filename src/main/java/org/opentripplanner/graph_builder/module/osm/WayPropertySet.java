@@ -59,6 +59,7 @@ public class WayPropertySet {
   private BiFunction<StreetTraversalPermission, Float, Double> defaultBicycleSafetyForPermission;
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
   private final WayProperties defaultProperties;
+  private final List<MixinProperties> mixins = new ArrayList<>();
 
   public WayPropertySet() {
     /* sensible defaults */
@@ -85,28 +86,29 @@ public class WayPropertySet {
     WayProperties rightResult = defaultProperties;
     int bestLeftScore = 0;
     int bestRightScore = 0;
-    List<WayProperties> leftMixins = new ArrayList<>();
-    List<WayProperties> rightMixins = new ArrayList<>();
+    List<MixinProperties> leftMixins = new ArrayList<>();
+    List<MixinProperties> rightMixins = new ArrayList<>();
     for (WayPropertyPicker picker : wayProperties) {
       OsmSpecifier specifier = picker.specifier();
       WayProperties wayProperties = picker.properties();
       var score = specifier.matchScores(way);
-      if (picker.safetyMixin()) {
-        if (score.left() > 0) {
-          leftMixins.add(wayProperties);
-        }
-        if (score.right() > 0) {
-          rightMixins.add(wayProperties);
-        }
-      } else {
-        if (score.left() > bestLeftScore) {
-          leftResult = wayProperties;
-          bestLeftScore = score.left();
-        }
-        if (score.right() > bestRightScore) {
-          rightResult = wayProperties;
-          bestRightScore = score.right();
-        }
+      if (score.left() > bestLeftScore) {
+        leftResult = wayProperties;
+        bestLeftScore = score.left();
+      }
+      if (score.right() > bestRightScore) {
+        rightResult = wayProperties;
+        bestRightScore = score.right();
+      }
+    }
+
+    for (var mixin : mixins) {
+      var score = mixin.specifier().matchScores(way);
+      if (score.left() > 0) {
+        leftMixins.add(mixin);
+      }
+      if (score.right() > 0) {
+        rightMixins.add(mixin);
       }
     }
 
@@ -262,12 +264,12 @@ public class WayPropertySet {
     return result;
   }
 
-  public void addProperties(OsmSpecifier spec, WayProperties properties, boolean mixin) {
-    wayProperties.add(new WayPropertyPicker(spec, properties, mixin));
+  public void addMixin(MixinProperties mixin) {
+    mixins.add(mixin);
   }
 
   public void addProperties(OsmSpecifier spec, WayProperties properties) {
-    wayProperties.add(new WayPropertyPicker(spec, properties, false));
+    wayProperties.add(new WayPropertyPicker(spec, properties));
   }
 
   public void addCreativeNamer(OsmSpecifier spec, CreativeNamer namer) {
@@ -387,16 +389,12 @@ public class WayPropertySet {
     this.defaultBicycleSafetyForPermission = defaultBicycleSafetyForPermission;
   }
 
-  public void setMixinProperties(OsmSpecifier spec, WayPropertiesBuilder properties) {
-    addProperties(spec, properties.build(), true);
+  public void setMixinProperties(OsmSpecifier spec, MixinPropertiesBuilder builder) {
+    addMixin(builder.build(spec));
   }
 
-  public void setMixinProperties(String spec, WayPropertiesBuilder properties) {
-    setMixinProperties(spec, properties.build());
-  }
-
-  public void setMixinProperties(String spec, WayProperties properties) {
-    addProperties(new BestMatchSpecifier(spec), properties, true);
+  public void setMixinProperties(String spec, MixinPropertiesBuilder builder) {
+    setMixinProperties(new BestMatchSpecifier(spec), builder);
   }
 
   public void setProperties(String s, WayProperties props) {
@@ -408,11 +406,11 @@ public class WayPropertySet {
   }
 
   public void setProperties(OsmSpecifier spec, WayProperties properties) {
-    addProperties(spec, properties, false);
+    addProperties(spec, properties);
   }
 
   public void setProperties(OsmSpecifier spec, WayPropertiesBuilder properties) {
-    addProperties(spec, properties.build(), false);
+    addProperties(spec, properties.build());
   }
 
   public void setCarSpeed(String spec, float speed) {
@@ -445,7 +443,7 @@ public class WayPropertySet {
 
   private WayProperties applyMixins(
     WayProperties result,
-    List<WayProperties> mixins,
+    List<MixinProperties> mixins,
     boolean right
   ) {
     SafetyFeatures bicycleSafetyFeatures = result.getBicycleSafetyFeatures();
@@ -454,20 +452,20 @@ public class WayPropertySet {
     SafetyFeatures walkSafetyFeatures = result.getWalkSafetyFeatures();
     double forwardWalk = walkSafetyFeatures.forward();
     double backWalk = walkSafetyFeatures.back();
-    for (WayProperties properties : mixins) {
+    for (var mixin : mixins) {
       if (right) {
-        if (properties.getBicycleSafetyFeatures() != null) {
-          backBicycle *= properties.getBicycleSafetyFeatures().back();
+        if (mixin.bicycleSafety() != null) {
+          backBicycle *= mixin.bicycleSafety().back();
         }
-        if (properties.getWalkSafetyFeatures() != null) {
-          backWalk *= properties.getWalkSafetyFeatures().back();
+        if (mixin.walkSafety() != null) {
+          backWalk *= mixin.walkSafety().back();
         }
       } else {
-        if (properties.getBicycleSafetyFeatures() != null) {
-          forwardBicycle *= properties.getBicycleSafetyFeatures().forward();
+        if (mixin.bicycleSafety() != null) {
+          forwardBicycle *= mixin.bicycleSafety().forward();
         }
-        if (properties.getWalkSafetyFeatures() != null) {
-          forwardWalk *= properties.getWalkSafetyFeatures().forward();
+        if (mixin.walkSafety() != null) {
+          forwardWalk *= mixin.walkSafety().forward();
         }
       }
     }
