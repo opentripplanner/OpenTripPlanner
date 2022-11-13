@@ -13,7 +13,6 @@ public class TemplateUtil {
 
   private static final String PARAMETERS_TABLE = "PARAMETERS-TABLE";
   private static final String PARAMETERS_DETAILS = "PARAMETERS-DETAILS";
-
   private static final String EXAMPLE = "JSON-EXAMPLE";
   private static final String COMMENT_OPEN = "<!-- ";
   private static final String COMMENT_CLOSE = " -->";

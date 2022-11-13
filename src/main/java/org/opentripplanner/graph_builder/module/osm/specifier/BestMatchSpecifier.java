@@ -31,9 +31,9 @@ public class BestMatchSpecifier implements OsmSpecifier {
     int leftScore = 0, rightScore = 0;
     int leftMatches = 0, rightMatches = 0;
 
-    for (var op : tests) {
-      var leftMatch = op.matchLeft(way);
-      var rightMatch = op.matchRight(way);
+    for (var test : tests) {
+      var leftMatch = test.matchLeft(way);
+      var rightMatch = test.matchRight(way);
 
       int leftTagScore = toTagScore(leftMatch);
       leftScore += leftTagScore;
@@ -86,7 +86,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
       case EXACT -> EXACT_MATCH_SCORE;
       // wildcard matches are basically tiebreakers
       case WILDCARD -> 1;
-      // if the op says surface=cobblestone:flattened but the way has surface=cobblestone
+      // if the test says surface=cobblestone:flattened but the way has surface=cobblestone
       case PREFIX -> 75;
       // no match means no score
       case NONE -> 0;
