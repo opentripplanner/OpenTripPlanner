@@ -125,8 +125,9 @@ public class Station
 
   /**
    * The generalized cost priority associated with the stop independently of trips, routes and/or
-   * other stops. This is supported in NeTEx, but not in GTFS. This should work by adding adjusting
-   * the cost for all board-/alight- events in the routing search.
+   * other stops. This is supported in NeTEx, but not in GTFS. However, it can be configured for
+   * GTFS feeds. This should work by adding adjusting the cost for all board-/alight- events in the
+   * routing search.
    * <p/>
    * To not interfere with request parameters this must be implemented in a neutral way. This mean
    * that the {@link StopTransferPriority#ALLOWED} (which is default) should a nett-effect of adding

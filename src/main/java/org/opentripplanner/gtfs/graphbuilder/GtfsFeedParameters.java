@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 /**
  * Configure a GTFS feed.
@@ -13,6 +14,7 @@ public class GtfsFeedParameters implements DataSourceConfig {
 
   private final URI source;
   private final String feedId;
+  private StopTransferPriority stationTransferPreference;
 
   GtfsFeedParameters(GtfsFeedParametersBuilder builder) {
     this.source = Objects.requireNonNull(builder.source());
@@ -28,5 +30,9 @@ public class GtfsFeedParameters implements DataSourceConfig {
   /** See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}. */
   public Optional<String> feedId() {
     return Optional.ofNullable(feedId);
+  }
+
+  public StopTransferPriority stationTransferPreference() {
+    return stationTransferPreference;
   }
 }

@@ -9,6 +9,7 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,8 @@ public class GtfsBundle {
   public int subwayAccessTime;
 
   private double maxStopToShapeSnapDistance = 150;
+
+  private StopTransferPriority stationTransferPreference;
 
   /** Used by unit tests */
   public GtfsBundle(File gtfsFile) {
@@ -46,6 +49,7 @@ public class GtfsBundle {
       this.feedId =
         new GtfsFeedId.Builder().id(configuredDataSource.config().feedId().get()).build();
     }
+    this.stationTransferPreference = configuredDataSource.config().stationTransferPreference();
   }
 
   public CsvInputSource getCsvInputSource() {
@@ -122,5 +126,9 @@ public class GtfsBundle {
 
   public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+  }
+
+  public StopTransferPriority stationTransferPreference() {
+    return stationTransferPreference;
   }
 }

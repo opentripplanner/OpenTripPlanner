@@ -90,6 +90,7 @@ Sections follow that describe particular settings in more depth.
 |       type = "GTFS"                                                      |    `enum`   | The feed input format.                                                                                                      | *Required* |                                   |  2.2  |
 |       feedId                                                             |   `string`  | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                     | *Optional* |                                   |   na  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |   na  |
+|       [stationTransferPreference](#tf_0_stationTransferPreference)       |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                              | *Optional* | `"allowed"`                       |  2.3  |
 |    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                    | *Optional* |                                   |  2.2  |
 |       type = "NETEX"                                                     |    `enum`   | The feed input format.                                                                                                      | *Required* |                                   |  2.2  |
 |       feedId                                                             |   `string`  | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt. | *Required* |                                   |  2.2  |
@@ -958,6 +959,15 @@ or at various different locations around the local filesystem.
 
 When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds
 section, auto-scanning in the base directory for this feed type will be disabled.
+
+
+<h3 id="tf_0_stationTransferPreference">stationTransferPreference</h3>
+
+**Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`  \
+**Path:** /transitFeeds/[0]  \
+**Enum values:** `discouraged` | `allowed` | `recommended` | `preferred`
+
+Should there be some preference or aversion for transfers at stops that are part of a station.
 
 
 <h3 id="tf_1_groupFilePattern">groupFilePattern</h3>
