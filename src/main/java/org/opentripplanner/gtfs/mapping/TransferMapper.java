@@ -265,6 +265,7 @@ class TransferMapper {
       ? s -> (s instanceof RegularStop && ((RegularStop) s).getParentStation() == station)
       : s -> s == stop;
 
+    int index = -1;
     for (int i = firstStopPos; i < lastStopPos; i++) {
       StopTime stopTime = stopTimes.get(i);
       if (boardTrip && stopTime.getPickupType().isNotRoutable()) {
@@ -275,10 +276,15 @@ class TransferMapper {
       }
 
       if (stopMatches.test(stopTime.getStop())) {
-        return i;
+        if (boardTrip) {
+          return i;
+        } else {
+          // If boardTrip is false we need to continue looping and use the last matching stop.
+          index = i;
+        }
       }
     }
-    return -1;
+    return index;
   }
 
   private boolean sameBlockId(Trip a, Trip b) {

@@ -21,6 +21,21 @@ import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 public class TransferMapper {
 
+  private enum Label {
+    FROM("from"),
+    TO("to");
+
+    private String label;
+
+    Label(String label) {
+      this.label = label;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+  }
+
   private final FeedScopedIdFactory idFactory;
   private final DataImportIssueStore issueStore;
   private final ArrayListMultimap<String, String> scheduledStopPointsIndex;
@@ -56,8 +71,8 @@ public class TransferMapper {
   @Nullable
   public ConstrainedTransfer mapToTransfer(ServiceJourneyInterchange it) {
     var id = it.getId();
-    var from = mapPoint("from", id, it.getFromJourneyRef(), it.getFromPointRef());
-    var to = mapPoint("to", id, it.getToJourneyRef(), it.getToPointRef());
+    var from = mapPoint(Label.FROM, id, it.getFromJourneyRef(), it.getFromPointRef());
+    var to = mapPoint(Label.TO, id, it.getToJourneyRef(), it.getToPointRef());
 
     if (from == null || to == null) {
       return null;
@@ -75,22 +90,22 @@ public class TransferMapper {
 
   @Nullable
   private TripTransferPoint mapPoint(
-    String label,
+    Label label,
     String interchangeId,
     VehicleJourneyRefStructure sjRef,
     ScheduledStopPointRefStructure pointRef
   ) {
     var sjId = sjRef.getRef();
-    var trip = findTrip(label + "Journey", interchangeId, sjId);
-    int stopPos = findStopPosition(interchangeId, label + "Point", sjId, pointRef);
+    var trip = findTrip(label, "Journey", interchangeId, sjId);
+    int stopPos = findStopPosition(interchangeId, label, "Point", sjId, pointRef);
     return (trip == null || stopPos < 0) ? null : new TripTransferPoint(trip, stopPos);
   }
 
   @Nullable
-  private Trip findTrip(String fieldName, String rootId, String sjId) {
+  private Trip findTrip(Label label, String fieldName, String rootId, String sjId) {
     var tripId = createId(sjId);
     Trip trip = trips.get(tripId);
-    return assertRefExist(fieldName, rootId, sjId, trip) ? trip : null;
+    return assertRefExist(label.getLabel() + fieldName, rootId, sjId, trip) ? trip : null;
   }
 
   private TransferConstraint mapConstraint(ServiceJourneyInterchange it) {
@@ -133,12 +148,19 @@ public class TransferMapper {
 
   private int findStopPosition(
     String interchangeId,
-    String label,
+    Label label,
+    String fieldName,
     String sjId,
     ScheduledStopPointRefStructure scheduledStopPointRef
   ) {
     String sspId = scheduledStopPointRef.getRef();
-    int index = scheduledStopPointsIndex.get(sjId).indexOf(sspId);
+
+    int index = -1;
+    if (label == Label.TO) {
+      index = scheduledStopPointsIndex.get(sjId).indexOf(sspId);
+    } else if (label == Label.FROM) {
+      index = scheduledStopPointsIndex.get(sjId).lastIndexOf(sspId);
+    }
 
     if (index >= 0) {
       return index;
@@ -149,7 +171,13 @@ public class TransferMapper {
       : "Service-journey not found";
 
     issueStore.add(
-      new InterchangePointMappingFailed(detailedMsg, interchangeId, label, sjId, sspId)
+      new InterchangePointMappingFailed(
+        detailedMsg,
+        interchangeId,
+        label.getLabel() + fieldName,
+        sjId,
+        sspId
+      )
     );
     return index;
   }
