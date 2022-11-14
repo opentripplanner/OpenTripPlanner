@@ -105,7 +105,7 @@ public class CsvFileIO {
           write(out, col2Str(result.routes));
           write(out, col2Str(result.stops));
           // Skip delimiter for the last value
-          out.print(result.details);
+          out.print(result.details.replace(CSV_DELIMITER, '_'));
           out.println();
         }
       }
