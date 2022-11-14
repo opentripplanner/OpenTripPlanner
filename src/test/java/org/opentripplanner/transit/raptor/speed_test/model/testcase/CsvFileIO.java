@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.time.DurationUtils;
@@ -87,7 +86,7 @@ public class CsvFileIO {
       return;
     }
 
-    try (PrintWriter out = new PrintWriter(expectedResultsOutputFile, CHARSET_UTF_8.name())) {
+    try (PrintWriter out = new PrintWriter(expectedResultsOutputFile, CHARSET_UTF_8)) {
       out.println(
         "tcId,nTransfers,duration,cost,walkDistance,startTime,endTime,agencies,modes,routes,stops,details"
       );
@@ -260,7 +259,7 @@ public class CsvFileIO {
         parseTime(csvReader.get("startTime")),
         parseTime(csvReader.get("endTime")),
         str2Col(csvReader.get("agencies")),
-        str2Col(csvReader.get("modes"), CsvFileIO::parseMode),
+        str2Col(csvReader.get("modes"), TransitMode::valueOf),
         str2Col(csvReader.get("routes")),
         str2Col(csvReader.get("stops")),
         csvReader.get("details")
@@ -275,13 +274,5 @@ public class CsvFileIO {
 
   private boolean isCommentOrEmpty(String line) {
     return line.startsWith("#") || line.matches("[\\s,;|]*");
-  }
-
-  private static Enum<?> parseMode(String mode) {
-    try {
-      return TransitMode.valueOf(mode);
-    } catch (IllegalArgumentException ignore) {
-      return TraverseMode.valueOf(mode);
-    }
   }
 }
