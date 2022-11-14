@@ -33,7 +33,7 @@ class Result {
   /** Alphabetical distinct list of agencies. A {@code List} is used because the order is important. */
   final List<String> agencies;
   /** Alphabetical distinct list of modes. A {@code List} is used because the order is important. */
-  final List<Enum<?>> modes;
+  final List<TransitMode> modes;
   /** A list of routes in tha same order as they appear in the journey. */
   final List<String> routes;
   /** A list of stops in tha same order as they appear in the journey. */
