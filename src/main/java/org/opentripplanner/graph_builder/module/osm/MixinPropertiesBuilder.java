@@ -3,8 +3,8 @@ package org.opentripplanner.graph_builder.module.osm;
 import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
 
 /**
- * Builder for {@link WayProperties}. Bicycle and walk safety features are nullable, but they should
- * be set before building the final {@link WayProperties} for a way.
+ * Builder for {@link MixinProperties}. If you don't set the safety features they will have a default
+ * value of 1, which means no change.
  */
 public class MixinPropertiesBuilder {
 
