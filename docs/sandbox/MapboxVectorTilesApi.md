@@ -24,7 +24,7 @@ To enable this you need to add the feature `SandboxAPIMapboxVectorTilesApi` in `
 
 The feature must be configured in `router-config.json` as follows
 
-```
+```JSON
 {
   "vectorTileLayers": [
     {
