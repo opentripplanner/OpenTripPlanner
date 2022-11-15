@@ -280,13 +280,13 @@ The main optimization goal for the OTP server is minimizing response time.
 
 
 ### Garbage collector
-- 
+ 
 - The G1 garbage collector (default since Java 9) offers a good compromise between low latency (i.e. low GC pause time) and GC overhead.
 - If latency spikes are an issue, the ZGC garbage collector is an alternative. It produces in general more overhead than G1.  
 
 
 ### Memory settings 
-- 
+ 
 - Using Large Memory Pages can reduce pressure on the TLB cache and increase performance.  
 - It is in general not recommended to use large memory page in _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`) for latency-sensitive applications, since memory is allocated on-demand and this can induce latency spikes if the memory is fragmented.  
   Thus _TLBFS_ mode (`-XX:+UseHugeTLBFS`) should be the first choice.
@@ -302,13 +302,13 @@ The main optimization goal for the Graph Builder is minimizing total build time.
 
 
 ### Garbage collector
-- 
+ 
 - In theory, the Parallel garbage collector offers the best throughput.  
 In practice, it can be challenging to optimize the Parallel GC to build both a street graph and a transit graph, the memory usage patterns being different. 
 - The G1 garbage collector provides in general a good compromise.  
 
 
 ### Memory settings 
-- 
+ 
 - Using Large Memory Pages can reduce pressure on the TLB cache and increase performance.  
 - Since latency is not an issue, Large Memory Pages can be used indifferently in _TLBFS_ mode (`-XX:+UseHugeTLBFS`) or _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`)
