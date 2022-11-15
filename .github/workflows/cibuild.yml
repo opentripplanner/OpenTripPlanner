@@ -81,9 +81,9 @@ jobs:
           # mike has support for specifing the origin but then it tries to rebase the _local_ gh-pages
           # branch onto the remote which fails. that's the reason for this git hackery.
           
-          git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/docs-experiment.git 
+          git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/docs.git 
           git fetch $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
-          mike deploy --branch $LOCAL_BRANCH dev
+          mike deploy --branch $LOCAL_BRANCH dev-2.x
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
   container-image:
