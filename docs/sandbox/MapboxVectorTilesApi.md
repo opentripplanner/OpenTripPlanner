@@ -20,7 +20,16 @@ Currently, only the language with the highest priority from the header is used.
 
 ### Configuration
 
-To enable this you need to add the feature `SandboxAPIMapboxVectorTilesApi` in `otp-config.json`.
+To enable this you need to add the feature `otp-config.json`.
+
+```json
+// otp-config.json
+{
+  "otpFeatures": {
+    "VehicleToStopHeuristics": true
+  }
+}
+```
 
 The feature must be configured in `router-config.json` as follows
 
