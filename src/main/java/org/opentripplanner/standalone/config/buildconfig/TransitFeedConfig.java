@@ -71,6 +71,13 @@ public class TransitFeedConfig {
       .withSource(
         node.of("source").since(NA).summary("The unique URI pointing to the data file.").asUri()
       )
+      .withRemoveRepeatedStops(
+        node
+          .of("removeRepeatedStops")
+          .since(V2_3)
+          .summary("Should consecutive identical stops be merged into one stop time entry")
+          .asBoolean(true)
+      )
       .withStationTransferPreference(
         node
           .of("stationTransferPreference")

@@ -54,6 +54,7 @@ public class GtfsContextBuilder {
       StopTransferPriority.ALLOWED
     );
     mapper.mapStopTripAndRouteDataIntoBuilder();
+    mapper.mapAndAddTransfersToBuilder();
     OtpTransitServiceBuilder transitBuilder = mapper.getBuilder();
     return new GtfsContextBuilder(feedId, transitBuilder)
       .withDataImportIssueStore(DataImportIssueStore.noopIssueStore());
@@ -137,6 +138,7 @@ public class GtfsContextBuilder {
   private void repairStopTimesForEachTrip() {
     new ValidateAndInterpolateStopTimesForEachTrip(
       transitBuilder.getStopTimesSortedByTrip(),
+      true,
       true,
       issueStore
     )
