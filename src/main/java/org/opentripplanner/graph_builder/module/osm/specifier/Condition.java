@@ -1,12 +1,12 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
-import static org.opentripplanner.graph_builder.module.osm.specifier.Test.MatchResult.EXACT;
-import static org.opentripplanner.graph_builder.module.osm.specifier.Test.MatchResult.NONE;
+import static org.opentripplanner.graph_builder.module.osm.specifier.Condition.MatchResult.EXACT;
+import static org.opentripplanner.graph_builder.module.osm.specifier.Condition.MatchResult.NONE;
 
 import javax.annotation.Nonnull;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public sealed interface Test {
+public sealed interface Condition {
   @Nonnull
   static MatchResult getMatchResult(OSMWithTags way, String opKey, String opValue) {
     if (opValue.equals("*") && way.hasTag(opKey)) {
@@ -74,7 +74,7 @@ public sealed interface Test {
     }
   }
 
-  record Equals(String key, String value) implements Test {
+  record Equals(String key, String value) implements Condition {
     @Override
     public boolean isWildcard() {
       return value.equals("*");
@@ -110,7 +110,7 @@ public sealed interface Test {
     }
   }
 
-  record Absent(String key) implements Test {
+  record Absent(String key) implements Condition {
     @Override
     public MatchResult match(OSMWithTags way) {
       if (way.hasTag(key)) {
@@ -131,7 +131,7 @@ public sealed interface Test {
     }
   }
 
-  record GreaterThan(String key, int value) implements Test {
+  record GreaterThan(String key, int value) implements Condition {
     @Override
     public MatchResult match(OSMWithTags way) {
       var maybeInt = way.getTagAsInt(key, ignored -> {});

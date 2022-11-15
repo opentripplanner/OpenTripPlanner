@@ -5,9 +5,9 @@ import static org.opentripplanner.graph_builder.module.osm.specifier.ExactMatchS
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
+import org.opentripplanner.graph_builder.module.osm.specifier.Condition.Absent;
+import org.opentripplanner.graph_builder.module.osm.specifier.Condition.GreaterThan;
 import org.opentripplanner.graph_builder.module.osm.specifier.ExactMatchSpecifier;
-import org.opentripplanner.graph_builder.module.osm.specifier.Test;
-import org.opentripplanner.graph_builder.module.osm.specifier.Test.Absent;
 
 public class PortlandMapper implements OsmTagMapper {
 
@@ -27,7 +27,7 @@ public class PortlandMapper implements OsmTagMapper {
     props.setMixinProperties("highway=tertiary", withModes(ALL).walkSafety(1.1));
     props.setMixinProperties("highway=tertiary_link", withModes(ALL).walkSafety(1.1));
     props.setMixinProperties(
-      new ExactMatchSpecifier(new Test.GreaterThan("lanes", 4)),
+      new ExactMatchSpecifier(new GreaterThan("lanes", 4)),
       withModes(ALL).walkSafety(1.1)
     );
     props.setMixinProperties("sidewalk=both", withModes(ALL).walkSafety(0.8));
