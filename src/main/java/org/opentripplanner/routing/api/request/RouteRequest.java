@@ -195,15 +195,6 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /* INSTANCE METHODS */
 
-  public RouteRequest copyAndPrepareForTransferRouting() {
-    var rr = clone();
-    rr.setArriveBy(false);
-    rr.setDateTime(Instant.ofEpochSecond(0));
-    rr.setFrom(null);
-    rr.setTo(null);
-    return rr;
-  }
-
   /**
    * This method is used to clone the default message, and insert a current time. A typical use-case
    * is to copy the default request(from router-config), and then set all user specified parameters

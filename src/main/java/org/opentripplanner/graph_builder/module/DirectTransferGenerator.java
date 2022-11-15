@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +116,13 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
         for (RouteRequest transferProfile : transferRequests) {
-          RouteRequest streetRequest = transferProfile.copyAndPrepareForTransferRouting();
+          var streetRequest = transferProfile.clone();
+
+          // Make sure we use a generic request, without any specific fields set
+          streetRequest.setArriveBy(false);
+          streetRequest.setDateTime(Instant.ofEpochSecond(0));
+          streetRequest.setFrom(null);
+          streetRequest.setTo(null);
 
           for (NearbyStop sd : findNearbyStops(
             nearbyStopFinder,
