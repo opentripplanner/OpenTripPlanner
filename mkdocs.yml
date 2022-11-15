@@ -8,6 +8,7 @@ site_url: https://docs.opentripplanner.org
 repo_url: https://github.com/opentripplanner/OpenTripPlanner
 docs_dir: docs
 site_dir: target/mkdocs
+strict: true
 
 theme:
     name: material
