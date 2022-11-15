@@ -77,10 +77,10 @@ jobs:
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
           
-          git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/docs-experiment.git 
+          git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/docs.git 
           
           git fetch $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
-          mike deploy --branch $LOCAL_BRANCH dev
+          mike deploy --branch $LOCAL_BRANCH dev-2.x
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
   container-image:
