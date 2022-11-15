@@ -83,7 +83,9 @@ jobs:
           
           git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/docs.git 
           git fetch $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
-          mike deploy --branch $LOCAL_BRANCH dev-2.x
+          # prefix is the root folder where to deploy the HTML, we use 'en' to emulate the URL
+          # structure of readthedocs
+          mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
   container-image:

@@ -23,10 +23,6 @@ extra:
     version:
         provider: mike
 
-plugins:
-    mike:
-        deploy_prefix: en
-
 markdown_extensions:
     - pymdownx.highlight:
           anchor_linenums: true
