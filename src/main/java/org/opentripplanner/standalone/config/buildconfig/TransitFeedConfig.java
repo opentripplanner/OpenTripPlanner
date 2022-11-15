@@ -76,9 +76,7 @@ public class TransitFeedConfig {
           .of("stationTransferPreference")
           .since(V2_3)
           .summary(
-            """
-          Should there be some preference or aversion for transfers at stops that are part of a station.
-          """
+            "Should there be some preference or aversion for transfers at stops that are part of a station."
           )
           .asEnum(StopTransferPriority.ALLOWED)
       )
