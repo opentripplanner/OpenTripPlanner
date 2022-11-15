@@ -6,5 +6,5 @@ MkDocs is a Python program. See http://www.mkdocs.org/ for information on how to
 
 In short, to preview the documentation as you work on it:
 
-$ pip install -r docs/requirments.txt
+$ pip install -r docs/requirements.txt
 $ mkdocs serve
