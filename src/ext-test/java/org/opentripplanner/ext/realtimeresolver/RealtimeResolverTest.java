@@ -18,7 +18,45 @@ class RealtimeResolverTest {
 
   private static MockLeg MOCK_LEG = new MockLeg();
 
+  @Test
+  void testPopulateLegsWithRealtime() {
+    var legs = new ArrayList<Leg>();
+    legs.add(new MockLeg(MOCK_LEG));
+    legs.add(new MockLeg(null));
+    legs.add(new MockLeg(MOCK_LEG));
+
+    var itineraries = new ArrayList<Itinerary>();
+    itineraries.add(new Itinerary(legs));
+    itineraries.add(new Itinerary(legs));
+    itineraries.add(new Itinerary(legs));
+
+    RealtimeResolver.populateLegsWithRealtime(
+      itineraries,
+      new DefaultTransitService(new TransitModel())
+    );
+
+    assertEquals(3, itineraries.size());
+
+    itineraries.forEach(it -> {
+      var lgs = it.getLegs();
+      assertEquals(3, lgs.size());
+      assertEquals(MOCK_LEG, lgs.get(0));
+      assertNotEquals(MOCK_LEG, lgs.get(1));
+      assertEquals(MOCK_LEG, lgs.get(2));
+    });
+  }
+
   private static class MockLeg implements Leg {
+
+    private Leg realtimeLeg;
+
+    public MockLeg() {
+      this.realtimeLeg = null;
+    }
+
+    public MockLeg(Leg realtimeLeg) {
+      this.realtimeLeg = realtimeLeg;
+    }
 
     @Override
     public boolean isTransitLeg() {
@@ -67,38 +105,21 @@ class RealtimeResolverTest {
 
     @Override
     public LegReference getLegReference() {
-      return new MockLegReference();
+      return new MockLegReference(realtimeLeg);
     }
   }
 
   private static class MockLegReference implements LegReference {
 
+    private Leg leg;
+
+    public MockLegReference(Leg leg) {
+      this.leg = leg;
+    }
+
     @Override
     public Leg getLeg(TransitService transitService) {
-      return MOCK_LEG;
+      return leg;
     }
-  }
-
-  @Test
-  void testPopulateLegsWithRealtime() {
-    var legs = new ArrayList<Leg>();
-    legs.add(new MockLeg());
-    legs.add(new MockLeg());
-    legs.add(new MockLeg());
-
-    var itineraries = new ArrayList<Itinerary>();
-    itineraries.add(new Itinerary(legs));
-    itineraries.add(new Itinerary(legs));
-    itineraries.add(new Itinerary(legs));
-
-    RealtimeResolver.populateLegsWithRealtime(itineraries, new DefaultTransitService(new TransitModel()));
-
-    assertEquals(3, itineraries.size());
-
-    itineraries.forEach(it -> {
-      var lgs = it.getLegs();
-      assertEquals(3, lgs.size());
-      lgs.forEach(l -> assertEquals(MOCK_LEG, l));
-    });
   }
 }
