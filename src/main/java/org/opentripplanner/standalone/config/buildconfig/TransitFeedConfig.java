@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import java.util.List;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
@@ -68,6 +69,13 @@ public class TransitFeedConfig {
       )
       .withSource(
         node.of("source").since(NA).summary("The unique URI pointing to the data file.").asUri()
+      )
+      .withRemoveRepeatedStops(
+        node
+          .of("removeRepeatedStops")
+          .since(V2_3)
+          .summary("Should consecutive identical stops be merged into one stop time entry")
+          .asBoolean(true)
       )
       .build();
   }
