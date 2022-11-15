@@ -24,7 +24,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.ItineraryFares;
-import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.transit.model.basic.Money;
 
 public class FareMapper {
 

@@ -3,13 +3,8 @@
 ## Contact Info
 
 - For HSL Park and Ride updater: Digitransit team, HSL, Helsinki, Finland
+- For Bikely updater: Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
 
-## Changelog
-
-- Create initial sandbox implementation (January
-  2022, https://github.com/opentripplanner/OpenTripPlanner/pull/3796)
-- Add timeZone parameter to hsl and parkapi updaters (September 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4427)
-- Added support for HSL parking hubs (October 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4510)
 
 ## Documentation
 
@@ -18,9 +13,10 @@ enabled/disabled through `otp-config.json` but from `router-config.json` updater
 
 Currently contains the following updaters:
 
-- HSL Park and Ride (https://p.hsl.fi/docs/index.html)
-- ParkAPI (https://github.com/offenesdresden/ParkAPI)
+- [HSL Park and Ride](https://p.hsl.fi/docs/index.html)
+- [ParkAPI](https://github.com/offenesdresden/ParkAPI)
 - KML (Keyhole Markup language) placemark parks. Use name as bike park name and point coordinates.
+- [Bikely](https://www.safebikely.com/)
 
 ### Configuration
 
@@ -32,75 +28,292 @@ All updaters have the following parameters in common:
 - `type`: this needs to be `"vehicle-parking"`
 - `feedId`: this is used as a "prefix" for park ids, entrance ids and sometimes also for tags.
 
-<b>To use HSL park updater:</b>
+## HSL Park and Ride
 
-```
+<!-- hsl-park BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Config Parameter                |     Type    | Summary                                      |  Req./Opt. | Default Value | Since |
+|---------------------------------|:-----------:|----------------------------------------------|:----------:|---------------|:-----:|
+| type = "VEHICLE_PARKING"        |    `enum`   | The type of the updater.                     | *Required* |               |   na  |
+| facilitiesFrequencySec          |  `integer`  | How often the facilities should be updated.  | *Optional* | `3600`        |  2.2  |
+| facilitiesUrl                   |   `string`  | URL of the facilities.                       | *Optional* |               |  2.2  |
+| [feedId](#u__2__feedId)         |   `string`  | The name of the data source.                 | *Optional* |               |  2.2  |
+| hubsUrl                         |   `string`  | Hubs URL                                     | *Optional* |               |  2.2  |
+| [sourceType](#u__2__sourceType) |    `enum`   | The source of the vehicle updates.           | *Required* |               |  2.2  |
+| [timeZone](#u__2__timeZone)     | `time-zone` | The time zone of the feed.                   | *Optional* |               |  2.2  |
+| utilizationsFrequencySec        |  `integer`  | How often the utilization should be updated. | *Optional* | `600`         |  2.2  |
+| utilizationsUrl                 |   `string`  | URL of the utilization data.                 | *Optional* |               |  2.2  |
+
+
+#### Details
+
+<h4 id="u__2__feedId">feedId</h4>
+
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[2] 
+
+The name of the data source.
+
+This will end up in the API responses as the feed id of of the parking lot.
+
+<h4 id="u__2__sourceType">sourceType</h4>
+
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
+**Path:** /updaters/[2]  \
+**Enum values:** `kml` | `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
+
+The source of the vehicle updates.
+
+<h4 id="u__2__timeZone">timeZone</h4>
+
+**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[2] 
+
+The time zone of the feed.
+
+Used for converting abstract opening hours into concrete points in time.
+
+
+
+##### Example configuration
+
+```JSON
+// router-config.json
 {
-    "type": "vehicle-parking",
-    "sourceType": "hsl-park",
-    "feedId": "hslpark",
-    "timeZone": "Europe/Helsinki",
-    "facilitiesFrequencySec": 3600,
-    "facilitiesUrl": "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
-    "utilizationsFrequencySec": 600,
-    "utilizationsUrl": "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
-    "hubsUrl": "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
+    "updaters": [
+    {
+      "type" : "vehicle-parking",
+      "sourceType" : "hsl-park",
+      "feedId" : "hslpark",
+      "timeZone" : "Europe/Helsinki",
+      "facilitiesFrequencySec" : 3600,
+      "facilitiesUrl" : "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
+      "utilizationsFrequencySec" : 600,
+      "utilizationsUrl" : "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
+      "hubsUrl" : "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
+    }
+  ]
+
 }
 ```
 
-- `sourceType`: needs to be `"hsl-park"`
-- `timeZone`: must be configured to parse opening hours.
-  The value can be given either as a zone id, or an UTC offset.
-- `facilitiesUrl`: URL that contains the basic information for the parks
-- `facilitiesFrequencySec`: how often should the basic information for parks be refetched. Should be
-  more than `utilizationsFrequencySec` and if it's <= 0, parks are only fetched once. Default `600`.
-- `utilizationsUrl`: URL that contains realtime updates to parks
-- `utilizationsFrequencySec`: how often should the basic information for parks be refetched. Should
-  be less than `facilitiesFrequencySec` and if it's < 0, realtime information is never refetched.
-  Default `3600`.
-- `hubsUrl` URL that contains parking hubs
+<!-- hsl-park END -->
 
-<b>To use KML park updater:</b>
+## KML 
 
-```
+<!-- kml BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Config Parameter                |    Type   | Summary                                 |  Req./Opt. | Default Value | Since |
+|---------------------------------|:---------:|-----------------------------------------|:----------:|---------------|:-----:|
+| type = "VEHICLE_PARKING"        |   `enum`  | The type of the updater.                | *Required* |               |   na  |
+| [feedId](#u__3__feedId)         |  `string` | The name of the data source.            | *Optional* |               |  2.2  |
+| frequencySec                    | `integer` | How often to update the parking lots.   | *Optional* | `60`          |  2.2  |
+| namePrefix                      |  `string` | Prefix for the names.                   | *Optional* |               |  2.2  |
+| [sourceType](#u__3__sourceType) |   `enum`  | The source of the vehicle updates.      | *Required* |               |  2.2  |
+| url                             |  `string` | URL of the KML file.                    | *Optional* |               |  2.2  |
+| zip                             | `boolean` | Whether the resource is zip-compressed. | *Optional* | `false`       |  2.2  |
+
+
+#### Details
+
+<h4 id="u__3__feedId">feedId</h4>
+
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[3] 
+
+The name of the data source.
+
+This will end up in the API responses as the feed id of of the parking lot.
+
+<h4 id="u__3__sourceType">sourceType</h4>
+
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
+**Path:** /updaters/[3]  \
+**Enum values:** `kml` | `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
+
+The source of the vehicle updates.
+
+
+
+##### Example configuration
+
+```JSON
+// router-config.json
 {
-    "type": "vehicle-parking",
-    "sourceType": "kml",
-    "feedId": "kml",
-    "frequencySec": 600,
-    "url": "https://foo.bar",
-    "namePrefix": "foo",
-    "zip": true
+    "updaters": [
+    {
+      "type" : "vehicle-parking",
+      "sourceType" : "kml",
+      "feedId" : "kml",
+      "frequencySec" : 600,
+      "url" : "https://foo.bar",
+      "namePrefix" : "foo",
+      "zip" : true
+    }
+  ]
+
 }
 ```
 
-- `sourceType`: needs to be `"kml"`
-- `url`: URL that contains the park data in KML format
-- `frequencySec`: how often park data is refetched. Default `60`.
-- `namePrefix`: Adds this prefix to park names
-- `zip`: Tells if the data is zipped or not.
+<!-- kml END -->
 
-<b>To use ParkAPI updater:</b>
+## ParkAPI 
 
-```
+<!-- park-api BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Config Parameter                |       Type      | Summary                            |  Req./Opt. | Default Value | Since |
+|---------------------------------|:---------------:|------------------------------------|:----------:|---------------|:-----:|
+| type = "VEHICLE_PARKING"        |      `enum`     | The type of the updater.           | *Required* |               |   na  |
+| [feedId](#u__4__feedId)         |     `string`    | The name of the data source.       | *Optional* |               |  2.2  |
+| frequencySec                    |    `integer`    | How often to update the source.    | *Optional* | `60`          |  2.2  |
+| [sourceType](#u__4__sourceType) |      `enum`     | The source of the vehicle updates. | *Required* |               |  2.2  |
+| [timeZone](#u__4__timeZone)     |   `time-zone`   | The time zone of the feed.         | *Optional* |               |  2.2  |
+| url                             |     `string`    | URL of the resource.               | *Optional* |               |  2.2  |
+| [headers](#u__4__headers)       | `map of string` | HTTP headers to add.               | *Optional* |               |  2.2  |
+| [tags](#u__4__tags)             |    `string[]`   | Tags to add to the parking lots.   | *Optional* |               |  2.2  |
+
+
+#### Details
+
+<h4 id="u__4__feedId">feedId</h4>
+
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[4] 
+
+The name of the data source.
+
+This will end up in the API responses as the feed id of of the parking lot.
+
+<h4 id="u__4__sourceType">sourceType</h4>
+
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
+**Path:** /updaters/[4]  \
+**Enum values:** `kml` | `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
+
+The source of the vehicle updates.
+
+<h4 id="u__4__timeZone">timeZone</h4>
+
+**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[4] 
+
+The time zone of the feed.
+
+Used for converting abstract opening hours into concrete points in time.
+
+<h4 id="u__4__headers">headers</h4>
+
+**Since version:** `2.2` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[4] 
+
+HTTP headers to add.
+
+<h4 id="u__4__tags">tags</h4>
+
+**Since version:** `2.2` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[4] 
+
+Tags to add to the parking lots.
+
+
+
+##### Example configuration
+
+```JSON
+// router-config.json
 {
-    "type": "vehicle-parking",
-    "sourceType": "park-api",
-    "feedId": "parkapi",
-    "timeZone": "Europe/Berlin",
-    "frequencySec": 600,
-    "url": "https://foo.bar",
-    "headers": {"Cache-Control": "max-age=604800"},
-    "tags": ["source:parkapi"]
+    "updaters": [
+    {
+      "type" : "vehicle-parking",
+      "sourceType" : "park-api",
+      "feedId" : "parkapi",
+      "timeZone" : "Europe/Berlin",
+      "frequencySec" : 600,
+      "url" : "https://foo.bar",
+      "headers" : {
+        "Cache-Control" : "max-age=604800"
+      },
+      "tags" : [ "source:parkapi" ]
+    }
+  ]
+
 }
 ```
 
-- `sourceType`: needs to be `"park-api"` if car parks are fetched, `"bicycle-park-api"` if bicycle
-  parks.
-- `timeZone`: must be configured to parse opening hours.
-  The value can be given either as a zone id, or an UTC offset.
-- `url`: URL that contains the park data in KML format
-- `frequencySec`: how often park data is refetched. Default `60`.
-- `headers`: Use these headers for requests
-- `tags`: Add these tags to all parks.
+<!-- park-api END -->
 
+## Bikely
+
+<!-- bikely BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Config Parameter                |       Type      | Summary                            |  Req./Opt. | Default Value | Since |
+|---------------------------------|:---------------:|------------------------------------|:----------:|---------------|:-----:|
+| type = "VEHICLE_PARKING"        |      `enum`     | The type of the updater.           | *Required* |               |   na  |
+| [feedId](#u__5__feedId)         |     `string`    | The name of the data source.       | *Optional* |               |  2.2  |
+| frequencySec                    |    `integer`    | How often to update the source.    | *Optional* | `60`          |  2.3  |
+| [sourceType](#u__5__sourceType) |      `enum`     | The source of the vehicle updates. | *Required* |               |  2.2  |
+| url                             |     `string`    | URL of the locations endpoint.     | *Optional* |               |  2.3  |
+| [headers](#u__5__headers)       | `map of string` | HTTP headers to add.               | *Optional* |               |  2.3  |
+
+
+#### Details
+
+<h4 id="u__5__feedId">feedId</h4>
+
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[5] 
+
+The name of the data source.
+
+This will end up in the API responses as the feed id of of the parking lot.
+
+<h4 id="u__5__sourceType">sourceType</h4>
+
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
+**Path:** /updaters/[5]  \
+**Enum values:** `kml` | `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
+
+The source of the vehicle updates.
+
+<h4 id="u__5__headers">headers</h4>
+
+**Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[5] 
+
+HTTP headers to add.
+
+
+
+##### Example configuration
+
+```JSON
+// router-config.json
+{
+    "updaters": [
+    {
+      "type" : "vehicle-parking",
+      "feedId" : "bikely",
+      "sourceType" : "bikely",
+      "url" : "https://api.safebikely.com/api/v1/s/locations",
+      "headers" : {
+        "X-Bikely-Token" : "${BIKELY_TOKEN}",
+        "Authorization" : "${BIKELY_AUTHORIZATION}"
+      }
+    }
+  ]
+
+}
+```
+
+<!-- bikely END -->
+
+
+## Changelog
+
+- Create initial sandbox implementation (January 2022, [#3796](https://github.com/opentripplanner/OpenTripPlanner/pull/3796))
+- Add timeZone parameter to hsl and parkapi updaters (September 2022, [#4427](https://github.com/opentripplanner/OpenTripPlanner/pull/4427))
+- Added support for HSL parking hubs (October 2022, [#4510](https://github.com/opentripplanner/OpenTripPlanner/pull/4510))

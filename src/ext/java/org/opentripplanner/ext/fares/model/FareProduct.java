@@ -2,7 +2,7 @@ package org.opentripplanner.ext.fares.model;
 
 import java.time.Duration;
 import java.util.Objects;
-import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public record FareProduct(

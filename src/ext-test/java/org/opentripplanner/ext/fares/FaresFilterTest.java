@@ -10,9 +10,9 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
-import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.Money;
 
 public class FaresFilterTest implements PlanTestConstants {
 
