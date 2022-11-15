@@ -969,6 +969,9 @@ section, auto-scanning in the base directory for this feed type will be disabled
 
 Should there be some preference or aversion for transfers at stops that are part of a station.
 
+This parameter sets the generic level of preference. What is the actual cost can be changed
+with the `stopTransferCost` parameter in the router configuration.
+
 
 <h3 id="tf_1_groupFilePattern">groupFilePattern</h3>
 

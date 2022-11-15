@@ -78,6 +78,12 @@ public class TransitFeedConfig {
           .summary(
             "Should there be some preference or aversion for transfers at stops that are part of a station."
           )
+          .description(
+            """
+            This parameter sets the generic level of preference. What is the actual cost can be changed
+            with the `stopTransferCost` parameter in the router configuration.
+            """
+          )
           .asEnum(StopTransferPriority.ALLOWED)
       )
       .build();
