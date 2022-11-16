@@ -12,7 +12,6 @@ site_dir: target/mkdocs
 theme:
     name: material
     features:
-        - navigation.tabs
         - toc.integrate
     palette:
         primary: blue
