@@ -43,6 +43,7 @@ public class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
 
     var name = new NonLocalizedString(jsonNode.path("name").asText());
 
+    var totalSpots = jsonNode.get("totalParkingSpots").asInt();
     var freeSpots = jsonNode.get("availableParkingSpots").asInt();
     var isUnderMaintenance = workingHours.get("isUnderMaintenance").asBoolean();
 
@@ -61,6 +62,7 @@ public class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
       .id(vehicleParkId)
       .name(name)
       .bicyclePlaces(true)
+      .capacity(VehicleParkingSpaces.builder().bicycleSpaces(totalSpots).build())
       .availability(VehicleParkingSpaces.builder().bicycleSpaces(freeSpots).build())
       .state(toState(isUnderMaintenance))
       .coordinate(coord)
