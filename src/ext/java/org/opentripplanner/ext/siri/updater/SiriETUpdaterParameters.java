@@ -8,9 +8,6 @@ public class SiriETUpdaterParameters
 
   private final String configRef;
   private final String feedId;
-  private final int logFrequency;
-  private final int maxSnapshotFrequencyMs;
-  private final boolean purgeExpiredData;
   private final boolean blockReadinessUntilInitialized;
 
   private final String url;
@@ -25,9 +22,6 @@ public class SiriETUpdaterParameters
   public SiriETUpdaterParameters(
     String configRef,
     String feedId,
-    int logFrequency,
-    int maxSnapshotFrequencyMs,
-    boolean purgeExpiredData,
     boolean blockReadinessUntilInitialized,
     String url,
     int frequencySec,
@@ -38,9 +32,6 @@ public class SiriETUpdaterParameters
   ) {
     this.configRef = configRef;
     this.feedId = feedId;
-    this.logFrequency = logFrequency;
-    this.maxSnapshotFrequencyMs = maxSnapshotFrequencyMs;
-    this.purgeExpiredData = purgeExpiredData;
     this.blockReadinessUntilInitialized = blockReadinessUntilInitialized;
     this.url = url;
     this.frequencySec = frequencySec;
@@ -52,18 +43,6 @@ public class SiriETUpdaterParameters
 
   public String getFeedId() {
     return feedId;
-  }
-
-  public int getLogFrequency() {
-    return logFrequency;
-  }
-
-  public int getMaxSnapshotFrequencyMs() {
-    return maxSnapshotFrequencyMs;
-  }
-
-  public boolean purgeExpiredData() {
-    return purgeExpiredData;
   }
 
   public boolean blockReadinessUntilInitialized() {
