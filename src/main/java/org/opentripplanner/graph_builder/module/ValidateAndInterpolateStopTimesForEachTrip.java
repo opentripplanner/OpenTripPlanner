@@ -41,15 +41,18 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
 
   private final TripStopTimes stopTimesByTrip;
   private final boolean interpolate;
+  private final boolean removeRepeatedStops;
   private final DataImportIssueStore issueStore;
 
   public ValidateAndInterpolateStopTimesForEachTrip(
     TripStopTimes stopTimesByTrip,
     boolean interpolate,
+    boolean removeRepeatedStops,
     DataImportIssueStore issueStore
   ) {
     this.stopTimesByTrip = stopTimesByTrip;
     this.interpolate = interpolate;
+    this.removeRepeatedStops = removeRepeatedStops;
     this.issueStore = issueStore;
   }
 
@@ -106,21 +109,23 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       StopTime st = it.next();
       if (prev != null) {
         if (prev.getStop().equals(st.getStop())) {
-          // Merge the two stop times, making sure we're not throwing out a stop time with times in
-          // favor of an interpolated stop time. Keep the arrival time of the previous stop, unless
-          // it didn't have an arrival time, in which case replace it with the arrival time of this
-          // stop time. This is particularly important at the last stop in a route (see issue #2220)
-          if (prev.getArrivalTime() == StopTime.MISSING_VALUE) {
-            prev.setArrivalTime(st.getArrivalTime());
-          }
+          if (removeRepeatedStops) {
+            // Merge the two stop times, making sure we're not throwing out a stop time with times in
+            // favor of an interpolated stop time. Keep the arrival time of the previous stop, unless
+            // it didn't have an arrival time, in which case replace it with the arrival time of this
+            // stop time. This is particularly important at the last stop in a route (see issue #2220)
+            if (prev.getArrivalTime() == StopTime.MISSING_VALUE) {
+              prev.setArrivalTime(st.getArrivalTime());
+            }
 
-          // prefer to replace with the departure time of this stop time, unless this stop time has
-          // no departure time
-          if (st.getDepartureTime() != StopTime.MISSING_VALUE) {
-            prev.setDepartureTime(st.getDepartureTime());
-          }
+            // prefer to replace with the departure time of this stop time, unless this stop time has
+            // no departure time
+            if (st.getDepartureTime() != StopTime.MISSING_VALUE) {
+              prev.setDepartureTime(st.getDepartureTime());
+            }
 
-          it.remove();
+            it.remove();
+          }
           stopSequencesRemoved.add(st.getStopSequence());
         }
       }

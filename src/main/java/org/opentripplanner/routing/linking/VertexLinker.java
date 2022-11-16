@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.linking;
+package org.opentripplanner.routing.linking;
 
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +21,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graph.index.EdgeSpatialIndex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
@@ -60,7 +61,7 @@ public class VertexLinker {
   /**
    * Spatial index of StreetEdges in the graph.
    */
-  private final StreetSpatialIndex streetSpatialIndex = new StreetSpatialIndex();
+  private final EdgeSpatialIndex edgeSpatialIndex;
 
   private final Graph graph;
 
@@ -73,10 +74,8 @@ public class VertexLinker {
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
    * given time.
    */
-  public VertexLinker(Graph graph, StopModel stopModel) {
-    for (StreetEdge se : graph.getEdgesOfType(StreetEdge.class)) {
-      streetSpatialIndex.insert(se.getGeometry(), se, Scope.PERMANENT);
-    }
+  public VertexLinker(Graph graph, StopModel stopModel, EdgeSpatialIndex edgeSpatialIndex) {
+    this.edgeSpatialIndex = edgeSpatialIndex;
     this.graph = graph;
     this.stopModel = stopModel;
   }
@@ -111,7 +110,7 @@ public class VertexLinker {
   public void removeEdgeFromIndex(Edge edge, Scope scope) {
     // Edges without geometry will not have been added to the index in the first place
     if (edge.getGeometry() != null) {
-      streetSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge, scope);
+      edgeSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge, scope);
     }
   }
 
@@ -261,7 +260,7 @@ public class VertexLinker {
     // street edges traversable by at least one of the given modes and are still present in the
     // graph. Calculate a distance to each of those edges, and keep only the ones within the search
     // radius.
-    List<DistanceTo<StreetEdge>> candidateEdges = streetSpatialIndex
+    List<DistanceTo<StreetEdge>> candidateEdges = edgeSpatialIndex
       .query(env, scope)
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
@@ -314,7 +313,7 @@ public class VertexLinker {
       var candidateEdgesForMode = candidateEdges
         .stream()
         .filter(e -> e.item.canTraverse(modeSet))
-        .collect(Collectors.toList());
+        .toList();
 
       if (candidateEdgesForMode.isEmpty()) {
         continue;
@@ -449,10 +448,10 @@ public class VertexLinker {
     if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges
       if (newEdges.first != null) {
-        streetSpatialIndex.insert(newEdges.first.getGeometry(), newEdges.first, scope);
+        edgeSpatialIndex.insert(newEdges.first.getGeometry(), newEdges.first, scope);
       }
       if (newEdges.second != null) {
-        streetSpatialIndex.insert(newEdges.second.getGeometry(), newEdges.second, scope);
+        edgeSpatialIndex.insert(newEdges.second.getGeometry(), newEdges.second, scope);
       }
 
       if (scope == Scope.PERMANENT) {

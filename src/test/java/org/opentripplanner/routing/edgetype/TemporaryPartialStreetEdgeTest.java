@@ -10,14 +10,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.graph.index.StreetIndex;
+import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -115,7 +115,7 @@ public class TemporaryPartialStreetEdgeTest {
     Coordinate nearestPoint = new Coordinate(0.5, 2.0);
     List<StreetEdge> edges = new ArrayList<>();
     edges.add(e2);
-    TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocationForTest(
+    TemporaryStreetLocation end = StreetIndex.createTemporaryStreetLocationForTest(
       "middle of e2",
       new NonLocalizedString("foo"),
       edges,
@@ -123,7 +123,7 @@ public class TemporaryPartialStreetEdgeTest {
       true,
       tempEdges
     );
-    TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocationForTest(
+    TemporaryStreetLocation start = StreetIndex.createTemporaryStreetLocationForTest(
       "middle of e2",
       new NonLocalizedString("foo"),
       edges,

@@ -1,0 +1,21 @@
+{
+  "osmDefaults": {
+    "osmTagMapping": "germany",
+    "timeZone": "Europe/Berlin"
+  },
+  "staticBikeParkAndRide": true,
+  "discardMinTransferTimes": true,
+  "transitModelTimeZone": "Europe/Berlin",
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/switzerland/gtfs_fp2022_2022-11-02_04-15.zip",
+      "feedId": "1"
+    }
+  ],
+  "osm": [
+    {
+      "source": "https://otp-performance.leonard.io/data/switzerland/switzerland-padded-2022-11-07.osm.pbf"
+    }
+  ]
+}

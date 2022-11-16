@@ -26,8 +26,11 @@ public class UpdaterConfigDocTest {
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "UpdaterConfig.md");
   private static final File OUT_FILE = new File(DOCS_ROOT, "UpdaterConfig.md");
 
-  private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
-  private static final Set<String> SKIP_UPDATERS = Set.of("siri-azure-sx-updater");
+  private static final String ROUTER_CONFIG_FILENAME = "standalone/config/router-config.json";
+  private static final Set<String> SKIP_UPDATERS = Set.of(
+    "siri-azure-sx-updater",
+    "vehicle-parking"
+  );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 
   /**
@@ -39,11 +42,11 @@ public class UpdaterConfigDocTest {
    * </ul>
    */
   @Test
-  public void updateBuildConfigurationDoc() {
+  public void updateRouterConfigurationDoc() {
     NodeAdapter node = readBuildConfig();
 
     // Read and close inout file (same as output file)
-    String doc = readFile(TEMPLATE);
+    String template = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 
     for (String childName : node.listChildrenByName()) {
@@ -51,17 +54,17 @@ public class UpdaterConfigDocTest {
       var type = child.typeQualifier();
 
       if (!SKIP_UPDATERS.contains(type)) {
-        doc = replaceSection(doc, type, updaterDoc(child));
+        template = replaceSection(template, type, updaterDoc(child));
       }
     }
 
-    writeFile(OUT_FILE, doc);
+    writeFile(OUT_FILE, template);
     assertFileEquals(original, OUT_FILE);
   }
 
   private NodeAdapter readBuildConfig() {
-    var json = jsonNodeFromResource(BUILD_CONFIG_FILENAME);
-    var conf = new RouterConfig(json, BUILD_CONFIG_FILENAME, false);
+    var json = jsonNodeFromResource(ROUTER_CONFIG_FILENAME);
+    var conf = new RouterConfig(json, ROUTER_CONFIG_FILENAME, false);
     return conf.asNodeAdapter().child("updaters");
   }
 

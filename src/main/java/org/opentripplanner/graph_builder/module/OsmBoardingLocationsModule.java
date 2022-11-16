@@ -5,8 +5,6 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -18,7 +16,9 @@ import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.graph.index.StreetIndex;
+import org.opentripplanner.routing.linking.LinkingDirection;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -63,7 +63,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   public void buildGraph() {
     LOG.info("Improving boarding locations by checking OSM entities...");
 
-    StreetVertexIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
+    StreetIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
     this.linker = streetIndex.getVertexLinker();
     int successes = 0;
 
@@ -95,7 +95,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     //no inputs
   }
 
-  private boolean connectVertexToStop(TransitStopVertex ts, StreetVertexIndex index, Graph graph) {
+  private boolean connectVertexToStop(TransitStopVertex ts, StreetIndex index, Graph graph) {
     var stopCode = ts.getStop().getCode();
     var stopId = ts.getStop().getId().getId();
     Envelope envelope = new Envelope(ts.getCoordinate());

@@ -13,10 +13,12 @@ public class GtfsFeedParameters implements DataSourceConfig {
 
   private final URI source;
   private final String feedId;
+  private final boolean removeRepeatedStops;
 
   GtfsFeedParameters(GtfsFeedParametersBuilder builder) {
     this.source = Objects.requireNonNull(builder.source());
     this.feedId = builder.feedId();
+    this.removeRepeatedStops = builder.removeRepeatedStops();
   }
 
   /** See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}. */
@@ -28,5 +30,9 @@ public class GtfsFeedParameters implements DataSourceConfig {
   /** See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}. */
   public Optional<String> feedId() {
     return Optional.ofNullable(feedId);
+  }
+
+  public boolean removeRepeatedStops() {
+    return removeRepeatedStops;
   }
 }

@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
@@ -20,6 +18,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.LinkingDirection;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -49,7 +49,8 @@ public class FakeGraph {
       Set.of(),
       gg,
       DataImportIssueStore.noopIssueStore(),
-      new DefaultMapper()
+      new DefaultMapper(),
+      true
     );
 
     osmModule.buildGraph();

@@ -12,8 +12,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
@@ -111,7 +111,7 @@ class ItineraryResultMapper {
   private Result map(Itinerary itinerary) {
     List<String> agencies = new ArrayList<>();
     List<String> routes = new ArrayList<>();
-    Set<Enum<?>> modes = new HashSet<>();
+    Set<TransitMode> modes = new HashSet<>();
     List<String> stops = new ArrayList<>();
 
     for (Leg it : itinerary.getLegs()) {
@@ -119,8 +119,6 @@ class ItineraryResultMapper {
         agencies.add(agencyShortName(it.getAgency()));
         routes.add(it.getRoute().getName());
         modes.add(trLeg.getMode());
-      } else if (it instanceof StreetLeg streetLeg) {
-        modes.add(streetLeg.getMode());
       }
       if (it.getTo().stop != null) {
         stops.add(it.getTo().stop.getId().toString());

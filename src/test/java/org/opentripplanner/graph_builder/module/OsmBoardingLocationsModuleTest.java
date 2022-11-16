@@ -52,7 +52,7 @@ class OsmBoardingLocationsModuleTest {
 
   static Stream<Arguments> testCases = Stream.of(
     Arguments.of(
-      true,
+      false,
       Set.of(
         "osm:node:302563833",
         "osm:node:3223067049",
@@ -63,14 +63,14 @@ class OsmBoardingLocationsModuleTest {
         "osm:node:302563839"
       )
     ),
-    Arguments.of(false, Set.of("osm:node:768590748"))
+    Arguments.of(true, Set.of("osm:node:768590748"))
   );
 
   @ParameterizedTest(
     name = "add boarding locations and link them to platform edges when skipVisibility={0}"
   )
   @VariableSource("testCases")
-  void addAndLinkBoardingLocations(boolean skipVisibility, Set<String> linkedVertices) {
+  void addAndLinkBoardingLocations(boolean areaVisibility, Set<String> linkedVertices) {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(new StopModel(), deduplicator);
@@ -94,9 +94,9 @@ class OsmBoardingLocationsModuleTest {
       Set.of("ref", "ref:IFOPT"),
       graph,
       noopIssueStore(),
-      new DefaultMapper()
+      new DefaultMapper(),
+      areaVisibility
     );
-    osmModule.skipVisibility = skipVisibility;
 
     osmModule.buildGraph();
 

@@ -4,7 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.sources.VehicleRentalSourceFactory;
-import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 
 public class VehicleRentalUpdaterConfig {
@@ -14,7 +14,7 @@ public class VehicleRentalUpdaterConfig {
       .of("sourceType")
       .since(NA)
       .summary("What source of vehicle rental updater to use.")
-      .asEnum(DataSourceType.class);
+      .asEnum(VehicleRentalSourceType.class);
     return new VehicleRentalUpdaterParameters(
       configRef + "." + sourceType,
       c

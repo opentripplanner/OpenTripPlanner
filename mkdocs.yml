@@ -13,7 +13,7 @@ site_dir: target/mkdocs
 # In that case subdirectories can be used to organize pages.
 # The list below organizes them into categories and controls the order.
 
-pages:
+nav:
 - Home: 'index.md'
 - About:
     - Governance: 'Governance.md'

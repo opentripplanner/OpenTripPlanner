@@ -81,7 +81,8 @@ public class PruneNoThruIslandsTest {
         Set.of(),
         graph,
         noopIssueStore(),
-        new DefaultMapper()
+        new DefaultMapper(),
+        false
       );
       osmModule.customNamer =
         new CustomNamer() {
@@ -99,7 +100,6 @@ public class PruneNoThruIslandsTest {
           @Override
           public void configure() {}
         };
-      osmModule.skipVisibility = true;
       osmModule.buildGraph();
 
       transitModel.index();

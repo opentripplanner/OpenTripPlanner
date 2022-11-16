@@ -1,5 +1,5 @@
 {
-  "configVersion" : "v2.2.0-EN000121",
+  "configVersion": "v2.2.0-EN000121",
   "streetRoutingTimeout": "5s",
   "routingDefaults": {
     "walkSpeed": 1.3,
@@ -30,19 +30,19 @@
     "transferSlack": 120,
     // Default slack for any mode is 0 (zero)
     "boardSlackForMode": {
-      "AIRPLANE" : "35m"
+      "AIRPLANE": "35m"
     },
     "alightSlackForMode": {
-      "AIRPLANE" : "15m"
+      "AIRPLANE": "15m"
     },
-    "transitReluctanceForMode" : {
-      "RAIL" : 0.85
+    "transitReluctanceForMode": {
+      "RAIL": 0.85
     },
     "maxAccessEgressDurationForMode": {
       "BIKE_RENTAL": "20m"
     },
-    "itineraryFilters" : {
-      "transitGeneralizedCostLimit" : "3600 + 2.5 x",
+    "itineraryFilters": {
+      "transitGeneralizedCostLimit": "3600 + 2.5 x",
       "bikeRentalDistanceRatio": 0.3,
       "accessibilityScore": true
     },
@@ -75,18 +75,18 @@
     "maxTransferDurationSeconds": 240
   },
   "transit": {
-    "maxNumberOfTransfers" : 12,
-    "dynamicSearchWindow" : {
-      "minTransitTimeCoefficient" : 0.5,
-      "minWaitTimeCoefficient" : 0.5,
-      "minWinTimeMinutes" : 60,
-      "maxWinTimeMinutes" : 300
+    "maxNumberOfTransfers": 12,
+    "dynamicSearchWindow": {
+      "minTransitTimeCoefficient": 0.5,
+      "minWaitTimeCoefficient": 0.5,
+      "minWinTimeMinutes": 60,
+      "maxWinTimeMinutes": 300
     },
-    "stopTransferCost" : {
-      "DISCOURAGED" : 1500,
-      "ALLOWED" : 75,
-      "RECOMMENDED" : 30,
-      "PREFERRED" : 0
+    "stopTransferCost": {
+      "DISCOURAGED": 1500,
+      "ALLOWED": 75,
+      "RECOMMENDED": 30,
+      "PREFERRED": 0
     }
   },
   "vehicleRentalServiceDirectory": {
@@ -99,7 +99,7 @@
     }
   },
   "transmodelApi": {
-    "hideFeedId" : true
+    "hideFeedId": true
   },
   "vectorTileLayers": [
     {
@@ -120,7 +120,8 @@
     },
     {
       "name": "rentalPlaces",
-      "type": "VehicleRental", // all rental places: stations and free-floating vehicles
+      // all rental places: stations and free-floating vehicles
+      "type": "VehicleRental",
       "mapper": "Digitransit",
       "maxZoom": 20,
       "minZoom": 14,
@@ -129,7 +130,8 @@
     },
     {
       "name": "rentalVehicle",
-      "type": "VehicleRentalVehicle", // just free-floating vehicles
+      // just free-floating vehicles
+      "type": "VehicleRentalVehicle",
       "mapper": "Digitransit",
       "maxZoom": 20,
       "minZoom": 14,
@@ -137,7 +139,8 @@
     },
     {
       "name": "rentalStation",
-      "type": "VehicleRentalStation", // just rental stations
+      // just rental stations
+      "type": "VehicleRentalStation",
       "mapper": "Digitransit",
       "maxZoom": 20,
       "minZoom": 14,
@@ -179,7 +182,47 @@
     },
     {
       "type": "vehicle-parking",
-      "sourceType": "hsl-park"
+      "sourceType": "hsl-park",
+      "feedId": "hslpark",
+      "timeZone": "Europe/Helsinki",
+      "facilitiesFrequencySec": 3600,
+      "facilitiesUrl": "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
+      "utilizationsFrequencySec": 600,
+      "utilizationsUrl": "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
+      "hubsUrl": "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
+    },
+    {
+      "type": "vehicle-parking",
+      "sourceType": "kml",
+      "feedId": "kml",
+      "frequencySec": 600,
+      "url": "https://foo.bar",
+      "namePrefix": "foo",
+      "zip": true
+    },
+    {
+      "type": "vehicle-parking",
+      "sourceType": "park-api",
+      "feedId": "parkapi",
+      "timeZone": "Europe/Berlin",
+      "frequencySec": 600,
+      "url": "https://foo.bar",
+      "headers": {
+        "Cache-Control": "max-age=604800"
+      },
+      "tags": [
+        "source:parkapi"
+      ]
+    },
+    {
+      "type": "vehicle-parking",
+      "feedId": "bikely",
+      "sourceType": "bikely",
+      "url": "https://api.safebikely.com/api/v1/s/locations",
+      "headers": {
+        "X-Bikely-Token": "${BIKELY_TOKEN}",
+        "Authorization": "${BIKELY_AUTHORIZATION}"
+      }
     },
     {
       "type": "stop-time-updater",
@@ -195,19 +238,17 @@
       "feedId": "1",
       "frequencySec": 60
     },
-
     // Streaming differential GTFS-RT TripUpdates over websockets
     {
       "type": "websocket-gtfs-rt-updater"
     },
-
     // SIRI SX updater for Azure Service Bus
     {
       "type": "siri-azure-sx-updater",
       "topic": "some_topic",
       "servicebus-url": "service_bus_url",
       "feedId": "feed_id",
-      "customMidnight":  4,
+      "customMidnight": 4,
       "history": {
         "url": "endpoint_url",
         "fromDateTime": "-P1D",

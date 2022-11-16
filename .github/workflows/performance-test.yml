@@ -28,6 +28,10 @@ jobs:
           - location: skanetrafiken
             iterations: 1
             jfr-delay: "50s"
+            
+          - location: switzerland
+            iterations: 4
+            jfr-delay: "50s"
     steps:
       - uses: actions/checkout@v3.1.0
         with:

@@ -2,16 +2,13 @@ package org.opentripplanner.standalone.config.routerconfig.updaters.sources;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
-import java.util.EnumSet;
 import java.util.Map;
-import java.util.Set;
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
 import org.opentripplanner.ext.vilkkubikerental.VilkkuBikeRentalDataSourceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
-import org.opentripplanner.util.OtpAppException;
 
 /**
  * This class is an object representation of the data source for a single real-time updater in
@@ -19,24 +16,18 @@ import org.opentripplanner.util.OtpAppException;
  */
 public class VehicleRentalSourceFactory {
 
-  private static final Set<DataSourceType> CONFIG_MAPPING = EnumSet.of(
-    DataSourceType.GBFS,
-    DataSourceType.SMOOVE,
-    DataSourceType.VILKKU
-  );
-  private final DataSourceType type;
+  private final VehicleRentalSourceType type;
   private final NodeAdapter c;
 
-  public VehicleRentalSourceFactory(DataSourceType type, NodeAdapter c) {
+  public VehicleRentalSourceFactory(VehicleRentalSourceType type, NodeAdapter c) {
     this.type = type;
     this.c = c;
   }
 
-  public static VehicleRentalDataSourceParameters create(DataSourceType type, NodeAdapter c) {
-    if (!CONFIG_MAPPING.contains(type)) {
-      throw new OtpAppException("The updater source type is not supported: " + type);
-    }
-
+  public static VehicleRentalDataSourceParameters create(
+    VehicleRentalSourceType type,
+    NodeAdapter c
+  ) {
     return new VehicleRentalSourceFactory(type, c).create();
   }
 
@@ -61,7 +52,6 @@ public class VehicleRentalSourceFactory {
         allowOverloading(),
         headers()
       );
-      default -> new VehicleRentalDataSourceParameters(type, url(), headers());
     };
   }
 

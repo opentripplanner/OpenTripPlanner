@@ -1,8 +1,7 @@
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.routing.graph.index;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,9 +13,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
-import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -27,6 +23,10 @@ import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.linking.DisposableEdgeCollection;
+import org.opentripplanner.routing.linking.LinkingDirection;
+import org.opentripplanner.routing.linking.Scope;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -49,9 +49,9 @@ import org.slf4j.LoggerFactory;
  * intersection, based on input latitude and longitude. Instantiating this class is expensive,
  * because it creates a spatial index of all of the intersections in the graph.
  */
-public class StreetVertexIndex {
+public class StreetIndex {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndex.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StreetIndex.class);
 
   private final StopModel stopModel;
 
@@ -59,20 +59,17 @@ public class StreetVertexIndex {
 
   private final Map<FeedScopedId, TransitStopVertex> transitStopVertices;
 
-  /**
-   * Contains only instances of {@link StreetEdge}
-   */
-  private final HashGridSpatialIndex<Edge> edgeTree;
+  private final EdgeSpatialIndex edgeSpatialIndex;
   private final HashGridSpatialIndex<Vertex> verticesTree;
 
   /**
    * Should only be called by the graph.
    */
-  public StreetVertexIndex(Graph graph, StopModel stopModel) {
+  public StreetIndex(Graph graph, StopModel stopModel) {
     this.stopModel = stopModel;
-    this.edgeTree = new HashGridSpatialIndex<>();
+    this.edgeSpatialIndex = new EdgeSpatialIndex();
     this.verticesTree = new HashGridSpatialIndex<>();
-    this.vertexLinker = new VertexLinker(graph, stopModel);
+    this.vertexLinker = new VertexLinker(graph, stopModel, edgeSpatialIndex);
     this.transitStopVertices = toImmutableMap(graph.getVerticesOfType(TransitStopVertex.class));
     postSetup(graph.getVertices());
   }
@@ -159,19 +156,16 @@ public class StreetVertexIndex {
    * geometry will not be indexed.
    */
   public Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
-    List<Edge> edges = edgeTree.query(envelope);
-    for (Iterator<Edge> ie = edges.iterator(); ie.hasNext();) {
-      Edge e = ie.next();
-      if (e.getToVertex() == null || e.getFromVertex() == null) {
-        ie.remove();
-      } else {
-        Envelope eenv = edgeGeometryOrStraightLine(e).getEnvelopeInternal();
-        if (!envelope.intersects(eenv)) {
-          ie.remove();
+    return edgeSpatialIndex
+      .query(envelope, Scope.PERMANENT)
+      .filter(e -> {
+        if (e.getToVertex() == null || e.getFromVertex() == null) {
+          return false;
         }
-      }
-    }
-    return edges;
+        Envelope eenv = edgeGeometryOrStraightLine(e).getEnvelopeInternal();
+        return envelope.intersects(eenv);
+      })
+      .toList();
   }
 
   /**
@@ -226,7 +220,7 @@ public class StreetVertexIndex {
     return (
       getClass().getName() +
       " -- edgeTree: " +
-      edgeTree.toString() +
+      edgeSpatialIndex.toString() +
       " -- verticesTree: " +
       verticesTree.toString()
     );
@@ -244,13 +238,10 @@ public class StreetVertexIndex {
     Set<DisposableEdgeCollection> tempEdges
   ) {
     // Check if coordinate is provided and connect it to graph
-    Coordinate coordinate = location.getCoordinate();
-    if (coordinate != null) {
-      //return getClosestVertex(loc, options, endVertex);
-      return createVertexFromLocation(location, streetMode, endVertex, tempEdges);
+    if (location.getCoordinate() == null) {
+      return null;
     }
-
-    return null;
+    return createVertexFromLocation(location, streetMode, endVertex, tempEdges);
   }
 
   /**
@@ -410,18 +401,9 @@ public class StreetVertexIndex {
     LOG.info(progress.startMessage());
 
     for (Vertex gv : vertices) {
-      /*
-       * We add all edges with geometry, skipping transit, filtering them out after. We do not
-       * index transit edges as we do not need them and some GTFS do not have shape data, so
-       * long straight lines between 2 faraway stations will wreck performance on a hash grid
-       * spatial index.
-       *
-       * If one need to store transit edges in the index, we could improve the hash grid
-       * rasterizing splitting long segments.
-       */
       for (Edge e : gv.getOutgoing()) {
         LineString geometry = edgeGeometryOrStraightLine(e);
-        edgeTree.insert(geometry, e);
+        edgeSpatialIndex.insert(geometry, e, Scope.PERMANENT);
       }
       Envelope env = new Envelope(gv.getCoordinate());
       verticesTree.insert(env, gv);

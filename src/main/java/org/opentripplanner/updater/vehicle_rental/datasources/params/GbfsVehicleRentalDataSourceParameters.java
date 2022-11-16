@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.params;
 
 import java.util.Map;
-import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 
 public class GbfsVehicleRentalDataSourceParameters extends VehicleRentalDataSourceParameters {
 
@@ -16,7 +16,7 @@ public class GbfsVehicleRentalDataSourceParameters extends VehicleRentalDataSour
     Map<String, String> httpHeaders,
     String network
   ) {
-    super(DataSourceType.GBFS, url, httpHeaders);
+    super(VehicleRentalSourceType.GBFS, url, httpHeaders);
     this.language = language;
     this.allowKeepingRentedVehicleAtDestination = allowKeepingRentedVehicleAtDestination;
     this.network = network;
