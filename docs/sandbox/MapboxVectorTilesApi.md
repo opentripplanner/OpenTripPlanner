@@ -26,7 +26,7 @@ To enable this you need to add the feature `otp-config.json`.
 // otp-config.json
 {
   "otpFeatures": {
-    "VehicleToStopHeuristics": true
+    "SandboxAPIMapboxVectorTilesApi": true
   }
 }
 ```
