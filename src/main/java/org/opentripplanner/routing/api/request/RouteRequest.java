@@ -78,7 +78,7 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /* ACCESSOR/SETTER METHODS */
 
-  void setJourney(JourneyRequest journey) {
+  public void setJourney(JourneyRequest journey) {
     this.journey = journey;
   }
 
