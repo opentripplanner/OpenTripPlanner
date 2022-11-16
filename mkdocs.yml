@@ -13,7 +13,6 @@ strict: true
 theme:
     name: material
     features:
-        - navigation.tabs
         - toc.integrate
     palette:
         primary: blue
