@@ -57,8 +57,6 @@ public class ViaRoutingWorker {
       this.request.setTo(request.routeRequest().to());
     }
 
-    this.request.setJourney(v.journeyRequest());
-
     var response = this.routingWorker.apply(this.request);
 
     if (v.viaLocation() == null) {

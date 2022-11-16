@@ -9,8 +9,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 
@@ -24,7 +22,6 @@ public class RouteViaRequest implements Serializable {
   private GenericLocation to = new GenericLocation(null, null);
   private Instant dateTime = Instant.now();
   private Duration searchWindow;
-  private JourneyRequest journey = new JourneyRequest();
   private boolean wheelchair = false;
   private RoutingPreferences preferences = new RoutingPreferences();
 
@@ -52,7 +49,6 @@ public class RouteViaRequest implements Serializable {
     this.to = Objects.requireNonNull(builder.to);
     this.dateTime = Objects.requireNonNull(builder.dateTime);
     this.searchWindow = Objects.requireNonNull(builder.searchWindow);
-    this.journey = Objects.requireNonNull(builder.journey);
     this.wheelchair = builder.wheelchair;
     this.preferences = Objects.requireNonNull(builder.preferences);
   }
@@ -72,7 +68,6 @@ public class RouteViaRequest implements Serializable {
     request.setFrom(from);
     request.setSearchWindow(searchWindow);
     request.setDateTime(dateTime);
-    request.setJourney(journey);
     request.setWheelchair(wheelchair);
     request.setPreferences(preferences);
 
@@ -123,7 +118,6 @@ public class RouteViaRequest implements Serializable {
       to.equals(other.to) &&
       dateTime.equals(other.dateTime) &&
       searchWindow.equals(other.searchWindow) &&
-      journey.equals(other.journey) &&
       wheelchair == other.wheelchair &&
       preferences.equals(other.preferences)
     );
@@ -131,16 +125,7 @@ public class RouteViaRequest implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-      viaLegs,
-      from,
-      to,
-      dateTime,
-      searchWindow,
-      journey,
-      wheelchair,
-      preferences
-    );
+    return Objects.hash(viaLegs, from, to, dateTime, searchWindow, wheelchair, preferences);
   }
 
   public static class Builder {
@@ -162,7 +147,6 @@ public class RouteViaRequest implements Serializable {
       this.to = original.to;
       this.dateTime = original.dateTime;
       this.searchWindow = original.searchWindow;
-      this.journey = original.journey;
       this.wheelchair = original.wheelchair;
       this.preferences = original.preferences;
       this.viaLegs = original.viaLegs;
