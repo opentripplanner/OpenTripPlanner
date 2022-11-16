@@ -14,6 +14,7 @@ import org.opentripplanner.standalone.config.framework.JsonSupport;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer;
 import org.opentripplanner.test.support.FilePatternSource;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 
 @OnlyIfDocsExist
 public class ExampleConfigTest {
@@ -30,6 +31,12 @@ public class ExampleConfigTest {
   @ParameterizedTest(name = "Check validity of {0}")
   void buildConfig(Path filename) {
     testConfig(filename, a -> new BuildConfig(a, true));
+  }
+
+  @FilePatternSource(pattern = "test/performance/**/speed-test-config.json")
+  @ParameterizedTest(name = "Check validity of {0}")
+  void speedTestConfig(Path filename) {
+    testConfig(filename, SpeedTestConfig::new);
   }
 
   @FilePatternSource(pattern = { "src/test/resources/standalone/config/invalid-config.json" })
