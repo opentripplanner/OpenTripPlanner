@@ -15,6 +15,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add performance test for switzerland [#4576](https://github.com/opentripplanner/OpenTripPlanner/pull/4576)
 - Add Bikely vehicle parking updater [#4589](https://github.com/opentripplanner/OpenTripPlanner/pull/4589)
 - Fix interchange generation when identical consecutive stops are filtered [#4586](https://github.com/opentripplanner/OpenTripPlanner/pull/4586)
+- Add test for SpeedTestConfigs used in performance tests [#4596](https://github.com/opentripplanner/OpenTripPlanner/pull/4596)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
