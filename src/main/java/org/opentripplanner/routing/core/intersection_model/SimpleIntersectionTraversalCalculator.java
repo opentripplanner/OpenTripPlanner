@@ -109,6 +109,12 @@ public class SimpleIntersectionTraversalCalculator
     return acrossTrafficBicycleTurnMultiplier;
   }
 
+  /**
+   * Sometimes this is applied twice (or even more than twice) when crossing a road which has
+   * multiple traffic lights which are synchronized. Therefore, this penalty should not be too high,
+   * so it's reasonable on average until we have implemented some logic for combining these traffic
+   * lights in intersections.
+   **/
   public double getExpectedWalkingAndCyclingTrafficLightTimeSec() {
     return 15;
   }
