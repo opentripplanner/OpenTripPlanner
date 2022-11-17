@@ -435,6 +435,23 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
+          .name("relaxTransitSearchCostCriteria")
+          .description(
+            """
+            Whether non-optimal transit paths should be returned.
+            Let c be the existing minimum pareto optimal cost to beat. Then a trip with cost c'
+            is accepted if the following is true: `c' < Math.round(c * relaxRaptorCostCriteria)`
+            If the value is less than 0.0 a normal '<' comparison is performed.
+            Values greater than 2.0 are not supported, due to performance reasons.
+            """
+          )
+          .type(Scalars.GraphQLFloat)
+          .defaultValue(preferences.transit().raptor().relaxTransitSearchCostCriteria())
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
           .name("itineraryFilters")
           .description(
             "Configure the itinerary-filter-chain. NOTE! THESE PARAMETERS ARE USED " +

@@ -19,6 +19,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -638,6 +639,13 @@ public abstract class RoutingResource {
 
   @QueryParam("useVehicleParkingAvailabilityInformation")
   protected Boolean useVehicleParkingAvailabilityInformation;
+
+  /**
+   * Whether we want to return non-optimal transit paths, this should be set to over 1.0
+   * {@link SearchParams#relaxCostAtDestination()}
+   */
+  @QueryParam("relaxTransitSearchCostCriteria")
+  protected Double relaxTransitSearchCostCriteria;
 
   @QueryParam("debugRaptorStops")
   private String debugRaptorStops;

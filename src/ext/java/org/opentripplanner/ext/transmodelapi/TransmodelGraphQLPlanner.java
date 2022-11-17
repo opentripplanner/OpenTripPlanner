@@ -274,6 +274,10 @@ public class TransmodelGraphQLPlanner {
       });
       callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
       callWith.argument("includePlannedCancellations", tr::setIncludePlannedCancellations);
+      callWith.argument(
+        "relaxTransitSearchCostCriteria",
+        (Double value) -> tr.withRaptor(it -> it.withRelaxTransitSearchCostCriteria(value))
+      );
     });
     preferences.withItineraryFilter(itineraryFilter -> {
       callWith.argument("debugItineraryFilter", itineraryFilter::withDebug);

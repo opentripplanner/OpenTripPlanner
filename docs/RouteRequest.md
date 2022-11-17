@@ -62,6 +62,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | numItineraries                                                                                   |        `integer`       | The maximum number of itineraries to return.                                                                                       | *Optional* | `50`                     |  2.0  |
 | [optimize](#rd_optimize)                                                                         |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                    | *Optional* | `"safe"`                 |  2.0  |
 | [otherThanPreferredRoutesPenalty](#rd_otherThanPreferredRoutesPenalty)                           |        `integer`       | Penalty added for using every route that is not preferred if user set any route as preferred.                                      | *Optional* | `300`                    |  2.0  |
+| [relaxTransitSearchCostCriteria](#rd_relaxTransitSearchCostCriteria)                             |        `double`        | Whether non-optimal transit paths should be returned                                                                               | *Optional* | `-1.0`                   |  2.3  |
 | [searchWindow](#rd_searchWindow)                                                                 |       `duration`       | The duration of the search-window.                                                                                                 | *Optional* |                          |  2.0  |
 | stairsReluctance                                                                                 |        `double`        | Used instead of walkReluctance for stairs.                                                                                         | *Optional* | `2.0`                    |  2.0  |
 | [stairsTimeFactor](#rd_stairsTimeFactor)                                                         |        `double`        | How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.                        | *Optional* | `3.0`                    |  2.1  |
@@ -237,6 +238,21 @@ The set of characteristics that the user wants to optimize for.
 Penalty added for using every route that is not preferred if user set any route as preferred.
 
 We return number of seconds that we are willing to wait for preferred route.
+
+<h3 id="rd_relaxTransitSearchCostCriteria">relaxTransitSearchCostCriteria</h3>
+
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `-1.0`   
+**Path:** /routingDefaults 
+
+Whether non-optimal transit paths should be returned
+
+Let c be the existing minimum pareto optimal cost to beat. Then a trip with cost c'
+is accepted if the following is true: `c' < Math.round(c * relaxRaptorCostCriteria)`
+
+If the value is less than 0.0 a normal '<' comparison is performed.
+
+Values greater than 2.0 are not supported, due to performance reasons.
+
 
 <h3 id="rd_searchWindow">searchWindow</h3>
 
