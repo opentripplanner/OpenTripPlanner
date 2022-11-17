@@ -19,6 +19,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add alerts to leg when reading in a leg reference [#4595](https://github.com/opentripplanner/OpenTripPlanner/pull/4595)
 - Remove KML bike parking updater [#4602](https://github.com/opentripplanner/OpenTripPlanner/pull/4602)
 - Initial implementation of via search [#4554](https://github.com/opentripplanner/OpenTripPlanner/pull/4554)
+- Use material design theme for documentation, auto-deploy to Github Pages [#4575](https://github.com/opentripplanner/OpenTripPlanner/pull/4575)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
