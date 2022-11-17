@@ -4,8 +4,6 @@ import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdater;
 import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdater;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
-import org.opentripplanner.ext.vehicleparking.kml.KmlBikeParkDataSource;
-import org.opentripplanner.ext.vehicleparking.kml.KmlUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.BicycleParkAPIUpdater;
 import org.opentripplanner.ext.vehicleparking.parkapi.CarParkAPIUpdater;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
@@ -29,7 +27,6 @@ public class VehicleParkingDataSourceFactory {
         (HslParkUpdaterParameters) parameters,
         openingHoursCalendarService
       );
-      case KML -> new KmlBikeParkDataSource((KmlUpdaterParameters) parameters);
       case PARK_API -> new CarParkAPIUpdater(
         (ParkAPIUpdaterParameters) parameters,
         openingHoursCalendarService

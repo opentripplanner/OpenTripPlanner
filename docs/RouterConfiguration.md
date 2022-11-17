@@ -571,14 +571,6 @@ Http headers.
     "hubsUrl" : "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
   }, {
     "type" : "vehicle-parking",
-    "sourceType" : "kml",
-    "feedId" : "kml",
-    "frequencySec" : 600,
-    "url" : "https://foo.bar",
-    "namePrefix" : "foo",
-    "zip" : true
-  }, {
-    "type" : "vehicle-parking",
     "sourceType" : "park-api",
     "feedId" : "parkapi",
     "timeZone" : "Europe/Berlin",
