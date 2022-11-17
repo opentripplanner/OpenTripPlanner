@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev-2.x
-      - fix-bw-speed-test
 
 jobs:
   perf-test:
@@ -63,7 +62,6 @@ jobs:
       - name: Copy graph, run speed test
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
-          MEASUREMENT_ENVIRONMENT: CI
           SPEEDTEST_LOCATION: ${{ matrix.location }}
           MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr"
         run: |
