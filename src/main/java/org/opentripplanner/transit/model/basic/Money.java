@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.core;
+package org.opentripplanner.transit.model.basic;
 
 import java.text.NumberFormat;
 import java.util.Currency;
@@ -26,11 +26,15 @@ public record Money(Currency currency, int cents) implements Comparable<Money> {
     return cents - m.cents;
   }
 
-  @Override
-  public String toString() {
-    NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.ENGLISH);
+  public String localize(Locale loc) {
+    NumberFormat nf = NumberFormat.getCurrencyInstance(loc);
     nf.setCurrency(currency);
     nf.setMaximumFractionDigits(currency.getDefaultFractionDigits());
     return nf.format(cents / (Math.pow(10, currency.getDefaultFractionDigits())));
+  }
+
+  @Override
+  public String toString() {
+    return localize(Locale.ENGLISH);
   }
 }

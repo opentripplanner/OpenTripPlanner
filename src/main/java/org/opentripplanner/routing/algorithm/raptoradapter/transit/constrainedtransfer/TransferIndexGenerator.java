@@ -230,12 +230,14 @@ public class TransferIndexGenerator {
     // All trips have at least one pattern, no need to chech for null here
     var patterns = patternsByTrip.get(trip);
     int stopPosInPattern = point.getStopPositionInPattern();
-    int stopIndex = patterns.iterator().next().stopIndex(stopPosInPattern);
-    var sourcePoint = createTransferPointForPattern(trip, stopIndex);
     return patterns
       .stream()
-      .map(p -> new TPoint(p, sourcePoint, trip, stopPosInPattern))
-      .collect(Collectors.toList());
+      .map(pattern -> {
+        int stopIndex = pattern.stopIndex(stopPosInPattern);
+        var sourcePoint = createTransferPointForPattern(trip, stopIndex);
+        return new TPoint(pattern, sourcePoint, trip, stopPosInPattern);
+      })
+      .toList();
   }
 
   private static class TPoint {

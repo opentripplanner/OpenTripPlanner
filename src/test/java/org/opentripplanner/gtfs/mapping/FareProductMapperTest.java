@@ -6,7 +6,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareProduct;
-import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.transit.model.basic.Money;
 
 class FareProductMapperTest {
 

@@ -8,8 +8,8 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
-import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.transit.model.basic.Money;
 
 /**
  * This appears to be used in combination with transit using an AddingMultipleFareService.

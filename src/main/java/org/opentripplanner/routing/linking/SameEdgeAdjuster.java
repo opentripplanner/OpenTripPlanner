@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.linking;
+package org.opentripplanner.routing.linking;
 
 import com.google.common.collect.Sets;
 import java.util.HashSet;

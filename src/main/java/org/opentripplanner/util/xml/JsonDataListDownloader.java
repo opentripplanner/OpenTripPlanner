@@ -19,7 +19,7 @@ public class JsonDataListDownloader<T> {
   private final String jsonParsePath;
   private final Map<String, String> headers;
   private final Function<JsonNode, T> elementParser;
-  private String url;
+  private final String url;
 
   public JsonDataListDownloader(
     String url,
@@ -55,10 +55,6 @@ public class JsonDataListDownloader<T> {
     return null;
   }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
   private static String convertStreamToString(java.io.InputStream is) {
     try (java.util.Scanner scanner = new java.util.Scanner(is).useDelimiter("\\A")) {
       return scanner.hasNext() ? scanner.next() : "";
@@ -89,9 +85,13 @@ public class JsonDataListDownloader<T> {
       if (node == null) {
         continue;
       }
-      T parsedElement = elementParser.apply(node);
-      if (parsedElement != null) {
-        out.add(parsedElement);
+      try {
+        T parsedElement = elementParser.apply(node);
+        if (parsedElement != null) {
+          out.add(parsedElement);
+        }
+      } catch (Exception e) {
+        log.error("Could not process element in JSON list downloaded from {}", url, e);
       }
     }
     return out;

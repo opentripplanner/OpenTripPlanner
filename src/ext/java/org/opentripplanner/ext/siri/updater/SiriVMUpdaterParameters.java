@@ -42,12 +42,12 @@ public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
   }
 
   @Override
-  public int getFrequencySec() {
+  public int frequencySec() {
     return frequencySec;
   }
 
   @Override
-  public String getConfigRef() {
+  public String configRef() {
     return configRef;
   }
 

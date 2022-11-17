@@ -15,8 +15,6 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -35,6 +33,8 @@ import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.LinkingDirection;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
@@ -54,7 +54,7 @@ public class ConstantsForTests {
 
   private static final String PORTLAND_GTFS = "src/test/resources/portland/portland.gtfs.zip";
 
-  private static final String PORTLAND_CENTRAL_OSM =
+  public static final String PORTLAND_CENTRAL_OSM =
     "src/test/resources/portland/portland-central-filtered.osm.pbf";
 
   private static final String PORTLAND_BIKE_SHARE_CSV =
@@ -93,8 +93,6 @@ public class ConstantsForTests {
     "src/test/resources/germany/herrenberg-barrier-gates.osm.pbf";
   public static final String HERRENBERG_OSM =
     "src/test/resources/germany/herrenberg-minimal.osm.pbf";
-  public static final String STUTTGART_SCHWABSTR_OSM =
-    "src/test/resources/germany/stuttgart-schwabstrasse.osm.pbf";
   public static final String ISLAND_PRUNE_OSM =
     "src/test/resources/germany/herrenberg-island-prune-nothru.osm.pbf";
 
@@ -141,11 +139,11 @@ public class ConstantsForTests {
           // Need to use a mutable set here, since it is used
           graph,
           noopIssueStore(),
-          new DefaultMapper()
+          new DefaultMapper(),
+          false
         );
         osmModule.staticBikeParkAndRide = true;
         osmModule.staticParkAndRide = true;
-        osmModule.skipVisibility = true;
         osmModule.buildGraph();
       }
       // Add transit data from GTFS
@@ -191,9 +189,9 @@ public class ConstantsForTests {
         Set.of(),
         graph,
         noopIssueStore(),
-        new DefaultMapper()
+        new DefaultMapper(),
+        false
       );
-      osmModule.skipVisibility = true;
       osmModule.buildGraph();
       return new TestOtpModel(graph, transitModel);
     } catch (Exception e) {
@@ -250,9 +248,9 @@ public class ConstantsForTests {
           Set.of(),
           graph,
           noopIssueStore(),
-          new DefaultMapper()
+          new DefaultMapper(),
+          false
         );
-        osmModule.skipVisibility = true;
         osmModule.buildGraph();
       }
       // Add transit data from Netex

@@ -8,7 +8,7 @@ import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
-public class PollingStoptimeUpdaterConfig {
+public class PollingTripUpdaterConfig {
 
   public static PollingTripUpdaterParameters create(String configRef, NodeAdapter c) {
     String file = null;
@@ -34,12 +34,6 @@ public class PollingStoptimeUpdaterConfig {
         .since(NA)
         .summary("How often the data should be downloaded in seconds.")
         .asInt(60),
-      c.of("maxSnapshotFrequencyMs").since(NA).summary("TODO").asInt(-1),
-      c
-        .of("purgeExpiredData")
-        .since(NA)
-        .summary("Should expired data removed from the snapshot.")
-        .asBoolean(false),
       c
         .of("fuzzyTripMatching")
         .since(NA)

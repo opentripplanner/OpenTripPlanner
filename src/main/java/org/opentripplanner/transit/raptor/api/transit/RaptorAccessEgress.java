@@ -131,6 +131,17 @@ public interface RaptorAccessEgress {
     return false;
   }
 
+  /**
+   * Is this access or egress without duration.
+   * This commonly refers to:
+   * An empty access where you board transit directly at the origin
+   * An empty egress where you alight transit directly at the destination
+   * @return true if the duration is 0;
+   */
+  default boolean isEmpty() {
+    return durationInSeconds() == 0;
+  }
+
   /** Call this from toString */
   default String asString() {
     String duration = DurationUtils.durationToStr(durationInSeconds());

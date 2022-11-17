@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -12,6 +14,11 @@ import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 
+/**
+ * This class is used to combine alerts from multiple {@link TransitAlertService}s. Each
+ * {@link TransitAlertProvider} has its own service, and all need to be queried in order to fetch
+ * all alerts.
+ */
 public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   private final ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
@@ -54,10 +61,13 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getStopAlerts(FeedScopedId stop) {
+  public Collection<TransitAlert> getStopAlerts(
+    FeedScopedId stop,
+    Set<StopCondition> stopConditions
+  ) {
     return transitAlertServices
       .stream()
-      .map(transitAlertService -> transitAlertService.getStopAlerts(stop))
+      .map(transitAlertService -> transitAlertService.getStopAlerts(stop, stopConditions))
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
   }
@@ -90,10 +100,16 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getStopAndRouteAlerts(FeedScopedId stop, FeedScopedId route) {
+  public Collection<TransitAlert> getStopAndRouteAlerts(
+    FeedScopedId stop,
+    FeedScopedId route,
+    Set<StopCondition> stopConditions
+  ) {
     return transitAlertServices
       .stream()
-      .map(transitAlertService -> transitAlertService.getStopAndRouteAlerts(stop, route))
+      .map(transitAlertService ->
+        transitAlertService.getStopAndRouteAlerts(stop, route, stopConditions)
+      )
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
   }
@@ -102,11 +118,14 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   public Collection<TransitAlert> getStopAndTripAlerts(
     FeedScopedId stop,
     FeedScopedId trip,
-    LocalDate serviceDate
+    LocalDate serviceDate,
+    Set<StopCondition> stopConditions
   ) {
     return transitAlertServices
       .stream()
-      .map(transitAlertService -> transitAlertService.getStopAndTripAlerts(stop, trip, serviceDate))
+      .map(transitAlertService ->
+        transitAlertService.getStopAndTripAlerts(stop, trip, serviceDate, stopConditions)
+      )
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
   }

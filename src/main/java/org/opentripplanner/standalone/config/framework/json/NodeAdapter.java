@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config.framework.json;
 
+import static org.opentripplanner.standalone.config.framework.json.NodeInfo.SOURCETYPE_QUALIFIER;
 import static org.opentripplanner.standalone.config.framework.json.NodeInfo.TYPE_QUALIFIER;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -146,6 +147,11 @@ public class NodeAdapter {
   public String typeQualifier() {
     assertRequiredFieldExist(TYPE_QUALIFIER);
     return json.path(TYPE_QUALIFIER).asText();
+  }
+
+  public String sourceTypeQualifier() {
+    assertRequiredFieldExist(SOURCETYPE_QUALIFIER);
+    return json.path(SOURCETYPE_QUALIFIER).asText();
   }
 
   /**

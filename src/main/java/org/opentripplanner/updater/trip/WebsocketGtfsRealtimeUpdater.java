@@ -80,7 +80,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     TimetableSnapshotSource snapshotSource,
     TransitModel transitModel
   ) {
-    this.configRef = parameters.getConfigRef();
+    this.configRef = parameters.configRef();
     this.url = parameters.getUrl();
     this.feedId = parameters.getFeedId();
     this.reconnectPeriodSec = parameters.getReconnectPeriodSec();

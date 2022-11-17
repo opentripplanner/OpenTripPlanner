@@ -13,12 +13,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
+import org.opentripplanner.routing.alertpatch.EntityKey;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.routing.alertpatch.StopConditionsHelper;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -68,9 +71,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     List<RoutePointTypeEnumeration> stopConditions = Arrays.asList(
       RoutePointTypeEnumeration.DESTINATION,
       RoutePointTypeEnumeration.NOT_STOPPING,
-      RoutePointTypeEnumeration.REQUEST_STOP,
-      RoutePointTypeEnumeration.EXCEPTIONAL_STOP,
-      RoutePointTypeEnumeration.START_POINT
+      RoutePointTypeEnumeration.REQUEST_STOP
     );
 
     PtSituationElement ptSituation = createPtSituationElement(
@@ -116,9 +117,47 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Stop.class));
     assertTrue(matchesEntity(transitAlert, stopId));
 
-    assertTrue(transitAlert.getStopConditions().contains(StopCondition.DESTINATION));
-    assertTrue(transitAlert.getStopConditions().contains(StopCondition.NOT_STOPPING));
-    assertTrue(transitAlert.getStopConditions().contains(StopCondition.REQUEST_STOP));
+    assertEquals(1, transitAlert.getEntities().size());
+    EntitySelector entitySelector = transitAlert.getEntities().iterator().next();
+    assertTrue(
+      ((EntitySelector.Stop) entitySelector).stopConditions().contains(StopCondition.DESTINATION)
+    );
+    assertTrue(
+      StopConditionsHelper.matchesStopCondition(entitySelector, Set.of(StopCondition.DESTINATION))
+    );
+
+    assertTrue(
+      ((EntitySelector.Stop) entitySelector).stopConditions().contains(StopCondition.NOT_STOPPING)
+    );
+    assertTrue(
+      StopConditionsHelper.matchesStopCondition(entitySelector, Set.of(StopCondition.NOT_STOPPING))
+    );
+
+    assertTrue(
+      ((EntitySelector.Stop) entitySelector).stopConditions().contains(StopCondition.REQUEST_STOP)
+    );
+    assertTrue(
+      StopConditionsHelper.matchesStopCondition(entitySelector, Set.of(StopCondition.REQUEST_STOP))
+    );
+
+    // The following StopConditions are not added to the EntitySelector, and should not match
+    assertFalse(
+      ((EntitySelector.Stop) entitySelector).stopConditions().contains(StopCondition.START_POINT)
+    );
+    assertFalse(
+      StopConditionsHelper.matchesStopCondition(entitySelector, Set.of(StopCondition.START_POINT))
+    );
+
+    assertFalse(
+      ((EntitySelector.Stop) entitySelector).stopConditions()
+        .contains(StopCondition.EXCEPTIONAL_STOP)
+    );
+    assertFalse(
+      StopConditionsHelper.matchesStopCondition(
+        entitySelector,
+        Set.of(StopCondition.EXCEPTIONAL_STOP)
+      )
+    );
 
     assertNotNull(transitAlert.getAlertUrlList());
     assertFalse(transitAlert.getAlertUrlList().isEmpty());
@@ -241,12 +280,22 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Stop.class));
     assertTrue(matchesEntity(transitAlert, stopId0));
 
+    boolean foundStartPointStopCondition = false;
+    boolean foundDestinationStopCondition = false;
+    for (EntitySelector entity : transitAlert.getEntities()) {
+      if (((EntitySelector.Stop) entity).stopConditions().contains(StopCondition.START_POINT)) {
+        foundStartPointStopCondition = true;
+      }
+      if (((EntitySelector.Stop) entity).stopConditions().contains(StopCondition.DESTINATION)) {
+        foundDestinationStopCondition = true;
+      }
+    }
     assertTrue(
-      transitAlert.getStopConditions().contains(StopCondition.START_POINT),
+      foundStartPointStopCondition,
       "Alert does not contain default condition START_POINT"
     );
     assertTrue(
-      transitAlert.getStopConditions().contains(StopCondition.DESTINATION),
+      foundDestinationStopCondition,
       "Alert does not contain default condition DESTINATION"
     );
 
@@ -259,12 +308,23 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Stop.class));
     assertTrue(matchesEntity(transitAlert, stopId1));
 
+    foundStartPointStopCondition = false;
+    foundDestinationStopCondition = false;
+    for (EntitySelector entity : transitAlert.getEntities()) {
+      if (((EntitySelector.Stop) entity).stopConditions().contains(StopCondition.START_POINT)) {
+        foundStartPointStopCondition = true;
+      }
+      if (((EntitySelector.Stop) entity).stopConditions().contains(StopCondition.DESTINATION)) {
+        foundDestinationStopCondition = true;
+      }
+    }
+
     assertTrue(
-      transitAlert.getStopConditions().contains(StopCondition.START_POINT),
+      foundStartPointStopCondition,
       "Alert does not contain default condition START_POINT"
     );
     assertTrue(
-      transitAlert.getStopConditions().contains(StopCondition.DESTINATION),
+      foundDestinationStopCondition,
       "Alert does not contain default condition DESTINATION"
     );
   }
@@ -342,12 +402,13 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
-    // Verify that requesting specific date does not include alert for all dates
+    // Verify that requesting specific date does include alert for all dates
     LocalDate serviceDate = LocalDate.of(2014, 1, 1);
     Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(tripId, serviceDate);
 
     assertNotNull(tripPatches);
-    assertEquals(0, tripPatches.size());
+    assertEquals(1, tripPatches.size());
+    final TransitAlert datedTransitAlert = tripPatches.iterator().next();
 
     // Verify that NOT requesting specific date includes alert for all dates
     serviceDate = null;
@@ -357,8 +418,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(1, tripPatches.size());
 
     final TransitAlert transitAlert = tripPatches.iterator().next();
-
-    final TransitAlert datedTransitAlert = tripPatches.iterator().next();
 
     assertEquals(transitAlert, datedTransitAlert);
 
@@ -852,12 +911,12 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     boolean foundMatch = false;
     for (EntitySelector entity : transitAlert.getEntities()) {
       if (!foundMatch) {
-        if (entity instanceof EntitySelector.Stop) {
-          foundMatch = ((EntitySelector.Stop) entity).stopId.equals(feedScopedEntityId);
-        } else if (entity instanceof EntitySelector.Trip) {
-          foundMatch = ((EntitySelector.Trip) entity).tripId.equals(feedScopedEntityId);
-        } else if (entity instanceof EntitySelector.Route) {
-          foundMatch = ((EntitySelector.Route) entity).routeId.equals(feedScopedEntityId);
+        if (entity instanceof EntitySelector.Stop entitySelector) {
+          foundMatch = entitySelector.stopId().equals(feedScopedEntityId);
+        } else if (entity instanceof EntitySelector.Trip entitySelector) {
+          foundMatch = entitySelector.tripId().equals(feedScopedEntityId);
+        } else if (entity instanceof EntitySelector.Route entitySelector) {
+          foundMatch = entitySelector.routeId().equals(feedScopedEntityId);
         }
       }
     }
@@ -1013,17 +1072,12 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     boolean foundMatch = false;
     for (EntitySelector entity : transitAlert.getEntities()) {
       if (!foundMatch) {
-        if (entity instanceof EntitySelector.StopAndRoute) {
+        if (entity.key() instanceof EntityKey.StopAndRoute stopAndRoute) {
+          foundMatch = stopAndRoute.equals((new EntityKey.StopAndRoute(stopId, routeOrTripId)));
+        } else if (entity instanceof EntitySelector.StopAndTrip stopAndTrip) {
           foundMatch =
-            ((EntitySelector.StopAndRoute) entity).stopAndRoute.equals(
-                (new EntitySelector.StopAndRouteOrTripKey(stopId, routeOrTripId, serviceDate))
-              );
-        }
-        if (entity instanceof EntitySelector.StopAndTrip) {
-          foundMatch =
-            ((EntitySelector.StopAndTrip) entity).stopAndTrip.equals(
-                (new EntitySelector.StopAndRouteOrTripKey(stopId, routeOrTripId, serviceDate))
-              );
+            stopAndTrip.key().equals(new EntityKey.StopAndTrip(stopId, routeOrTripId)) &&
+            stopAndTrip.serviceDate().equals(serviceDate);
         }
       }
     }
