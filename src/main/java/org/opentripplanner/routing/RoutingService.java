@@ -7,10 +7,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
+import org.opentripplanner.routing.algorithm.via.ViaRoutingWorker;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.request.RouteViaRequest;
+import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -56,8 +57,13 @@ public class RoutingService implements org.opentripplanner.routing.api.request.R
   }
 
   @Override
-  public RoutingResponse route(RouteViaRequest request, RoutingPreferences preferences) {
-    throw new RuntimeException("Not implemented");
+  public ViaRoutingResponse route(RouteViaRequest request) {
+    var viaRoutingWorker = new ViaRoutingWorker(
+      request,
+      req ->
+        new RoutingWorker(serverContext, req, serverContext.transitService().getTimeZone()).route()
+    );
+    return viaRoutingWorker.route();
   }
 
   /** {@link Graph#getVertex(String)} */
