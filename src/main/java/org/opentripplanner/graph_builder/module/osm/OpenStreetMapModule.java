@@ -434,9 +434,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
               node.getId(),
               new NonLocalizedString(label)
             );
-          if (node.hasTrafficLight()) {
-            iv.trafficLight = true;
-          }
+          iv.setHighwayTrafficLight(node.hasHighwayTrafficLight());
+          iv.setCrossingTrafficLight(node.hasCrossingTrafficLight());
         }
 
         intersectionNodes.put(nid, iv);

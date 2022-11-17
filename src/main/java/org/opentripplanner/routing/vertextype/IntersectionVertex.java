@@ -11,10 +11,9 @@ public class IntersectionVertex extends StreetVertex {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * Does this intersection have a traffic light?
-   */
-  public boolean trafficLight;
+  private boolean highwayTrafficLight;
+
+  private boolean crossingTrafficLight;
 
   /**
    * Is this a free-flowing intersection, i.e. should it have no delay at all? e.g., freeway ramps,
@@ -30,11 +29,48 @@ public class IntersectionVertex extends StreetVertex {
   public IntersectionVertex(Graph g, String label, double x, double y, I18NString name) {
     super(g, label, x, y, name);
     freeFlowing = false;
-    trafficLight = false;
+    highwayTrafficLight = false;
+    crossingTrafficLight = false;
   }
 
   public IntersectionVertex(Graph g, String label, double x, double y) {
     this(g, label, x, y, new NonLocalizedString(label));
+  }
+
+  /**
+   * Does this intersection have a traffic light meant for cars (and for other means of traversing on such roads)?
+   */
+  public void setHighwayTrafficLight(boolean highwayTrafficLight) {
+    this.highwayTrafficLight = highwayTrafficLight;
+  }
+
+  /**
+   * Does this intersection have a traffic light meant for pedestrians and cyclists?
+   */
+  public void setCrossingTrafficLight(boolean crossingTrafficLight) {
+    this.crossingTrafficLight = crossingTrafficLight;
+  }
+
+  /**
+   * Takes into account both traffic lights meant for pedestrians and for cars as cyclists have
+   * to obey both rules.
+   */
+  public boolean hasCyclingTrafficLight() {
+    return this.highwayTrafficLight || this.crossingTrafficLight;
+  }
+
+  /**
+   * Doesn't take into account traffic lights meant for cars.
+   */
+  public boolean hasWalkingTrafficLight() {
+    return this.crossingTrafficLight;
+  }
+
+  /**
+   * Doesn't take into account traffic lights meant for pedestrians.
+   */
+  public boolean hasDrivingTrafficLight() {
+    return this.highwayTrafficLight;
   }
 
   /** Returns true if this.freeFlowing or if it appears that this vertex is free-flowing */
@@ -43,6 +79,8 @@ public class IntersectionVertex extends StreetVertex {
       return true;
     }
 
-    return getDegreeIn() == 1 && getDegreeOut() == 1 && !this.trafficLight;
+    return (
+      getDegreeIn() == 1 && getDegreeOut() == 1 && !highwayTrafficLight && !crossingTrafficLight
+    );
   }
 }

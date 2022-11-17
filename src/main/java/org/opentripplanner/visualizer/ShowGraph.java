@@ -785,7 +785,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       if (
         drawStreetVertices &&
         (
-          (v instanceof IntersectionVertex && ((IntersectionVertex) v).trafficLight) ||
+          (v instanceof IntersectionVertex && ((IntersectionVertex) v).hasCyclingTrafficLight()) ||
           (
             v instanceof ElevatorOnboardVertex ||
             v instanceof ElevatorOffboardVertex ||
@@ -796,7 +796,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
           )
         )
       ) {
-        if (v instanceof IntersectionVertex && ((IntersectionVertex) v).trafficLight) {
+        if (v instanceof IntersectionVertex && ((IntersectionVertex) v).hasCyclingTrafficLight()) {
           fill(120, 60, 60); // Make traffic lights red dots
           drawVertex(v, 5);
         }

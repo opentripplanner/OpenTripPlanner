@@ -107,7 +107,7 @@ public class FlexIntegrationTest {
     var from = GenericLocation.fromStopId("ALEX DR@ALEX WAY", "MARTA", "97266");
     var to = new GenericLocation(33.86701256815635, -84.61787939071655);
 
-    var itin = getItinerary(from, to, 1);
+    var itin = getItinerary(from, to, 2);
 
     assertEquals(5, itin.getLegs().size());
 
@@ -149,8 +149,8 @@ public class FlexIntegrationTest {
 
     // walk, flex
     assertEquals(2, itin.getLegs().size());
-    assertEquals("2021-12-02T12:53:12-05:00[America/New_York]", itin.startTime().toString());
-    assertEquals(3173, itin.getGeneralizedCost());
+    assertEquals("2021-12-02T12:52:42-05:00[America/New_York]", itin.startTime().toString());
+    assertEquals(3203, itin.getGeneralizedCost());
 
     var walkToFlex = itin.getStreetLeg(0);
     assertEquals(WALK, walkToFlex.getMode());

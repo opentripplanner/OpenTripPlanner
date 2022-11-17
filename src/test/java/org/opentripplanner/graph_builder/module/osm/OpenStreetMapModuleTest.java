@@ -133,20 +133,20 @@ public class OpenStreetMapModuleTest {
     IntersectionVertex iv2 = (IntersectionVertex) gg.getVertex("osm:node:42442273");
     IntersectionVertex iv3 = (IntersectionVertex) gg.getVertex("osm:node:1919595927");
     IntersectionVertex iv4 = (IntersectionVertex) gg.getVertex("osm:node:42452026");
-    assertTrue(iv1.trafficLight);
-    assertTrue(iv2.trafficLight);
-    assertTrue(iv3.trafficLight);
-    assertTrue(iv4.trafficLight);
+    assertTrue(iv1.hasDrivingTrafficLight());
+    assertTrue(iv2.hasDrivingTrafficLight());
+    assertTrue(iv3.hasDrivingTrafficLight());
+    assertTrue(iv4.hasDrivingTrafficLight());
 
     // These are not.
     IntersectionVertex iv5 = (IntersectionVertex) gg.getVertex("osm:node:42435485");
     IntersectionVertex iv6 = (IntersectionVertex) gg.getVertex("osm:node:42439335");
     IntersectionVertex iv7 = (IntersectionVertex) gg.getVertex("osm:node:42436761");
     IntersectionVertex iv8 = (IntersectionVertex) gg.getVertex("osm:node:42442291");
-    assertFalse(iv5.trafficLight);
-    assertFalse(iv6.trafficLight);
-    assertFalse(iv7.trafficLight);
-    assertFalse(iv8.trafficLight);
+    assertFalse(iv5.hasDrivingTrafficLight());
+    assertFalse(iv6.hasDrivingTrafficLight());
+    assertFalse(iv7.hasDrivingTrafficLight());
+    assertFalse(iv8.hasDrivingTrafficLight());
 
     Set<P2<Vertex>> edgeEndpoints = new HashSet<>();
     for (StreetEdge se : gg.getStreetEdges()) {
