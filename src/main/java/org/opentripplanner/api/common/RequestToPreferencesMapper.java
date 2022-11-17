@@ -2,6 +2,9 @@ package org.opentripplanner.api.common;
 
 import java.util.function.Consumer;
 import javax.validation.constraints.NotNull;
+import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -121,10 +124,41 @@ class RequestToPreferencesMapper {
   }
 
   private void mapItineraryFilter() {
-    setIfNotNull(
-      req.debugItineraryFilter,
-      value -> preferences.withItineraryFilter(it -> it.withDebug(value))
-    );
+    preferences.withItineraryFilter(filter -> {
+      setIfNotNull(req.debugItineraryFilter, filter::withDebug);
+      setIfNotNull(req.groupSimilarityKeepOne, filter::withGroupSimilarityKeepOne);
+      setIfNotNull(req.groupSimilarityKeepThree, filter::withGroupSimilarityKeepThree);
+      setIfNotNull(
+        req.groupedOtherThanSameLegsMaxCostMultiplier,
+        filter::withGroupedOtherThanSameLegsMaxCostMultiplier
+      );
+      filter.withTransitGeneralizedCostLimit(mapTransitGeneralizedCostFilterParams(filter));
+      setIfNotNull(
+        req.nonTransitGeneralizedCostLimitFunction,
+        it -> filter.withNonTransitGeneralizedCostLimit(RequestFunctions.parse(it))
+      );
+    });
+  }
+
+  private TransitGeneralizedCostFilterParams mapTransitGeneralizedCostFilterParams(
+    ItineraryFilterPreferences.Builder filter
+  ) {
+    TransitGeneralizedCostFilterParams result = filter.original().transitGeneralizedCostLimit();
+    if (req.transitGeneralizedCostLimitFunction != null) {
+      result =
+        new TransitGeneralizedCostFilterParams(
+          RequestFunctions.parse(req.transitGeneralizedCostLimitFunction),
+          result.intervalRelaxFactor()
+        );
+    }
+    if (req.transitGeneralizedCostLimitIntervalRelaxFactor != null) {
+      result =
+        new TransitGeneralizedCostFilterParams(
+          result.costLimitFunction(),
+          req.transitGeneralizedCostLimitIntervalRelaxFactor
+        );
+    }
+    return result;
   }
 
   private void mapParking() {
