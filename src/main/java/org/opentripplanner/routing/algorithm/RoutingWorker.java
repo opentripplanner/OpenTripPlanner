@@ -29,7 +29,6 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -79,9 +78,15 @@ public class RoutingWorker {
       createPagingSearchWindowAdjuster(serverContext.routerConfig());
     this.additionalSearchDays =
       createAdditionalSearchDays(
-        serverContext.routerConfig().raptorTuningParameters(),
         zoneId,
-        request
+        request,
+        Duration.ofMinutes(
+          serverContext
+            .raptorConfig()
+            .tuningParameters()
+            .dynamicSearchWindowCoefficients()
+            .maxWinTimeMinutes()
+        )
       );
   }
 
@@ -179,14 +184,11 @@ public class RoutingWorker {
   }
 
   private static AdditionalSearchDays createAdditionalSearchDays(
-    RaptorTuningParameters raptorTuningParameters,
     ZoneId zoneId,
-    RouteRequest request
+    RouteRequest request,
+    Duration maxWindow
   ) {
     var searchDateTime = ZonedDateTime.ofInstant(request.dateTime(), zoneId);
-    var maxWindow = Duration.ofMinutes(
-      raptorTuningParameters.dynamicSearchWindowCoefficients().maxWinTimeMinutes()
-    );
 
     return new AdditionalSearchDays(
       request.arriveBy(),

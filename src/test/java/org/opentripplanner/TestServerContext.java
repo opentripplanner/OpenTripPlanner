@@ -30,7 +30,7 @@ public class TestServerContext {
       Metrics.globalRegistry,
       null
     );
-    creatTransitLayerForRaptor(transitModel, routerConfig);
+    creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningParameters());
     return context;
   }
 }
