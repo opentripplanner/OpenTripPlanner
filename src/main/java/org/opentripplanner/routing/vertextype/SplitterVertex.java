@@ -13,7 +13,7 @@ public class SplitterVertex extends IntersectionVertex {
   private static final long serialVersionUID = 1L;
 
   public SplitterVertex(Graph g, String label, double x, double y, I18NString name) {
-    super(g, label, x, y, name);
+    super(g, label, x, y, name, false, false);
   }
 
   @Override

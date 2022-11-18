@@ -356,9 +356,14 @@ public class SimpleIntersectionTraversalCalculatorTest {
     boolean hasHighwayLight,
     boolean hasCrossingLight
   ) {
-    IntersectionVertex v = new IntersectionVertex(graph, label, coord.y, coord.x);
-    v.setHighwayTrafficLight(hasHighwayLight);
-    v.setCrossingTrafficLight(hasCrossingLight);
+    IntersectionVertex v = new IntersectionVertex(
+      graph,
+      label,
+      coord.y,
+      coord.x,
+      hasHighwayLight,
+      hasCrossingLight
+    );
     return v;
   }
 

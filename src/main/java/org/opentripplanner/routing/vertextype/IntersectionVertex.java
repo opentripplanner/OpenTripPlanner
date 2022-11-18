@@ -20,33 +20,47 @@ public class IntersectionVertex extends StreetVertex {
    * SOME LOGIC IN THIS FILE IS BASED ON THAT THERE ARE ONLY THE CURRENT FLAGS AND IN THIS ORDER, IF
    * MORE FLAGS ARE ADDED, THE CURRENT LOGIC NEEDS TO AT LEAST BE REVIEWED AND MAYBE MODIFIED.
    */
-  private short flags;
+  private final short flags;
 
   //For testing only
   public IntersectionVertex(Graph g, String label, double x, double y, String name) {
-    this(g, label, x, y, new NonLocalizedString(name));
+    this(g, label, x, y, new NonLocalizedString(name), false, false);
   }
 
-  public IntersectionVertex(Graph g, String label, double x, double y, I18NString name) {
+  public IntersectionVertex(
+    Graph g,
+    String label,
+    double x,
+    double y,
+    I18NString name,
+    boolean hasHighwayTrafficLight,
+    boolean hasCrossingTrafficLight
+  ) {
     super(g, label, x, y, name);
+    flags = initFlags(hasHighwayTrafficLight, hasCrossingTrafficLight);
   }
 
   public IntersectionVertex(Graph g, String label, double x, double y) {
-    this(g, label, x, y, new NonLocalizedString(label));
+    this(g, label, x, y, new NonLocalizedString(label), false, false);
   }
 
-  /**
-   * Does this intersection have a traffic light meant for cars (and for other means of traversing on such roads)?
-   */
-  public void setHighwayTrafficLight(boolean highwayTrafficLight) {
-    flags = BitSetUtils.set(flags, HIGHWAY_TRAFFIC_LIGHT_INDEX, highwayTrafficLight);
-  }
-
-  /**
-   * Does this intersection have a traffic light meant for pedestrians and cyclists?
-   */
-  public void setCrossingTrafficLight(boolean crossingTrafficLight) {
-    flags = BitSetUtils.set(flags, CROSSING_TRAFFIC_LIGHT_INDEX, crossingTrafficLight);
+  public IntersectionVertex(
+    Graph g,
+    String label,
+    double x,
+    double y,
+    boolean hasHighwayTrafficLight,
+    boolean hasCrossingTrafficLight
+  ) {
+    this(
+      g,
+      label,
+      x,
+      y,
+      new NonLocalizedString(label),
+      hasHighwayTrafficLight,
+      hasCrossingTrafficLight
+    );
   }
 
   /**
@@ -80,5 +94,12 @@ public class IntersectionVertex extends StreetVertex {
   /** Has no highway or crossing traffic light. */
   private boolean hasNoTrafficLight() {
     return flags == 0;
+  }
+
+  private short initFlags(boolean highwayTrafficLight, boolean crossingTrafficLight) {
+    short flags = 0;
+    flags = BitSetUtils.set(flags, HIGHWAY_TRAFFIC_LIGHT_INDEX, highwayTrafficLight);
+    flags = BitSetUtils.set(flags, CROSSING_TRAFFIC_LIGHT_INDEX, crossingTrafficLight);
+    return flags;
   }
 }

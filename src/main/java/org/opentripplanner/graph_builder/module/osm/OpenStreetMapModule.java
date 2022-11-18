@@ -427,10 +427,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
               coordinate.x,
               coordinate.y,
               node.getId(),
-              new NonLocalizedString(label)
+              new NonLocalizedString(label),
+              node.hasHighwayTrafficLight(),
+              node.hasCrossingTrafficLight()
             );
-          iv.setHighwayTrafficLight(node.hasHighwayTrafficLight());
-          iv.setCrossingTrafficLight(node.hasCrossingTrafficLight());
         }
 
         intersectionNodes.put(nid, iv);
@@ -1237,7 +1237,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           coordinate.x,
           coordinate.y,
           node.getId(),
-          new NonLocalizedString(label)
+          new NonLocalizedString(label),
+          false,
+          false
         );
         vertices.put(level, vertex);
 

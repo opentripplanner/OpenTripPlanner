@@ -22,8 +22,17 @@ public class OsmVertex extends IntersectionVertex {
     this.nodeId = nodeId;
   }
 
-  public OsmVertex(Graph g, String label, double x, double y, long nodeId, I18NString name) {
-    super(g, label, x, y, name);
+  public OsmVertex(
+    Graph g,
+    String label,
+    double x,
+    double y,
+    long nodeId,
+    I18NString name,
+    boolean hasHighwayTrafficLight,
+    boolean hasCrossingTrafficLight
+  ) {
+    super(g, label, x, y, name, hasHighwayTrafficLight, hasCrossingTrafficLight);
     this.nodeId = nodeId;
   }
 }

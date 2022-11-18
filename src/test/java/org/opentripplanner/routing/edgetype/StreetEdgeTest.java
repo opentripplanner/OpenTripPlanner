@@ -140,10 +140,14 @@ public class StreetEdgeTest {
    */
   @Test
   public void testTraverseModeSwitchBike() {
-    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN);
-    StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-
-    v1.setCrossingTrafficLight(true);
+    var vWithTrafficLight = new IntersectionVertex(graph, "maple_1st", 2.0, 2.0, false, true);
+    StreetEdge e0 = edge(v0, vWithTrafficLight, 50.0, StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge e1 = edge(
+      vWithTrafficLight,
+      v2,
+      18.4,
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
+    );
 
     AStarRequestBuilder forward = AStarRequest.copyOf(proto);
     forward.withPreferences(p -> p.withBike(it -> it.withSpeed(3.0f)));
@@ -173,10 +177,14 @@ public class StreetEdgeTest {
    */
   @Test
   public void testTraverseModeSwitchWalk() {
-    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-    StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
-
-    v1.setCrossingTrafficLight(true);
+    var vWithTrafficLight = new IntersectionVertex(graph, "maple_1st", 2.0, 2.0, false, true);
+    StreetEdge e0 = edge(
+      v0,
+      vWithTrafficLight,
+      50.0,
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
+    );
+    StreetEdge e1 = edge(vWithTrafficLight, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
 
     AStarRequestBuilder forward = AStarRequest.copyOf(proto);
 
@@ -335,8 +343,8 @@ public class StreetEdgeTest {
     Coordinate c1 = new Coordinate(-122.575033, 45.456773);
     Coordinate c2 = new Coordinate(-122.576668, 45.451426);
 
-    StreetVertex v1 = new IntersectionVertex(null, "v1", c1.x, c1.y, (NonLocalizedString) null);
-    StreetVertex v2 = new IntersectionVertex(null, "v2", c2.x, c2.y, (NonLocalizedString) null);
+    StreetVertex v1 = new IntersectionVertex(null, "v1", c1.x, c1.y, null, false, false);
+    StreetVertex v2 = new IntersectionVertex(null, "v2", c2.x, c2.y, null, false, false);
 
     GeometryFactory factory = new GeometryFactory();
     LineString geometry = factory.createLineString(new Coordinate[] { c1, c2 });
