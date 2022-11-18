@@ -47,7 +47,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
 
     // This edge is added so the v2 intersection has more than two edges connected to it so it isn't
     // free flowing
-    StreetEdge e2 = edge(v2, v3, 1.0, false);
+    edge(v2, v3, 1.0, false);
 
     // Edge has same first and last angle.
     assertEquals(90, e1.getInAngle());
@@ -132,6 +132,83 @@ public class SimpleIntersectionTraversalCalculatorTest {
     assertEquals(
       15.1125,
       calculator.computeTraversalDuration(v2, e2, e1, TraverseMode.BICYCLE, 40, 40),
+      0.1
+    );
+  }
+
+  @Test
+  public void testWalk() {
+    IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false, false);
+    IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false, false);
+
+    StreetEdge e1 = edge(v1, v2, 1.0, false);
+
+    IntersectionVertex v3 = vertex("test2", new Coordinate(1.0, 1.0), false, false);
+
+    StreetEdge e2 = edge(v2, v3, 1.0, false);
+
+    // This edge is added so the v2 intersection has more than two edges connected to it so it isn't
+    // free flowing
+    edge(v2, v3, 1.0, false);
+
+    assertEquals(
+      0.1125,
+      calculator.computeTraversalDuration(v2, e1, e2, TraverseMode.WALK, 40, 40),
+      0.1
+    );
+    assertEquals(
+      0.1125,
+      calculator.computeTraversalDuration(v2, e2, e1, TraverseMode.WALK, 40, 40),
+      0.1
+    );
+  }
+
+  @Test
+  public void testWalkFreeFlowing() {
+    // vertices have only one incoming/outgoing edge, so they are interpreted to be free flowing
+    IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false, false);
+    IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false, false);
+
+    StreetEdge e1 = edge(v1, v2, 1.0, false);
+
+    IntersectionVertex v3 = vertex("test2", new Coordinate(1.0, 1.0), false, false);
+
+    StreetEdge e2 = edge(v2, v3, 1.0, false);
+
+    assertEquals(
+      0,
+      calculator.computeTraversalDuration(v2, e1, e2, TraverseMode.WALK, 40, 40),
+      0.1
+    );
+    assertEquals(
+      0,
+      calculator.computeTraversalDuration(v2, e2, e1, TraverseMode.WALK, 40, 40),
+      0.1
+    );
+  }
+
+  @Test
+  public void testWalkTrafficLights() {
+    // Graph with an intersection with traffic lights
+    IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false, false);
+    IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false, true);
+
+    StreetEdge e1 = edge(v1, v2, 1.0, false);
+
+    IntersectionVertex v3 = vertex("test2", new Coordinate(1.0, 1.0), false, false);
+
+    StreetEdge e2 = edge(v2, v3, 1.0, false);
+
+    // With traffic lights on both directions
+
+    assertEquals(
+      15.1125,
+      calculator.computeTraversalDuration(v2, e1, e2, TraverseMode.WALK, 40, 40),
+      0.1
+    );
+    assertEquals(
+      15.1125,
+      calculator.computeTraversalDuration(v2, e2, e1, TraverseMode.WALK, 40, 40),
       0.1
     );
   }
