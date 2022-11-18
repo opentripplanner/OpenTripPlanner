@@ -98,7 +98,7 @@ public class IntersectionVertex extends StreetVertex {
     return flags == 0 || (getDegreeIn() == 1 && getDegreeOut() == 1 && hasNoTrafficLight());
   }
 
-  public boolean hasNoTrafficLight() {
+  private boolean hasNoTrafficLight() {
     // return true if node has no crossing or highway traffic light
     return (flags & HIGHWAY_OR_CROSSING_TRAFFIC_LIGHT_MASK) == 0;
   }
