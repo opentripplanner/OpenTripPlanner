@@ -504,10 +504,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     String newServiceJourneyRef = estimatedVehicleJourney.getEstimatedVehicleJourneyCode();
     Objects.requireNonNull(newServiceJourneyRef, "EstimatedVehicleJourneyCode is required");
 
-    // Replaced/duplicated ServiceJourneyId
-    //        VehicleJourneyRef existingServiceJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef();
-    //        Objects.requireNonNull(existingServiceJourneyRef, "VehicleJourneyRef is required");
-
     // LineRef of added trip
     Objects.requireNonNull(estimatedVehicleJourney.getLineRef(), "LineRef is required");
     String lineRef = estimatedVehicleJourney.getLineRef().getValue();
@@ -516,14 +512,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Objects.requireNonNull(estimatedVehicleJourney.getOperatorRef(), "OperatorRef is required");
     String operatorRef = estimatedVehicleJourney.getOperatorRef().getValue();
 
-    //Required in SIRI, but currently not in use by OTP
-    //        Objects.requireNonNull(estimatedVehicleJourney.getRouteRef(), "RouteRef is required");
-    //        String routeRef = estimatedVehicleJourney.getRouteRef().getValue();
-
-    //        Objects.requireNonNull(estimatedVehicleJourney.getGroupOfLinesRef(), "GroupOfLinesRef is required");
-    //        String groupOfLines = estimatedVehicleJourney.getGroupOfLinesRef().getValue();
-
-    //        Objects.requireNonNull(estimatedVehicleJourney.getExternalLineRef(), "ExternalLineRef is required");
     String externalLineRef;
     if (estimatedVehicleJourney.getExternalLineRef() != null) {
       externalLineRef = estimatedVehicleJourney.getExternalLineRef().getValue();
@@ -535,52 +523,26 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       .getTransitModelIndex()
       .getOperatorForId()
       .get(new FeedScopedId(feedId, operatorRef));
-    //        Objects.requireNonNull(operator, "Operator " + operatorRef + " is unknown");
 
     FeedScopedId tripId = new FeedScopedId(feedId, newServiceJourneyRef);
 
-    Route replacedRoute = externalLineRef != null
-      ? transitModel.getTransitModelIndex().getRouteForId(new FeedScopedId(feedId, externalLineRef))
-      : null;
+    Route replacedRoute = getReplacedRoute(transitModel, feedId, externalLineRef);
 
     FeedScopedId routeId = new FeedScopedId(feedId, lineRef);
     Route route = transitModel.getTransitModelIndex().getRouteForId(routeId);
 
-    T2<TransitMode, String> transitMode = getTransitMode(
+    T2<TransitMode, String> transitMode = AddedTripHelper.getTransitMode(
       estimatedVehicleJourney.getVehicleModes(),
       replacedRoute
     );
 
-    if (route == null) { // Route is unknown - create new
-      var routeBuilder = Route.of(routeId);
-      routeBuilder.withMode(transitMode.first);
-      routeBuilder.withNetexSubmode(transitMode.second);
-      routeBuilder.withOperator(operator);
-
-      // TODO - SIRI: Is there a better way to find authority/Agency?
-      // Finding first Route with same Operator, and using same Authority
-      Agency agency = transitModel
-        .getTransitModelIndex()
-        .getAllRoutes()
-        .stream()
-        .filter(route1 ->
-          route1 != null && route1.getOperator() != null && route1.getOperator().equals(operator)
-        )
-        .findFirst()
-        .map(Route::getAgency)
-        // If not found, copy from replaced route
-        .orElseGet(() -> replacedRoute.getAgency());
-      routeBuilder.withAgency(agency);
-
-      if (
-        estimatedVehicleJourney.getPublishedLineNames() != null &&
-        !estimatedVehicleJourney.getPublishedLineNames().isEmpty()
-      ) {
-        routeBuilder.withShortName(
-          "" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue()
-        );
-      }
-      route = routeBuilder.build();
+    if (route == null) {
+      route = AddedTripHelper.getRoute(transitModel.getTransitModelIndex().getAllRoutes(),
+        estimatedVehicleJourney.getPublishedLineNames(),
+        operator,
+        replacedRoute,
+        routeId,
+        transitMode);
       LOG.info("Adding route {} to transitModel.", routeId);
       transitModel.getTransitModelIndex().addRoutes(route);
     }
@@ -785,6 +747,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     pattern.add(tripTimes);
 
+
+    /* Validate */
     tripTimes
       .validateNonIncreasingTimes()
       .ifFailure(error -> {
@@ -797,6 +761,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         );
       });
 
+    /* commit */
     return addTripToGraphAndBuffer(
       feedId,
       transitModel,
@@ -809,42 +774,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     );
   }
 
-  /**
-   * Resolves TransitMode from SIRI VehicleMode
-   */
-  private T2<TransitMode, String> getTransitMode(
-    List<VehicleModesEnumeration> vehicleModes,
-    Route replacedRoute
-  ) {
-    TransitMode transitMode = mapTransitMainMode(vehicleModes);
-
-    String transitSubMode = resolveTransitSubMode(transitMode, replacedRoute);
-
-    return new T2<>(transitMode, transitSubMode);
-  }
-
-  /**
-   * Resolves submode based on added trips's mode and replacedRoute's mode
-   *
-   * @param transitMode   Mode of the added trip
-   * @param replacedRoute Route that is being replaced
-   * @return String-representation of submode
-   */
-  private String resolveTransitSubMode(TransitMode transitMode, Route replacedRoute) {
-    if (replacedRoute != null) {
-      TransitMode replacedRouteMode = replacedRoute.getMode();
-
-      if (replacedRouteMode == TransitMode.RAIL) {
-        if (transitMode.equals(TransitMode.RAIL)) {
-          // Replacement-route is also RAIL
-          return RailSubmodeEnumeration.REPLACEMENT_RAIL_SERVICE.value();
-        } else if (transitMode.equals(TransitMode.BUS)) {
-          // Replacement-route is BUS
-          return BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value();
-        }
-      }
-    }
-    return null;
+  private Route getReplacedRoute(TransitModel transitModel, String feedId, String externalLineRef) {
+    return externalLineRef != null
+      ? transitModel.getTransitModelIndex().getRouteForId(new FeedScopedId(feedId, externalLineRef))
+      : null;
   }
 
   private Result<?, List<UpdateError>> handleModifiedTrip(
