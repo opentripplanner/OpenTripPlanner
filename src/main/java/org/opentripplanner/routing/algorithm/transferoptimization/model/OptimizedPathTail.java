@@ -48,7 +48,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     super(null, slackProvider, costCalculator, stopNameResolver);
     this.waitTimeCostCalculator = waitTimeCostCalculator;
     this.stopPriorityCostCalculator =
-      (stopBoardAlightCosts != null || extraStopBoardAlightCostsFactor > 0.01)
+      (stopBoardAlightCosts != null && extraStopBoardAlightCostsFactor > 0.01)
         ? new StopPriorityCostCalculator(extraStopBoardAlightCostsFactor, stopBoardAlightCosts)
         : null;
   }
