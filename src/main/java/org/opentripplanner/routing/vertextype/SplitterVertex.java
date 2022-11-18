@@ -13,8 +13,13 @@ public class SplitterVertex extends IntersectionVertex {
   private static final long serialVersionUID = 1L;
 
   public SplitterVertex(Graph g, String label, double x, double y, I18NString name) {
+    super(g, label, x, y, name);
+  }
+
+  @Override
+  public boolean inferredFreeFlowing() {
     // splitter vertices don't represent something that exists in the world, so traversing them is
     // always free.
-    super(g, label, x, y, name, true);
+    return true;
   }
 }

@@ -13,7 +13,9 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
@@ -165,9 +167,14 @@ public class SimpleIntersectionTraversalCalculatorTest {
 
     // A vertex for each. No light.
     IntersectionVertex u = vertex("from_v", a, false, false);
-    IntersectionVertex v = vertex("intersection", b, false, false);
+    SplitterVertex v = new SplitterVertex(
+      graph,
+      "intersection",
+      b.getX(),
+      b.getY(),
+      new NonLocalizedString("intersection")
+    );
     IntersectionVertex w = vertex("to_v", c, false, false);
-    v.setFreeFlowing(true);
 
     // Two edges.
     StreetEdge fromEdge = edge(u, v, 1.0, false);
