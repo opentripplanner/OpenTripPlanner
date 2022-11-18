@@ -12,9 +12,6 @@ public class SiriETUpdaterConfig {
     return new SiriETUpdaterParameters(
       configRef,
       c.of("feedId").since(NA).summary("TODO").asString(null),
-      c.of("logFrequency").since(NA).summary("TODO").asInt(-1),
-      c.of("maxSnapshotFrequencyMs").since(NA).summary("TODO").asInt(-1),
-      c.of("purgeExpiredData").since(NA).summary("TODO").asBoolean(false),
       c.of("blockReadinessUntilInitialized").since(NA).summary("TODO").asBoolean(false),
       c.of("url").since(NA).summary("TODO").asString(),
       c.of("frequencySec").since(NA).summary("TODO").asInt(60),
