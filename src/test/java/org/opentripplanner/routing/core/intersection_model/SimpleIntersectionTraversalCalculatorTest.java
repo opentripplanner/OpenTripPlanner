@@ -167,7 +167,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     IntersectionVertex u = vertex("from_v", a, false, false);
     IntersectionVertex v = vertex("intersection", b, false, false);
     IntersectionVertex w = vertex("to_v", c, false, false);
-    v.freeFlowing = true;
+    v.setFreeFlowing(true);
 
     // Two edges.
     StreetEdge fromEdge = edge(u, v, 1.0, false);

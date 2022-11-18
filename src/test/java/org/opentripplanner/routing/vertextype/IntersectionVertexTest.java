@@ -62,15 +62,6 @@ public class IntersectionVertexTest {
   }
 
   @Test
-  public void testFreeFlowing() {
-    IntersectionVertex iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0);
-    assertFalse(iv.freeFlowing);
-
-    iv.freeFlowing = true;
-    assertTrue(iv.freeFlowing);
-  }
-
-  @Test
   public void testInferredFreeFlowing() {
     IntersectionVertex iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0);
     assertFalse(iv.hasDrivingTrafficLight());
@@ -102,10 +93,6 @@ public class IntersectionVertexTest {
     assertTrue(iv.hasWalkingTrafficLight());
     assertTrue(iv.hasCyclingTrafficLight());
     assertFalse(iv.inferredFreeFlowing());
-
-    // Set the freeFlowing bit to false.
-    iv.freeFlowing = false;
-    assertFalse(iv.freeFlowing);
   }
 
   /****
