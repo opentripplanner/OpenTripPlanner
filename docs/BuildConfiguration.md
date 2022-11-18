@@ -231,7 +231,7 @@ suitability for biking and walking. It's possible to define "safety" values for 
 
 To add your own OSM tag mapping have a look
 at `org.opentripplanner.graph_builder.module.osm.tagmapping.NorwayTagMapper`
-and `org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultWayPropertySet` as examples. 
+and `org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper` as examples. 
 If you choose to mainly rely on the default rules, make sure you add your own rules first before applying the default ones.
 The mechanism is that for any two identical tags, OTP will use the first one.
 
