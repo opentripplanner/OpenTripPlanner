@@ -61,4 +61,8 @@ public class EdgeSpatialIndex {
       );
     };
   }
+
+  public void compact() {
+    permanentEdgeIndex.compact();
+  }
 }

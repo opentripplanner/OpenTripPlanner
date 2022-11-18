@@ -53,6 +53,10 @@ class StopModelIndex {
     for (AreaStop it : flexStops) {
       locationIndex.insert(it.getGeometry().getEnvelopeInternal(), it);
     }
+
+    // Trim the sizes of the indices
+    regularStopSpatialIndex.compact();
+    locationIndex.compact();
   }
 
   /**
