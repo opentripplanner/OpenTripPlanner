@@ -20,6 +20,9 @@ public class BestMatchSpecifier implements OsmSpecifier {
    * @see ExactMatchSpecifier#MATCH_MULTIPLIER
    */
   public static final int EXACT_MATCH_SCORE = 100;
+  public static final int WILDCARD_MATCH_SCORE = 1;
+  public static final int PREFIX_MATCH_SCORE = 75;
+  public static final int NO_MATCH_SCORE = 0;
   private final Condition[] conditions;
 
   public BestMatchSpecifier(String spec) {
@@ -85,11 +88,11 @@ public class BestMatchSpecifier implements OsmSpecifier {
     return switch (res) {
       case EXACT -> EXACT_MATCH_SCORE;
       // wildcard matches are basically tiebreakers
-      case WILDCARD -> 1;
+      case WILDCARD -> WILDCARD_MATCH_SCORE;
       // if the test says surface=cobblestone:flattened but the way has surface=cobblestone
-      case PREFIX -> 75;
+      case PREFIX -> PREFIX_MATCH_SCORE;
       // no match means no score
-      case NONE -> 0;
+      case NONE -> NO_MATCH_SCORE;
     };
   }
 }
