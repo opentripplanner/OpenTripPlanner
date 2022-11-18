@@ -50,7 +50,8 @@ public interface Heuristics {
   int[] bestGeneralizedCostToIntArray(int unreached);
 
   /**
-   * The heuristic from the origin to the given stop.
+   * The heuristic from the origin to the given stop. Returns {@link HeuristicAtStop#UNREACHED} if
+   * the stop is not reached.
    */
   @Nullable
   HeuristicAtStop createHeuristicAtStop(int stop);

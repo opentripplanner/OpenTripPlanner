@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.HeuristicAtStop;
@@ -62,9 +61,14 @@ public class HeuristicsAdapter implements Heuristics {
   @Override
   public int bestTravelDuration(int stop) {
     if (reached(stop)) {
-      return calculator.duration(originDepartureTime, times.time(stop));
+      return bestTravelDurationInternal(stop);
     }
     return NOT_SET;
+  }
+
+  /** This method should be used only when it has been established that the stop has been reached */
+  private int bestTravelDurationInternal(int stop) {
+    return calculator.duration(originDepartureTime, times.time(stop));
   }
 
   @Override
@@ -85,9 +89,14 @@ public class HeuristicsAdapter implements Heuristics {
   @Override
   public int bestGeneralizedCost(int stop) {
     if (reached(stop)) {
-      return costCalculator.calculateMinCost(bestTravelDuration(stop), bestNumOfTransfers(stop));
+      return bestGeneralizedCostInternal(stop);
     }
     return NOT_SET;
+  }
+
+  /** This method should be used only when it has been established that the stop has been reached */
+  private int bestGeneralizedCostInternal(int stop) {
+    return costCalculator.calculateMinCost(bestTravelDuration(stop), bestNumOfTransfers(stop));
   }
 
   @Override
@@ -96,15 +105,14 @@ public class HeuristicsAdapter implements Heuristics {
   }
 
   @Override
-  @Nullable
   public HeuristicAtStop createHeuristicAtStop(int stop) {
     return reached(stop)
       ? new HeuristicAtStop(
-        bestTravelDuration(stop),
+        bestTravelDurationInternal(stop),
         bestNumOfTransfers(stop),
-        bestGeneralizedCost(stop)
+        bestGeneralizedCostInternal(stop)
       )
-      : null;
+      : HeuristicAtStop.UNREACHED;
   }
 
   @Override
