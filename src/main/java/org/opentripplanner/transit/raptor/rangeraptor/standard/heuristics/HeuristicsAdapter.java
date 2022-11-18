@@ -13,6 +13,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.util.lang.IntUtils;
@@ -29,6 +30,7 @@ public class HeuristicsAdapter implements Heuristics {
   private final BestTimes times;
   private final BestNumberOfTransfers transfers;
   private final TIntObjectMap<List<RaptorAccessEgress>> egressPaths;
+  private final AccessPaths accessPaths;
   private final TransitCalculator<?> calculator;
   private final CostCalculator<?> costCalculator;
   private int originDepartureTime = -1;
@@ -37,11 +39,14 @@ public class HeuristicsAdapter implements Heuristics {
   private int minJourneyTravelDuration = NOT_SET;
   private int minJourneyNumOfTransfers = NOT_SET;
   private int earliestArrivalTime = NOT_SET;
+  private int minAccessTravelDuration = NOT_SET;
+  private int minAccessCost = NOT_SET;
 
   public HeuristicsAdapter(
     BestTimes times,
     BestNumberOfTransfers transfers,
     EgressPaths egressPaths,
+    AccessPaths accessPaths,
     TransitCalculator<?> calculator,
     CostCalculator<?> costCalculator,
     WorkerLifeCycle lifeCycle
@@ -49,6 +54,7 @@ public class HeuristicsAdapter implements Heuristics {
     this.times = times;
     this.transfers = transfers;
     this.egressPaths = egressPaths.byStop();
+    this.accessPaths = accessPaths;
     this.calculator = calculator;
     this.costCalculator = costCalculator;
     lifeCycle.onSetupIteration(this::setUpIteration);
@@ -85,7 +91,12 @@ public class HeuristicsAdapter implements Heuristics {
   @Override
   public int bestGeneralizedCost(int stop) {
     if (reached(stop)) {
-      return costCalculator.calculateMinCost(bestTravelDuration(stop), bestNumOfTransfers(stop));
+      return costCalculator.calculateMinCost(
+        bestTravelDuration(stop),
+        bestNumOfTransfers(stop),
+        minAccessTravelDuration,
+        minAccessCost
+      );
     }
     return NOT_SET;
   }
@@ -201,6 +212,39 @@ public class HeuristicsAdapter implements Heuristics {
       }
       return true;
     });
+
+    accessPaths
+      .arrivedOnStreetByNumOfRides()
+      .forEachEntry((stop, list) -> {
+        for (RaptorAccessEgress it : list) {
+          if (it.generalizedCost() < minAccessCost) {
+            minAccessCost = it.generalizedCost();
+            minAccessTravelDuration = it.durationInSeconds();
+          }
+        }
+        return true;
+      });
+
+    accessPaths
+      .arrivedOnBoardByNumOfRides()
+      .forEachEntry((stop, list) -> {
+        for (RaptorAccessEgress it : list) {
+          if (it.generalizedCost() < minAccessCost) {
+            minAccessCost = it.generalizedCost();
+            minAccessTravelDuration = it.durationInSeconds();
+          }
+        }
+        return true;
+      });
+
+    // If no access paths are found, we set the duration and cost for the 'best access path' to 0
+    if (minAccessTravelDuration == NOT_SET) {
+      minAccessTravelDuration = 0;
+    }
+    if (minAccessCost == NOT_SET) {
+      minAccessCost = 0;
+    }
+
     aggregatedResultsCalculated = true;
   }
 

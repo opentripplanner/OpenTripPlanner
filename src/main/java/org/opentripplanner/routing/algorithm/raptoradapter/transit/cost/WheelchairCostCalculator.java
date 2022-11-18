@@ -65,8 +65,18 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements 
   }
 
   @Override
-  public int calculateMinCost(int minTravelTime, int minNumTransfers) {
-    return delegate.calculateMinCost(minTravelTime, minNumTransfers);
+  public int calculateMinCost(
+    int minTravelTime,
+    int minNumTransfers,
+    int minAccessDuration,
+    int minAccessCost
+  ) {
+    return delegate.calculateMinCost(
+      minTravelTime,
+      minNumTransfers,
+      minAccessDuration,
+      minAccessCost
+    );
   }
 
   @Override

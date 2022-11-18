@@ -108,6 +108,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
       bestTimes(),
       this.bestNumberOfTransfers,
       ctx.egressPaths(),
+      ctx.accessPaths(),
       ctx.calculator(),
       costCalculator,
       ctx.lifeCycle()

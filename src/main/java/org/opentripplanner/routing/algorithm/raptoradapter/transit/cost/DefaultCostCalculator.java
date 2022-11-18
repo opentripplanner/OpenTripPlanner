@@ -121,13 +121,19 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
   }
 
   @Override
-  public int calculateMinCost(int minTravelTime, int minNumTransfers) {
+  public int calculateMinCost(
+    int minTravelTime,
+    int minNumTransfers,
+    int minAccessDuration,
+    int minAccessCost
+  ) {
     return (
       boardCostOnly +
       boardAndTransferCost *
       minNumTransfers +
       transitFactors.minFactor() *
-      minTravelTime
+      (minTravelTime - minAccessDuration) +
+      minAccessCost
     );
   }
 
