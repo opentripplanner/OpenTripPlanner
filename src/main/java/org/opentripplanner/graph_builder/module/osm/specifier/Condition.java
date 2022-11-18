@@ -122,12 +122,12 @@ public sealed interface Condition {
 
     @Override
     public MatchResult matchLeft(OSMWithTags way) {
-      throw new RuntimeException("Not implemented.");
+      throw new UnsupportedOperationException("Not implemented.");
     }
 
     @Override
     public MatchResult matchRight(OSMWithTags way) {
-      throw new RuntimeException("Not implemented.");
+      throw new UnsupportedOperationException("Not implemented.");
     }
   }
 
@@ -144,12 +144,12 @@ public sealed interface Condition {
 
     @Override
     public MatchResult matchLeft(OSMWithTags way) {
-      throw new RuntimeException("Not implemented.");
+      throw new UnsupportedOperationException("Not implemented.");
     }
 
     @Override
     public MatchResult matchRight(OSMWithTags way) {
-      throw new RuntimeException("Not implemented.");
+      throw new UnsupportedOperationException("Not implemented.");
     }
   }
 }
