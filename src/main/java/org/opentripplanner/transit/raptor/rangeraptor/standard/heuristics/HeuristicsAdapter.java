@@ -53,21 +53,11 @@ public class HeuristicsAdapter implements Heuristics {
     lifeCycle.onSetupIteration(this::setUpIteration);
   }
 
-  @Override
   public boolean reached(int stop) {
     return times.isStopReached(stop);
   }
 
-  @Override
-  public int bestTravelDuration(int stop) {
-    if (reached(stop)) {
-      return bestTravelDurationInternal(stop);
-    }
-    return NOT_SET;
-  }
-
-  /** This method should be used only when it has been established that the stop has been reached */
-  private int bestTravelDurationInternal(int stop) {
+  private int bestTravelDuration(int stop) {
     return calculator.duration(originDepartureTime, times.time(stop));
   }
 
@@ -76,7 +66,6 @@ public class HeuristicsAdapter implements Heuristics {
     return toIntArray(size(), unreached, this::bestTravelDuration);
   }
 
-  @Override
   public int bestNumOfTransfers(int stop) {
     return transfers.calculateMinNumberOfTransfers(stop);
   }
@@ -86,16 +75,7 @@ public class HeuristicsAdapter implements Heuristics {
     return toIntArray(size(), unreached, this::bestNumOfTransfers);
   }
 
-  @Override
-  public int bestGeneralizedCost(int stop) {
-    if (reached(stop)) {
-      return bestGeneralizedCostInternal(stop);
-    }
-    return NOT_SET;
-  }
-
-  /** This method should be used only when it has been established that the stop has been reached */
-  private int bestGeneralizedCostInternal(int stop) {
+  private int bestGeneralizedCost(int stop) {
     return costCalculator.calculateMinCost(bestTravelDuration(stop), bestNumOfTransfers(stop));
   }
 
@@ -108,9 +88,9 @@ public class HeuristicsAdapter implements Heuristics {
   public HeuristicAtStop createHeuristicAtStop(int stop) {
     return reached(stop)
       ? new HeuristicAtStop(
-        bestTravelDurationInternal(stop),
+        bestTravelDuration(stop),
         bestNumOfTransfers(stop),
-        bestGeneralizedCostInternal(stop)
+        bestGeneralizedCost(stop)
       )
       : HeuristicAtStop.UNREACHED;
   }
