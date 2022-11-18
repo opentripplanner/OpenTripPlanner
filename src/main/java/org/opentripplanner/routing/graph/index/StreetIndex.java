@@ -411,6 +411,10 @@ public class StreetIndex {
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }
+
+    // Trim the sizes of the indices
+    edgeSpatialIndex.compact();
+    verticesTree.compact();
     LOG.info(progress.completeMessage());
   }
 

@@ -51,7 +51,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   private final double xBinSize, yBinSize;
 
   /* The map of all bins. Please see visit() and xKey/yKey for details on the key. */
-  private final TLongObjectHashMap<List<T>> bins;
+  private final TLongObjectHashMap<ArrayList<T>> bins;
 
   private int nBins = 0;
 
@@ -171,6 +171,17 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     nObjects++;
   }
 
+  /**
+   * Make each bin be exactly the required size. This is helpful for large indices, which are mostly
+   * used for reads only.
+   */
+  public void compact() {
+    bins.forEachValue(ts -> {
+      ts.trimToSize();
+      return true;
+    });
+  }
+
   public String toString() {
     return String.format(
       Locale.ROOT,
@@ -241,7 +252,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
          * default implementation is: hashInt = (int)(value ^ (value >>> 32));
          */
         long mapKey = (yKey << 32) | ((xKey & 0xFFFF) << 16) | ((xKey >> 16) & 0xFFFF);
-        List<T> bin = bins.get(mapKey);
+        ArrayList<T> bin = bins.get(mapKey);
         if (createIfEmpty && bin == null) {
           bin = new ArrayList<>();
           bins.put(mapKey, bin);
