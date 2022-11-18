@@ -282,7 +282,6 @@
                         --add-opens java.base/java.util.concurrent.locks=ALL-UNNAMED
                         --add-opens java.base/java.util.regex=ALL-UNNAMED
                         --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
-                        --add-opens java.base/java.util.logging=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
