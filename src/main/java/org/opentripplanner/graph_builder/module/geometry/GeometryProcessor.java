@@ -111,7 +111,11 @@ public class GeometryProcessor {
   private LineString[] createGeometry(FeedScopedId shapeId, List<StopTime> stopTimes) {
     if (hasShapeDist(shapeId, stopTimes)) {
       // this trip has shape_dist in stop_times
-      return getHopGeometriesViaShapeDistTravelled(stopTimes, shapeId);
+      LineString[] geometries = getHopGeometriesViaShapeDistTravelled(stopTimes, shapeId);
+      if (geometries != null) {
+        return geometries;
+      }
+      // else proceed to method below which uses shape without distance information
     }
 
     LineString shapeLineString = getLineStringForShapeId(shapeId);
@@ -288,6 +292,9 @@ public class GeometryProcessor {
       st0 = stopTimes.get(i);
       StopTime st1 = stopTimes.get(i + 1);
       geoms[i] = getHopGeometryViaShapeDistTraveled(shapeId, st0, st1);
+      if (geoms[i] == null) {
+        return null;
+      }
     }
     return geoms;
   }
@@ -357,7 +364,8 @@ public class GeometryProcessor {
       if (equals(startIndex, endIndex)) {
         //bogus shape_dist_traveled
         issueStore.add(new BogusShapeDistanceTraveled(st1));
-        return createSimpleGeometry(st0.getStop(), st1.getStop());
+        // return null to indicate failure. Another approach which does not need shape_dist_traveled will be used.
+        return null;
       }
       LineString line = getLineStringForShapeId(shapeId);
       LocationIndexedLine lol = new LocationIndexedLine(line);
@@ -445,8 +453,7 @@ public class GeometryProcessor {
 
       if (!isValid(geometry, st0.getStop(), st1.getStop())) {
         issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
-        //fall back to trivial geometry
-        geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
+        return null;
       }
       geometriesByShapeSegmentKey.put(key, geometry);
     }
