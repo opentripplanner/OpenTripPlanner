@@ -89,6 +89,9 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     }
     int minArrivalTime = arrivalTime + h.minTravelDuration();
     int minNumberOfTransfers = roundProvider.round() - 1 + h.minNumTransfers();
+    if (minNumberOfTransfers >= roundProvider.roundMaxLimit()) {
+      return false;
+    }
     int minTravelDuration = travelDuration + h.minTravelDuration();
     int minCost = cost + h.minCost();
     int departureTime = minArrivalTime - minTravelDuration;

@@ -16,4 +16,9 @@ public interface RoundProvider {
    * The current Raptor round.
    */
   int round();
+
+  /**
+   * Maximum limit of rounds. This number can decrease during the search.
+   */
+  int roundMaxLimit();
 }
