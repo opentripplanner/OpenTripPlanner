@@ -116,13 +116,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
         for (RouteRequest transferProfile : transferRequests) {
-          var streetRequest = transferProfile.clone();
-
-          // Make sure we use a generic request, without any specific fields set
-          streetRequest.setArriveBy(false);
-          streetRequest.setDateTime(Instant.ofEpochSecond(0));
-          streetRequest.setFrom(null);
-          streetRequest.setTo(null);
+          RouteRequest streetRequest = prepareTransferRequest(transferProfile);
 
           for (NearbyStop sd : findNearbyStops(
             nearbyStopFinder,
@@ -201,6 +195,17 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   @Override
   public void checkInputs() {
     // No inputs
+  }
+
+  private static RouteRequest prepareTransferRequest(RouteRequest transferProfile) {
+    var streetRequest = transferProfile.clone();
+
+    // Make sure we use a generic request, without any specific fields set
+    streetRequest.setArriveBy(false);
+    streetRequest.setDateTime(Instant.ofEpochSecond(0));
+    streetRequest.setFrom(null);
+    streetRequest.setTo(null);
+    return streetRequest;
   }
 
   private static Iterable<NearbyStop> findNearbyStops(
