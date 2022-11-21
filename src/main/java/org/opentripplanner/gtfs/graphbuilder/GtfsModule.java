@@ -139,7 +139,8 @@ public class GtfsModule implements GraphBuilderModule {
           gtfsBundle.getFeedId().getId(),
           issueStore,
           discardMinTransferTimes,
-          gtfsDao
+          gtfsDao,
+          gtfsBundle.stationTransferPreference()
         );
         mapper.mapStopTripAndRouteDataIntoBuilder();
 

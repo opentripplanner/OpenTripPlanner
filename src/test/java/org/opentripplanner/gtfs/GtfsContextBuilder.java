@@ -16,6 +16,7 @@ import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 /**
  * This class helps building GtfsContext and post process the GtfsDao by repairing
@@ -49,7 +50,8 @@ public class GtfsContextBuilder {
       feedId.getId(),
       DataImportIssueStore.noopIssueStore(),
       false,
-      gtfsImport.getDao()
+      gtfsImport.getDao(),
+      StopTransferPriority.ALLOWED
     );
     mapper.mapStopTripAndRouteDataIntoBuilder();
     mapper.mapAndAddTransfersToBuilder();
