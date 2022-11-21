@@ -10,16 +10,15 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.service.TransitModel;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
 public class AddedTripHelper {
+
   private static final Logger LOG = LoggerFactory.getLogger(AddedTripHelper.class);
 
   /**
@@ -29,6 +28,8 @@ public class AddedTripHelper {
    * We will find the first Route with same Operator, and use the same Authority
    * If no operator found, copy the agency from replaced route
    *
+   * If no name is given for the route, an empty string will be set as the name.
+   *
    * @param routes routes currently in the transit model
    * @param names the published names for the route. Only the first element in the list is used
    * @param operator the operator for this line
@@ -37,13 +38,14 @@ public class AddedTripHelper {
    * @param transitMode the mode of the route
    * @return a new Route
    */
-  public static Route getRoute(Collection<Route> routes,
-                               List<NaturalLanguageStringStructure> names,
-                               Operator operator,
-                               Route replacedRoute,
-                               FeedScopedId routeId,
-                               T2<TransitMode, String> transitMode) {
-
+  public static Route getRoute(
+    Collection<Route> routes,
+    List<NaturalLanguageStringStructure> names,
+    Operator operator,
+    Route replacedRoute,
+    FeedScopedId routeId,
+    T2<TransitMode, String> transitMode
+  ) {
     var routeBuilder = Route.of(routeId);
     routeBuilder.withMode(transitMode.first);
     routeBuilder.withNetexSubmode(transitMode.second);
@@ -61,20 +63,19 @@ public class AddedTripHelper {
     routeBuilder.withAgency(agency);
 
     if (isNotNullOrEmpty(names)) {
-
-      var name =  names.stream()
+      var name = names
+        .stream()
         .findFirst()
         .map(NaturalLanguageStringStructure::getValue)
         .orElse("");
       routeBuilder.withShortName(name);
-
     }
 
     return routeBuilder.build();
   }
 
   private static boolean isNotNullOrEmpty(List<NaturalLanguageStringStructure> list) {
-    return list != null && !list.isEmpty();
+    return list != null;
   }
 
   /**
