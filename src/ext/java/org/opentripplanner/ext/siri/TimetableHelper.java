@@ -776,7 +776,7 @@ public class TimetableHelper {
    * service time. If none of the suppliers provide a time, return null.
    */
   @SafeVarargs
-  private static Integer getAvailableTime(
+  private static int getAvailableTime(
     ZonedDateTime startOfService,
     Supplier<ZonedDateTime>... timeSuppliers
   ) {
@@ -786,7 +786,7 @@ public class TimetableHelper {
         return ServiceDateUtils.secondsSinceStartOfService(startOfService, time);
       }
     }
-    return null;
+    return -1;
   }
 
   /**
@@ -897,5 +897,165 @@ public class TimetableHelper {
       .minusDays(calculateDayOffset(oldTimes))
       .withZoneSameInstant(zoneId)
       .toLocalDate();
+  }
+
+  /**
+   * Loop through all passed times, return the first non-negative one or the last one
+   */
+  private static int handleMissingRealtime(int... times) {
+    if (times.length == 0) {
+      throw new IllegalArgumentException("Need at least one value");
+    }
+
+    int time = -1;
+    for (int t : times) {
+      time = t;
+      if (time >= 0) {
+        break;
+      }
+    }
+
+    return time;
+  }
+
+  /**
+   * Function to check if an Object boolean is true,
+   * this will return false if the value is null or false
+   * @param value nullable boolean
+   * @return a primitive boolean
+   */
+  public static boolean isTrue(Boolean value) {
+    return Boolean.TRUE.equals(value);
+  }
+
+  public static void applyUpdates(
+    ZonedDateTime departureDate,
+    List<StopTime> stopTimes,
+    TripTimes tripTimes,
+    int index,
+    boolean isJourneyPredictionInaccurate,
+    RecordedCall recordedCall
+  ) {
+    if (isTrue(recordedCall.isCancellation())) {
+      stopTimes.get(index).cancel();
+      tripTimes.setCancelled(index);
+    }
+
+    // Set flag for inaccurate prediction if either call OR journey has inaccurate-flag set.
+    boolean isCallPredictionInaccurate = isTrue(recordedCall.isPredictionInaccurate());
+    if (isJourneyPredictionInaccurate || isCallPredictionInaccurate) {
+      tripTimes.setPredictionInaccurate(index);
+    }
+
+    int arrivalTime = tripTimes.getArrivalTime(index);
+    if (recordedCall.getActualArrivalTime() != null) {
+      //Flag as recorded
+      tripTimes.setRecorded(index);
+    }
+
+    int realtimeArrivalTime = getAvailableTime(
+      departureDate,
+      recordedCall::getActualArrivalTime,
+      recordedCall::getExpectedArrivalTime,
+      recordedCall::getAimedArrivalTime
+    );
+
+    int departureTime = tripTimes.getDepartureTime(index);
+    if (recordedCall.getActualDepartureTime() != null) {
+      //Flag as recorded
+      tripTimes.setRecorded(index);
+    }
+
+    int realtimeDepartureTime = getAvailableTime(
+      departureDate,
+      recordedCall::getActualDepartureTime,
+      recordedCall::getExpectedDepartureTime,
+      recordedCall::getAimedDepartureTime
+    );
+
+    if (index == 0) {
+      realtimeArrivalTime =
+        handleMissingRealtime(realtimeArrivalTime, realtimeDepartureTime, arrivalTime);
+    } else {
+      realtimeArrivalTime = handleMissingRealtime(realtimeArrivalTime, arrivalTime);
+    }
+
+    if (index == (stopTimes.size() - 1)) {
+      realtimeDepartureTime =
+        handleMissingRealtime(realtimeDepartureTime, realtimeArrivalTime, departureTime);
+    } else {
+      realtimeDepartureTime = handleMissingRealtime(realtimeDepartureTime, departureTime);
+    }
+
+    int arrivalDelay = realtimeArrivalTime - arrivalTime;
+    tripTimes.updateArrivalDelay(index, arrivalDelay);
+
+    int departureDelay = realtimeDepartureTime - departureTime;
+    tripTimes.updateDepartureDelay(index, departureDelay);
+  }
+
+  public static void applyUpdates(
+    ZonedDateTime departureDate,
+    List<StopTime> stopTimes,
+    TripTimes tripTimes,
+    int index,
+    boolean isJourneyPredictionInaccurate,
+    EstimatedCall estimatedCall
+  ) {
+    if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
+      stopTimes.get(index).cancel();
+      tripTimes.setCancelled(index);
+    }
+
+    // Set flag for inaccurate prediction if either call OR journey has inaccurate-flag set.
+    boolean isCallPredictionInaccurate = isTrue(estimatedCall.isPredictionInaccurate());
+    if (isJourneyPredictionInaccurate || isCallPredictionInaccurate) {
+      tripTimes.setPredictionInaccurate(index);
+    }
+
+    // Update dropoff-/pickuptype only if status is cancelled
+    CallStatusEnumeration arrivalStatus = estimatedCall.getArrivalStatus();
+    if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
+      stopTimes.get(index).cancelDropOff();
+    }
+
+    CallStatusEnumeration departureStatus = estimatedCall.getDepartureStatus();
+    if (departureStatus == CallStatusEnumeration.CANCELLED) {
+      stopTimes.get(index).cancelPickup();
+    }
+
+    int arrivalTime = tripTimes.getArrivalTime(index);
+    int realtimeArrivalTime = getAvailableTime(
+      departureDate,
+      estimatedCall::getExpectedArrivalTime,
+      estimatedCall::getAimedArrivalTime
+    );
+
+    int departureTime = tripTimes.getDepartureTime(index);
+    int realtimeDepartureTime = getAvailableTime(
+      departureDate,
+      estimatedCall::getExpectedDepartureTime,
+      estimatedCall::getAimedDepartureTime
+    );
+
+    if (index == 0) {
+      realtimeArrivalTime =
+        handleMissingRealtime(realtimeArrivalTime, realtimeDepartureTime, arrivalTime);
+    } else {
+      realtimeArrivalTime = handleMissingRealtime(realtimeArrivalTime, arrivalTime);
+    }
+
+    if (index == (stopTimes.size() - 1)) {
+      realtimeDepartureTime =
+        handleMissingRealtime(realtimeDepartureTime, realtimeArrivalTime, departureTime);
+    } else {
+      realtimeDepartureTime = handleMissingRealtime(realtimeDepartureTime, departureTime);
+    }
+
+    int arrivalDelay = realtimeArrivalTime - arrivalTime;
+    tripTimes.updateArrivalDelay(index, arrivalDelay);
+
+    int departureDelay = realtimeDepartureTime - departureTime;
+    tripTimes.updateDepartureDelay(index, departureDelay);
   }
 }

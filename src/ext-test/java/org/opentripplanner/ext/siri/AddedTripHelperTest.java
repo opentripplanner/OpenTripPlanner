@@ -187,4 +187,35 @@ public class AddedTripHelperTest {
     assertEquals(expectedMode, mode.first, "Mode not mapped to correct internal mode");
     assertEquals(subMode, mode.second, "Mode not mapped to correct sub mode");
   }
+
+  @ParameterizedTest
+  @CsvSource({ "10,11,0,3,true", "10,11,2,3,true", "10,11,1,3,false" })
+  public void testGetTimeForStop(
+    int arrivalTime,
+    int departureTime,
+    int stopIndex,
+    int numStops,
+    boolean expectedEqual
+  ) {
+    var arrivalAndDepartureTime = AddedTripHelper.getTimeForStop(
+      arrivalTime,
+      departureTime,
+      stopIndex,
+      numStops
+    );
+
+    if (expectedEqual) {
+      assertEquals(
+        arrivalAndDepartureTime.first,
+        arrivalAndDepartureTime.second,
+        "Arrival and departure time are expected to be equal"
+      );
+    } else {
+      assertNotEquals(
+        arrivalAndDepartureTime.first,
+        arrivalAndDepartureTime.second,
+        "Arrival and departure time are expected to differ"
+      );
+    }
+  }
 }

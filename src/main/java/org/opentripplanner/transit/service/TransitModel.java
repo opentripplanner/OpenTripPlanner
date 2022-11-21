@@ -222,6 +222,10 @@ public class TransitModel implements Serializable {
    */
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
+    if (serviceDate == null) {
+      return null;
+    }
+
     // Start of day
     ZonedDateTime time = ServiceDateUtils.asStartOfService(serviceDate, getTimeZone());
 

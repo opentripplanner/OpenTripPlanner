@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.ZoneId;
@@ -97,5 +98,16 @@ class TransitModelTest {
     Trip trip = transitModelIndex.getTripForId().get(SAMPLE_TRIP_ID);
     Timetable timetable = transitModelIndex.getPatternForTrip().get(trip).getScheduledTimetable();
     assertEquals(20 * 60 - 60 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
+  }
+
+  @Test
+  void getOrCreateServiceIdForDateTest() {
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    var transitModel = new TransitModel(stopModel, deduplicator);
+
+    var actualServiceId = transitModel.getOrCreateServiceIdForDate(null);
+
+    assertNull(actualServiceId);
   }
 }
