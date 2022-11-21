@@ -4,10 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -84,30 +82,22 @@ public class VehicleParkingsLayerTest {
         ]
       }
       """;
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      mapper.readTree(config);
-      var tiles = VectorTileConfig.mapVectorTilesParameters(
-        new NodeAdapter(mapper.readTree(config), "vectorTiles"),
-        "vectorTileLayers"
-      );
-      assertEquals(1, tiles.layers().size());
-      VehicleParkingsLayerBuilder builder = new VehicleParkingsLayerBuilder(
-        graph,
-        tiles.layers().get(0),
-        Locale.US
-      );
+    NodeAdapter nodeAdapter = newNodeAdapterForTest(config);
+    var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTileLayers");
+    assertEquals(1, tiles.layers().size());
+    VehicleParkingsLayerBuilder builder = new VehicleParkingsLayerBuilder(
+      graph,
+      tiles.layers().get(0),
+      Locale.US
+    );
 
-      List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
+    List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
 
-      assertEquals("[POINT (1 2)]", geometries.toString());
-      assertEquals(
-        "VehicleParking{name: 'name', coordinate: (2.0, 1.0)}",
-        geometries.get(0).getUserData().toString()
-      );
-    } catch (JacksonException exception) {
-      fail(exception.toString());
-    }
+    assertEquals("[POINT (1 2)]", geometries.toString());
+    assertEquals(
+      "VehicleParking{name: 'name', coordinate: (2.0, 1.0)}",
+      geometries.get(0).getUserData().toString()
+    );
   }
 
   @Test
