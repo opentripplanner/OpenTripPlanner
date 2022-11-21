@@ -423,6 +423,19 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
+          .name("maximumAdditionalTransfers")
+          .description(
+            "Maximum number of additional transfers compared to the best number of transfers " +
+            "allowed. Note! The best way to reduce the number of transfers is to set the " +
+            "`transferPenalty` parameter."
+          )
+          .type(Scalars.GraphQLInt)
+          .defaultValue(preferences.transfer().maxAdditionalTransfers())
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
           .name("debugItineraryFilter")
           .description(
             "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries " +

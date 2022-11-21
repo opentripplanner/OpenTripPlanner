@@ -252,6 +252,7 @@ public class TransmodelGraphQLPlanner {
 
       callWith.argument("waitReluctance", transfer::withWaitReluctance);
       callWith.argument("maximumTransfers", transfer::withMaxTransfers);
+      callWith.argument("maximumAdditionalTransfers", transfer::withMaxAdditionalTransfers);
     });
     preferences.withTransit(tr -> {
       callWith.argument(

@@ -472,19 +472,25 @@ public abstract class RoutingResource {
    * <p>
    * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
    *
-   * @deprecated TODO OTP2 Regression. A maxTransfers should be set in the router config, not
-   * here. Instead the client should be able to pass in a parameter for
-   * the max number of additional/extra transfers relative to the best
-   * trip (with the fewest possible transfers) within constraint of the
-   * other search parameters.
-   * This might be to complicated to explain to the customer, so we
-   * might stick to the old limit, but that have side-effects that you
-   * might not find any trips on a day where a critical part of the
-   * trip is not available, because of some real-time disruption.
+   * @deprecated Use {@link #maxAdditionalTransfers} instead to pass in the max number of
+   * additional/extra transfers relative to the best trip (with the fewest possible transfers)
+   * within constraint of the other search parameters. This might be too complicated to explain to
+   * the customer, so you might stick to the old limit, but that has side-effects where you might
+   * not find any trips on a day when a critical part of the trip is not available, because of some
+   * real-time disruption.
    */
   @Deprecated
   @QueryParam("maxTransfers")
   protected Integer maxTransfers;
+
+  /**
+   * The maximum number of additional transfers (that is, one plus the maximum number of boardings)
+   * in additiona to hte result with the least number of transfers that a trip will be allowed.
+   * <p>
+   * Consider using the {@link #transferPenalty} instead of this parameter.
+   */
+  @QueryParam("maxAdditionalTransfers")
+  protected Integer maxAdditionalTransfers;
 
   /**
    * If true, goal direction is turned off and a full path tree is built (specify only once)

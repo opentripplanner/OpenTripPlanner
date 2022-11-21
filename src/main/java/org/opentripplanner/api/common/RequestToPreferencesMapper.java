@@ -114,6 +114,7 @@ class RequestToPreferencesMapper {
 
       setIfNotNull(req.nonpreferredTransferPenalty, transfer::withNonpreferredCost);
       setIfNotNull(req.maxTransfers, transfer::withMaxTransfers);
+      setIfNotNull(req.maxAdditionalTransfers, transfer::withMaxAdditionalTransfers);
     });
   }
 
