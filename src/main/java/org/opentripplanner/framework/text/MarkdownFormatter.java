@@ -79,7 +79,7 @@ public class MarkdownFormatter {
   }
 
   public static String lineBreak() {
-    return " \\";
+    return "  ";
   }
 
   private static String normalizeAnchor(String anchor) {
