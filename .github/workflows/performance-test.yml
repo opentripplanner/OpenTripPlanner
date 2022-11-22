@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev-2.x
-      - performance-service
 
 jobs:
   perf-test:
