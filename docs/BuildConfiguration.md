@@ -63,6 +63,8 @@ Sections follow that describe particular settings in more depth.
 | [elevationBucket](#elevationBucket)                                      |   `object`  | Used to download NED elevation tiles from the given AWS S3 bucket.                                                          | *Optional* |                                   |   na  |
 | [fares](sandbox/Fares.md)                                                |   `object`  | Fare configuration.                                                                                                         | *Optional* |                                   |  2.0  |
 | gtfsDefaults                                                             |   `object`  | The gtfsDefaults section allows you to specify default properties for GTFS files.                                           | *Optional* |                                   |  2.3  |
+|    removeRepeatedStops                                                   |  `boolean`  | Should consecutive identical stops be merged into one stop time entry                                                       | *Optional* | `true`                            |  2.3  |
+|    [stationTransferPreference](#gd_stationTransferPreference)            |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                              | *Optional* | `"allowed"`                       |  2.3  |
 | [localFileNamePatterns](#localFileNamePatterns)                          |   `object`  | Patterns for matching OTP file types in the base directory                                                                  | *Optional* |                                   |  2.0  |
 |    [dem](#lfp_dem)                                                       |   `regexp`  | Pattern for matching elevation DEM files.                                                                                   | *Optional* | `"(?i)\.tiff?$"`                  |  2.0  |
 |    [gtfs](#lfp_gtfs)                                                     |   `regexp`  | Patterns for matching GTFS zip-files or directories.                                                                        | *Optional* | `"(?i)gtfs"`                      |  2.0  |
@@ -90,9 +92,9 @@ Sections follow that describe particular settings in more depth.
 |    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                    | *Optional* |                                   |  2.2  |
 |       type = "GTFS"                                                      |    `enum`   | The feed input format.                                                                                                      | *Required* |                                   |  2.2  |
 |       feedId                                                             |   `string`  | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                     | *Optional* |                                   |  2.2  |
-|       removeRepeatedStops                                                |  `boolean`  | Should consecutive identical stops be merged into one stop time entry                                                       | *Optional* | `true`                            |  2.3  |
+|       removeRepeatedStops                                                |  `boolean`  | Should consecutive identical stops be merged into one stop time entry.                                                      | *Optional* | `true`                            |  2.3  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
-|       [stationTransferPreference](#tf_0_stationTransferPreference)       |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                              | *Optional* | `"allowed"`                       |  2.3  |
+|       [stationTransferPreference](#tf_0_stationTransferPreference)       |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                              | *Optional* | `"recommended"`                   |  2.3  |
 |    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                    | *Optional* |                                   |  2.2  |
 |       type = "NETEX"                                                     |    `enum`   | The feed input format.                                                                                                      | *Required* |                                   |  2.2  |
 |       feedId                                                             |   `string`  | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt. | *Required* |                                   |  2.2  |
@@ -780,6 +782,18 @@ for the next graph build operation. You should add the `--cache <directory>` com
 to specify your NED tile cache location.
 
 
+<h3 id="gd_stationTransferPreference">stationTransferPreference</h3>
+
+**Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`  \
+**Path:** /gtfsDefaults  \
+**Enum values:** `discouraged` | `allowed` | `recommended` | `preferred`
+
+Should there be some preference or aversion for transfers at stops that are part of a station.
+
+This parameter sets the generic level of preference. What is the actual cost can be changed
+with the `stopTransferCost` parameter in the router configuration.
+
+
 <h3 id="localFileNamePatterns">localFileNamePatterns</h3>
 
 **Since version:** `2.0` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
@@ -965,7 +979,7 @@ section, auto-scanning in the base directory for this feed type will be disabled
 
 <h3 id="tf_0_stationTransferPreference">stationTransferPreference</h3>
 
-**Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`  \
+**Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"recommended"`  \
 **Path:** /transitFeeds/[0]  \
 **Enum values:** `discouraged` | `allowed` | `recommended` | `preferred`
 
@@ -1093,6 +1107,10 @@ case where this is not the case.
     "groupFilePattern" : "(\\w{3})_.*\\.xml",
     "ignoreFilePattern" : "(temp|tmp)",
     "ferryIdsNotAllowedForBicycle" : [ "RUT:B107", "RUT:B209" ]
+  },
+  "gtfsDefaults" : {
+    "stationTransferPreference" : "recommended",
+    "removeRepeatedStops" : true
   },
   "transitFeeds" : [ {
     "type" : "gtfs",

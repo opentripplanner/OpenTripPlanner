@@ -30,6 +30,10 @@
     "ignoreFilePattern" : "(temp|tmp)",
     "ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
   },
+  "gtfsDefaults" : {
+    "stationTransferPreference" : "recommended",
+    "removeRepeatedStops" : true
+  },
   "transitFeeds" : [
     {
       "type" : "gtfs",
