@@ -6,6 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +18,7 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -22,10 +27,14 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
 import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
 import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
+import uk.org.siri.siri20.OccupancyEnumeration;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.StopPointRef;
 
@@ -56,6 +65,10 @@ public class TimeTableHelperTest {
   private RegularStop stop;
   private Station station;
 
+  private Trip trip;
+  private List<StopTime> stopTimes;
+  private TripTimes tripTimes;
+
   @BeforeEach
   public void setUp() {
     stopLocation = RegularStop.of(SCOPED_STOP_ID).build();
@@ -71,7 +84,8 @@ public class TimeTableHelperTest {
     stop =
       RegularStop.of(SCOPED_STOP_ID).withCoordinate(0.0, 0.0).withParentStation(station).build();
     stopTime.setStop(stop);
-    stopPattern = new StopPattern(List.of(stopTime));
+    stopTimes = List.of(stopTime);
+    stopPattern = new StopPattern(stopTimes);
 
     agency = Agency.of(SCOPED_AGENCY_ID).withName(AGENCY_NAME).withTimezone("CET").build();
 
@@ -85,6 +99,10 @@ public class TimeTableHelperTest {
 
     tripPattern =
       TripPattern.of(SCOPED_PATTERN_ID).withStopPattern(stopPattern).withRoute(route).build();
+
+    trip = Trip.of(new FeedScopedId(FEED_ID, "TRIP_ID")).withRoute(route).build();
+    var deduplicator = new Deduplicator();
+    tripTimes = new TripTimes(trip, stopTimes, deduplicator);
   }
 
   @Test
@@ -261,8 +279,219 @@ public class TimeTableHelperTest {
     }
   }
 
+  @Test
+  public void testApplyUpdates_MapPredictionInaccurate_EstimatedCall() {
+    // Arrange
+    var startOfService = ZonedDateTime.of(LocalDateTime.of(2022, 12, 9, 0, 0), ZoneId.of("CET"));
+    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithEstimatedCalls(
+      SCOPED_STOP_ID,
+      false,
+      OccupancyEnumeration.SEATS_AVAILABLE,
+      true
+    );
+    int callCounter = 0;
+
+    for (var estimatedCall : estimatedVehicleJourney.getEstimatedCalls().getEstimatedCalls()) {
+      // Act
+      TimetableHelper.applyUpdates(
+        startOfService,
+        stopTimes,
+        tripTimes,
+        callCounter,
+        false,
+        estimatedCall,
+        null
+      );
+
+      // Assert
+
+      assertStatuses(
+        callCounter,
+        OccupancyStatus.MANY_SEATS_AVAILABLE,
+        PickDrop.SCHEDULED,
+        false,
+        true
+      );
+      callCounter++;
+    }
+  }
+
+  @Test
+  public void testApplyUpdates_CancellationPriorityOverPredictionInaccurate_EstimatedCall() {
+    // Arrange
+    var startOfService = ZonedDateTime.of(LocalDateTime.of(2022, 12, 9, 0, 0), ZoneId.of("CET"));
+    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithEstimatedCalls(
+      SCOPED_STOP_ID,
+      true,
+      OccupancyEnumeration.FULL,
+      true
+    );
+    int callCounter = 0;
+
+    for (var estimatedCall : estimatedVehicleJourney.getEstimatedCalls().getEstimatedCalls()) {
+      // Act
+      TimetableHelper.applyUpdates(
+        startOfService,
+        stopTimes,
+        tripTimes,
+        callCounter,
+        false,
+        estimatedCall,
+        null
+      );
+
+      // Assert
+
+      assertStatuses(callCounter, OccupancyStatus.FULL, PickDrop.CANCELLED, false, false);
+      callCounter++;
+    }
+  }
+
+  @Test
+  public void testApplyUpdates_CancellationPriorityOverPredictionInaccurate_RecordedCall() {
+    // Arrange
+    var startOfService = ZonedDateTime.of(LocalDateTime.of(2022, 12, 9, 0, 0), ZoneId.of("CET"));
+    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithRecordedCalls(
+      SCOPED_STOP_ID,
+      true,
+      OccupancyEnumeration.FULL,
+      true,
+      startOfService.plus(Duration.ofHours(1))
+    );
+    int callCounter = 0;
+
+    for (var recordedCall : estimatedVehicleJourney.getRecordedCalls().getRecordedCalls()) {
+      // Act
+      TimetableHelper.applyUpdates(
+        startOfService,
+        stopTimes,
+        tripTimes,
+        callCounter,
+        false,
+        recordedCall,
+        null
+      );
+
+      // Assert
+
+      assertStatuses(callCounter, OccupancyStatus.FULL, PickDrop.CANCELLED, false, false);
+      callCounter++;
+    }
+  }
+
+  @Test
+  public void testApplyUpdates_PredictionInaccuratePriorityOverRecorded() {
+    // Arrange
+    var predictionInaccurate = true;
+    var startOfService = ZonedDateTime.of(LocalDateTime.of(2022, 12, 9, 0, 0), ZoneId.of("CET"));
+    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithRecordedCalls(
+      SCOPED_STOP_ID,
+      predictionInaccurate,
+      OccupancyEnumeration.FULL,
+      false,
+      startOfService.plus(Duration.ofHours(1))
+    );
+    int callCounter = 0;
+
+    for (var recordedCall : estimatedVehicleJourney.getRecordedCalls().getRecordedCalls()) {
+      // Act
+      TimetableHelper.applyUpdates(
+        startOfService,
+        stopTimes,
+        tripTimes,
+        callCounter,
+        false,
+        recordedCall,
+        null
+      );
+
+      // Assert
+      assertStatuses(
+        callCounter,
+        OccupancyStatus.FULL,
+        PickDrop.SCHEDULED,
+        false,
+        predictionInaccurate
+      );
+
+      callCounter++;
+    }
+  }
+
+  @Test
+  public void testApplyUpdates_ActualTimeResultsInRecorded() {
+    // Arrange
+    var predictionInaccurate = false;
+    var startOfService = ZonedDateTime.of(LocalDateTime.of(2022, 12, 9, 0, 0), ZoneId.of("CET"));
+    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithRecordedCalls(
+      SCOPED_STOP_ID,
+      predictionInaccurate,
+      OccupancyEnumeration.STANDING_AVAILABLE,
+      false,
+      startOfService.plus(Duration.ofHours(1))
+    );
+    int callCounter = 0;
+
+    for (var recordedCall : estimatedVehicleJourney.getRecordedCalls().getRecordedCalls()) {
+      // Act
+      TimetableHelper.applyUpdates(
+        startOfService,
+        stopTimes,
+        tripTimes,
+        callCounter,
+        false,
+        recordedCall,
+        null
+      );
+
+      // Assert
+      assertStatuses(
+        callCounter,
+        OccupancyStatus.STANDING_ROOM_ONLY,
+        PickDrop.SCHEDULED,
+        true,
+        predictionInaccurate
+      );
+
+      callCounter++;
+    }
+  }
+
+  private void assertStatuses(
+    int index,
+    OccupancyStatus occupancyStatus,
+    PickDrop pickDrop,
+    boolean recorded,
+    boolean predictionInaccurate
+  ) {
+    assertAll(() -> {
+      assertEquals(
+        predictionInaccurate,
+        tripTimes.isPredictionInaccurate(index),
+        "Prediction inaccurate mapped incorrectly"
+      );
+      assertEquals(recorded, tripTimes.isRecordedStop(index), "Recorded status mapped incorrectly");
+      assertEquals(
+        occupancyStatus,
+        tripTimes.getOccupancyStatus(index),
+        "Occupancy should be mapped to " + occupancyStatus
+      );
+      assertEquals(pickDrop, stopTimes.get(index).getDropOffType(), "Pickdrop should be scheduled");
+    });
+  }
+
   private EstimatedVehicleJourney getEstimatedVehicleJourneyWithRecordedCalls(
     FeedScopedId newStopScopedId
+  ) {
+    return getEstimatedVehicleJourneyWithRecordedCalls(newStopScopedId, false, null, false, null);
+  }
+
+  private EstimatedVehicleJourney getEstimatedVehicleJourneyWithRecordedCalls(
+    FeedScopedId newStopScopedId,
+    boolean predictionInaccurate,
+    OccupancyEnumeration occupancyEnumeration,
+    boolean cancellation,
+    ZonedDateTime actualTime
   ) {
     var estimatedVehicleJourney = new EstimatedVehicleJourney();
     var stopPointRef = new StopPointRef();
@@ -270,6 +499,10 @@ public class TimeTableHelperTest {
 
     var recordedCall = new RecordedCall();
     recordedCall.setStopPointRef(stopPointRef);
+    recordedCall.setPredictionInaccurate(predictionInaccurate);
+    recordedCall.setOccupancy(occupancyEnumeration);
+    recordedCall.setCancellation(cancellation);
+    recordedCall.setActualDepartureTime(actualTime);
 
     var recordedCalls = new EstimatedVehicleJourney.RecordedCalls();
     recordedCalls.getRecordedCalls().add(recordedCall);
@@ -281,12 +514,24 @@ public class TimeTableHelperTest {
   private EstimatedVehicleJourney getEstimatedVehicleJourneyWithEstimatedCalls(
     FeedScopedId newStopScopedId
   ) {
+    return getEstimatedVehicleJourneyWithEstimatedCalls(newStopScopedId, false, null, false);
+  }
+
+  private EstimatedVehicleJourney getEstimatedVehicleJourneyWithEstimatedCalls(
+    FeedScopedId newStopScopedId,
+    boolean cancellation,
+    OccupancyEnumeration occupancyEnumeration,
+    boolean predictionInaccurate
+  ) {
     var estimatedVehicleJourney = new EstimatedVehicleJourney();
     var stopPointRef = new StopPointRef();
     stopPointRef.setValue(newStopScopedId.toString());
 
     var estimatedCall = new EstimatedCall();
     estimatedCall.setStopPointRef(stopPointRef);
+    estimatedCall.setCancellation(cancellation);
+    estimatedCall.setOccupancy(occupancyEnumeration);
+    estimatedCall.setPredictionInaccurate(predictionInaccurate);
 
     var estimatedCalls = new EstimatedVehicleJourney.EstimatedCalls();
     estimatedCalls.getEstimatedCalls().add(estimatedCall);

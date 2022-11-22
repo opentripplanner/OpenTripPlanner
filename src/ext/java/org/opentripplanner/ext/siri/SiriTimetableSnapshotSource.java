@@ -714,7 +714,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         tripTimes,
         i,
         isJourneyPredictionInaccurate,
-        recordedCall
+        recordedCall,
+        estimatedVehicleJourney.getOccupancy()
       );
       i++;
     }
@@ -725,7 +726,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         tripTimes,
         i,
         isJourneyPredictionInaccurate,
-        estimatedCall
+        estimatedCall,
+        estimatedVehicleJourney.getOccupancy()
       );
       i++;
     }
