@@ -32,7 +32,8 @@
   },
   "gtfsDefaults" : {
     "stationTransferPreference" : "recommended",
-    "removeRepeatedStops" : true
+    "removeRepeatedStops" : true,
+    "discardMinTransferTimes": false
   },
   "transitFeeds" : [
     {

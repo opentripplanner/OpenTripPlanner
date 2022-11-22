@@ -18,8 +18,9 @@ class GtfsConfigTest {
       """
       {
         gtfsDefaults: {
-         'removeRepeatedStops': 'false',
-         'stationTransferPreference' : 'preferred'
+         'removeRepeatedStops': false,
+         'stationTransferPreference' : 'preferred',
+         'discardMinTransferTimes': true
        }
       }
       """
@@ -29,6 +30,7 @@ class GtfsConfigTest {
 
     assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
+    assertTrue(subject.discardMinTransferTimes());
   }
 
   @Test
@@ -42,6 +44,7 @@ class GtfsConfigTest {
 
     assertTrue(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.ALLOWED, subject.stationTransferPreference());
+    assertFalse(subject.discardMinTransferTimes());
   }
 
   @Test
@@ -50,8 +53,9 @@ class GtfsConfigTest {
       """
       {
         gtfsDefaults: {
-         'removeRepeatedStops': 'false',
-         'stationTransferPreference' : 'preferred'
+         'removeRepeatedStops': false,
+         'stationTransferPreference' : 'preferred',
+         'discardMinTransferTimes': true
        }
       }
       """
@@ -74,6 +78,7 @@ class GtfsConfigTest {
     assertEquals("test", subject.feedId().get());
     assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
+    assertTrue(subject.discardMinTransferTimes());
   }
 
   @Test
@@ -82,8 +87,9 @@ class GtfsConfigTest {
       """
       {
         gtfsDefaults: {
-         'removeRepeatedStops': 'true',
-         'stationTransferPreference' : 'allowed'
+         'removeRepeatedStops': true,
+         'stationTransferPreference' : 'allowed',
+         'discardMinTransferTimes': true
        }
       }
       """
@@ -96,8 +102,9 @@ class GtfsConfigTest {
       {
          'source': 'https://foo.bar/gtfs.zip',
          'feedId': 'test',
-         'removeRepeatedStops': 'false',
-         'stationTransferPreference' : 'preferred'
+         'removeRepeatedStops': false,
+         'stationTransferPreference' : 'preferred',
+         'discardMinTransferTimes': false
       }
       """
     );
@@ -108,6 +115,7 @@ class GtfsConfigTest {
     assertEquals("test", subject.feedId().get());
     assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
+    assertFalse(subject.discardMinTransferTimes());
   }
 
   @Test
@@ -125,7 +133,8 @@ class GtfsConfigTest {
          'source': 'https://foo.bar/gtfs.zip',
          'feedId': 'test',
          'removeRepeatedStops': 'false',
-         'stationTransferPreference' : 'preferred'
+         'stationTransferPreference' : 'preferred',
+         'discardMinTransferTimes': true
       }
       """
     );
@@ -136,5 +145,6 @@ class GtfsConfigTest {
     assertEquals("test", subject.feedId().get());
     assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
+    assertTrue(subject.discardMinTransferTimes());
   }
 }

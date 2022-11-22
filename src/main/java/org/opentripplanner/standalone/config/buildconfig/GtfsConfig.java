@@ -62,6 +62,19 @@ public class GtfsConfig {
           )
           .asEnum(defaults.stationTransferPreference())
       )
+      .withDiscardMinTransferTimes(
+        node
+          .of("discardMinTransferTimes")
+          .since(V2_3)
+          .summary("Should minimum transfer times in GTFS files be discarded.")
+          .description(
+            """
+            This is useful eg. when the minimum transfer time is only set for ticketing purposes,
+            but we want to calculate the transfers always from OSM data.
+            """
+          )
+          .asBoolean(defaults.discardMinTransferTimes())
+      )
       .build();
   }
 
@@ -88,6 +101,19 @@ public class GtfsConfig {
             """
           )
           .asEnum(GtfsFeedParameters.DEFAULT_STATION_TRANSFER_PREFERENCE)
+      )
+      .withDiscardMinTransferTimes(
+        node
+          .of("discardMinTransferTimes")
+          .since(V2_3)
+          .summary("Should minimum transfer times in GTFS files be discarded.")
+          .description(
+            """
+            This is useful eg. when the minimum transfer time is only set for ticketing purposes,
+            but we want to calculate the transfers always from OSM data.
+            """
+          )
+          .asBoolean(GtfsFeedParameters.DEFAULT_DISCARD_MIN_TRANSFER_TIMES)
       )
       .build();
   }

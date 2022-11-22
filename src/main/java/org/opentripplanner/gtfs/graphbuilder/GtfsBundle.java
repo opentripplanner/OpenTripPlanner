@@ -30,6 +30,8 @@ public class GtfsBundle {
 
   private StopTransferPriority stationTransferPreference;
 
+  private boolean discardMinTransferTimes;
+
   /** Used by unit tests */
   public GtfsBundle(File gtfsFile) {
     this(DataStoreModule.compositeSource(gtfsFile, FileType.GTFS));
@@ -52,6 +54,7 @@ public class GtfsBundle {
     }
     this.removeRepeatedStops = configuredDataSource.config().removeRepeatedStops();
     this.stationTransferPreference = configuredDataSource.config().stationTransferPreference();
+    this.discardMinTransferTimes = configuredDataSource.config().discardMinTransferTimes();
   }
 
   public CsvInputSource getCsvInputSource() {
@@ -136,5 +139,9 @@ public class GtfsBundle {
 
   public StopTransferPriority stationTransferPreference() {
     return stationTransferPreference;
+  }
+
+  public boolean discardMinTransferTimes() {
+    return discardMinTransferTimes;
   }
 }

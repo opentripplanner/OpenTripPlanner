@@ -13,6 +13,7 @@ public class GtfsFeedParametersBuilder {
   private boolean removeRepeatedStops = GtfsFeedParameters.DEFAULT_REMOVE_REPEATED_STOPS;
   private StopTransferPriority stationTransferPreference =
     GtfsFeedParameters.DEFAULT_STATION_TRANSFER_PREFERENCE;
+  private boolean discardMinTransferTimes = GtfsFeedParameters.DEFAULT_DISCARD_MIN_TRANSFER_TIMES;
 
   public GtfsFeedParametersBuilder() {}
 
@@ -57,6 +58,15 @@ public class GtfsFeedParametersBuilder {
 
   boolean removeRepeatedStops() {
     return removeRepeatedStops;
+  }
+
+  public GtfsFeedParametersBuilder withDiscardMinTransferTimes(boolean value) {
+    this.discardMinTransferTimes = value;
+    return this;
+  }
+
+  boolean discardMinTransferTimes() {
+    return discardMinTransferTimes;
   }
 
   public GtfsFeedParameters build() {

@@ -26,7 +26,6 @@ Sections follow that describe particular settings in more depth.
 | [buildReportDir](#buildReportDir)                                        |    `uri`    | URI to the directory where the graph build report should be written to.                                                     | *Optional* |                                   |  2.0  |
 | [configVersion](#configVersion)                                          |   `string`  | Deployment version of the *build-config.json*.                                                                              | *Optional* |                                   |  2.1  |
 | [dataImportReport](#dataImportReport)                                    |  `boolean`  | Generate nice HTML report of Graph errors/warnings                                                                          | *Optional* | `false`                           |  2.0  |
-| [discardMinTransferTimes](#discardMinTransferTimes)                      |  `boolean`  | Should minimum transfer times in GTFS files be discarded.                                                                   | *Optional* | `false`                           |  2.2  |
 | [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)      |   `double`  | The distance between elevation samples in meters.                                                                           | *Optional* | `10.0`                            |  2.0  |
 | [elevationUnitMultiplier](#elevationUnitMultiplier)                      |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* | `1.0`                             |  2.0  |
 | embedRouterConfig                                                        |  `boolean`  | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                | *Optional* | `true`                            |  2.0  |
@@ -63,6 +62,7 @@ Sections follow that describe particular settings in more depth.
 | [elevationBucket](#elevationBucket)                                      |   `object`  | Used to download NED elevation tiles from the given AWS S3 bucket.                                                          | *Optional* |                                   |   na  |
 | [fares](sandbox/Fares.md)                                                |   `object`  | Fare configuration.                                                                                                         | *Optional* |                                   |  2.0  |
 | gtfsDefaults                                                             |   `object`  | The gtfsDefaults section allows you to specify default properties for GTFS files.                                           | *Optional* |                                   |  2.3  |
+|    [discardMinTransferTimes](#gd_discardMinTransferTimes)                |  `boolean`  | Should minimum transfer times in GTFS files be discarded.                                                                   | *Optional* | `false`                           |  2.3  |
 |    removeRepeatedStops                                                   |  `boolean`  | Should consecutive identical stops be merged into one stop time entry                                                       | *Optional* | `true`                            |  2.3  |
 |    [stationTransferPreference](#gd_stationTransferPreference)            |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                              | *Optional* | `"allowed"`                       |  2.3  |
 | [localFileNamePatterns](#localFileNamePatterns)                          |   `object`  | Patterns for matching OTP file types in the base directory                                                                  | *Optional* |                                   |  2.0  |
@@ -91,6 +91,7 @@ Sections follow that describe particular settings in more depth.
 | [transitFeeds](#transitFeeds)                                            |  `object[]` | Scan for transit data files                                                                                                 | *Optional* |                                   |  2.2  |
 |    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                    | *Optional* |                                   |  2.2  |
 |       type = "GTFS"                                                      |    `enum`   | The feed input format.                                                                                                      | *Required* |                                   |  2.2  |
+|       [discardMinTransferTimes](#tf_0_discardMinTransferTimes)           |  `boolean`  | Should minimum transfer times in GTFS files be discarded.                                                                   | *Optional* | `false`                           |  2.3  |
 |       feedId                                                             |   `string`  | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                     | *Optional* |                                   |  2.2  |
 |       removeRepeatedStops                                                |  `boolean`  | Should consecutive identical stops be merged into one stop time entry.                                                      | *Optional* | `true`                            |  2.3  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
@@ -462,17 +463,6 @@ Generate nice HTML report of Graph errors/warnings
 
 The reports are stored in the same location as the graph.
 
-<h3 id="discardMinTransferTimes">discardMinTransferTimes</h3>
-
-**Since version:** `2.2` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
-**Path:** / 
-
-Should minimum transfer times in GTFS files be discarded.
-
-This is useful eg. when the minimum transfer time is only set for ticketing purposes,
-but we want to calculate the transfers always from OSM data.
-
-
 <h3 id="distanceBetweenElevationSamples">distanceBetweenElevationSamples</h3>
 
 **Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10.0`  \
@@ -782,6 +772,17 @@ for the next graph build operation. You should add the `--cache <directory>` com
 to specify your NED tile cache location.
 
 
+<h3 id="gd_discardMinTransferTimes">discardMinTransferTimes</h3>
+
+**Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** /gtfsDefaults 
+
+Should minimum transfer times in GTFS files be discarded.
+
+This is useful eg. when the minimum transfer time is only set for ticketing purposes,
+but we want to calculate the transfers always from OSM data.
+
+
 <h3 id="gd_stationTransferPreference">stationTransferPreference</h3>
 
 **Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`  \
@@ -977,6 +978,17 @@ When a feed of a particular type (`netex` or `gtfs`) is specified in the transit
 section, auto-scanning in the base directory for this feed type will be disabled.
 
 
+<h3 id="tf_0_discardMinTransferTimes">discardMinTransferTimes</h3>
+
+**Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** /transitFeeds/[0] 
+
+Should minimum transfer times in GTFS files be discarded.
+
+This is useful eg. when the minimum transfer time is only set for ticketing purposes,
+but we want to calculate the transfers always from OSM data.
+
+
 <h3 id="tf_0_stationTransferPreference">stationTransferPreference</h3>
 
 **Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"recommended"`  \
@@ -1110,7 +1122,8 @@ case where this is not the case.
   },
   "gtfsDefaults" : {
     "stationTransferPreference" : "recommended",
-    "removeRepeatedStops" : true
+    "removeRepeatedStops" : true,
+    "discardMinTransferTimes" : false
   },
   "transitFeeds" : [ {
     "type" : "gtfs",

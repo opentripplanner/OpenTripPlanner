@@ -312,7 +312,6 @@ public class ConstantsForTests {
       noopIssueStore(),
       ServiceDateInterval.unbounded(),
       fareServiceFactory,
-      false,
       true,
       300
     );

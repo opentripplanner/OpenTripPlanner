@@ -179,7 +179,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   public LocalDate transitServiceStart;
 
   public LocalDate transitServiceEnd;
-  public boolean discardMinTransferTimes;
   public ZoneId transitModelTimeZone;
   public boolean blockBasedInterlining;
 
@@ -569,18 +568,6 @@ recommended.
         )
         .description("[Detailed documentation](BoardingLocations.md)")
         .asStringSet(List.copyOf(Set.of("ref")));
-    discardMinTransferTimes =
-      root
-        .of("discardMinTransferTimes")
-        .since(V2_2)
-        .summary("Should minimum transfer times in GTFS files be discarded.")
-        .description(
-          """
-          This is useful eg. when the minimum transfer time is only set for ticketing purposes,
-          but we want to calculate the transfers always from OSM data.
-          """
-        )
-        .asBoolean(false);
 
     var localFileNamePatternsConfig = root
       .of("localFileNamePatterns")
