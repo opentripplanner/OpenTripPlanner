@@ -1,7 +1,5 @@
 package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
-import javax.annotation.Nullable;
-
 /**
  * The heuristics are used in the multi-criteria search and can be generated using the standard
  * search. This interface decouple these two implementations and make it possible to implement more
@@ -9,14 +7,10 @@ import javax.annotation.Nullable;
  */
 public interface Heuristics {
   /**
-   * Is the stop reached by the heuristic search?
+   * The heuristic from the origin to the given stop. Returns {@link HeuristicAtStop#UNREACHED} if
+   * the stop is not reached.
    */
-  boolean reached(int stop);
-
-  /**
-   * The best overall travel duration from origin to the given stop.
-   */
-  int bestTravelDuration(int stop);
+  HeuristicAtStop createHeuristicAtStop(int stop);
 
   /**
    * To plot or debug the travel duration.
@@ -26,11 +20,6 @@ public interface Heuristics {
   int[] bestTravelDurationToIntArray(int unreached);
 
   /**
-   * The best number of transfers to reach the given stop.
-   */
-  int bestNumOfTransfers(int stop);
-
-  /**
    * To plot or debug the number of transfers.
    *
    * @param unreached set all unreached values to this value
@@ -38,22 +27,11 @@ public interface Heuristics {
   int[] bestNumOfTransfersToIntArray(int unreached);
 
   /**
-   * The best overall generalized cost from origin to the given stop.
-   */
-  int bestGeneralizedCost(int stop);
-
-  /**
    * To plot or debug the generalized cost.
    *
    * @param unreached set all unreached values to this value
    */
   int[] bestGeneralizedCostToIntArray(int unreached);
-
-  /**
-   * The heuristic from the origin to the given stop.
-   */
-  @Nullable
-  HeuristicAtStop createHeuristicAtStop(int stop);
 
   /**
    * The number of stops in the heuristics. This includes all stops also stops not reached.
