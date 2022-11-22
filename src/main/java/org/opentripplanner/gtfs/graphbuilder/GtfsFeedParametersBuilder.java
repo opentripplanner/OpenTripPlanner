@@ -10,8 +10,16 @@ public class GtfsFeedParametersBuilder {
 
   private URI source;
   private String feedId;
-  private boolean removeRepeatedStops = true;
-  private StopTransferPriority stationTransferPreference;
+  private boolean removeRepeatedStops = GtfsFeedParameters.DEFAULT_REMOVE_REPEATED_STOPS;
+  private StopTransferPriority stationTransferPreference =
+    GtfsFeedParameters.DEFAULT_STATION_TRANSFER_PREFERENCE;
+
+  public GtfsFeedParametersBuilder() {}
+
+  public GtfsFeedParametersBuilder(GtfsFeedParameters original) {
+    this.removeRepeatedStops = original.removeRepeatedStops();
+    this.stationTransferPreference = original.stationTransferPreference();
+  }
 
   public GtfsFeedParametersBuilder withFeedId(String feedId) {
     this.feedId = feedId;

@@ -23,11 +23,13 @@ import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParamete
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
+import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
 import org.opentripplanner.standalone.config.buildconfig.NetexConfig;
 import org.opentripplanner.standalone.config.buildconfig.OsmConfig;
 import org.opentripplanner.standalone.config.buildconfig.S3BucketConfig;
@@ -148,6 +150,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final double maxTransferDurationSeconds;
   public final Boolean extraEdgesStopPlatformLink;
   public final NetexFeedParameters netexDefaults;
+  public final GtfsFeedParameters gtfsDefaults;
 
   public final OsmDefaultParameters osmDefaults;
 
@@ -694,7 +697,9 @@ Netex data is also often supplied in a ZIP file.
     dem = DemConfig.mapDemConfig(root, "dem");
 
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
-    transitFeeds = TransitFeedConfig.mapTransitFeeds(root, "transitFeeds", netexDefaults);
+    gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
+    transitFeeds =
+      TransitFeedConfig.mapTransitFeeds(root, "transitFeeds", netexDefaults, gtfsDefaults);
 
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(root, "fares");

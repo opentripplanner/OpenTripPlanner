@@ -154,7 +154,7 @@ public class GraphBuilderDataSources {
       .stream()
       .filter(gtfsFeedConfig -> uriMatch(gtfsFeedConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new GtfsFeedParametersBuilder().withSource(dataSource.uri()).build());
+      .orElse(buildConfig.gtfsDefaults.copyOf().withSource(dataSource.uri()).build());
   }
 
   public Iterable<ConfiguredDataSource<NetexFeedParameters>> getNetexConfiguredDatasource() {
