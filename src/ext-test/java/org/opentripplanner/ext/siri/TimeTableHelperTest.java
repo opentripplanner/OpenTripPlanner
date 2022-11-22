@@ -58,37 +58,33 @@ public class TimeTableHelperTest {
 
   @BeforeEach
   public void setUp() {
-    stopLocation = RegularStop.of(SCOPED_STOP_ID)
-      .build();
+    stopLocation = RegularStop.of(SCOPED_STOP_ID).build();
 
-    station = Station.of(SCOPED_STATION_ID)
-      .withName(new NonLocalizedString(STATION_NAME))
-      .withCoordinate(0.0,0.0)
-      .build();
+    station =
+      Station
+        .of(SCOPED_STATION_ID)
+        .withName(new NonLocalizedString(STATION_NAME))
+        .withCoordinate(0.0, 0.0)
+        .build();
 
     var stopTime = new StopTime();
-    stop = RegularStop.of(SCOPED_STOP_ID)
-      .withCoordinate(0.0,0.0)
-      .withParentStation(station)
-      .build();
+    stop =
+      RegularStop.of(SCOPED_STOP_ID).withCoordinate(0.0, 0.0).withParentStation(station).build();
     stopTime.setStop(stop);
     stopPattern = new StopPattern(List.of(stopTime));
 
-    agency = Agency.of(SCOPED_AGENCY_ID)
-      .withName(AGENCY_NAME)
-      .withTimezone("CET")
-      .build();
+    agency = Agency.of(SCOPED_AGENCY_ID).withName(AGENCY_NAME).withTimezone("CET").build();
 
-    route = Route.of(SCOPED_LINE_ID)
-      .withShortName(LINE_SHORT_NAME)
-      .withAgency(agency)
-      .withMode(TransitMode.FUNICULAR)
-      .build();
+    route =
+      Route
+        .of(SCOPED_LINE_ID)
+        .withShortName(LINE_SHORT_NAME)
+        .withAgency(agency)
+        .withMode(TransitMode.FUNICULAR)
+        .build();
 
-    tripPattern = TripPattern.of(SCOPED_PATTERN_ID)
-      .withStopPattern(stopPattern)
-      .withRoute(route)
-      .build();
+    tripPattern =
+      TripPattern.of(SCOPED_PATTERN_ID).withStopPattern(stopPattern).withRoute(route).build();
   }
 
   @Test
@@ -98,7 +94,11 @@ public class TimeTableHelperTest {
     Function<FeedScopedId, StopLocation> stopFetcher = s -> this.stopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(tripPattern, estimatedVehicleJourney, stopFetcher);
+    var result = TimetableHelper.createModifiedStops(
+      tripPattern,
+      estimatedVehicleJourney,
+      stopFetcher
+    );
 
     // Assert
     assertNotNull(result, "The stops should not be null");
@@ -118,7 +118,11 @@ public class TimeTableHelperTest {
     Function<FeedScopedId, StopLocation> stopFetcher = s -> this.stopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(tripPattern, estimatedVehicleJourney, stopFetcher);
+    var result = TimetableHelper.createModifiedStops(
+      tripPattern,
+      estimatedVehicleJourney,
+      stopFetcher
+    );
 
     // Assert
     assertNotNull(result, "The stops should not be null");
@@ -136,11 +140,17 @@ public class TimeTableHelperTest {
     // Arrange
     var newStopScopedId = new FeedScopedId(FEED_ID, "RECORDED_STOP");
     var newRecordedStopLocation = RegularStop.of(newStopScopedId).build();
-    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithRecordedCalls(newStopScopedId);
+    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithRecordedCalls(
+      newStopScopedId
+    );
     Function<FeedScopedId, StopLocation> stopFetcher = s -> newRecordedStopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(tripPattern, estimatedVehicleJourney, stopFetcher);
+    var result = TimetableHelper.createModifiedStops(
+      tripPattern,
+      estimatedVehicleJourney,
+      stopFetcher
+    );
 
     // Assert
     assertNotNull(result, "The stops should not be null");
@@ -157,20 +167,32 @@ public class TimeTableHelperTest {
   public void testChangedRecordCallStopSameStation() {
     // Arrange
     var newStopScopedId = new FeedScopedId(FEED_ID, "RECORDED_STOP");
-    var newRecordedStopLocation = RegularStop.of(newStopScopedId)
-      .withParentStation(station).build();
-    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithRecordedCalls(newStopScopedId);
+    var newRecordedStopLocation = RegularStop
+      .of(newStopScopedId)
+      .withParentStation(station)
+      .build();
+    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithRecordedCalls(
+      newStopScopedId
+    );
     Function<FeedScopedId, StopLocation> stopFetcher = s -> newRecordedStopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(tripPattern, estimatedVehicleJourney, stopFetcher);
+    var result = TimetableHelper.createModifiedStops(
+      tripPattern,
+      estimatedVehicleJourney,
+      stopFetcher
+    );
 
     // Assert
     assertNotNull(result, "The stops should not be null");
     assertNotEquals(0, result.size(), "There should be more than 0 stopLocations created");
     for (StopLocation location : result) {
       assertAll(() -> {
-        assertEquals(newStopScopedId, location.getId(), "StopLocation id should be set from the recorded call");
+        assertEquals(
+          newStopScopedId,
+          location.getId(),
+          "StopLocation id should be set from the recorded call"
+        );
         assertEquals(newRecordedStopLocation, location);
       });
     }
@@ -180,20 +202,32 @@ public class TimeTableHelperTest {
   public void testChangedEstimatedCallStopSameStation() {
     // Arrange
     var newStopScopedId = new FeedScopedId(FEED_ID, "RECORDED_STOP");
-    var newRecordedStopLocation = RegularStop.of(newStopScopedId)
-      .withParentStation(station).build();
-    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithEstimatedCalls(newStopScopedId);
+    var newRecordedStopLocation = RegularStop
+      .of(newStopScopedId)
+      .withParentStation(station)
+      .build();
+    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithEstimatedCalls(
+      newStopScopedId
+    );
     Function<FeedScopedId, StopLocation> stopFetcher = s -> newRecordedStopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(tripPattern, estimatedVehicleJourney, stopFetcher);
+    var result = TimetableHelper.createModifiedStops(
+      tripPattern,
+      estimatedVehicleJourney,
+      stopFetcher
+    );
 
     // Assert
     assertNotNull(result, "The stops should not be null");
     assertNotEquals(0, result.size(), "There should be more than 0 stopLocations created");
     for (StopLocation location : result) {
       assertAll(() -> {
-        assertEquals(newStopScopedId, location.getId(), "StopLocation id should be set from the recorded call");
+        assertEquals(
+          newStopScopedId,
+          location.getId(),
+          "StopLocation id should be set from the recorded call"
+        );
         assertEquals(newRecordedStopLocation, location);
       });
     }
@@ -204,11 +238,17 @@ public class TimeTableHelperTest {
     // Arrange
     var newStopScopedId = new FeedScopedId(FEED_ID, "RECORDED_STOP");
     var newRecordedStopLocation = RegularStop.of(newStopScopedId).build();
-    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithEstimatedCalls(newStopScopedId);
+    EstimatedVehicleJourney estimatedVehicleJourney = getEstimatedVehicleJourneyWithEstimatedCalls(
+      newStopScopedId
+    );
     Function<FeedScopedId, StopLocation> stopFetcher = s -> newRecordedStopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(tripPattern, estimatedVehicleJourney, stopFetcher);
+    var result = TimetableHelper.createModifiedStops(
+      tripPattern,
+      estimatedVehicleJourney,
+      stopFetcher
+    );
 
     // Assert
     assertNotNull(result, "The stops should not be null");
@@ -221,7 +261,9 @@ public class TimeTableHelperTest {
     }
   }
 
-  private EstimatedVehicleJourney getEstimatedVehicleJourneyWithRecordedCalls(FeedScopedId newStopScopedId) {
+  private EstimatedVehicleJourney getEstimatedVehicleJourneyWithRecordedCalls(
+    FeedScopedId newStopScopedId
+  ) {
     var estimatedVehicleJourney = new EstimatedVehicleJourney();
     var stopPointRef = new StopPointRef();
     stopPointRef.setValue(newStopScopedId.toString());
@@ -236,7 +278,9 @@ public class TimeTableHelperTest {
     return estimatedVehicleJourney;
   }
 
-  private EstimatedVehicleJourney getEstimatedVehicleJourneyWithEstimatedCalls(FeedScopedId newStopScopedId) {
+  private EstimatedVehicleJourney getEstimatedVehicleJourneyWithEstimatedCalls(
+    FeedScopedId newStopScopedId
+  ) {
     var estimatedVehicleJourney = new EstimatedVehicleJourney();
     var stopPointRef = new StopPointRef();
     stopPointRef.setValue(newStopScopedId.toString());
@@ -250,7 +294,6 @@ public class TimeTableHelperTest {
 
     return estimatedVehicleJourney;
   }
-
 
   @Test
   public void testCreateModifiedStopTimes() {
