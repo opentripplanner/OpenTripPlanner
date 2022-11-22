@@ -128,6 +128,11 @@ public class RoutingWorker {
     boolean removeWalkAllTheWayResultsFromDirectFlex =
       request.journey().direct().mode() == StreetMode.FLEXIBLE;
 
+    var modes = request.journey().modes();
+    boolean hasFlex = List
+      .of(modes.directMode, modes.accessMode, modes.egressMode)
+      .contains(StreetMode.FLEXIBLE);
+
     ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
       request.itinerariesSortOrder(),
       request.preferences().itineraryFilter(),
@@ -140,6 +145,7 @@ public class RoutingWorker {
       request.wheelchair(),
       request.preferences().wheelchair().maxSlope(),
       serverContext.graph().getFareService(),
+      hasFlex && request.preferences().itineraryFilter().flexOnlyToDestination(),
       serverContext.transitService().getTransitAlertService(),
       serverContext.transitService()::getMultiModalStationForStation
     );

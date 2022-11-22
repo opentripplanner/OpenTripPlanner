@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.routerequest;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
@@ -231,6 +232,16 @@ removed from list.
             "This can be used by frontend developers to implement a simple traffic light UI."
           )
           .asBoolean(dft.useAccessibilityScore())
+      )
+      .withFlexOnlyToDestination(
+        c
+          .of("flexOnlyToDestination")
+          .since(V2_3)
+          .summary("Only allow flex services that arrive very close to the destination.")
+          .description(
+            "Useful for when you advertise the service as \"driving the passenger home\". \"Close\" is defined as less than 2 minutes of walking."
+          )
+          .asBoolean(dft.flexOnlyToDestination())
       )
       .build();
   }

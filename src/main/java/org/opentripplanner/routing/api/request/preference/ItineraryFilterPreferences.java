@@ -28,6 +28,7 @@ public final class ItineraryFilterPreferences {
   private final boolean filterItinerariesWithSameFirstOrLastTrip;
   private final boolean accessibilityScore;
   private final boolean removeItinerariesWithSameRoutesAndStops;
+  private final boolean flexOnlyToDestination;
 
   private ItineraryFilterPreferences() {
     this.debug = false;
@@ -42,6 +43,7 @@ public final class ItineraryFilterPreferences {
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.accessibilityScore = false;
     this.removeItinerariesWithSameRoutesAndStops = false;
+    this.flexOnlyToDestination = false;
   }
 
   private ItineraryFilterPreferences(Builder builder) {
@@ -59,6 +61,7 @@ public final class ItineraryFilterPreferences {
       builder.filterItinerariesWithSameFirstOrLastTrip;
     this.accessibilityScore = builder.accessibilityScore;
     this.removeItinerariesWithSameRoutesAndStops = builder.removeItinerariesWithSameRoutesAndStops;
+    this.flexOnlyToDestination = builder.flexOnlyToDestination;
   }
 
   public static Builder of() {
@@ -109,6 +112,10 @@ public final class ItineraryFilterPreferences {
     return removeItinerariesWithSameRoutesAndStops;
   }
 
+  public boolean flexOnlyToDestination() {
+    return flexOnlyToDestination;
+  }
+
   public boolean useAccessibilityScore() {
     return accessibilityScore;
   }
@@ -127,6 +134,7 @@ public final class ItineraryFilterPreferences {
     private boolean filterItinerariesWithSameFirstOrLastTrip;
     private boolean removeItinerariesWithSameRoutesAndStops;
     private boolean accessibilityScore;
+    private boolean flexOnlyToDestination;
 
     public ItineraryFilterPreferences original() {
       return original;
@@ -194,6 +202,11 @@ public final class ItineraryFilterPreferences {
 
     public Builder withAccessibilityScore(boolean accessibilityScore) {
       this.accessibilityScore = accessibilityScore;
+      return this;
+    }
+
+    public Builder withFlexOnlyToDestination(boolean b) {
+      this.flexOnlyToDestination = b;
       return this;
     }
 

@@ -86,6 +86,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [bikeRentalDistanceRatio](#rd_if_bikeRentalDistanceRatio)                                     |        `double`        | Filter routes that consist of bike-rental and walking by the minimum fraction of the bike-rental leg using _distance_.             | *Optional* | `0.0`                    |  2.1  |
 |    debug                                                                                         |        `boolean`       | Enable this to attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters.    | *Optional* | `false`                  |  2.0  |
 |    [filterItinerariesWithSameFirstOrLastTrip](#rd_if_filterItinerariesWithSameFirstOrLastTrip)   |        `boolean`       | If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains.            | *Optional* | `false`                  |  2.2  |
+|    [flexOnlyToDestination](#rd_if_flexOnlyToDestination)                                         |        `boolean`       | Only allow flex services that arrive very close to the destination.                                                                | *Optional* | `false`                  |  2.3  |
 |    groupSimilarityKeepOne                                                                        |        `double`        | Pick ONE itinerary from each group after putting itineraries that are 85% similar together.                                        | *Optional* | `0.85`                   |  2.1  |
 |    groupSimilarityKeepThree                                                                      |        `double`        | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity.             | *Optional* | `0.68`                   |  2.1  |
 |    [groupedOtherThanSameLegsMaxCostMultiplier](#rd_if_groupedOtherThanSameLegsMaxCostMultiplier) |        `double`        | Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.                             | *Optional* | `2.0`                    |  2.1  |
@@ -449,6 +450,15 @@ during comparison. Before filtering, trips are sorted by their generalized cost.
 through the list from top to bottom. If an itinerary matches from any other itinerary from above, it is
 removed from list.
 
+
+<h3 id="rd_if_flexOnlyToDestination">flexOnlyToDestination</h3>
+
+**Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** /routingDefaults/itineraryFilters 
+
+Only allow flex services that arrive very close to the destination.
+
+Useful for when you advertise the service as "driving the passenger home". Close is defined as less than 2 minutes of walking.
 
 <h3 id="rd_if_groupedOtherThanSameLegsMaxCostMultiplier">groupedOtherThanSameLegsMaxCostMultiplier</h3>
 

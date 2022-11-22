@@ -12,12 +12,9 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FlexTripEdge extends Edge {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FlexTripEdge.class);
   private final FlexTrip trip;
   public StopLocation s1;
   public StopLocation s2;
