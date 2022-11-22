@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -34,12 +33,10 @@ class GtfsConfigTest {
 
   @Test
   void mapMissingGtfsDefaultParameters() {
-    NodeAdapter nodeAdapter = newNodeAdapterForTest(
-      """
+    NodeAdapter nodeAdapter = newNodeAdapterForTest("""
       {
       }
-      """
-    );
+      """);
 
     var subject = GtfsConfig.mapGtfsDefaultParameters(nodeAdapter, "gtfsDefaults");
 
@@ -48,9 +45,7 @@ class GtfsConfigTest {
   }
 
   @Test
-  @Disabled
   void mapGtfsFeedWithDefaults() {
-    // TODO fix this
     NodeAdapter defaultsAdapter = newNodeAdapterForTest(
       """
       {
@@ -117,12 +112,10 @@ class GtfsConfigTest {
 
   @Test
   void mapGtfsFeedWithNoDefaults() {
-    NodeAdapter noDefaultsAdapter = newNodeAdapterForTest(
-      """
+    NodeAdapter noDefaultsAdapter = newNodeAdapterForTest("""
       {
       }
-      """
-    );
+      """);
 
     var defaults = GtfsConfig.mapGtfsDefaultParameters(noDefaultsAdapter, "gtfsDefaults");
 

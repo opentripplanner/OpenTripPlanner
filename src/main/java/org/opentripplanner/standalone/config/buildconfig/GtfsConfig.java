@@ -44,8 +44,8 @@ public class GtfsConfig {
         node
           .of("removeRepeatedStops")
           .since(V2_3)
-          .summary("Should consecutive identical stops be merged into one stop time entry")
-          .asBoolean(GtfsFeedParameters.DEFAULT_REMOVE_REPEATED_STOPS)
+          .summary("Should consecutive identical stops be merged into one stop time entry.")
+          .asBoolean(defaults.removeRepeatedStops())
       )
       .withStationTransferPreference(
         node
@@ -60,7 +60,7 @@ public class GtfsConfig {
             with the `stopTransferCost` parameter in the router configuration.
             """
           )
-          .asEnum(GtfsFeedParameters.DEFAULT_STATION_TRANSFER_PREFERENCE)
+          .asEnum(defaults.stationTransferPreference())
       )
       .build();
   }
