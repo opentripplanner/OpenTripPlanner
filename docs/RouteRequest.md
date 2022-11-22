@@ -458,7 +458,7 @@ removed from list.
 
 Only allow flex services that arrive very close to the destination.
 
-Useful for when you advertise the service as "driving the passenger home". Close is defined as less than 2 minutes of walking.
+Useful for when you advertise the service as "driving the passenger home". "Close" is defined as less than 2 minutes of walking.
 
 <h3 id="rd_if_groupedOtherThanSameLegsMaxCostMultiplier">groupedOtherThanSameLegsMaxCostMultiplier</h3>
 

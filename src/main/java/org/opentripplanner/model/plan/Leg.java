@@ -58,6 +58,11 @@ public interface Leg {
     return false;
   }
 
+  /** The mode is cycling. */
+  default boolean isCyclingLeg() {
+    return false;
+  }
+
   /**
    * The mode is a street mode; Hence not a transit mode.
    */
