@@ -1313,13 +1313,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     resetSearchDateButton.addActionListener(
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          searchDate.setText(DATE_FORMAT.format(Instant.now()));
+          searchDate.setText(DATE_FORMAT.format(ZonedDateTime.now()));
         }
       }
     );
     routingPanel.add(resetSearchDateButton);
     searchDate = new JTextField();
-    searchDate.setText(DATE_FORMAT.format(Instant.now()));
+    searchDate.setText(DATE_FORMAT.format(ZonedDateTime.now()));
     routingPanel.add(searchDate);
 
     // row: launch, continue, and clear path search
