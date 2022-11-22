@@ -7,8 +7,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class BogusShapeGeometryCaught implements DataImportIssue {
 
   public static final String FMT =
-    "Shape geometry for shape_id %s cannot be used with stop " +
-    "times %s and %s; shape_dist_traveled information will not be used";
+    "Shape_dist_traveled for shape_id %s is in conflict with stop " +
+    "times %s and %s; shape_dist_traveled will not be used";
 
   final FeedScopedId shapeId;
   final StopTime stA;
