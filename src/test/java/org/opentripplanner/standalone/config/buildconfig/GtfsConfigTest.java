@@ -20,7 +20,8 @@ class GtfsConfigTest {
         gtfsDefaults: {
          'removeRepeatedStops': false,
          'stationTransferPreference' : 'preferred',
-         'discardMinTransferTimes': true
+         'discardMinTransferTimes': true,
+         'blockBasedInterlining': false
        }
       }
       """
@@ -31,6 +32,7 @@ class GtfsConfigTest {
     assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
     assertTrue(subject.discardMinTransferTimes());
+    assertFalse(subject.blockBasedInterlining());
   }
 
   @Test
@@ -45,6 +47,7 @@ class GtfsConfigTest {
     assertTrue(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.ALLOWED, subject.stationTransferPreference());
     assertFalse(subject.discardMinTransferTimes());
+    assertTrue(subject.blockBasedInterlining());
   }
 
   @Test
@@ -55,7 +58,8 @@ class GtfsConfigTest {
         gtfsDefaults: {
          'removeRepeatedStops': false,
          'stationTransferPreference' : 'preferred',
-         'discardMinTransferTimes': true
+         'discardMinTransferTimes': true,
+         'blockBasedInterlining': false
        }
       }
       """
@@ -79,6 +83,7 @@ class GtfsConfigTest {
     assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
     assertTrue(subject.discardMinTransferTimes());
+    assertFalse(subject.blockBasedInterlining());
   }
 
   @Test
@@ -89,7 +94,8 @@ class GtfsConfigTest {
         gtfsDefaults: {
          'removeRepeatedStops': true,
          'stationTransferPreference' : 'allowed',
-         'discardMinTransferTimes': true
+         'discardMinTransferTimes': true,
+         'blockBasedInterlining': true
        }
       }
       """
@@ -104,7 +110,8 @@ class GtfsConfigTest {
          'feedId': 'test',
          'removeRepeatedStops': false,
          'stationTransferPreference' : 'preferred',
-         'discardMinTransferTimes': false
+         'discardMinTransferTimes': false,
+         'blockBasedInterlining': false
       }
       """
     );
@@ -116,6 +123,7 @@ class GtfsConfigTest {
     assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
     assertFalse(subject.discardMinTransferTimes());
+    assertFalse(subject.blockBasedInterlining());
   }
 
   @Test
@@ -134,7 +142,8 @@ class GtfsConfigTest {
          'feedId': 'test',
          'removeRepeatedStops': 'false',
          'stationTransferPreference' : 'preferred',
-         'discardMinTransferTimes': true
+         'discardMinTransferTimes': true,
+         'blockBasedInterlining': false
       }
       """
     );
@@ -146,5 +155,6 @@ class GtfsConfigTest {
     assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
     assertTrue(subject.discardMinTransferTimes());
+    assertFalse(subject.blockBasedInterlining());
   }
 }

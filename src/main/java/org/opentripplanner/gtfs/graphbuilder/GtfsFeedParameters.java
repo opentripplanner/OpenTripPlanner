@@ -18,11 +18,14 @@ public class GtfsFeedParameters implements DataSourceConfig {
 
   public static final boolean DEFAULT_DISCARD_MIN_TRANSFER_TIMES = false;
 
+  public static final boolean DEFAULT_BLOCK_BASED_INTERLINING = true;
+
   private final URI source;
   private final String feedId;
   private final boolean removeRepeatedStops;
   private final StopTransferPriority stationTransferPreference;
   private final boolean discardMinTransferTimes;
+  private final boolean blockBasedInterlining;
 
   GtfsFeedParameters(GtfsFeedParametersBuilder builder) {
     this.source = builder.source();
@@ -30,6 +33,7 @@ public class GtfsFeedParameters implements DataSourceConfig {
     this.removeRepeatedStops = builder.removeRepeatedStops();
     this.stationTransferPreference = builder.stationTransferPreference();
     this.discardMinTransferTimes = builder.discardMinTransferTimes();
+    this.blockBasedInterlining = builder.blockBasedInterlining();
   }
 
   /** See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}. */
@@ -53,6 +57,10 @@ public class GtfsFeedParameters implements DataSourceConfig {
 
   public boolean discardMinTransferTimes() {
     return discardMinTransferTimes;
+  }
+
+  public boolean blockBasedInterlining() {
+    return blockBasedInterlining;
   }
 
   public GtfsFeedParametersBuilder copyOf() {

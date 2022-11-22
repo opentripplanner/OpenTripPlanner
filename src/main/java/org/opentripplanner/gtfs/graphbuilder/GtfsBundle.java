@@ -32,6 +32,8 @@ public class GtfsBundle {
 
   private boolean discardMinTransferTimes;
 
+  private boolean blockBasedInterlining;
+
   /** Used by unit tests */
   public GtfsBundle(File gtfsFile) {
     this(DataStoreModule.compositeSource(gtfsFile, FileType.GTFS));
@@ -55,6 +57,7 @@ public class GtfsBundle {
     this.removeRepeatedStops = configuredDataSource.config().removeRepeatedStops();
     this.stationTransferPreference = configuredDataSource.config().stationTransferPreference();
     this.discardMinTransferTimes = configuredDataSource.config().discardMinTransferTimes();
+    this.blockBasedInterlining = configuredDataSource.config().blockBasedInterlining();
   }
 
   public CsvInputSource getCsvInputSource() {
@@ -143,5 +146,9 @@ public class GtfsBundle {
 
   public boolean discardMinTransferTimes() {
     return discardMinTransferTimes;
+  }
+
+  public boolean blockBasedInterlining() {
+    return blockBasedInterlining;
   }
 }

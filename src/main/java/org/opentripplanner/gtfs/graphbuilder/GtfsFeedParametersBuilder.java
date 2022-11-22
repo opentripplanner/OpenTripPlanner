@@ -14,6 +14,7 @@ public class GtfsFeedParametersBuilder {
   private StopTransferPriority stationTransferPreference =
     GtfsFeedParameters.DEFAULT_STATION_TRANSFER_PREFERENCE;
   private boolean discardMinTransferTimes = GtfsFeedParameters.DEFAULT_DISCARD_MIN_TRANSFER_TIMES;
+  private boolean blockBasedInterlining = GtfsFeedParameters.DEFAULT_BLOCK_BASED_INTERLINING;
 
   public GtfsFeedParametersBuilder() {}
 
@@ -21,6 +22,7 @@ public class GtfsFeedParametersBuilder {
     this.removeRepeatedStops = original.removeRepeatedStops();
     this.stationTransferPreference = original.stationTransferPreference();
     this.discardMinTransferTimes = original.discardMinTransferTimes();
+    this.blockBasedInterlining = original.blockBasedInterlining();
   }
 
   public GtfsFeedParametersBuilder withFeedId(String feedId) {
@@ -68,6 +70,15 @@ public class GtfsFeedParametersBuilder {
 
   boolean discardMinTransferTimes() {
     return discardMinTransferTimes;
+  }
+
+  public GtfsFeedParametersBuilder withBlockBasedInterlining(boolean value) {
+    this.blockBasedInterlining = value;
+    return this;
+  }
+
+  boolean blockBasedInterlining() {
+    return blockBasedInterlining;
   }
 
   public GtfsFeedParameters build() {

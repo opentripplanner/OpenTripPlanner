@@ -33,7 +33,8 @@
   "gtfsDefaults" : {
     "stationTransferPreference" : "recommended",
     "removeRepeatedStops" : true,
-    "discardMinTransferTimes": false
+    "discardMinTransferTimes": false,
+    "blockBasedInterlining": true
   },
   "transitFeeds" : [
     {

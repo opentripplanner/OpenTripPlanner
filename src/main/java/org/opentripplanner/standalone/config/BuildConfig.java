@@ -180,7 +180,6 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public LocalDate transitServiceEnd;
   public ZoneId transitModelTimeZone;
-  public boolean blockBasedInterlining;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
@@ -350,14 +349,6 @@ all of the elevation values in the street edges.
           "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle."
         )
         .asInt(200);
-    blockBasedInterlining =
-      root
-        .of("blockBasedInterlining")
-        .since(V2_2)
-        .summary(
-          "Whether to create stay-seated transfers in between two trips with the same block id."
-        )
-        .asBoolean(true);
     maxTransferDurationSeconds =
       root
         .of("maxTransferDurationSeconds")

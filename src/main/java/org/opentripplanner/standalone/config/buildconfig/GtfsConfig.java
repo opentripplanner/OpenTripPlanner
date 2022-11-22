@@ -75,6 +75,15 @@ public class GtfsConfig {
           )
           .asBoolean(defaults.discardMinTransferTimes())
       )
+      .withBlockBasedInterlining(
+        node
+          .of("blockBasedInterlining")
+          .since(V2_3)
+          .summary(
+            "Whether to create stay-seated transfers in between two trips with the same block id."
+          )
+          .asBoolean(defaults.blockBasedInterlining())
+      )
       .build();
   }
 
@@ -114,6 +123,15 @@ public class GtfsConfig {
             """
           )
           .asBoolean(GtfsFeedParameters.DEFAULT_DISCARD_MIN_TRANSFER_TIMES)
+      )
+      .withBlockBasedInterlining(
+        node
+          .of("blockBasedInterlining")
+          .since(V2_3)
+          .summary(
+            "Whether to create stay-seated transfers in between two trips with the same block id."
+          )
+          .asBoolean(GtfsFeedParameters.DEFAULT_BLOCK_BASED_INTERLINING)
       )
       .build();
   }

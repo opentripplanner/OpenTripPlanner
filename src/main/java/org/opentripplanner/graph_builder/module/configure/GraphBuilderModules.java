@@ -97,7 +97,6 @@ public class GraphBuilderModules {
       issueStore,
       config.getTransitServicePeriod(),
       config.fareServiceFactory,
-      config.blockBasedInterlining,
       config.maxInterlineDistance
     );
   }
