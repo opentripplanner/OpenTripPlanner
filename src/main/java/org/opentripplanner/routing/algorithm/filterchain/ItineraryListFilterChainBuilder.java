@@ -19,6 +19,7 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestD
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OtherThanSameLegsMaxGeneralizedCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikeParkWithShortBikeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
@@ -44,7 +45,7 @@ import org.opentripplanner.transit.model.site.Station;
  */
 public class ItineraryListFilterChainBuilder {
 
-  private static final int NOT_SET = -1;
+  public static final int NOT_SET = -1;
 
   private final SortOrder sortOrder;
   private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();
@@ -68,6 +69,7 @@ public class ItineraryListFilterChainBuilder {
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
   private boolean flexOnlyToDestination;
+  private double minBikeParkingDistance;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -267,6 +269,11 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withMinBikeParkingDistance(double distance) {
+    this.minBikeParkingDistance = distance;
+    return this;
+  }
+
   public ItineraryListFilterChainBuilder withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
     boolean remove
   ) {
@@ -289,6 +296,9 @@ public class ItineraryListFilterChainBuilder {
 
     if (flexOnlyToDestination) {
       filters.add(new FlexOnlyToDestinationFilter());
+    }
+    if (minBikeParkingDistance > NOT_SET) {
+      filters.add(new RemoveBikeParkWithShortBikeFilter(minBikeParkingDistance));
     }
 
     if (accessibilityScore) {

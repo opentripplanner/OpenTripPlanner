@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import static org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder.NOT_SET;
+
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
@@ -29,6 +31,7 @@ public final class ItineraryFilterPreferences {
   private final boolean accessibilityScore;
   private final boolean removeItinerariesWithSameRoutesAndStops;
   private final boolean flexOnlyToDestination;
+  private final double minBikeParkingDistance;
 
   private ItineraryFilterPreferences() {
     this.debug = false;
@@ -44,6 +47,7 @@ public final class ItineraryFilterPreferences {
     this.accessibilityScore = false;
     this.removeItinerariesWithSameRoutesAndStops = false;
     this.flexOnlyToDestination = false;
+    this.minBikeParkingDistance = NOT_SET;
   }
 
   private ItineraryFilterPreferences(Builder builder) {
@@ -62,6 +66,7 @@ public final class ItineraryFilterPreferences {
     this.accessibilityScore = builder.accessibilityScore;
     this.removeItinerariesWithSameRoutesAndStops = builder.removeItinerariesWithSameRoutesAndStops;
     this.flexOnlyToDestination = builder.flexOnlyToDestination;
+    this.minBikeParkingDistance = builder.minBikeParkingDistance;
   }
 
   public static Builder of() {
@@ -120,6 +125,10 @@ public final class ItineraryFilterPreferences {
     return accessibilityScore;
   }
 
+  public double minBikeParkingDistance() {
+    return minBikeParkingDistance;
+  }
+
   public static class Builder {
 
     private final ItineraryFilterPreferences original;
@@ -135,6 +144,7 @@ public final class ItineraryFilterPreferences {
     private boolean removeItinerariesWithSameRoutesAndStops;
     private boolean accessibilityScore;
     private boolean flexOnlyToDestination;
+    public double minBikeParkingDistance;
 
     public ItineraryFilterPreferences original() {
       return original;
@@ -207,6 +217,11 @@ public final class ItineraryFilterPreferences {
 
     public Builder withFlexOnlyToDestination(boolean b) {
       this.flexOnlyToDestination = b;
+      return this;
+    }
+
+    public Builder withMinBikeParkingDistance(double distance) {
+      this.minBikeParkingDistance = distance;
       return this;
     }
 

@@ -243,6 +243,18 @@ removed from list.
           )
           .asBoolean(dft.flexOnlyToDestination())
       )
+      .withMinBikeParkingDistance(
+        c
+          .of("minBikeParkingDistance")
+          .since(V2_3)
+          .summary(
+            "Filter out bike park+ride results that have fewer meters of cycling than this value."
+          )
+          .description(
+            "Useful if you want to exclude those routes which have only a few meters of cycling before parking the bike and taking public transport."
+          )
+          .asDouble(dft.minBikeParkingDistance())
+      )
       .build();
   }
 

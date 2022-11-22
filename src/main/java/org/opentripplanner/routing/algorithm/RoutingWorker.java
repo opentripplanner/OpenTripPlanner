@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
+import static org.opentripplanner.transit.raptor.api.request.SearchParams.NOT_SET;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -132,6 +134,14 @@ public class RoutingWorker {
     boolean hasFlex = List
       .of(modes.directMode, modes.accessMode, modes.egressMode)
       .contains(StreetMode.FLEXIBLE);
+    boolean hasBikePark = List
+      .of(modes.accessMode, modes.egressMode)
+      .contains(StreetMode.BIKE_TO_PARK);
+
+    double minBikeParkingDistance = NOT_SET;
+    if (hasBikePark) {
+      minBikeParkingDistance = request.preferences().itineraryFilter().minBikeParkingDistance();
+    }
 
     ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
       request.itinerariesSortOrder(),
@@ -146,6 +156,7 @@ public class RoutingWorker {
       request.preferences().wheelchair().maxSlope(),
       serverContext.graph().getFareService(),
       hasFlex && request.preferences().itineraryFilter().flexOnlyToDestination(),
+      minBikeParkingDistance,
       serverContext.transitService().getTransitAlertService(),
       serverContext.transitService()::getMultiModalStationForStation
     );

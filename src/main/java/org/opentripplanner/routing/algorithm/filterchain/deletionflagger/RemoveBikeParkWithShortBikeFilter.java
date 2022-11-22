@@ -10,10 +10,10 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
  */
 public class RemoveBikeParkWithShortBikeFilter implements ItineraryListFilter {
 
-  private final double minCyclingToTransitDistance;
+  private final double minBikeParkingDistance;
 
-  public RemoveBikeParkWithShortBikeFilter(double minCyclingToTransitDistance) {
-    this.minCyclingToTransitDistance = minCyclingToTransitDistance;
+  public RemoveBikeParkWithShortBikeFilter(double minBikeParkingDistance) {
+    this.minBikeParkingDistance = minBikeParkingDistance;
   }
 
   @Override
@@ -31,7 +31,7 @@ public class RemoveBikeParkWithShortBikeFilter implements ItineraryListFilter {
         }
       }
 
-      return bikeParkingDistance > minCyclingToTransitDistance;
+      return bikeParkingDistance > minBikeParkingDistance;
     } else {
       return true;
     }

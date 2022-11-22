@@ -90,6 +90,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    groupSimilarityKeepOne                                                                        |        `double`        | Pick ONE itinerary from each group after putting itineraries that are 85% similar together.                                        | *Optional* | `0.85`                   |  2.1  |
 |    groupSimilarityKeepThree                                                                      |        `double`        | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity.             | *Optional* | `0.68`                   |  2.1  |
 |    [groupedOtherThanSameLegsMaxCostMultiplier](#rd_if_groupedOtherThanSameLegsMaxCostMultiplier) |        `double`        | Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.                             | *Optional* | `2.0`                    |  2.1  |
+|    [minBikeParkingDistance](#rd_if_minBikeParkingDistance)                                       |        `double`        | Filter out bike park+ride results that have fewer meters of cycling than this value.                                               | *Optional* | `-1.0`                   |  2.3  |
 |    [nonTransitGeneralizedCostLimit](#rd_if_nonTransitGeneralizedCostLimit)                       |    `linear-function`   | The function define a max-limit for generalized-cost for non-transit itineraries.                                                  | *Optional* | `"f(x) = 3,600 + 2.0 x"` |  2.1  |
 |    [parkAndRideDurationRatio](#rd_if_parkAndRideDurationRatio)                                   |        `double`        | Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.                      | *Optional* | `0.0`                    |  2.1  |
 |    [removeItinerariesWithSameRoutesAndStops](#rd_if_removeItinerariesWithSameRoutesAndStops)     |        `boolean`       | Set to true if you want to list only the first itinerary  which goes through the same stops and routes.                            | *Optional* | `false`                  |  2.2  |
@@ -471,6 +472,15 @@ Of the itineraries grouped to maximum of three itineraries, how much worse can t
 be compared to the lowest cost. 2.0 means that they can be double the cost, and any itineraries
 having a higher cost will be filtered.
 
+
+<h3 id="rd_if_minBikeParkingDistance">minBikeParkingDistance</h3>
+
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `-1.0`  \
+**Path:** /routingDefaults/itineraryFilters 
+
+Filter out bike park+ride results that have fewer meters of cycling than this value.
+
+Useful if you want to exclude those routes which have only a few meters of cycling before parking the bike and taking public transport.
 
 <h3 id="rd_if_nonTransitGeneralizedCostLimit">nonTransitGeneralizedCostLimit</h3>
 
