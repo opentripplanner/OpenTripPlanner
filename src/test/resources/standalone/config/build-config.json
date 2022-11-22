@@ -31,7 +31,7 @@
     "ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
   },
   "gtfsDefaults" : {
-    "stationTransferPreference" : "recommended",
+    "stationTransferPreference" : "allowed",
     "removeRepeatedStops" : true,
     "discardMinTransferTimes": false,
     "blockBasedInterlining": true,

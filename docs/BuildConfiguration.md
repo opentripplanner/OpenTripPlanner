@@ -97,7 +97,7 @@ Sections follow that describe particular settings in more depth.
 |       maxInterlineDistance                                               |  `integer`  | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.               | *Optional* | `200`                             |  2.3  |
 |       removeRepeatedStops                                                |  `boolean`  | Should consecutive identical stops be merged into one stop time entry.                                                      | *Optional* | `true`                            |  2.3  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
-|       [stationTransferPreference](#tf_0_stationTransferPreference)       |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                              | *Optional* | `"recommended"`                   |  2.3  |
+|       [stationTransferPreference](#tf_0_stationTransferPreference)       |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                              | *Optional* | `"allowed"`                       |  2.3  |
 |    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                    | *Optional* |                                   |  2.2  |
 |       type = "NETEX"                                                     |    `enum`   | The feed input format.                                                                                                      | *Required* |                                   |  2.2  |
 |       feedId                                                             |   `string`  | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt. | *Required* |                                   |  2.2  |
@@ -993,7 +993,7 @@ but we want to calculate the transfers always from OSM data.
 
 <h3 id="tf_0_stationTransferPreference">stationTransferPreference</h3>
 
-**Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"recommended"`  \
+**Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`  \
 **Path:** /transitFeeds/[0]  \
 **Enum values:** `discouraged` | `allowed` | `recommended` | `preferred`
 
@@ -1123,7 +1123,7 @@ case where this is not the case.
     "ferryIdsNotAllowedForBicycle" : [ "RUT:B107", "RUT:B209" ]
   },
   "gtfsDefaults" : {
-    "stationTransferPreference" : "recommended",
+    "stationTransferPreference" : "allowed",
     "removeRepeatedStops" : true,
     "discardMinTransferTimes" : false,
     "blockBasedInterlining" : true,
