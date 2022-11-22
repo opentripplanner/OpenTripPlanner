@@ -964,8 +964,8 @@ section, auto-scanning in the base directory for this feed type will be disabled
 
 <h3 id="tf_0_stationTransferPreference">stationTransferPreference</h3>
 
-**Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`  \
-**Path:** /transitFeeds/[0]  \
+**Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`   
+**Path:** /transitFeeds/[0]   
 **Enum values:** `discouraged` | `allowed` | `recommended` | `preferred`
 
 Should there be some preference or aversion for transfers at stops that are part of a station.
