@@ -297,6 +297,7 @@ public class ItineraryListFilterChainBuilder {
     if (flexOnlyToDestination) {
       filters.add(new FlexOnlyToDestinationFilter());
     }
+
     if (minBikeParkingDistance > NOT_SET) {
       filters.add(new RemoveBikeParkWithShortBikeFilter(minBikeParkingDistance));
     }

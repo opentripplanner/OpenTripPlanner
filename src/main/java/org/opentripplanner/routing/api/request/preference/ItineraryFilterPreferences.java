@@ -241,6 +241,8 @@ public final class ItineraryFilterPreferences {
       this.removeItinerariesWithSameRoutesAndStops =
         original.removeItinerariesWithSameRoutesAndStops;
       this.accessibilityScore = original.accessibilityScore;
+      this.flexOnlyToDestination = original.flexOnlyToDestination;
+      this.minBikeParkingDistance = original.minBikeParkingDistance;
     }
 
     public Builder apply(Consumer<Builder> body) {

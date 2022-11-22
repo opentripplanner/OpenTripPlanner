@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.opentripplanner.transit.raptor.api.request.SearchParams.NOT_SET;
+import static org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder.NOT_SET;
 
 import java.time.Duration;
 import java.time.Instant;

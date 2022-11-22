@@ -25,10 +25,9 @@ class FlexOnlyToDestinationFilterTest implements PlanTestConstants {
 
   @Test
   void flexWithLongWalk() {
-    var regularTransit = newItinerary(A).flex(T11_16, T11_20, C).walk(mins(3), D).build();
-
+    var flex = newItinerary(A).flex(T11_16, T11_20, C).walk(mins(3), D).build();
     // if there is a "long" walk, we want to filter it out
-    var result = filter.filter(List.of(regularTransit));
+    var result = filter.filter(List.of(flex));
     assertEquals(List.of(), result);
   }
 
