@@ -311,7 +311,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         List<EstimatedVehicleJourney> journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
         LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
         for (EstimatedVehicleJourney journey : journeys) {
-          if (journey.isExtraJourney() != null && journey.isExtraJourney()) {
+          if (isReplacementDeparture(journey, feedId)) {
             // Added trip
             try {
               Result<?, UpdateError> res = handleAddedTrip(transitModel, feedId, journey);
@@ -343,6 +343,26 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
     }
     return results;
+  }
+
+  /**
+   * Check if VehicleJourney is an replacement departure according to SIRI-ET requirements.
+   */
+  private boolean isReplacementDeparture(EstimatedVehicleJourney vehicleJourney, String feedId) {
+    // Replacement departure only if ExtraJourney is true
+    if (!Optional.ofNullable(vehicleJourney.isExtraJourney()).orElse(false)) {
+      return false;
+    }
+
+    // If Trip exists by DatedServiceJourney then this is not replacement departure
+    var datedServiceJourneyId = resolveDatedServiceJourneyId(vehicleJourney);
+    return datedServiceJourneyId
+      .map(dsjId ->
+        getTimetableSnapshot()
+          .getRealtimeAddedTripOnServiceDate()
+          .containsKey(new FeedScopedId(feedId, dsjId))
+      )
+      .orElse(false);
   }
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
@@ -1079,6 +1099,32 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     EstimatedVehicleJourney estimatedVehicleJourney,
     String feedId
   ) {
+    var datedServiceJourney = resolveDatedServiceJourneyId(estimatedVehicleJourney);
+
+    datedServiceJourney.ifPresent(datedServiceJourneyId -> {
+      // VehicleJourneyRef is the reference to the serviceJourney being replaced.
+      var replacementRef = Optional.ofNullable(estimatedVehicleJourney.getVehicleJourneyRef());
+      List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
+      replacementRef.ifPresent(ref -> {
+        var id = new FeedScopedId(feedId, ref.getValue());
+        var replacedTrip = buffer.getRealtimeAddedTripOnServiceDate().get(id);
+        listOfReplacedVehicleJourneys.add(replacedTrip);
+      });
+
+      buffer.addLastAddedTripOnServiceDate(
+        TripOnServiceDate
+          .of(new FeedScopedId(feedId, datedServiceJourneyId))
+          .withTrip(trip)
+          .withReplacementFor(listOfReplacedVehicleJourneys)
+          .withServiceDate(serviceDate)
+          .build()
+      );
+    });
+  }
+
+  private Optional<String> resolveDatedServiceJourneyId(
+    EstimatedVehicleJourney estimatedVehicleJourney
+  ) {
     // Fallback to FramedVehicleJourneyRef if DatedVehicleJourneyRef is not set
     Supplier<Optional<String>> getFramedVehicleJourney = () ->
       Optional
@@ -1089,30 +1135,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Supplier<Optional<String>> getEstimatedVehicleJourneyCode = () ->
       Optional.ofNullable(estimatedVehicleJourney.getEstimatedVehicleJourneyCode());
 
-    Optional
+    return Optional
       .ofNullable(estimatedVehicleJourney.getDatedVehicleJourneyRef())
       .map(DatedVehicleJourneyRef::getValue)
       .or(getFramedVehicleJourney)
-      .or(getEstimatedVehicleJourneyCode)
-      .ifPresent(datedServiceJourneyId -> {
-        // VehicleJourneyRef is the reference to the serviceJourney being replaced.
-        var replacementRef = Optional.ofNullable(estimatedVehicleJourney.getVehicleJourneyRef());
-        List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
-        replacementRef.ifPresent(ref -> {
-          var id = new FeedScopedId(feedId, ref.getValue());
-          var replacedTrip = buffer.getRealtimeAddedTripOnServiceDate().get(id);
-          listOfReplacedVehicleJourneys.add(replacedTrip);
-        });
-
-        buffer.addLastAddedTripOnServiceDate(
-          TripOnServiceDate
-            .of(new FeedScopedId(feedId, datedServiceJourneyId))
-            .withTrip(trip)
-            .withReplacementFor(listOfReplacedVehicleJourneys)
-            .withServiceDate(serviceDate)
-            .build()
-        );
-      });
+      .or(getEstimatedVehicleJourneyCode);
   }
 
   /**
