@@ -20,6 +20,7 @@ public class GtfsFeedParametersBuilder {
   public GtfsFeedParametersBuilder(GtfsFeedParameters original) {
     this.removeRepeatedStops = original.removeRepeatedStops();
     this.stationTransferPreference = original.stationTransferPreference();
+    this.discardMinTransferTimes = original.discardMinTransferTimes();
   }
 
   public GtfsFeedParametersBuilder withFeedId(String feedId) {
