@@ -96,8 +96,7 @@ public class GraphBuilderModules {
       graph,
       issueStore,
       config.getTransitServicePeriod(),
-      config.fareServiceFactory,
-      config.maxInterlineDistance
+      config.fareServiceFactory
     );
   }
 

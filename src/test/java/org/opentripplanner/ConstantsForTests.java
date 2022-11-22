@@ -311,8 +311,7 @@ public class ConstantsForTests {
       graph,
       noopIssueStore(),
       ServiceDateInterval.unbounded(),
-      fareServiceFactory,
-      300
+      fareServiceFactory
     );
 
     module.buildGraph();

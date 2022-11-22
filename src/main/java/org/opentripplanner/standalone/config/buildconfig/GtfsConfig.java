@@ -84,6 +84,15 @@ public class GtfsConfig {
           )
           .asBoolean(defaults.blockBasedInterlining())
       )
+      .withMaxInterlineDistance(
+        node
+          .of("maxInterlineDistance")
+          .since(V2_3)
+          .summary(
+            "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle."
+          )
+          .asInt(defaults.maxInterlineDistance())
+      )
       .build();
   }
 
@@ -132,6 +141,15 @@ public class GtfsConfig {
             "Whether to create stay-seated transfers in between two trips with the same block id."
           )
           .asBoolean(GtfsFeedParameters.DEFAULT_BLOCK_BASED_INTERLINING)
+      )
+      .withMaxInterlineDistance(
+        node
+          .of("maxInterlineDistance")
+          .since(V2_3)
+          .summary(
+            "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle."
+          )
+          .asInt(GtfsFeedParameters.DEFAULT_MAX_INTERLINE_DISTANCE)
       )
       .build();
   }

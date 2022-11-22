@@ -15,6 +15,7 @@ public class GtfsFeedParametersBuilder {
     GtfsFeedParameters.DEFAULT_STATION_TRANSFER_PREFERENCE;
   private boolean discardMinTransferTimes = GtfsFeedParameters.DEFAULT_DISCARD_MIN_TRANSFER_TIMES;
   private boolean blockBasedInterlining = GtfsFeedParameters.DEFAULT_BLOCK_BASED_INTERLINING;
+  private int maxInterlineDistance = GtfsFeedParameters.DEFAULT_MAX_INTERLINE_DISTANCE;
 
   public GtfsFeedParametersBuilder() {}
 
@@ -23,6 +24,7 @@ public class GtfsFeedParametersBuilder {
     this.stationTransferPreference = original.stationTransferPreference();
     this.discardMinTransferTimes = original.discardMinTransferTimes();
     this.blockBasedInterlining = original.blockBasedInterlining();
+    this.maxInterlineDistance = original.maxInterlineDistance();
   }
 
   public GtfsFeedParametersBuilder withFeedId(String feedId) {
@@ -79,6 +81,15 @@ public class GtfsFeedParametersBuilder {
 
   boolean blockBasedInterlining() {
     return blockBasedInterlining;
+  }
+
+  public GtfsFeedParametersBuilder withMaxInterlineDistance(int value) {
+    this.maxInterlineDistance = value;
+    return this;
+  }
+
+  int maxInterlineDistance() {
+    return maxInterlineDistance;
   }
 
   public GtfsFeedParameters build() {

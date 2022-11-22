@@ -76,7 +76,6 @@ public class GtfsModule implements GraphBuilderModule {
   private final ServiceDateInterval transitPeriodLimit;
   private final List<GtfsBundle> gtfsBundles;
   private final FareServiceFactory fareServiceFactory;
-  private final int maxInterlineDistance;
 
   private final TransitModel transitModel;
   private final Graph graph;
@@ -89,8 +88,7 @@ public class GtfsModule implements GraphBuilderModule {
     Graph graph,
     DataImportIssueStore issueStore,
     ServiceDateInterval transitPeriodLimit,
-    FareServiceFactory fareServiceFactory,
-    int maxInterlineDistance
+    FareServiceFactory fareServiceFactory
   ) {
     this.gtfsBundles = bundles;
     this.transitModel = transitModel;
@@ -98,7 +96,6 @@ public class GtfsModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.transitPeriodLimit = transitPeriodLimit;
     this.fareServiceFactory = fareServiceFactory;
-    this.maxInterlineDistance = maxInterlineDistance;
   }
 
   public GtfsModule(
@@ -113,8 +110,7 @@ public class GtfsModule implements GraphBuilderModule {
       graph,
       DataImportIssueStore.noopIssueStore(),
       transitPeriodLimit,
-      new DefaultFareServiceFactory(),
-      100
+      new DefaultFareServiceFactory()
     );
   }
 
@@ -183,7 +179,7 @@ public class GtfsModule implements GraphBuilderModule {
           new InterlineProcessor(
             transitModel.getTransferService(),
             builder.getStaySeatedNotAllowed(),
-            maxInterlineDistance,
+            gtfsBundle.maxInterlineDistance(),
             issueStore
           )
             .run(otpTransitService.getTripPatterns());

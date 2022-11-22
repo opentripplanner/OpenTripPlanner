@@ -20,12 +20,15 @@ public class GtfsFeedParameters implements DataSourceConfig {
 
   public static final boolean DEFAULT_BLOCK_BASED_INTERLINING = true;
 
+  public static final int DEFAULT_MAX_INTERLINE_DISTANCE = 200;
+
   private final URI source;
   private final String feedId;
   private final boolean removeRepeatedStops;
   private final StopTransferPriority stationTransferPreference;
   private final boolean discardMinTransferTimes;
   private final boolean blockBasedInterlining;
+  private final int maxInterlineDistance;
 
   GtfsFeedParameters(GtfsFeedParametersBuilder builder) {
     this.source = builder.source();
@@ -34,6 +37,7 @@ public class GtfsFeedParameters implements DataSourceConfig {
     this.stationTransferPreference = builder.stationTransferPreference();
     this.discardMinTransferTimes = builder.discardMinTransferTimes();
     this.blockBasedInterlining = builder.blockBasedInterlining();
+    this.maxInterlineDistance = builder.maxInterlineDistance();
   }
 
   /** See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}. */
@@ -61,6 +65,10 @@ public class GtfsFeedParameters implements DataSourceConfig {
 
   public boolean blockBasedInterlining() {
     return blockBasedInterlining;
+  }
+
+  public int maxInterlineDistance() {
+    return maxInterlineDistance;
   }
 
   public GtfsFeedParametersBuilder copyOf() {

@@ -166,7 +166,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final TransitFeeds transitFeeds;
   public boolean staticParkAndRide;
   public boolean staticBikeParkAndRide;
-  public int maxInterlineDistance;
   public double distanceBetweenElevationSamples;
   public double maxElevationPropagationMeters;
   public boolean readCachedElevations;
@@ -341,14 +340,6 @@ all of the elevation values in the street edges.
             """
         )
         .asInt(1000);
-    maxInterlineDistance =
-      root
-        .of("maxInterlineDistance")
-        .since(V1_5)
-        .summary(
-          "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle."
-        )
-        .asInt(200);
     maxTransferDurationSeconds =
       root
         .of("maxTransferDurationSeconds")

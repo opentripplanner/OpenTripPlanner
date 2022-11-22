@@ -34,7 +34,8 @@
     "stationTransferPreference" : "recommended",
     "removeRepeatedStops" : true,
     "discardMinTransferTimes": false,
-    "blockBasedInterlining": true
+    "blockBasedInterlining": true,
+    "maxInterlineDistance": 200
   },
   "transitFeeds" : [
     {

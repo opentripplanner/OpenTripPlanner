@@ -34,6 +34,8 @@ public class GtfsBundle {
 
   private boolean blockBasedInterlining;
 
+  private int maxInterlineDistance;
+
   /** Used by unit tests */
   public GtfsBundle(File gtfsFile) {
     this(DataStoreModule.compositeSource(gtfsFile, FileType.GTFS));
@@ -58,6 +60,7 @@ public class GtfsBundle {
     this.stationTransferPreference = configuredDataSource.config().stationTransferPreference();
     this.discardMinTransferTimes = configuredDataSource.config().discardMinTransferTimes();
     this.blockBasedInterlining = configuredDataSource.config().blockBasedInterlining();
+    this.maxInterlineDistance = configuredDataSource.config().maxInterlineDistance();
   }
 
   public CsvInputSource getCsvInputSource() {
@@ -150,5 +153,9 @@ public class GtfsBundle {
 
   public boolean blockBasedInterlining() {
     return blockBasedInterlining;
+  }
+
+  public int maxInterlineDistance() {
+    return maxInterlineDistance;
   }
 }
