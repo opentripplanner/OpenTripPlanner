@@ -47,6 +47,16 @@ public class OpeningHours implements Comparable<OpeningHours>, Serializable {
   @Override
   public String toString() {
     return (
+      periodDescription +
+      " " +
+      TimeUtils.timeToStrCompact(startTime) +
+      "-" +
+      TimeUtils.timeToStrCompact(endTime)
+    );
+  }
+
+  public String osmFormat() {
+    return (
       toOsm(periodDescription) +
       " " +
       TimeUtils.timeToStrCompactNoSeconds(startTime) +

@@ -81,6 +81,10 @@ public class HslParkUpdaterTest {
       "}",
       first.getOpeningHours().toString()
     );
+    assertEquals(
+      "Mo-Fr 0:00-23:59,Sa 0:00-23:59,Su 0:00-23:59",
+      first.getOpeningHours().osmFormat()
+    );
 
     var firstVehicleParkingGroup = first.getVehicleParkingGroup();
     assertEquals("hslpark:321", firstVehicleParkingGroup.id().toString());

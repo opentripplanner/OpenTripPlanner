@@ -39,6 +39,9 @@ public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<Vehicl
         new T2<>("realTimeData", vehicleParking.hasRealTimeData())
       )
     );
+    if (vehicleParking.getOpeningHours() != null) {
+      items.add(new T2<>("openingHours", vehicleParking.getOpeningHours().osmFormat()));
+    }
     items.addAll(mapI18NString("name", vehicleParking.getName()));
     items.addAll(mapI18NString("note", vehicleParking.getNote()));
     // TODO add when openingHours are implemented

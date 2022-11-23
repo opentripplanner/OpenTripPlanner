@@ -46,10 +46,7 @@ public class ParkAPIUpdaterTest {
       "OHCalendar{zoneId: Europe/Berlin, openingHours: [Mo-Su 0:00-23:59]}",
       first.getOpeningHours().toString()
     );
-    assertEquals(
-      "Mo-Su 0:00-23:59",
-      first.getOpeningHours().osmFormat()
-    );
+    assertEquals("Mo-Su 0:00-23:59", first.getOpeningHours().osmFormat());
     assertTrue(first.hasAnyCarPlaces());
     assertNull(first.getCapacity());
 

@@ -8,6 +8,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -16,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
@@ -27,6 +32,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class VehicleParkingsLayerTest {
@@ -37,6 +43,21 @@ public class VehicleParkingsLayerTest {
 
   @BeforeEach
   public void setUp() {
+    var service = new OpeningHoursCalendarService(
+      new Deduplicator(),
+      LocalDate.of(2022, Month.JANUARY, 1),
+      LocalDate.of(2024, Month.DECEMBER, 31)
+    );
+
+    // Create a OHCalendarBuilder for each entity with opening hours
+    var calBuilder = service.newBuilder(ZoneId.of("Europe/Berlin"));
+
+    // Simple case 08:00- 16:30  April 1st to April 3rd
+    calBuilder
+      .openingHours("Mo-Fr", LocalTime.of(8, 0), LocalTime.of(16, 30))
+      .on(LocalDate.of(2022, Month.APRIL, 1))
+      .add();
+
     vehicleParking =
       VehicleParking
         .builder()
@@ -50,9 +71,7 @@ public class VehicleParkingsLayerTest {
         .detailsUrl("details")
         .note(new NonLocalizedString("note"))
         .tags(List.of("tag1", "tag2"))
-        // TODO add when openingHours are implemented
-        // .openingHours(
-        //         RepeatingTimePeriod.parseFromOsmTurnRestriction("Monday", "Friday", "07:30", "09:30"))
+        .openingHoursCalendar(calBuilder.build())
         // .feeHours(null)
         .state(VehicleParkingState.OPERATIONAL)
         .capacity(VehicleParkingSpaces.builder().bicycleSpaces(5).carSpaces(6).build())
@@ -125,6 +144,7 @@ public class VehicleParkingsLayerTest {
     assertEquals("OPERATIONAL", map.get("state").toString());
 
     // openingHours, feeHours
+    assertEquals("Mo-Fr 8:00-16:30", map.get("openingHours"));
 
     assertTrue((Boolean) map.get("bicyclePlaces"));
     assertTrue((Boolean) map.get("anyCarPlaces"));
