@@ -6,8 +6,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.basic.I18NString;
 

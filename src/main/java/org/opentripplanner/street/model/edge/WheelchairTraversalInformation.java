@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.street.model.edge;
 
 public interface WheelchairTraversalInformation {
   /**

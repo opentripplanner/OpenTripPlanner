@@ -5,7 +5,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ConflictingBikeTags;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
  *

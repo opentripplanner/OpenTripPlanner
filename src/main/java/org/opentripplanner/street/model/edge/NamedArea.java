@@ -2,7 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.Serializable;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 /**

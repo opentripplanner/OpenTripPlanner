@@ -10,7 +10,7 @@ import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.routing.edgetype.WheelchairTraversalInformation;
+import org.opentripplanner.street.model.edge.WheelchairTraversalInformation;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**

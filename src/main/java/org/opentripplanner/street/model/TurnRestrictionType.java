@@ -1,4 +1,4 @@
-package org.opentripplanner.common;
+package org.opentripplanner.street.model;
 
 public enum TurnRestrictionType {
   NO_TURN,

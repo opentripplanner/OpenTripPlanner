@@ -3,9 +3,9 @@ package org.opentripplanner.street.model.edge;
 import java.io.Serializable;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class StreetElevationExtension implements Serializable {

@@ -12,11 +12,11 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.mockito.Mockito;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetElevationExtension;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.transit.model.basic.LocalizedStringFormat;
 
 class MissingElevationHandlerTest {

@@ -3,8 +3,8 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.common.RepeatingTimePeriod;
-import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**

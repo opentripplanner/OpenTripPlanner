@@ -13,8 +13,8 @@ import org.opentripplanner.routing.api.request.preference.AccessibilityPreferenc
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.basic.Accessibility;

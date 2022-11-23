@@ -8,7 +8,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.module.osm.OSMFilter;
 import org.opentripplanner.graph_builder.module.osm.WayProperties;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OSMWayTest {
 
