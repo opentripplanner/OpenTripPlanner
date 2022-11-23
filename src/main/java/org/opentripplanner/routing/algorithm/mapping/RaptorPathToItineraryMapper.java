@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.plan.FrequencyTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -36,7 +37,6 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * This maps the paths found by the Raptor search algorithm to the itinerary structure currently

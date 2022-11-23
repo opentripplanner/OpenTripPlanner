@@ -5,7 +5,7 @@ import static org.opentripplanner.framework.time.DurationUtils.durationToStr;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.RouteStationTransferPoint;
 import org.opentripplanner.model.transfer.RouteStopTransferPoint;

@@ -19,10 +19,10 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
-import org.opentripplanner.common.geometry.CompactElevationProfile;
-import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.framework.geometry.CompactElevationProfile;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.index.StreetIndex;
@@ -339,7 +339,7 @@ public class Graph implements Serializable {
    * Calculates convexHull of all the vertices during build time
    */
   public void calculateConvexHull() {
-    convexHull = GraphUtils.makeConvexHull(this);
+    convexHull = GeometryUtils.makeConvexHull(getVertices(), Vertex::getCoordinate);
   }
 
   /**

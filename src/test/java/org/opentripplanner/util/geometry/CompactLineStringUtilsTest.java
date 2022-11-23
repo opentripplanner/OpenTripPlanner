@@ -13,7 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.DlugoszVarLenIntPacker;
+import org.opentripplanner.framework.geometry.CompactLineStringUtils;
+import org.opentripplanner.framework.geometry.DlugoszVarLenIntPacker;
 
 public class CompactLineStringUtilsTest {
 

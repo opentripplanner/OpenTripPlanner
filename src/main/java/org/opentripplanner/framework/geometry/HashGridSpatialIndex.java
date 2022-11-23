@@ -1,4 +1,4 @@
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.framework.geometry;
 
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
  * @author laurent
  */
 public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(HashGridSpatialIndex.class);

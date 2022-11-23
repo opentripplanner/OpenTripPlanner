@@ -1,8 +1,7 @@
-package org.opentripplanner.util.geometry;
+package org.opentripplanner.framework.geometry;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.DlugoszVarLenIntPacker;
 
 /**
  * Compact line string. To optimize storage, we use the following tricks:

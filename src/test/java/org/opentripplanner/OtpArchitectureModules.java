@@ -16,15 +16,7 @@ public interface OtpArchitectureModules {
   Package FRAMEWORK = OTP_ROOT.subPackage("framework");
   Package UTIL = OTP_ROOT.subPackage("util");
 
-  /** @deprecated Move geometry utils together and push into where it is used if appropriate. */
-  @Deprecated
-  Package COMMON_GEOM = OTP_ROOT.subPackage("common.geometry");
-
-  /** @deprecated Move geometry utils together and push into where it is used if appropriate. */
-  @Deprecated
-  Package UTIL_GEOM = UTIL.subPackage("geometry");
-
-  Module GEO_UTILS = Module.of(JTS_GEOM, COMMON_GEOM, UTIL_GEOM);
+  Module GEO_UTILS = Module.of(JTS_GEOM, FRAMEWORK.subPackage("geometry"));
 
   Package RAPTOR_ADAPTER = OTP_ROOT
     .subPackage("routing")

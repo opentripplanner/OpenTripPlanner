@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Queue;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
-import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.graph_builder.issues.GraphIsland;

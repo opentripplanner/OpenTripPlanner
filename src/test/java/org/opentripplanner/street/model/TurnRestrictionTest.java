@@ -14,6 +14,7 @@ import org.opentripplanner.astar.AStarBuilder;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -24,7 +25,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class TurnRestrictionTest {
 

@@ -19,6 +19,7 @@ import org.opentripplanner.astar.AStarBuilder;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
@@ -35,7 +36,6 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.

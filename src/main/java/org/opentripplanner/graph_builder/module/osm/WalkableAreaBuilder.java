@@ -25,8 +25,9 @@ import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.AreaTooComplicated;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
@@ -47,7 +48,6 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * Theoretically, it is not correct to build the visibility graph on the joined polygon of areas

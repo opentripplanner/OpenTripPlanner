@@ -1,4 +1,4 @@
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.inspector;
 
 import org.geotools.geometry.Envelope2D;
 

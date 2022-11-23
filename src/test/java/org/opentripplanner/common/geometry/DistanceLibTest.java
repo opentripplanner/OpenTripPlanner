@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 
 public class DistanceLibTest {
 

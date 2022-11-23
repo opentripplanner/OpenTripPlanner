@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
@@ -23,7 +24,6 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class TemporaryPartialStreetEdgeTest {
 

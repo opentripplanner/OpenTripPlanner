@@ -3,12 +3,12 @@ package org.opentripplanner.street.model.edge;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * A relatively low cost edge for alighting from an elevator. All narrative generation is done by

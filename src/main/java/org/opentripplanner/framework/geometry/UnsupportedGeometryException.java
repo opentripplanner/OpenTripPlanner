@@ -1,4 +1,4 @@
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.framework.geometry;
 
 public class UnsupportedGeometryException extends Exception {
 
