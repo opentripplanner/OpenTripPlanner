@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.speed_test.model.testcase;
 
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
 
 public record TestCaseDefinition(
   String id,

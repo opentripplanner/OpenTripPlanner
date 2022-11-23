@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor._data.stoparrival;
 
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.util.time.TimeUtils;
 
 public class Egress {
 

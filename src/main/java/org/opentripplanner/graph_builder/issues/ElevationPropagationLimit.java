@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
-import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.graph_builder.DataImportIssue;
 
 public class ElevationPropagationLimit implements DataImportIssue {
 

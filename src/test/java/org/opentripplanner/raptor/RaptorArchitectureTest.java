@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor;
 
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
-import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK_TEXT;
 import static org.opentripplanner.OtpArchitectureModules.GNU_TROVE;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
@@ -55,15 +54,7 @@ public class RaptorArchitectureTest {
     var internalApi = RR_INTERNAL_API.dependsOn(RAPTOR_API, RAPTOR_SPI).verify();
 
     // RangeRaptor common allowed dependencies
-    var common = Module.of(
-      FRAMEWORK_TEXT,
-      UTILS,
-      GNU_TROVE,
-      RAPTOR_API,
-      RAPTOR_SPI,
-      RAPTOR_UTILS,
-      internalApi
-    );
+    var common = Module.of(UTILS, GNU_TROVE, RAPTOR_API, RAPTOR_SPI, RAPTOR_UTILS, internalApi);
 
     var debug = rr.subPackage("debug").dependsOn(common).verify();
     var lifecycle = rr.subPackage("lifecycle").dependsOn(common).verify();

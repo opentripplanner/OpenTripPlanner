@@ -1,11 +1,11 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class represent the STATE for one possible path up until the point where a given trip is

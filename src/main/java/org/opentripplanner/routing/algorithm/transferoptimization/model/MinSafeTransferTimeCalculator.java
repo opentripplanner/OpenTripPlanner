@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
-import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
+import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
 
 import java.util.Collection;
 import java.util.function.ToIntFunction;

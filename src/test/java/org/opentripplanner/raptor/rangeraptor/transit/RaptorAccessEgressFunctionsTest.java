@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.calculateEgressDepartureTime;
@@ -9,7 +10,6 @@ import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctio
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByStop;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForStandardRaptor;
 import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
-import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 import java.util.Arrays;
 import java.util.Collection;

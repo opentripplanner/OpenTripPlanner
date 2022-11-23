@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.api.request.framework;
 
-import org.opentripplanner.util.lang.DoubleUtils;
+import org.opentripplanner.framework.lang.DoubleUtils;
 
 /**
  * This utility can be used to perform sanity checks on common number types. It will also normalize

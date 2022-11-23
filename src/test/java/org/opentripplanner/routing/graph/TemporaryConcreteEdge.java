@@ -7,8 +7,8 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.edge.TemporaryEdge;
+import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {

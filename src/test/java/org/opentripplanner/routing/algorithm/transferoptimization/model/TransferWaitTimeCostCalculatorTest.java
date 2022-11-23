@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
+import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
 
 import org.junit.jupiter.api.Test;
 

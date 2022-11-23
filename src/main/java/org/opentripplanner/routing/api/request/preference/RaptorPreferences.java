@@ -9,10 +9,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.spi.SearchDirection;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Set of optimizations to use with Raptor. These are available here for testing purposes.

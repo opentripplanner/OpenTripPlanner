@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor._data.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
+import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
-import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
-import static org.opentripplanner.util.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

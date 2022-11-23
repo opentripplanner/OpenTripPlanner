@@ -3,13 +3,13 @@ package org.opentripplanner.raptor.service;
 import static java.util.Comparator.comparingInt;
 import static org.opentripplanner.raptor.api.debug.DebugTopic.HEURISTICS;
 
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.request.DebugRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.CompareIntArrays;
-import org.opentripplanner.util.lang.IntUtils;
 
 /**
  * Utility class to log computed heuristic data.

@@ -1,12 +1,12 @@
 package org.opentripplanner.raptor.rangeraptor.standard.besttimes;
 
-import static org.opentripplanner.util.lang.IntUtils.intArray;
+import static org.opentripplanner.framework.lang.IntUtils.intArray;
 
 import java.util.BitSet;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.util.BitSetIterator;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class is responsible for keeping track of the overall best times and the best "on-board"

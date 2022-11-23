@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.StationElement;

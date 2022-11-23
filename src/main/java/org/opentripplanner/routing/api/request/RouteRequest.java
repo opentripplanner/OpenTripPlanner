@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
+import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -9,13 +9,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.time.DateUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
-import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

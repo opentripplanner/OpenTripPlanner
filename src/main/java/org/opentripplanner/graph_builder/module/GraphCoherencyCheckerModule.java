@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module;
 
 import javax.inject.Inject;
+import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.astar.model.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

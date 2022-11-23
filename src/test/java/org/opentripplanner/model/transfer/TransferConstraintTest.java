@@ -10,7 +10,7 @@ import static org.opentripplanner.util.OTPFeature.MinimumTransferTimeIsDefinitiv
 
 import java.util.function.IntSupplier;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.framework.time.DurationUtils;
 
 public class TransferConstraintTest {
 

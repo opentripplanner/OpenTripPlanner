@@ -6,10 +6,10 @@ import static org.mockito.Mockito.mock;
 
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
-import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 

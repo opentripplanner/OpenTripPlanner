@@ -5,8 +5,8 @@ import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class GraphUtils {

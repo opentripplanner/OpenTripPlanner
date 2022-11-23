@@ -9,13 +9,13 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
-import org.opentripplanner.util.lang.DoubleUtils;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class holds preferences for street routing in general, not mode specific.
