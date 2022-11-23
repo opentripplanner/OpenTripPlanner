@@ -9,9 +9,9 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class TestConstrainedBoardingSearch

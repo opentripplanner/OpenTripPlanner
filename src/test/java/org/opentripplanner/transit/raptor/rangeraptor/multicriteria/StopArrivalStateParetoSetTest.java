@@ -4,14 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.StopArrivalParetoSet;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 
 public class StopArrivalStateParetoSetTest {
 

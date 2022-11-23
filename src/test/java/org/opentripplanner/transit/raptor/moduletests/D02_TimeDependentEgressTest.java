@@ -12,14 +12,14 @@ import static org.opentripplanner.util.time.TimeUtils.hm2time;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor.RaptorService;
+import org.opentripplanner.raptor.RaptorService;
+import org.opentripplanner.raptor.api.request.RaptorProfile;
+import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 
 /*
  * FEATURE UNDER TEST

@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *         done by adding an {@code *} to the stop: {@code [1010,1183,3211*,492]}.
  *     </li>
  *     To list stops you need to know the Raptor stop index. Enable log {@code level="debug"} for
- *     the {@code org.opentripplanner.transit.raptor} package to list all paths found by Raptor.
+ *     the {@code org.opentripplanner.raptor} package to list all paths found by Raptor.
  *     The paths will contain the stop index. For paths not listed you will have to do some
  *     research.
  * </ol>

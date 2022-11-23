@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
+import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 
 /**
  * The static {@code setupDebugLogging(...)} method is used to setup Raptor debugging. To enable

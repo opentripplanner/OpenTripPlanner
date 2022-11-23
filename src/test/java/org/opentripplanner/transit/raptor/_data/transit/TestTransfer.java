@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor._data.transit;
 
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.raptor.api.transit.RaptorTransfer;
 
 /**
  * Simple implementation for {@link RaptorTransfer} for use in unit-tests.

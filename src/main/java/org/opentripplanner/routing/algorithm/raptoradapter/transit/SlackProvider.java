@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.util.Map;
+import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 
 /**
  * This class provides transferSlack, boardSlack and alightSlack for the Raptor algorithm.

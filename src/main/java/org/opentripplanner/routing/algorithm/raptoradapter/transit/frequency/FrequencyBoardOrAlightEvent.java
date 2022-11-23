@@ -1,16 +1,16 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
 import java.time.LocalDate;
+import org.opentripplanner.raptor.api.transit.RaptorTransferConstraint;
+import org.opentripplanner.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 /**
  * Represents a result of a {@link RaptorTripScheduleSearch}, with materialized {@link TripTimes}.

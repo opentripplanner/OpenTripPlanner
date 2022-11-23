@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.api.transit.RaptorRoute;
+import org.opentripplanner.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.raptor.api.transit.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.api.transit.SearchDirection;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
-import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {

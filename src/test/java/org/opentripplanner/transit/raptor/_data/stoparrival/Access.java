@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
+import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.view.AccessPathView;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.transit.raptor.api.view.AccessPathView;
 
 public class Access extends AbstractStopArrival {
 

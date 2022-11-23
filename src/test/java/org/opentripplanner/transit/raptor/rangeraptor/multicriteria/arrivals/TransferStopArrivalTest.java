@@ -6,9 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public class TransferStopArrivalTest {
 

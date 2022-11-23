@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.util.paretoset.ParetoSetWithMarker;
 
 public class ParetoSetWithMarkerTest {
 

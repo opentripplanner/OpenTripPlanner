@@ -9,17 +9,17 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.request.Optimization;
+import org.opentripplanner.raptor.api.request.RaptorProfile;
+import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.raptor.service.RangeRaptorDynamicSearch;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.request.Optimization;
-import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.configure.RaptorConfig;
-import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
-import org.opentripplanner.transit.raptor.service.RangeRaptorDynamicSearch;
 
 /**
  * Feature under test

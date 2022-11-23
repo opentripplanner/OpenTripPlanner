@@ -1,17 +1,17 @@
 package org.opentripplanner.transit.raptor._data.api;
 
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripTimes;
+import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.findTripTimes;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.PathBuilder;
+import org.opentripplanner.raptor.api.transit.CostCalculator;
+import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.path.PathBuilder;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 
 /**
  * Utility to help build paths for testing. The path builder is "reusable", every time the {@code

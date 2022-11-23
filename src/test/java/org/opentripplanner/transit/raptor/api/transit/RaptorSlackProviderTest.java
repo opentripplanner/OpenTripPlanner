@@ -1,8 +1,9 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
 
 class RaptorSlackProviderTest {
 

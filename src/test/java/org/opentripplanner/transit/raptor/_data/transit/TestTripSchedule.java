@@ -3,22 +3,13 @@ package org.opentripplanner.transit.raptor._data.transit;
 import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
-import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopTime;
+import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.network.TripPatternBuilder;
-import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
 

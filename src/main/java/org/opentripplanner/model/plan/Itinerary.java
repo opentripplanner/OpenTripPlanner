@@ -10,10 +10,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.core.ItineraryFares;
-import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 

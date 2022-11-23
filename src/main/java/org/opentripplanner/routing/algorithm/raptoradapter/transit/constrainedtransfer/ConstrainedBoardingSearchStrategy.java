@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
+import org.opentripplanner.raptor.api.transit.IntIterator;
+import org.opentripplanner.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.transit.SearchDirection;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 
 /**
  * Used to search forward and in reverse.

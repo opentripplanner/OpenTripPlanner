@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.raptor.api.transit.CostCalculator;
 
 public class CostCalculatorFactory {
 

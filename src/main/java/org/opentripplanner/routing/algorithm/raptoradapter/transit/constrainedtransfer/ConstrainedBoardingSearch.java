@@ -5,11 +5,11 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 /**
  * The responsibility of this class is to provide transfer constraints to the Raptor search for a

@@ -1,12 +1,12 @@
 package org.opentripplanner.transit.raptor.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.raptor.util.IntIterators.intDecIterator;
-import static org.opentripplanner.transit.raptor.util.IntIterators.intIncIterator;
-import static org.opentripplanner.transit.raptor.util.IntIterators.singleValueIterator;
+import static org.opentripplanner.raptor.util.IntIterators.intDecIterator;
+import static org.opentripplanner.raptor.util.IntIterators.intIncIterator;
+import static org.opentripplanner.raptor.util.IntIterators.singleValueIterator;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.raptor.api.transit.IntIterator;
 
 public class IntIteratorsTest {
 

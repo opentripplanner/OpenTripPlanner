@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor.rangeraptor.context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
-import static org.opentripplanner.transit.raptor.rangeraptor.context.SearchContext.accessOrEgressPaths;
+import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
+import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
+import static org.opentripplanner.raptor.rangeraptor.context.SearchContext.accessOrEgressPaths;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 class SearchContextTest implements RaptorTestConstants {
 

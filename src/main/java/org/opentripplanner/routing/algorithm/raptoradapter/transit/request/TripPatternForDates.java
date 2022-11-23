@@ -1,9 +1,14 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import gnu.trove.list.TIntList;
 import java.util.BitSet;
-import java.util.List;
 import java.util.function.IntUnaryOperator;
+import org.opentripplanner.raptor.api.transit.IntIterator;
+import org.opentripplanner.raptor.api.transit.RaptorRoute;
+import org.opentripplanner.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.raptor.api.transit.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.api.transit.SearchDirection;
+import org.opentripplanner.raptor.util.IntIterators;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -12,13 +17,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.Tri
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
-import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
-import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**

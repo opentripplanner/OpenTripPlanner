@@ -10,6 +10,20 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.api.transit.CostCalculator;
+import org.opentripplanner.raptor.api.transit.IntIterator;
+import org.opentripplanner.raptor.api.transit.RaptorConstrainedTransfer;
+import org.opentripplanner.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.api.transit.RaptorPathConstrainedTransferSearch;
+import org.opentripplanner.raptor.api.transit.RaptorRoute;
+import org.opentripplanner.raptor.api.transit.RaptorStopNameResolver;
+import org.opentripplanner.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.raptor.api.transit.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
+import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
@@ -17,20 +31,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.Generali
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
-import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
-import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData

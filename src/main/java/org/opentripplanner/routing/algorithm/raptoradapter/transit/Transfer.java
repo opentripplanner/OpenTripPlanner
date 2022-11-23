@@ -5,13 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 public class Transfer {
 

@@ -2,13 +2,13 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.calculateEgressDepartureTime;
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByRound;
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByStop;
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForStandardRaptor;
 import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flexAndWalk;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.AccessEgressFunctions.calculateEgressDepartureTime;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.AccessEgressFunctions.groupByRound;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.AccessEgressFunctions.groupByStop;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForStandardRaptor;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 import java.util.Arrays;
@@ -16,11 +16,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
+import org.opentripplanner.raptor.rangeraptor.transit.ForwardTimeCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.ReverseTimeCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.SlackProviderAdapter;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 
 class AccessEgressFunctionsTest implements RaptorTestConstants {
 

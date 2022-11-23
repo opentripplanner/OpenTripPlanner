@@ -3,9 +3,9 @@ package org.opentripplanner.transit.raptor.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.path.PathStringBuilder;
+import org.opentripplanner.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 
 public class PathStringBuilderTest {
 

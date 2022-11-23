@@ -9,10 +9,12 @@ import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.transit.IntIterator;
+import org.opentripplanner.raptor.rangeraptor.transit.ForwardTransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 
 public class ForwardTransitCalculatorTest {
 

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.BitSet;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.util.BitSetIterator;
 
 public class BitSetIteratorTest {
 

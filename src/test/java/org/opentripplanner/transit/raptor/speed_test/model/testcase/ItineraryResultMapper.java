@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 
 /**
  * Map an Itinerary to a result instance. We do this to normalize the Itinerary for the purpose of

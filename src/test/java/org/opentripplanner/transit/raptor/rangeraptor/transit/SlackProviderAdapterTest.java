@@ -1,14 +1,15 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
+import static org.opentripplanner.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
+import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
+import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
+import org.opentripplanner.raptor.rangeraptor.transit.SlackProviderAdapter;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.internalapi.SlackProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
-import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 
 public class SlackProviderAdapterTest implements RaptorTestConstants {
 

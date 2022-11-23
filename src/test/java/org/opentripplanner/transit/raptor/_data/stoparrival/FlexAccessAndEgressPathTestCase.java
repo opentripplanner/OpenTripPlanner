@@ -8,16 +8,16 @@ import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**

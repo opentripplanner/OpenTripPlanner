@@ -19,12 +19,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.raptor.api.path.AccessPathLeg;
+import org.opentripplanner.raptor.api.path.EgressPathLeg;
+import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.PathLeg;
+import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.api.transit.BoardAndAlightTime;
+import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
-import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 public class PathTest implements RaptorTestConstants {
 

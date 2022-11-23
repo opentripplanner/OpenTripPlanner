@@ -3,13 +3,14 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator.testDummyCalculator;
+import static org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator.testDummyCalculator;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.transit.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
 

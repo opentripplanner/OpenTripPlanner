@@ -21,12 +21,15 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAnd
 import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseBWithOpeningHoursText;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
+import org.opentripplanner.raptor.rangeraptor.path.ForwardPathMapper;
+import org.opentripplanner.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 
 public class PathMapperTest implements RaptorTestConstants {
 

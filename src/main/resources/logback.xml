@@ -46,7 +46,7 @@
   <logger name="org.opentripplanner.routing.vertextype.IntersectionVertex" level="info"/>
 
   <!-- Raptor request debug logging - Turn on/off: debug/info -->
-  <logger name="org.opentripplanner.transit.raptor.RaptorService" level="info"/>
+  <logger name="org.opentripplanner.raptor.RaptorService" level="info"/>
 
   <!-- THIRD PARTY LOGGERS -->
 

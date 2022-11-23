@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
+import org.opentripplanner.raptor.api.view.ArrivalView;
+import org.opentripplanner.raptor.api.view.TransitPathView;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.api.view.TransitPathView;
 
 public class Bus extends AbstractStopArrival implements TransitPathView<TestTripSchedule> {
 

@@ -3,9 +3,9 @@ package org.opentripplanner.transit.raptor._data.api;
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 
 /**
  * This utility help converting a Raptor path to a string which is used in several unit tests for

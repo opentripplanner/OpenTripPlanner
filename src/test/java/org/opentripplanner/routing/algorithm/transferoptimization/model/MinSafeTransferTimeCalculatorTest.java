@@ -8,11 +8,11 @@ import static org.opentripplanner.util.time.TimeUtils.time;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.util.time.DurationUtils;
 
 public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {

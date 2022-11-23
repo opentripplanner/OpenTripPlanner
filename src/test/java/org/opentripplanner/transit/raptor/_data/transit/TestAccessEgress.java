@@ -5,7 +5,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
 
 /**
  * Simple implementation for {@link RaptorAccessEgress} for use in unit-tests.

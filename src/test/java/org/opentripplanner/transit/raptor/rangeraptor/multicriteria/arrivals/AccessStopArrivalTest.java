@@ -8,9 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public class AccessStopArrivalTest {
 

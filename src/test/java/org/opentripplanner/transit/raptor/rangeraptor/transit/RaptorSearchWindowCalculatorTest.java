@@ -4,10 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.request.DynamicSearchWindowCoefficients;
+import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.api.request.SearchParams;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
 
 public class RaptorSearchWindowCalculatorTest {
 
