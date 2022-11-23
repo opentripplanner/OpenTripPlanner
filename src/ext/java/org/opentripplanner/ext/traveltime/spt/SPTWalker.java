@@ -8,7 +8,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;

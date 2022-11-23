@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;

@@ -30,7 +30,7 @@ import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.AStarRequestMapper;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;

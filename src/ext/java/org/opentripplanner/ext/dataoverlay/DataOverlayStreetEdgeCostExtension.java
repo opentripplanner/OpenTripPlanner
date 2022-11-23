@@ -12,7 +12,7 @@ import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.dataoverlay.routing.Parameter;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.StreetEdgeCostExtension;
+import org.opentripplanner.street.model.edge.StreetEdgeCostExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -2,6 +2,7 @@ package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**
  * This vertex is created from all barrier tags.
@@ -11,7 +12,7 @@ import org.opentripplanner.routing.graph.Graph;
  * <p>
  * On this vertex geometry is split and two new edges are created.
  * <p>
- * If start/end vertex of {@link org.opentripplanner.routing.edgetype.StreetEdge} is BarrierVertex
+ * If start/end vertex of {@link StreetEdge} is BarrierVertex
  * edge isn't traversable with CAR.
  * <p>
  * Created by mabu on 11.5.2015.

@@ -29,7 +29,7 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;

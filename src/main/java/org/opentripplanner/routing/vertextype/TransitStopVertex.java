@@ -2,7 +2,7 @@ package org.opentripplanner.routing.vertextype;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;

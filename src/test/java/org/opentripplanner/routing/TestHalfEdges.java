@@ -26,7 +26,7 @@ import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.AStarRequestBuilder;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.routing.graph.Graph;

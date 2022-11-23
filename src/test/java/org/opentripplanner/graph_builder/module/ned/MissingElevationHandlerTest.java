@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.mockito.Mockito;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetElevationExtension;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetElevationExtension;
 import org.opentripplanner.transit.model.basic.LocalizedStringFormat;
 
 class MissingElevationHandlerTest {

@@ -3,7 +3,7 @@ package org.opentripplanner.routing.spt;
 import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**
  * A class that determines when one search branch prunes another at the same Vertex, and ultimately

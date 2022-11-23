@@ -20,7 +20,7 @@ import org.opengis.referencing.FactoryException;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.notes.DynamicStreetNotesSource;

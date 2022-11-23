@@ -10,7 +10,7 @@ import java.util.Map;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.astar.model.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

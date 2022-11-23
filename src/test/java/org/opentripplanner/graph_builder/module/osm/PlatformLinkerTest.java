@@ -12,7 +12,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;

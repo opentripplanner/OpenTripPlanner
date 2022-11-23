@@ -2,7 +2,7 @@ package org.opentripplanner.common;
 
 import java.io.Serializable;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 
 public class TurnRestriction implements Serializable {
 
