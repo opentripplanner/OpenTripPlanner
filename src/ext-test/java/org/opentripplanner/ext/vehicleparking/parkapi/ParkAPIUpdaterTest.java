@@ -45,7 +45,7 @@ public class ParkAPIUpdaterTest {
     var first = parkingLots.get(0);
     assertEquals("Parkplatz Alenberghalle", first.getName().toString());
     assertEquals(
-      "OHCalendar{zoneId: Europe/Berlin, openingHours: [Mo-Su 0:00-23:59:59]}",
+      "OHCalendar[startOfCalendar=2022-01-01, endOfCalendar=2023-01-02, zoneId=Europe/Berlin, openingHours=[Mo-Su 0:00-23:59:59]]",
       first.getOpeningHours().toString()
     );
     assertEquals("Mo-Su 0:00-23:59", OsmOpeningHoursSupport.osmFormat(first.getOpeningHours()));
