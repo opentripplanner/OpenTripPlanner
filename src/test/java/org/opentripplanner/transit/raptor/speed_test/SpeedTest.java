@@ -22,7 +22,7 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
@@ -44,7 +44,6 @@ public class SpeedTest {
 
   private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
 
-  private final Graph graph;
   private final TransitModel transitModel;
 
   private final BuildConfig buildConfig;
@@ -64,7 +63,6 @@ public class SpeedTest {
     this.opts = opts;
     this.config = SpeedTestConfig.config(opts.rootDir());
     var model = loadGraph(opts.rootDir(), config.graph);
-    this.graph = model.graph();
     this.transitModel = model.transitModel();
     this.buildConfig = model.buildConfig();
 
@@ -75,12 +73,16 @@ public class SpeedTest {
 
     this.serverContext =
       DefaultServerRequestContext.create(
-        // TODO: We should create a new RouterConfig from the SpeedTestConfig
-        RouterConfig.DEFAULT,
+        config.transitRoutingParams,
+        config.request,
+        null,
         new RaptorConfig<>(config.transitRoutingParams),
-        graph,
+        model.graph(),
         new DefaultTransitService(transitModel),
         timer.getRegistry(),
+        List::of,
+        FlexConfig.DEFAULT,
+        null,
         null
       );
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now

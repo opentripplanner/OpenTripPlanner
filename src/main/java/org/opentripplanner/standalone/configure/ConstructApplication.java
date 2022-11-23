@@ -130,7 +130,7 @@ public class ConstructApplication {
     // Create MetricsLogging
     factory.metricsLogging();
 
-    creatTransitLayerForRaptor(transitModel(), routerConfig().transitTuningParameters());
+    creatTransitLayerForRaptor(transitModel(), routerConfig().transitTuningConfig());
 
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(graph(), transitModel(), routerConfig().updaterConfig());

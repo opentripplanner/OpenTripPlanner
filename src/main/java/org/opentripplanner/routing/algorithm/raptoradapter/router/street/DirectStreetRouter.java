@@ -37,7 +37,7 @@ public class DirectStreetRouter {
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(
         serverContext.traverseVisitor(),
-        serverContext.routerConfig().streetRoutingTimeout(),
+        serverContext.streetRoutingTimeout(),
         serverContext.dataOverlayContext(request)
       );
       List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(directRequest, temporaryVertices);

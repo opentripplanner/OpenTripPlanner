@@ -91,10 +91,6 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     return new RaptorSearchWindowCalculator(tuningParameters.dynamicSearchWindowCoefficients());
   }
 
-  public RaptorTuningParameters tuningParameters() {
-    return tuningParameters;
-  }
-
   /* private factory methods */
 
   private Worker<T> createWorker(

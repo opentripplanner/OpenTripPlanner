@@ -1,16 +1,20 @@
 package org.opentripplanner.standalone.api;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import java.time.Duration;
 import java.util.Locale;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.OTPFeature;
@@ -52,8 +56,6 @@ public interface OtpServerRequestContext {
    */
   Locale defaultLocale();
 
-  RouterConfig routerConfig();
-
   RaptorConfig<TripSchedule> raptorConfig();
 
   Graph graph();
@@ -69,6 +71,12 @@ public interface OtpServerRequestContext {
    */
   @HttpRequestScoped
   RoutingService routingService();
+
+  TransitTuningParameters transitTuningParameters();
+
+  RaptorTuningParameters raptorTuningParameters();
+
+  Duration streetRoutingTimeout();
 
   MeterRegistry meterRegistry();
 
@@ -91,6 +99,10 @@ public interface OtpServerRequestContext {
   default GraphFinder graphFinder() {
     return GraphFinder.getInstance(graph(), transitService()::findRegularStop);
   }
+
+  FlexConfig flexConfig();
+
+  VectorTilesResource.LayersParameters vectorTileLayers();
 
   default DataOverlayContext dataOverlayContext(RouteRequest request) {
     return OTPFeature.DataOverlay.isOnElseNull(() ->

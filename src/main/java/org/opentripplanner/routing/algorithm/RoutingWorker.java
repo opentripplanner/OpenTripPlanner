@@ -21,6 +21,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -28,7 +29,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -75,19 +76,12 @@ public class RoutingWorker {
       );
     this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     this.pagingSearchWindowAdjuster =
-      createPagingSearchWindowAdjuster(serverContext.routerConfig());
-    this.additionalSearchDays =
-      createAdditionalSearchDays(
-        zoneId,
-        request,
-        Duration.ofMinutes(
-          serverContext
-            .raptorConfig()
-            .tuningParameters()
-            .dynamicSearchWindowCoefficients()
-            .maxWinTimeMinutes()
-        )
+      createPagingSearchWindowAdjuster(
+        serverContext.transitTuningParameters(),
+        serverContext.raptorTuningParameters()
       );
+    this.additionalSearchDays =
+      createAdditionalSearchDays(serverContext.raptorTuningParameters(), zoneId, request);
   }
 
   public RoutingResponse route() {
@@ -184,11 +178,14 @@ public class RoutingWorker {
   }
 
   private static AdditionalSearchDays createAdditionalSearchDays(
+    RaptorTuningParameters raptorTuningParameters,
     ZoneId zoneId,
-    RouteRequest request,
-    Duration maxWindow
+    RouteRequest request
   ) {
     var searchDateTime = ZonedDateTime.ofInstant(request.dateTime(), zoneId);
+    var maxWindow = Duration.ofMinutes(
+      raptorTuningParameters.dynamicSearchWindowCoefficients().maxWinTimeMinutes()
+    );
 
     return new AdditionalSearchDays(
       request.arriveBy(),
@@ -309,12 +306,15 @@ public class RoutingWorker {
     return transitSearchTimeZero.toInstant();
   }
 
-  private PagingSearchWindowAdjuster createPagingSearchWindowAdjuster(RouterConfig routerConfig) {
-    var c = routerConfig.raptorTuningParameters().dynamicSearchWindowCoefficients();
+  private PagingSearchWindowAdjuster createPagingSearchWindowAdjuster(
+    TransitTuningParameters transitTuningParameters,
+    RaptorTuningParameters raptorTuningParameters
+  ) {
+    var c = raptorTuningParameters.dynamicSearchWindowCoefficients();
     return new PagingSearchWindowAdjuster(
       c.minWinTimeMinutes(),
       c.maxWinTimeMinutes(),
-      routerConfig.transitTuningParameters().pagingSearchWindowAdjustments()
+      transitTuningParameters.pagingSearchWindowAdjustments()
     );
   }
 }
