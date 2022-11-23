@@ -1,11 +1,11 @@
 package org.opentripplanner.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.common.LoggingUtil.fileSizeToString;
+import static org.opentripplanner.common.FileSizeToTextConverter.fileSizeToString;
 
 import org.junit.jupiter.api.Test;
 
-public class LoggingUtilTest {
+public class FileSizeToTextConverterTest {
 
   @Test
   public void testFileSizeToString() {

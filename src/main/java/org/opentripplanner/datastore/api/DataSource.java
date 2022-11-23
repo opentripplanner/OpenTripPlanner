@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import org.apache.commons.io.IOUtils;
-import org.opentripplanner.common.LoggingUtil;
+import org.opentripplanner.common.FileSizeToTextConverter;
 import org.opentripplanner.datastore.OtpDataStore;
 
 /**
@@ -141,7 +141,7 @@ public interface DataSource {
       info += "  " + sdf.format(lastModified());
     }
     if (size() > 0) {
-      info += "  " + LoggingUtil.fileSizeToString(size());
+      info += "  " + FileSizeToTextConverter.fileSizeToString(size());
     }
     return info;
   }

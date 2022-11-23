@@ -5,7 +5,7 @@ import java.util.Locale;
 /**
  * Utility functions for logging output.
  */
-public class LoggingUtil {
+public class FileSizeToTextConverter {
 
   public static String fileSizeToString(long n) {
     if (n >= 1_000_000_000) {
@@ -23,6 +23,4 @@ public class LoggingUtil {
       return String.format(Locale.ROOT, "%d bytes", n);
     }
   }
-  /* private methods */
-
 }

@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import org.opentripplanner.common.LoggingUtil;
+import org.opentripplanner.common.FileSizeToTextConverter;
 import org.opentripplanner.util.time.DurationUtils;
 
 /**
@@ -240,7 +240,7 @@ public class ProgressTracker {
 
   private String toStr(long value) {
     return logFormatAsBytes
-      ? LoggingUtil.fileSizeToString(value)
+      ? FileSizeToTextConverter.fileSizeToString(value)
       : DecimalFormat.getInstance().format(value);
   }
 }
