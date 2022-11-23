@@ -79,10 +79,10 @@ public class MarkdownFormatter {
   }
 
   /**
-   * Line-breaks in markdown is a bit problematic, we should avoid mixing HTML tags and markdown since not all 
+   * Line-breaks in markdown is a bit problematic, we should avoid mixing HTML tags and markdown since not all
    * Markdown applications support it, the same goes for ending the line with {@code \}. The best alternative
    * seams to be using two trailing spaces {@code "  "} followed by a line-break, even if this is error-prune.
-   * This method does not add the line-break, just the trailing spaces. 
+   * This method does not add the line-break, just the trailing spaces.
    * <p>
    * For more info see https://www.markdownguide.org/basic-syntax/#line-breaks
    */
