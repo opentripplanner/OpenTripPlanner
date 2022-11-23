@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
-import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.framework.time.DurationUtils;
 
 /**
  * Encapsulate information about an access or egress path. We do not distinguish between

@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPriority;
@@ -7,7 +8,6 @@ import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * This builder is used to create a {@link ConstrainedTransfer} for use in unit-tests. It build a

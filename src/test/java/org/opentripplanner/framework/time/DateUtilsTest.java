@@ -1,7 +1,7 @@
-package org.opentripplanner.util.time;
+package org.opentripplanner.framework.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.util.time.DateUtils.secToHHMM;
+import static org.opentripplanner.framework.time.DateUtils.secToHHMM;
 
 import java.time.LocalDate;
 import java.time.ZoneId;

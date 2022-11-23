@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor._data;
 
-import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
-import static org.opentripplanner.util.time.TimeUtils.hm2time;
+import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
+import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 
 public interface RaptorTestConstants {
   // Time duration(D) constants, all values are in seconds

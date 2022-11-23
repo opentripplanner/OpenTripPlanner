@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -16,7 +17,6 @@ import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.util.lang.IntUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * The responsibility of this class is to play the {@link Heuristics} role. It wrap the internal

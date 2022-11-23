@@ -11,6 +11,7 @@ import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackPro
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
@@ -20,7 +21,6 @@ import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.spi.SearchDirection;
-import org.opentripplanner.util.time.DurationUtils;
 
 /**
  * FEATURE UNDER TEST

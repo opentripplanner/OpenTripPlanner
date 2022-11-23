@@ -1,4 +1,4 @@
-package org.opentripplanner.util.time;
+package org.opentripplanner.framework.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

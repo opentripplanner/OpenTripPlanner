@@ -49,6 +49,8 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.astar.AStarBuilder;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
@@ -75,8 +77,6 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 @Path("/traveltime")
 public class TravelTimeResource {

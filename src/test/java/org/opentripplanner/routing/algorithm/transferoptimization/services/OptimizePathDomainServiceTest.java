@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.txConstrained;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.tx;
-import static org.opentripplanner.util.time.TimeUtils.time;
 
 import java.util.Collection;
 import java.util.List;

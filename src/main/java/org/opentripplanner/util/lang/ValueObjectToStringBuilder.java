@@ -2,8 +2,8 @@ package org.opentripplanner.util.lang;
 
 import java.time.Duration;
 import java.util.function.Function;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.TimeUtils;
 
 /**
  * Use this to-string-builder to build value objects. A [ValueObject](http://wiki.c2.com/?ValueObject)

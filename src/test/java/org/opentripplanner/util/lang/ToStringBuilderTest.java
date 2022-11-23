@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.util.time.TimeUtils;
+import org.opentripplanner.framework.time.TimeUtils;
 
 public class ToStringBuilderTest {
 

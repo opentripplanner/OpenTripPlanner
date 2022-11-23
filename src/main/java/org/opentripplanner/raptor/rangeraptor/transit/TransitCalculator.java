@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import static org.opentripplanner.util.time.TimeUtils.hm2time;
+import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 
 import java.util.Iterator;
 import org.opentripplanner.raptor.spi.IntIterator;

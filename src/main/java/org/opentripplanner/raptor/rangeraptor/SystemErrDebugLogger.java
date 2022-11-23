@@ -3,13 +3,15 @@ package org.opentripplanner.raptor.rangeraptor;
 import static org.opentripplanner.framework.text.Table.Align.Center;
 import static org.opentripplanner.framework.text.Table.Align.Left;
 import static org.opentripplanner.framework.text.Table.Align.Right;
-import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
+import static org.opentripplanner.framework.time.TimeUtils.timeToStrCompact;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.text.Table;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.debug.DebugTopic;
@@ -22,8 +24,6 @@ import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.util.lang.IntUtils;
 import org.opentripplanner.util.lang.OtpNumberFormat;
 import org.opentripplanner.util.lang.StringUtils;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * A debug logger witch can be plugged into Raptor to do debug logging to standard error. This is

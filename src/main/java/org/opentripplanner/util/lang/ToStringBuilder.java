@@ -1,7 +1,7 @@
 package org.opentripplanner.util.lang;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.util.time.DurationUtils.durationToStr;
+import static org.opentripplanner.framework.time.DurationUtils.durationToStr;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -16,8 +16,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.TimeUtils;
 
 /**
  * This toString builder which add elements to a compact string of the form:

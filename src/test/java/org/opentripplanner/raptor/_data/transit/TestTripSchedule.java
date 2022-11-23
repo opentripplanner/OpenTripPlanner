@@ -4,6 +4,7 @@ import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATI
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -11,7 +12,6 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.util.lang.ToStringBuilder;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.

@@ -1,4 +1,4 @@
-package org.opentripplanner.util.time;
+package org.opentripplanner.framework.time;
 
 import static java.util.Locale.ROOT;
 

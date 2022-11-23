@@ -14,7 +14,6 @@ public interface OtpArchitectureModules {
 
   Package OTP_ROOT = Package.of("org.opentripplanner");
   Package FRAMEWORK = OTP_ROOT.subPackage("framework");
-  Package FRAMEWORK_TEXT = FRAMEWORK.subPackage("text");
   Package UTIL = OTP_ROOT.subPackage("util");
   Package GEO_UTIL = OTP_ROOT.subPackage("common.geometry");
 
@@ -31,10 +30,11 @@ public interface OtpArchitectureModules {
    * to move the reminding classes to the places they belong.
    */
   Module UTILS = Module.of(
+    FRAMEWORK.subPackage("text"),
+    FRAMEWORK.subPackage("time"),
     UTIL.subPackage("lang"),
     UTIL.subPackage("logging"),
     UTIL.subPackage("resources"),
-    UTIL.subPackage("time"),
     UTIL.subPackage("geometry")
   );
 

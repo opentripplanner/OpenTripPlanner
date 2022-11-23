@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import java.util.Iterator;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.spi.IntIterator;
@@ -14,7 +15,6 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.IntIterators;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * Used to calculate times in a forward trip search.

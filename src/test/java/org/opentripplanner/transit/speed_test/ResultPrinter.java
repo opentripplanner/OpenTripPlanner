@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.speed_test;
 
-import static org.opentripplanner.util.time.DurationUtils.msToSecondsStr;
+import static org.opentripplanner.framework.time.DurationUtils.msToSecondsStr;
 
 import java.util.ArrayList;
 import java.util.List;

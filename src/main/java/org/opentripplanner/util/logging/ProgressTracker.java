@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.text.FileSizeToTextConverter;
-import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.framework.time.DurationUtils;
 
 /**
  * The progress tracker notify the caller based a time interval.

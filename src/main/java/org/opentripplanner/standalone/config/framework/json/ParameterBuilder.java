@@ -35,12 +35,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.LocalDateUtils;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.LocalDateUtils;
 
 public class ParameterBuilder {
 
