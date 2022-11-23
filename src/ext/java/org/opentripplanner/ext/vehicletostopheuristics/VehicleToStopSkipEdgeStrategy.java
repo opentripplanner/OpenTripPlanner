@@ -16,7 +16,7 @@ import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vertextype;
+package org.opentripplanner.street.model.vertex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -8,9 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class IntersectionVertexTest {

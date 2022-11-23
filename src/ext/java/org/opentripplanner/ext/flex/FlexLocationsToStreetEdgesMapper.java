@@ -7,7 +7,7 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.graph.index.StreetIndex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.geometry.GeometryUtils;

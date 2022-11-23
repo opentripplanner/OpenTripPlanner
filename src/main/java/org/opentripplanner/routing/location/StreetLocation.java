@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.location;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 

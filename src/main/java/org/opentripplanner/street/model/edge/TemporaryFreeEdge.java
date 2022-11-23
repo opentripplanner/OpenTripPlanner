@@ -3,7 +3,7 @@ package org.opentripplanner.street.model.edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.street.model.vertex.TemporaryVertex;
 
 public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
 

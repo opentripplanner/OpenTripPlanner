@@ -2,7 +2,7 @@ package org.opentripplanner.routing.core.intersection_model;
 
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
 
 /**
  * Abstract turn calculator model provides various methods most implementations will use.

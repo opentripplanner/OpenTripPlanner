@@ -7,7 +7,7 @@ import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 
 // TODO Seems like this should be merged with the PlaceFinderTraverseVisitor
 

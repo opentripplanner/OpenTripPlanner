@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 
 public class VehicleParkingUnlinked implements DataImportIssue {
 

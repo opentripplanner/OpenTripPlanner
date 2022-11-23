@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vertextype;
+package org.opentripplanner.street.model.vertex;
 
 import java.util.ArrayList;
 import java.util.HashSet;

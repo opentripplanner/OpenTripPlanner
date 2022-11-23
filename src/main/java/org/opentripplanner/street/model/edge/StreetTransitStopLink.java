@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.edge;
 
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 
 /**
  * This represents the connection between a street vertex and a transit vertex where going from the

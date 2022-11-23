@@ -14,7 +14,7 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.street.model.vertex.StreetVertex;
 
 public abstract class ParkAndRideTest extends GraphRoutingTest {
 

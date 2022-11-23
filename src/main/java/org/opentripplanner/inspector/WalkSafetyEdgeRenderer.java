@@ -8,7 +8,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
 
 /**
  * Render walk safety for each edge using a color palette. Display the walk safety factor as label.

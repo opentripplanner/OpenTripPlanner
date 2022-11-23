@@ -43,7 +43,7 @@
   <logger name="org.opentripplanner.routing.impl.RetryingPathServiceImpl" level="info"/>
 
   <!-- Avoid printing debug messages about free-flowing vertices -->
-  <logger name="org.opentripplanner.routing.vertextype.IntersectionVertex" level="info"/>
+  <logger name="org.opentripplanner.street.model.vertex.IntersectionVertex" level="info"/>
 
   <!-- Raptor request debug logging - Turn on/off: debug/info -->
   <logger name="org.opentripplanner.transit.raptor.RaptorService" level="info"/>

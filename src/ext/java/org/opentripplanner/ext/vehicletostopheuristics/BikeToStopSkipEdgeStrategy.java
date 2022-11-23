@@ -5,7 +5,7 @@ import java.util.function.Function;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;

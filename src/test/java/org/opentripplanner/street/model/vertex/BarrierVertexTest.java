@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vertextype;
+package org.opentripplanner.street.model.vertex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -11,9 +11,9 @@ import org.opentripplanner.graph_builder.module.osm.OSMFilter;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**

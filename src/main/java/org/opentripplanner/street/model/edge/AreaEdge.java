@@ -2,7 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 public class AreaEdge extends StreetEdge {

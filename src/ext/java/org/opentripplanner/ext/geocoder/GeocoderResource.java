@@ -15,7 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
-import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.site.StopLocation;
 

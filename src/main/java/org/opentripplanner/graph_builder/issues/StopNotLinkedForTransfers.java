@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.astar.model.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 
 public class StopNotLinkedForTransfers implements DataImportIssue {
 

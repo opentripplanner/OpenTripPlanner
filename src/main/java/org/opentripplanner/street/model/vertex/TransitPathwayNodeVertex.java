@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vertextype;
+package org.opentripplanner.street.model.vertex;
 
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;

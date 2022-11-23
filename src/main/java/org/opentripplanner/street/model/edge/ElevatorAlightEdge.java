@@ -5,8 +5,8 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
-import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
+import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
+import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
