@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
@@ -171,32 +170,7 @@ public class Graph implements Serializable {
     if (e != null) {
       streetNotesService.removeStaticNotes(e);
 
-      if (e instanceof StreetEdge) {
-        ((StreetEdge) e).removeAllTurnRestrictions();
-      }
-
-      if (e.fromv != null) {
-        e.fromv
-          .getIncoming()
-          .stream()
-          .filter(StreetEdge.class::isInstance)
-          .map(StreetEdge.class::cast)
-          .forEach(otherEdge -> {
-            for (TurnRestriction turnRestriction : otherEdge.getTurnRestrictions()) {
-              if (turnRestriction.to == e) {
-                otherEdge.removeTurnRestriction(turnRestriction);
-              }
-            }
-          });
-
-        e.fromv.removeOutgoing(e);
-        e.fromv = null;
-      }
-
-      if (e.tov != null) {
-        e.tov.removeIncoming(e);
-        e.tov = null;
-      }
+      e.remove();
     }
   }
 

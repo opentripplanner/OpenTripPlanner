@@ -6,7 +6,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
@@ -133,6 +135,30 @@ public abstract class Edge implements Serializable {
    */
   public int getDistanceIndependentTime() {
     return 0;
+  }
+
+  public void remove() {
+    if (this.fromv != null) {
+      this.fromv.getIncoming()
+        .stream()
+        .filter(StreetEdge.class::isInstance)
+        .map(StreetEdge.class::cast)
+        .forEach(otherEdge -> {
+          for (TurnRestriction turnRestriction : otherEdge.getTurnRestrictions()) {
+            if (turnRestriction.to == this) {
+              otherEdge.removeTurnRestriction(turnRestriction);
+            }
+          }
+        });
+
+      this.fromv.removeOutgoing(this);
+      this.fromv = null;
+    }
+
+    if (this.tov != null) {
+      this.tov.removeIncoming(this);
+      this.tov = null;
+    }
   }
 
   /* SERIALIZATION */

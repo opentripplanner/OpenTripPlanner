@@ -1208,6 +1208,13 @@ public class StreetEdge
     return false;
   }
 
+  @Override
+  public void remove() {
+    removeAllTurnRestrictions();
+
+    super.remove();
+  }
+
   private void writeObject(ObjectOutputStream out) throws IOException {
     out.defaultWriteObject();
   }
