@@ -3,6 +3,7 @@ package org.opentripplanner.raptor._data.transit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
@@ -11,7 +12,6 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
 

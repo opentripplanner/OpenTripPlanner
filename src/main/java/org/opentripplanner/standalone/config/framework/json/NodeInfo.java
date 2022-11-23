@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
+import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 
 /**
  * Information about a configuration parameter.

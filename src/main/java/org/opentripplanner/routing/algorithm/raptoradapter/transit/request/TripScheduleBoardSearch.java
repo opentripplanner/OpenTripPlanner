@@ -2,12 +2,12 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.function.IntUnaryOperator;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.spi.SearchDirection;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * The purpose of this class is to optimize the search for a trip schedule for a given pattern and

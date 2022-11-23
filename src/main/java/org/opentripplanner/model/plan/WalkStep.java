@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.util.lang.DoubleUtils;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:

@@ -9,11 +9,11 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.lang.DoubleUtils;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place using

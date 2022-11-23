@@ -3,8 +3,8 @@ package org.opentripplanner.transit.model.organization;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.framework.TransitObject;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilder> {
 

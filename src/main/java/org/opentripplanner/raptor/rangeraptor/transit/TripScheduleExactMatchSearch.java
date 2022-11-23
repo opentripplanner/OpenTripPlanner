@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This trip search will only match trips that is within the given slack of the timeLimit.

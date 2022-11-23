@@ -1,7 +1,8 @@
-package org.opentripplanner.util.lang;
+package org.opentripplanner.framework.tostring;
 
 import java.time.Duration;
 import java.util.function.Function;
+import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 

@@ -3,9 +3,9 @@ package org.opentripplanner.model;
 import java.io.Serializable;
 import java.util.List;
 import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Represents a transfer between stops with the street network path attatched to it.

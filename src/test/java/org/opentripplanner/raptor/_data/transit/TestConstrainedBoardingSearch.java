@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class TestConstrainedBoardingSearch
   implements RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> {

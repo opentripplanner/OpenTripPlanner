@@ -1,15 +1,15 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
+import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.api.request.framework.Units;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Parameters for doing transfers between transit legs.

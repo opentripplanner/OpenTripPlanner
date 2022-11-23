@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.api.path.PathBuilder;
 import org.opentripplanner.raptor.api.path.PathBuilderLeg;
@@ -13,7 +14,6 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimized;
-import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**
  * This class is used to decorate a {@link TransitPathLeg} with information about transfers

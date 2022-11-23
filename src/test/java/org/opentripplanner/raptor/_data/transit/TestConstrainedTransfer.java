@@ -1,12 +1,12 @@
 package org.opentripplanner.raptor._data.transit;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransferBoarding;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 class TestConstrainedTransfer implements RaptorConstrainedTransfer {
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.util.lang;
+package org.opentripplanner.framework.lang;
 
 import java.util.function.Function;
 import javax.annotation.Nullable;

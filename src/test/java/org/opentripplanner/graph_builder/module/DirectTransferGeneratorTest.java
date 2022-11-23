@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -30,7 +31,6 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This creates a graph with trip patterns

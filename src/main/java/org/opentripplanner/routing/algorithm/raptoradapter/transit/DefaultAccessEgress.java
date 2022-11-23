@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Default implementation of the RaptorAccessEgress interface.

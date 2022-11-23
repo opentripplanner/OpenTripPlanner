@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.util.HttpUtils;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

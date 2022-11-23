@@ -9,6 +9,9 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.framework.lang.OtpNumberFormat;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -21,9 +24,6 @@ import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
-import org.opentripplanner.util.lang.IntUtils;
-import org.opentripplanner.util.lang.OtpNumberFormat;
-import org.opentripplanner.util.lang.StringUtils;
 
 /**
  * A debug logger witch can be plugged into Raptor to do debug logging to standard error. This is

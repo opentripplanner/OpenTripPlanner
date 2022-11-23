@@ -1,4 +1,4 @@
-package org.opentripplanner.util.lang;
+package org.opentripplanner.framework.tostring;
 
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.framework.time.DurationUtils.durationToStr;
@@ -16,6 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.util.lang.ObjectUtils;
-import org.opentripplanner.util.lang.StringUtils;
+import org.opentripplanner.framework.lang.ObjectUtils;
+import org.opentripplanner.framework.lang.StringUtils;
 
 /**
  * This class is responsible for creating a pretty table that can be printed to a terminal window.
