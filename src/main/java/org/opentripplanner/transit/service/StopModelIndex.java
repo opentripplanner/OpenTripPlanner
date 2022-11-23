@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
+import org.opentripplanner.framework.collection.CollectionsView;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.util.lang.CollectionsView;
 
 /**
  * Indexed access to Stop entities.

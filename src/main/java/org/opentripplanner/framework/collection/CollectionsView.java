@@ -1,4 +1,4 @@
-package org.opentripplanner.util.lang;
+package org.opentripplanner.framework.collection;
 
 import java.io.Serializable;
 import java.util.AbstractCollection;
