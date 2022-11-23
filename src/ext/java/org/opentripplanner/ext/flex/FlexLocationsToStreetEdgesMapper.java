@@ -4,6 +4,7 @@ import java.util.HashSet;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
@@ -11,7 +12,6 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.geometry.GeometryUtils;
-import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

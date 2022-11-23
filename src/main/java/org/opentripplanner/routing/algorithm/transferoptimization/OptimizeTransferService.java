@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.framework.logging.ThrottleLogger;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.path.PathDiff;
@@ -10,7 +11,6 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedP
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
-import org.opentripplanner.util.logging.ThrottleLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

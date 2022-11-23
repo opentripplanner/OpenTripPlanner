@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -24,7 +25,6 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
