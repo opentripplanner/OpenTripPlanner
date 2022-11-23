@@ -13,6 +13,8 @@ import org.opentripplanner.routing.api.request.request.TransitRequest;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
+import org.opentripplanner.transit.model.network.GroupOfRoutesBuilder;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 
@@ -35,6 +37,8 @@ public class TestBanning {
       transit.bannedRoutes(),
       Set.copyOf(transit.whiteListedAgencies()),
       transit.whiteListedRoutes(),
+      transit.whiteListedGroupsOfRoutes(),
+      transit.bannedGroupsOfRoutes(),
       routes
     );
 
@@ -56,6 +60,8 @@ public class TestBanning {
       transit.bannedRoutes(),
       Set.copyOf(transit.whiteListedAgencies()),
       transit.whiteListedRoutes(),
+      transit.whiteListedGroupsOfRoutes(),
+      transit.bannedGroupsOfRoutes(),
       routes
     );
 
@@ -63,14 +69,104 @@ public class TestBanning {
     assertTrue(bannedRoutes.contains(id("RUT:Route:2")));
   }
 
+  @Test
+  public void testWhitelistedGroupsOfRoutes() {
+    Collection<Route> routes = getTestRoutes();
+    TransitRequest transitRequest = new TransitRequest();
+    Collection<FeedScopedId> bannedRoutes;
+
+    transitRequest.setWhiteListedGroupsOfRoutes(List.of(id("RUT:GroupOfRoutes:1")));
+
+    bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
+      Set.copyOf(transitRequest.bannedAgencies()),
+      transitRequest.bannedRoutes(),
+      Set.copyOf(transitRequest.whiteListedAgencies()),
+      transitRequest.whiteListedRoutes(),
+      transitRequest.whiteListedGroupsOfRoutes(),
+      transitRequest.bannedGroupsOfRoutes(),
+      routes
+    );
+
+    assertEquals(1, bannedRoutes.size());
+    assertTrue(bannedRoutes.contains(id("RUT:Route:2")));
+
+
+    transitRequest.setWhiteListedGroupsOfRoutes(List.of(id("RUT:GroupOfRoutes:2")));
+
+    bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
+      Set.copyOf(transitRequest.bannedAgencies()),
+      transitRequest.bannedRoutes(),
+      Set.copyOf(transitRequest.whiteListedAgencies()),
+      transitRequest.whiteListedRoutes(),
+      transitRequest.whiteListedGroupsOfRoutes(),
+      transitRequest.bannedGroupsOfRoutes(),
+      routes
+    );
+
+    assertEquals(1, bannedRoutes.size());
+    assertTrue(bannedRoutes.contains(id("RUT:Route:1")));
+  }
+
+  @Test
+  public void testBannedGroupsOfRoutes() {
+    Collection<Route> routes = getTestRoutes();
+    TransitRequest transitRequest = new TransitRequest();
+    Collection<FeedScopedId> bannedRoutes;
+
+    transitRequest.setBannedGroupsOfRoutes(List.of(id("RUT:GroupOfRoutes:1")));
+
+    bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
+      Set.copyOf(transitRequest.bannedAgencies()),
+      transitRequest.bannedRoutes(),
+      Set.copyOf(transitRequest.whiteListedAgencies()),
+      transitRequest.whiteListedRoutes(),
+      transitRequest.whiteListedGroupsOfRoutes(),
+      transitRequest.bannedGroupsOfRoutes(),
+      routes
+    );
+
+    assertEquals(2, bannedRoutes.size());
+    assertTrue(bannedRoutes.contains(id("RUT:Route:1")));
+    assertTrue(bannedRoutes.contains(id("RUT:Route:3")));
+
+
+    transitRequest.setBannedGroupsOfRoutes(List.of(id("RUT:GroupOfRoutes:2")));
+
+    bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
+      Set.copyOf(transitRequest.bannedAgencies()),
+      transitRequest.bannedRoutes(),
+      Set.copyOf(transitRequest.whiteListedAgencies()),
+      transitRequest.whiteListedRoutes(),
+      transitRequest.whiteListedGroupsOfRoutes(),
+      transitRequest.bannedGroupsOfRoutes(),
+      routes
+    );
+
+    assertEquals(2, bannedRoutes.size());
+    assertTrue(bannedRoutes.contains(id("RUT:Route:2")));
+    assertTrue(bannedRoutes.contains(id("RUT:Route:3")));
+  }
+
   private List<Route> getTestRoutes() {
     Agency agency1 = TransitModelForTest.agency("A").copy().withId(id("RUT:Agency:1")).build();
     Agency agency2 = TransitModelForTest.agency("B").copy().withId(id("RUT:Agency:2")).build();
 
+    GroupOfRoutes groupOfRoutes1 = GroupOfRoutes.of(id("RUT:GroupOfRoutes:1")).build();
+    GroupOfRoutes groupOfRoutes2 = GroupOfRoutes.of(id("RUT:GroupOfRoutes:2")).build();
+
     return List.of(
-      TransitModelForTest.route("RUT:Route:1").withAgency(agency1).build(),
-      TransitModelForTest.route("RUT:Route:2").withAgency(agency1).build(),
-      TransitModelForTest.route("RUT:Route:3").withAgency(agency2).build()
+      TransitModelForTest.route("RUT:Route:1")
+        .withAgency(agency1)
+        .withGroupOfRoutes(List.of(groupOfRoutes1))
+        .build(),
+      TransitModelForTest.route("RUT:Route:2")
+        .withGroupOfRoutes(List.of(groupOfRoutes2))
+        .withAgency(agency1)
+        .build(),
+      TransitModelForTest.route("RUT:Route:3")
+        .withGroupOfRoutes(List.of(groupOfRoutes1, groupOfRoutes2))
+        .withAgency(agency2)
+        .build()
     );
   }
 }

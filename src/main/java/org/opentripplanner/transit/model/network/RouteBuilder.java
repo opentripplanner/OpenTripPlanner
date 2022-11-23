@@ -198,6 +198,11 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
     return this;
   }
 
+  public RouteBuilder withGroupOfRoutes(List<GroupOfRoutes> groupsOfRoutes) {
+    this.groupsOfRoutes = groupsOfRoutes;
+    return this;
+  }
+
   public List<GroupOfRoutes> getGroupsOfRoutes() {
     if (groupsOfRoutes == null) {
       groupsOfRoutes = new ArrayList<>();

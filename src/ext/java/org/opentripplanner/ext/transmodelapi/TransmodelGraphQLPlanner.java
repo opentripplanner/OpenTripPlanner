@@ -181,6 +181,16 @@ public class TransmodelGraphQLPlanner {
       (List<String> networks) -> request.journey().rental().setBannedNetworks(Set.copyOf(networks))
     );
 
+    callWith.argument(
+      "whiteListed.groupsOfLines",
+      (List<String> groupsOfLines) -> request.journey().transit().setWhiteListedGroupsOfRoutes(mapIDsToDomain(groupsOfLines))
+    );
+
+    callWith.argument(
+      "banned.groupsOfLines",
+      (List<String> groupsOfLines) -> request.journey().transit().setBannedGroupsOfRoutes(mapIDsToDomain(groupsOfLines))
+    );
+
     // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
     // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
     // callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);

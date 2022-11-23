@@ -46,5 +46,11 @@ public class BannedInputType {
         "Set of ids of rental networks that should not be allowed for renting vehicles."
       )
     )
+    .field(
+      GqlUtil.newIdListInputField(
+        "groupsOfLines",
+        "Set of ids of groups of lines that should not be used"
+      )
+    )
     .build();
 }

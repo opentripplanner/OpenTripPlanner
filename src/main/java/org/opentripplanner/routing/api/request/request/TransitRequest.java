@@ -22,6 +22,8 @@ public class TransitRequest implements Cloneable, Serializable {
   private List<FeedScopedId> unpreferredAgencies = List.of();
   private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
   private RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
+  private List<FeedScopedId> whiteListedGroupsOfRoutes = List.of();
+  private List<FeedScopedId> bannedGroupsOfRoutes = List.of();
 
   /**
    * @deprecated TODO OTP2 Needs to be implemented
@@ -233,6 +235,22 @@ public class TransitRequest implements Cloneable, Serializable {
 
   public DebugRaptor raptorDebugging() {
     return raptorDebugging;
+  }
+
+  public void setWhiteListedGroupsOfRoutes(List<FeedScopedId> whiteListedGroupsOfRoutes) {
+    this.whiteListedGroupsOfRoutes = whiteListedGroupsOfRoutes;
+  }
+
+  public List<FeedScopedId> whiteListedGroupsOfRoutes() {
+    return whiteListedGroupsOfRoutes;
+  }
+
+  public void setBannedGroupsOfRoutes(List<FeedScopedId> bannedGroupsOfRoutes) {
+    this.bannedGroupsOfRoutes = bannedGroupsOfRoutes;
+  }
+
+  public List<FeedScopedId> bannedGroupsOfRoutes() {
+    return bannedGroupsOfRoutes;
   }
 
   public TransitRequest clone() {

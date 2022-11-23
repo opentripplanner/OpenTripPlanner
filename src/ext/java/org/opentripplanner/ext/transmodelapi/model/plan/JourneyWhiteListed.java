@@ -35,6 +35,7 @@ public class JourneyWhiteListed {
         "Set of ids of rental networks that should be used for renting vehicles."
       )
     )
+    .field(newIdListInputField("groupsOfLines", "Set of ids for groups of lines that should be used"))
     .build();
 
   public final Set<FeedScopedId> authorityIds;
