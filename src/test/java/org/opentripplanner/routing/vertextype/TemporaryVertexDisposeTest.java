@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 
 public class TemporaryVertexDisposeTest {
 

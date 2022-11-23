@@ -5,7 +5,7 @@ import javax.inject.Inject;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.transit.model.site.AreaStop;

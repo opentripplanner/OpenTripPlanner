@@ -14,7 +14,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 /**

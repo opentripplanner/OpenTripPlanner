@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder;
 
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.astar.model.Vertex;
 
 /**
  * Represents noteworthy data import issues that occur during the graph building process. These

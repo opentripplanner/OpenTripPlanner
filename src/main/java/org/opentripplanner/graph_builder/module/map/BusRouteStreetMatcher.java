@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;

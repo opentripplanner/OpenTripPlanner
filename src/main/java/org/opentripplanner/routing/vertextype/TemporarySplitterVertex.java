@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.model.Edge;
 
 /**
  * TODO: decide what to do with this. Currently temporary vertices have only incoming or outgoing edges

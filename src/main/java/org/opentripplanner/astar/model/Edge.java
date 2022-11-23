@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.astar.model;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

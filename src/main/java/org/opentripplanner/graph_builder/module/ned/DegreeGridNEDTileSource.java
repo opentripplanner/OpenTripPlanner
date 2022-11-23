@@ -17,7 +17,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

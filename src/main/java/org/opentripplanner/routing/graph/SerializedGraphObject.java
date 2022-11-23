@@ -16,6 +16,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;

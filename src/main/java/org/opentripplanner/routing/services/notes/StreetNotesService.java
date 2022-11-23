@@ -8,7 +8,7 @@ import java.util.Set;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.model.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,7 +5,7 @@ import org.opentripplanner.ext.traveltime.geometry.AccumulativeGridSampler;
 import org.opentripplanner.ext.traveltime.spt.SPTVisitor;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.model.Edge;
 
 class SampleGridSPTVisitor implements SPTVisitor {
 

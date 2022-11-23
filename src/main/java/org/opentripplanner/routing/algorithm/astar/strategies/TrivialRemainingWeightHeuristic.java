@@ -4,7 +4,7 @@ import java.util.Set;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 
 /**
  * A trivial heuristic that always returns 0, which is always admissible. For use in testing,

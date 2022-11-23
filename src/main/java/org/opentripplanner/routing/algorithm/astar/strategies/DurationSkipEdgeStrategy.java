@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import java.time.Duration;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.model.Edge;
 
 /**
  * Skips edges when the specified number of seconds has elapsed. This does not guarantee that we get

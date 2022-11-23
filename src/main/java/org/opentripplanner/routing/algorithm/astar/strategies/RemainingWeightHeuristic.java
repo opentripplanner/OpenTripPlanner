@@ -5,7 +5,7 @@ import java.util.Set;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 
 /**
  * Interface for classes that provides an admissible estimate of (lower bound on) the weight of a

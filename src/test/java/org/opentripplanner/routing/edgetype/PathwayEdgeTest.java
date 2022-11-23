@@ -14,7 +14,7 @@ import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;

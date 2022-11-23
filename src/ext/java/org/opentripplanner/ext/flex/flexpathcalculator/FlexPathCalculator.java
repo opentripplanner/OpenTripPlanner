@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 
 /**
  * FlexPathCalculator is used to calculate the driving times and distances during flex routing

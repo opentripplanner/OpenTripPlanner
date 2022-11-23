@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

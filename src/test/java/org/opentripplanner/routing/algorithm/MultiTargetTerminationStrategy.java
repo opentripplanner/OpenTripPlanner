@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 
 /**
  * A termination strategy that terminates after multiple targets have been reached.

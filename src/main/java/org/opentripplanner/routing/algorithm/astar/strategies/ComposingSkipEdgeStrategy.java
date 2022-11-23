@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.model.Edge;
 
 /**
  * Use several strategies in composition with each other, for example by limiting by time and number

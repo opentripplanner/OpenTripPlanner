@@ -2,7 +2,7 @@ package org.opentripplanner.ext.traveltime.spt;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.model.Edge;
 
 public interface SPTVisitor {
   /**

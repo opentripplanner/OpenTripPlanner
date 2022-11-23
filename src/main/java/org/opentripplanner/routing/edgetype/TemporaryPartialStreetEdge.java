@@ -2,7 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 

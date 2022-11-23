@@ -9,7 +9,7 @@ import java.util.Set;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.model.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

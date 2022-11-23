@@ -14,7 +14,7 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 
 /**

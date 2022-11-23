@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.model.Vertex;
 
 /**
  * Marker interface for temporary vertices.

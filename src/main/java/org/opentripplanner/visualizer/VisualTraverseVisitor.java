@@ -2,7 +2,7 @@ package org.opentripplanner.visualizer;
 
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.model.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
