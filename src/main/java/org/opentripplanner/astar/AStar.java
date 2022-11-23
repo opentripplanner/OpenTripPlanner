@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.astar;
+package org.opentripplanner.astar;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
