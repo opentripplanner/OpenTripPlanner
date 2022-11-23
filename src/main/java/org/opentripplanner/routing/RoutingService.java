@@ -1,22 +1,15 @@
 package org.opentripplanner.routing;
 
 import java.time.ZoneId;
-import java.util.Collection;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.via.ViaRoutingWorker;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
-import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.astar.model.Vertex;
-import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -28,7 +21,6 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.WorldEnvelope;
 
 // TODO VIA: 2022-08-29 javadocs
 /**
@@ -64,76 +56,6 @@ public class RoutingService implements org.opentripplanner.routing.api.request.R
         new RoutingWorker(serverContext, req, serverContext.transitService().getTimeZone()).route()
     );
     return viaRoutingWorker.route();
-  }
-
-  /** {@link Graph#getVertex(String)} */
-  public Vertex getVertex(String label) {
-    return this.graph.getVertex(label);
-  }
-
-  /** {@link Graph#getVertices()} */
-  public Collection<Vertex> getVertices() {
-    return this.graph.getVertices();
-  }
-
-  /** {@link Graph#getVerticesOfType(Class)} */
-  public <T extends Vertex> List<T> getVerticesOfType(Class<T> cls) {
-    return this.graph.getVerticesOfType(cls);
-  }
-
-  /** {@link Graph#getEdges()} */
-  public Collection<Edge> getEdges() {
-    return this.graph.getEdges();
-  }
-
-  /** {@link Graph#getEdgesOfType(Class)} */
-  public <T extends Edge> List<T> getEdgesOfType(Class<T> cls) {
-    return this.graph.getEdgesOfType(cls);
-  }
-
-  /** {@link Graph#getStreetEdges()} */
-  public Collection<StreetEdge> getStreetEdges() {
-    return this.graph.getStreetEdges();
-  }
-
-  /** {@link Graph#containsVertex(Vertex)} */
-  public boolean containsVertex(Vertex v) {
-    return this.graph.containsVertex(v);
-  }
-
-  /** {@link Graph#getExtent()} */
-  public Envelope getExtent() {
-    return this.graph.getExtent();
-  }
-
-  /** {@link Graph#countVertices()} */
-  public int countVertices() {
-    return this.graph.countVertices();
-  }
-
-  /** {@link Graph#countEdges()} */
-  public int countEdges() {
-    return this.graph.countEdges();
-  }
-
-  /** {@link Graph#getStreetIndex()} */
-  public StreetIndex getStreetIndex() {
-    return this.graph.getStreetIndex();
-  }
-
-  /** {@link Graph#getConvexHull()} */
-  public Geometry getConvexHull() {
-    return this.graph.getConvexHull();
-  }
-
-  /** {@link Graph#getEnvelope()} */
-  public WorldEnvelope getEnvelope() {
-    return this.graph.getEnvelope();
-  }
-
-  /** {@link Graph#getDistanceBetweenElevationSamples()} */
-  public double getDistanceBetweenElevationSamples() {
-    return this.graph.getDistanceBetweenElevationSamples();
   }
 
   public RealtimeVehiclePositionService getVehiclePositionService() {

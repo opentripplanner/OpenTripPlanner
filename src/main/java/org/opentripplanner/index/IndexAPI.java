@@ -52,7 +52,6 @@ import org.opentripplanner.api.model.ApiTripTimeShort;
 import org.opentripplanner.api.support.SemanticHash;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -626,10 +625,6 @@ public class IndexAPI {
   private TripPattern tripPattern(Trip trip) {
     var pattern = transitService().getPatternForTrip(trip);
     return validateExist("TripPattern", pattern, "trip", trip.getId());
-  }
-
-  private RoutingService routingService() {
-    return serverContext.routingService();
   }
 
   private TransitService transitService() {
