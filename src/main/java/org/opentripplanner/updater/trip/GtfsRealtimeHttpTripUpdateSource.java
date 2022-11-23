@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip;
 
+import com.google.protobuf.ExtensionRegistry;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
@@ -9,6 +10,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.GtfsRealtimeExtensions;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -27,10 +29,12 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
    * previous updates should be disregarded
    */
   private boolean fullDataset = true;
+  private ExtensionRegistry registry = ExtensionRegistry.newInstance();
 
   public GtfsRealtimeHttpTripUpdateSource(Parameters config) {
     this.feedId = config.getFeedId();
     this.url = config.getUrl();
+    GtfsRealtimeExtensions.registerAllExtensions(registry);
   }
 
   @Override
@@ -40,7 +44,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     List<TripUpdate> updates = null;
     fullDataset = true;
     try {
-      InputStream is = HttpUtils.getData(
+      InputStream is = HttpUtils.openInputStream(
         URI.create(url),
         Map.of(
           "Accept",
@@ -49,7 +53,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
       );
       if (is != null) {
         // Decode message
-        feedMessage = FeedMessage.parseFrom(is);
+        feedMessage = FeedMessage.parseFrom(is, registry);
         feedEntityList = feedMessage.getEntityList();
 
         // Change fullDataset value if this is an incremental update

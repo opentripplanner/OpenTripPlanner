@@ -1,0 +1,40 @@
+syntax = "proto2";
+
+import "gtfs-realtime.proto";
+
+option java_package = "org.opentripplanner";
+package transit_realtime;
+
+message OtpTripDescriptorExtension {
+  optional string route_url = 1;
+  optional string agency_id = 2;
+  optional string route_long_name = 3;
+  optional uint32 route_type = 4;
+}
+
+extend TripDescriptor {
+  optional OtpTripDescriptorExtension trip_descriptor = 9000;
+}
+
+message OtpStopTimePropertiesExtension {
+  enum DropOffPickupType {
+    // Regularly scheduled pickup/dropoff.
+    REGULAR = 0;
+
+    // No pickup/dropoff available
+    NONE = 1;
+
+    // Must phone agency to arrange pickup/dropoff.
+    PHONE_AGENCY = 2;
+
+    // Must coordinate with driver to arrange pickup/dropoff.
+    COORDINATE_WITH_DRIVER = 3;
+  }
+
+  optional DropOffPickupType pickup_type = 1;
+  optional DropOffPickupType dropoff_type = 2;
+}
+
+extend TripUpdate.StopTimeUpdate.StopTimeProperties {
+  optional OtpStopTimePropertiesExtension stop_time_properties = 9000;
+}
