@@ -263,6 +263,20 @@ enum AlertSeverityLevelType {
     SEVERE
 }
 
+type OpeningHours {
+    osm: String
+    """
+    Opening hours for the selected dates using the local time of the parking lot.
+    Each date can have multiple time spans.
+    """
+    dates(
+        """
+        Opening hours will be returned for these dates. Dates should use YYYYMMDD format.
+        """
+        dates: [String!]!
+    ): [LocalTimeSpanDate]
+}
+
 """Bike park represents a location where bicycles can be parked."""
 type BikePark implements Node & PlaceInterface {
     """
@@ -297,16 +311,8 @@ type BikePark implements Node & PlaceInterface {
     """
     tags: [String]
 
-    """
-    Opening hours for the selected dates using the local time of the park.
-    Each date can have multiple time spans.
-    """
-    openingHours(
-        """
-        Opening hours will be returned for these dates. Dates should use YYYYMMDD format.
-        """
-        dates: [String!]!
-    ): [LocalTimeSpanDate]
+
+    openingHours: OpeningHours
 }
 
 """Vehicle parking represents a location where bicycles or cars can be parked."""
@@ -758,6 +764,8 @@ type CarPark implements Node & PlaceInterface {
     Opening hours for the selected dates using the local time of the park.
     Each date can have multiple time spans.
     """
+
+
     openingHours(
         """
         Opening hours will be returned for these dates. Dates should use YYYYMMDD format.
