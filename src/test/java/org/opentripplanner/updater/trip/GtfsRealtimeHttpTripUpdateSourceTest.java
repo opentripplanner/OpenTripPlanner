@@ -9,7 +9,7 @@ import org.opentripplanner.GtfsRealtimeExtensions;
 class GtfsRealtimeHttpTripUpdateSourceTest {
 
   @Test
-  void extension() {
+  void parseExtension() {
     var source = new GtfsRealtimeHttpTripUpdateSource(
       new GtfsRealtimeHttpTripUpdateSource.Parameters() {
         @Override
@@ -36,5 +36,7 @@ class GtfsRealtimeHttpTripUpdateSourceTest {
         .getStopTimeProperties()
         .hasExtension(GtfsRealtimeExtensions.stopTimeProperties)
     );
+
+    assertTrue(first.getTrip().hasExtension(GtfsRealtimeExtensions.tripDescriptor));
   }
 }

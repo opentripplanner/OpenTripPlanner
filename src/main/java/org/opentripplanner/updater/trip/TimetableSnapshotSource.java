@@ -34,6 +34,8 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.GtfsRealtimeExtensions;
+import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -632,14 +634,48 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     //
     // Create added trip
     //
-
+    // Create dummy agency for added trips
+    Agency dummyAgency = Agency
+      .of(new FeedScopedId(tripId.getFeedId(), "Dummy"))
+      .withName("Dummy")
+      .withTimezone("Europe/Paris")
+      .build();
     Route route = null;
     if (tripDescriptor.hasRouteId()) {
       // Try to find route
       route = getRouteForRouteId(new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId()));
-    }
+    } else if (tripDescriptor.hasExtension(GtfsRealtimeExtensions.tripDescriptor)) {
+      FeedScopedId id = tripDescriptor.hasRouteId()
+        ? new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
+        : tripId;
 
-    if (route == null) {
+      var builder = Route.of(id);
+
+      var ext = TripExtension.ofTripDescriptor(tripDescriptor);
+
+      var agency = transitService
+        .getAgencies()
+        .stream()
+        .filter(a -> a.getId().getFeedId().equals(tripId.getFeedId()))
+        .filter(ext::matchesAgencyId)
+        .findFirst()
+        .orElse(dummyAgency);
+
+      builder.withAgency(agency);
+
+      builder.withGtfsType(ext.routeTypeWithFallback());
+      var mode = TransitModeMapper.mapMode(ext.routeTypeWithFallback());
+      builder.withMode(mode);
+
+      // Create route name
+      var name = Objects.requireNonNullElse(ext.routeLongName(), tripId.toString());
+      builder.withLongName(new NonLocalizedString(name));
+      builder.withShortName(name);
+      builder.withUrl(ext.routeUrl());
+      builder.withAgency(dummyAgency);
+
+      route = builder.build();
+    } else if (route == null) {
       // Create new Route
       // Use route id of trip descriptor if available
       FeedScopedId id = tripDescriptor.hasRouteId()
@@ -647,12 +683,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         : tripId;
 
       var builder = Route.of(id);
-      // Create dummy agency for added trips
-      Agency dummyAgency = Agency
-        .of(new FeedScopedId(tripId.getFeedId(), "Dummy"))
-        .withName("Dummy")
-        .withTimezone("Europe/Paris")
-        .build();
+
       builder.withAgency(dummyAgency);
       // Guess the route type as it doesn't exist yet in the specifications
       // Bus. Used for short- and long-distance bus routes.
@@ -766,8 +797,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (stopTimeUpdate.hasStopSequence()) {
         stopTime.setStopSequence(stopTimeUpdate.getStopSequence());
       }
-      stopTime.setPickupType(SCHEDULED); // Regularly scheduled pickup
-      stopTime.setDropOffType(SCHEDULED); // Regularly scheduled drop off
+      var extension = StopTimeExtension.ofStopTime(stopTimeUpdate.getStopTimeProperties());
+      stopTime.setPickupType(extension.pickupOpt().orElse(SCHEDULED));
+      stopTime.setDropOffType(extension.dropOffOpt().orElse(SCHEDULED));
       // Add stop time to list
       stopTimes.add(stopTime);
     }
@@ -813,7 +845,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           .ifPresent(newTripTimes::updateWheelchairAccessibility);
       }
     }
-
+    final List<StopLocation> stops1 = pattern.getStops();
+    LOG.trace(
+      "New pattern with mode {} on {} from {} to {}",
+      trip.getRoute().getMode(),
+      serviceDate,
+      stops1.get(1).getName(),
+      stops1.get(stops1.size() - 1).getName()
+    );
     // Add new trip times to the buffer
     return buffer.update(pattern, newTripTimes, serviceDate);
   }
