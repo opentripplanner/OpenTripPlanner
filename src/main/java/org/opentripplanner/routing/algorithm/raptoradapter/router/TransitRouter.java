@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.raptor.RaptorService;
+import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
@@ -27,9 +30,6 @@ import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.raptor.RaptorService;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.util.OTPFeature;
 
 public class TransitRouter {

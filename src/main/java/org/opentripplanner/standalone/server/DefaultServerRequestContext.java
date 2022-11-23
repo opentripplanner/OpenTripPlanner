@@ -5,6 +5,7 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.inspector.TileRendererManager;
+import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -13,7 +14,6 @@ import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.configure.RequestLoggerFactory;
-import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 
