@@ -7,8 +7,6 @@ import java.io.Serializable;
 import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.street.model.TurnRestriction;
-import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
@@ -139,17 +137,9 @@ public abstract class Edge implements Serializable {
 
   public void remove() {
     if (this.fromv != null) {
-      this.fromv.getIncoming()
-        .stream()
-        .filter(StreetEdge.class::isInstance)
-        .map(StreetEdge.class::cast)
-        .forEach(otherEdge -> {
-          for (TurnRestriction turnRestriction : otherEdge.getTurnRestrictions()) {
-            if (turnRestriction.to == this) {
-              otherEdge.removeTurnRestriction(turnRestriction);
-            }
-          }
-        });
+      for (Edge edge : this.fromv.getIncoming()) {
+        edge.removeTurnRestrictionsTo(this);
+      }
 
       this.fromv.removeOutgoing(this);
       this.fromv = null;
@@ -160,6 +150,8 @@ public abstract class Edge implements Serializable {
       this.tov = null;
     }
   }
+
+  public void removeTurnRestrictionsTo(Edge origin) {}
 
   /* SERIALIZATION */
 

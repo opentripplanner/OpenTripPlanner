@@ -856,6 +856,15 @@ public class StreetEdge
     }
   }
 
+  @Override
+  public void removeTurnRestrictionsTo(Edge other) {
+    for (TurnRestriction turnRestriction : this.getTurnRestrictions()) {
+      if (turnRestriction.to == other) {
+        this.removeTurnRestriction(turnRestriction);
+      }
+    }
+  }
+
   /**
    * Get the immutable {@link List} of {@link TurnRestriction}s that belongs to this
    * {@link StreetEdge}.
@@ -867,6 +876,13 @@ public class StreetEdge
   public List<TurnRestriction> getTurnRestrictions() {
     // this can be safely returned as it's unmodifiable
     return turnRestrictions;
+  }
+
+  @Override
+  public void remove() {
+    removeAllTurnRestrictions();
+
+    super.remove();
   }
 
   protected void copyPropertiesToSplitEdge(
@@ -1207,13 +1223,6 @@ public class StreetEdge
     }
 
     return false;
-  }
-
-  @Override
-  public void remove() {
-    removeAllTurnRestrictions();
-
-    super.remove();
   }
 
   private void writeObject(ObjectOutputStream out) throws IOException {
