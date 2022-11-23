@@ -75,13 +75,18 @@ public class HslParkUpdaterTest {
     assertEquals(600, first.getAvailability().getCarSpaces());
     assertNull(first.getAvailability().getBicycleSpaces());
     assertEquals(
-      "OHCalendar[startOfCalendar=2022-01-01, endOfCalendar=2023-01-02, zoneId=Europe/Helsinki, openingHours=[Business days 0:00-23:59:59, Saturday 0:00-23:59:59, Sunday 0:00-23:59:59]]",
+      "Mo-Fr 0:00-23:59,Sa 0:00-23:59,Su 0:00-23:59",
+      first.getOpeningHours().osmFormat()
+    );
+    assertEquals(
+      "OHCalendar[startOfCalendar=2022-01-01, endOfCalendar=2023-01-02, zoneId=Europe/Helsinki, openingHours=[Mo-Fr 0:00-23:59, Sa 0:00-23:59, Su 0:00-23:59]]",
       first.getOpeningHours().toString()
     );
     assertEquals(
       "Mo-Fr 0:00-23:59,Sa 0:00-23:59,Su 0:00-23:59",
       OsmOpeningHoursSupport.osmFormat(first.getOpeningHours())
     );
+
 
     var firstVehicleParkingGroup = first.getVehicleParkingGroup();
     assertEquals("hslpark:321", firstVehicleParkingGroup.id().toString());
@@ -106,7 +111,7 @@ public class HslParkUpdaterTest {
     assertNull(second.getAvailability());
 
     assertEquals(
-      "OHCalendar[startOfCalendar=2022-01-01, endOfCalendar=2023-01-02, zoneId=Europe/Helsinki, openingHours=[Business days 6:00-17:30]]",
+      "OHCalendar[startOfCalendar=2022-01-01, endOfCalendar=2023-01-02, zoneId=Europe/Helsinki, openingHours=[Mo-Fr 6:00-17:30]]",
       second.getOpeningHours().toString()
     );
     assertEquals(firstVehicleParkingGroup, second.getVehicleParkingGroup());
@@ -128,7 +133,7 @@ public class HslParkUpdaterTest {
     assertEquals(VehicleParkingState.TEMPORARILY_CLOSED, fourth.getState());
     assertEquals(0, fourth.getTags().size());
     assertEquals(
-      "OHCalendar[startOfCalendar=2022-01-01, endOfCalendar=2023-01-02, zoneId=Europe/Helsinki, openingHours=[Saturday 7:00-18:00, Business days 7:00-21:00, Sunday 12:00-21:00]]",
+      "OHCalendar[startOfCalendar=2022-01-01, endOfCalendar=2023-01-02, zoneId=Europe/Helsinki, openingHours=[Sa 7:00-18:00, Mo-Fr 7:00-21:00, Su 12:00-21:00]]",
       fourth.getOpeningHours().toString()
     );
     assertNull(fourth.getVehicleParkingGroup());
