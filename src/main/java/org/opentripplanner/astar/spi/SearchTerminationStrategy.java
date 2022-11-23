@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.astar.strategies;
+package org.opentripplanner.astar.spi;
 
 import org.opentripplanner.routing.core.State;
 

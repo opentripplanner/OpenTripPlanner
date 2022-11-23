@@ -1,6 +1,9 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import java.util.Set;
+import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -8,8 +11,6 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.VehicleRentalState;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.astar.model.Vertex;
 
 /**
  * A Euclidean remaining weight strategy.

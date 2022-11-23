@@ -1,7 +1,7 @@
-package org.opentripplanner.routing.algorithm.astar.strategies;
+package org.opentripplanner.astar.spi;
 
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.routing.core.State;
 
 /**
  * Strategy interface to provide additional logic to decide if a given edge should not be considered

@@ -1,7 +1,7 @@
-package org.opentripplanner.routing.algorithm.astar;
+package org.opentripplanner.astar.spi;
 
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.routing.core.State;
 
 public interface TraverseVisitor {
   /** Called when A* explores an edge */

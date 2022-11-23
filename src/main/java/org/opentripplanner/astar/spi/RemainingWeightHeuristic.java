@@ -1,11 +1,11 @@
-package org.opentripplanner.routing.algorithm.astar.strategies;
+package org.opentripplanner.astar.spi;
 
 import java.io.Serializable;
 import java.util.Set;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.astar.model.Vertex;
 
 /**
  * Interface for classes that provides an admissible estimate of (lower bound on) the weight of a

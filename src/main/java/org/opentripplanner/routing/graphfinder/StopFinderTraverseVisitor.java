@@ -2,11 +2,11 @@ package org.opentripplanner.routing.graphfinder;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 // TODO Seems like this should be merged with the PlaceFinderTraverseVisitor

@@ -4,7 +4,7 @@ import dagger.Module;
 import dagger.Provides;
 import io.micrometer.core.instrument.Metrics;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
+import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
