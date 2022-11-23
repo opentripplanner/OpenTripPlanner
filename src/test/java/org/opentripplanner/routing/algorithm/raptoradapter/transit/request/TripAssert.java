@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.api.transit.RaptorTripScheduleSearch;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 
 class TripAssert {
 

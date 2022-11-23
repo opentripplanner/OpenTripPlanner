@@ -42,6 +42,6 @@ public interface OtpArchitectureModules {
   Package TRANSIT_MODEL = TRANSIT.subPackage("model");
 
   /* The Raptor module */
-  Package RAPTOR_SERVICE = TRANSIT.subPackage("raptor");
-  Package RAPTOR_API = RAPTOR_SERVICE.subPackage("api.(*)..");
+  Package RAPTOR_ROOT = OTP_ROOT.subPackage("raptor");
+  Package RAPTOR_API = RAPTOR_ROOT.subPackage("api.(*)..");
 }
