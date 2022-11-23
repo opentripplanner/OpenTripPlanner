@@ -45,7 +45,8 @@ public class GraphSerializationTest {
       JarFile.class,
       SoftReference.class,
       Class.class,
-      Logger.class,
+      org.slf4j.Logger.class,
+      ch.qos.logback.classic.Logger.class,
       HashGridSpatialIndex.class,
       Deduplicator.class
     )

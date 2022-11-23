@@ -139,7 +139,8 @@ public class GtfsModule implements GraphBuilderModule {
           gtfsBundle.getFeedId().getId(),
           issueStore,
           discardMinTransferTimes,
-          gtfsDao
+          gtfsDao,
+          gtfsBundle.stationTransferPreference()
         );
         mapper.mapStopTripAndRouteDataIntoBuilder();
 
@@ -154,7 +155,14 @@ public class GtfsModule implements GraphBuilderModule {
           builder.getFlexTripsById().addAll(FlexTripsMapper.createFlexTrips(builder, issueStore));
         }
 
-        validateAndInterpolateStopTimesForEachTrip(builder.getStopTimesSortedByTrip(), issueStore);
+        validateAndInterpolateStopTimesForEachTrip(
+          builder.getStopTimesSortedByTrip(),
+          issueStore,
+          gtfsBundle.removeRepeatedStops()
+        );
+
+        // We need to run this after the cleaning of the data, as stop indices might have changed
+        mapper.mapAndAddTransfersToBuilder();
 
         GeometryProcessor geometryProcessor = new GeometryProcessor(
           builder,
@@ -219,9 +227,16 @@ public class GtfsModule implements GraphBuilderModule {
    */
   private void validateAndInterpolateStopTimesForEachTrip(
     TripStopTimes stopTimesByTrip,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    boolean removeRepeatedStops
   ) {
-    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, true, issueStore).run();
+    new ValidateAndInterpolateStopTimesForEachTrip(
+      stopTimesByTrip,
+      true,
+      removeRepeatedStops,
+      issueStore
+    )
+      .run();
   }
 
   /**

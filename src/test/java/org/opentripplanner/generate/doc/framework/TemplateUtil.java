@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
  */
 public class TemplateUtil {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TemplateUtil.class);
-
   private static final String PARAMETERS_TABLE = "PARAMETERS-TABLE";
   private static final String PARAMETERS_DETAILS = "PARAMETERS-DETAILS";
   private static final String EXAMPLE = "JSON-EXAMPLE";

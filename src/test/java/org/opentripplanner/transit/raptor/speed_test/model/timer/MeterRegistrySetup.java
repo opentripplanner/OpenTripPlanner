@@ -58,7 +58,7 @@ class MeterRegistrySetup {
 
       @Override
       public String uri() {
-        return "https://otp-github-actions-runner.leonard.io:8087";
+        return "https://db.otp-performance.leonard.io";
       }
 
       @Override

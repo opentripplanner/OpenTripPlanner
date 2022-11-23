@@ -561,7 +561,34 @@ Http headers.
     }
   }, {
     "type" : "vehicle-parking",
-    "sourceType" : "hsl-park"
+    "sourceType" : "hsl-park",
+    "feedId" : "hslpark",
+    "timeZone" : "Europe/Helsinki",
+    "facilitiesFrequencySec" : 3600,
+    "facilitiesUrl" : "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
+    "utilizationsFrequencySec" : 600,
+    "utilizationsUrl" : "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
+    "hubsUrl" : "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
+  }, {
+    "type" : "vehicle-parking",
+    "sourceType" : "park-api",
+    "feedId" : "parkapi",
+    "timeZone" : "Europe/Berlin",
+    "frequencySec" : 600,
+    "url" : "https://foo.bar",
+    "headers" : {
+      "Cache-Control" : "max-age=604800"
+    },
+    "tags" : [ "source:parkapi" ]
+  }, {
+    "type" : "vehicle-parking",
+    "feedId" : "bikely",
+    "sourceType" : "bikely",
+    "url" : "https://api.safebikely.com/api/v1/s/locations",
+    "headers" : {
+      "X-Bikely-Token" : "${BIKELY_TOKEN}",
+      "Authorization" : "${BIKELY_AUTHORIZATION}"
+    }
   }, {
     "type" : "stop-time-updater",
     "frequencySec" : 60,
