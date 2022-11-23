@@ -3,6 +3,7 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.List;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -36,10 +37,12 @@ public class LegacyGraphQLBikeParkImpl implements LegacyGraphQLDataFetchers.Lega
       LegacyGraphQLUtils.getTranslation(getSource(environment).getName(), environment);
   }
 
-  // TODO
   @Override
-  public DataFetcher<Iterable<Object>> openingHours() {
-    return environment -> null;
+  public DataFetcher<LegacyGraphQLOpeningHours> openingHours() {
+    return environment -> {
+      var cal = getSource(environment).getOpeningHours();
+      return new LegacyGraphQLOpeningHours(cal.osmFormat(), List.of());
+    };
   }
 
   @Override

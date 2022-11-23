@@ -92,3 +92,5 @@ config:
     FormFactor: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor
     PropulsionType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType
     RentalVehicleType: org.opentripplanner.routing.vehicle_rental.RentalVehicleType#RentalVehicleType
+    OpeningHours: org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLOpeningHours
+    LocalTimeSpanDate:
