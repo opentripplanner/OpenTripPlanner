@@ -1,4 +1,4 @@
-package org.opentripplanner.common.pqueue;
+package org.opentripplanner.astar.model;
 
 import java.util.Arrays;
 

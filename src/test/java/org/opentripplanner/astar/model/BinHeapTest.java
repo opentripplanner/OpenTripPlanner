@@ -1,4 +1,4 @@
-package org.opentripplanner.common.pqueue;
+package org.opentripplanner.astar.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  * Test correctness and relative speed of various
  * priority queue implementations.
  */
-public class TestPQueues {
+public class BinHeapTest {
 
   private static final int N = 50000;
 
