@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.api.view;
 
-import org.opentripplanner.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 
 /**
  * Provide transfer path information to debugger and path mapping.

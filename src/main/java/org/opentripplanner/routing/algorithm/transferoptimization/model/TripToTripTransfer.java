@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**

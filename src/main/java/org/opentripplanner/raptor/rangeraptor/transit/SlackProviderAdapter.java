@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
  * This class is an adapter for the internal {@link SlackProvider} which wrap the api {@link

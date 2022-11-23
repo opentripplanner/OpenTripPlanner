@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.transit;
+package org.opentripplanner.raptor.spi;
 
 /**
  * Responsible for providing {@code boardSlack}, {@code alightSlack} and {@code transferSlack}.

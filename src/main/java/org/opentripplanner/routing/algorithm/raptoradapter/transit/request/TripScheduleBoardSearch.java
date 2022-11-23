@@ -2,11 +2,11 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.function.IntUnaryOperator;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.transit.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.raptor.api.transit.RaptorTripScheduleSearch;
-import org.opentripplanner.raptor.api.transit.SearchDirection;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**

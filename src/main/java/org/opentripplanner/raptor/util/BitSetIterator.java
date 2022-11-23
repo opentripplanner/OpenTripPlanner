@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.util;
 
 import java.util.BitSet;
-import org.opentripplanner.raptor.api.transit.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterator;
 
 /**
  * TODO TGR

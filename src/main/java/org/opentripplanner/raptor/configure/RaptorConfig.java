@@ -5,9 +5,6 @@ import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.raptor.api.transit.CostCalculator;
-import org.opentripplanner.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicSearch;
@@ -18,6 +15,9 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
+import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * This class is responsible for creating a new search and holding application scoped Raptor state.

@@ -14,7 +14,7 @@ import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.stoparrival.Access;
 import org.opentripplanner.raptor._data.stoparrival.Bus;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.transit.BoardAndAlightTime;
+import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class TripTimesSearchTest implements RaptorTestConstants {

@@ -6,9 +6,9 @@ import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
-import org.opentripplanner.raptor.api.transit.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.api.transit.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * An OptimizedPath decorates a path returned from Raptor with a transfer-priority-cost and a

@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.transit.RaptorTripScheduleSearch;
-import org.opentripplanner.raptor.api.transit.SearchDirection;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 /**
  * The purpose of this class is to create a new trip search.

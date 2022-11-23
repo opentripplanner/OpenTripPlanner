@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
-import static org.opentripplanner.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.calculateEgressDepartureTime;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByRound;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByStop;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForStandardRaptor;
+import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 import java.util.Arrays;
@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 class AccessEgressFunctionsTest implements RaptorTestConstants {
 

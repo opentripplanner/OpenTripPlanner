@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.api.view;
 
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public interface PatternRideView<T extends RaptorTripSchedule> {
   ArrivalView<T> prevArrival();

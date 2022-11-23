@@ -12,18 +12,18 @@ import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparato
 
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
-import org.opentripplanner.raptor.api.transit.CostCalculator;
-import org.opentripplanner.raptor.api.transit.RaptorPathConstrainedTransferSearch;
-import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.raptor.api.transit.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.transit.SearchDirection;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.ForwardPathMapper;
 import org.opentripplanner.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.raptor.rangeraptor.path.ReversePathMapper;
+import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**

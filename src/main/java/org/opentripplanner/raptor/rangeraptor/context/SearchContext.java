@@ -12,14 +12,6 @@ import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
-import org.opentripplanner.raptor.api.transit.CostCalculator;
-import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.raptor.api.transit.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.raptor.api.transit.RaptorTripPattern;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.transit.SearchDirection;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
@@ -33,6 +25,14 @@ import org.opentripplanner.raptor.rangeraptor.transit.ReverseTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.raptor.rangeraptor.transit.SlackProviderAdapter;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 /**
  * The search context is used to hold search scoped instances and to pass these to who ever need

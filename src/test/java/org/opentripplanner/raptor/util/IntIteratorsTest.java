@@ -6,7 +6,7 @@ import static org.opentripplanner.raptor.util.IntIterators.intIncIterator;
 import static org.opentripplanner.raptor.util.IntIterators.singleValueIterator;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor.api.transit.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterator;
 
 public class IntIteratorsTest {
 

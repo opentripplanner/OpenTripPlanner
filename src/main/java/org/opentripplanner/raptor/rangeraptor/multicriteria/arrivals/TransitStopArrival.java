@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.transit.TransitArrival;
 import org.opentripplanner.raptor.api.view.TransitPathView;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.TransitArrival;
 
 /**
  * @param <T> The TripSchedule type defined by the user of the raptor API.

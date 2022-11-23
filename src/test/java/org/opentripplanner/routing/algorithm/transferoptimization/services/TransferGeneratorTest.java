@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
+import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
 
 import java.time.Duration;
 import java.util.List;
@@ -26,7 +26,7 @@ import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.util.time.TimeUtils;
 

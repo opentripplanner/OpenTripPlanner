@@ -4,16 +4,16 @@ import java.util.Collection;
 import java.util.Iterator;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.response.StopArrivals;
-import org.opentripplanner.raptor.api.transit.IntIterator;
-import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.transit.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.StopArrivalsAdaptor;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.TransitArrival;
 import org.opentripplanner.raptor.util.BitSetIterator;
 
 /**

@@ -5,7 +5,7 @@ import static java.util.stream.Collectors.toMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import org.opentripplanner.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.AStarRequestMapper;

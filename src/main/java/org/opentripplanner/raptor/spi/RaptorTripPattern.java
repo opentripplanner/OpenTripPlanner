@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.transit;
+package org.opentripplanner.raptor.spi;
 
 /**
  * This interface represent a trip pattern. A trip-pattern in the raptor context is just a list of

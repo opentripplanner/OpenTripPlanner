@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.transit;
+package org.opentripplanner.raptor.spi;
 
 /**
  * The Raptor path result contains an entity with the "special" transfer with constraints. Raptor

@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.util.time.TimeUtils;

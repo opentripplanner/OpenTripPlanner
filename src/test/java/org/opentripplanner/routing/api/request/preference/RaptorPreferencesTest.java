@@ -13,7 +13,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
-import org.opentripplanner.raptor.api.transit.SearchDirection;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 class RaptorPreferencesTest {
 

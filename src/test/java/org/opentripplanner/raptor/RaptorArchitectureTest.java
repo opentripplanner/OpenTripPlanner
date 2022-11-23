@@ -19,6 +19,7 @@ public class RaptorArchitectureTest {
   private static final Package RAPTOR_UTIL = RAPTOR.subPackage("util");
   private static final Package RAPTOR_UTIL_PARETO_SET = RAPTOR_UTIL.subPackage("paretoset");
   private static final Module RAPTOR_UTILS = Module.of(RAPTOR_UTIL, RAPTOR_UTIL_PARETO_SET);
+  private static final Package RAPTOR_SPI = RAPTOR.subPackage("spi");
   private static final Package CONFIGURE = RAPTOR.subPackage("configure");
   private static final Package SERVICE = RAPTOR.subPackage("service");
   private static final Package RANGE_RAPTOR = RAPTOR.subPackage("rangeraptor");
@@ -34,16 +35,16 @@ public class RaptorArchitectureTest {
   void enforcePackageDependenciesRaptorAPI() {
     var api = RAPTOR.subPackage("api");
     var debug = api.subPackage("debug").dependsOn(UTILS).verify();
-    var transit = api.subPackage("transit").dependsOn(UTILS).verify();
-    var view = api.subPackage("view").dependsOn(UTILS, transit).verify();
-    var path = api.subPackage("path").dependsOn(UTILS, transit).verify();
-    var request = api.subPackage("request").dependsOn(UTILS, debug, transit, path, view).verify();
-    api.subPackage("response").dependsOn(UTILS, request, path, transit).verify();
+    var spi = RAPTOR.subPackage("spi").dependsOn(UTILS).verify();
+    var view = api.subPackage("view").dependsOn(UTILS, spi).verify();
+    var path = api.subPackage("path").dependsOn(UTILS, spi).verify();
+    var request = api.subPackage("request").dependsOn(UTILS, debug, spi, path, view).verify();
+    api.subPackage("response").dependsOn(UTILS, request, path, spi).verify();
   }
 
   @Test
   void enforcePackageDependenciesUtil() {
-    RAPTOR_UTIL.dependsOn(UTILS, RAPTOR_API).verify();
+    RAPTOR_UTIL.dependsOn(UTILS, RAPTOR_SPI).verify();
     RAPTOR_UTIL_PARETO_SET.verify();
   }
 
@@ -51,10 +52,18 @@ public class RaptorArchitectureTest {
   void enforcePackageDependenciesInRaptorImplementation() {
     var rr = RANGE_RAPTOR;
 
-    var internalApi = RR_INTERNAL_API.dependsOn(RAPTOR_API).verify();
+    var internalApi = RR_INTERNAL_API.dependsOn(RAPTOR_API, RAPTOR_SPI).verify();
 
     // RangeRaptor common allowed dependencies
-    var common = Module.of(FRAMEWORK_TEXT, UTILS, GNU_TROVE, RAPTOR_API, RAPTOR_UTILS, internalApi);
+    var common = Module.of(
+      FRAMEWORK_TEXT,
+      UTILS,
+      GNU_TROVE,
+      RAPTOR_API,
+      RAPTOR_SPI,
+      RAPTOR_UTILS,
+      internalApi
+    );
 
     var debug = rr.subPackage("debug").dependsOn(common).verify();
     var lifecycle = rr.subPackage("lifecycle").dependsOn(common).verify();
@@ -68,7 +77,10 @@ public class RaptorArchitectureTest {
     var rrCommon = Module.of(common, debug, lifecycle, RR_TRANSIT, path);
 
     // Standard Range Raptor Implementation
-    var stdInternalApi = RR_STANDARD.subPackage("internalapi").dependsOn(RAPTOR_API).verify();
+    var stdInternalApi = RR_STANDARD
+      .subPackage("internalapi")
+      .dependsOn(RAPTOR_API, RAPTOR_SPI)
+      .verify();
     var stdBestTimes = RR_STANDARD
       .subPackage("besttimes")
       .dependsOn(rrCommon, stdInternalApi)
@@ -129,7 +141,7 @@ public class RaptorArchitectureTest {
   @Test
   void enforcePackageDependenciesInRaptorService() {
     SERVICE
-      .dependsOn(UTILS, RAPTOR_API, RAPTOR_UTIL, CONFIGURE, RR_INTERNAL_API, RR_TRANSIT)
+      .dependsOn(UTILS, RAPTOR_API, RAPTOR_SPI, RAPTOR_UTIL, CONFIGURE, RR_INTERNAL_API, RR_TRANSIT)
       .verify();
   }
 
@@ -138,6 +150,7 @@ public class RaptorArchitectureTest {
     CONFIGURE
       .dependsOn(
         RAPTOR_API,
+        RAPTOR_SPI,
         RANGE_RAPTOR,
         RR_INTERNAL_API,
         RR_TRANSIT,

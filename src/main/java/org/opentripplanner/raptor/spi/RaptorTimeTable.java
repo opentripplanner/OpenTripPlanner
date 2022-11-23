@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.transit;
+package org.opentripplanner.raptor.spi;
 
 /**
  * A TimeTable is a list of trips in service for the given search date and a limited time before and

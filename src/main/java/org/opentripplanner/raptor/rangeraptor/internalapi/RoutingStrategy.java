@@ -1,11 +1,11 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import java.util.function.IntConsumer;
-import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.raptor.api.transit.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorker;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.TransitArrival;
 
 /**
  * Provides alternative implementations of some logic within the {@link RangeRaptorWorker}.

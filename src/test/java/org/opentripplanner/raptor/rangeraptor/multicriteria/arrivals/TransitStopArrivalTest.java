@@ -9,7 +9,7 @@ import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public class TransitStopArrivalTest {
 

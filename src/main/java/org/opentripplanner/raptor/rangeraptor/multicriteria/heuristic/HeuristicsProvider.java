@@ -1,13 +1,13 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic;
 
 import org.opentripplanner.raptor.api.request.Optimization;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * A wrapper around {@link Heuristics} to cache elements to avoid recalculation of heuristic

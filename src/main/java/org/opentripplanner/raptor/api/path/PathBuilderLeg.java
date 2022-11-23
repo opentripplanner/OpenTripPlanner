@@ -2,14 +2,14 @@ package org.opentripplanner.raptor.api.path;
 
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.transit.BoardAndAlightTime;
-import org.opentripplanner.raptor.api.transit.CostCalculator;
-import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.transit.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.raptor.api.transit.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.BoardAndAlightTime;
+import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * This is the leg implementation for the {@link PathBuilder}. It is a private inner class which

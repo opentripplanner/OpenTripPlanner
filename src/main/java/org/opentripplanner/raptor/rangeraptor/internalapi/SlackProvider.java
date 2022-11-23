@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
-import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
 
 /**
  * Responsible for providing {@code boardSlack} and {@code alightSlack} to the Raptor algorithm - to

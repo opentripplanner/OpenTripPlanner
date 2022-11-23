@@ -1,12 +1,12 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
 import java.util.function.IntConsumer;
-import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.raptor.api.transit.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.TransitArrival;
 
 /**
  * The purpose of this class is to implement a routing strategy for finding the best arrival-time.

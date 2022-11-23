@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.util;
 
-import org.opentripplanner.raptor.api.transit.IntIterator;
+import org.opentripplanner.raptor.spi.IntIterator;
 
 public class IntIterators {
 

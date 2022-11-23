@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.response.StopArrivals;
-import org.opentripplanner.raptor.api.transit.IntIterator;
-import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorker;
+import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The contract the state must implement for the {@link RangeRaptorWorker} to do its job. This allow

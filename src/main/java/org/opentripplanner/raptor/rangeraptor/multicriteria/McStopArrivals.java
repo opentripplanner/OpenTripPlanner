@@ -3,13 +3,13 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 import java.util.BitSet;
 import java.util.Collections;
 import org.opentripplanner.raptor.api.response.StopArrivals;
-import org.opentripplanner.raptor.api.transit.IntIterator;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
+import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.BitSetIterator;
 
 /**

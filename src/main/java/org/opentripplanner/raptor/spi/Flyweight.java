@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.transit;
+package org.opentripplanner.raptor.spi;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.transit;
+package org.opentripplanner.raptor.spi;
 
 /**
  * The {@link RaptorRoute} serve as the aggregate root for the transit model needed by Raptor to

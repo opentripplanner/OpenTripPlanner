@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * This is a calculator to calculate a min-safe-transfer-time. The min-safe-transfer-time is used to

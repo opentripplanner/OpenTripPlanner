@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.transit;
+package org.opentripplanner.raptor.spi;
 
 import java.util.Iterator;
 import javax.annotation.Nonnull;

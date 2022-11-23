@@ -2,10 +2,10 @@ package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals;
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**

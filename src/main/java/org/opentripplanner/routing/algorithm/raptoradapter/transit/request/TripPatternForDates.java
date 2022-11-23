@@ -2,12 +2,12 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.BitSet;
 import java.util.function.IntUnaryOperator;
-import org.opentripplanner.raptor.api.transit.IntIterator;
-import org.opentripplanner.raptor.api.transit.RaptorRoute;
-import org.opentripplanner.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.raptor.api.transit.RaptorTripPattern;
-import org.opentripplanner.raptor.api.transit.RaptorTripScheduleSearch;
-import org.opentripplanner.raptor.api.transit.SearchDirection;
+import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorRoute;
+import org.opentripplanner.raptor.spi.RaptorTimeTable;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.IntIterators;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;

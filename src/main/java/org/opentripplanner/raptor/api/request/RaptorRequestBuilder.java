@@ -5,9 +5,9 @@ import java.util.EnumSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
-import org.opentripplanner.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.transit.SearchDirection;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 /**
  * This is a Request builder to help construct valid requests. Se the request classes for

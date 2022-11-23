@@ -5,8 +5,8 @@ import static org.opentripplanner.raptor.api.request.RaptorRequest.assertPropert
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**

@@ -7,9 +7,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.transit.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.transit.RaptorTransferConstraint;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The result path of a Raptor search describing the one possible journey.

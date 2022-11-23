@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
 import java.util.Collection;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.response.StopArrivals;
-import org.opentripplanner.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Combine Heuristics and Worker into one class to be able to retrieve the heuristics after the

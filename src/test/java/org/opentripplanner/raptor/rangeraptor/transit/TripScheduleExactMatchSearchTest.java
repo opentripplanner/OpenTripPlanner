@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestRoute;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.transit.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 
 public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
 

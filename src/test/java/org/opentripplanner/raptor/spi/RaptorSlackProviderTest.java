@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.transit;
+package org.opentripplanner.raptor.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
