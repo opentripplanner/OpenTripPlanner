@@ -3,11 +3,9 @@ package org.opentripplanner.graph_builder.module;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
@@ -116,12 +114,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
         for (RouteRequest transferProfile : transferRequests) {
-          RouteRequest streetRequest = prepareTransferRequest(transferProfile);
-
           for (NearbyStop sd : findNearbyStops(
             nearbyStopFinder,
             ts0,
-            streetRequest,
+            transferProfile,
             transferProfile.journey().transfer(),
             false
           )) {
@@ -143,7 +139,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             for (NearbyStop sd : findNearbyStops(
               nearbyStopFinder,
               ts0,
-              streetRequest,
+              transferProfile,
               transferProfile.journey().transfer(),
               true
             )) {
@@ -197,17 +193,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     // No inputs
   }
 
-  private static RouteRequest prepareTransferRequest(RouteRequest transferProfile) {
-    var streetRequest = transferProfile.clone();
-
-    // Make sure we use a generic request, without any specific fields set
-    streetRequest.setArriveBy(false);
-    streetRequest.setDateTime(Instant.ofEpochSecond(0));
-    streetRequest.setFrom(null);
-    streetRequest.setTo(null);
-    return streetRequest;
-  }
-
   private static Iterable<NearbyStop> findNearbyStops(
     NearbyStopFinder nearbyStopFinder,
     Vertex vertex,
@@ -225,37 +210,5 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       : nearbyStopFinder.findNearbyStops(vertex, request, streetRequest, reverseDirection);
   }
 
-  private static class TransferKey {
-
-    private final StopLocation source;
-    private final StopLocation target;
-    private final List<Edge> edges;
-
-    private TransferKey(StopLocation source, StopLocation target, List<Edge> edges) {
-      this.source = source;
-      this.target = target;
-      this.edges = edges;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(source, target, edges);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      final TransferKey that = (TransferKey) o;
-      return (
-        source.equals(that.source) &&
-        target.equals(that.target) &&
-        Objects.equals(edges, that.edges)
-      );
-    }
-  }
+  private record TransferKey(StopLocation source, StopLocation target, List<Edge> edges) {}
 }

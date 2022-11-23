@@ -10,7 +10,6 @@ public class AStarRequestMapper {
       .of()
       .withStartTime(opt.dateTime())
       .withPreferences(opt.preferences())
-      .withArriveBy(opt.arriveBy())
       .withWheelchair(opt.wheelchair())
       .withParking(opt.journey().parking())
       .withRental(opt.journey().rental())
