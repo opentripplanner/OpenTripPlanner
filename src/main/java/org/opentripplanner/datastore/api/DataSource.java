@@ -6,8 +6,8 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import org.apache.commons.io.IOUtils;
-import org.opentripplanner.common.FileSizeToTextConverter;
 import org.opentripplanner.datastore.OtpDataStore;
+import org.opentripplanner.framework.text.FileSizeToTextConverter;
 
 /**
  * A data source is generalized type to represent an file, database blob or unit that OTP read or

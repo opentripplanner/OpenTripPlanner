@@ -1,7 +1,7 @@
-package org.opentripplanner.common;
+package org.opentripplanner.framework.text;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.common.FileSizeToTextConverter.fileSizeToString;
+import static org.opentripplanner.framework.text.FileSizeToTextConverter.fileSizeToString;
 
 import org.junit.jupiter.api.Test;
 

@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import org.opentripplanner.common.FileSizeToTextConverter;
+import org.opentripplanner.framework.text.FileSizeToTextConverter;
 import org.opentripplanner.util.time.DurationUtils;
 
 /**

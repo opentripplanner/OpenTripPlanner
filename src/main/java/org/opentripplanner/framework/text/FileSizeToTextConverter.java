@@ -1,4 +1,4 @@
-package org.opentripplanner.common;
+package org.opentripplanner.framework.text;
 
 import java.util.Locale;
 
