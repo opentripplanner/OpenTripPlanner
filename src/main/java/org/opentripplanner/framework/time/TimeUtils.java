@@ -118,7 +118,9 @@ public class TimeUtils {
   }
 
   public static String timeToStrCompactNoSeconds(int time) {
-    return timeToStrCompact((int) Duration.ofSeconds(time).truncatedTo(ChronoUnit.MINUTES).toSeconds());
+    return timeToStrCompact(
+      (int) Duration.ofSeconds(time).truncatedTo(ChronoUnit.MINUTES).toSeconds()
+    );
   }
 
   public static String durationToStrCompact(Duration duration) {
