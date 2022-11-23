@@ -11,11 +11,11 @@ import org.locationtech.jts.index.strtree.STRtree;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.locationtech.jts.simplify.DouglasPeuckerSimplifier;
-import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

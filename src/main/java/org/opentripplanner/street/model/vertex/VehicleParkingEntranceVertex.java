@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;

@@ -3,8 +3,8 @@ package org.opentripplanner.routing.graph.index;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.linking.Scope;
 
 /**

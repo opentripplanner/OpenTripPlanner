@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.routing.graph.Graph;
 
 /**
  * This class is used to keep track of temporary edges added to the graph, so that they can be

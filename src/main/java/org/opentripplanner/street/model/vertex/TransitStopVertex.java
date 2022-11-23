@@ -2,10 +2,10 @@ package org.opentripplanner.street.model.vertex;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;

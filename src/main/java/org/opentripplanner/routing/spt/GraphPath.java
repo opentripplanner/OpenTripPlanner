@@ -3,9 +3,9 @@ package org.opentripplanner.routing.spt;
 import java.util.LinkedList;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**

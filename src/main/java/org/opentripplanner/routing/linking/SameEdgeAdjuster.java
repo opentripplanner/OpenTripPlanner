@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 
 public class SameEdgeAdjuster {

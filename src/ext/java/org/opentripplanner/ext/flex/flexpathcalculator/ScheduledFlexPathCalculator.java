@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 
 /**
  * Calculate the driving times based on the scheduled timetable for the route.
