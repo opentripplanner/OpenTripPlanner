@@ -43,8 +43,12 @@ public class ParkAPIUpdaterTest {
     var first = parkingLots.get(0);
     assertEquals("Parkplatz Alenberghalle", first.getName().toString());
     assertEquals(
-      "OHCalendar{zoneId: Europe/Berlin, openingHours: [Mo-Su 0:00-23:59:59]}",
+      "OHCalendar{zoneId: Europe/Berlin, openingHours: [Mo-Su 0:00-23:59]}",
       first.getOpeningHours().toString()
+    );
+    assertEquals(
+      "Mo-Su 0:00-23:59",
+      first.getOpeningHours().osmFormat()
     );
     assertTrue(first.hasAnyCarPlaces());
     assertNull(first.getCapacity());

@@ -47,11 +47,11 @@ public class OpeningHours implements Comparable<OpeningHours>, Serializable {
   @Override
   public String toString() {
     return (
-      periodDescription +
+      toOsm(periodDescription) +
       " " +
-      TimeUtils.timeToStrCompact(startTime) +
+      TimeUtils.timeToStrCompactNoSeconds(startTime) +
       "-" +
-      TimeUtils.timeToStrCompact(endTime)
+      TimeUtils.timeToStrCompactNoSeconds(endTime)
     );
   }
 
@@ -71,5 +71,19 @@ public class OpeningHours implements Comparable<OpeningHours>, Serializable {
     return (
       days.get(day) && this.startTime <= secondsSinceMidnight && secondsSinceMidnight <= endTime
     );
+  }
+
+  private static String toOsm(String description) {
+    return switch (description.toLowerCase()) {
+      case "business days" -> "Mo-Fr";
+      case "monday" -> "Mo";
+      case "tuesday" -> "Tu";
+      case "wednesday" -> "We";
+      case "thursday" -> "Th";
+      case "friday" -> "Fr";
+      case "saturday" -> "Sa";
+      case "sunday" -> "Su";
+      default -> description;
+    };
   }
 }

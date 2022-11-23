@@ -103,6 +103,7 @@ public class HslParkUpdaterTest {
     assertNull(second.getCapacity().getBicycleSpaces());
     assertFalse(second.hasRealTimeData());
     assertNull(second.getAvailability());
+
     assertEquals(
       "OHCalendar{" +
       "zoneId: Europe/Helsinki, " +
