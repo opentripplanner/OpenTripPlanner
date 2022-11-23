@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.AStarBuilder;
+import org.opentripplanner.astar.DominanceFunction;
+import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
@@ -15,8 +17,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

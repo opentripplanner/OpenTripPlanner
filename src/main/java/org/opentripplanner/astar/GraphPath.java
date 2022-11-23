@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.spt;
+package org.opentripplanner.astar;
 
 import java.util.LinkedList;
 import org.locationtech.jts.geom.LineString;

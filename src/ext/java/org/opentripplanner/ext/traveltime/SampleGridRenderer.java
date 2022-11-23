@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.traveltime;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.traveltime.geometry.AccumulativeGridSampler;
 import org.opentripplanner.ext.traveltime.geometry.AccumulativeMetric;
@@ -8,7 +9,6 @@ import org.opentripplanner.ext.traveltime.geometry.SparseMatrixZSampleGrid;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 import org.opentripplanner.ext.traveltime.spt.SPTVisitor;
 import org.opentripplanner.ext.traveltime.spt.SPTWalker;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

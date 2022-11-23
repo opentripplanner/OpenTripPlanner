@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm;
+package org.opentripplanner.astar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,17 +10,15 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.astar.AStarBuilder;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
+import org.opentripplanner.routing.algorithm.MultiTargetTerminationStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteEdge;
 import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.routing.graph.TemporaryConcreteEdge;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 

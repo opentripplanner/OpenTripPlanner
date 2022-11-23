@@ -15,9 +15,6 @@ import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.framework.time.DateUtils;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

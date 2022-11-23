@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.astar.GraphPath;
 
 public class PathComparatorTest {
 

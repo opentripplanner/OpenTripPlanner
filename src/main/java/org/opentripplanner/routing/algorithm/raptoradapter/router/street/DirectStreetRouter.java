@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collections;
 import java.util.List;
+import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -11,7 +12,6 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 public class DirectStreetRouter {

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.spt;
+package org.opentripplanner.astar;
 
 import java.io.Serializable;
 import java.util.Objects;

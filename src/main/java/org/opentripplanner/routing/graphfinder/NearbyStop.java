@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**

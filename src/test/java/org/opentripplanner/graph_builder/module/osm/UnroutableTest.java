@@ -12,6 +12,8 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.AStarBuilder;
+import org.opentripplanner.astar.GraphPath;
+import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
@@ -19,8 +21,6 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 /**

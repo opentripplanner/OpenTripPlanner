@@ -24,9 +24,6 @@ import org.opentripplanner.routing.core.AStarRequestMapper;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class AStarBuilder {
 

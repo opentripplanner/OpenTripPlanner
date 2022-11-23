@@ -4,13 +4,13 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.astar.AStarBuilder;
+import org.opentripplanner.astar.DominanceFunction;
+import org.opentripplanner.astar.GraphPath;
+import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network

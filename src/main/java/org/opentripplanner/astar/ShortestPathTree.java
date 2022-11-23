@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.spt;
+package org.opentripplanner.astar;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;

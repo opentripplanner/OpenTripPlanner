@@ -17,6 +17,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.AStarBuilder;
+import org.opentripplanner.astar.DominanceFunction;
+import org.opentripplanner.astar.GraphPath;
+import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.datastore.api.FileType;
@@ -32,9 +35,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TriangleInequalityTest {

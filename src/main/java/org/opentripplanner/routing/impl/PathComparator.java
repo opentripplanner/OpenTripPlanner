@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.impl;
 
 import java.util.Comparator;
-import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.astar.GraphPath;
 
 public class PathComparator implements Comparator<GraphPath> {
 
