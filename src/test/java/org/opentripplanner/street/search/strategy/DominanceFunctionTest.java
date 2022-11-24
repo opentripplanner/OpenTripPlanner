@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateData;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 public class DominanceFunctionTest {
 

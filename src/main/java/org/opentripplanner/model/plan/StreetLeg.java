@@ -5,10 +5,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.StreetNote;
@@ -28,13 +26,10 @@ public class StreetLeg implements Leg {
   private final Place from;
   private final Place to;
   private final int generalizedCost;
-  private final Double elevationLost;
-  private final Double elevationGained;
-
   private final LineString legGeometry;
   private final List<WalkStep> walkSteps;
   private final Set<StreetNote> streetNotes;
-  private final List<P2<Double>> legElevation;
+  private final ElevationProfile elevationProfile;
 
   private final FeedScopedId pathwayId;
   private final Boolean walkingBike;
@@ -51,11 +46,9 @@ public class StreetLeg implements Leg {
     this.from = builder.getFrom();
     this.to = builder.getTo();
     this.generalizedCost = builder.getGeneralizedCost();
-    this.legElevation = builder.getElevation();
+    this.elevationProfile = builder.getElevationProfile();
     this.legGeometry = builder.getGeometry();
     this.walkSteps = builder.getWalkSteps();
-    this.elevationGained = calculateElevationGained(legElevation);
-    this.elevationLost = calculateElevationLost(legElevation);
     this.streetNotes = Set.copyOf(builder.getStreetNotes());
     this.pathwayId = builder.getPathwayId();
     this.walkingBike = builder.getWalkingBike();
@@ -122,26 +115,12 @@ public class StreetLeg implements Leg {
     return legGeometry;
   }
 
-  List<P2<Double>> getRawLegElevation() {
-    return legElevation;
-  }
-
   /**
    * Get elevation profile, with values rounded to two decimals.
    */
   @Override
-  public List<P2<Double>> getRoundedLegElevation() {
-    return normalizeElevation(legElevation);
-  }
-
-  @Override
-  public Double getElevationGained() {
-    return elevationGained;
-  }
-
-  @Override
-  public Double getElevationLost() {
-    return elevationLost;
+  public ElevationProfile getElevationProfile() {
+    return elevationProfile;
   }
 
   @Override
@@ -214,57 +193,12 @@ public class StreetLeg implements Leg {
       .addNum("cost", generalizedCost)
       .addObj("gtfsPathwayId", pathwayId)
       .addObj("legGeometry", legGeometry)
-      .addStr("legElevation", legElevation != null ? legElevation.toString() : null)
-      .addNum("elevationGained", elevationGained, "m")
-      .addNum("elevationLost", elevationLost, "m")
+      .addObj("legElevation", elevationProfile)
       .addCol("walkSteps", walkSteps)
       .addCol("streetNotes", streetNotes)
       .addBool("walkingBike", walkingBike)
       .addBool("rentedVehicle", rentedVehicle)
       .addStr("bikeRentalNetwork", vehicleRentalNetwork)
       .toString();
-  }
-
-  static List<P2<Double>> normalizeElevation(List<P2<Double>> elevation) {
-    return elevation == null
-      ? null
-      : elevation
-        .stream()
-        .map(it ->
-          new P2<>(DoubleUtils.roundTo2Decimals(it.first), DoubleUtils.roundTo2Decimals(it.second))
-        )
-        .toList();
-  }
-
-  private static Double calculateElevationGained(List<P2<Double>> legElevation) {
-    return calculateElevationChange(legElevation, v -> v > 0.0);
-  }
-
-  private static Double calculateElevationLost(List<P2<Double>> legElevation) {
-    return calculateElevationChange(legElevation, v -> v < 0.0);
-  }
-
-  private static Double calculateElevationChange(
-    List<P2<Double>> legElevation,
-    Predicate<Double> elevationFilter
-  ) {
-    if (legElevation == null) {
-      return null;
-    }
-    double sum = 0.0;
-    Double lastElevation = null;
-
-    for (final P2<Double> p2 : legElevation) {
-      double elevation = p2.second;
-      if (lastElevation != null) {
-        double change = elevation - lastElevation;
-        if (elevationFilter.test(change)) {
-          sum += Math.abs(change);
-        }
-      }
-      lastElevation = elevation;
-    }
-
-    return DoubleUtils.roundTo2Decimals(sum);
   }
 }

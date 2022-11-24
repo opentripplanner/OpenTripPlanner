@@ -4,9 +4,9 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
-import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 public class SimpleConcreteEdge extends Edge {

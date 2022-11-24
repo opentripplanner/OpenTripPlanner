@@ -11,11 +11,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.plan.ElevationProfile;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -185,13 +185,12 @@ public class GraphPathToItineraryMapper {
   /**
    * TODO: This is mindless. Why is this set on leg, rather than on a walk step? Now only the first pathway is used
    */
-  private static StreetLegBuilder setPathwayInfo(StreetLegBuilder leg, List<State> legStates) {
+  private static void setPathwayInfo(StreetLegBuilder leg, List<State> legStates) {
     for (State legsState : legStates) {
       if (legsState.getBackEdge() instanceof PathwayEdge pe) {
         leg.withPathwayId(pe.getId());
       }
     }
-    return leg;
   }
 
   /**
@@ -257,41 +256,41 @@ public class GraphPathToItineraryMapper {
       .orElse(TraverseMode.WALK);
   }
 
-  private static List<P2<Double>> encodeElevationProfileWithNaN(
+  private static ElevationProfile encodeElevationProfileWithNaN(
     Edge edge,
     double distanceOffset,
     double heightOffset
   ) {
     var elevations = encodeElevationProfile(edge, distanceOffset, heightOffset);
     if (elevations.isEmpty()) {
-      return List.of(
-        new P2<>(distanceOffset, Double.NaN),
-        new P2<>(distanceOffset + edge.getDistanceMeters(), Double.NaN)
-      );
+      return ElevationProfile
+        .of()
+        .stepYUnknown(distanceOffset)
+        .stepYUnknown(distanceOffset + edge.getDistanceMeters())
+        .build();
     }
     return elevations;
   }
 
-  private static List<P2<Double>> encodeElevationProfile(
+  private static ElevationProfile encodeElevationProfile(
     Edge edge,
     double distanceOffset,
     double heightOffset
   ) {
-    ArrayList<P2<Double>> out = new ArrayList<P2<Double>>();
-
     if (!(edge instanceof StreetEdge elevEdge)) {
-      return out;
+      return ElevationProfile.empty();
     }
     if (elevEdge.getElevationProfile() == null) {
-      return out;
+      return ElevationProfile.empty();
     }
 
+    var out = ElevationProfile.of();
     Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
     for (final Coordinate coordinate : coordArr) {
-      out.add(new P2<>(coordinate.x + distanceOffset, coordinate.y + heightOffset));
+      out.step(coordinate.x + distanceOffset, coordinate.y + heightOffset);
     }
 
-    return out;
+    return out.build();
   }
 
   /**
@@ -391,7 +390,9 @@ public class GraphPathToItineraryMapper {
       .withDistanceMeters(distanceMeters)
       .withGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
       .withGeometry(geometry)
-      .withElevation(makeElevation(edges, firstState.getPreferences().system().geoidElevation()))
+      .withElevationProfile(
+        makeElevation(edges, firstState.getPreferences().system().geoidElevation())
+      )
       .withWalkSteps(walkSteps)
       .withRentedVehicle(firstState.isRentingVehicle())
       .withWalkingBike(false);
@@ -416,7 +417,7 @@ public class GraphPathToItineraryMapper {
    * @param leg    The leg to add the mode and alerts to
    * @param states The states that go with the leg
    */
-  private StreetLegBuilder addStreetNotes(StreetLegBuilder leg, List<State> states) {
+  private void addStreetNotes(StreetLegBuilder leg, List<State> states) {
     for (State state : states) {
       Set<StreetNote> streetNotes = streetNotesService.getNotes(state);
 
@@ -424,43 +425,25 @@ public class GraphPathToItineraryMapper {
         leg.withStreetNotes(streetNotes);
       }
     }
-    return leg;
   }
 
-  private List<P2<Double>> makeElevation(List<Edge> edges, boolean geoidElevation) {
-    ArrayList<P2<Double>> elevationProfile = new ArrayList<>();
+  private ElevationProfile makeElevation(List<Edge> edges, boolean geoidElevation) {
+    var builder = ElevationProfile.of();
 
     double heightOffset = geoidElevation ? ellipsoidToGeoidDifference : 0;
 
     double distanceOffset = 0;
     for (final Edge edge : edges) {
       if (edge.getDistanceMeters() > 0) {
-        elevationProfile.addAll(encodeElevationProfileWithNaN(edge, distanceOffset, heightOffset));
+        builder.add(encodeElevationProfileWithNaN(edge, distanceOffset, heightOffset));
         distanceOffset += edge.getDistanceMeters();
       }
     }
 
-    // Remove repeated values, preserving the first and last value
-    for (int i = elevationProfile.size() - 3; i >= 0; i--) {
-      var first = elevationProfile.get(i);
-      var second = elevationProfile.get(i + 1);
-      var third = elevationProfile.get(i + 2);
+    builder.removeDuplicateSteps();
 
-      if (
-        Objects.equals(first.second, second.second) && Objects.equals(second.second, third.second)
-      ) {
-        elevationProfile.remove(i + 1);
-      } else if (first.second.isNaN() && second.second.isNaN() && third.second.isNaN()) {
-        elevationProfile.remove(i + 1);
-      } else if (Objects.equals(first, second)) {
-        elevationProfile.remove(i + 1);
-      }
-    }
+    var p = builder.build();
 
-    if (elevationProfile.stream().allMatch(p2 -> p2.second.isNaN())) {
-      return null;
-    }
-
-    return elevationProfile;
+    return p.isAllYUnknown() ? null : p;
   }
 }

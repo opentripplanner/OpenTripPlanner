@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

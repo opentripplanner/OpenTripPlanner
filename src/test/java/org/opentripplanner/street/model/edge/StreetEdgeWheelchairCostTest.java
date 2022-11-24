@@ -13,8 +13,8 @@ import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.VariableSource;
 
 class StreetEdgeWheelchairCostTest extends GraphRoutingTest {

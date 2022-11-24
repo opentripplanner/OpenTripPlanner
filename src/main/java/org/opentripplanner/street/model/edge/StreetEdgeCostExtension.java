@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.edge;
 
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
 
 /**
  * This interface allows us to set ONE extension for adding extra cost to an {@link StreetEdge}.

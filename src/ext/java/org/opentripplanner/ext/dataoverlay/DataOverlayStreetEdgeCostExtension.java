@@ -11,8 +11,8 @@ import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.dataoverlay.routing.Parameter;
 import org.opentripplanner.street.model.edge.StreetEdgeCostExtension;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,22 +1,21 @@
 package org.opentripplanner.api.mapping;
 
-import java.util.List;
-import org.opentripplanner.common.model.P2;
+import org.opentripplanner.model.plan.ElevationProfile;
 
 public class ElevationMapper {
 
-  public static String mapElevation(List<P2<Double>> pairs) {
-    if (pairs == null) {
+  public static String mapElevation(ElevationProfile p) {
+    if (p == null) {
       return null;
     }
     StringBuilder str = new StringBuilder();
-    for (P2<Double> pair : pairs) {
-      str.append(Math.round(pair.first));
+    for (var step : p.steps()) {
+      str.append(Math.round(step.x()));
       str.append(",");
-      if (Double.isNaN(pair.second)) {
+      if (step.isYUnknown()) {
         str.append("NaN");
       } else {
-        str.append(Math.round(pair.second * 10.0) / 10.0);
+        str.append(Math.round(step.y() * 10.0) / 10.0);
       }
       str.append(",");
     }
