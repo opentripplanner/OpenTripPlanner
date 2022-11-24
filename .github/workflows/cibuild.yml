@@ -58,12 +58,13 @@ jobs:
   docs:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
-    needs: build
+    #needs: build
     env:
       REMOTE: docs
       LOCAL_BRANCH: local-pages
       REMOTE_BRANCH: main
       TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
+      MASTER_BRANCH_VERSION: v2.2.0
 
     steps:
       - uses: actions/checkout@v3.1.0
@@ -81,18 +82,19 @@ jobs:
           # mike has support for specifing the origin but then it tries to rebase the _local_ gh-pages
           # branch onto the remote which fails. that's the reason for this git hackery.
           
-          deploy_version="dev-2.x"
-          if [ ${{ github.ref }} = 'refs/heads/master' ]; 
-          then
-            deploy_version="latest"
-          fi
-
           git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/docs.git 
           git fetch $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
+          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
+
           # prefix is the root folder where to deploy the HTML, we use 'en' to emulate the URL
           # structure of readthedocs
-          mike deploy --branch $LOCAL_BRANCH --prefix en ${deploy_version}
-          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
+          
+          if [ ${{ github.ref }} = 'refs/heads/master' ]; 
+          then
+            mike deploy --branch $LOCAL_BRANCH --prefix en --update-aliases $MASTER_BRANCH_VERSION latest
+          else
+            mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
+          fi
 
   container-image:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
