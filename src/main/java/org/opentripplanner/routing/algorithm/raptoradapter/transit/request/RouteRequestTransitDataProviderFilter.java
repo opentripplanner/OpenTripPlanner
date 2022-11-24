@@ -157,8 +157,8 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       bannedAgenciesCollection.isEmpty() &&
       whiteListedRoutes.isEmpty() &&
       whiteListedAgenciesCollection.isEmpty() &&
-        whiteListedGroupsOfRoutesCollection.isEmpty() &&
-        bannedGroupsOfRoutesCollection.isEmpty()
+      whiteListedGroupsOfRoutesCollection.isEmpty() &&
+      bannedGroupsOfRoutesCollection.isEmpty()
     ) {
       return List.of();
     }
@@ -171,7 +171,15 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     List<FeedScopedId> ret = new ArrayList<>();
     for (Route route : routes) {
       if (
-        routeIsBanned(bannedAgencies, bannedRoutes, whiteListedAgencies, whiteListedRoutes, whiteListedGroupsOfRoutes, bannedGroupOfRoutes, route)
+        routeIsBanned(
+          bannedAgencies,
+          bannedRoutes,
+          whiteListedAgencies,
+          whiteListedRoutes,
+          whiteListedGroupsOfRoutes,
+          bannedGroupOfRoutes,
+          route
+        )
       ) {
         ret.add(route.getId());
       }
@@ -194,7 +202,6 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     Set<FeedScopedId> bannedGroupsOfRoutes,
     Route route
   ) {
-
     /* check if agency is banned for this plan */
     if (!bannedAgencies.isEmpty()) {
       if (bannedAgencies.contains(route.getAgency().getId())) {
@@ -209,7 +216,11 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       }
     }
 
-    var groupOfRoutesIDs = route.getGroupsOfRoutes().stream().map(AbstractTransitEntity::getId).toList();
+    var groupOfRoutesIDs = route
+      .getGroupsOfRoutes()
+      .stream()
+      .map(AbstractTransitEntity::getId)
+      .toList();
 
     if (!bannedGroupsOfRoutes.isEmpty()) {
       for (var id : groupOfRoutesIDs) {

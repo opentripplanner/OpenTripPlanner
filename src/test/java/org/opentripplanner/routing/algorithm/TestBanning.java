@@ -77,31 +77,32 @@ public class TestBanning {
 
     transitRequest.setWhiteListedGroupsOfRoutes(List.of(id("RUT:GroupOfRoutes:1")));
 
-    bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
-      Set.copyOf(transitRequest.bannedAgencies()),
-      transitRequest.bannedRoutes(),
-      Set.copyOf(transitRequest.whiteListedAgencies()),
-      transitRequest.whiteListedRoutes(),
-      transitRequest.whiteListedGroupsOfRoutes(),
-      transitRequest.bannedGroupsOfRoutes(),
-      routes
-    );
+    bannedRoutes =
+      RouteRequestTransitDataProviderFilter.bannedRoutes(
+        Set.copyOf(transitRequest.bannedAgencies()),
+        transitRequest.bannedRoutes(),
+        Set.copyOf(transitRequest.whiteListedAgencies()),
+        transitRequest.whiteListedRoutes(),
+        transitRequest.whiteListedGroupsOfRoutes(),
+        transitRequest.bannedGroupsOfRoutes(),
+        routes
+      );
 
     assertEquals(1, bannedRoutes.size());
     assertTrue(bannedRoutes.contains(id("RUT:Route:2")));
 
-
     transitRequest.setWhiteListedGroupsOfRoutes(List.of(id("RUT:GroupOfRoutes:2")));
 
-    bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
-      Set.copyOf(transitRequest.bannedAgencies()),
-      transitRequest.bannedRoutes(),
-      Set.copyOf(transitRequest.whiteListedAgencies()),
-      transitRequest.whiteListedRoutes(),
-      transitRequest.whiteListedGroupsOfRoutes(),
-      transitRequest.bannedGroupsOfRoutes(),
-      routes
-    );
+    bannedRoutes =
+      RouteRequestTransitDataProviderFilter.bannedRoutes(
+        Set.copyOf(transitRequest.bannedAgencies()),
+        transitRequest.bannedRoutes(),
+        Set.copyOf(transitRequest.whiteListedAgencies()),
+        transitRequest.whiteListedRoutes(),
+        transitRequest.whiteListedGroupsOfRoutes(),
+        transitRequest.bannedGroupsOfRoutes(),
+        routes
+      );
 
     assertEquals(1, bannedRoutes.size());
     assertTrue(bannedRoutes.contains(id("RUT:Route:1")));
@@ -115,32 +116,33 @@ public class TestBanning {
 
     transitRequest.setBannedGroupsOfRoutes(List.of(id("RUT:GroupOfRoutes:1")));
 
-    bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
-      Set.copyOf(transitRequest.bannedAgencies()),
-      transitRequest.bannedRoutes(),
-      Set.copyOf(transitRequest.whiteListedAgencies()),
-      transitRequest.whiteListedRoutes(),
-      transitRequest.whiteListedGroupsOfRoutes(),
-      transitRequest.bannedGroupsOfRoutes(),
-      routes
-    );
+    bannedRoutes =
+      RouteRequestTransitDataProviderFilter.bannedRoutes(
+        Set.copyOf(transitRequest.bannedAgencies()),
+        transitRequest.bannedRoutes(),
+        Set.copyOf(transitRequest.whiteListedAgencies()),
+        transitRequest.whiteListedRoutes(),
+        transitRequest.whiteListedGroupsOfRoutes(),
+        transitRequest.bannedGroupsOfRoutes(),
+        routes
+      );
 
     assertEquals(2, bannedRoutes.size());
     assertTrue(bannedRoutes.contains(id("RUT:Route:1")));
     assertTrue(bannedRoutes.contains(id("RUT:Route:3")));
 
-
     transitRequest.setBannedGroupsOfRoutes(List.of(id("RUT:GroupOfRoutes:2")));
 
-    bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
-      Set.copyOf(transitRequest.bannedAgencies()),
-      transitRequest.bannedRoutes(),
-      Set.copyOf(transitRequest.whiteListedAgencies()),
-      transitRequest.whiteListedRoutes(),
-      transitRequest.whiteListedGroupsOfRoutes(),
-      transitRequest.bannedGroupsOfRoutes(),
-      routes
-    );
+    bannedRoutes =
+      RouteRequestTransitDataProviderFilter.bannedRoutes(
+        Set.copyOf(transitRequest.bannedAgencies()),
+        transitRequest.bannedRoutes(),
+        Set.copyOf(transitRequest.whiteListedAgencies()),
+        transitRequest.whiteListedRoutes(),
+        transitRequest.whiteListedGroupsOfRoutes(),
+        transitRequest.bannedGroupsOfRoutes(),
+        routes
+      );
 
     assertEquals(2, bannedRoutes.size());
     assertTrue(bannedRoutes.contains(id("RUT:Route:2")));
@@ -155,15 +157,18 @@ public class TestBanning {
     GroupOfRoutes groupOfRoutes2 = GroupOfRoutes.of(id("RUT:GroupOfRoutes:2")).build();
 
     return List.of(
-      TransitModelForTest.route("RUT:Route:1")
+      TransitModelForTest
+        .route("RUT:Route:1")
         .withAgency(agency1)
         .withGroupOfRoutes(List.of(groupOfRoutes1))
         .build(),
-      TransitModelForTest.route("RUT:Route:2")
+      TransitModelForTest
+        .route("RUT:Route:2")
         .withGroupOfRoutes(List.of(groupOfRoutes2))
         .withAgency(agency1)
         .build(),
-      TransitModelForTest.route("RUT:Route:3")
+      TransitModelForTest
+        .route("RUT:Route:3")
         .withGroupOfRoutes(List.of(groupOfRoutes1, groupOfRoutes2))
         .withAgency(agency2)
         .build()

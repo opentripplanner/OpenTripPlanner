@@ -183,12 +183,14 @@ public class TransmodelGraphQLPlanner {
 
     callWith.argument(
       "whiteListed.groupsOfLines",
-      (List<String> groupsOfLines) -> request.journey().transit().setWhiteListedGroupsOfRoutes(mapIDsToDomain(groupsOfLines))
+      (List<String> groupsOfLines) ->
+        request.journey().transit().setWhiteListedGroupsOfRoutes(mapIDsToDomain(groupsOfLines))
     );
 
     callWith.argument(
       "banned.groupsOfLines",
-      (List<String> groupsOfLines) -> request.journey().transit().setBannedGroupsOfRoutes(mapIDsToDomain(groupsOfLines))
+      (List<String> groupsOfLines) ->
+        request.journey().transit().setBannedGroupsOfRoutes(mapIDsToDomain(groupsOfLines))
     );
 
     // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
