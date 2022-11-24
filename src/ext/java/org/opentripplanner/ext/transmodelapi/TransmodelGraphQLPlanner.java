@@ -7,6 +7,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -26,6 +27,7 @@ import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.FilterRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -132,12 +134,16 @@ public class TransmodelGraphQLPlanner {
     callWith.argument(
       "whiteListed.authorities",
       (Collection<String> authorities) ->
-        request.journey().transit().setWhiteListedAgencies(mapIDsToDomain(authorities))
+        request
+          .journey()
+          .transit()
+          .commonFilters()
+          .setWhiteListedAgencies(mapIDsToDomain(authorities))
     );
     callWith.argument(
       "banned.authorities",
       (Collection<String> authorities) ->
-        request.journey().transit().setBannedAgencies(mapIDsToDomain(authorities))
+        request.journey().transit().commonFilters().setBannedAgencies(mapIDsToDomain(authorities))
     );
 
     callWith.argument(
@@ -155,17 +161,22 @@ public class TransmodelGraphQLPlanner {
         request
           .journey()
           .transit()
+          .commonFilters()
           .setWhiteListedRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)))
     );
     callWith.argument(
       "banned.lines",
       (List<String> lines) ->
-        request.journey().transit().setBannedRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)))
+        request
+          .journey()
+          .transit()
+          .commonFilters()
+          .setBannedRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)))
     );
     callWith.argument(
       "banned.serviceJourneys",
       (Collection<String> serviceJourneys) ->
-        request.journey().transit().setBannedTrips(mapIDsToDomain(serviceJourneys))
+        request.journey().transit().commonFilters().setBannedTrips(mapIDsToDomain(serviceJourneys))
     );
 
     // callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
@@ -184,13 +195,21 @@ public class TransmodelGraphQLPlanner {
     callWith.argument(
       "whiteListed.groupsOfLines",
       (List<String> groupsOfLines) ->
-        request.journey().transit().setWhiteListedGroupsOfRoutes(mapIDsToDomain(groupsOfLines))
+        request
+          .journey()
+          .transit()
+          .commonFilters()
+          .setWhiteListedGroupsOfRoutes(mapIDsToDomain(groupsOfLines))
     );
 
     callWith.argument(
       "banned.groupsOfLines",
       (List<String> groupsOfLines) ->
-        request.journey().transit().setBannedGroupsOfRoutes(mapIDsToDomain(groupsOfLines))
+        request
+          .journey()
+          .transit()
+          .commonFilters()
+          .setBannedGroupsOfRoutes(mapIDsToDomain(groupsOfLines))
     );
 
     // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
@@ -201,6 +220,8 @@ public class TransmodelGraphQLPlanner {
     // callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
     RequestModes modes = getModes(environment, callWith);
+    request.journey().transit().setFeedIdSpecificFilters(getFilters(environment, callWith));
+
     if (modes != null) {
       request.journey().setModes(modes);
     }
@@ -328,25 +349,111 @@ public class TransmodelGraphQLPlanner {
         mBuilder.withTransitModes(MainAndSubMode.all());
       } else {
         mBuilder.clearTransitModes();
-        for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
-          if (modeWithSubmodes.containsKey("transportMode")) {
-            TransitMode mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
-            if (modeWithSubmodes.containsKey("transportSubModes")) {
-              var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
-                "transportSubModes"
-              );
-              for (TransmodelTransportSubmode submode : transportSubModes) {
-                mBuilder.withTransitMode(mainMode, submode.getValue());
-              }
-            } else {
-              mBuilder.withTransitMode(mainMode);
-            }
-          }
-        }
+        setTransportModes(transportModes.get(), mBuilder);
       }
       return mBuilder.build();
     }
     return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, FilterRequest> getFilters(
+    DataFetchingEnvironment environment,
+    DataFetcherDecorator callWith
+  ) {
+    if (GqlUtil.hasArgument(environment, "filters")) {
+      ElementWrapper<List<LinkedHashMap<String, ?>>> filters = new ElementWrapper<>();
+      callWith.argument("filters", filters::set);
+
+      var filterMap = new HashMap<String, FilterRequest>();
+
+      for (var filter : filters.get()) {
+        var feedIds = ((LinkedHashMap<String, List<String>>) filter.get("selector")).get("feedId");
+        var filterRequest = new FilterRequest();
+
+        // Map transport modes
+        if (filter.containsKey("transportModes")) {
+          var transportModes = (List<LinkedHashMap<String, ?>>) filter.get("transportModes");
+          RequestModesBuilder mBuilder = RequestModes.of();
+          mBuilder.clearTransitModes();
+          setTransportModes(transportModes, mBuilder);
+
+          var modes = mBuilder.build();
+          filterRequest.setModes(modes.transitModes);
+        }
+
+        // Map whitelisted
+        if (filter.containsKey("whiteListed")) {
+          var whiteListed = (LinkedHashMap<String, List<String>>) filter.get("whiteListed");
+
+          if (whiteListed.containsKey("authorities")) {
+            filterRequest.setWhiteListedAgencies(mapIDsToDomain(whiteListed.get("authorities")));
+          }
+
+          if (whiteListed.containsKey("lines")) {
+            filterRequest.setWhiteListedRoutes(
+              RouteMatcher.idMatcher(mapIDsToDomain(whiteListed.get("lines")))
+            );
+          }
+
+          if (whiteListed.containsKey("groupsOfLines")) {
+            filterRequest.setWhiteListedGroupsOfRoutes(
+              mapIDsToDomain(whiteListed.get("groupsOfLines"))
+            );
+          }
+        }
+
+        // Map banned
+        if (filter.containsKey("banned")) {
+          var banned = (LinkedHashMap<String, List<String>>) filter.get("banned");
+
+          if (banned.containsKey("authorities")) {
+            filterRequest.setBannedAgencies(mapIDsToDomain(banned.get("authorities")));
+          }
+
+          if (banned.containsKey("groupsOfLines")) {
+            filterRequest.setBannedGroupsOfRoutes(mapIDsToDomain(banned.get("groupsOfLines")));
+          }
+
+          if (banned.containsKey("lines")) {
+            filterRequest.setBannedRoutes(
+              RouteMatcher.idMatcher(mapIDsToDomain(banned.get("lines")))
+            );
+          }
+
+          if (banned.containsKey("serviceJourneys")) {
+            filterRequest.setBannedTrips(mapIDsToDomain(banned.get("serviceJourneys")));
+          }
+        }
+
+        for (var feedId : feedIds) {
+          filterMap.put(feedId, filterRequest.clone());
+        }
+      }
+
+      return filterMap;
+    } else {
+      return new HashMap<>();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void setTransportModes(List<LinkedHashMap<String, ?>> transportModes, RequestModesBuilder modesBuilder) {
+    for (var modeWithSubmodes : transportModes) {
+      if (modeWithSubmodes.containsKey("transportMode")) {
+        TransitMode mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
+        if (modeWithSubmodes.containsKey("transportSubModes")) {
+          var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
+            "transportSubModes"
+          );
+          for (TransmodelTransportSubmode submode : transportSubModes) {
+            modesBuilder.withTransitMode(mainMode, submode.getValue());
+          }
+        } else {
+          modesBuilder.withTransitMode(mainMode);
+        }
+      }
+    }
   }
 
   /**

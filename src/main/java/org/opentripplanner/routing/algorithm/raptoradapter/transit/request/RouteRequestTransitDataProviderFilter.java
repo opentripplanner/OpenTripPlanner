@@ -3,16 +3,19 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
+import org.opentripplanner.routing.api.request.request.TransitRequest;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -38,22 +41,32 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
 
   private final Set<FeedScopedId> bannedTrips;
 
+  private final Map<String, AllowTransitModeFilter> feedIdSpecificTransitModeFilter;
+
   public RouteRequestTransitDataProviderFilter(
     boolean requireBikesAllowed,
     boolean wheelchairEnabled,
     WheelchairPreferences wheelchairPreferences,
     boolean includePlannedCancellations,
-    Collection<MainAndSubMode> allowedTransitModes,
     Collection<FeedScopedId> bannedRoutes,
-    Collection<FeedScopedId> bannedTrips
+    TransitRequest transitRequest
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
     this.wheelchairEnabled = wheelchairEnabled;
     this.wheelchairPreferences = wheelchairPreferences;
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = Set.copyOf(bannedRoutes);
-    this.bannedTrips = Set.copyOf(bannedTrips);
-    this.transitModeFilter = AllowTransitModeFilter.of(allowedTransitModes);
+    this.bannedTrips = Set.copyOf(transitRequest.commonFilters().bannedTrips());
+    this.transitModeFilter = AllowTransitModeFilter.of(transitRequest.commonFilters().modes());
+
+    var feedIdSpecificTransitModeFilter = new HashMap<String, AllowTransitModeFilter>();
+    for (var entry : transitRequest.feedIdSpecificFilters().entrySet()) {
+      feedIdSpecificTransitModeFilter.put(
+        entry.getKey(),
+        AllowTransitModeFilter.of(entry.getValue().modes())
+      );
+    }
+    this.feedIdSpecificTransitModeFilter = feedIdSpecificTransitModeFilter;
   }
 
   public RouteRequestTransitDataProviderFilter(
@@ -65,17 +78,8 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       request.wheelchair(),
       request.preferences().wheelchair(),
       request.preferences().transit().includePlannedCancellations(),
-      request.journey().transit().modes(),
-      bannedRoutes(
-        request.journey().transit().bannedAgencies(),
-        request.journey().transit().bannedRoutes(),
-        request.journey().transit().whiteListedAgencies(),
-        request.journey().transit().whiteListedRoutes(),
-        request.journey().transit().whiteListedGroupsOfRoutes(),
-        request.journey().transit().bannedGroupsOfRoutes(),
-        transitService.getAllRoutes()
-      ),
-      request.journey().transit().bannedTrips()
+      bannedRoutes(request.journey().transit(), transitService.getAllRoutes()),
+      request.journey().transit()
     );
   }
 
@@ -95,6 +99,13 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
   @Override
   public boolean tripTimesPredicate(TripTimes tripTimes) {
     final Trip trip = tripTimes.getTrip();
+
+    // Check if there is feedId-specific filter, otherwise use common one
+    var transitModeFilter = feedIdSpecificTransitModeFilter.getOrDefault(
+      trip.getId().getFeedId(),
+      this.transitModeFilter
+    );
+
     if (!transitModeFilter.allows(trip.getMode(), trip.getNetexSubMode())) {
       return false;
     }
@@ -144,38 +155,39 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
   }
 
   public static List<FeedScopedId> bannedRoutes(
-    Collection<FeedScopedId> bannedAgenciesCollection,
-    RouteMatcher bannedRoutes,
-    Collection<FeedScopedId> whiteListedAgenciesCollection,
-    RouteMatcher whiteListedRoutes,
-    Collection<FeedScopedId> whiteListedGroupsOfRoutesCollection,
-    Collection<FeedScopedId> bannedGroupsOfRoutesCollection,
+    TransitRequest transitRequest,
     Collection<Route> routes
   ) {
     if (
-      bannedRoutes.isEmpty() &&
-      bannedAgenciesCollection.isEmpty() &&
-      whiteListedRoutes.isEmpty() &&
-      whiteListedAgenciesCollection.isEmpty() &&
-      whiteListedGroupsOfRoutesCollection.isEmpty() &&
-      bannedGroupsOfRoutesCollection.isEmpty()
+      transitRequest.feedIdSpecificFilters().isEmpty() &&
+      transitRequest.commonFilters().bannedAgencies().isEmpty() &&
+      transitRequest.commonFilters().bannedRoutes().isEmpty() &&
+      transitRequest.commonFilters().whiteListedAgencies().isEmpty() &&
+      transitRequest.commonFilters().whiteListedRoutes().isEmpty() &&
+      transitRequest.commonFilters().whiteListedGroupsOfRoutes().isEmpty() &&
+      transitRequest.commonFilters().bannedGroupsOfRoutes().isEmpty()
     ) {
+      // nothing to filter with
       return List.of();
     }
 
-    Set<FeedScopedId> bannedAgencies = Set.copyOf(bannedAgenciesCollection);
-    Set<FeedScopedId> whiteListedAgencies = Set.copyOf(whiteListedAgenciesCollection);
-    Set<FeedScopedId> whiteListedGroupsOfRoutes = Set.copyOf(whiteListedGroupsOfRoutesCollection);
-    Set<FeedScopedId> bannedGroupOfRoutes = Set.copyOf(bannedGroupsOfRoutesCollection);
-
     List<FeedScopedId> ret = new ArrayList<>();
     for (Route route : routes) {
+      var filter = transitRequest.feedIdSpecificFilter(route.getId().getFeedId());
+      if (filter == null) filter = transitRequest.commonFilters();
+
+      // TODO: 2022-11-24 do we really need to create a copy here?
+      Set<FeedScopedId> bannedAgencies = Set.copyOf(filter.bannedAgencies());
+      Set<FeedScopedId> whiteListedAgencies = Set.copyOf(filter.whiteListedAgencies());
+      Set<FeedScopedId> whiteListedGroupsOfRoutes = Set.copyOf(filter.whiteListedGroupsOfRoutes());
+      Set<FeedScopedId> bannedGroupOfRoutes = Set.copyOf(filter.bannedGroupsOfRoutes());
+
       if (
         routeIsBanned(
           bannedAgencies,
-          bannedRoutes,
+          filter.bannedRoutes(),
           whiteListedAgencies,
-          whiteListedRoutes,
+          filter.whiteListedRoutes(),
           whiteListedGroupsOfRoutes,
           bannedGroupOfRoutes,
           route
@@ -184,6 +196,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
         ret.add(route.getId());
       }
     }
+
     return ret;
   }
 
@@ -202,6 +215,17 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     Set<FeedScopedId> bannedGroupsOfRoutes,
     Route route
   ) {
+    if (
+      bannedAgencies.isEmpty() &&
+      bannedRoutes.isEmpty() &&
+      whiteListedAgencies.isEmpty() &&
+      whiteListedRoutes.isEmpty() &&
+      whiteListedGroupsOfRoutes.isEmpty() &&
+      bannedGroupsOfRoutes.isEmpty()
+    ) {
+      return false;
+    }
+
     /* check if agency is banned for this plan */
     if (!bannedAgencies.isEmpty()) {
       if (bannedAgencies.contains(route.getAgency().getId())) {
@@ -222,12 +246,8 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       .map(AbstractTransitEntity::getId)
       .toList();
 
-    if (!bannedGroupsOfRoutes.isEmpty()) {
-      for (var id : groupOfRoutesIDs) {
-        if (bannedGroupsOfRoutes.contains(id)) {
-          return true;
-        }
-      }
+    if (!Collections.disjoint(bannedGroupsOfRoutes, groupOfRoutesIDs)) {
+      return true;
     }
 
     boolean whiteListed = false;

@@ -20,6 +20,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.FilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.util.OTPFeature;
@@ -706,18 +707,22 @@ public abstract class RoutingResource {
 
       {
         var transit = journey.transit();
+        var commonFilters = new FilterRequest();
+
         // Filter Agencies
         setIfNotNull(preferredAgencies, transit::setPreferredAgenciesFromString);
         setIfNotNull(unpreferredAgencies, transit::setUnpreferredAgenciesFromString);
-        setIfNotNull(bannedAgencies, transit::setBannedAgenciesFromSting);
-        setIfNotNull(whiteListedAgencies, transit::setWhiteListedAgenciesFromSting);
+        setIfNotNull(bannedAgencies, commonFilters::setBannedAgenciesFromSting);
+        setIfNotNull(whiteListedAgencies, commonFilters::setWhiteListedAgenciesFromSting);
         // Filter Routes
         setIfNotNull(preferredRoutes, transit::setPreferredRoutesFromString);
         setIfNotNull(unpreferredRoutes, transit::setUnpreferredRoutesFromString);
-        setIfNotNull(bannedRoutes, transit::setBannedRoutesFromString);
-        setIfNotNull(whiteListedRoutes, transit::setWhiteListedRoutesFromString);
+        setIfNotNull(bannedRoutes, commonFilters::setBannedRoutesFromString);
+        setIfNotNull(whiteListedRoutes, commonFilters::setWhiteListedRoutesFromString);
         // Filter Trips
-        setIfNotNull(bannedTrips, transit::setBannedTripsFromString);
+        setIfNotNull(bannedTrips, commonFilters::setBannedTripsFromString);
+
+        transit.setCommonFilters(commonFilters);
       }
       {
         var debugRaptor = journey.transit().raptorDebugging();

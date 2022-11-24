@@ -293,7 +293,14 @@ public class NearbyStopFinder {
     ) {
       var strategy = new VehicleToStopSkipEdgeStrategy(
         transitService::getRoutesForStop,
-        routingRequest.journey().transit().modes().stream().map(MainAndSubMode::mainMode).toList()
+        routingRequest
+          .journey()
+          .transit()
+          .commonFilters()
+          .modes()
+          .stream()
+          .map(MainAndSubMode::mainMode)
+          .toList()
       );
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
     } else if (

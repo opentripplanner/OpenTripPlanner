@@ -17,6 +17,8 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
+import org.opentripplanner.routing.api.request.request.TransitRequest;
+import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -77,14 +79,16 @@ public class RouteRequestTransitDataProviderFilterTest {
       .build()
       .getRoutingTripPattern();
 
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(MainAndSubMode.all());
+
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       true,
       DEFAULT_ACCESSIBILITY,
       false,
-      MainAndSubMode.all(),
       Set.of(),
-      Set.of()
+      transitRequest
     );
 
     var boardingPossible = new BitSet();
@@ -101,14 +105,16 @@ public class RouteRequestTransitDataProviderFilterTest {
   public void notFilteringExpectedTripPatternForDateTest() {
     TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
 
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(List.of(new MainAndSubMode(TransitMode.BUS)));
+
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
-      Set.of()
+      transitRequest
     );
 
     boolean valid = filter.tripPatternPredicate(tripPatternForDate);
@@ -120,14 +126,16 @@ public class RouteRequestTransitDataProviderFilterTest {
   public void bannedRouteFilteringTest() {
     TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
 
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(List.of(new MainAndSubMode(TransitMode.BUS)));
+
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(ROUTE.getId()),
-      Set.of()
+      transitRequest
     );
 
     boolean valid = filter.tripPatternPredicate(tripPatternForDate);
@@ -147,14 +155,17 @@ public class RouteRequestTransitDataProviderFilterTest {
       null
     );
 
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(List.of(new MainAndSubMode(TransitMode.BUS)));
+    transitRequest.commonFilters().setBannedTrips(List.of(TRIP_ID));
+
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
-      Set.of(TRIP_ID)
+      transitRequest
     );
 
     boolean valid = filter.tripTimesPredicate(tripTimes);
@@ -200,14 +211,16 @@ public class RouteRequestTransitDataProviderFilterTest {
       null
     );
 
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(List.of(new MainAndSubMode(TransitMode.BUS)));
+
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
-      Set.of()
+      transitRequest
     );
 
     boolean valid = filter.tripTimesPredicate(tripTimes);
@@ -227,14 +240,16 @@ public class RouteRequestTransitDataProviderFilterTest {
       null
     );
 
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(MainAndSubMode.all());
+
     var filter = new RouteRequestTransitDataProviderFilter(
       true,
       true,
       WheelchairPreferences.DEFAULT,
       false,
-      MainAndSubMode.all(),
       Set.of(),
-      Set.of()
+      transitRequest
     );
 
     boolean valid = filter.tripTimesPredicate(tripTimes);
@@ -254,14 +269,16 @@ public class RouteRequestTransitDataProviderFilterTest {
       null
     );
 
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(MainAndSubMode.all());
+
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       true,
       WheelchairPreferences.DEFAULT,
       false,
-      MainAndSubMode.all(),
       Set.of(),
-      Set.of()
+      transitRequest
     );
 
     boolean valid = filter.tripTimesPredicate(tripTimes);
@@ -281,14 +298,16 @@ public class RouteRequestTransitDataProviderFilterTest {
       TripAlteration.PLANNED
     );
 
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(List.of(new MainAndSubMode(TransitMode.BUS)));
+
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       true,
       WheelchairPreferences.DEFAULT,
       false,
-      List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
-      Set.of()
+      transitRequest
     );
 
     boolean valid = filter.tripTimesPredicate(wheelchairAccessibleTrip);
@@ -308,14 +327,16 @@ public class RouteRequestTransitDataProviderFilterTest {
       TripAlteration.PLANNED
     );
 
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(List.of(new MainAndSubMode(TransitMode.BUS)));
+
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       true,
       WheelchairPreferences.DEFAULT,
       false,
-      List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
-      Set.of()
+      transitRequest
     );
 
     assertFalse(filter.tripTimesPredicate(realTimeWheelchairAccessibleTrip));
@@ -347,14 +368,15 @@ public class RouteRequestTransitDataProviderFilterTest {
     );
 
     // Given
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(List.of(new MainAndSubMode(TransitMode.BUS)));
     var filter1 = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       WheelchairPreferences.DEFAULT,
       true,
-      List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
-      Set.of()
+      transitRequest
     );
 
     // When
@@ -368,14 +390,14 @@ public class RouteRequestTransitDataProviderFilterTest {
     assertTrue(valid2);
 
     // Given
+    transitRequest.commonFilters().setModes(MainAndSubMode.all());
     var filter2 = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      MainAndSubMode.all(),
       Set.of(),
-      Set.of()
+      transitRequest
     );
 
     // When
@@ -482,14 +504,15 @@ public class RouteRequestTransitDataProviderFilterTest {
       TripAlteration.CANCELLATION
     );
 
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(List.of(new MainAndSubMode(TransitMode.BUS)));
     var filter = new RouteRequestTransitDataProviderFilter(
       true,
       true,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
-      Set.of()
+      transitRequest
     );
 
     assertTrue(filter.tripTimesPredicate(matchingTripTimes));
@@ -501,18 +524,16 @@ public class RouteRequestTransitDataProviderFilterTest {
     assertFalse(filter.tripTimesPredicate(failingTripTimes5));
   }
 
-  private boolean validateModesOnTripTimes(
-    Collection<MainAndSubMode> allowedModes,
-    TripTimes tripTimes
-  ) {
+  private boolean validateModesOnTripTimes(List<MainAndSubMode> allowedModes, TripTimes tripTimes) {
+    var transitRequest = new TransitRequest();
+    transitRequest.commonFilters().setModes(allowedModes);
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      allowedModes,
       Set.of(),
-      Set.of()
+      transitRequest
     );
 
     return filter.tripTimesPredicate(tripTimes);

@@ -113,6 +113,7 @@ public abstract class GtfsTest {
       routingRequest
         .journey()
         .transit()
+        .commonFilters()
         .setBannedRoutes(
           RouteMatcher.idMatcher(List.of(new FeedScopedId(feedId.getId(), excludedRoute)))
         );

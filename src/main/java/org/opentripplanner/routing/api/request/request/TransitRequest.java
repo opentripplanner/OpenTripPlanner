@@ -2,7 +2,10 @@ package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -11,19 +14,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 // TODO VIA: Javadoc
 public class TransitRequest implements Cloneable, Serializable {
 
-  private List<MainAndSubMode> modes = MainAndSubMode.all();
-
-  private List<FeedScopedId> whiteListedAgencies = List.of();
-  private List<FeedScopedId> bannedAgencies = List.of();
-
   @Deprecated
   private List<FeedScopedId> preferredAgencies = List.of();
 
   private List<FeedScopedId> unpreferredAgencies = List.of();
-  private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
-  private RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
-  private List<FeedScopedId> whiteListedGroupsOfRoutes = List.of();
-  private List<FeedScopedId> bannedGroupsOfRoutes = List.of();
 
   /**
    * @deprecated TODO OTP2 Needs to be implemented
@@ -32,52 +26,40 @@ public class TransitRequest implements Cloneable, Serializable {
   private List<FeedScopedId> preferredRoutes = List.of();
 
   private List<FeedScopedId> unpreferredRoutes = List.of();
-  private List<FeedScopedId> bannedTrips = List.of();
+
+  private FilterRequest commonFilters = new FilterRequest();
+
+  private Map<String, FilterRequest> feedIdSpecificFilters = new HashMap<>();
+
   private DebugRaptor raptorDebugging = new DebugRaptor();
 
-  public void setModes(List<MainAndSubMode> modes) {
-    this.modes = modes;
+  public void setRaptorDebugging(DebugRaptor raptorDebugging) {
+    this.raptorDebugging = raptorDebugging;
   }
 
-  public List<MainAndSubMode> modes() {
-    return modes;
+  public DebugRaptor raptorDebugging() {
+    return raptorDebugging;
   }
 
-  public void setWhiteListedAgenciesFromSting(String s) {
-    if (!s.isEmpty()) {
-      whiteListedAgencies = FeedScopedId.parseListOfIds(s);
-    }
+  public FilterRequest commonFilters() {
+    return commonFilters;
   }
 
-  /**
-   * Only use certain named agencies
-   */
-  public void setWhiteListedAgencies(List<FeedScopedId> whiteListedAgencies) {
-    this.whiteListedAgencies = whiteListedAgencies;
+  public void setCommonFilters(FilterRequest commonFilters) {
+    this.commonFilters = commonFilters;
   }
 
-  public List<FeedScopedId> whiteListedAgencies() {
-    return whiteListedAgencies;
+  @Nullable
+  public FilterRequest feedIdSpecificFilter(String feedId) {
+    return feedIdSpecificFilters.getOrDefault(feedId, null);
   }
 
-  /**
-   * Do not use certain named agencies
-   */
-  public void setBannedAgenciesFromSting(String s) {
-    if (!s.isEmpty()) {
-      bannedAgencies = FeedScopedId.parseListOfIds(s);
-    }
+  public Map<String, FilterRequest> feedIdSpecificFilters() {
+    return feedIdSpecificFilters;
   }
 
-  /**
-   * Do not use certain named agencies
-   */
-  public void setBannedAgencies(List<FeedScopedId> bannedAgencies) {
-    this.bannedAgencies = bannedAgencies;
-  }
-
-  public List<FeedScopedId> bannedAgencies() {
-    return bannedAgencies;
+  public void setFeedIdSpecificFilters(Map<String, FilterRequest> feedIdSpecificFilters) {
+    this.feedIdSpecificFilters = feedIdSpecificFilters;
   }
 
   @Deprecated
@@ -115,57 +97,6 @@ public class TransitRequest implements Cloneable, Serializable {
 
   public List<FeedScopedId> unpreferredAgencies() {
     return unpreferredAgencies;
-  }
-
-  /**
-   * Only use certain named routes
-   */
-  public void setWhiteListedRoutesFromString(String s) {
-    if (!s.isEmpty()) {
-      whiteListedRoutes = RouteMatcher.parse(s);
-    } else {
-      whiteListedRoutes = RouteMatcher.emptyMatcher();
-    }
-  }
-
-  /**
-   * Only use certain named routes
-   */
-  public void setWhiteListedRoutes(RouteMatcher whiteListedRoutes) {
-    this.whiteListedRoutes = whiteListedRoutes;
-  }
-
-  /**
-   * Only use certain named routes
-   */
-  public RouteMatcher whiteListedRoutes() {
-    return whiteListedRoutes;
-  }
-
-  /**
-   * Do not use certain named routes. The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
-   * This parameter format is completely nonstandard and should be revised for the 2.0 API, see
-   * issue #1671.
-   */
-  public void setBannedRoutesFromString(String s) {
-    if (!s.isEmpty()) {
-      bannedRoutes = RouteMatcher.parse(s);
-    } else {
-      bannedRoutes = RouteMatcher.emptyMatcher();
-    }
-  }
-
-  /**
-   * Do not use certain named routes. The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
-   * This parameter format is completely nonstandard and should be revised for the 2.0 API, see
-   * issue #1671.
-   */
-  public void setBannedRoutes(RouteMatcher bannedRoutes) {
-    this.bannedRoutes = bannedRoutes;
-  }
-
-  public RouteMatcher bannedRoutes() {
-    return bannedRoutes;
   }
 
   @Deprecated
@@ -209,65 +140,23 @@ public class TransitRequest implements Cloneable, Serializable {
     return unpreferredRoutes;
   }
 
-  /**
-   * Do not use certain trips
-   */
-  public void setBannedTripsFromString(String ids) {
-    if (!ids.isEmpty()) {
-      bannedTrips = FeedScopedId.parseListOfIds(ids);
-    }
-  }
-
-  /**
-   * Do not use certain trips
-   */
-  public void setBannedTrips(List<FeedScopedId> bannedTrips) {
-    this.bannedTrips = bannedTrips;
-  }
-
-  public List<FeedScopedId> bannedTrips() {
-    return bannedTrips;
-  }
-
-  public void setRaptorDebugging(DebugRaptor raptorDebugging) {
-    this.raptorDebugging = raptorDebugging;
-  }
-
-  public DebugRaptor raptorDebugging() {
-    return raptorDebugging;
-  }
-
-  public void setWhiteListedGroupsOfRoutes(List<FeedScopedId> whiteListedGroupsOfRoutes) {
-    this.whiteListedGroupsOfRoutes = whiteListedGroupsOfRoutes;
-  }
-
-  public List<FeedScopedId> whiteListedGroupsOfRoutes() {
-    return whiteListedGroupsOfRoutes;
-  }
-
-  public void setBannedGroupsOfRoutes(List<FeedScopedId> bannedGroupsOfRoutes) {
-    this.bannedGroupsOfRoutes = bannedGroupsOfRoutes;
-  }
-
-  public List<FeedScopedId> bannedGroupsOfRoutes() {
-    return bannedGroupsOfRoutes;
-  }
-
   public TransitRequest clone() {
     try {
       var clone = (TransitRequest) super.clone();
 
-      clone.modes = new ArrayList<>(this.modes);
-      clone.whiteListedAgencies = List.copyOf(this.whiteListedAgencies);
-      clone.bannedAgencies = List.copyOf(this.bannedAgencies);
+      clone.commonFilters = this.commonFilters.clone();
+
+      var clonedFeedIdSpecificFilters = new HashMap<String, FilterRequest>();
+      for (var entry : this.feedIdSpecificFilters.entrySet()) {
+        clonedFeedIdSpecificFilters.put(entry.getKey(), entry.getValue().clone());
+      }
+      clone.feedIdSpecificFilters = clonedFeedIdSpecificFilters;
+
+      clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
       clone.preferredAgencies = List.copyOf(this.preferredAgencies);
       clone.unpreferredAgencies = List.copyOf(this.unpreferredAgencies);
-      clone.whiteListedRoutes = this.whiteListedRoutes.clone();
-      clone.bannedRoutes = this.bannedRoutes.clone();
       clone.preferredRoutes = List.copyOf(this.preferredRoutes);
       clone.unpreferredRoutes = List.copyOf(this.unpreferredRoutes);
-      clone.bannedTrips = List.copyOf(this.bannedTrips);
-      clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
 
       return clone;
     } catch (CloneNotSupportedException e) {

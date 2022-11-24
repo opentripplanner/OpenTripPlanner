@@ -74,7 +74,7 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    if (request.journey().transit().modes().isEmpty()) {
+    if (request.journey().transit().commonFilters().modes().isEmpty()) {
       return new TransitRouterResult(List.of(), null);
     }
 

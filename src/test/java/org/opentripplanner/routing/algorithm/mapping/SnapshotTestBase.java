@@ -277,7 +277,7 @@ public abstract class SnapshotTestBase {
       .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
-    var transitModes = mapModes(request.journey().transit().modes());
+    var transitModes = mapModes(request.journey().transit().commonFilters().modes());
 
     var modes = Stream
       .concat(
