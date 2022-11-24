@@ -5,7 +5,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -24,7 +25,6 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

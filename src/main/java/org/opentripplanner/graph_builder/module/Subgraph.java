@@ -1,4 +1,4 @@
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.graph_builder.module;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -6,17 +6,17 @@ import java.util.Set;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 
-public class Subgraph {
+class Subgraph {
 
   private final Set<Vertex> streetVertexSet;
   private final Set<Vertex> stopsVertexSet;
 
-  public Subgraph() {
+  Subgraph() {
     streetVertexSet = new HashSet<>();
     stopsVertexSet = new HashSet<>();
   }
 
-  public void addVertex(Vertex vertex) {
+  void addVertex(Vertex vertex) {
     if (vertex instanceof TransitStopVertex) {
       stopsVertexSet.add(vertex);
     } else {
@@ -24,28 +24,28 @@ public class Subgraph {
     }
   }
 
-  public boolean contains(Vertex vertex) {
+  boolean contains(Vertex vertex) {
     return (streetVertexSet.contains(vertex) || stopsVertexSet.contains(vertex));
   }
 
-  public int streetSize() {
+  int streetSize() {
     return streetVertexSet.size();
   }
 
-  public int stopSize() {
+  int stopSize() {
     return stopsVertexSet.size();
   }
 
-  public Vertex getRepresentativeVertex() {
+  Vertex getRepresentativeVertex() {
     //TODO this is not very smart but good enough at the moment
     return streetVertexSet.iterator().next();
   }
 
-  public Iterator<Vertex> streetIterator() {
+  Iterator<Vertex> streetIterator() {
     return streetVertexSet.iterator();
   }
 
-  public Iterator<Vertex> stopIterator() {
+  Iterator<Vertex> stopIterator() {
     return stopsVertexSet.iterator();
   }
 }

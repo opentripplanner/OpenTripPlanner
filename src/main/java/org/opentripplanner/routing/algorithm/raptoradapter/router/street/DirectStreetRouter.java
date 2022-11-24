@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.astar.GraphPath;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;

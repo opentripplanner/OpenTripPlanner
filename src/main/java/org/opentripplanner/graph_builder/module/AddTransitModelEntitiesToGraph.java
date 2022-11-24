@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
-import static org.opentripplanner.common.geometry.SphericalDistanceLibrary.distance;
+import static org.opentripplanner.framework.geometry.SphericalDistanceLibrary.distance;
 
 import java.util.Collection;
 import java.util.HashMap;

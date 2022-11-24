@@ -17,6 +17,7 @@ import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -39,7 +40,6 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * A mapper class used in converting internal GraphPaths to Itineraries, which are returned by the

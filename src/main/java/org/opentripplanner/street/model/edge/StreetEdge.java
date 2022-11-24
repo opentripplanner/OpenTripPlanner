@@ -12,9 +12,12 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.common.geometry.DirectionUtils;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.framework.geometry.CompactLineStringUtils;
+import org.opentripplanner.framework.geometry.DirectionUtils;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.SplitLineString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -33,8 +36,6 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.util.BitSetUtils;
-import org.opentripplanner.util.geometry.CompactLineStringUtils;
-import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -652,12 +653,12 @@ public class StreetEdge
    * edge will be removed from the graph.
    */
   public P2<StreetEdge> splitDestructively(SplitterVertex v) {
-    P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
+    SplitLineString geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
     StreetEdge e1 = new StreetEdge(
       (StreetVertex) fromv,
       v,
-      geoms.first,
+      geoms.beginning(),
       name,
       permission,
       this.isBack()
@@ -665,7 +666,7 @@ public class StreetEdge
     StreetEdge e2 = new StreetEdge(
       v,
       (StreetVertex) tov,
-      geoms.second,
+      geoms.ending(),
       name,
       permission,
       this.isBack()
@@ -731,7 +732,7 @@ public class StreetEdge
     DisposableEdgeCollection tempEdges,
     LinkingDirection direction
   ) {
-    P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
+    SplitLineString geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
     StreetEdge e1 = null;
     StreetEdge e2 = null;
@@ -742,7 +743,7 @@ public class StreetEdge
           this,
           (StreetVertex) fromv,
           v,
-          geoms.first,
+          geoms.beginning(),
           name,
           this.isBack()
         );
@@ -755,7 +756,7 @@ public class StreetEdge
           this,
           v,
           (StreetVertex) tov,
-          geoms.second,
+          geoms.ending(),
           name,
           this.isBack()
         );

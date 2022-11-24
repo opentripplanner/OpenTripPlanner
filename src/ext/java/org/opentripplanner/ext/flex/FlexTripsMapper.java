@@ -7,12 +7,12 @@ import java.util.List;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
+import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

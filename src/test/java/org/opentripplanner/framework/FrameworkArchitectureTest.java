@@ -10,6 +10,7 @@ public class FrameworkArchitectureTest {
   private static final Package COLLECTION = FRAMEWORK.subPackage("collection");
   private static final Package IO = FRAMEWORK.subPackage("io");
   private static final Package LANG = FRAMEWORK.subPackage("lang");
+  private static final Package LOGGING = FRAMEWORK.subPackage("logging");
   private static final Package TEXT = FRAMEWORK.subPackage("text");
   private static final Package TIME = FRAMEWORK.subPackage("time");
   private static final Package TO_STRING = FRAMEWORK.subPackage("tostring");
@@ -22,6 +23,11 @@ public class FrameworkArchitectureTest {
   @Test
   void enforceIoPackageDependencies() {
     IO.verify();
+  }
+
+  @Test
+  void enforceLoggingPackageDependencies() {
+    LOGGING.dependsOn(TEXT, TIME).verify();
   }
 
   @Test

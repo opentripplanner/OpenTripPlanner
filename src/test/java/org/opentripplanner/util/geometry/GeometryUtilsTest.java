@@ -8,7 +8,8 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.CoordinateSequenceFactory;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.model.P2;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SplitLineString;
 
 public class GeometryUtilsTest {
 
@@ -93,44 +94,44 @@ public class GeometryUtilsTest {
     CoordinateSequence sequence = coordinateSequenceFactory.create(coordinates);
     LineString geometry = new LineString(sequence, geometryFactory);
 
-    P2<LineString> result;
+    SplitLineString result;
     LineString[][] results = new LineString[9][2];
 
     result = GeometryUtils.splitGeometryAtFraction(geometry, 0);
-    results[0][0] = result.first;
-    results[0][1] = result.second;
+    results[0][0] = result.beginning();
+    results[0][1] = result.ending();
 
     result = GeometryUtils.splitGeometryAtFraction(geometry, 0.125);
-    results[1][0] = result.first;
-    results[1][1] = result.second;
+    results[1][0] = result.beginning();
+    results[1][1] = result.ending();
 
     result = GeometryUtils.splitGeometryAtFraction(geometry, 0.25);
-    results[2][0] = result.first;
-    results[2][1] = result.second;
+    results[2][0] = result.beginning();
+    results[2][1] = result.ending();
 
     result = GeometryUtils.splitGeometryAtFraction(geometry, 0.375);
-    results[3][0] = result.first;
-    results[3][1] = result.second;
+    results[3][0] = result.beginning();
+    results[3][1] = result.ending();
 
     result = GeometryUtils.splitGeometryAtFraction(geometry, 0.5);
-    results[4][0] = result.first;
-    results[4][1] = result.second;
+    results[4][0] = result.beginning();
+    results[4][1] = result.ending();
 
     result = GeometryUtils.splitGeometryAtFraction(geometry, 0.625);
-    results[5][0] = result.first;
-    results[5][1] = result.second;
+    results[5][0] = result.beginning();
+    results[5][1] = result.ending();
 
     result = GeometryUtils.splitGeometryAtFraction(geometry, 0.75);
-    results[6][0] = result.first;
-    results[6][1] = result.second;
+    results[6][0] = result.beginning();
+    results[6][1] = result.ending();
 
     result = GeometryUtils.splitGeometryAtFraction(geometry, 0.875);
-    results[7][0] = result.first;
-    results[7][1] = result.second;
+    results[7][0] = result.beginning();
+    results[7][1] = result.ending();
 
     result = GeometryUtils.splitGeometryAtFraction(geometry, 1);
-    results[8][0] = result.first;
-    results[8][1] = result.second;
+    results[8][0] = result.beginning();
+    results[8][1] = result.ending();
 
     sequence = coordinateSequenceFactory.create(referenceCoordinates[0][0]);
     geometry = new LineString(sequence, geometryFactory);

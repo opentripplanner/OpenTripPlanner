@@ -2,7 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.Serializable;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.common.geometry.CompactElevationProfile;
+import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;

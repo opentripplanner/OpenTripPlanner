@@ -21,6 +21,7 @@ import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StreetNote;
@@ -50,7 +51,6 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class TestHalfEdges {
 

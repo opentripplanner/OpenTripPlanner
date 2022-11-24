@@ -13,7 +13,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -34,7 +35,6 @@ import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a

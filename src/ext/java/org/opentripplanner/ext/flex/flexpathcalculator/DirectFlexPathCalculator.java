@@ -3,8 +3,8 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.astar.model.Vertex;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.util.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 
 /**
  * Calculated driving times and distance based on direct distance and fixed average driving speed.

@@ -15,7 +15,8 @@ public interface OtpArchitectureModules {
   Package OTP_ROOT = Package.of("org.opentripplanner");
   Package FRAMEWORK = OTP_ROOT.subPackage("framework");
   Package UTIL = OTP_ROOT.subPackage("util");
-  Package GEO_UTIL = OTP_ROOT.subPackage("common.geometry");
+
+  Module GEO_UTILS = Module.of(JTS_GEOM, FRAMEWORK.subPackage("geometry"));
 
   Package RAPTOR_ADAPTER = OTP_ROOT
     .subPackage("routing")
@@ -24,18 +25,15 @@ public interface OtpArchitectureModules {
   Package RAPTOR_ADAPTER_API = RAPTOR_ADAPTER.subPackage("api");
 
   /**
-   * This is a bag of TRUE util classes - no dependencies to other OTP classes of frameworks.
-   * The {@link #UTIL} packages needs cleanup, it contains model, framework and API classes.
-   * The strategy is therefore to move the true util classes into sub packages, and then later
-   * to move the reminding classes to the places they belong.
+   * This is a bag of TRUE util classes - no dependencies to other OTP classes or frameworks
+   * (except true utilities like slf4j).
    */
   Module UTILS = Module.of(
+    FRAMEWORK.subPackage("lang"),
+    FRAMEWORK.subPackage("logging"),
     FRAMEWORK.subPackage("text"),
     FRAMEWORK.subPackage("time"),
-    UTIL.subPackage("lang"),
-    UTIL.subPackage("logging"),
-    UTIL.subPackage("resources"),
-    UTIL.subPackage("geometry")
+    FRAMEWORK.subPackage("tostring")
   );
 
   Package TRANSIT = OTP_ROOT.subPackage("transit");

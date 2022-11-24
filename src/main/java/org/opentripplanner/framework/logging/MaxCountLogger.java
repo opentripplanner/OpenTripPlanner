@@ -1,4 +1,4 @@
-package org.opentripplanner.util.logging;
+package org.opentripplanner.framework.logging;
 
 import org.slf4j.Logger;
 

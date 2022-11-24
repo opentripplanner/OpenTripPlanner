@@ -2,9 +2,9 @@ package org.opentripplanner.street.model.edge;
 
 import java.util.List;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * This represents the connection between a boarding location and a transit vertex where going from the

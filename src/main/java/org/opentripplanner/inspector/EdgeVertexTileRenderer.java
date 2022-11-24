@@ -30,9 +30,9 @@ import org.locationtech.jts.operation.buffer.OffsetCurveBuilder;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * A TileRenderer implementation which get all edges/vertex in the bounding box of the tile, and

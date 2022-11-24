@@ -1,14 +1,18 @@
-package org.opentripplanner.util.geometry;
+package org.opentripplanner.framework.geometry;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.geotools.referencing.CRS;
+import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.CoordinateSequenceFactory;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
@@ -18,8 +22,6 @@ import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opentripplanner.common.geometry.UnsupportedGeometryException;
-import org.opentripplanner.common.model.P2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,21 @@ public class GeometryUtils {
         "Could not create longitude-first WGS84 coordinate reference system."
       );
     }
+  }
+
+  public static <T> Geometry makeConvexHull(
+    Collection<T> collection,
+    Function<T, Coordinate> mapToCoordinate
+  ) {
+    var gf = getGeometryFactory();
+    Geometry[] points = new Geometry[collection.size()];
+    int i = 0;
+    for (T v : collection) {
+      points[i++] = gf.createPoint(mapToCoordinate.apply(v));
+    }
+
+    var col = new GeometryCollection(points, gf);
+    return new ConvexHull(col).getConvexHull();
   }
 
   public static LineString makeLineString(double... coords) {
@@ -102,7 +119,7 @@ public class GeometryUtils {
   /**
    * Splits the input geometry into two LineStrings at the given point.
    */
-  public static P2<LineString> splitGeometryAtPoint(Geometry geometry, Coordinate nearestPoint) {
+  public static SplitLineString splitGeometryAtPoint(Geometry geometry, Coordinate nearestPoint) {
     // An index in JTS can actually refer to any point along the line. It is NOT an array index.
     LocationIndexedLine line = new LocationIndexedLine(geometry);
     LinearLocation l = line.indexOf(nearestPoint);
@@ -110,26 +127,26 @@ public class GeometryUtils {
     LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
     LineString ending = (LineString) line.extractLine(l, line.getEndIndex());
 
-    return new P2<>(beginning, ending);
+    return new SplitLineString(beginning, ending);
   }
 
   /**
    * Splits the input geometry into two LineStrings at a fraction of the distance covered.
    */
-  public static P2<LineString> splitGeometryAtFraction(Geometry geometry, double fraction) {
+  public static SplitLineString splitGeometryAtFraction(Geometry geometry, double fraction) {
     LineString empty = new LineString(null, gf);
     Coordinate[] coordinates = geometry.getCoordinates();
     CoordinateSequence sequence = gf.getCoordinateSequenceFactory().create(coordinates);
     LineString total = new LineString(sequence, gf);
 
     if (coordinates.length < 2) {
-      return new P2<>(empty, empty);
+      return new SplitLineString(empty, empty);
     }
     if (fraction <= 0) {
-      return new P2<>(empty, total);
+      return new SplitLineString(empty, total);
     }
     if (fraction >= 1) {
-      return new P2<>(total, empty);
+      return new SplitLineString(total, empty);
     }
 
     double totalDistance = total.getLength();
@@ -142,7 +159,7 @@ public class GeometryUtils {
     LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
     LineString ending = (LineString) line.extractLine(l, line.getEndIndex());
 
-    return new P2<>(beginning, ending);
+    return new SplitLineString(beginning, ending);
   }
 
   /**
@@ -155,9 +172,9 @@ public class GeometryUtils {
     Coordinate first,
     Coordinate second
   ) {
-    P2<LineString> splitGeom = GeometryUtils.splitGeometryAtPoint(geomerty, first);
-    splitGeom = GeometryUtils.splitGeometryAtPoint(splitGeom.second, second);
-    return splitGeom.first;
+    SplitLineString splitGeom = GeometryUtils.splitGeometryAtPoint(geomerty, first);
+    splitGeom = GeometryUtils.splitGeometryAtPoint(splitGeom.ending(), second);
+    return splitGeom.beginning();
   }
 
   /**

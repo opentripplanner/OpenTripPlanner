@@ -1,4 +1,4 @@
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.framework.geometry;
 
 import java.io.Serializable;
 import org.locationtech.jts.geom.Coordinate;
@@ -19,8 +19,6 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
  * @author laurent
  */
 public final class CompactElevationProfile implements Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   public static final double DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS = 10;
 

@@ -7,7 +7,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
