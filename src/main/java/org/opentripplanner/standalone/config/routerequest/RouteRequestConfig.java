@@ -435,7 +435,9 @@ ferries, where the check-in process needs to be done in good time before ride.
         c
           .of("bikeStairsReluctance")
           .since(V2_3)
-          .summary("The set of characteristics that the user wants to optimize for.")
+          .summary(
+            "How bad is it to walk the bicycle up/down a flight of stairs compared to taking a detour."
+          )
           .asDouble(dft.stairsReluctance())
       );
   }
