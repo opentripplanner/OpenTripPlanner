@@ -64,6 +64,8 @@ public class NearbyStopFinder {
   private final Duration durationLimit;
   private final DataOverlayContext dataOverlayContext;
 
+  private final Set<String> alwaysGenerateTransfersFeeds;
+
   private DirectGraphFinder directGraphFinder;
 
   /**
@@ -76,12 +78,14 @@ public class NearbyStopFinder {
     TransitService transitService,
     Duration durationLimit,
     DataOverlayContext dataOverlayContext,
-    boolean useStreets
+    boolean useStreets,
+    Set<String> alwaysGenerateTransfersFeeds
   ) {
     this.transitService = transitService;
     this.dataOverlayContext = dataOverlayContext;
     this.useStreets = useStreets;
     this.durationLimit = durationLimit;
+    this.alwaysGenerateTransfersFeeds = alwaysGenerateTransfersFeeds;
 
     if (!useStreets) {
       // We need to accommodate straight line distance (in meters) but when streets are present we
@@ -109,6 +113,11 @@ public class NearbyStopFinder {
     /* Track the closest stop on each flex trip nearby. */
     MinMap<FlexTrip<?, ?>, NearbyStop> closestStopForFlexTrip = new MinMap<>();
 
+    // Generally we don't want to generate a transfer when there are no patterns at the stop, however
+    // there are special stops which are purely there so you can add a trip via a realtime updater
+    // so for those you _do_ want to generate a transfer.
+    List<NearbyStop> overrideStops = new ArrayList<>();
+
     /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
     for (NearbyStop nearbyStop : findNearbyStops(
       vertex,
@@ -130,6 +139,11 @@ public class NearbyStopFinder {
           }
         }
       }
+
+      if (alwaysGenerateTransfersFeeds.contains(ts1.getId().getFeedId())) {
+        overrideStops.add(nearbyStop);
+      }
+
       if (OTPFeature.FlexRouting.isOn()) {
         for (FlexTrip<?, ?> trip : transitService.getFlexIndex().getFlexTripsByStop(ts1)) {
           if (
@@ -147,6 +161,7 @@ public class NearbyStopFinder {
     Set<NearbyStop> uniqueStops = new HashSet<>();
     uniqueStops.addAll(closestStopForFlexTrip.values());
     uniqueStops.addAll(closestStopForPattern.values());
+    uniqueStops.addAll(overrideStops);
     return uniqueStops;
   }
 

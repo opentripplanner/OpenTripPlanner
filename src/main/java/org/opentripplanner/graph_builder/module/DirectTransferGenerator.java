@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.logging.ProgressTracker;
@@ -45,6 +46,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Graph graph;
   private final TransitModel transitModel;
   private final DataImportIssueStore issueStore;
+  private final Set<String> feedsWithToExcludeFromPatternCheck;
 
   public DirectTransferGenerator(
     Graph graph,
@@ -53,11 +55,23 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     Duration radiusByDuration,
     List<RouteRequest> transferRequests
   ) {
+    this(graph, transitModel, issueStore, radiusByDuration, transferRequests, Set.of());
+  }
+
+  public DirectTransferGenerator(
+    Graph graph,
+    TransitModel transitModel,
+    DataImportIssueStore issueStore,
+    Duration radiusByDuration,
+    List<RouteRequest> transferRequests,
+    Set<String> feedsWithToExcludeFromPatternCheck
+  ) {
     this.graph = graph;
     this.transitModel = transitModel;
     this.issueStore = issueStore;
     this.radiusByDuration = radiusByDuration;
     this.transferRequests = transferRequests;
+    this.feedsWithToExcludeFromPatternCheck = feedsWithToExcludeFromPatternCheck;
   }
 
   @Override
@@ -72,7 +86,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       new DefaultTransitService(transitModel),
       radiusByDuration,
       null,
-      graph.hasStreets
+      graph.hasStreets,
+      feedsWithToExcludeFromPatternCheck
     );
     if (nearbyStopFinder.useStreets) {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");

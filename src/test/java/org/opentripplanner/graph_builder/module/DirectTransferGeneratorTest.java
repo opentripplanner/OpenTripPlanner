@@ -31,6 +31,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This creates a graph with trip patterns
