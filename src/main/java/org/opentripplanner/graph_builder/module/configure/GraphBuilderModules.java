@@ -170,10 +170,7 @@ public class GraphBuilderModules {
       );
     } else if (dataSources.has(DEM)) {
       gridCoverageFactories.addAll(
-        createDemGeotiffGridCoverageFactories(
-          dataSources.getDemConfiguredDatasource(),
-          config.elevationUnitMultiplier
-        )
+        createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDatasource())
       );
     }
     // Refactoring this class, it was made clear that this allows for adding multiple elevation
@@ -264,15 +261,11 @@ public class GraphBuilderModules {
   }
 
   private static List<ElevationGridCoverageFactory> createDemGeotiffGridCoverageFactories(
-    Iterable<ConfiguredDataSource<DemExtractParameters>> dataSources,
-    double defaultElevationUnitMultiplier
+    Iterable<ConfiguredDataSource<DemExtractParameters>> dataSources
   ) {
     List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
     for (ConfiguredDataSource<DemExtractParameters> demSource : dataSources) {
-      double elevationUnitMultiplier = demSource
-        .config()
-        .elevationUnitMultiplier()
-        .orElse(defaultElevationUnitMultiplier);
+      double elevationUnitMultiplier = demSource.config().elevationUnitMultiplier();
       elevationGridCoverageFactories.add(
         createGeotiffGridCoverageFactoryImpl(demSource.dataSource(), elevationUnitMultiplier)
       );
