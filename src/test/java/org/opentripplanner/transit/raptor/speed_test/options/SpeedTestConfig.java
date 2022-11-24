@@ -19,7 +19,7 @@ public class SpeedTestConfig {
   private static final Logger LOG = LoggerFactory.getLogger(SpeedTestConfig.class);
   public static final String FILE_NAME = "speed-test-config.json";
 
-  private final JsonNode rawNode;
+  private final NodeAdapter adapter;
 
   /**
    * The test date is the date used for all test cases. The default value is today.
@@ -35,13 +35,17 @@ public class SpeedTestConfig {
   public final RouteRequest request;
 
   public SpeedTestConfig(JsonNode node) {
-    NodeAdapter adapter = new NodeAdapter(node, FILE_NAME);
-    this.rawNode = node;
+    this(new NodeAdapter(node, FILE_NAME));
+  }
+
+  public SpeedTestConfig(NodeAdapter adapter) {
+    this.adapter = adapter;
     testDate = adapter.of("testDate").asDateOrRelativePeriod("PT0D", ZoneId.of("UTC"));
     graph = adapter.of("graph").asUri(null);
     feedId = adapter.of("feedId").asString();
     transitRoutingParams = new TransitRoutingConfig("tuningParameters", adapter);
     request = mapRouteRequest(adapter.of("routingDefaults").asObject());
+    adapter.logAllUnusedParameters(LOG::warn);
   }
 
   public static SpeedTestConfig config(File dir) {
@@ -53,6 +57,6 @@ public class SpeedTestConfig {
 
   @Override
   public String toString() {
-    return rawNode.toPrettyString();
+    return adapter.toPrettyString();
   }
 }

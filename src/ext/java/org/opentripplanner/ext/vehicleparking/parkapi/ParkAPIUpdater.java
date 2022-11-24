@@ -41,11 +41,11 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     ParkAPIUpdaterParameters parameters,
     OpeningHoursCalendarService openingHoursCalendarService
   ) {
-    super(parameters.getUrl(), JSON_PARSE_PATH, parameters.getHttpHeaders());
-    this.feedId = parameters.getFeedId();
-    this.staticTags = parameters.getTags();
+    super(parameters.url(), JSON_PARSE_PATH, parameters.httpHeaders());
+    this.feedId = parameters.feedId();
+    this.staticTags = parameters.tags();
     this.osmOpeningHoursParser =
-      new OSMOpeningHoursParser(openingHoursCalendarService, parameters.getTimeZone());
+      new OSMOpeningHoursParser(openingHoursCalendarService, parameters.timeZone());
   }
 
   @Override

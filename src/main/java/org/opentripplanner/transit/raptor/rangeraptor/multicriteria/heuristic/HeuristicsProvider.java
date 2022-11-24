@@ -84,7 +84,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
   private boolean qualify(int stop, int arrivalTime, int travelDuration, int cost) {
     HeuristicAtStop h = get(stop);
 
-    if (h == null) {
+    if (h == HeuristicAtStop.UNREACHED) {
       return false;
     }
     int minArrivalTime = arrivalTime + h.minTravelDuration();
@@ -96,13 +96,13 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
   }
 
   private String rejectErrorMessage(int stop) {
-    return get(stop) == null
+    return get(stop) == HeuristicAtStop.UNREACHED
       ? "The stop was not reached in the heuristic calculation."
       : get(stop).toString();
   }
 
   private HeuristicAtStop get(int stop) {
-    if (stops[stop] == null && heuristics.reached(stop)) {
+    if (stops[stop] == null) {
       stops[stop] = heuristics.createHeuristicAtStop(stop);
     }
     return stops[stop];

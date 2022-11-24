@@ -7,22 +7,23 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
+import org.opentripplanner.routing.algorithm.via.ViaRoutingWorker;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.request.RouteViaRequest;
+import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -56,8 +57,13 @@ public class RoutingService implements org.opentripplanner.routing.api.request.R
   }
 
   @Override
-  public RoutingResponse route(RouteViaRequest request, RoutingPreferences preferences) {
-    throw new RuntimeException("Not implemented");
+  public ViaRoutingResponse route(RouteViaRequest request) {
+    var viaRoutingWorker = new ViaRoutingWorker(
+      request,
+      req ->
+        new RoutingWorker(serverContext, req, serverContext.transitService().getTimeZone()).route()
+    );
+    return viaRoutingWorker.route();
   }
 
   /** {@link Graph#getVertex(String)} */
@@ -111,7 +117,7 @@ public class RoutingService implements org.opentripplanner.routing.api.request.R
   }
 
   /** {@link Graph#getStreetIndex()} */
-  public StreetVertexIndex getStreetIndex() {
+  public StreetIndex getStreetIndex() {
     return this.graph.getStreetIndex();
   }
 
@@ -134,9 +140,9 @@ public class RoutingService implements org.opentripplanner.routing.api.request.R
     return this.graph.getVehiclePositionService();
   }
 
-  /** {@link Graph#getVehicleRentalStationService()} */
-  public VehicleRentalStationService getVehicleRentalStationService() {
-    return this.graph.getVehicleRentalStationService();
+  /** {@link Graph#getVehicleRentalService()} */
+  public VehicleRentalService getVehicleRentalService() {
+    return this.graph.getVehicleRentalService();
   }
 
   /** {@link Graph#getVehicleParkingService()} */

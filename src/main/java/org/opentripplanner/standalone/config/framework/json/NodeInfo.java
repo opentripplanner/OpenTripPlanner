@@ -42,6 +42,7 @@ public record NodeInfo(
 )
   implements Comparable<NodeInfo> {
   static final String TYPE_QUALIFIER = "type";
+  static final String SOURCETYPE_QUALIFIER = "sourceType";
 
   public NodeInfo {
     Objects.requireNonNull(name);

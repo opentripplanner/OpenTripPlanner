@@ -5,8 +5,8 @@ package org.opentripplanner.updater;
  * config interfaces of child classes.
  */
 public interface PollingGraphUpdaterParameters {
-  int getFrequencySec();
+  int frequencySec();
 
   /** The config name/type for the updater. Used to reference the configuration element. */
-  String getConfigRef();
+  String configRef();
 }

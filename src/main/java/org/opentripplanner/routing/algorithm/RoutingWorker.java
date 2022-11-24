@@ -173,7 +173,8 @@ public class RoutingWorker {
       firstRemovedItinerary,
       filteredItineraries,
       routingErrors,
-      debugTimingAggregator
+      debugTimingAggregator,
+      serverContext.transitService()
     );
   }
 

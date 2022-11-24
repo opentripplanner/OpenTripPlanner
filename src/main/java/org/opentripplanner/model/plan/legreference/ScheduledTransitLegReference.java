@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -47,7 +48,7 @@ public record ScheduledTransitLegReference(
     int boardingTime = tripTimes.getDepartureTime(fromStopPositionInPattern);
     int alightingTime = tripTimes.getArrivalTime(toStopPositionInPattern);
 
-    return new ScheduledTransitLeg(
+    ScheduledTransitLeg leg = new ScheduledTransitLeg(
       tripTimes,
       tripPattern,
       fromStopPositionInPattern,
@@ -61,5 +62,13 @@ public record ScheduledTransitLegReference(
       0, // TODO: What should we have here
       null
     );
+
+    new AlertToLegMapper(
+      transitService.getTransitAlertService(),
+      transitService::getMultiModalStationForStation
+    )
+      .addTransitAlertsToLeg(leg, false);
+
+    return leg;
   }
 }

@@ -167,7 +167,7 @@ possible to keep parts of the configuration in separate files. To include the co
 use
 `${includeFile:FILE_NAME}`. The `FILE_NAME` must be the name of a file in the configuration
 directory. Relative paths are not supported.
-<p>
+
 To allow both files (the configuration file and the injected file) to be valid JSON files, a special
 case is supported. If the include file directive is quoted, then the quotes are removed, if the 
 text inserted is valid JSON (starts with `{` and ends with `}`). 
@@ -239,6 +239,7 @@ Here is a list of all features which can be toggled on/off and their default val
 | `FaresV2`                            | Enable import of GTFS-Fares v2 data.                                                                                                                                                              |                    |    ✓️   |
 | `FlexRouting`                        | Enable FLEX routing.                                                                                                                                                                              |                    |    ✓️   |
 | `GoogleCloudStorage`                 | Enable Google Cloud Storage integration.                                                                                                                                                          |                    |    ✓️   |
+| `RealtimeResolver`                   | When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with realtime data                                                                                        |                    |    ✓️   |
 | `ReportApi`                          | Enable the report API.                                                                                                                                                                            |                    |    ✓️   |
 | `SandboxAPIGeocoder`                 | Enable the Geocoder API.                                                                                                                                                                          |                    |    ✓️   |
 | `SandboxAPILegacyGraphQLApi`         | Enable (GTFS) GraphQL API.                                                                                                                                                                        |                    |    ✓️   |
@@ -280,13 +281,13 @@ The main optimization goal for the OTP server is minimizing response time.
 
 
 ### Garbage collector
-- 
+ 
 - The G1 garbage collector (default since Java 9) offers a good compromise between low latency (i.e. low GC pause time) and GC overhead.
 - If latency spikes are an issue, the ZGC garbage collector is an alternative. It produces in general more overhead than G1.  
 
 
 ### Memory settings 
-- 
+ 
 - Using Large Memory Pages can reduce pressure on the TLB cache and increase performance.  
 - It is in general not recommended to use large memory page in _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`) for latency-sensitive applications, since memory is allocated on-demand and this can induce latency spikes if the memory is fragmented.  
   Thus _TLBFS_ mode (`-XX:+UseHugeTLBFS`) should be the first choice.
@@ -302,13 +303,13 @@ The main optimization goal for the Graph Builder is minimizing total build time.
 
 
 ### Garbage collector
-- 
+ 
 - In theory, the Parallel garbage collector offers the best throughput.  
 In practice, it can be challenging to optimize the Parallel GC to build both a street graph and a transit graph, the memory usage patterns being different. 
 - The G1 garbage collector provides in general a good compromise.  
 
 
 ### Memory settings 
-- 
+ 
 - Using Large Memory Pages can reduce pressure on the TLB cache and increase performance.  
 - Since latency is not an issue, Large Memory Pages can be used indifferently in _TLBFS_ mode (`-XX:+UseHugeTLBFS`) or _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`)

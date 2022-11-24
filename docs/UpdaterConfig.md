@@ -87,21 +87,19 @@ predicted arrival and departure times for the remainder of the trip.
 | Config Parameter                                                      |    Type   | Summary                                             |  Req./Opt. | Default Value        | Since |
 |-----------------------------------------------------------------------|:---------:|-----------------------------------------------------|:----------:|----------------------|:-----:|
 | type = "STOP_TIME_UPDATER"                                            |   `enum`  | The type of the updater.                            | *Required* |                      |   na  |
-| [backwardsDelayPropagationType](#u__3__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled.        | *Optional* | `"required-no-data"` |  2.2  |
+| [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled.        | *Optional* | `"required-no-data"` |  2.2  |
 | feedId                                                                |  `string` | Which feed the updates apply to.                    | *Optional* |                      |   na  |
 | frequencySec                                                          | `integer` | How often the data should be downloaded in seconds. | *Optional* | `60`                 |   na  |
 | fuzzyTripMatching                                                     | `boolean` | If the trips should be matched fuzzily.             | *Optional* | `false`              |   na  |
-| maxSnapshotFrequencyMs                                                | `integer` | TODO                                                | *Optional* | `-1`                 |   na  |
-| purgeExpiredData                                                      | `boolean` | Should expired data removed from the snapshot.      | *Optional* | `false`              |   na  |
 | url                                                                   |  `string` | The URL of the GTFS-RT resource.                    | *Required* |                      |   na  |
 
 
 #### Details
 
-<h4 id="u__3__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
+<h4 id="u__5__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`  \
-**Path:** /updaters/[3]  \
+**Path:** /updaters/[5]  \
 **Enum values:** `required-no-data` | `required` | `always`
 
 How backwards propagation should be handled.
@@ -149,7 +147,7 @@ How backwards propagation should be handled.
 | Config Parameter                                                      |    Type   | Summary                  |  Req./Opt. | Default Value        | Since |
 |-----------------------------------------------------------------------|:---------:|--------------------------|:----------:|----------------------|:-----:|
 | type = "WEBSOCKET_GTFS_RT_UPDATER"                                    |   `enum`  | The type of the updater. | *Required* |                      |   na  |
-| [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |   na  |
+| [backwardsDelayPropagationType](#u__7__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |   na  |
 | feedId                                                                |  `string` | TODO                     | *Optional* |                      |   na  |
 | reconnectPeriodSec                                                    | `integer` | TODO                     | *Optional* | `60`                 |   na  |
 | url                                                                   |  `string` | TODO                     | *Optional* |                      |   na  |
@@ -157,10 +155,10 @@ How backwards propagation should be handled.
 
 #### Details
 
-<h4 id="u__5__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
+<h4 id="u__7__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
 **Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`  \
-**Path:** /updaters/[5]  \
+**Path:** /updaters/[7]  \
 **Enum values:** `required-no-data` | `required` | `always`
 
 TODO
@@ -288,7 +286,7 @@ GBFS feeds must include a system_id which will be used as the default `network`.
 
 **Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
 **Path:** /updaters/[1]  \
-**Enum values:** `gbfs` | `smoove` | `vilkku` | `kml` | `park-api` | `bicycle-park-api` | `hsl-park`
+**Enum values:** `gbfs` | `smoove` | `vilkku`
 
 What source of vehicle rental updater to use.
 
@@ -331,66 +329,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 Vehicle parking options and configuration is documented in
 its [sandbox documentation](sandbox/VehicleParking.md).
 
-<!-- vehicle-parking BEGIN -->
-<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-
-| Config Parameter                |     Type    | Summary                                      |  Req./Opt. | Default Value | Since |
-|---------------------------------|:-----------:|----------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_PARKING"        |    `enum`   | The type of the updater.                     | *Required* |               |   na  |
-| facilitiesFrequencySec          |  `integer`  | How often the facilities should be updated.  | *Optional* | `3600`        |   na  |
-| facilitiesUrl                   |   `string`  | URL of the facilities.                       | *Optional* |               |   na  |
-| [feedId](#u__2__feedId)         |   `string`  | The name of the data source.                 | *Optional* |               |   na  |
-| hubsUrl                         |   `string`  | Hubs URL                                     | *Optional* |               |   na  |
-| [sourceType](#u__2__sourceType) |    `enum`   | The source of the vehicle updates.           | *Required* |               |   na  |
-| [timeZone](#u__2__timeZone)     | `time-zone` | The time zone of the feed.                   | *Optional* |               |   na  |
-| utilizationsFrequencySec        |  `integer`  | How often the utilization should be updated. | *Optional* | `600`         |   na  |
-| utilizationsUrl                 |   `string`  | URL of the utilization data.                 | *Optional* |               |   na  |
-
-
-#### Details
-
-<h4 id="u__2__feedId">feedId</h4>
-
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
-**Path:** /updaters/[2] 
-
-The name of the data source.
-
-This will end up in the API responses as the feed id of of the parking lot.
-
-<h4 id="u__2__sourceType">sourceType</h4>
-
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
-**Path:** /updaters/[2]  \
-**Enum values:** `gbfs` | `smoove` | `vilkku` | `kml` | `park-api` | `bicycle-park-api` | `hsl-park`
-
-The source of the vehicle updates.
-
-<h4 id="u__2__timeZone">timeZone</h4>
-
-**Since version:** `na` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
-**Path:** /updaters/[2] 
-
-The time zone of the feed.
-
-Used for converting abstract opening hours into concrete points in time.
-
-
-
-```JSON
-// router-config.json
-{
-    "updaters": [
-    {
-      "type" : "vehicle-parking",
-      "sourceType" : "hsl-park"
-    }
-  ]
-
-}
-```
-
-<!-- vehicle-parking END -->
+<!-- INSERT: vehicle-parking -->
 
 
 
