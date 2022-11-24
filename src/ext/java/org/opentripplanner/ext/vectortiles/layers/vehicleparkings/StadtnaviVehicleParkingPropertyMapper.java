@@ -44,20 +44,9 @@ public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<Vehicl
     }
     items.addAll(mapI18NString("name", vehicleParking.getName()));
     items.addAll(mapI18NString("note", vehicleParking.getNote()));
-    // TODO add when openingHours are implemented
-    // items.addAll(mapI18NString("openingHours", vehicleParking.getOpeningHours()));
-    // items.addAll(mapI18NString("feeHours", vehicleParking.getFeeHours()));
     items.addAll(mapPlaces("capacity", vehicleParking.getCapacity()));
     items.addAll(mapPlaces("availability", vehicleParking.getAvailability()));
     return items;
-  }
-
-  private static List<T2<String, Object>> mapI18NString(String key, Object object) {
-    if (object instanceof I18NString) {
-      return mapI18NString(key, (I18NString) object);
-    } else {
-      return List.of();
-    }
   }
 
   private static List<T2<String, Object>> mapI18NString(String key, I18NString i18n) {
