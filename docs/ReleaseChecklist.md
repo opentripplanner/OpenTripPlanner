@@ -24,7 +24,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * It is important to finalize the documentation before tagging the release, to ensure the 
       published documentation is associated with the release tag 
 * Update the variable MASTER_BRANCH_VERSION in `cibuild.yml`
-    * This tells the GH Action that pushes the documentation on master that what the name of the 
+    * This tells the GH Action that pushes the documentation on master what the name of the 
       current version is. 
       For version 2.3.0 Leonard has already done it: [Example commit](https://github.com/opentripplanner/OpenTripPlanner/commit/3cb061ab1e4253c3977a5d08fa5abab1b0baefd7)
 * Check [on GH Actions](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/) that
