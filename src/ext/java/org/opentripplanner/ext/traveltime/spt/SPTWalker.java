@@ -26,9 +26,9 @@ public class SPTWalker {
 
   private static final Logger LOG = LoggerFactory.getLogger(SPTWalker.class);
 
-  private final ShortestPathTree spt;
+  private final ShortestPathTree<State, Edge, Vertex> spt;
 
-  public SPTWalker(ShortestPathTree spt) {
+  public SPTWalker(ShortestPathTree<State, Edge, Vertex> spt) {
     this.spt = spt;
   }
 

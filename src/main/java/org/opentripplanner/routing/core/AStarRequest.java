@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.astar.DominanceFunction;
+import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
@@ -28,7 +28,7 @@ public class AStarRequest {
    * How close to do you have to be to the start or end to be considered "close".
    *
    * @see AStarRequest#isCloseToStartOrEnd(Vertex)
-   * @see DominanceFunction#betterOrEqualAndComparable(State, State)
+   * @see DominanceFunctions#betterOrEqualAndComparable(State, State)
    */
   private static final int MAX_CLOSENESS_METERS = 500;
 
@@ -159,7 +159,7 @@ public class AStarRequest {
    * If you encounter a case of this, you can adjust this code to take this into account.
    *
    * @see AStarRequest#MAX_CLOSENESS_METERS
-   * @see DominanceFunction#betterOrEqualAndComparable(State, State)
+   * @see DominanceFunctions#betterOrEqualAndComparable(State, State)
    */
   public boolean isCloseToStartOrEnd(Vertex vertex) {
     return (

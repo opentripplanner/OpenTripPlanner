@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.transit.model.basic.I18NString;
 
@@ -13,7 +14,7 @@ import org.opentripplanner.transit.model.basic.I18NString;
  * This is the standard implementation of an edge with fixed from and to Vertex instances; all
  * standard OTP edges are subclasses of this.
  */
-public abstract class Edge implements Serializable {
+public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializable {
 
   protected Vertex fromv;
 

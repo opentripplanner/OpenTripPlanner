@@ -79,9 +79,9 @@ public class GraphPathToItineraryMapper {
   /**
    * Generates a TripPlan from a set of paths
    */
-  public List<Itinerary> mapItineraries(List<GraphPath> paths) {
+  public List<Itinerary> mapItineraries(List<GraphPath<State, Edge, Vertex>> paths) {
     List<Itinerary> itineraries = new LinkedList<>();
-    for (GraphPath path : paths) {
+    for (GraphPath<State, Edge, Vertex> path : paths) {
       Itinerary itinerary = generateItinerary(path);
       if (itinerary.getLegs().isEmpty()) {
         continue;
@@ -99,7 +99,7 @@ public class GraphPathToItineraryMapper {
    * @param path The graph path to base the itinerary on
    * @return The generated itinerary
    */
-  public Itinerary generateItinerary(GraphPath path) {
+  public Itinerary generateItinerary(GraphPath<State, Edge, Vertex> path) {
     List<Leg> legs = new ArrayList<>();
     WalkStep previousStep = null;
     for (List<State> legStates : sliceStates(path.states)) {

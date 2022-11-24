@@ -10,11 +10,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.AStarBuilder;
+import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
+import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -100,14 +102,15 @@ public class TurnRestrictionTest {
       preferences.withCar(it -> it.withSpeed(1.0)).withWalk(w -> w.withSpeed(1.0))
     );
 
-    ShortestPathTree tree = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> tree = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(topRight)
       .setTo(bottomLeft)
       .getShortestPathTree();
 
-    GraphPath path = tree.getPath(bottomLeft);
+    GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
     assertNotNull(path);
 
     // Since there are no turn restrictions applied to the default modes (walking + transit)
@@ -129,14 +132,15 @@ public class TurnRestrictionTest {
     var request = new RouteRequest();
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
 
-    ShortestPathTree tree = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> tree = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(topRight)
       .setTo(bottomLeft)
       .getShortestPathTree();
 
-    GraphPath path = tree.getPath(bottomLeft);
+    GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
     assertNotNull(path);
 
     // Since there are no turn restrictions applied to the default modes (walking + transit)
@@ -158,15 +162,16 @@ public class TurnRestrictionTest {
     var request = new RouteRequest();
     request.withPreferences(p -> p.withCar(it -> it.withSpeed(1.0)));
 
-    ShortestPathTree tree = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> tree = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setStreetRequest(new StreetRequest(StreetMode.CAR))
       .setFrom(topRight)
       .setTo(bottomLeft)
       .getShortestPathTree();
 
-    GraphPath path = tree.getPath(bottomLeft);
+    GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
     assertNotNull(path);
 
     // If not for turn restrictions, the shortest path would be to take 1st to Main,

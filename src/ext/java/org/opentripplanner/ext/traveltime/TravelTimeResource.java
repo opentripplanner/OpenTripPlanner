@@ -46,8 +46,9 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.astar.AStarBuilder;
-import org.opentripplanner.astar.DominanceFunction;
+import org.opentripplanner.astar.AStar;
+import org.opentripplanner.astar.DominanceFunctions;
+import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -59,6 +60,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.api.response.StopArrivals;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -244,12 +246,13 @@ public class TravelTimeResource {
 
       var arrivals = route(accessList).getArrivals();
 
-      var spt = AStarBuilder
-        .allDirectionsMaxDuration(traveltimeRequest.maxCutoff)
+      var spt = AStar
+        .<State, Edge, Vertex>of()
+        .setSkipEdgeStrategy(new DurationSkipEdgeStrategy(traveltimeRequest.maxCutoff))
         .setRequest(routingRequest)
         .setStreetRequest(accessRequest.journey().access())
         .setVerticesContainer(temporaryVertices)
-        .setDominanceFunction(new DominanceFunction.EarliestArrival())
+        .setDominanceFunction(new DominanceFunctions.EarliestArrival())
         .setInitialStates(getInitialStates(arrivals, temporaryVertices))
         .getShortestPathTree();
 

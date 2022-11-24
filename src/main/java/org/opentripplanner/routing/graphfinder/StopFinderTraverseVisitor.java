@@ -14,7 +14,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 /**
  * A TraverseVisitor used in finding stops while walking the street graph.
  */
-public class StopFinderTraverseVisitor implements TraverseVisitor {
+public class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
   private final double radiusMeters;
   /** A list of closest stops found while walking the graph */
@@ -43,7 +43,7 @@ public class StopFinderTraverseVisitor implements TraverseVisitor {
    * @return A SkipEdgeStrategy that will stop exploring edges after the distance radius has been
    * reached.
    */
-  public SkipEdgeStrategy getSkipEdgeStrategy() {
+  public SkipEdgeStrategy<State, Edge> getSkipEdgeStrategy() {
     return (current, edge) -> current.getWalkDistance() > radiusMeters;
   }
 }

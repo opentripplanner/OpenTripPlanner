@@ -10,7 +10,7 @@ import org.opentripplanner.routing.core.State;
  * all relevant results up to the specified duration, as the only criterion we optimize on is
  * generalized cost.
  */
-public class DurationSkipEdgeStrategy implements SkipEdgeStrategy {
+public class DurationSkipEdgeStrategy implements SkipEdgeStrategy<State, Edge> {
 
   private final double durationInSeconds;
 

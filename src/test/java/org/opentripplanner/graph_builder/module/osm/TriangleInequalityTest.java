@@ -16,8 +16,8 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.AStarBuilder;
-import org.opentripplanner.astar.DominanceFunction;
+import org.opentripplanner.astar.AStar;
+import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Edge;
@@ -30,8 +30,10 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParamet
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Graph;
@@ -173,9 +175,15 @@ public class TriangleInequalityTest {
     checkTriangleInequality(modes);
   }
 
-  private GraphPath getPath(RouteRequest options, Edge startBackEdge, Vertex u, Vertex v) {
-    return AStarBuilder
-      .oneToOne()
+  private GraphPath<State, Edge, Vertex> getPath(
+    RouteRequest options,
+    Edge startBackEdge,
+    Vertex u,
+    Vertex v
+  ) {
+    return AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setOriginBackEdge(startBackEdge)
       .setRequest(options)
       .setFrom(u)
@@ -208,16 +216,17 @@ public class TriangleInequalityTest {
       prototypeOptions.journey().setModes(modes);
     }
 
-    ShortestPathTree tree = AStarBuilder
-      .oneToOne()
-      .setDominanceFunction(new DominanceFunction.EarliestArrival())
+    ShortestPathTree<State, Edge, Vertex> tree = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setDominanceFunction(new DominanceFunctions.EarliestArrival())
       .setRequest(prototypeOptions)
       .setFrom(start)
       .setTo(end)
       .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
 
-    GraphPath path = tree.getPath(end);
+    GraphPath<State, Edge, Vertex> path = tree.getPath(end);
     assertNotNull(path);
 
     double startEndWeight = path.getWeight();
@@ -232,13 +241,23 @@ public class TriangleInequalityTest {
         continue;
       }
 
-      GraphPath startIntermediatePath = getPath(prototypeOptions, null, start, intermediate);
+      GraphPath<State, Edge, Vertex> startIntermediatePath = getPath(
+        prototypeOptions,
+        null,
+        start,
+        intermediate
+      );
       if (startIntermediatePath == null) {
         continue;
       }
 
       Edge back = startIntermediatePath.states.getLast().getBackEdge();
-      GraphPath intermediateEndPath = getPath(prototypeOptions, back, intermediate, end);
+      GraphPath<State, Edge, Vertex> intermediateEndPath = getPath(
+        prototypeOptions,
+        back,
+        intermediate,
+        end
+      );
       if (intermediateEndPath == null) {
         continue;
       }

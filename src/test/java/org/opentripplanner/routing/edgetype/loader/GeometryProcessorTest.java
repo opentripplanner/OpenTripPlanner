@@ -15,9 +15,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.astar.AStarBuilder;
+import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
+import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssue;
@@ -25,7 +26,9 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -126,8 +129,7 @@ public class GeometryProcessorTest {
   public void testIssue() {
     boolean found = false;
     for (DataImportIssue it : issueStore.getIssues()) {
-      if (it instanceof NegativeHopTime) {
-        NegativeHopTime nht = (NegativeHopTime) it;
+      if (it instanceof NegativeHopTime nht) {
         assertTrue(nht.st0.getDepartureTime() > nht.st1.getArrivalTime());
         found = true;
       }
@@ -141,16 +143,17 @@ public class GeometryProcessorTest {
     Vertex stop_g = graph.getVertex(feedId + ":G_depart");
     Vertex stop_h = graph.getVertex(feedId + ":H_arrive");
 
-    ShortestPathTree spt;
-    GraphPath path;
+    ShortestPathTree<State, Edge, Vertex> spt;
+    GraphPath<State, Edge, Vertex> path;
     RouteRequest options = new RouteRequest();
 
     // Friday evening
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 23, 20, 0));
 
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setFrom(stop_g)
         .setTo(stop_h)
@@ -164,8 +167,9 @@ public class GeometryProcessorTest {
     long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 0, 5, 0);
     options.setDateTime(Instant.ofEpochSecond(startTime));
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setFrom(stop_g)
         .setTo(stop_h)
@@ -186,21 +190,23 @@ public class GeometryProcessorTest {
 
     RouteRequest options = new RouteRequest();
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 19, 12, 0, 0));
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setFrom(stop_o)
       .setTo(stop_p)
       .getShortestPathTree();
-    GraphPath path = spt.getPath(stop_p);
+    GraphPath<State, Edge, Vertex> path = spt.getPath(stop_p);
     assertNotNull(path);
     long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 10, 0);
     assertEquals(endTime, path.getEndTime());
 
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 19, 12, 0, 1));
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setFrom(stop_o)
         .setTo(stop_p)
@@ -217,14 +223,15 @@ public class GeometryProcessorTest {
     Vertex stop_c = graph.getVertex(feedId + ":C");
     RouteRequest options = new RouteRequest();
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 1, 10, 0, 0));
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setFrom(stop_d)
       .setTo(stop_c)
       .getShortestPathTree();
 
-    GraphPath path = spt.getPath(stop_c);
+    GraphPath<State, Edge, Vertex> path = spt.getPath(stop_c);
     assertNotNull(path);
     assertEquals(
       TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 11, 0, 0),
@@ -252,13 +259,14 @@ public class GeometryProcessorTest {
     options.setWheelchair(true);
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 0, 0, 0));
 
-    ShortestPathTree spt;
-    GraphPath path;
+    ShortestPathTree<State, Edge, Vertex> spt;
+    GraphPath<State, Edge, Vertex> path;
 
     // stop B is accessible, so there should be a path.
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setFrom(near_a)
         .setTo(near_b)
@@ -269,8 +277,9 @@ public class GeometryProcessorTest {
 
     // stop C is not accessible, so there should be no path.
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setFrom(near_a)
         .setTo(near_c)
@@ -281,8 +290,9 @@ public class GeometryProcessorTest {
 
     // stop E has no accessibility information, but we should still be able to route to it.
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setFrom(near_a)
         .setTo(near_e)
@@ -297,8 +307,9 @@ public class GeometryProcessorTest {
     ZonedDateTime zdt = ZonedDateTime.of(ldt, ZoneId.of("America/New_York"));
     options.setDateTime(zdt.toInstant());
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setFrom(near_a)
         .setTo(split_d)
@@ -325,13 +336,14 @@ public class GeometryProcessorTest {
     LocalDateTime ldt = LocalDateTime.of(2009, 10, 2, 8, 30, 0);
     ZonedDateTime startTime = ZonedDateTime.of(ldt, ZoneId.of("America/New_York"));
     options.setDateTime(startTime.toInstant());
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setFrom(graph.getVertex(feedId + ":Q"))
       .setTo(destination)
       .getShortestPathTree();
-    GraphPath path = spt.getPath(destination);
+    GraphPath<State, Edge, Vertex> path = spt.getPath(destination);
 
     long endTime = path.getEndTime();
     assertTrue(endTime - startTime.toEpochSecond() < 7200);
@@ -342,16 +354,17 @@ public class GeometryProcessorTest {
     Vertex stop_u = graph.getVertex(feedId + ":U_depart");
     Vertex stop_v = graph.getVertex(feedId + ":V_arrive");
 
-    ShortestPathTree spt;
-    GraphPath path;
+    ShortestPathTree<State, Edge, Vertex> spt;
+    GraphPath<State, Edge, Vertex> path;
 
     RouteRequest options = new RouteRequest();
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 0, 0, 0));
 
     // U to V - original stop times - shouldn't be used
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setFrom(stop_u)
         .setTo(stop_v)
@@ -365,8 +378,9 @@ public class GeometryProcessorTest {
     // U to V - first frequency
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 7, 0, 0));
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setFrom(stop_u)
         .setTo(stop_v)
@@ -380,8 +394,9 @@ public class GeometryProcessorTest {
     // U to V - second frequency
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 14, 0, 0));
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setFrom(stop_u)
         .setTo(stop_v)
@@ -404,14 +419,15 @@ public class GeometryProcessorTest {
 
     RouteRequest options = new RouteRequest();
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 1, 16, 0, 0));
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setFrom(entrance)
       .setTo(stop)
       .getShortestPathTree();
 
-    GraphPath path = spt.getPath(stop);
+    GraphPath<State, Edge, Vertex> path = spt.getPath(stop);
     assertNotNull(path);
     assertEquals(
       TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 34),

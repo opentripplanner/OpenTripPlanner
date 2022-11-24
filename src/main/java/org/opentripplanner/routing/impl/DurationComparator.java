@@ -3,7 +3,7 @@ package org.opentripplanner.routing.impl;
 import java.util.Comparator;
 import org.opentripplanner.astar.GraphPath;
 
-public class DurationComparator implements Comparator<GraphPath> {
+public class DurationComparator implements Comparator<GraphPath<?, ?, ?>> {
 
   @Override
   public int compare(GraphPath o1, GraphPath o2) {

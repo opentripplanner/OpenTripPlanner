@@ -23,7 +23,7 @@ public class ConstructApplicationModule {
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
     TransitService transitService,
-    @Nullable TraverseVisitor traverseVisitor
+    @Nullable TraverseVisitor<?, ?> traverseVisitor
   ) {
     return DefaultServerRequestContext.create(
       routerConfig,
@@ -37,7 +37,7 @@ public class ConstructApplicationModule {
 
   @Provides
   @Nullable
-  TraverseVisitor traverseVisitor(@Nullable GraphVisualizer graphVisualizer) {
+  TraverseVisitor<?, ?> traverseVisitor(@Nullable GraphVisualizer graphVisualizer) {
     return graphVisualizer == null ? null : graphVisualizer.traverseVisitor;
   }
 }

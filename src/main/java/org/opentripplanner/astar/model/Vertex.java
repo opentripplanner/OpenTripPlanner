@@ -9,7 +9,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.DirectionUtils;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.basic.I18NString;
@@ -21,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * A vertex in the graph. Each vertex has a longitude/latitude location, as well as a set of
  * incoming and outgoing edges.
  */
-public abstract class Vertex implements Serializable, Cloneable {
+public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serializable, Cloneable {
 
   private static final long serialVersionUID = 1L;
 
@@ -108,16 +110,10 @@ public abstract class Vertex implements Serializable, Cloneable {
     }
   }
 
-  /**
-   * Get a collection containing all the edges leading from this vertex to other vertices. There is
-   * probably some overhead to creating the wrapper ArrayList objects, but this allows filtering and
-   * combining edge lists using stock Collection-based methods.
-   */
   public Collection<Edge> getOutgoing() {
     return Arrays.asList(outgoing);
   }
 
-  /** Get a collection containing all the edges leading from other vertices to this vertex. */
   public Collection<Edge> getIncoming() {
     return Arrays.asList(incoming);
   }

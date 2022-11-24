@@ -37,7 +37,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
  * <p>
  * {@see https://github.com/opentripplanner/OpenTripPlanner/pull/3906}
  */
-public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
+public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Edge> {
 
   public static final Set<StreetMode> applicableModes = Set.of(
     BIKE_TO_PARK,

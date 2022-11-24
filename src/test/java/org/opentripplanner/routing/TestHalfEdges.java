@@ -16,7 +16,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
-import org.opentripplanner.astar.AStarBuilder;
+import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Edge;
@@ -25,6 +25,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.AStarRequest;
@@ -226,41 +227,44 @@ public class TestHalfEdges {
 
     long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
     options.setDateTime(Instant.ofEpochSecond(startTime));
-    ShortestPathTree spt1 = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt1 = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
       .setFrom(br)
       .setTo(end)
       .getShortestPathTree();
 
-    GraphPath pathBr = spt1.getPath(end);
+    GraphPath<State, Edge, Vertex> pathBr = spt1.getPath(end);
     assertNotNull(pathBr, "There must be a path from br to end");
 
-    ShortestPathTree spt2 = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt2 = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
       .setFrom(tr)
       .setTo(end)
       .getShortestPathTree();
 
-    GraphPath pathTr = spt2.getPath(end);
+    GraphPath<State, Edge, Vertex> pathTr = spt2.getPath(end);
     assertNotNull(pathTr, "There must be a path from tr to end");
     assertTrue(
       pathBr.getWeight() > pathTr.getWeight(),
       "path from bottom to end must be longer than path from top to end"
     );
 
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
 
-    GraphPath path = spt.getPath(end);
+    GraphPath<State, Edge, Vertex> path = spt.getPath(end);
     assertNotNull(path, "There must be a path from start to end");
 
     // the bottom is not part of the shortest path
@@ -271,8 +275,9 @@ public class TestHalfEdges {
 
     options.setArriveBy(true);
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setStreetRequest(options.journey().direct())
         .setFrom(start)
@@ -320,8 +325,9 @@ public class TestHalfEdges {
       );
 
     spt =
-      AStarBuilder
-        .oneToOne()
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setStreetRequest(options.journey().direct())
         .setFrom(start)
@@ -362,7 +368,13 @@ public class TestHalfEdges {
       );
 
     spt =
-      AStarBuilder.oneToOne().setRequest(options).setFrom(start).setTo(end).getShortestPathTree();
+      AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
+        .setRequest(options)
+        .setFrom(start)
+        .setTo(end)
+        .getShortestPathTree();
 
     path = spt.getPath(start);
     assertNotNull(path, "There must be a path from top to bottom");
@@ -417,15 +429,16 @@ public class TestHalfEdges {
 
     long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
     options.setDateTime(Instant.ofEpochSecond(startTime));
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
 
-    GraphPath path = spt.getPath(end);
+    GraphPath<State, Edge, Vertex> path = spt.getPath(end);
     assertNotNull(path, "There must be a path from start to end");
     assertEquals(1, path.edges.size());
     tempEdges.disposeEdges();
@@ -469,15 +482,16 @@ public class TestHalfEdges {
 
     long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
     options.setDateTime(Instant.ofEpochSecond(startTime));
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
 
-    GraphPath path = spt.getPath(end);
+    GraphPath<State, Edge, Vertex> path = spt.getPath(end);
     assertNotNull(path, "There must be a path from start to end");
     assertTrue(path.edges.size() > 1);
     tempEdges.disposeEdges();
@@ -637,12 +651,15 @@ public class TestHalfEdges {
     ) {
       assertNotNull(container.getFromVertices());
       assertNotNull(container.getToVertices());
-      ShortestPathTree spt = AStarBuilder
-        .oneToOne()
+      ShortestPathTree<State, Edge, Vertex> spt = AStar
+        .<State, Edge, Vertex>of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(walking)
         .setVerticesContainer(container)
         .getShortestPathTree();
-      GraphPath path = spt.getPath(container.getToVertices().iterator().next());
+      GraphPath<State, Edge, Vertex> path = spt.getPath(
+        container.getToVertices().iterator().next()
+      );
       for (State s : path.states) {
         assertNotSame(s.getBackEdge(), top);
       }

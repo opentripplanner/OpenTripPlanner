@@ -11,15 +11,17 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.AStarBuilder;
+import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
@@ -65,15 +67,16 @@ public class UnroutableTest {
 
     Vertex from = graph.getVertex("osm:node:2003617278");
     Vertex to = graph.getVertex("osm:node:40446276");
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
       .setFrom(from)
       .setTo(to)
       .getShortestPathTree();
 
-    GraphPath path = spt.getPath(to);
+    GraphPath<State, Edge, Vertex> path = spt.getPath(to);
     // At the time of writing this test, the router simply doesn't find a path at all when highway=construction
     // is filtered out, thus the null check.
     if (path != null) {

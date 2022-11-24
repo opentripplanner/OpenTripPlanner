@@ -5,13 +5,16 @@ import static java.lang.Integer.min;
 import java.util.Comparator;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.astar.AStarBuilder;
-import org.opentripplanner.astar.DominanceFunction;
+import org.opentripplanner.astar.AStar;
+import org.opentripplanner.astar.DominanceFunctions;
+import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -65,7 +68,7 @@ public class StreetGraphFinder implements GraphFinder {
       maxResults,
       radiusMeters
     );
-    SkipEdgeStrategy terminationStrategy = visitor.getSkipEdgeStrategy();
+    SkipEdgeStrategy<State, Edge> terminationStrategy = visitor.getSkipEdgeStrategy();
     findClosestUsingStreets(lat, lon, visitor, terminationStrategy);
     List<PlaceAtDistance> results = visitor.placesFound;
     results.sort(Comparator.comparingDouble(PlaceAtDistance::distance));
@@ -75,8 +78,8 @@ public class StreetGraphFinder implements GraphFinder {
   private void findClosestUsingStreets(
     double lat,
     double lon,
-    TraverseVisitor visitor,
-    SkipEdgeStrategy skipEdgeStrategy
+    TraverseVisitor<State, Edge> visitor,
+    SkipEdgeStrategy<State, Edge> skipEdgeStrategy
   ) {
     // Make a normal OTP routing request so we can traverse edges and use GenericAStar
     // TODO make a function that builds normal routing requests from profile requests
@@ -94,10 +97,11 @@ public class StreetGraphFinder implements GraphFinder {
         StreetMode.WALK
       )
     ) {
-      AStarBuilder
-        .allDirections(skipEdgeStrategy)
+      AStar
+        .<State, Edge, Vertex>of()
+        .setSkipEdgeStrategy(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
-        .setDominanceFunction(new DominanceFunction.LeastWalk())
+        .setDominanceFunction(new DominanceFunctions.LeastWalk())
         .setRequest(rr)
         .setVerticesContainer(temporaryVertices)
         .getShortestPathTree();

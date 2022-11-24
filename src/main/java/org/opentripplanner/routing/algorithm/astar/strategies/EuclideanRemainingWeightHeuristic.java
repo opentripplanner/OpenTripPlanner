@@ -15,7 +15,7 @@ import org.opentripplanner.street.model.edge.FreeEdge;
 /**
  * A Euclidean remaining weight strategy.
  */
-public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic {
+public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic<State, Vertex> {
 
   private double lat;
   private double lon;

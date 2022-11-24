@@ -1,9 +1,8 @@
 package org.opentripplanner.astar.spi;
 
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.routing.core.State;
-
-public interface TraverseVisitor {
+public interface TraverseVisitor<
+  State extends AStarState<State, Edge, ?>, Edge extends AStarEdge<State, Edge, ?>
+> {
   /** Called when A* explores an edge */
   void visitEdge(Edge edge);
 

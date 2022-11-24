@@ -602,7 +602,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     );
   }
 
-  private void drawGraphPath(GraphPath gp) {
+  private void drawGraphPath(GraphPath<State, Edge, Vertex> gp) {
     // draw edges in different colors according to mode
     for (State s : gp.states) {
       TraverseMode mode = s.getBackMode();

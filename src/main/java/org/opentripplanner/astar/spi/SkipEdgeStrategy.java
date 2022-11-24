@@ -1,8 +1,5 @@
 package org.opentripplanner.astar.spi;
 
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.routing.core.State;
-
 /**
  * Strategy interface to provide additional logic to decide if a given edge should not be considered
  * for traversal. This can also be used to limit the search, for example by duration or distance.
@@ -11,7 +8,9 @@ import org.opentripplanner.routing.core.State;
  *
  * @author bdferris
  */
-public interface SkipEdgeStrategy {
+public interface SkipEdgeStrategy<
+  State extends AStarState<State, Edge, ?>, Edge extends AStarEdge<State, Edge, ?>
+> {
   /**
    * @param current the current vertex
    * @param edge    the current edge to potentially be skipped

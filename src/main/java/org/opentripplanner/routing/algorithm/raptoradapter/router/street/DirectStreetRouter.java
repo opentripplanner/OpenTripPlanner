@@ -3,12 +3,15 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.astar.GraphPath;
+import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -40,7 +43,10 @@ public class DirectStreetRouter {
         serverContext.routerConfig().streetRoutingTimeout(),
         serverContext.dataOverlayContext(request)
       );
-      List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(directRequest, temporaryVertices);
+      List<GraphPath<State, Edge, Vertex>> paths = gpFinder.graphPathFinderEntryPoint(
+        directRequest,
+        temporaryVertices
+      );
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(

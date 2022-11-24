@@ -7,12 +7,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.astar.AStarBuilder;
+import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.GraphPath;
+import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 
@@ -20,7 +23,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
 
   protected Graph graph;
 
-  public static List<String> graphPath(GraphPath graphPath) {
+  public static List<String> graphPath(GraphPath<State, Edge, Vertex> graphPath) {
     return graphPath.states
       .stream()
       .map(s ->
@@ -161,8 +164,9 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     request.journey().parking().setRequiredTags(requiredTags);
     request.setArriveBy(arriveBy);
 
-    var tree = AStarBuilder
-      .oneToOne()
+    var tree = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setStreetRequest(new StreetRequest(streetMode))
       .setFrom(fromVertex)

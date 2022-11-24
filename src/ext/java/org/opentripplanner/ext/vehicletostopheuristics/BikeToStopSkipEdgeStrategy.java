@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * number of accesses to those stops which actually have trips where you can take the bike on. Once
  * we have reached enough of trips we skip all further edges.
  */
-public class BikeToStopSkipEdgeStrategy implements SkipEdgeStrategy {
+public class BikeToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Edge> {
 
   private static final int LIMIT = 100;
   private static final double MAX_FACTOR = 1.2;

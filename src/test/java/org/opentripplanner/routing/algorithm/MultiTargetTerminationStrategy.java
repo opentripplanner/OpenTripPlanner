@@ -14,7 +14,7 @@ import org.opentripplanner.routing.core.State;
  *
  * @author avi
  */
-public class MultiTargetTerminationStrategy implements SearchTerminationStrategy {
+public class MultiTargetTerminationStrategy implements SearchTerminationStrategy<State> {
 
   private final Set<Vertex> unreachedTargets;
   private final Set<Vertex> reachedTargets;

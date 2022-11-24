@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.DominanceFunction;
+import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
@@ -17,7 +18,7 @@ public class DominanceFunctionTest {
 
   @Test
   public void testGeneralDominanceFunction() {
-    DominanceFunction minimumWeightDominanceFunction = new DominanceFunction.MinimumWeight();
+    DominanceFunction minimumWeightDominanceFunction = new DominanceFunctions.MinimumWeight();
     Vertex fromVertex = mock(TransitStopVertex.class);
     Vertex toVertex = mock(TransitStopVertex.class);
 

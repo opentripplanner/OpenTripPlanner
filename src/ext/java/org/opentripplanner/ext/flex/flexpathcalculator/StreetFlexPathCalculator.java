@@ -3,14 +3,17 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.astar.AStarBuilder;
-import org.opentripplanner.astar.DominanceFunction;
+import org.opentripplanner.astar.AStar;
+import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
+import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.core.State;
 
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network
@@ -30,7 +33,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
   private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
 
-  private final Map<Vertex, ShortestPathTree> cache = new HashMap<>();
+  private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> cache = new HashMap<>();
   private final boolean reverseDirection;
 
   public StreetFlexPathCalculator(boolean reverseDirection) {
@@ -44,7 +47,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     Vertex originVertex = reverseDirection ? tov : fromv;
     Vertex destinationVertex = reverseDirection ? fromv : tov;
 
-    ShortestPathTree shortestPathTree;
+    ShortestPathTree<State, Edge, Vertex> shortestPathTree;
     if (cache.containsKey(originVertex)) {
       shortestPathTree = cache.get(originVertex);
     } else {
@@ -52,7 +55,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       cache.put(originVertex, shortestPathTree);
     }
 
-    GraphPath path = shortestPathTree.getPath(destinationVertex);
+    GraphPath<State, Edge, Vertex> path = shortestPathTree.getPath(destinationVertex);
     if (path == null) {
       return null;
     }
@@ -66,13 +69,14 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     return new FlexPath(distance, duration, path::getGeometry);
   }
 
-  private ShortestPathTree routeToMany(Vertex vertex) {
+  private ShortestPathTree<State, Edge, Vertex> routeToMany(Vertex vertex) {
     RouteRequest routingRequest = new RouteRequest();
     routingRequest.setArriveBy(reverseDirection);
 
-    return AStarBuilder
-      .allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION)
-      .setDominanceFunction(new DominanceFunction.EarliestArrival())
+    return AStar
+      .<State, Edge, Vertex>of()
+      .setSkipEdgeStrategy(new DurationSkipEdgeStrategy(MAX_FLEX_TRIP_DURATION))
+      .setDominanceFunction(new DominanceFunctions.EarliestArrival())
       .setRequest(routingRequest)
       .setStreetRequest(new StreetRequest(StreetMode.CAR))
       .setFrom(reverseDirection ? null : vertex)

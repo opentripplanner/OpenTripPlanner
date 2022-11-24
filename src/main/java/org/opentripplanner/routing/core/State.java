@@ -1,11 +1,14 @@
 package org.opentripplanner.routing.core;
 
+import static org.opentripplanner.framework.lang.ObjectUtils.requireNotInitialized;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
@@ -14,7 +17,7 @@ import org.opentripplanner.routing.core.intersection_model.IntersectionTraversal
 import org.opentripplanner.street.model.edge.VehicleRentalEdge;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 
-public class State implements Cloneable {
+public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   private final AStarRequest request;
 
@@ -215,6 +218,10 @@ public class State implements Cloneable {
 
   public Edge getBackEdge() {
     return this.backEdge;
+  }
+
+  public void initBackEdge(Edge initialBackEdge) {
+    this.backEdge = requireNotInitialized(this.backEdge, initialBackEdge);
   }
 
   /**

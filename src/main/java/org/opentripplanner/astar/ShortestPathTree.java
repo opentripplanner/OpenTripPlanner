@@ -11,8 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.astar.model.Vertex;
-import org.opentripplanner.routing.core.State;
+import org.opentripplanner.astar.spi.AStarEdge;
+import org.opentripplanner.astar.spi.AStarState;
+import org.opentripplanner.astar.spi.AStarVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,45 +33,49 @@ import org.slf4j.LoggerFactory;
  * implementation, and applies to all subclasses. It essentially splits each vertex into N vertices
  * depending on the incoming edge being taken.
  */
-public class ShortestPathTree {
+public class ShortestPathTree<
+  State extends AStarState<State, Edge, Vertex>,
+  Edge extends AStarEdge<State, Edge, Vertex>,
+  Vertex extends AStarVertex<State, Edge, Vertex>
+> {
 
   private static final Logger LOG = LoggerFactory.getLogger(ShortestPathTree.class);
 
-  public final DominanceFunction dominanceFunction;
+  public final DominanceFunction<State> dominanceFunction;
 
   private final Map<Vertex, List<State>> stateSets;
 
   /** Indicates that the search timed out or was otherwise aborted. */
   private boolean aborted = false;
 
-  public ShortestPathTree(DominanceFunction dominanceFunction) {
+  public ShortestPathTree(DominanceFunction<State> dominanceFunction) {
     this.dominanceFunction = dominanceFunction;
     // Initialized with a reasonable size, see #4445
     stateSets = new IdentityHashMap<>(10_000);
   }
 
   /** @return a list of GraphPaths, sometimes empty but never null. */
-  public List<GraphPath> getPaths(Vertex dest) {
+  public List<GraphPath<State, Edge, Vertex>> getPaths(Vertex dest) {
     List<? extends State> stateList = getStates(dest);
     if (stateList == null) {
       return Collections.emptyList();
     }
-    List<GraphPath> ret = new LinkedList<>();
+    List<GraphPath<State, Edge, Vertex>> ret = new LinkedList<>();
     for (State s : stateList) {
       if (s.isFinal()) {
-        ret.add(new GraphPath(s));
+        ret.add(new GraphPath<>(s));
       }
     }
     return ret;
   }
 
   /** @return a single optimal, optionally back-optimized path to the given vertex. */
-  public GraphPath getPath(Vertex dest) {
+  public GraphPath<State, Edge, Vertex> getPath(Vertex dest) {
     State s = getState(dest);
     if (s == null) {
       return null;
     } else {
-      return new GraphPath(s);
+      return new GraphPath<>(s);
     }
   }
 
@@ -165,7 +170,7 @@ public class ShortestPathTree {
     State ret = null;
     // TODO are we only checking path parser acceptance when we fetch states via this specific method?
     for (State s : states) {
-      if ((ret == null || s.weight < ret.weight) && s.isFinal()) {
+      if ((ret == null || s.getWeight() < ret.getWeight()) && s.isFinal()) {
         ret = s;
       }
     }

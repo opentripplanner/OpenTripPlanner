@@ -8,11 +8,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.AStarBuilder;
+import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
+import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -118,7 +120,13 @@ public class TurnCostTest {
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
     // Since we traverse 3 intersections, the total cost should be 330.
-    GraphPath path = checkForwardRouteDuration(proto, StreetMode.WALK, topRight, bottomLeft, 330);
+    GraphPath<State, Edge, Vertex> path = checkForwardRouteDuration(
+      proto,
+      StreetMode.WALK,
+      topRight,
+      bottomLeft,
+      330
+    );
 
     // The intersection traversal cost should be applied to the state *after*
     // the intersection itself.
@@ -143,7 +151,13 @@ public class TurnCostTest {
     RouteRequest options = proto.clone();
 
     // Without turn costs, this path costs 3x100 + 1x50 = 300.
-    GraphPath path = checkForwardRouteDuration(options, StreetMode.CAR, topRight, bottomLeft, 350);
+    GraphPath<State, Edge, Vertex> path = checkForwardRouteDuration(
+      options,
+      StreetMode.CAR,
+      topRight,
+      bottomLeft,
+      350
+    );
 
     List<State> states = path.states;
     assertEquals(5, states.size());
@@ -161,7 +175,13 @@ public class TurnCostTest {
 
     // Without turn costs, this path costs 3x100 + 1x50 = 350.
     // Since there are 3 turns, the total cost should be 380.
-    GraphPath path = checkForwardRouteDuration(proto, StreetMode.CAR, topRight, bottomLeft, 380);
+    GraphPath<State, Edge, Vertex> path = checkForwardRouteDuration(
+      proto,
+      StreetMode.CAR,
+      topRight,
+      bottomLeft,
+      380
+    );
 
     List<State> states = path.states;
     assertEquals(5, states.size());
@@ -179,22 +199,23 @@ public class TurnCostTest {
     assertEquals(380, states.get(4).getElapsedTimeSeconds()); // broad2_3 = 100
   }
 
-  private GraphPath checkForwardRouteDuration(
+  private GraphPath<State, Edge, Vertex> checkForwardRouteDuration(
     RouteRequest request,
     StreetMode streetMode,
     Vertex from,
     Vertex to,
     int expectedDuration
   ) {
-    ShortestPathTree tree = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> tree = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setStreetRequest(new StreetRequest(streetMode))
       .setFrom(from)
       .setTo(to)
       .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
-    GraphPath path = tree.getPath(bottomLeft);
+    GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
     assertNotNull(path);
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.

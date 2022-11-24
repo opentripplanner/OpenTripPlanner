@@ -34,7 +34,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
    */
   public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
     double effectiveWalkDistance = 0.0;
-    var graphPath = new GraphPath(state);
+    var graphPath = new GraphPath<>(state);
     var edges = new ArrayList<Edge>();
     for (Edge edge : graphPath.edges) {
       effectiveWalkDistance += edge.getEffectiveWalkDistance();

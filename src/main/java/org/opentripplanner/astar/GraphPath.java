@@ -3,21 +3,23 @@ package org.opentripplanner.astar;
 import java.util.LinkedList;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.astar.spi.AStarEdge;
+import org.opentripplanner.astar.spi.AStarState;
+import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.State;
 
 /**
  * A shortest path on the graph.
  */
-public class GraphPath {
+public class GraphPath<
+  State extends AStarState<State, Edge, Vertex>,
+  Edge extends AStarEdge<State, Edge, Vertex>,
+  Vertex extends AStarVertex<State, Edge, Vertex>
+> {
 
   public LinkedList<State> states;
 
   public LinkedList<Edge> edges;
-
-  private double walkDistance = 0;
 
   /**
    * Construct a GraphPath based on the given state by following back-edge fields all the way back
@@ -31,8 +33,6 @@ public class GraphPath {
    * @param s - the state for which a path is requested
    */
   public GraphPath(State s) {
-    walkDistance = s.getWalkDistance();
-
     /* Put path in chronological order */
     State lastState;
     // needed to track repeat invocations of path-reversing methods
@@ -138,12 +138,7 @@ public class GraphPath {
   public String toString() {
     return "GraphPath(nStates=" + states.size() + ")";
   }
-
   /****
    * Private Methods
    ****/
-
-  public double getWalkDistance() {
-    return walkDistance;
-  }
 }

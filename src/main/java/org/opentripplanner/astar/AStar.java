@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.astar.model.BinHeap;
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.astar.spi.AStarEdge;
+import org.opentripplanner.astar.spi.AStarState;
+import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.framework.time.DateUtils;
-import org.opentripplanner.routing.core.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,11 @@ import org.slf4j.LoggerFactory;
  * Find the shortest path between graph vertices using A*. A basic Dijkstra search is a special case
  * of AStar where the heuristic is always zero.
  */
-public class AStar {
+public class AStar<
+  State extends AStarState<State, Edge, Vertex>,
+  Edge extends AStarEdge<State, Edge, Vertex>,
+  Vertex extends AStarVertex<State, Edge, Vertex>
+> {
 
   private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
 
@@ -31,28 +35,36 @@ public class AStar {
   private final boolean arriveBy;
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
-  private final RemainingWeightHeuristic heuristic;
-  private final SkipEdgeStrategy skipEdgeStrategy;
-  private final SearchTerminationStrategy terminationStrategy;
-  private final TraverseVisitor traverseVisitor;
+  private final RemainingWeightHeuristic<State, Vertex> heuristic;
+  private final SkipEdgeStrategy<State, Edge> skipEdgeStrategy;
+  private final SearchTerminationStrategy<State> terminationStrategy;
+  private final TraverseVisitor<State, Edge> traverseVisitor;
   private final Duration timeout;
 
-  private final ShortestPathTree spt;
+  private final ShortestPathTree<State, Edge, Vertex> spt;
   private final BinHeap<State> pq;
   private final List<State> targetAcceptedStates;
 
   private State u;
   private int nVisited;
 
-  protected AStar(
-    RemainingWeightHeuristic heuristic,
-    SkipEdgeStrategy skipEdgeStrategy,
-    TraverseVisitor traverseVisitor,
+  public static <
+    State extends AStarState<State, Edge, Vertex>,
+    Edge extends AStarEdge<State, Edge, Vertex>,
+    Vertex extends AStarVertex<State, Edge, Vertex>
+  > AStarBuilder<State, Edge, Vertex> of() {
+    return new AStarBuilder<>();
+  }
+
+  AStar(
+    RemainingWeightHeuristic<State, Vertex> heuristic,
+    SkipEdgeStrategy<State, Edge> skipEdgeStrategy,
+    TraverseVisitor<State, Edge> traverseVisitor,
     boolean arriveBy,
     Set<Vertex> fromVertices,
     Set<Vertex> toVertices,
-    SearchTerminationStrategy terminationStrategy,
-    DominanceFunction dominanceFunction,
+    SearchTerminationStrategy<State> terminationStrategy,
+    DominanceFunction<State> dominanceFunction,
     Duration timeout,
     Collection<State> initialStates
   ) {
@@ -65,7 +77,7 @@ public class AStar {
     this.terminationStrategy = terminationStrategy;
     this.timeout = timeout;
 
-    this.spt = new ShortestPathTree(dominanceFunction);
+    this.spt = new ShortestPathTree<>(dominanceFunction);
 
     // Initialized with a reasonable size, see #4445
     this.pq = new BinHeap<>(1000);
@@ -74,17 +86,17 @@ public class AStar {
 
     for (State initialState : initialStates) {
       spt.add(initialState);
-      pq.insert(initialState, initialState.weight);
+      pq.insert(initialState, initialState.getWeight());
     }
   }
 
-  protected ShortestPathTree getShortestPathTree() {
+  ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
     runSearch();
 
     return spt;
   }
 
-  protected List<GraphPath> getPathsToTarget() {
+  List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
     runSearch();
 
     return targetAcceptedStates

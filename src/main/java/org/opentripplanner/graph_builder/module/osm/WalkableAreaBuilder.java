@@ -18,8 +18,8 @@ import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.astar.AStarBuilder;
-import org.opentripplanner.astar.DominanceFunction;
+import org.opentripplanner.astar.AStar;
+import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Edge;
@@ -387,16 +387,17 @@ public class WalkableAreaBuilder {
     RouteRequest options = new RouteRequest();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
-      ShortestPathTree spt = AStarBuilder
-        .allDirections(new ListedEdgesOnly(edges))
-        .setDominanceFunction(new DominanceFunction.EarliestArrival())
+      ShortestPathTree<State, Edge, Vertex> spt = AStar
+        .<State, Edge, Vertex>of()
+        .setSkipEdgeStrategy(new ListedEdgesOnly(edges))
+        .setDominanceFunction(new DominanceFunctions.EarliestArrival())
         .setRequest(options)
         .setStreetRequest(new StreetRequest(mode))
         .setFrom(vertex)
         .getShortestPathTree();
 
       for (Vertex endVertex : startingVertices) {
-        GraphPath path = spt.getPath(endVertex);
+        GraphPath<State, Edge, Vertex> path = spt.getPath(endVertex);
         if (path != null) {
           usedEdges.addAll(path.edges);
         }
@@ -692,7 +693,7 @@ public class WalkableAreaBuilder {
     return false;
   }
 
-  record ListedEdgesOnly(Set<Edge> edges) implements SkipEdgeStrategy {
+  record ListedEdgesOnly(Set<Edge> edges) implements SkipEdgeStrategy<State, Edge> {
     @Override
     public boolean shouldSkipEdge(State current, Edge edge) {
       return !edges.contains(edge);

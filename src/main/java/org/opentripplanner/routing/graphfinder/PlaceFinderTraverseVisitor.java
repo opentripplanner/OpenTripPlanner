@@ -23,7 +23,7 @@ import org.opentripplanner.transit.service.TransitService;
 /**
  * A TraverseVisitor used in finding various types of places while walking the street graph.
  */
-public class PlaceFinderTraverseVisitor implements TraverseVisitor {
+public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
   public final List<PlaceAtDistance> placesFound = new ArrayList<>();
   private final TransitService transitService;
@@ -112,7 +112,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
    * of the place that is furthest away. This is to account for the fact that the a star does not
    * traverse edges ordered by distance.
    */
-  public SkipEdgeStrategy getSkipEdgeStrategy() {
+  public SkipEdgeStrategy<State, Edge> getSkipEdgeStrategy() {
     return (current, edge) -> {
       double furthestDistance = radiusMeters;
 

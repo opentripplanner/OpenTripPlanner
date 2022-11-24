@@ -11,13 +11,13 @@ import org.opentripplanner.astar.GraphPath;
 
 public class PathComparatorTest {
 
-  GraphPath a = mockGraphPath(5, 7);
+  GraphPath<?, ?, ?> a = mockGraphPath(5, 7);
 
-  GraphPath b = mockGraphPath(0, 8);
+  GraphPath<?, ?, ?> b = mockGraphPath(0, 8);
 
-  GraphPath c = mockGraphPath(9, 12);
+  GraphPath<?, ?, ?> c = mockGraphPath(9, 12);
 
-  private final List<GraphPath> paths = Arrays.asList(a, b, c);
+  private final List<GraphPath<?, ?, ?>> paths = Arrays.asList(a, b, c);
 
   @Test
   public void testPathComparator() {
@@ -37,8 +37,8 @@ public class PathComparatorTest {
     assertEquals(paths, Arrays.asList(a, c, b));
   }
 
-  private GraphPath mockGraphPath(long startTime, long endTime) {
-    GraphPath path = mock(GraphPath.class);
+  private GraphPath<?, ?, ?> mockGraphPath(long startTime, long endTime) {
+    GraphPath<?, ?, ?> path = mock(GraphPath.class);
     when(path.getStartTime()).thenReturn(startTime);
     when(path.getEndTime()).thenReturn(endTime);
     when(path.getDuration()).thenReturn((int) (endTime - startTime));

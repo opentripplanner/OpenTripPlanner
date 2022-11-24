@@ -6,7 +6,7 @@ import org.opentripplanner.routing.core.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VisualTraverseVisitor implements TraverseVisitor {
+public class VisualTraverseVisitor implements TraverseVisitor<State, Edge> {
 
   private static final Logger LOG = LoggerFactory.getLogger(VisualTraverseVisitor.class);
 

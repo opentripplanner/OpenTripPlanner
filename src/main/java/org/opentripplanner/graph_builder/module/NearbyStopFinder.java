@@ -11,8 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.astar.AStarBuilder;
-import org.opentripplanner.astar.DominanceFunction;
+import org.opentripplanner.astar.AStar;
+import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
@@ -212,9 +212,10 @@ public class NearbyStopFinder {
       return stopsFound;
     }
 
-    ShortestPathTree spt = AStarBuilder
-      .allDirections(getSkipEdgeStrategy(reverseDirection, request))
-      .setDominanceFunction(new DominanceFunction.MinimumWeight())
+    ShortestPathTree<State, Edge, Vertex> spt = AStar
+      .<State, Edge, Vertex>of()
+      .setSkipEdgeStrategy(getSkipEdgeStrategy(reverseDirection, request))
+      .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)
       .setStreetRequest(streetRequest)
       .setFrom(reverseDirection ? null : originVertices)
@@ -281,7 +282,7 @@ public class NearbyStopFinder {
     return directGraphFinder.findClosestStops(c0, limitMeters);
   }
 
-  private SkipEdgeStrategy getSkipEdgeStrategy(
+  private SkipEdgeStrategy<State, Edge> getSkipEdgeStrategy(
     boolean reverseDirection,
     RouteRequest routingRequest
   ) {
@@ -305,13 +306,13 @@ public class NearbyStopFinder {
         transitService::getRoutesForStop,
         routingRequest.journey().transit().modes().stream().map(MainAndSubMode::mainMode).toList()
       );
-      return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
+      return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     } else if (
       OTPFeature.VehicleToStopHeuristics.isOn() &&
       routingRequest.journey().access().mode() == StreetMode.BIKE
     ) {
       var strategy = new BikeToStopSkipEdgeStrategy(transitService::getTripsForStop);
-      return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
+      return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     } else {
       return durationSkipEdgeStrategy;
     }

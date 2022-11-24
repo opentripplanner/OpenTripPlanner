@@ -10,9 +10,11 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.MultiTargetTerminationStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -87,8 +89,9 @@ public class AStarTest {
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
-    ShortestPathTree tree = AStarBuilder
-      .oneToOne()
+    ShortestPathTree tree = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
       .setTo(to)
@@ -117,8 +120,9 @@ public class AStarTest {
     request.setArriveBy(true);
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
-    ShortestPathTree tree = AStarBuilder
-      .oneToOne()
+    ShortestPathTree tree = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
       .setTo(to)
@@ -171,14 +175,15 @@ public class AStarTest {
     );
     new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
-    ShortestPathTree tree = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> tree = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
       .setTo(to)
       .getShortestPathTree();
 
-    GraphPath path = tree.getPath(to);
+    GraphPath<State, Edge, Vertex> path = tree.getPath(to);
 
     List<State> states = path.states;
 
@@ -218,8 +223,9 @@ public class AStarTest {
     );
     new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
-    ShortestPathTree tree = AStarBuilder
-      .oneToOne()
+    ShortestPathTree tree = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
       .setTo(to)
@@ -258,8 +264,9 @@ public class AStarTest {
 
     Vertex v1 = graph.getVertex("56th_24th");
     Vertex v2 = graph.getVertex("leary_20th");
-    ShortestPathTree tree = AStarBuilder
-      .oneToOne()
+    ShortestPathTree tree = AStar
+      .<State, Edge, Vertex>of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setTerminationStrategy(strategy)
       .setRequest(request)
       .setFrom(v1)

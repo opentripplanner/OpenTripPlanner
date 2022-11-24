@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.astar.GraphPath;
+import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -26,6 +28,7 @@ import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -260,7 +263,10 @@ public class TestIntermediatePlaces {
         request.journey().egress().mode()
       )
     ) {
-      List<GraphPath> paths = graphPathFinder.graphPathFinderEntryPoint(request, temporaryVertices);
+      List<GraphPath<State, Edge, Vertex>> paths = graphPathFinder.graphPathFinderEntryPoint(
+        request,
+        temporaryVertices
+      );
 
       assertNotNull(paths);
       assertFalse(paths.isEmpty());

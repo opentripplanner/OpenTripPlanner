@@ -1,16 +1,18 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.astar.spi.AStarEdge;
+import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
-import org.opentripplanner.routing.core.State;
 
 /**
  * Use several strategies in composition with each other, for example by limiting by time and number
  * of stops visited. Only one needs to be skipped in order for {@link
  * SkipEdgeStrategy#shouldSkipEdge(State, Edge)} to return null.
  */
-public record ComposingSkipEdgeStrategy(SkipEdgeStrategy... strategies)
-  implements SkipEdgeStrategy {
+public record ComposingSkipEdgeStrategy<
+  State extends AStarState<State, Edge, ?>, Edge extends AStarEdge<State, Edge, ?>
+>(SkipEdgeStrategy<State, Edge>... strategies)
+  implements SkipEdgeStrategy<State, Edge> {
   @Override
   public boolean shouldSkipEdge(State current, Edge edge) {
     for (var strategy : strategies) {

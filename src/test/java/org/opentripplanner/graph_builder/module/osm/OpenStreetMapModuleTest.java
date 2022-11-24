@@ -32,6 +32,7 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -356,7 +357,7 @@ public class OpenStreetMapModuleTest {
     Vertex topV = graph.getVertex("osm:node:559271124");
 
     GraphPathFinder graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
-    List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(
+    List<GraphPath<State, Edge, Vertex>> pathList = graphPathFinder.graphPathFinderEntryPoint(
       request,
       Set.of(bottomV),
       Set.of(topV)
@@ -364,7 +365,7 @@ public class OpenStreetMapModuleTest {
 
     assertNotNull(pathList);
     assertFalse(pathList.isEmpty());
-    for (GraphPath path : pathList) {
+    for (GraphPath<State, Edge, Vertex> path : pathList) {
       assertFalse(path.states.isEmpty());
     }
   }

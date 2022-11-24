@@ -6,35 +6,37 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.astar.spi.AStarEdge;
+import org.opentripplanner.astar.spi.AStarState;
+import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
-import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.AStarRequestMapper;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 
-public class AStarBuilder {
+public class AStarBuilder<
+  State extends AStarState<State, Edge, Vertex>,
+  Edge extends AStarEdge<State, Edge, Vertex>,
+  Vertex extends AStarVertex<State, Edge, Vertex>
+> {
 
-  private final RemainingWeightHeuristic heuristic;
-  private final SkipEdgeStrategy skipEdgeStrategy;
-  private TraverseVisitor traverseVisitor;
+  private RemainingWeightHeuristic<State, Vertex> heuristic = new TrivialRemainingWeightHeuristic<>();
+  private SkipEdgeStrategy<State, Edge> skipEdgeStrategy;
+  private TraverseVisitor<State, Edge> traverseVisitor;
   private RouteRequest routeRequest;
   private Set<Vertex> fromVertices;
   private Set<Vertex> toVertices;
-  private SearchTerminationStrategy terminationStrategy;
-  private DominanceFunction dominanceFunction;
+  private SearchTerminationStrategy<State> terminationStrategy;
+  private DominanceFunction<State> dominanceFunction;
   private Duration timeout;
   private Edge originBackEdge;
   private Collection<State> initialStates;
@@ -42,121 +44,120 @@ public class AStarBuilder {
   private DataOverlayContext dataOverlayContext;
   private StreetRequest streetRequest = new StreetRequest();
 
-  public AStarBuilder(
-    RemainingWeightHeuristic remainingWeightHeuristic,
-    SkipEdgeStrategy strategy
+  AStarBuilder() {}
+
+  public AStarBuilder<State, Edge, Vertex> setHeuristic(
+    RemainingWeightHeuristic<State, Vertex> heuristic
   ) {
-    this.heuristic = remainingWeightHeuristic;
-    this.skipEdgeStrategy = strategy;
+    this.heuristic = heuristic;
+    return this;
   }
 
-  public static AStarBuilder oneToOne() {
-    return new AStarBuilder(new EuclideanRemainingWeightHeuristic(), null);
+  public AStarBuilder<State, Edge, Vertex> setSkipEdgeStrategy(
+    SkipEdgeStrategy<State, Edge> skipEdgeStrategy
+  ) {
+    this.skipEdgeStrategy = skipEdgeStrategy;
+    return this;
   }
 
-  public static AStarBuilder oneToOneMaxDuration(Duration maxDuration) {
-    return new AStarBuilder(
-      new EuclideanRemainingWeightHeuristic(),
-      new DurationSkipEdgeStrategy(maxDuration)
-    );
-  }
-
-  public static AStarBuilder allDirectionsMaxDuration(Duration maxDuration) {
-    return allDirections(new DurationSkipEdgeStrategy(maxDuration));
-  }
-
-  public static AStarBuilder allDirections(SkipEdgeStrategy strategy) {
-    return new AStarBuilder(new TrivialRemainingWeightHeuristic(), strategy);
-  }
-
-  public AStarBuilder setTraverseVisitor(TraverseVisitor traverseVisitor) {
+  public AStarBuilder<State, Edge, Vertex> setTraverseVisitor(
+    TraverseVisitor<State, Edge> traverseVisitor
+  ) {
     this.traverseVisitor = traverseVisitor;
     return this;
   }
 
-  public AStarBuilder setRequest(RouteRequest request) {
+  public AStarBuilder<State, Edge, Vertex> setRequest(RouteRequest request) {
     this.routeRequest = request;
     return this;
   }
 
-  public AStarBuilder setStreetRequest(StreetRequest streetRequest) {
+  public AStarBuilder<State, Edge, Vertex> setStreetRequest(StreetRequest streetRequest) {
     this.streetRequest = streetRequest;
     return this;
   }
 
-  public AStarBuilder setFrom(Set<Vertex> fromVertices) {
+  public AStarBuilder<State, Edge, Vertex> setFrom(Set<Vertex> fromVertices) {
     this.fromVertices = fromVertices;
     return this;
   }
 
-  public AStarBuilder setFrom(Vertex fromVertex) {
+  public AStarBuilder<State, Edge, Vertex> setFrom(Vertex fromVertex) {
     this.fromVertices = Collections.singleton(fromVertex);
     return this;
   }
 
-  public AStarBuilder setTo(Set<Vertex> toVertices) {
+  public AStarBuilder<State, Edge, Vertex> setTo(Set<Vertex> toVertices) {
     this.toVertices = toVertices;
     return this;
   }
 
-  public AStarBuilder setTo(Vertex toVertex) {
+  public AStarBuilder<State, Edge, Vertex> setTo(Vertex toVertex) {
     this.toVertices = Collections.singleton(toVertex);
     return this;
   }
 
-  public AStarBuilder setVerticesContainer(TemporaryVerticesContainer container) {
-    this.fromVertices = container.getFromVertices();
-    this.toVertices = container.getToVertices();
+  public AStarBuilder<State, Edge, Vertex> setVerticesContainer(
+    TemporaryVerticesContainer container
+  ) {
+    this.fromVertices = (Set<Vertex>) container.getFromVertices();
+    this.toVertices = (Set<Vertex>) container.getToVertices();
     return this;
   }
 
-  public AStarBuilder setTerminationStrategy(SearchTerminationStrategy terminationStrategy) {
+  public AStarBuilder<State, Edge, Vertex> setTerminationStrategy(
+    SearchTerminationStrategy<State> terminationStrategy
+  ) {
     this.terminationStrategy = terminationStrategy;
     return this;
   }
 
   /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
-  public AStarBuilder setDominanceFunction(DominanceFunction dominanceFunction) {
+  public AStarBuilder<State, Edge, Vertex> setDominanceFunction(
+    DominanceFunction<State> dominanceFunction
+  ) {
     this.dominanceFunction = dominanceFunction;
     return this;
   }
 
-  public AStarBuilder setTimeout(Duration timeout) {
+  public AStarBuilder<State, Edge, Vertex> setTimeout(Duration timeout) {
     this.timeout = timeout;
     return this;
   }
 
-  public AStarBuilder setIntersectionTraversalCalculator(
+  public AStarBuilder<State, Edge, Vertex> setIntersectionTraversalCalculator(
     IntersectionTraversalCalculator intersectionTraversalCalculator
   ) {
     this.intersectionTraversalCalculator = intersectionTraversalCalculator;
     return this;
   }
 
-  public AStarBuilder setDataOverlayContext(DataOverlayContext dataOverlayContext) {
+  public AStarBuilder<State, Edge, Vertex> setDataOverlayContext(
+    DataOverlayContext dataOverlayContext
+  ) {
     this.dataOverlayContext = dataOverlayContext;
     return this;
   }
 
-  public AStarBuilder setOriginBackEdge(Edge originBackEdge) {
+  public AStarBuilder<State, Edge, Vertex> setOriginBackEdge(Edge originBackEdge) {
     this.originBackEdge = originBackEdge;
     return this;
   }
 
-  public AStarBuilder setInitialStates(Collection<State> initialStates) {
+  public AStarBuilder<State, Edge, Vertex> setInitialStates(Collection<State> initialStates) {
     this.initialStates = initialStates;
     return this;
   }
 
-  public ShortestPathTree getShortestPathTree() {
+  public ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
     return build().getShortestPathTree();
   }
 
-  public List<GraphPath> getPathsToTarget() {
+  public List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
     return build().getPathsToTarget();
   }
 
-  private AStar build() {
+  private AStar<State, Edge, Vertex> build() {
     final Set<Vertex> origin = routeRequest.arriveBy() ? toVertices : fromVertices;
     final Set<Vertex> destination = routeRequest.arriveBy() ? fromVertices : toVertices;
 
@@ -170,11 +171,15 @@ public class AStarBuilder {
         .withMode(streetRequest.mode())
         .build();
 
-      initialStates = State.getInitialStates(origin, aStarRequest);
+      initialStates =
+        (Collection<State>) org.opentripplanner.routing.core.State.getInitialStates(
+          (Set<org.opentripplanner.astar.model.Vertex>) origin,
+          aStarRequest
+        );
 
       if (originBackEdge != null) {
         for (var state : initialStates) {
-          state.backEdge = originBackEdge;
+          state.initBackEdge(originBackEdge);
         }
       }
     }
@@ -195,7 +200,7 @@ public class AStarBuilder {
 
     heuristic.initialize(routeRequest, streetRequest.mode(), origin, destination);
 
-    return new AStar(
+    return new AStar<>(
       heuristic,
       skipEdgeStrategy,
       traverseVisitor,
@@ -203,7 +208,9 @@ public class AStarBuilder {
       origin,
       destination,
       terminationStrategy,
-      Optional.ofNullable(dominanceFunction).orElseGet(DominanceFunction.Pareto::new),
+      Optional
+        .ofNullable(dominanceFunction)
+        .orElseGet(() -> (DominanceFunction<State>) new DominanceFunctions.Pareto()),
       timeout,
       initialStates
     );

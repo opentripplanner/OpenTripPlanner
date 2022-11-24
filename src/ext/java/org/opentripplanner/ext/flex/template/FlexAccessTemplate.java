@@ -98,7 +98,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     ZonedDateTime startTime = startOfTime.plusSeconds(timeShift);
 
     return graphPathToItineraryMapper
-      .generateItinerary(new GraphPath(state))
+      .generateItinerary(new GraphPath<>(state))
       .withTimeShiftToStartAt(startTime);
   }
 

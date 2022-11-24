@@ -1,17 +1,20 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import java.util.Set;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.astar.spi.AStarState;
+import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.State;
 
 /**
  * A trivial heuristic that always returns 0, which is always admissible. For use in testing,
  * troubleshooting, and spatial analysis applications where there is no target.
  */
-public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic {
+public class TrivialRemainingWeightHeuristic<
+  State extends AStarState<State, ?, Vertex>, Vertex extends AStarVertex<State, ?, Vertex>
+>
+  implements RemainingWeightHeuristic<State, Vertex> {
 
   @Override
   public void initialize(
