@@ -3,7 +3,6 @@ package org.opentripplanner.ext.siri;
 import static org.opentripplanner.ext.siri.SiriTransportModeMapper.mapTransitMainMode;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.common.model.T2;
@@ -90,23 +89,18 @@ public class AddedTripHelper {
     Operator operator,
     T2<TransitMode, String> transitMode,
     List<NaturalLanguageStringStructure> destinationNames,
-    LocalDate serviceDate,
     FeedScopedId calServiceId
   ) {
+    if (calServiceId == null) {
+      return UpdateError.result(tripId, NO_START_DATE);
+    }
+
     var tripBuilder = Trip.of(tripId);
     tripBuilder.withRoute(route);
 
     // Explicitly set TransitMode on Trip - in case it differs from Route
     tripBuilder.withMode(transitMode.first);
     tripBuilder.withNetexSubmode(transitMode.second);
-
-    if (serviceDate == null) {
-      return UpdateError.result(tripId, NO_START_DATE);
-    }
-
-    if (calServiceId == null) {
-      return UpdateError.result(tripId, NO_START_DATE);
-    }
 
     tripBuilder.withServiceId(calServiceId);
 

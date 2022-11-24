@@ -572,7 +572,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       operator,
       transitMode,
       estimatedVehicleJourney.getDestinationNames(),
-      serviceDate,
       calServiceId
     );
 

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -65,6 +68,63 @@ public class AddedTripHelperTest {
         .withRoute(getRouteWithAgency(agency, operator))
         .withHeadsign(headsign)
         .build();
+  }
+
+  @Test
+  public void testGetTrip_FailOnMissingServiceId() {
+    var actualTrip = AddedTripHelper.getTrip(null, null, null, null, null, null);
+
+    assertAll(() -> {
+      assertTrue(actualTrip.isFailure(), "Trip creation should fail");
+      assertEquals(
+        UpdateError.UpdateErrorType.NO_START_DATE,
+        actualTrip.failureValue().errorType(),
+        "Trip creation should fail without start date"
+      );
+    });
+  }
+
+  @Test
+  public void testGetTrip() {
+    var route = getRouteWithAgency(agency, operator);
+    var destinationName = new NaturalLanguageStringStructure();
+    var transitMode = new T2<>(TransitMode.RAIL, "replacementRailService");
+    var serviceId = new FeedScopedId("FEED ID", "CS ID");
+
+    var actualTrip = AddedTripHelper.getTrip(
+      trip.getId(),
+      route,
+      operator,
+      transitMode,
+      List.of(destinationName),
+      serviceId
+    );
+
+    assertAll(() -> {
+      assertTrue(actualTrip.isSuccess(), "Trip creation should succeed");
+      assertEquals(trip.getId(), actualTrip.successValue().getId(), "Trip is should be mapped");
+      assertEquals(
+        operator,
+        actualTrip.successValue().getOperator(),
+        "operator is should be mapped"
+      );
+      assertEquals(route, actualTrip.successValue().getRoute(), "route is should be mapped");
+      assertEquals(
+        transitMode.first,
+        actualTrip.successValue().getMode(),
+        "transitMode is should be mapped"
+      );
+      assertEquals(
+        SubMode.of(transitMode.second),
+        actualTrip.successValue().getNetexSubMode(),
+        "submode is should be mapped"
+      );
+      assertEquals(
+        serviceId,
+        actualTrip.successValue().getServiceId(),
+        "serviceId is should be mapped"
+      );
+    });
   }
 
   @Test
