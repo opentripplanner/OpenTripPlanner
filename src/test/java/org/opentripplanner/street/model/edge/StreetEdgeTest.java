@@ -284,16 +284,6 @@ public class StreetEdgeTest {
     );
   }
 
-  @Test
-  public void bicycleOnStairs() {
-    var edge = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
-    edge.setStairs(true);
-    var forward = AStarRequest.copyOf(proto);
-    State state = new State(v0, forward.withMode(StreetMode.BIKE).build());
-    var result = edge.traverse(state);
-    assertNull(result);
-  }
-
   /****
    * Private Methods
    ****/

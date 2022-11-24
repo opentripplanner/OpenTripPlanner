@@ -105,7 +105,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     Arguments.of(3, 67)
   );
 
-  @ParameterizedTest(name = "stairs reluctance of of {0} should lead to traversal costs of {1}")
+  @ParameterizedTest(name = "stairs reluctance of {0} should lead to traversal costs of {1}")
   @VariableSource("stairsCases")
   public void stairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
@@ -125,13 +125,39 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     assertEquals(15, (long) notStairsResult.weight);
   }
 
+  static Stream<Arguments> bikeStairsCases = Stream.of(
+    Arguments.of(1, 45),
+    Arguments.of(1.5, 67),
+    Arguments.of(3, 135)
+  );
+
+  @ParameterizedTest(name = "bike stairs reluctance of {0} should lead to traversal costs of {1}")
+  @VariableSource("bikeStairsCases")
+  public void bikeStairsReluctance(double stairsReluctance, long expectedCost) {
+    double length = 10;
+    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    edge.setStairs(true);
+
+    var req = AStarRequest.of();
+    req.withPreferences(p -> p.withBike(b -> b.withStairsReluctance(stairsReluctance)));
+    req.withMode(StreetMode.BIKE);
+    var result = traverse(edge, req.build());
+    assertEquals(expectedCost, (long) result.weight);
+
+    assertEquals(23, result.getElapsedTimeSeconds());
+
+    edge.setStairs(false);
+    var notStairsResult = traverse(edge, req.build());
+    assertEquals(4, (long) notStairsResult.weight);
+  }
+
   static Stream<Arguments> walkSafetyCases = Stream.of(
     Arguments.of(0, 15),
     Arguments.of(0.5, 22),
     Arguments.of(1, 30)
   );
 
-  @ParameterizedTest(name = "walk safety factor of of {0} should lead to traversal costs of {1}")
+  @ParameterizedTest(name = "walk safety factor of {0} should lead to traversal costs of {1}")
   @VariableSource("walkSafetyCases")
   public void walkSafetyFactor(double walkSafetyFactor, long expectedCost) {
     double length = 10;

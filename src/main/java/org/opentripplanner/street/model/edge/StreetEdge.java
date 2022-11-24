@@ -392,9 +392,7 @@ public class StreetEdge
 
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
     if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
-      if (isStairs()) {
-        return null;
-      } else if (canTraverse(TraverseMode.BICYCLE)) {
+      if (canTraverse(TraverseMode.BICYCLE)) {
         editor = doTraverse(s0, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
         editor = doTraverse(s0, TraverseMode.WALK, true);
@@ -1180,6 +1178,10 @@ public class StreetEdge
       if (walkingBike) {
         // take slopes into account when walking bikes
         time = weight = (getEffectiveBikeDistance() / speed);
+        if (isStairs()) {
+          // we do allow walking the bike across a stairs but there is a very high default penalty
+          weight *= preferences.bike().stairsReluctance();
+        }
       } else {
         // take slopes into account when walking
         time = getEffectiveWalkDistance() / speed;
