@@ -64,7 +64,7 @@ jobs:
       LOCAL_BRANCH: local-pages
       REMOTE_BRANCH: main
       TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
-      MASTER_BRANCH_VERSION: v2.2.0
+      MASTER_BRANCH_VERSION: 2.2.0
 
     steps:
       - uses: actions/checkout@v3.1.0
@@ -84,17 +84,17 @@ jobs:
           
           git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/docs.git 
           git fetch $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
-          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
           # prefix is the root folder where to deploy the HTML, we use 'en' to emulate the URL
           # structure of readthedocs
           
           if [ ${{ github.ref }} = 'refs/heads/master' ]; 
           then
-            mike deploy --branch $LOCAL_BRANCH --prefix en --update-aliases $MASTER_BRANCH_VERSION latest
+            mike deploy --branch $LOCAL_BRANCH --prefix en --title=$MASTER_BRANCH_VERSION --update-aliases v$MASTER_BRANCH_VERSION latest
           else
             mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
           fi
+          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
   container-image:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
