@@ -78,4 +78,12 @@ public class VehicleParkingService implements Serializable {
   public ImmutableListMultimap<VehicleParkingGroup, VehicleParking> getVehicleParkingGroups() {
     return vehicleParkingGroups;
   }
+
+  public boolean hasBikeParking() {
+    return vehicleParkings.stream().anyMatch(VehicleParking::hasBicyclePlaces);
+  }
+
+  public boolean hasCarParking() {
+    return vehicleParkings.stream().anyMatch(VehicleParking::hasAnyCarPlaces);
+  }
 }

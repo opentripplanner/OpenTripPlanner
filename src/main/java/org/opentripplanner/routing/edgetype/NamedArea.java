@@ -19,8 +19,6 @@ public class NamedArea implements Serializable {
 
   private double walkSafetyMultiplier;
 
-  private int streetClass;
-
   private StreetTraversalPermission permission;
 
   public I18NString getName() {
@@ -61,13 +59,5 @@ public class NamedArea implements Serializable {
 
   public void setPermission(StreetTraversalPermission permission) {
     this.permission = permission;
-  }
-
-  public int getStreetClass() {
-    return streetClass;
-  }
-
-  public void setStreetClass(int streetClass) {
-    this.streetClass = streetClass;
   }
 }

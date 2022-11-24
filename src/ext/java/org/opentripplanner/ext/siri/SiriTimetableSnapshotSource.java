@@ -716,9 +716,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     var id = tripPatternIdGenerator.generateUniqueTripPatternId(trip);
 
+    // TODO: We always create a new TripPattern to be able to modify its scheduled timetable
     TripPattern pattern = TripPattern
       .of(id)
       .withRoute(tripBuilder.getRoute())
+      .withMode(trip.getMode())
       .withStopPattern(stopPattern)
       .build();
 

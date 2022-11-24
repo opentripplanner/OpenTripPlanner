@@ -23,6 +23,7 @@
     <jaxrs>
        <application path="/otp/" />
     </jaxrs>
+    <jackson1 disabled="true"/>
   </modules>
 
 </enunciate>

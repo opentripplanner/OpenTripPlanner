@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import java.util.List;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**

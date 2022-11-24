@@ -28,6 +28,10 @@ jobs:
           - location: skanetrafiken
             iterations: 1
             jfr-delay: "50s"
+            
+          - location: switzerland
+            iterations: 4
+            jfr-delay: "50s"
     steps:
       - uses: actions/checkout@v3.1.0
         with:
@@ -58,7 +62,6 @@ jobs:
       - name: Copy graph, run speed test
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
-          MEASUREMENT_ENVIRONMENT: CI
           SPEEDTEST_LOCATION: ${{ matrix.location }}
           MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr"
         run: |

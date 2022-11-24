@@ -1,0 +1,60 @@
+{
+  // Run all test-cases on the given date
+  "testDate": "2022-10-25",
+  "feedId": "1",
+  
+  // Relative paths supported like "../../data/otp-ci/graph-${otp.serialization.version.id}.obj"
+  // Default: "graph.obj"
+  "graph": "graph.obj",
+
+  // OTP Default is 45 minutes (2700 seconds)
+  // maxWalkDurationSeconds: 2700,
+
+  "tuningParameters": {
+    // maxNumberOfTransfers: 12,
+
+    // scheduledTripBinarySearchThreshold: 50,
+
+    // iterationDepartureStepInSeconds: 60,
+
+    // searchThreadPoolSize: 0,
+
+    "dynamicSearchWindow": {
+      "minTransitTimeCoefficient": 0.75,
+      "minWaitTimeCoefficient": 0.0
+      // minTimeMinutes: 30,
+      // minTimeMinutes: 40,
+
+      // default is 180 minutes (3 hours)
+      // maxLengthMinutes : 360,
+
+      // stepMinutes: 10
+      // stepMinutes: 10
+    },
+    "stopTransferCost": {
+      "DISCOURAGED": 86400,
+      "ALLOWED": 3000,
+      "RECOMMENDED": 300,
+      "PREFERRED": 0
+    }
+  },
+  "routingDefaults": {
+    // Default is 1.4 m/s = ~ 5.0 km/t
+    "walkSpeed": 1.4,
+    // Should not be used - a high cost indicate an error
+    "bikeBoardCost": 222000,
+    "walkBoardCost": 600,
+    "transferPenalty": 0,
+    "walkReluctance": 4.0,
+    "waitReluctance": 1.0,
+    "boardSlack": "30s",
+    "alightSlack": "15s",
+    "transferSlack": "60s",
+    "boardSlackForMode": {
+      "AIRPLANE": "30m"
+    },
+    "transitReluctanceForMode": {
+      "RAIL": 1.0
+    }
+  }
+}

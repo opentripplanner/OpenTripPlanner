@@ -131,7 +131,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>> {
    * <p>
    * The unit is centi-seconds
    */
-  public int generalizedCost() {
+  public final int generalizedCost() {
     return generalizedCost;
   }
 

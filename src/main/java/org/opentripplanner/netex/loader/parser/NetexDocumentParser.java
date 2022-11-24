@@ -2,15 +2,13 @@ package org.opentripplanner.netex.loader.parser;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.CompositeFrame;
+import org.rutebanken.netex.model.FareFrame;
 import org.rutebanken.netex.model.GeneralFrame;
 import org.rutebanken.netex.model.InfrastructureFrame;
-import org.rutebanken.netex.model.LocaleStructure;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.rutebanken.netex.model.ResourceFrame;
 import org.rutebanken.netex.model.ServiceCalendarFrame;
@@ -32,9 +30,11 @@ public class NetexDocumentParser {
   private static final Logger LOG = LoggerFactory.getLogger(NetexDocumentParser.class);
 
   private final NetexEntityIndex netexIndex;
+  private final boolean ignoreFareFrame;
 
-  private NetexDocumentParser(NetexEntityIndex netexIndex) {
+  private NetexDocumentParser(NetexEntityIndex netexIndex, boolean ignoreFareFrame) {
     this.netexIndex = netexIndex;
+    this.ignoreFareFrame = ignoreFareFrame;
   }
 
   /**
@@ -43,9 +43,10 @@ public class NetexDocumentParser {
    */
   public static void parseAndPopulateIndex(
     NetexEntityIndex index,
-    PublicationDeliveryStructure doc
+    PublicationDeliveryStructure doc,
+    boolean ignoreFareFrame
   ) {
-    new NetexDocumentParser(index).parse(doc);
+    new NetexDocumentParser(index, ignoreFareFrame).parse(doc);
   }
 
   public static void finnishUp() {
@@ -74,6 +75,8 @@ public class NetexDocumentParser {
       parse((ServiceFrame) value, new ServiceFrameParser(netexIndex.flexibleStopPlaceById));
     } else if (value instanceof SiteFrame) {
       parse((SiteFrame) value, new SiteFrameParser());
+    } else if (!ignoreFareFrame && value instanceof FareFrame) {
+      parse((FareFrame) value, new FareFrameParser());
     } else if (value instanceof CompositeFrame) {
       // We recursively parse composite frames and content until there
       // is no more nested frames - this is accepting documents which

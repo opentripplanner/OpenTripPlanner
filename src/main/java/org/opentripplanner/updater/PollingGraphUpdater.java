@@ -35,8 +35,8 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
 
   /** Shared configuration code for all polling graph updaters. */
   public PollingGraphUpdater(PollingGraphUpdaterParameters config) {
-    this.pollingPeriodSeconds = config.getFrequencySec();
-    this.configRef = config.getConfigRef();
+    this.pollingPeriodSeconds = config.frequencySec();
+    this.configRef = config.configRef();
   }
 
   public Integer pollingPeriodSeconds() {

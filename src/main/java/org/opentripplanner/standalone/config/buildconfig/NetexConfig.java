@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -137,10 +138,10 @@ public class NetexConfig {
         config
           .of("ferryIdsNotAllowedForBicycle")
           .since(V2_0)
-          .summary("List ferries witch do not allow bikes.")
+          .summary("List ferries which do not allow bikes.")
           .description(
             """
-            Bicycles are allowed on most ferries however Nordic profile doesn't contain a place
+            Bicycles are allowed on most ferries however the Nordic profile doesn't contain a place
             where bicycle conveyance can be defined.
             
             For this reason we allow bicycles on ferries by default and allow to override the rare
@@ -148,6 +149,13 @@ public class NetexConfig {
             """
           )
           .asStringSet(original.ferryIdsNotAllowedForBicycle())
+      )
+      .withIgnoreFareFrame(
+        config
+          .of("ignoreFareFrame")
+          .since(V2_3)
+          .summary("Ignore contents of the FareFrame")
+          .asBoolean(original.ignoreFareFrame())
       );
   }
 

@@ -20,7 +20,6 @@ class TransfersMapper {
     for (int i = 0; i < stopModel.stopIndexSize(); ++i) {
       var stop = stopModel.stopByIndex(i);
       ArrayList<Transfer> list = new ArrayList<>();
-      transferByStopIndex.add(list);
 
       for (PathTransfer pathTransfer : transitModel.getTransfersByStop(stop)) {
         if (pathTransfer.to instanceof RegularStop) {
@@ -36,7 +35,12 @@ class TransfersMapper {
           list.add(newTransfer);
         }
       }
+
+      // Create a copy to compact and make the inner lists immutable
+      transferByStopIndex.add(List.copyOf(list));
     }
-    return transferByStopIndex;
+
+    // Return an immutable copy
+    return List.copyOf(transferByStopIndex);
   }
 }

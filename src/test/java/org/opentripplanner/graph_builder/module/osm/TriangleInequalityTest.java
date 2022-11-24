@@ -74,7 +74,8 @@ public class TriangleInequalityTest {
       Set.of(),
       graph,
       noopIssueStore(),
-      new DefaultMapper()
+      new DefaultMapper(),
+      true
     );
     osmModule.buildGraph();
   }

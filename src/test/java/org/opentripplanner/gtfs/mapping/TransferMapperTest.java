@@ -7,6 +7,7 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 public class TransferMapperTest {
 
@@ -28,7 +29,10 @@ public class TransferMapperTest {
     TRANSLATION_HELPER
   );
 
-  private static final StationMapper STATION_MAPPER = new StationMapper(TRANSLATION_HELPER);
+  private static final StationMapper STATION_MAPPER = new StationMapper(
+    TRANSLATION_HELPER,
+    StopTransferPriority.ALLOWED
+  );
 
   private static final StopMapper STOP_MAPPER = new StopMapper(
     TRANSLATION_HELPER,

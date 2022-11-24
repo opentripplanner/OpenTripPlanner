@@ -70,6 +70,11 @@ public enum OTPFeature {
   FaresV2(false, true, "Enable import of GTFS-Fares v2 data."),
   FlexRouting(false, true, "Enable FLEX routing."),
   GoogleCloudStorage(false, true, "Enable Google Cloud Storage integration."),
+  RealtimeResolver(
+    false,
+    true,
+    "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with realtime data"
+  ),
   ReportApi(false, true, "Enable the report API."),
   SandboxAPIGeocoder(false, true, "Enable the Geocoder API."),
   SandboxAPILegacyGraphQLApi(false, true, "Enable (GTFS) GraphQL API."),

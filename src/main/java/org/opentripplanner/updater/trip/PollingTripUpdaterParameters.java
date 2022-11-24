@@ -7,8 +7,6 @@ public class PollingTripUpdaterParameters
 
   private final String configRef;
   private final int frequencySec;
-  private final int maxSnapshotFrequencyMs;
-  private final boolean purgeExpiredData;
   private final boolean fuzzyTripMatching;
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
 
@@ -19,8 +17,6 @@ public class PollingTripUpdaterParameters
   public PollingTripUpdaterParameters(
     String configRef,
     int frequencySec,
-    int maxSnapshotFrequencyMs,
-    boolean purgeExpiredData,
     boolean fuzzyTripMatching,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     String feedId,
@@ -29,8 +25,6 @@ public class PollingTripUpdaterParameters
   ) {
     this.configRef = configRef;
     this.frequencySec = frequencySec;
-    this.maxSnapshotFrequencyMs = maxSnapshotFrequencyMs;
-    this.purgeExpiredData = purgeExpiredData;
     this.fuzzyTripMatching = fuzzyTripMatching;
     this.backwardsDelayPropagationType = backwardsDelayPropagationType;
     this.feedId = feedId;
@@ -39,7 +33,7 @@ public class PollingTripUpdaterParameters
   }
 
   @Override
-  public int getFrequencySec() {
+  public int frequencySec() {
     return frequencySec;
   }
 
@@ -49,7 +43,7 @@ public class PollingTripUpdaterParameters
   }
 
   @Override
-  public String getConfigRef() {
+  public String configRef() {
     return configRef;
   }
 
