@@ -29,6 +29,9 @@ public final class FareLegRuleMapper {
             r.getNetworkId(),
             r.getFromAreaId(),
             r.getToAreaId(),
+            r.getMaxDistance(),
+            r.getMinDistance(),
+            r.getDistanceType(),
             productForRule
           );
         } else {

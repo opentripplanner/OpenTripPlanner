@@ -8,6 +8,9 @@ public record FareLegRule(
   @Nullable String networkId,
   @Nullable String fromAreaId,
   @Nullable String toAreadId,
+  @Nullable Double minDistance,
+  @Nullable Double maxDistance,
+  @Nullable Integer distanceType,
   @Nonnull FareProduct fareProduct
 ) {
   public String feedId() {
