@@ -33,6 +33,7 @@ public class AStarBuilder {
   private final SkipEdgeStrategy skipEdgeStrategy;
   private TraverseVisitor traverseVisitor;
   private RouteRequest routeRequest;
+  private boolean arriveBy;
   private Set<Vertex> fromVertices;
   private Set<Vertex> toVertices;
   private SearchTerminationStrategy terminationStrategy;
@@ -78,6 +79,12 @@ public class AStarBuilder {
 
   public AStarBuilder setRequest(RouteRequest request) {
     this.routeRequest = request;
+    this.arriveBy = request.arriveBy();
+    return this;
+  }
+
+  public AStarBuilder setArriveBy(boolean arriveBy) {
+    this.arriveBy = arriveBy;
     return this;
   }
 
@@ -159,8 +166,8 @@ public class AStarBuilder {
   }
 
   private AStar build() {
-    final Set<Vertex> origin = routeRequest.arriveBy() ? toVertices : fromVertices;
-    final Set<Vertex> destination = routeRequest.arriveBy() ? fromVertices : toVertices;
+    final Set<Vertex> origin = arriveBy ? toVertices : fromVertices;
+    final Set<Vertex> destination = arriveBy ? fromVertices : toVertices;
 
     Collection<State> initialStates;
 
@@ -170,6 +177,7 @@ public class AStarBuilder {
       AStarRequest aStarRequest = AStarRequestMapper
         .map(routeRequest)
         .withMode(streetRequest.mode())
+        .withArriveBy(arriveBy)
         .build();
 
       initialStates = State.getInitialStates(origin, aStarRequest);
@@ -195,13 +203,19 @@ public class AStarBuilder {
       state.getRequest().setDataOverlayContext(dataOverlayContext);
     }
 
-    heuristic.initialize(routeRequest, streetRequest.mode(), origin, destination);
+    heuristic.initialize(
+      streetRequest.mode(),
+      origin,
+      destination,
+      arriveBy,
+      routeRequest.preferences()
+    );
 
     return new AStar(
       heuristic,
       skipEdgeStrategy,
       traverseVisitor,
-      routeRequest.arriveBy(),
+      arriveBy,
       origin,
       destination,
       terminationStrategy,
