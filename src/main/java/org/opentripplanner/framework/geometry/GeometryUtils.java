@@ -1,9 +1,10 @@
 package org.opentripplanner.framework.geometry;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.geotools.referencing.CRS;
@@ -22,6 +23,7 @@ import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,13 +82,33 @@ public class GeometryUtils {
     return factory.createLineString(coordinates);
   }
 
+  public static <T> LineString concatenateLineStrings(
+    List<T> inputObjects,
+    Function<T, LineString> mapper
+  ) {
+    return concatenateLineStrings(inputObjects.stream().map(mapper).toList());
+  }
+
   public static LineString concatenateLineStrings(List<LineString> lineStrings) {
     GeometryFactory factory = getGeometryFactory();
+    Predicate<Coordinate[]> nonZeroLength = coordinates -> coordinates.length != 0;
     return factory.createLineString(
       lineStrings
         .stream()
-        .flatMap(t -> Arrays.stream(t.getCoordinates()))
-        .toArray(Coordinate[]::new)
+        .filter(Objects::nonNull)
+        .map(LineString::getCoordinates)
+        .filter(nonZeroLength)
+        .<CoordinateArrayListSequence>collect(
+          CoordinateArrayListSequence::new,
+          (acc, segment) -> {
+            if ((acc.size() == 0 || !acc.getCoordinate(acc.size() - 1).equals(segment[0]))) {
+              acc.extend(segment);
+            } else {
+              acc.extend(segment, 1);
+            }
+          },
+          (head, tail) -> head.extend(tail.toCoordinateArray())
+        )
     );
   }
 

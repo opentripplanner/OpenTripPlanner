@@ -7,13 +7,14 @@ import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network
@@ -60,13 +61,17 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       return null;
     }
 
-    int distance = (int) path.getDistanceMeters();
+    int distance = (int) path.edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
     int duration = path.getDuration();
 
     // computing the linestring from the graph path is a surprisingly expensive operation
     // so we delay it until it's actually needed. since most flex paths are never shown to the user
     // this improves performance quite a bit.
-    return new FlexPath(distance, duration, path::getGeometry);
+    return new FlexPath(
+      distance,
+      duration,
+      () -> GeometryUtils.concatenateLineStrings(path.edges, Edge::getGeometry)
+    );
   }
 
   private ShortestPathTree<State, Edge, Vertex> routeToMany(Vertex vertex) {

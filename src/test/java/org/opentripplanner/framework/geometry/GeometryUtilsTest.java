@@ -1,15 +1,14 @@
-package org.opentripplanner.util.geometry;
+package org.opentripplanner.framework.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.CoordinateSequenceFactory;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.SplitLineString;
 
 public class GeometryUtilsTest {
 
@@ -204,5 +203,43 @@ public class GeometryUtilsTest {
     sequence = coordinateSequenceFactory.create(referenceCoordinates[8][1]);
     geometry = new LineString(sequence, geometryFactory);
     assertEquals(geometry, results[8][1]);
+  }
+
+  @Test
+  void concatenateLineStringsWithSameFromToTest() {
+    Coordinate[] coordinates = new Coordinate[4];
+
+    coordinates[0] = new Coordinate(0, 0);
+    coordinates[1] = new Coordinate(0, 1);
+    coordinates[2] = new Coordinate(0, 1);
+    coordinates[3] = new Coordinate(0, 2);
+
+    LineString line = GeometryUtils.concatenateLineStrings(
+      List.of(
+        GeometryUtils.makeLineString(new Coordinate[] { coordinates[0], coordinates[1] }),
+        GeometryUtils.makeLineString(new Coordinate[] { coordinates[2], coordinates[3] })
+      )
+    );
+
+    assertEquals(3, line.getCoordinates().length);
+  }
+
+  @Test
+  void concatenateLineStringsWithDifferentFromToTest() {
+    Coordinate[] coordinates = new Coordinate[4];
+
+    coordinates[0] = new Coordinate(0, 0);
+    coordinates[1] = new Coordinate(0, 1);
+    coordinates[2] = new Coordinate(1, 1);
+    coordinates[3] = new Coordinate(1, 2);
+
+    LineString line = GeometryUtils.concatenateLineStrings(
+      List.of(
+        GeometryUtils.makeLineString(new Coordinate[] { coordinates[0], coordinates[1] }),
+        GeometryUtils.makeLineString(new Coordinate[] { coordinates[2], coordinates[3] })
+      )
+    );
+
+    assertEquals(4, line.getCoordinates().length);
   }
 }

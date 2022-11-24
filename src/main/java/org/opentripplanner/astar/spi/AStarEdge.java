@@ -1,7 +1,5 @@
 package org.opentripplanner.astar.spi;
 
-import org.locationtech.jts.geom.LineString;
-
 public interface AStarEdge<
   State extends AStarState<State, Edge, Vertex>,
   Edge extends AStarEdge<State, Edge, Vertex>,
@@ -11,9 +9,5 @@ public interface AStarEdge<
 
   Vertex getToVertex();
 
-  LineString getGeometry();
-
   State traverse(State u);
-
-  double getDistanceMeters();
 }

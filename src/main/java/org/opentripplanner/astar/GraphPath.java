@@ -1,12 +1,9 @@
 package org.opentripplanner.astar;
 
 import java.util.LinkedList;
-import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.AStarVertex;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 
 /**
  * A shortest path on the graph.
@@ -81,45 +78,8 @@ public class GraphPath<
     return (int) states.getLast().getElapsedTimeSeconds();
   }
 
-  /**
-   * Returns the total distance of all the edges in this path
-   */
-  public double getDistanceMeters() {
-    return edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
-  }
-
   public double getWeight() {
     return states.getLast().getWeight();
-  }
-
-  public Vertex getStartVertex() {
-    return states.getFirst().getVertex();
-  }
-
-  public Vertex getEndVertex() {
-    return states.getLast().getVertex();
-  }
-
-  /**
-   * Returns the geometry for the entire path
-   */
-  public LineString getGeometry() {
-    CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
-
-    for (Edge edge : edges) {
-      LineString geometry = edge.getGeometry();
-
-      if (geometry != null) {
-        if (coordinates.size() == 0) {
-          coordinates.extend(geometry.getCoordinates());
-        } else {
-          // Avoid duplications
-          coordinates.extend(geometry.getCoordinates(), 1);
-        }
-      }
-    }
-
-    return GeometryUtils.getGeometryFactory().createLineString(coordinates);
   }
 
   // must compare edges, not states, since states are different at each search

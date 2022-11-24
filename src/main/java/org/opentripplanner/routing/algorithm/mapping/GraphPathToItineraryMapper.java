@@ -10,10 +10,7 @@ import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.astar.GraphPath;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
@@ -29,6 +26,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
@@ -38,6 +36,7 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.util.OTPFeature;
 
@@ -128,30 +127,6 @@ public class GraphPathToItineraryMapper {
     itinerary.setArrivedAtDestinationWithRentedVehicle(lastState.isRentingVehicleFromStation());
 
     return itinerary;
-  }
-
-  /**
-   * Generate a {@link CoordinateArrayListSequence} based on an {@link Edge} array.
-   *
-   * @param edges The array of input edges
-   * @return The coordinates of the points on the edges
-   */
-  private static CoordinateArrayListSequence makeCoordinates(List<Edge> edges) {
-    CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
-
-    for (Edge edge : edges) {
-      LineString geometry = edge.getGeometry();
-
-      if (geometry != null) {
-        if (coordinates.size() == 0) {
-          coordinates.extend(geometry.getCoordinates());
-        } else {
-          coordinates.extend(geometry.getCoordinates(), 1); // Avoid duplications
-        }
-      }
-    }
-
-    return coordinates;
   }
 
   /**
@@ -386,8 +361,7 @@ public class GraphPathToItineraryMapper {
 
     double distanceMeters = edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
 
-    CoordinateArrayListSequence coordinates = makeCoordinates(edges);
-    LineString geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
+    LineString geometry = GeometryUtils.concatenateLineStrings(edges, Edge::getGeometry);
 
     var statesToWalkStepsMapper = new StatesToWalkStepsMapper(
       states,
