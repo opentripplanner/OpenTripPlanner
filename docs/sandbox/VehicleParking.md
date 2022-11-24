@@ -1,4 +1,4 @@
-# Vehicle Parking Updaters - OTP Sandbox Extension
+# Vehicle Parking Updaters
 
 ## Contact Info
 
@@ -49,7 +49,7 @@ All updaters have the following parameters in common:
 
 <h4 id="u__2__feedId">feedId</h4>
 
-**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[2] 
 
 The name of the data source.
@@ -58,15 +58,15 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 <h4 id="u__2__sourceType">sourceType</h4>
 
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
-**Path:** /updaters/[2]  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[2]   
 **Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
 
 The source of the vehicle updates.
 
 <h4 id="u__2__timeZone">timeZone</h4>
 
-**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[2] 
 
 The time zone of the feed.
@@ -120,7 +120,7 @@ Used for converting abstract opening hours into concrete points in time.
 
 <h4 id="u__3__feedId">feedId</h4>
 
-**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[3] 
 
 The name of the data source.
@@ -129,15 +129,15 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 <h4 id="u__3__sourceType">sourceType</h4>
 
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
-**Path:** /updaters/[3]  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[3]   
 **Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
 
 The source of the vehicle updates.
 
 <h4 id="u__3__timeZone">timeZone</h4>
 
-**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[3] 
 
 The time zone of the feed.
@@ -146,14 +146,14 @@ Used for converting abstract opening hours into concrete points in time.
 
 <h4 id="u__3__headers">headers</h4>
 
-**Since version:** `2.2` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[3] 
 
 HTTP headers to add.
 
 <h4 id="u__3__tags">tags</h4>
 
-**Since version:** `2.2` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[3] 
 
 Tags to add to the parking lots.
@@ -204,7 +204,7 @@ Tags to add to the parking lots.
 
 <h4 id="u__4__feedId">feedId</h4>
 
-**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[4] 
 
 The name of the data source.
@@ -213,15 +213,15 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 <h4 id="u__4__sourceType">sourceType</h4>
 
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
-**Path:** /updaters/[4]  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[4]   
 **Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
 
 The source of the vehicle updates.
 
 <h4 id="u__4__headers">headers</h4>
 
-**Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[4] 
 
 HTTP headers to add.
