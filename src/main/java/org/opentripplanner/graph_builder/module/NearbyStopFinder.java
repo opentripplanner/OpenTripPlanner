@@ -186,26 +186,15 @@ public class NearbyStopFinder {
   public List<NearbyStop> findNearbyStopsViaStreets(
     Set<Vertex> originVertices,
     boolean reverseDirection,
-    RouteRequest originalRequest,
+    RouteRequest request,
     StreetRequest streetRequest
   ) {
-    RouteRequest request = originalRequest.clone();
-    List<NearbyStop> stopsFound = new ArrayList<>();
-
-    request.setArriveBy(reverseDirection);
-    AStarRequest aStarRequest = AStarRequestMapper
-      .map(request)
-      .withMode(streetRequest.mode())
-      .build();
-
-    /* Add the origin vertices if they are stops */
-    for (Vertex vertex : originVertices) {
-      if (vertex instanceof TransitStopVertex tsv) {
-        stopsFound.add(
-          new NearbyStop(tsv.getStop(), 0, Collections.emptyList(), new State(vertex, aStarRequest))
-        );
-      }
-    }
+    List<NearbyStop> stopsFound = createDirectlyConnectedStops(
+      originVertices,
+      reverseDirection,
+      request,
+      streetRequest
+    );
 
     // Return only the origin vertices if there are no valid street modes
     if (streetRequest.mode() == StreetMode.NOT_SET) {
@@ -217,6 +206,7 @@ public class NearbyStopFinder {
       .setSkipEdgeStrategy(getSkipEdgeStrategy(reverseDirection, request))
       .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)
+      .setArriveBy(reverseDirection)
       .setStreetRequest(streetRequest)
       .setFrom(reverseDirection ? null : originVertices)
       .setTo(reverseDirection ? originVertices : null)
@@ -316,6 +306,32 @@ public class NearbyStopFinder {
     } else {
       return durationSkipEdgeStrategy;
     }
+  }
+
+  private static List<NearbyStop> createDirectlyConnectedStops(
+    Set<Vertex> originVertices,
+    boolean reverseDirection,
+    RouteRequest request,
+    StreetRequest streetRequest
+  ) {
+    List<NearbyStop> stopsFound = new ArrayList<>();
+
+    AStarRequest aStarRequest = AStarRequestMapper
+      .mapToTransferRequest(request)
+      .withArriveBy(reverseDirection)
+      .withMode(streetRequest.mode())
+      .build();
+
+    /* Add the origin vertices if they are stops */
+    for (Vertex vertex : originVertices) {
+      if (vertex instanceof TransitStopVertex tsv) {
+        stopsFound.add(
+          new NearbyStop(tsv.getStop(), 0, Collections.emptyList(), new State(vertex, aStarRequest))
+        );
+      }
+    }
+
+    return stopsFound;
   }
 
   private boolean canBoardFlex(State state, boolean reverse) {

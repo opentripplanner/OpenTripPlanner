@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.astar.strategies;
 import java.util.Set;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
@@ -27,15 +26,16 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
   //      not work correctly.
   @Override
   public void initialize(
-    RouteRequest request,
     StreetMode streetMode,
     Set<Vertex> fromVertices,
-    Set<Vertex> toVertices
+    Set<Vertex> toVertices,
+    boolean arriveBy,
+    RoutingPreferences preferences
   ) {
     Vertex target = toVertices.iterator().next();
-    maxStreetSpeed = getStreetSpeedUpperBound(request.preferences(), streetMode);
-    walkingSpeed = request.preferences().walk().speed();
-    arriveBy = request.arriveBy();
+    maxStreetSpeed = getStreetSpeedUpperBound(preferences, streetMode);
+    walkingSpeed = preferences.walk().speed();
+    this.arriveBy = arriveBy;
 
     if (target.getDegreeIn() == 1) {
       Edge edge = target.getIncoming().iterator().next();

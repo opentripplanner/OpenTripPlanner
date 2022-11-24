@@ -4,8 +4,8 @@ import java.util.Set;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 
 /**
  * A trivial heuristic that always returns 0, which is always admissible. For use in testing,
@@ -18,10 +18,11 @@ public class TrivialRemainingWeightHeuristic<
 
   @Override
   public void initialize(
-    RouteRequest request,
     StreetMode streetMode,
     Set<Vertex> fromVertices,
-    Set<Vertex> toVertices
+    Set<Vertex> toVertices,
+    boolean arriveBy,
+    RoutingPreferences preferences
   ) {}
 
   @Override

@@ -72,12 +72,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.transferMode = request.journey().transfer().mode();
-    this.request =
-      AStarRequestMapper
-        .map(request.copyAndPrepareForTransferRouting())
-        .withArriveBy(false)
-        .withMode(transferMode)
-        .build();
+    this.request = AStarRequestMapper.mapToTransferRequest(request).build();
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitService.getTimeZone(),

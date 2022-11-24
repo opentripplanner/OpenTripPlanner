@@ -244,15 +244,13 @@ public class TransitRouter {
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
     TransitLayer transitLayer
   ) {
-    RouteRequest transferRequest = request.copyAndPrepareForTransferRouting();
-
     return new RaptorRoutingRequestTransitData(
       transitLayer,
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
       new RouteRequestTransitDataProviderFilter(request, serverContext.transitService()),
-      transferRequest
+      request
     );
   }
 

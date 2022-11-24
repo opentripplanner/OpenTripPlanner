@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -115,12 +114,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
         for (RouteRequest transferProfile : transferRequests) {
-          RouteRequest streetRequest = transferProfile.copyAndPrepareForTransferRouting();
-
           for (NearbyStop sd : findNearbyStops(
             nearbyStopFinder,
             ts0,
-            streetRequest,
+            transferProfile,
             transferProfile.journey().transfer(),
             false
           )) {
@@ -142,7 +139,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             for (NearbyStop sd : findNearbyStops(
               nearbyStopFinder,
               ts0,
-              streetRequest,
+              transferProfile,
               transferProfile.journey().transfer(),
               true
             )) {
@@ -213,37 +210,5 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       : nearbyStopFinder.findNearbyStops(vertex, request, streetRequest, reverseDirection);
   }
 
-  private static class TransferKey {
-
-    private final StopLocation source;
-    private final StopLocation target;
-    private final List<Edge> edges;
-
-    private TransferKey(StopLocation source, StopLocation target, List<Edge> edges) {
-      this.source = source;
-      this.target = target;
-      this.edges = edges;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(source, target, edges);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      final TransferKey that = (TransferKey) o;
-      return (
-        source.equals(that.source) &&
-        target.equals(that.target) &&
-        Objects.equals(edges, that.edges)
-      );
-    }
-  }
+  private record TransferKey(StopLocation source, StopLocation target, List<Edge> edges) {}
 }
