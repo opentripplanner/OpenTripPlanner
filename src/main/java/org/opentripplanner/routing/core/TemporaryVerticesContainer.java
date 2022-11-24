@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -22,6 +21,7 @@ import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.SameEdgeAdjuster;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * This class is responsible for linking the RouteRequest origin and destination to the Graph used

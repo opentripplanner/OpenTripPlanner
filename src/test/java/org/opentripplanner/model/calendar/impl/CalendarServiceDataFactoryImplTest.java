@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.FeedInfo;
@@ -127,7 +127,7 @@ public class CalendarServiceDataFactoryImplTest {
       ConstantsForTests.FAKE_GTFS
     );
     OtpTransitServiceBuilder builder = ctxBuilder
-      .withDataImportIssueStore(DataImportIssueStore.noopIssueStore())
+      .withDataImportIssueStore(DataImportIssueStore.NOOP)
       .getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections

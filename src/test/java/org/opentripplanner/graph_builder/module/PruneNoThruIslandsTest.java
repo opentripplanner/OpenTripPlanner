@@ -1,7 +1,5 @@
 package org.opentripplanner.graph_builder.module;
 
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
-
 import java.io.File;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
@@ -80,7 +79,7 @@ public class PruneNoThruIslandsTest {
         List.of(osmProvider),
         Set.of(),
         graph,
-        noopIssueStore(),
+        DataImportIssueStore.NOOP,
         new DefaultMapper(),
         false
       );
@@ -109,7 +108,7 @@ public class PruneNoThruIslandsTest {
       PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(
         graph,
         transitModel,
-        noopIssueStore(),
+        DataImportIssueStore.NOOP,
         null
       );
       pruneNoThruIslands.setPruningThresholdIslandWithoutStops(40);

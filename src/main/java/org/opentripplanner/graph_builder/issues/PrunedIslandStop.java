@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.issues;
 
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.OsmUrlGenerator;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.common.OsmUrlGenerator;
-import org.opentripplanner.graph_builder.DataImportIssue;
 
 public class PrunedIslandStop implements DataImportIssue {
 

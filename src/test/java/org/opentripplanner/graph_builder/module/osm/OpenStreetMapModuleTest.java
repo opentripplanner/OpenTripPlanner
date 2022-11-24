@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
@@ -21,10 +20,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.GraphPath;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
@@ -35,8 +32,10 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -58,7 +57,7 @@ public class OpenStreetMapModuleTest {
       List.of(provider),
       Set.of(),
       gg,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       new DefaultMapper(),
       true
     );
@@ -126,7 +125,7 @@ public class OpenStreetMapModuleTest {
       List.of(provider),
       Set.of(),
       gg,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       new DefaultMapper(),
       true
     );
@@ -303,7 +302,7 @@ public class OpenStreetMapModuleTest {
       providers,
       Set.of(),
       graph,
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       new DefaultMapper(),
       false
     );
@@ -342,7 +341,7 @@ public class OpenStreetMapModuleTest {
       List.of(provider),
       Set.of(),
       graph,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       new DefaultMapper(),
       !skipVisibility
     );

@@ -1,13 +1,11 @@
 package org.opentripplanner.graph_builder.module;
 
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.logging.ProgressTracker;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ParkAndRideEntranceRemoved;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -60,7 +58,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   /** For test only */
   public static void linkStreetsForTestOnly(Graph graph, TransitModel model) {
-    new StreetLinkerModule(graph, model, noopIssueStore(), false).buildGraph();
+    new StreetLinkerModule(graph, model, DataImportIssueStore.NOOP, false).buildGraph();
   }
 
   @Override

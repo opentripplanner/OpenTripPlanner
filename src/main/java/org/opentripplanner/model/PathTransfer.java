@@ -2,9 +2,9 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.util.List;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**

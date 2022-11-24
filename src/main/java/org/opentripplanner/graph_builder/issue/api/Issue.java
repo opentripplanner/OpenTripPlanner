@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder;
+package org.opentripplanner.graph_builder.issue.api;
 
 /**
  * Generic issue type, which can be used to create issues.

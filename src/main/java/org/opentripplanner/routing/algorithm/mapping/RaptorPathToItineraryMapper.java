@@ -6,7 +6,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.astar.GraphPath;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.plan.FrequencyTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;
@@ -36,6 +35,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.transit.service.TransitService;
 
 /**

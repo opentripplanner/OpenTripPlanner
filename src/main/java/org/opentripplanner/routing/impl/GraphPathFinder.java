@@ -11,8 +11,6 @@ import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.AStarBuilder;
 import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
@@ -22,6 +20,8 @@ import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

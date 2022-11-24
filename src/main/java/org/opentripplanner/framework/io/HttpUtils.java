@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.framework.io;
 
 import java.io.IOException;
 import java.io.InputStream;

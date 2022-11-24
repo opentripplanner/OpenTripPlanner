@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.transferanalyzer.annotations;
 
-import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 /**

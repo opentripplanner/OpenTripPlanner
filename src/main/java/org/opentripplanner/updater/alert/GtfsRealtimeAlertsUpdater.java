@@ -4,6 +4,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
+import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -12,7 +13,6 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
-import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

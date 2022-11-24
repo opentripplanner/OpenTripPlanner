@@ -7,6 +7,7 @@ import org.opentripplanner._support.arch.Package;
 
 public class FrameworkArchitectureTest {
 
+  private static final Package APACHE_HTTP = Package.of("org.apache.http..");
   private static final Package COLLECTION = FRAMEWORK.subPackage("collection");
   private static final Package IO = FRAMEWORK.subPackage("io");
   private static final Package LANG = FRAMEWORK.subPackage("lang");
@@ -22,7 +23,7 @@ public class FrameworkArchitectureTest {
 
   @Test
   void enforceIoPackageDependencies() {
-    IO.verify();
+    IO.dependsOn(APACHE_HTTP).verify();
   }
 
   @Test

@@ -1,8 +1,7 @@
-package org.opentripplanner.common.model;
+package org.opentripplanner.ext.reportapi.model;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 

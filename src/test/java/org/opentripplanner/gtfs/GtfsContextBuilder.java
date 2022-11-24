@@ -3,7 +3,7 @@ package org.opentripplanner.gtfs;
 import java.io.File;
 import java.io.IOException;
 import javax.annotation.Nullable;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
@@ -48,7 +48,7 @@ public class GtfsContextBuilder {
     GtfsFeedId feedId = gtfsImport.getFeedId();
     var mapper = new GTFSToOtpTransitServiceMapper(
       feedId.getId(),
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       false,
       gtfsImport.getDao(),
       StopTransferPriority.ALLOWED
@@ -57,7 +57,7 @@ public class GtfsContextBuilder {
     mapper.mapAndAddTransfersToBuilder();
     OtpTransitServiceBuilder transitBuilder = mapper.getBuilder();
     return new GtfsContextBuilder(feedId, transitBuilder)
-      .withDataImportIssueStore(DataImportIssueStore.noopIssueStore());
+      .withDataImportIssueStore(DataImportIssueStore.NOOP);
   }
 
   public GtfsFeedId getFeedId() {
@@ -69,7 +69,7 @@ public class GtfsContextBuilder {
   }
 
   public GtfsContextBuilder withIssueStoreAndDeduplicator(Graph graph) {
-    return withIssueStoreAndDeduplicator(graph, DataImportIssueStore.noopIssueStore());
+    return withIssueStoreAndDeduplicator(graph, DataImportIssueStore.NOOP);
   }
 
   public GtfsContextBuilder withIssueStoreAndDeduplicator(

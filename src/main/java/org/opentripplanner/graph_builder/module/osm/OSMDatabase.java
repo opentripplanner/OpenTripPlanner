@@ -27,7 +27,7 @@ import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
 import org.opentripplanner.graph_builder.issues.PublicTransportRelationSkipped;
 import org.opentripplanner.graph_builder.issues.TooManyAreasInRelation;

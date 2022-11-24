@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
@@ -48,7 +48,7 @@ public class FakeGraph {
       List.of(provider),
       Set.of(),
       gg,
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       new DefaultMapper(),
       true
     );
