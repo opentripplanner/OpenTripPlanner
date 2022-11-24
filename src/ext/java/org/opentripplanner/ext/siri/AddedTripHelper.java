@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -155,6 +156,33 @@ public class AddedTripHelper {
     } else {
       return new T2<>(aimedArrivalTime, aimedDepartureTime);
     }
+  }
+
+  public static StopTime createStopTime(
+    Trip trip,
+    int stopSequence,
+    StopLocation stop,
+    Integer arrivalTime,
+    Integer departureTime,
+    String destinationDisplay
+  ) {
+    StopTime stopTime = new StopTime();
+    stopTime.setStopSequence(stopSequence);
+    stopTime.setTrip(trip);
+    stopTime.setStop(stop);
+    stopTime.setArrivalTime(arrivalTime);
+    stopTime.setDepartureTime(departureTime);
+
+    if (!destinationDisplay.isEmpty()) {
+      stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay));
+    } else if (trip.getHeadsign() != null) {
+      stopTime.setStopHeadsign(trip.getHeadsign());
+    } else {
+      // Fallback to empty string
+      stopTime.setStopHeadsign(new NonLocalizedString(""));
+    }
+
+    return stopTime;
   }
 
   private static boolean isNotNullOrEmpty(List<NaturalLanguageStringStructure> list) {

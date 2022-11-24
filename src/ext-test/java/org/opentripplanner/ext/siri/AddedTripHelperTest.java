@@ -17,6 +17,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.Trip;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
@@ -25,6 +27,7 @@ public class AddedTripHelperTest {
   private Agency agency;
   private Agency externalAgency;
   private Operator operator;
+  private Trip trip;
   private FeedScopedId routeId;
   private T2<TransitMode, String> transitMode;
   private NaturalLanguageStringStructure publishedNames;
@@ -54,6 +57,14 @@ public class AddedTripHelperTest {
     publishedNames = new NaturalLanguageStringStructure();
     publishedNames.setLang("en");
     publishedNames.setValue("Hogwarts Express");
+
+    var headsign = new NonLocalizedString("TEST TRIP TOWARDS TEST ISLAND");
+    trip =
+      Trip
+        .of(new FeedScopedId("FEED_ID", "TEST_TRIP"))
+        .withRoute(getRouteWithAgency(agency, operator))
+        .withHeadsign(headsign)
+        .build();
   }
 
   @Test
@@ -217,5 +228,80 @@ public class AddedTripHelperTest {
         "Arrival and departure time are expected to differ"
       );
     }
+  }
+
+  @Test
+  public void testCreateStopTime() {
+    var actualStopSequence = 123;
+
+    var regularStop = RegularStop.of(new FeedScopedId("FEED_ID", "TEST_STOP")).build();
+    var stopTime = AddedTripHelper.createStopTime(
+      trip,
+      actualStopSequence,
+      regularStop,
+      1000,
+      1200,
+      ""
+    );
+
+    assertAll(() -> {
+      assertEquals(trip, stopTime.getTrip(), "Trip not mapped correctly");
+      assertEquals(regularStop, stopTime.getStop(), "Stop not mapped correctly");
+      assertEquals(
+        actualStopSequence,
+        stopTime.getStopSequence(),
+        "StopSequence not mapped correctly"
+      );
+      assertEquals(
+        actualStopSequence,
+        stopTime.getStopSequence(),
+        "StopSequence not mapped correctly"
+      );
+      assertEquals(1000, stopTime.getArrivalTime(), "ArrivalTime not mapped correctly");
+      assertEquals(1200, stopTime.getDepartureTime(), "DepartureTime not mapped correctly");
+      assertEquals(
+        trip.getHeadsign(),
+        stopTime.getStopHeadsign(),
+        "DepartureTime not mapped correctly"
+      );
+    });
+  }
+
+  @Test
+  public void testCreateStopTimeOverrideHeadsignOnStop() {
+    var actualStopSequence = 123;
+
+    var regularStop = RegularStop.of(new FeedScopedId("FEED_ID", "TEST_STOP")).build();
+    String stop_headsign = "STOP_HEADSIGN";
+    var stopTime = AddedTripHelper.createStopTime(
+      trip,
+      actualStopSequence,
+      regularStop,
+      1000,
+      1200,
+      stop_headsign
+    );
+
+    assertAll(() -> {
+      assertEquals(trip, stopTime.getTrip(), "Trip not mapped correctly");
+      assertEquals(regularStop, stopTime.getStop(), "Stop not mapped correctly");
+      assertEquals(
+        actualStopSequence,
+        stopTime.getStopSequence(),
+        "StopSequence not mapped correctly"
+      );
+      assertEquals(
+        actualStopSequence,
+        stopTime.getStopSequence(),
+        "StopSequence not mapped correctly"
+      );
+      assertEquals(1000, stopTime.getArrivalTime(), "ArrivalTime not mapped correctly");
+      assertEquals(1200, stopTime.getDepartureTime(), "DepartureTime not mapped correctly");
+      assertEquals(
+        stop_headsign,
+        stopTime.getStopHeadsign().toString(),
+        "DepartureTime not mapped correctly"
+      );
+    });
   }
 }

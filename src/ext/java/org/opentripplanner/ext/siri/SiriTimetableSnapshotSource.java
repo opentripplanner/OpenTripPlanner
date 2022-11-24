@@ -28,7 +28,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -607,87 +606,33 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     int numStops = recordedCalls.size() + estimatedCalls.size();
 
-    // TODO - SIRI: Handle RecordedCalls. Finding departureTime++ from first stop will fail when
-    //              trip passes midnight, and the first stops are RecordedCalls.
+    ZonedDateTime departureDate = serviceDate.atStartOfDay(timeZone);
 
-    ZonedDateTime departureDate = serviceDate.atStartOfDay(transitModel.getTimeZone());
-
-    int i = 0;
-    for (RecordedCall recordedCall : recordedCalls) {
-      StopTime stopTime = new StopTime();
-      stopTime.setStopSequence(i);
-      stopTime.setTrip(trip);
-
-      var stop = getStopForStopId(transitModel, feedId, recordedCall.getStopPointRef().getValue());
-      stopTime.setStop(stop);
-
-      T2<Integer, Integer> arrivalAndDepartureTime = getArrivalAndDepartureTime(
+    int stopSequence = 0;
+    stopSequence =
+      handleRecordedCalls(
+        transitModel,
+        feedId,
+        trip,
+        addedStops,
+        aimedStopTimes,
+        recordedCalls,
         numStops,
         departureDate,
-        i,
-        recordedCall.getAimedArrivalTime(),
-        recordedCall.getAimedDepartureTime()
+        stopSequence
       );
 
-      stopTime.setArrivalTime(arrivalAndDepartureTime.first);
-      stopTime.setDepartureTime(arrivalAndDepartureTime.second);
-
-      // Destination display not present on recorded call
-      // Just use empty string
-      stopTime.setStopHeadsign(new NonLocalizedString(""));
-
-      addedStops.add(stop);
-      aimedStopTimes.add(stopTime);
-      i++;
-    }
-
-    for (EstimatedCall estimatedCall : estimatedCalls) {
-      StopTime stopTime = new StopTime();
-      stopTime.setStopSequence(i);
-      stopTime.setTrip(trip);
-
-      var stop = getStopForStopId(transitModel, feedId, estimatedCall.getStopPointRef().getValue());
-      stopTime.setStop(stop);
-
-      T2<Integer, Integer> arrivalAndDepartureTime = getArrivalAndDepartureTime(
-        numStops,
-        departureDate,
-        i,
-        estimatedCall.getAimedArrivalTime(),
-        estimatedCall.getAimedDepartureTime()
-      );
-      stopTime.setArrivalTime(arrivalAndDepartureTime.first);
-      stopTime.setDepartureTime(arrivalAndDepartureTime.second);
-
-      // Update pickup / dropof
-      var pickUpType = TimetableHelper.mapPickUpType(
-        stopTime.getPickupType(),
-        estimatedCall.getDepartureBoardingActivity()
-      );
-      pickUpType.ifPresent(stopTime::setPickupType);
-
-      var dropOffType = TimetableHelper.mapDropOffType(
-        stopTime.getDropOffType(),
-        estimatedCall.getArrivalBoardingActivity()
-      );
-      dropOffType.ifPresent(stopTime::setDropOffType);
-
-      // Update destination display
-      String destinationDisplay = AddedTripHelper.getFirstNameFromList(
-        estimatedCall.getDestinationDisplaies()
-      );
-
-      if (!destinationDisplay.isEmpty()) {
-        stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay));
-      } else if (trip.getHeadsign() == null) {
-        // Fallback to empty string
-        stopTime.setStopHeadsign(new NonLocalizedString(""));
-      }
-
-      addedStops.add(stop);
-      aimedStopTimes.add(stopTime);
-      i++;
-    }
+    handleEstimatedCalls(
+      transitModel,
+      feedId,
+      trip,
+      addedStops,
+      aimedStopTimes,
+      estimatedCalls,
+      numStops,
+      departureDate,
+      stopSequence
+    );
 
     StopPattern stopPattern = new StopPattern(aimedStopTimes);
 
@@ -710,30 +655,30 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       );
 
     // Loop through calls again and apply updates
-    i = 0;
+    stopSequence = 0;
     for (var recordedCall : recordedCalls) {
       TimetableHelper.applyUpdates(
         departureDate,
         aimedStopTimes,
         tripTimes,
-        i,
+        stopSequence,
         isJourneyPredictionInaccurate,
         recordedCall,
         estimatedVehicleJourney.getOccupancy()
       );
-      i++;
+      stopSequence++;
     }
     for (var estimatedCall : estimatedCalls) {
       TimetableHelper.applyUpdates(
         departureDate,
         aimedStopTimes,
         tripTimes,
-        i,
+        stopSequence,
         isJourneyPredictionInaccurate,
         estimatedCall,
         estimatedVehicleJourney.getOccupancy()
       );
-      i++;
+      stopSequence++;
     }
 
     // Adding trip to index necessary to include values in graphql-queries
@@ -777,6 +722,114 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       serviceDate,
       estimatedVehicleJourney
     );
+  }
+
+  private void handleEstimatedCalls(
+    TransitModel transitModel,
+    String feedId,
+    Trip trip,
+    List<StopLocation> addedStops,
+    List<StopTime> aimedStopTimes,
+    List<EstimatedCall> estimatedCalls,
+    int numStops,
+    ZonedDateTime departureDate,
+    int stopSequence
+  ) {
+    for (EstimatedCall estimatedCall : estimatedCalls) {
+      var stop = getStopForStopId(transitModel, feedId, estimatedCall.getStopPointRef().getValue());
+
+      // Update destination display
+      String destinationDisplay = AddedTripHelper.getFirstNameFromList(
+        estimatedCall.getDestinationDisplaies()
+      );
+
+      StopTime stopTime = createStopTime(
+        trip,
+        numStops,
+        departureDate,
+        stopSequence,
+        estimatedCall.getAimedArrivalTime(),
+        estimatedCall.getAimedDepartureTime(),
+        stop,
+        destinationDisplay
+      );
+
+      // Update pickup / dropof
+      var pickUpType = TimetableHelper.mapPickUpType(
+        stopTime.getPickupType(),
+        estimatedCall.getDepartureBoardingActivity()
+      );
+      pickUpType.ifPresent(stopTime::setPickupType);
+
+      var dropOffType = TimetableHelper.mapDropOffType(
+        stopTime.getDropOffType(),
+        estimatedCall.getArrivalBoardingActivity()
+      );
+      dropOffType.ifPresent(stopTime::setDropOffType);
+
+      addedStops.add(stop);
+      aimedStopTimes.add(stopTime);
+      stopSequence++;
+    }
+  }
+
+  private StopTime createStopTime(
+    Trip trip,
+    int numStops,
+    ZonedDateTime departureDate,
+    int stopSequence,
+    ZonedDateTime aimedArrivalTime,
+    ZonedDateTime aimedDepartureTime,
+    StopLocation stop,
+    String destinationDisplay
+  ) {
+    T2<Integer, Integer> arrivalAndDepartureTime = getArrivalAndDepartureTime(
+      numStops,
+      departureDate,
+      stopSequence,
+      aimedArrivalTime,
+      aimedDepartureTime
+    );
+
+    return AddedTripHelper.createStopTime(
+      trip,
+      stopSequence,
+      stop,
+      arrivalAndDepartureTime.first,
+      arrivalAndDepartureTime.second,
+      destinationDisplay
+    );
+  }
+
+  private int handleRecordedCalls(
+    TransitModel transitModel,
+    String feedId,
+    Trip trip,
+    List<StopLocation> addedStops,
+    List<StopTime> aimedStopTimes,
+    List<RecordedCall> recordedCalls,
+    int numStops,
+    ZonedDateTime departureDate,
+    int stopSequence
+  ) {
+    for (RecordedCall recordedCall : recordedCalls) {
+      var stop = getStopForStopId(transitModel, feedId, recordedCall.getStopPointRef().getValue());
+      StopTime stopTime = createStopTime(
+        trip,
+        numStops,
+        departureDate,
+        stopSequence,
+        recordedCall.getAimedArrivalTime(),
+        recordedCall.getAimedDepartureTime(),
+        stop,
+        "" // Destination display not present on recorded call
+      );
+
+      addedStops.add(stop);
+      aimedStopTimes.add(stopTime);
+      stopSequence++;
+    }
+    return stopSequence;
   }
 
   private T2<Integer, Integer> getArrivalAndDepartureTime(
