@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder;
+package org.opentripplanner.graph_builder.issue.report;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +72,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
       }
 
       //Groups issues in multimap according to issue type
-      for (DataImportIssue it : issueStore.getIssues()) {
+      for (DataImportIssue it : issueStore.listIssues()) {
         //writer.println("<p>" + it.getHTMLMessage() + "</p>");
         // writer.println("<small>" + it.getTypeName()+"</small>");
         addIssue(it);

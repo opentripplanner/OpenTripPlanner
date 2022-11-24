@@ -50,7 +50,7 @@ public class ReportResource {
   @Path("/bicycle-safety.html")
   @Produces(MediaType.TEXT_HTML)
   public Response getBicycleSafetyPage() {
-    try(var is = getClass().getResourceAsStream("/reportapi/report.html")) {
+    try (var is = getClass().getResourceAsStream("/reportapi/report.html")) {
       return Response.ok(new String(is.readAllBytes(), StandardCharsets.UTF_8)).build();
     } catch (IOException e) {
       return Response.serverError().build();

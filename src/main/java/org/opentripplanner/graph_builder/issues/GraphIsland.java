@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.graph_builder.DataImportIssue;
 
 public class GraphIsland implements DataImportIssue {
 

@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Objects;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 public class FareTransferRuleMapper {
 

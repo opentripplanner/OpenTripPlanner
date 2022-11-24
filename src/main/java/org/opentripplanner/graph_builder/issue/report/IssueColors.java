@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder;
+package org.opentripplanner.graph_builder.issue.report;
 
 import java.awt.Color;
 import java.util.Map;

@@ -11,6 +11,8 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.report.SummarizeDataImportIssues;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -168,7 +170,8 @@ public class GraphBuilder implements Runnable {
       load.buildGraph();
     }
 
-    issueStore.summarize();
+    new SummarizeDataImportIssues(issueStore.listIssues()).summarize();
+
     validate();
 
     logGraphBuilderCompleteStatus(startTime, graph, transitModel);

@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ConflictingBikeTags;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -151,7 +151,7 @@ public class OSMFilter {
     OSMWay way,
     StreetTraversalPermission def
   ) {
-    return getPermissionsForWay(way, def, false, false, DataImportIssueStore.noopIssueStore());
+    return getPermissionsForWay(way, def, false, false, DataImportIssueStore.NOOP);
   }
 
   /**

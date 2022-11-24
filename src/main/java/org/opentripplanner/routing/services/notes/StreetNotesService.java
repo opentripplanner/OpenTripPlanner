@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.street.model.edge.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

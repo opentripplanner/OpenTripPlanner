@@ -1,7 +1,5 @@
 package org.opentripplanner;
 
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
-
 import com.csvreader.CsvReader;
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +13,7 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -138,7 +137,7 @@ public class ConstantsForTests {
           Set.of(),
           // Need to use a mutable set here, since it is used
           graph,
-          noopIssueStore(),
+          DataImportIssueStore.NOOP,
           new DefaultMapper(),
           false
         );
@@ -188,7 +187,7 @@ public class ConstantsForTests {
         List.of(osmProvider),
         Set.of(),
         graph,
-        noopIssueStore(),
+        DataImportIssueStore.NOOP,
         new DefaultMapper(),
         false
       );
@@ -247,7 +246,7 @@ public class ConstantsForTests {
           List.of(osmProvider),
           Set.of(),
           graph,
-          noopIssueStore(),
+          DataImportIssueStore.NOOP,
           new DefaultMapper(),
           false
         );
@@ -263,7 +262,7 @@ public class ConstantsForTests {
         var sources = List.of(new ConfiguredDataSource<>(NETEX_MINIMAL_DATA_SOURCE, netexConfig));
 
         new NetexConfigure(buildConfig)
-          .createNetexModule(sources, transitModel, graph, noopIssueStore())
+          .createNetexModule(sources, transitModel, graph, DataImportIssueStore.NOOP)
           .buildGraph();
       }
       // Link transit stops to streets
@@ -309,7 +308,7 @@ public class ConstantsForTests {
       List.of(bundle),
       transitModel,
       graph,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       ServiceDateInterval.unbounded(),
       fareServiceFactory,
       false,

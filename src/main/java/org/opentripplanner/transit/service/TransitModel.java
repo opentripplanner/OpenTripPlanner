@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.PathTransfer;

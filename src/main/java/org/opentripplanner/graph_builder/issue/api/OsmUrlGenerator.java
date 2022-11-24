@@ -1,4 +1,4 @@
-package org.opentripplanner.common;
+package org.opentripplanner.graph_builder.issue.api;
 
 import org.locationtech.jts.geom.Coordinate;
 

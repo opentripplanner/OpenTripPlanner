@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * A termination strategy that terminates after multiple targets have been reached.

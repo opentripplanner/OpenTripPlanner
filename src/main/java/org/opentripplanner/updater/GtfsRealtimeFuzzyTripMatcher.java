@@ -6,7 +6,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -28,9 +28,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
   private final TransitService transitService;
 
   // TODO: replace this with a runtime solution
-  private final DirectionMapper directionMapper = new DirectionMapper(
-    DataImportIssueStore.noopIssueStore()
-  );
+  private final DirectionMapper directionMapper = new DirectionMapper(DataImportIssueStore.NOOP);
 
   public GtfsRealtimeFuzzyTripMatcher(TransitService transitService) {
     this.transitService = transitService;

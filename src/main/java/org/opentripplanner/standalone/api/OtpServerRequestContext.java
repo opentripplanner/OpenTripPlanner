@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.api;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Locale;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.inspector.TileRendererManager;
@@ -14,6 +13,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;

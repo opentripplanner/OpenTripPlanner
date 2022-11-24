@@ -18,11 +18,9 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -31,10 +29,12 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -48,7 +48,7 @@ public class GeometryProcessorTest {
 
   private Graph graph;
   private String feedId;
-  private DataImportIssueStore issueStore;
+  private DefaultDataImportIssueStore issueStore;
 
   @BeforeEach
   public void setUp() throws Exception {
@@ -56,7 +56,7 @@ public class GeometryProcessorTest {
     var stopModel = new StopModel();
     graph = new Graph(deduplicator);
     TransitModel transitModel = new TransitModel(stopModel, deduplicator);
-    this.issueStore = new DataImportIssueStore();
+    this.issueStore = new DefaultDataImportIssueStore();
 
     GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS)
       .withIssueStoreAndDeduplicator(graph)
@@ -128,7 +128,7 @@ public class GeometryProcessorTest {
   @Test
   public void testIssue() {
     boolean found = false;
-    for (DataImportIssue it : issueStore.getIssues()) {
+    for (DataImportIssue it : issueStore.listIssues()) {
       if (it instanceof NegativeHopTime nht) {
         assertTrue(nht.st0.getDepartureTime() > nht.st1.getArrivalTime());
         found = true;
