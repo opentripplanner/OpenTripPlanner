@@ -267,14 +267,11 @@ public class ElevationProfile {
         var second = steps.get(i + 1);
         var third = steps.get(i + 2);
 
-        // TODO - Remove one of the two lase elements is equals - this is a bug in the
-        //      - current implementation
-        //if (second.equals(third)) {
-        //  steps.remove(i + 1);
-        //} else
         if (first.y == second.y && second.y == third.y) {
           steps.remove(i + 1);
         } else if (first.equals(second)) {
+          steps.remove(i + 1);
+        } else if (second.equals(third)) {
           steps.remove(i + 1);
         }
       }

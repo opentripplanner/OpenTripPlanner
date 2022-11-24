@@ -76,8 +76,7 @@ class ElevationProfileTest {
       .step(5, Double.NaN)
       .stepYUnknown(6)
       .stepYUnknown(7)
-      // TODO - Add testcase for ending with two equal elements
-      //.step(8, 10)
+      .step(8, 10)
       .step(8, 10)
       .removeDuplicateSteps()
       .build();
