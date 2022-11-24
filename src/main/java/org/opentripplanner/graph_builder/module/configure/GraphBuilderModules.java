@@ -55,13 +55,7 @@ public class GraphBuilderModules {
   ) {
     List<OpenStreetMapProvider> providers = new ArrayList<>();
     for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
-      providers.add(
-        new OpenStreetMapProvider(
-          osmConfiguredDataSource,
-          config.osmDefaults,
-          config.osmCacheDataInMem
-        )
-      );
+      providers.add(new OpenStreetMapProvider(osmConfiguredDataSource, config.osmCacheDataInMem));
     }
 
     return new OpenStreetMapModule(

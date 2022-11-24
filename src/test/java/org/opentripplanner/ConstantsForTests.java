@@ -139,7 +139,6 @@ public class ConstantsForTests {
           // Need to use a mutable set here, since it is used
           graph,
           noopIssueStore(),
-          new DefaultMapper(),
           false
         );
         osmModule.staticBikeParkAndRide = true;
@@ -189,7 +188,6 @@ public class ConstantsForTests {
         Set.of(),
         graph,
         noopIssueStore(),
-        new DefaultMapper(),
         false
       );
       osmModule.buildGraph();
@@ -248,7 +246,6 @@ public class ConstantsForTests {
           Set.of(),
           graph,
           noopIssueStore(),
-          new DefaultMapper(),
           false
         );
         osmModule.buildGraph();

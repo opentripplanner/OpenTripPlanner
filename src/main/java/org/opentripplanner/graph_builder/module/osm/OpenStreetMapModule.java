@@ -81,7 +81,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private final List<OpenStreetMapProvider> providers;
   private final Set<String> boardingAreaRefTags;
   private final DataImportIssueStore issueStore;
-  private final OsmTagMapper osmTagMapper;
   private final Graph graph;
 
   private final boolean areaVisibility;
@@ -117,14 +116,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Set<String> boardingAreaRefTags,
     Graph graph,
     DataImportIssueStore issueStore,
-    OsmTagMapper osmTagMapper,
     boolean areaVisibility
   ) {
     this.providers = List.copyOf(providers);
     this.boardingAreaRefTags = boardingAreaRefTags;
     this.graph = graph;
     this.issueStore = issueStore;
-    this.osmTagMapper = osmTagMapper;
     this.areaVisibility = areaVisibility;
   }
 
@@ -135,14 +132,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Graph graph,
     DataImportIssueStore issueStore
   ) {
-    this(
-      List.copyOf(providers),
-      boardingAreaRefTags,
-      graph,
-      issueStore,
-      config.osmDefaults.osmOsmTagMapper,
-      config.areaVisibility
-    );
+    this(List.copyOf(providers), boardingAreaRefTags, graph, issueStore, config.areaVisibility);
     this.customNamer = config.customNamer;
     this.platformEntriesLinking = config.platformEntriesLinking;
     this.staticBikeParkAndRide = config.staticBikeParkAndRide;
@@ -158,11 +148,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
       LOG.info("Gathering OSM from provider: {}", provider);
+      LOG.info(
+        "Using OSM way configuration from {}.",
+        provider.getOsmTagMapper().getClass().getSimpleName()
+      );
       provider.readOSM(osmdb);
     }
     osmdb.postLoad();
-
-    LOG.info("Using OSM way configuration from {}.", osmTagMapper.getClass().getSimpleName());
 
     LOG.info("Building street graph from OSM");
     handler.buildGraph();

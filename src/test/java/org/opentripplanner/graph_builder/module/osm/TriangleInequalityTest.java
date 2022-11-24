@@ -19,10 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -63,18 +61,13 @@ public class TriangleInequalityTest {
       dataSource,
       new OsmExtractParametersBuilder().withSource(dataSource.uri()).build()
     );
-    OpenStreetMapProvider provider = new OpenStreetMapProvider(
-      source,
-      new OsmDefaultParameters(),
-      true
-    );
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(source, true);
 
     OpenStreetMapModule osmModule = new OpenStreetMapModule(
       List.of(provider),
       Set.of(),
       graph,
       noopIssueStore(),
-      new DefaultMapper(),
       true
     );
     osmModule.buildGraph();

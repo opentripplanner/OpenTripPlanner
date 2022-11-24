@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -47,7 +46,6 @@ public class UnroutableTest {
       Set.of(),
       graph,
       noopIssueStore(),
-      new DefaultMapper(),
       true
     );
     osmBuilder.buildGraph();
