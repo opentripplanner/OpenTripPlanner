@@ -20,7 +20,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.street.model.vertex.StreetVertex;

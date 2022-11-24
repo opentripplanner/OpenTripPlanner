@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InvalidVehicleParkingCapacity;
 import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;

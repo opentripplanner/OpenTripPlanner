@@ -2,7 +2,7 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 

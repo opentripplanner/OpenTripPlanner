@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.traveltime;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.ext.traveltime.geometry.AccumulativeGridSampler;
 import org.opentripplanner.ext.traveltime.spt.SPTVisitor;
 import org.opentripplanner.routing.core.State;

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;

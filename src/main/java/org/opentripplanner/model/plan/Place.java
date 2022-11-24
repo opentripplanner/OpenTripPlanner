@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;

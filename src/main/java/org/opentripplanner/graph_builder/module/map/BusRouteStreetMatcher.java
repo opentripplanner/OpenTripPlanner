@@ -7,7 +7,7 @@ import java.util.List;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;

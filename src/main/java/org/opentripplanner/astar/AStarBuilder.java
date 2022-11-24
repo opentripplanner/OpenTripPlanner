@@ -173,7 +173,7 @@ public class AStarBuilder<
 
       initialStates =
         (Collection<State>) org.opentripplanner.routing.core.State.getInitialStates(
-          (Set<org.opentripplanner.astar.model.Vertex>) origin,
+          (Set<org.opentripplanner.street.model.vertex.Vertex>) origin,
           aStarRequest
         );
 

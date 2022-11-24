@@ -9,8 +9,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.locationtech.jts.util.AssertionFailedException;
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 public class MidblockMatchState extends MatchState {
 

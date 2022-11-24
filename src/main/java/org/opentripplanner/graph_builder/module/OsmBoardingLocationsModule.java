@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;

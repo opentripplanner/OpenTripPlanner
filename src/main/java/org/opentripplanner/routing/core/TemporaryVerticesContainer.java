@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;

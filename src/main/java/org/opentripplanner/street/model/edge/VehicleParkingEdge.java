@@ -1,7 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;

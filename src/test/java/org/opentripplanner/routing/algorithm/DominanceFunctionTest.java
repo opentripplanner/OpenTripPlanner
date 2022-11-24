@@ -8,7 +8,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.DominanceFunction;
 import org.opentripplanner.astar.DominanceFunctions;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;

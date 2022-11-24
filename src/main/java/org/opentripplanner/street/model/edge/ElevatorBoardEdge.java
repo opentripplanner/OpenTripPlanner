@@ -3,7 +3,6 @@ package org.opentripplanner.street.model.edge;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.core.State;

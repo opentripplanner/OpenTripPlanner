@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;

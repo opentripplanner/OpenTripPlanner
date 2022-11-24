@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.api;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Locale;
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.inspector.TileRendererManager;

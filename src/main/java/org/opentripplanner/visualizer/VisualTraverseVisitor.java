@@ -1,6 +1,6 @@
 package org.opentripplanner.visualizer;
 
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.routing.core.State;
 import org.slf4j.Logger;

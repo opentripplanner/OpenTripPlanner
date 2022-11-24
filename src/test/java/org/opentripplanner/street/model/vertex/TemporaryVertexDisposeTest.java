@@ -3,7 +3,6 @@ package org.opentripplanner.street.model.vertex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.street.model.edge.FreeEdge;
 
 public class TemporaryVertexDisposeTest {

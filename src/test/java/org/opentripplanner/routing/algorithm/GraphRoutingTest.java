@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;

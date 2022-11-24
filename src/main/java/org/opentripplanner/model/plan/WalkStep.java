@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.model.StreetNote;

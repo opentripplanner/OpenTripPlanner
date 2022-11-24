@@ -1,7 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.astar.model.Vertex;
-
 /**
  * Marker interface for temporary vertices.
  * <p>

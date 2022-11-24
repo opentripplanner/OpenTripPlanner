@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import java.util.Set;
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.RouteRequest;

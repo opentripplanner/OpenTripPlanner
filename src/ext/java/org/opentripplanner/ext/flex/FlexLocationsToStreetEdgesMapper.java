@@ -3,7 +3,7 @@ package org.opentripplanner.ext.flex;
 import java.util.HashSet;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;

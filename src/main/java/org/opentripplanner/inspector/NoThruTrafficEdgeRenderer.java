@@ -1,8 +1,8 @@
 package org.opentripplanner.inspector;
 
 import java.awt.Color;
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;

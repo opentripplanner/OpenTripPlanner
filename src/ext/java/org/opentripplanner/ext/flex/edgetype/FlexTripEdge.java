@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.flex.edgetype;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;

@@ -11,7 +11,6 @@ import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.astar.model.Edge;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
 import org.opentripplanner.framework.geometry.DirectionUtils;

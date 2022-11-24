@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**

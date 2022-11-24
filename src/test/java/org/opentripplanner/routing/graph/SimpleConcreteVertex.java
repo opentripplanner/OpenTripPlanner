@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.graph;
 
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * Seems to be used only in tests. As far as I know this is not used in normal routing (abyrd).

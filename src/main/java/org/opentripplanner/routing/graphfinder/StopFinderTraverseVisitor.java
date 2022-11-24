@@ -2,8 +2,8 @@ package org.opentripplanner.routing.graphfinder;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.routing.core.State;

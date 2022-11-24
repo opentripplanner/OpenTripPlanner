@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 
 /**

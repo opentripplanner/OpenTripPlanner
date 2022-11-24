@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

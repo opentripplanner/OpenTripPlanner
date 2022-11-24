@@ -1,4 +1,4 @@
-package org.opentripplanner.astar.model;
+package org.opentripplanner.street.model.edge;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.transit.model.basic.I18NString;

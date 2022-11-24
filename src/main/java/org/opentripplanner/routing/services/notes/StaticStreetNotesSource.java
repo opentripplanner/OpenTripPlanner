@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;

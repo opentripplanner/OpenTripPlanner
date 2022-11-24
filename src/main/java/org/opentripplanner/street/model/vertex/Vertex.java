@@ -1,4 +1,4 @@
-package org.opentripplanner.astar.model;
+package org.opentripplanner.street.model.vertex;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,6 +13,7 @@ import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;

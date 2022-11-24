@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.astar.GraphPath;
-import org.opentripplanner.astar.model.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.plan.FrequencyTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;

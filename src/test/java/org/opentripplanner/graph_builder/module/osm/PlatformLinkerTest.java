@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.model.Vertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
