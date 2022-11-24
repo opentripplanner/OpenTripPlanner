@@ -2,8 +2,8 @@ package org.opentripplanner.street.model.vertex;
 
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import org.opentripplanner.astar.model.Edge;
-import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -13,7 +13,7 @@ import org.opentripplanner.transit.model.site.StationElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TransitStopVertex extends Vertex {
+public class TransitStopVertex extends StationElementVertex {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitStopVertex.class);
   private static final long serialVersionUID = 1L;
@@ -84,6 +84,7 @@ public class TransitStopVertex extends Vertex {
     return this.stop;
   }
 
+  @Nonnull
   @Override
   public StationElement getStationElement() {
     return this.stop;

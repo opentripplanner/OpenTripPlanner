@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.opentripplanner.astar.model.Vertex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
@@ -20,6 +19,7 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
+import org.opentripplanner.street.model.vertex.StationElementVertex;
 import org.opentripplanner.street.model.vertex.TransitBoardingAreaVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitPathwayNodeVertex;
@@ -52,7 +52,7 @@ public class AddTransitModelEntitiesToGraph {
   private final OtpTransitService otpTransitService;
 
   // Map of all station elements and their vertices in the graph
-  private final Map<StationElement<?, ?>, Vertex> stationElementNodes = new HashMap<>();
+  private final Map<StationElement<?, ?>, StationElementVertex> stationElementNodes = new HashMap<>();
 
   private final int subwayAccessTime;
 
@@ -181,8 +181,8 @@ public class AddTransitModelEntitiesToGraph {
 
   private void createPathwayEdgesAndAddThemToGraph(Graph graph) {
     for (Pathway pathway : otpTransitService.getAllPathways()) {
-      Vertex fromVertex = stationElementNodes.get(pathway.getFromStop());
-      Vertex toVertex = stationElementNodes.get(pathway.getToStop());
+      StationElementVertex fromVertex = stationElementNodes.get(pathway.getFromStop());
+      StationElementVertex toVertex = stationElementNodes.get(pathway.getToStop());
 
       if (fromVertex != null && toVertex != null) {
         // Elevator
@@ -243,28 +243,19 @@ public class AddTransitModelEntitiesToGraph {
   private void createElevatorEdgesAndAddThemToGraph(
     Graph graph,
     Pathway pathway,
-    Vertex fromVertex,
-    Vertex toVertex
+    StationElementVertex fromVertex,
+    StationElementVertex toVertex
   ) {
-    StationElement fromStation = fromVertex.getStationElement();
-    I18NString fromVertexLevelName = fromStation == null || fromStation.getLevelName() == null
-      ? fromVertex.getName()
-      : new NonLocalizedString(fromStation.getLevelName());
-    Double fromVertexLevelIndex = fromStation == null ? null : fromStation.getLevelIndex();
-
-    StationElement toStation = toVertex.getStationElement();
-    I18NString toVertexLevelName = toStation == null || toStation.getLevelName() == null
-      ? toVertex.getName()
-      : new NonLocalizedString(toStation.getLevelName());
-    Double toVertexLevelIndex = toStation == null ? null : toStation.getLevelIndex();
+    StopLevel fromLevel = getStopLevel(fromVertex);
+    StopLevel toLevel = getStopLevel(toVertex);
 
     double levels = 1;
     if (
-      fromVertexLevelIndex != null &&
-      toVertexLevelIndex != null &&
-      !fromVertexLevelIndex.equals(toVertexLevelIndex)
+      fromLevel.index() != null &&
+      toLevel.index() != null &&
+      !fromLevel.index().equals(toLevel.index())
     ) {
-      levels = Math.abs(fromVertexLevelIndex - toVertexLevelIndex);
+      levels = Math.abs(fromLevel.index() - toLevel.index());
     }
 
     ElevatorOffboardVertex fromOffboardVertex = new ElevatorOffboardVertex(
@@ -272,14 +263,14 @@ public class AddTransitModelEntitiesToGraph {
       fromVertex.getLabel() + "_" + pathway.getId() + "_offboard",
       fromVertex.getX(),
       fromVertex.getY(),
-      fromVertexLevelName
+      fromLevel.name()
     );
     ElevatorOffboardVertex toOffboardVertex = new ElevatorOffboardVertex(
       graph,
       toVertex.getLabel() + "_" + pathway.getId() + "_offboard",
       toVertex.getX(),
       toVertex.getY(),
-      toVertexLevelName
+      toLevel.name()
     );
 
     PathwayEdge.lowCost(fromVertex, fromOffboardVertex, fromVertex.getName(), PathwayMode.ELEVATOR);
@@ -290,18 +281,18 @@ public class AddTransitModelEntitiesToGraph {
       fromVertex.getLabel() + "_" + pathway.getId() + "_onboard",
       fromVertex.getX(),
       fromVertex.getY(),
-      fromVertexLevelName
+      fromLevel.name()
     );
     ElevatorOnboardVertex toOnboardVertex = new ElevatorOnboardVertex(
       graph,
       toVertex.getLabel() + "_" + pathway.getId() + "_onboard",
       toVertex.getX(),
       toVertex.getY(),
-      toVertexLevelName
+      toLevel.name()
     );
 
     new ElevatorBoardEdge(fromOffboardVertex, fromOnboardVertex);
-    new ElevatorAlightEdge(toOnboardVertex, toOffboardVertex, toVertexLevelName);
+    new ElevatorAlightEdge(toOnboardVertex, toOffboardVertex, toLevel.name());
 
     StreetTraversalPermission permission = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
     new ElevatorHopEdge(
@@ -322,7 +313,7 @@ public class AddTransitModelEntitiesToGraph {
       );
       PathwayEdge.lowCost(toVertex, toOffboardVertex, toVertex.getName(), PathwayMode.ELEVATOR);
       new ElevatorBoardEdge(toOffboardVertex, toOnboardVertex);
-      new ElevatorAlightEdge(fromOnboardVertex, fromOffboardVertex, fromVertexLevelName);
+      new ElevatorAlightEdge(fromOnboardVertex, fromOffboardVertex, fromLevel.name());
       new ElevatorHopEdge(
         toOnboardVertex,
         fromOnboardVertex,
@@ -332,6 +323,17 @@ public class AddTransitModelEntitiesToGraph {
         pathway.getTraversalTime()
       );
     }
+  }
+
+  private StopLevel getStopLevel(StationElementVertex vertex) {
+    StationElement<?, ?> fromStation = vertex.getStationElement();
+    var level = fromStation.level();
+    return level != null
+      ? new StopLevel(
+        NonLocalizedString.ofNullableOrElse(level.name(), fromStation.getName()),
+        level.index()
+      )
+      : new StopLevel(fromStation.getName(), null);
   }
 
   private void addFeedInfoToGraph(TransitModel transitModel) {
@@ -375,4 +377,6 @@ public class AddTransitModelEntitiesToGraph {
       transitModel.addFlexTrip(flexTrip.getId(), flexTrip);
     }
   }
+
+  private record StopLevel(I18NString name, Double index) {}
 }

@@ -1,12 +1,12 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.astar.model.Vertex;
+import javax.annotation.Nonnull;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.StationElement;
 
-public class TransitEntranceVertex extends Vertex {
+public class TransitEntranceVertex extends StationElementVertex {
 
   private static final long serialVersionUID = 1L;
 
@@ -42,6 +42,7 @@ public class TransitEntranceVertex extends Vertex {
     return this.entrance;
   }
 
+  @Nonnull
   @Override
   public StationElement getStationElement() {
     return this.entrance;

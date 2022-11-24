@@ -7,6 +7,7 @@ import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
 import org.opentripplanner.street.model.edge.PathwayEdge;
+import org.opentripplanner.street.model.vertex.StationElementVertex;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
 
@@ -64,11 +65,10 @@ public class PathwayEdgeRenderer implements EdgeVertexRenderer {
 
   @Override
   public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
-    StationElement stationElement = v.getStationElement();
-
-    if (stationElement == null) {
+    if (!(v instanceof StationElementVertex stationElementVertex)) {
       return false;
     }
+    StationElement<?, ?> stationElement = stationElementVertex.getStationElement();
 
     StringBuilder sb = new StringBuilder();
 

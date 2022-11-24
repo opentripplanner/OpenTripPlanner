@@ -14,7 +14,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.site.StationElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,11 +160,6 @@ public abstract class Vertex implements Serializable, Cloneable {
    */
   public String getDefaultName() {
     return this.name.toString();
-  }
-
-  /** Get the corresponding StationElement if this is a transit vertex */
-  public StationElement getStationElement() {
-    return null;
   }
 
   /** Every vertex has a label which is globally unique. */
