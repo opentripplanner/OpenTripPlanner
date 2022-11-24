@@ -28,7 +28,7 @@ public class StateEditor {
 
   /* CONSTRUCTORS */
 
-  public StateEditor(Vertex v, AStarRequest request) {
+  public StateEditor(Vertex v, StreetSearchRequest request) {
     child = new State(v, request);
   }
 

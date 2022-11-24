@@ -18,8 +18,8 @@ import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWe
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestMapper;
+import org.opentripplanner.routing.core.StreetSearchRequest;
+import org.opentripplanner.routing.core.StreetSearchRequestMapper;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 
@@ -173,7 +173,7 @@ public class AStarBuilder<
     if (this.initialStates != null) {
       initialStates = this.initialStates;
     } else {
-      AStarRequest aStarRequest = AStarRequestMapper
+      StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper
         .map(routeRequest)
         .withMode(streetRequest.mode())
         .withArriveBy(arriveBy)
@@ -182,7 +182,7 @@ public class AStarBuilder<
       initialStates =
         (Collection<State>) org.opentripplanner.routing.core.State.getInitialStates(
           (Set<org.opentripplanner.street.model.vertex.Vertex>) origin,
-          aStarRequest
+          streetSearchRequest
         );
 
       if (originBackEdge != null) {
@@ -202,8 +202,10 @@ public class AStarBuilder<
     }
 
     for (var state : initialStates) {
-      state.getRequest().setIntersectionTraversalCalculator(intersectionTraversalCalculator);
-      state.getRequest().setDataOverlayContext(dataOverlayContext);
+      ((StreetSearchRequest) state.getRequest()).setIntersectionTraversalCalculator(
+          intersectionTraversalCalculator
+        );
+      ((StreetSearchRequest) state.getRequest()).setDataOverlayContext(dataOverlayContext);
     }
 
     heuristic.initialize(

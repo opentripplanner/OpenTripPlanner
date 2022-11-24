@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.routing.core.AStarRequest;
+import org.opentripplanner.routing.core.StreetSearchRequest;
 
 public class RaptorTransferIndex {
 
@@ -25,7 +25,7 @@ public class RaptorTransferIndex {
 
   public static RaptorTransferIndex create(
     List<List<Transfer>> transfersByStopIndex,
-    AStarRequest request
+    StreetSearchRequest request
   ) {
     var forwardTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());
     var reversedTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());

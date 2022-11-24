@@ -8,9 +8,9 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.DominanceFunction;
 import org.opentripplanner.astar.DominanceFunctions;
-import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
+import org.opentripplanner.routing.core.StreetSearchRequest;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -24,10 +24,10 @@ public class DominanceFunctionTest {
 
     // Test if domination works in the general case
 
-    AStarRequest aStarRequest = AStarRequest.of().build();
-    StateData stateData = StateData.getInitialStateData(aStarRequest);
-    State stateA = new State(fromVertex, Instant.EPOCH, stateData, aStarRequest);
-    State stateB = new State(toVertex, Instant.EPOCH, stateData, aStarRequest);
+    StreetSearchRequest streetSearchRequest = StreetSearchRequest.of().build();
+    StateData stateData = StateData.getInitialStateData(streetSearchRequest);
+    State stateA = new State(fromVertex, Instant.EPOCH, stateData, streetSearchRequest);
+    State stateB = new State(toVertex, Instant.EPOCH, stateData, streetSearchRequest);
     stateA.weight = 1;
     stateB.weight = 2;
 

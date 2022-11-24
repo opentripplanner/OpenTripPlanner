@@ -26,9 +26,9 @@ import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestBuilder;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StreetSearchRequest;
+import org.opentripplanner.routing.core.StreetSearchRequestBuilder;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
@@ -528,7 +528,7 @@ public class TestHalfEdges {
 
     // The alert should be preserved
     // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
-    AStarRequestBuilder req = AStarRequest.of();
+    StreetSearchRequestBuilder req = StreetSearchRequest.of();
     State traversedOne = new State(start, req.build());
     State currentState;
     for (Edge e : start.getOutgoing()) {

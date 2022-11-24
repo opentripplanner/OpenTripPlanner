@@ -12,7 +12,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
-class AStarRequestMapperTest {
+class StreetSearchRequestMapperTest {
 
   @Test
   void map() {
@@ -29,7 +29,7 @@ class AStarRequestMapperTest {
     var modes = RequestModes.of().withAllStreetModes(StreetMode.BIKE).build();
     routeRequest.journey().setModes(modes);
 
-    var subject = AStarRequestMapper.map(routeRequest).build();
+    var subject = StreetSearchRequestMapper.map(routeRequest).build();
 
     assertEquals(dateTime, subject.startTime());
     assertEquals(from, subject.from());
@@ -51,7 +51,7 @@ class AStarRequestMapperTest {
     routeRequest.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
     routeRequest.setWheelchair(true);
 
-    var subject = AStarRequestMapper.mapToTransferRequest(routeRequest).build();
+    var subject = StreetSearchRequestMapper.mapToTransferRequest(routeRequest).build();
 
     assertEquals(Instant.EPOCH, subject.startTime());
     assertNull(subject.from());

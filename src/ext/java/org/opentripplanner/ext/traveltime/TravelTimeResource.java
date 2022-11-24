@@ -67,10 +67,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RouteRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestMapper;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
+import org.opentripplanner.routing.core.StreetSearchRequest;
+import org.opentripplanner.routing.core.StreetSearchRequestMapper;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -279,17 +279,17 @@ public class TravelTimeResource {
   ) {
     List<State> initialStates = new ArrayList<>();
 
-    AStarRequest aStarRequest = AStarRequestMapper
+    StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper
       .map(routingRequest)
       .withMode(routingRequest.journey().egress().mode())
       .withArriveBy(false)
       .build();
 
-    StateData stateData = StateData.getInitialStateData(aStarRequest);
+    StateData stateData = StateData.getInitialStateData(streetSearchRequest);
 
     for (var vertex : temporaryVertices.getFromVertices()) {
       // TODO StateData should be of direct mode here
-      initialStates.add(new State(vertex, startTime, stateData, aStarRequest));
+      initialStates.add(new State(vertex, startTime, stateData, streetSearchRequest));
     }
 
     // TODO - Add a method to return all Stops, not StopLocations
@@ -300,7 +300,7 @@ public class TravelTimeResource {
         Vertex v = graph.getStopVertexForStopId(stop.getId());
         if (v != null) {
           Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
-          State s = new State(v, time, stateData.clone(), aStarRequest);
+          State s = new State(v, time, stateData.clone(), streetSearchRequest);
           s.weight = startTime.until(time, ChronoUnit.SECONDS);
           initialStates.add(s);
         }

@@ -3,10 +3,10 @@ package org.opentripplanner.routing.core;
 import java.time.Instant;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
-public class AStarRequestMapper {
+public class StreetSearchRequestMapper {
 
-  public static AStarRequestBuilder map(RouteRequest opt) {
-    return AStarRequest
+  public static StreetSearchRequestBuilder map(RouteRequest opt) {
+    return StreetSearchRequest
       .of()
       .withStartTime(opt.dateTime())
       .withPreferences(opt.preferences())
@@ -17,8 +17,8 @@ public class AStarRequestMapper {
       .withTo(opt.to());
   }
 
-  public static AStarRequestBuilder mapToTransferRequest(RouteRequest opt) {
-    return AStarRequest
+  public static StreetSearchRequestBuilder mapToTransferRequest(RouteRequest opt) {
+    return StreetSearchRequest
       .of()
       .withStartTime(Instant.ofEpochSecond(0))
       .withPreferences(opt.preferences())

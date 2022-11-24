@@ -10,7 +10,7 @@ public class StateEditorTest {
 
   @Test
   public final void testIncrementTimeInSeconds() {
-    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
+    StateEditor stateEditor = new StateEditor(null, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementTimeInSeconds(999999999);
@@ -20,7 +20,7 @@ public class StateEditorTest {
 
   @Test
   public final void testWeightIncrement() {
-    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
+    StateEditor stateEditor = new StateEditor(null, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(10);
@@ -30,7 +30,7 @@ public class StateEditorTest {
 
   @Test
   public final void testNanWeightIncrement() {
-    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
+    StateEditor stateEditor = new StateEditor(null, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(Double.NaN);
@@ -40,7 +40,7 @@ public class StateEditorTest {
 
   @Test
   public final void testInfinityWeightIncrement() {
-    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
+    StateEditor stateEditor = new StateEditor(null, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(Double.NEGATIVE_INFINITY);

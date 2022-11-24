@@ -19,7 +19,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 
 public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
-  private final AStarRequest request;
+  private final StreetSearchRequest request;
 
   /* Data which is likely to change at most traversals */
 
@@ -53,16 +53,16 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   /**
    * Create an initial state, forcing vertex to the specified value. Useful for tests, etc.
    */
-  public State(Vertex vertex, AStarRequest aStarRequest) {
+  public State(Vertex vertex, StreetSearchRequest streetSearchRequest) {
     this(
       vertex,
-      aStarRequest.startTime(),
-      StateData.getInitialStateData(aStarRequest),
-      aStarRequest
+      streetSearchRequest.startTime(),
+      StateData.getInitialStateData(streetSearchRequest),
+      streetSearchRequest
     );
   }
 
-  public State(Vertex vertex, Instant startTime, StateData stateData, AStarRequest request) {
+  public State(Vertex vertex, Instant startTime, StateData stateData, StreetSearchRequest request) {
     this.request = request;
     this.weight = 0;
     this.vertex = vertex;
@@ -79,12 +79,14 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
    */
   public static Collection<State> getInitialStates(
     Set<Vertex> vertices,
-    AStarRequest aStarRequest
+    StreetSearchRequest streetSearchRequest
   ) {
     Collection<State> states = new ArrayList<>();
     for (Vertex vertex : vertices) {
-      for (StateData stateData : StateData.getInitialStateDatas(aStarRequest)) {
-        states.add(new State(vertex, aStarRequest.startTime(), stateData, aStarRequest));
+      for (StateData stateData : StateData.getInitialStateDatas(streetSearchRequest)) {
+        states.add(
+          new State(vertex, streetSearchRequest.startTime(), stateData, streetSearchRequest)
+        );
       }
     }
     return states;
@@ -257,7 +259,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return this;
   }
 
-  public AStarRequest getRequest() {
+  public StreetSearchRequest getRequest() {
     return request;
   }
 
@@ -407,7 +409,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   private State reversedClone() {
-    AStarRequest reversedRequest = request
+    StreetSearchRequest reversedRequest = request
       .copyOfReversed(getTime())
       .withPreferences(p -> p.withRental(r -> r.withUseAvailabilityInformation(false)))
       .build();

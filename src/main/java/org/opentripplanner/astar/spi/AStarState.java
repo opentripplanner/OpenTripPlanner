@@ -1,7 +1,6 @@
 package org.opentripplanner.astar.spi;
 
 import java.time.Instant;
-import org.opentripplanner.routing.core.AStarRequest;
 
 public interface AStarState<
   State extends AStarState<State, Edge, Vertex>,

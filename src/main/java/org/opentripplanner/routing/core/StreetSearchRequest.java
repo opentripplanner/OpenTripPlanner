@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.astar.DominanceFunctions;
+import org.opentripplanner.astar.spi.AStarRequest;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
@@ -20,14 +21,14 @@ import org.opentripplanner.street.model.vertex.Vertex;
 /**
  * This class contains all information from the {@link RouteRequest} class required for an A* search
  */
-public class AStarRequest {
+public class StreetSearchRequest implements AStarRequest {
 
-  private static final AStarRequest DEFAULT = new AStarRequest();
+  private static final StreetSearchRequest DEFAULT = new StreetSearchRequest();
 
   /**
    * How close to do you have to be to the start or end to be considered "close".
    *
-   * @see AStarRequest#isCloseToStartOrEnd(Vertex)
+   * @see StreetSearchRequest#isCloseToStartOrEnd(Vertex)
    * @see DominanceFunctions#betterOrEqualAndComparable(State, State)
    */
   private static final int MAX_CLOSENESS_METERS = 500;
@@ -54,7 +55,7 @@ public class AStarRequest {
   /**
    * Constructor only used for creating a default instance.
    */
-  private AStarRequest() {
+  private StreetSearchRequest() {
     this.startTime = Instant.now();
     this.preferences = new RoutingPreferences();
     this.mode = StreetMode.WALK;
@@ -68,7 +69,7 @@ public class AStarRequest {
     this.toEnvelope = null;
   }
 
-  AStarRequest(AStarRequestBuilder builder) {
+  StreetSearchRequest(StreetSearchRequestBuilder builder) {
     this.startTime = builder.startTime;
     this.preferences = builder.preferences;
     this.mode = builder.mode;
@@ -83,13 +84,13 @@ public class AStarRequest {
   }
 
   @Nonnull
-  public static AStarRequestBuilder of() {
-    return new AStarRequestBuilder(DEFAULT).withStartTime(Instant.now());
+  public static StreetSearchRequestBuilder of() {
+    return new StreetSearchRequestBuilder(DEFAULT).withStartTime(Instant.now());
   }
 
   @Nonnull
-  public static AStarRequestBuilder copyOf(AStarRequest original) {
-    return new AStarRequestBuilder(original);
+  public static StreetSearchRequestBuilder copyOf(StreetSearchRequest original) {
+    return new StreetSearchRequestBuilder(original);
   }
 
   public Instant startTime() {
@@ -133,7 +134,7 @@ public class AStarRequest {
     return to;
   }
 
-  public AStarRequestBuilder copyOfReversed(Instant time) {
+  public StreetSearchRequestBuilder copyOfReversed(Instant time) {
     return copyOf(this).withStartTime(time).withArriveBy(!arriveBy);
   }
 
@@ -158,7 +159,7 @@ public class AStarRequest {
    * <p>
    * If you encounter a case of this, you can adjust this code to take this into account.
    *
-   * @see AStarRequest#MAX_CLOSENESS_METERS
+   * @see StreetSearchRequest#MAX_CLOSENESS_METERS
    * @see DominanceFunctions#betterOrEqualAndComparable(State, State)
    */
   public boolean isCloseToStartOrEnd(Vertex vertex) {

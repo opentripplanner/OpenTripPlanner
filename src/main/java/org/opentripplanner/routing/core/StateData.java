@@ -59,7 +59,7 @@ public class StateData implements Cloneable {
   /**
    * Returns a set of initial StateDatas based on the options from the RouteRequest
    */
-  public static List<StateData> getInitialStateDatas(AStarRequest request) {
+  public static List<StateData> getInitialStateDatas(StreetSearchRequest request) {
     return getInitialStateDatas(
       request.mode(),
       request.arriveBy(),
@@ -72,7 +72,7 @@ public class StateData implements Cloneable {
    * Returns an initial StateData based on the options from the RouteRequest. This returns always
    * only a single state, which is considered the "base case"
    */
-  public static StateData getInitialStateData(AStarRequest request) {
+  public static StateData getInitialStateData(StreetSearchRequest request) {
     var stateDatas = getInitialStateDatas(
       request.mode(),
       request.arriveBy(),

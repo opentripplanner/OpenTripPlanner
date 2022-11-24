@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
-import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StreetSearchRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -22,7 +22,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
   Graph graph;
   VehicleParkingEdge vehicleParkingEdge;
-  AStarRequest request;
+  StreetSearchRequest request;
   VehicleParkingEntranceVertex vertex;
 
   @Test
@@ -162,7 +162,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
     vehicleParkingEdge = new VehicleParkingEdge(vertex);
 
     this.request =
-      AStarRequest
+      StreetSearchRequest
         .of()
         .withMode(parkingMode)
         .withPreferences(p -> p.withParking(VehicleParkingPreferences.of(realtime)))

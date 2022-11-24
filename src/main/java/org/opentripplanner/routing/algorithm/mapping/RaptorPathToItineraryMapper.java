@@ -29,10 +29,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestMapper;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.StreetSearchRequest;
+import org.opentripplanner.routing.core.StreetSearchRequestMapper;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
@@ -48,7 +48,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final TransitLayer transitLayer;
 
-  private final AStarRequest request;
+  private final StreetSearchRequest request;
   private final StreetMode transferMode;
   private final ZonedDateTime transitSearchTimeZero;
 
@@ -72,7 +72,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.transferMode = request.journey().transfer().mode();
-    this.request = AStarRequestMapper.mapToTransferRequest(request).build();
+    this.request = StreetSearchRequestMapper.mapToTransferRequest(request).build();
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitService.getTimeZone(),

@@ -10,8 +10,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StreetSearchRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
@@ -32,7 +32,7 @@ class ElevatorHopEdgeTest {
   @ParameterizedTest(name = "{0} should be allowed to traverse when requesting onlyAccessible")
   @VariableSource("noTraverse")
   public void shouldNotTraverse(Accessibility wheelchair) {
-    var req = AStarRequest.of();
+    var req = StreetSearchRequest.of();
     AccessibilityPreferences feature = AccessibilityPreferences.ofOnlyAccessible();
     req
       .withWheelchair(true)
@@ -58,18 +58,18 @@ class ElevatorHopEdgeTest {
   @ParameterizedTest(name = "{0} should allowed to traverse with a cost of {1}")
   @VariableSource("all")
   public void allowByDefault(Accessibility wheelchair, double expectedCost) {
-    var req = AStarRequest.of().build();
+    var req = StreetSearchRequest.of().build();
     var result = traverse(wheelchair, req);
     assertNotNull(result);
     assertTrue(result.weight > 1);
 
-    req = AStarRequest.copyOf(req).withWheelchair(true).build();
+    req = StreetSearchRequest.copyOf(req).withWheelchair(true).build();
     var wheelchairResult = traverse(wheelchair, req);
     assertNotNull(wheelchairResult);
     assertEquals(expectedCost, wheelchairResult.weight);
   }
 
-  private State traverse(Accessibility wheelchair, AStarRequest req) {
+  private State traverse(Accessibility wheelchair, StreetSearchRequest req) {
     var edge = new ElevatorHopEdge(from, to, StreetTraversalPermission.ALL, wheelchair);
     var state = new State(from, req);
 

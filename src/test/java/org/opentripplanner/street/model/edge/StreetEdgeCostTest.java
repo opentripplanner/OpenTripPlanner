@@ -8,8 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StreetSearchRequest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.test.support.VariableSource;
@@ -44,7 +44,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     double length = 100;
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
-    var req = AStarRequest.of();
+    var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withReluctance(walkReluctance)));
     State result = traverse(edge, req.withMode(StreetMode.WALK).build());
     assertNotNull(result);
@@ -66,7 +66,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     double length = 100;
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
-    var req = AStarRequest.of();
+    var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withBike(b -> b.withReluctance(bikeReluctance)));
 
     State result = traverse(edge, req.withMode(StreetMode.BIKE).build());
@@ -89,7 +89,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     double length = 100;
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
-    var req = AStarRequest.of();
+    var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withCar(c -> c.withReluctance(carReluctance)));
 
     State result = traverse(edge, req.withMode(StreetMode.CAR).build());
@@ -112,7 +112,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
     edge.setStairs(true);
 
-    var req = AStarRequest.of();
+    var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withStairsReluctance(stairsReluctance)));
     req.withMode(StreetMode.WALK);
     var result = traverse(edge, req.build());
@@ -146,7 +146,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     );
     edge.setWalkSafetyFactor(2);
 
-    var req = AStarRequest.of();
+    var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withSafetyFactor(walkSafetyFactor)));
     req.withMode(StreetMode.WALK);
     var result = traverse(edge, req.build());
@@ -159,7 +159,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     assertEquals(15, (long) defaultSafetyResult.weight);
   }
 
-  private State traverse(StreetEdge edge, AStarRequest request) {
+  private State traverse(StreetEdge edge, StreetSearchRequest request) {
     var state = new State(V1, request);
 
     assertEquals(0, state.weight);

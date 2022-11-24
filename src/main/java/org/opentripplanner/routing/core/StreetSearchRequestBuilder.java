@@ -8,7 +8,7 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 
-public class AStarRequestBuilder {
+public class StreetSearchRequestBuilder {
 
   Instant startTime;
   StreetMode mode;
@@ -20,7 +20,7 @@ public class AStarRequestBuilder {
   GenericLocation from;
   GenericLocation to;
 
-  AStarRequestBuilder(AStarRequest original) {
+  StreetSearchRequestBuilder(StreetSearchRequest original) {
     this.startTime = original.startTime();
     this.mode = original.mode();
     this.preferences = original.preferences();
@@ -32,56 +32,56 @@ public class AStarRequestBuilder {
     this.to = original.to();
   }
 
-  public AStarRequestBuilder withStartTime(Instant startTime) {
+  public StreetSearchRequestBuilder withStartTime(Instant startTime) {
     this.startTime = startTime;
     return this;
   }
 
-  public AStarRequestBuilder withMode(StreetMode mode) {
+  public StreetSearchRequestBuilder withMode(StreetMode mode) {
     this.mode = mode;
     return this;
   }
 
-  public AStarRequestBuilder withPreferences(RoutingPreferences preferences) {
+  public StreetSearchRequestBuilder withPreferences(RoutingPreferences preferences) {
     this.preferences = preferences;
     return this;
   }
 
-  public AStarRequestBuilder withPreferences(Consumer<RoutingPreferences.Builder> body) {
+  public StreetSearchRequestBuilder withPreferences(Consumer<RoutingPreferences.Builder> body) {
     return withPreferences(preferences.copyOf().apply(body).build());
   }
 
-  public AStarRequestBuilder withArriveBy(boolean arriveBy) {
+  public StreetSearchRequestBuilder withArriveBy(boolean arriveBy) {
     this.arriveBy = arriveBy;
     return this;
   }
 
-  public AStarRequestBuilder withWheelchair(boolean wheelchair) {
+  public StreetSearchRequestBuilder withWheelchair(boolean wheelchair) {
     this.wheelchair = wheelchair;
     return this;
   }
 
-  public AStarRequestBuilder withParking(VehicleParkingRequest parking) {
+  public StreetSearchRequestBuilder withParking(VehicleParkingRequest parking) {
     this.parking = parking;
     return this;
   }
 
-  public AStarRequestBuilder withRental(VehicleRentalRequest rental) {
+  public StreetSearchRequestBuilder withRental(VehicleRentalRequest rental) {
     this.rental = rental;
     return this;
   }
 
-  public AStarRequestBuilder withFrom(GenericLocation from) {
+  public StreetSearchRequestBuilder withFrom(GenericLocation from) {
     this.from = from;
     return this;
   }
 
-  public AStarRequestBuilder withTo(GenericLocation to) {
+  public StreetSearchRequestBuilder withTo(GenericLocation to) {
     this.to = to;
     return this;
   }
 
-  public AStarRequest build() {
-    return new AStarRequest(this);
+  public StreetSearchRequest build() {
+    return new StreetSearchRequest(this);
   }
 }

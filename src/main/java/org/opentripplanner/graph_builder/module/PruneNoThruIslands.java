@@ -15,8 +15,8 @@ import org.opentripplanner.graph_builder.issues.IsolatedStop;
 import org.opentripplanner.graph_builder.issues.PrunedIslandStop;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StreetSearchRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
@@ -324,7 +324,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         default -> throw new IllegalArgumentException();
       };
 
-    AStarRequest request = AStarRequest.of().withMode(streetMode).build();
+    StreetSearchRequest request = StreetSearchRequest.of().withMode(streetMode).build();
 
     for (Vertex gv : graph.getVertices()) {
       if (!(gv instanceof StreetVertex)) {

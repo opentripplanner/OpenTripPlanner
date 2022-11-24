@@ -8,9 +8,9 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
-import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.StreetSearchRequest;
 import org.opentripplanner.street.model.edge.Edge;
 
 public class Transfer {
@@ -58,7 +58,7 @@ public class Transfer {
     return edges;
   }
 
-  public Optional<RaptorTransfer> asRaptorTransfer(AStarRequest request) {
+  public Optional<RaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
     WalkPreferences walkPreferences = request.preferences().walk();
     if (edges == null || edges.isEmpty()) {
       double durationSeconds = distanceMeters / walkPreferences.speed();

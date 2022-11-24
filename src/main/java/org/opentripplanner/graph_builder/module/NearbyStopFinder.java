@@ -26,9 +26,9 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestMapper;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StreetSearchRequest;
+import org.opentripplanner.routing.core.StreetSearchRequestMapper;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -316,7 +316,7 @@ public class NearbyStopFinder {
   ) {
     List<NearbyStop> stopsFound = new ArrayList<>();
 
-    AStarRequest aStarRequest = AStarRequestMapper
+    StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper
       .mapToTransferRequest(request)
       .withArriveBy(reverseDirection)
       .withMode(streetRequest.mode())
@@ -326,7 +326,12 @@ public class NearbyStopFinder {
     for (Vertex vertex : originVertices) {
       if (vertex instanceof TransitStopVertex tsv) {
         stopsFound.add(
-          new NearbyStop(tsv.getStop(), 0, Collections.emptyList(), new State(vertex, aStarRequest))
+          new NearbyStop(
+            tsv.getStop(),
+            0,
+            Collections.emptyList(),
+            new State(vertex, streetSearchRequest)
+          )
         );
       }
     }

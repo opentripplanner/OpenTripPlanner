@@ -11,8 +11,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StreetSearchRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -194,7 +194,7 @@ class PathwayEdgeTest {
   }
 
   private State assertThatEdgeIsTraversable(PathwayEdge edge, boolean wheelchair) {
-    var req = AStarRequest.of().withWheelchair(wheelchair).withMode(StreetMode.WALK);
+    var req = StreetSearchRequest.of().withWheelchair(wheelchair).withMode(StreetMode.WALK);
 
     req.withPreferences(preferences ->
       preferences.withWheelchair(

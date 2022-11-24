@@ -12,8 +12,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StreetSearchRequest;
 import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
@@ -67,7 +67,7 @@ public class TemporaryPartialStreetEdgeTest {
 
   @Test
   public void testTraversal() {
-    AStarRequest request = AStarRequest.of().withMode(StreetMode.CAR).build();
+    StreetSearchRequest request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();
 
     // Partial edge with same endpoints as the parent.
     TemporaryPartialStreetEdge pEdge1 = newTemporaryPartialStreetEdge(
@@ -132,7 +132,7 @@ public class TemporaryPartialStreetEdgeTest {
       tempEdges
     );
 
-    AStarRequest request = AStarRequest
+    StreetSearchRequest request = StreetSearchRequest
       .of()
       .withMode(StreetMode.CAR)
       .withPreferences(p -> p.withStreet(s -> s.withTurnReluctance(1.0)))

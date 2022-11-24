@@ -14,10 +14,10 @@ public class TraverseResultTest {
 
     /* note: times are rounded to seconds toward zero */
 
-    AStarRequest aStarRequest = AStarRequest.of().build();
+    StreetSearchRequest streetSearchRequest = StreetSearchRequest.of().build();
     for (int i = 0; i < 4; i++) {
-      StateData stateData = StateData.getInitialStateData(aStarRequest);
-      State r = new State(null, Instant.ofEpochSecond(i * 1000), stateData, aStarRequest);
+      StateData stateData = StateData.getInitialStateData(streetSearchRequest);
+      State r = new State(null, Instant.ofEpochSecond(i * 1000), stateData, streetSearchRequest);
       resultChain = r.addToExistingResultChain(resultChain);
     }
 
