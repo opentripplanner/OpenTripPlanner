@@ -440,8 +440,6 @@ public class GraphPathToItineraryMapper {
       }
     }
 
-    builder.removeDuplicateSteps();
-
     var p = builder.build();
 
     return p.isAllYUnknown() ? null : p;

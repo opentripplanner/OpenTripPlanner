@@ -253,15 +253,14 @@ public class ElevationProfile {
       if (steps.size() == original.steps.size()) {
         return original;
       }
-      // TODO - Is there a case where we do not want to run this?
-      //removeDuplicateSteps();
+      removeDuplicateSteps();
       return new ElevationProfile(this);
     }
 
     /**
      * Remove repeated values, preserving the first and last value
      */
-    public Builder removeDuplicateSteps() {
+    private void removeDuplicateSteps() {
       for (int i = steps.size() - 3; i >= 0; --i) {
         var first = steps.get(i);
         var second = steps.get(i + 1);
@@ -275,7 +274,6 @@ public class ElevationProfile {
           steps.remove(i + 1);
         }
       }
-      return this;
     }
   }
 }

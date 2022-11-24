@@ -78,8 +78,8 @@ class ElevationProfileTest {
       .stepYUnknown(7)
       .step(8, 10)
       .step(8, 10)
-      .removeDuplicateSteps()
       .build();
+
     assertEquals(
       "ElevationProfile{steps: [[0.0, 0.0], [1.0, 1.0], [3.0, 1.0], [4.0, UNKNOWN], [7.0, UNKNOWN], [8.0, 10.0]]}",
       p.toString()
