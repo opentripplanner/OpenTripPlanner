@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.astar.AStar;
-import org.opentripplanner.astar.AStarBuilder;
 import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.spi.TraverseVisitor;
@@ -22,6 +20,7 @@ import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,8 +85,8 @@ public class GraphPathFinder {
   ) {
     StreetPreferences preferences = request.preferences().street();
 
-    AStarBuilder<State, Edge, Vertex> aStar = AStar
-      .<State, Edge, Vertex>of()
+    StreetSearchBuilder aStar = StreetSearchBuilder
+      .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setSkipEdgeStrategy(
         new DurationSkipEdgeStrategy(

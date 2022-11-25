@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
@@ -38,6 +37,7 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -201,8 +201,8 @@ public class NearbyStopFinder {
       return stopsFound;
     }
 
-    ShortestPathTree<State, Edge, Vertex> spt = AStar
-      .<State, Edge, Vertex>of()
+    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
+      .of()
       .setSkipEdgeStrategy(getSkipEdgeStrategy(reverseDirection, request))
       .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)

@@ -35,7 +35,7 @@ public class AStar<
   private final boolean arriveBy;
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
-  private final RemainingWeightHeuristic<State, Vertex> heuristic;
+  private final RemainingWeightHeuristic<State> heuristic;
   private final SkipEdgeStrategy<State, Edge> skipEdgeStrategy;
   private final SearchTerminationStrategy<State> terminationStrategy;
   private final TraverseVisitor<State, Edge> traverseVisitor;
@@ -48,16 +48,8 @@ public class AStar<
   private State u;
   private int nVisited;
 
-  public static <
-    State extends AStarState<State, Edge, Vertex>,
-    Edge extends AStarEdge<State, Edge, Vertex>,
-    Vertex extends AStarVertex<State, Edge, Vertex>
-  > AStarBuilder<State, Edge, Vertex> of() {
-    return new AStarBuilder<>();
-  }
-
   AStar(
-    RemainingWeightHeuristic<State, Vertex> heuristic,
+    RemainingWeightHeuristic<State> heuristic,
     SkipEdgeStrategy<State, Edge> skipEdgeStrategy,
     TraverseVisitor<State, Edge> traverseVisitor,
     boolean arriveBy,

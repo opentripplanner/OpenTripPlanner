@@ -15,7 +15,6 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
@@ -37,6 +36,7 @@ import org.opentripplanner.routing.core.intersection_model.IntersectionTraversal
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TriangleInequalityTest {
@@ -181,8 +181,8 @@ public class TriangleInequalityTest {
     Vertex u,
     Vertex v
   ) {
-    return AStar
-      .<State, Edge, Vertex>of()
+    return StreetSearchBuilder
+      .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setOriginBackEdge(startBackEdge)
       .setRequest(options)
@@ -216,8 +216,8 @@ public class TriangleInequalityTest {
       prototypeOptions.journey().setModes(modes);
     }
 
-    ShortestPathTree<State, Edge, Vertex> tree = AStar
-      .<State, Edge, Vertex>of()
+    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
+      .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setDominanceFunction(new DominanceFunctions.EarliestArrival())
       .setRequest(prototypeOptions)

@@ -5,7 +5,6 @@ import static java.lang.Integer.min;
 import java.util.Comparator;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
@@ -16,7 +15,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
@@ -97,8 +96,8 @@ public class StreetGraphFinder implements GraphFinder {
         StreetMode.WALK
       )
     ) {
-      AStar
-        .<State, Edge, Vertex>of()
+      StreetSearchBuilder
+        .of()
         .setSkipEdgeStrategy(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunctions.LeastWalk())

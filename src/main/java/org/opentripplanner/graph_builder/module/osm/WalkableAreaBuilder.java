@@ -18,7 +18,6 @@ import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
@@ -47,6 +46,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
@@ -387,8 +387,8 @@ public class WalkableAreaBuilder {
     RouteRequest options = new RouteRequest();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
-      ShortestPathTree<State, Edge, Vertex> spt = AStar
-        .<State, Edge, Vertex>of()
+      ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
+        .of()
         .setSkipEdgeStrategy(new ListedEdgesOnly(edges))
         .setDominanceFunction(new DominanceFunctions.EarliestArrival())
         .setRequest(options)

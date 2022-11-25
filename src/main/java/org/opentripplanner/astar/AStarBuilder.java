@@ -13,26 +13,18 @@ import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
-import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.StreetPreferences;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.StreetSearchRequest;
-import org.opentripplanner.routing.core.StreetSearchRequestMapper;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 
-public class AStarBuilder<
+public abstract class AStarBuilder<
   State extends AStarState<State, Edge, Vertex>,
   Edge extends AStarEdge<State, Edge, Vertex>,
-  Vertex extends AStarVertex<State, Edge, Vertex>
+  Vertex extends AStarVertex<State, Edge, Vertex>,
+  Builder extends AStarBuilder<State, Edge, Vertex, Builder>
 > {
 
-  private RemainingWeightHeuristic<State, Vertex> heuristic = new TrivialRemainingWeightHeuristic<>();
+  private Builder builder;
+  private RemainingWeightHeuristic<State> heuristic = RemainingWeightHeuristic.TRIVIAL;
   private SkipEdgeStrategy<State, Edge> skipEdgeStrategy;
   private TraverseVisitor<State, Edge> traverseVisitor;
-  private RouteRequest routeRequest;
   private boolean arriveBy;
   private Set<Vertex> fromVertices;
   private Set<Vertex> toVertices;
@@ -41,119 +33,81 @@ public class AStarBuilder<
   private Duration timeout;
   private Edge originBackEdge;
   private Collection<State> initialStates;
-  private IntersectionTraversalCalculator intersectionTraversalCalculator;
-  private DataOverlayContext dataOverlayContext;
-  private StreetRequest streetRequest = new StreetRequest();
 
-  AStarBuilder() {}
+  protected AStarBuilder() {}
 
-  public AStarBuilder<State, Edge, Vertex> setHeuristic(
-    RemainingWeightHeuristic<State, Vertex> heuristic
-  ) {
+  protected void setBuilder(Builder builder) {
+    this.builder = builder;
+  }
+
+  public Builder setHeuristic(RemainingWeightHeuristic<State> heuristic) {
     this.heuristic = heuristic;
-    return this;
+    return builder;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setSkipEdgeStrategy(
-    SkipEdgeStrategy<State, Edge> skipEdgeStrategy
-  ) {
+  public Builder setSkipEdgeStrategy(SkipEdgeStrategy<State, Edge> skipEdgeStrategy) {
     this.skipEdgeStrategy = skipEdgeStrategy;
-    return this;
+    return builder;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setTraverseVisitor(
-    TraverseVisitor<State, Edge> traverseVisitor
-  ) {
+  public Builder setTraverseVisitor(TraverseVisitor<State, Edge> traverseVisitor) {
     this.traverseVisitor = traverseVisitor;
-    return this;
+    return builder;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setRequest(RouteRequest request) {
-    this.routeRequest = request;
-    this.arriveBy = request.arriveBy();
-    return this;
-  }
-
-  public AStarBuilder<State, Edge, Vertex> setArriveBy(boolean arriveBy) {
+  public Builder setArriveBy(boolean arriveBy) {
     this.arriveBy = arriveBy;
-    return this;
+    return builder;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setStreetRequest(StreetRequest streetRequest) {
-    this.streetRequest = streetRequest;
-    return this;
+  protected boolean arriveBy() {
+    return arriveBy;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setFrom(Set<Vertex> fromVertices) {
+  public Builder setFrom(Set<Vertex> fromVertices) {
     this.fromVertices = fromVertices;
-    return this;
+    return builder;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setFrom(Vertex fromVertex) {
+  public Builder setFrom(Vertex fromVertex) {
     this.fromVertices = Collections.singleton(fromVertex);
-    return this;
+    return builder;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setTo(Set<Vertex> toVertices) {
+  public Builder setTo(Set<Vertex> toVertices) {
     this.toVertices = toVertices;
-    return this;
+    return builder;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setTo(Vertex toVertex) {
+  public Builder setTo(Vertex toVertex) {
     this.toVertices = Collections.singleton(toVertex);
-    return this;
+    return builder;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setVerticesContainer(
-    TemporaryVerticesContainer container
-  ) {
-    this.fromVertices = (Set<Vertex>) container.getFromVertices();
-    this.toVertices = (Set<Vertex>) container.getToVertices();
-    return this;
-  }
-
-  public AStarBuilder<State, Edge, Vertex> setTerminationStrategy(
-    SearchTerminationStrategy<State> terminationStrategy
-  ) {
+  public Builder setTerminationStrategy(SearchTerminationStrategy<State> terminationStrategy) {
     this.terminationStrategy = terminationStrategy;
-    return this;
+    return builder;
   }
 
   /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
-  public AStarBuilder<State, Edge, Vertex> setDominanceFunction(
-    DominanceFunction<State> dominanceFunction
-  ) {
+  public Builder setDominanceFunction(DominanceFunction<State> dominanceFunction) {
     this.dominanceFunction = dominanceFunction;
-    return this;
+    return builder;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setTimeout(Duration timeout) {
+  public Builder setTimeout(Duration timeout) {
     this.timeout = timeout;
-    return this;
+    return builder;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setIntersectionTraversalCalculator(
-    IntersectionTraversalCalculator intersectionTraversalCalculator
-  ) {
-    this.intersectionTraversalCalculator = intersectionTraversalCalculator;
-    return this;
-  }
-
-  public AStarBuilder<State, Edge, Vertex> setDataOverlayContext(
-    DataOverlayContext dataOverlayContext
-  ) {
-    this.dataOverlayContext = dataOverlayContext;
-    return this;
-  }
-
-  public AStarBuilder<State, Edge, Vertex> setOriginBackEdge(Edge originBackEdge) {
+  public Builder setOriginBackEdge(Edge originBackEdge) {
     this.originBackEdge = originBackEdge;
-    return this;
+    return builder;
   }
 
-  public AStarBuilder<State, Edge, Vertex> setInitialStates(Collection<State> initialStates) {
+  public Builder setInitialStates(Collection<State> initialStates) {
     this.initialStates = initialStates;
-    return this;
+    return builder;
   }
 
   public ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
@@ -173,17 +127,7 @@ public class AStarBuilder<
     if (this.initialStates != null) {
       initialStates = this.initialStates;
     } else {
-      StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper
-        .map(routeRequest)
-        .withMode(streetRequest.mode())
-        .withArriveBy(arriveBy)
-        .build();
-
-      initialStates =
-        (Collection<State>) org.opentripplanner.routing.core.State.getInitialStates(
-          (Set<org.opentripplanner.street.model.vertex.Vertex>) origin,
-          streetSearchRequest
-        );
+      initialStates = createInitialStates(origin);
 
       if (originBackEdge != null) {
         for (var state : initialStates) {
@@ -192,29 +136,8 @@ public class AStarBuilder<
       }
     }
 
-    if (intersectionTraversalCalculator == null) {
-      final StreetPreferences streetPreferences = routeRequest.preferences().street();
-      intersectionTraversalCalculator =
-        IntersectionTraversalCalculator.create(
-          streetPreferences.intersectionTraversalModel(),
-          streetPreferences.drivingDirection()
-        );
-    }
-
-    for (var state : initialStates) {
-      ((StreetSearchRequest) state.getRequest()).setIntersectionTraversalCalculator(
-          intersectionTraversalCalculator
-        );
-      ((StreetSearchRequest) state.getRequest()).setDataOverlayContext(dataOverlayContext);
-    }
-
-    heuristic.initialize(
-      streetRequest.mode(),
-      origin,
-      destination,
-      arriveBy,
-      routeRequest.preferences()
-    );
+    prepareInitialStates(initialStates);
+    initializeHeuristic(heuristic, origin, destination, arriveBy);
 
     return new AStar<>(
       heuristic,
@@ -224,11 +147,22 @@ public class AStarBuilder<
       origin,
       destination,
       terminationStrategy,
-      Optional
-        .ofNullable(dominanceFunction)
-        .orElseGet(() -> (DominanceFunction<State>) new DominanceFunctions.Pareto()),
+      Optional.ofNullable(dominanceFunction).orElseGet(this::createDefaultDominanceFunction),
       timeout,
       initialStates
     );
   }
+
+  protected abstract Collection<State> createInitialStates(Set<Vertex> originVertices);
+
+  protected abstract void prepareInitialStates(Collection<State> initialStates);
+
+  protected abstract void initializeHeuristic(
+    RemainingWeightHeuristic<State> heuristic,
+    Set<Vertex> origin,
+    Set<Vertex> destination,
+    boolean arriveBy
+  );
+
+  protected abstract DominanceFunction<State> createDefaultDominanceFunction();
 }

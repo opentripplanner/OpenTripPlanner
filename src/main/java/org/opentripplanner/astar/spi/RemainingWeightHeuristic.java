@@ -1,30 +1,19 @@
 package org.opentripplanner.astar.spi;
 
 import java.io.Serializable;
-import java.util.Set;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 
 /**
  * Interface for classes that provides an admissible estimate of (lower bound on) the weight of a
  * path to the target, starting from a given state.
  */
-public interface RemainingWeightHeuristic<
-  State extends AStarState<State, ?, Vertex>, Vertex extends AStarVertex<State, ?, Vertex>
->
+public interface RemainingWeightHeuristic<State extends AStarState<State, ?, ?>>
   extends Serializable {
   /**
-   * Perform any one-time setup and pre-computation that will be needed by later calls to
-   * computeForwardWeight/computeReverseWeight. We may want to start from multiple origin states, so
-   * initialization cannot depend on the origin vertex or state.
+   * A trivial heuristic that always returns 0, which is always admissible. For use in testing,
+   * troubleshooting, and spatial analysis applications where there is no target.
    */
-  void initialize(
-    StreetMode streetMode,
-    Set<Vertex> fromVertices,
-    Set<Vertex> toVertices,
-    boolean arriveBy,
-    RoutingPreferences preferences
-  );
+  @SuppressWarnings("rawtypes")
+  RemainingWeightHeuristic TRIVIAL = s -> 0;
 
   double estimateRemainingWeight(State s);
 }

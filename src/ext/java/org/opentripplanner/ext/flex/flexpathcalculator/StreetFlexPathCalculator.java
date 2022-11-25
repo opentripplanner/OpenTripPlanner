@@ -3,7 +3,6 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
@@ -15,6 +14,7 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network
@@ -78,8 +78,8 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     RouteRequest routingRequest = new RouteRequest();
     routingRequest.setArriveBy(reverseDirection);
 
-    return AStar
-      .<State, Edge, Vertex>of()
+    return StreetSearchBuilder
+      .of()
       .setSkipEdgeStrategy(new DurationSkipEdgeStrategy(MAX_FLEX_TRIP_DURATION))
       .setDominanceFunction(new DominanceFunctions.EarliestArrival())
       .setRequest(routingRequest)

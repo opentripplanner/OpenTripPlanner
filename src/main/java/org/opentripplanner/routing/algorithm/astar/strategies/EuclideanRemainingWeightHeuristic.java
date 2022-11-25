@@ -14,7 +14,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 /**
  * A Euclidean remaining weight strategy.
  */
-public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic<State, Vertex> {
+public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic<State> {
 
   private double lat;
   private double lon;
@@ -24,7 +24,6 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
 
   // TODO This currently only uses the first toVertex. If there are multiple toVertices, it will
   //      not work correctly.
-  @Override
   public void initialize(
     StreetMode streetMode,
     Set<Vertex> fromVertices,

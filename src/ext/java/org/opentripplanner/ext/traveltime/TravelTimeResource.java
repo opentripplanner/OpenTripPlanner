@@ -46,7 +46,6 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -75,8 +74,8 @@ import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -244,8 +243,8 @@ public class TravelTimeResource {
 
       var arrivals = route(accessList).getArrivals();
 
-      var spt = AStar
-        .<State, Edge, Vertex>of()
+      var spt = StreetSearchBuilder
+        .of()
         .setSkipEdgeStrategy(new DurationSkipEdgeStrategy(traveltimeRequest.maxCutoff))
         .setRequest(routingRequest)
         .setStreetRequest(accessRequest.journey().access())

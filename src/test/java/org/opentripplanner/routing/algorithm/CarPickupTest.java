@@ -5,18 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 
 /**
  * Test CarPickup: - it may start with (WALK - WALK_TO_PICKUP, CAR - IN_CAR) - it may end with (WALK
@@ -176,8 +174,8 @@ public class CarPickupTest extends GraphRoutingTest {
     var options = new RouteRequest();
     options.setArriveBy(arriveBy);
 
-    var tree = AStar
-      .<State, Edge, Vertex>of()
+    var tree = StreetSearchBuilder
+      .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setRequest(options)

@@ -22,6 +22,7 @@ import org.opentripplanner.routing.graph.TemporaryConcreteEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 public class AStarTest {
@@ -89,8 +90,8 @@ public class AStarTest {
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
-    ShortestPathTree tree = AStar
-      .<State, Edge, Vertex>of()
+    ShortestPathTree tree = StreetSearchBuilder
+      .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
@@ -120,8 +121,8 @@ public class AStarTest {
     request.setArriveBy(true);
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
-    ShortestPathTree tree = AStar
-      .<State, Edge, Vertex>of()
+    ShortestPathTree tree = StreetSearchBuilder
+      .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
@@ -175,8 +176,8 @@ public class AStarTest {
     );
     new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
-    ShortestPathTree<State, Edge, Vertex> tree = AStar
-      .<State, Edge, Vertex>of()
+    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
+      .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
@@ -223,8 +224,8 @@ public class AStarTest {
     );
     new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
-    ShortestPathTree tree = AStar
-      .<State, Edge, Vertex>of()
+    ShortestPathTree tree = StreetSearchBuilder
+      .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
@@ -264,8 +265,8 @@ public class AStarTest {
 
     Vertex v1 = graph.getVertex("56th_24th");
     Vertex v2 = graph.getVertex("leary_20th");
-    ShortestPathTree tree = AStar
-      .<State, Edge, Vertex>of()
+    ShortestPathTree tree = StreetSearchBuilder
+      .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setTerminationStrategy(strategy)
       .setRequest(request)
