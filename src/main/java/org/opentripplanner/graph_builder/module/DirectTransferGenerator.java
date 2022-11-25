@@ -46,7 +46,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Graph graph;
   private final TransitModel transitModel;
   private final DataImportIssueStore issueStore;
-  private final Set<String> feedsWithToExcludeFromPatternCheck;
+  private final Set<String> feedsToExcludeFromPatternCheck;
 
   public DirectTransferGenerator(
     Graph graph,
@@ -64,14 +64,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     DataImportIssueStore issueStore,
     Duration radiusByDuration,
     List<RouteRequest> transferRequests,
-    Set<String> feedsWithToExcludeFromPatternCheck
+    Set<String> feedsToExcludeFromPatternCheck
   ) {
     this.graph = graph;
     this.transitModel = transitModel;
     this.issueStore = issueStore;
     this.radiusByDuration = radiusByDuration;
     this.transferRequests = transferRequests;
-    this.feedsWithToExcludeFromPatternCheck = feedsWithToExcludeFromPatternCheck;
+    this.feedsToExcludeFromPatternCheck = feedsToExcludeFromPatternCheck;
   }
 
   @Override
@@ -87,7 +87,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       radiusByDuration,
       null,
       graph.hasStreets,
-      feedsWithToExcludeFromPatternCheck
+      feedsToExcludeFromPatternCheck
     );
     if (nearbyStopFinder.useStreets) {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
