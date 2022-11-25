@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip;
 
-import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_DUPLICATED;
@@ -820,9 +819,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (stopTimeUpdate.hasStopSequence()) {
         stopTime.setStopSequence(stopTimeUpdate.getStopSequence());
       }
-      var extension = StopTimeExtension.ofStopTime(stopTimeUpdate.getStopTimeProperties());
-      stopTime.setPickupType(extension.pickupOpt().orElse(SCHEDULED));
-      stopTime.setDropOffType(extension.dropOffOpt().orElse(SCHEDULED));
+      var added = AddedStopTime.ofStopTimeProperties(stopTimeUpdate.getStopTimeProperties());
+      stopTime.setPickupType(added.pickup());
+      stopTime.setDropOffType(added.dropOff());
       // Add stop time to list
       stopTimes.add(stopTime);
     }
