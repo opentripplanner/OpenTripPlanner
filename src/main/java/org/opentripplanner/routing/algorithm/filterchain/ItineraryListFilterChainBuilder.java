@@ -19,8 +19,8 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestD
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OtherThanSameLegsMaxGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikeParkWithShortBikeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortCyclingLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
@@ -299,7 +299,7 @@ public class ItineraryListFilterChainBuilder {
     }
 
     if (minBikeParkingDistance > NOT_SET) {
-      filters.add(new RemoveBikeParkWithShortBikeFilter(minBikeParkingDistance));
+      filters.add(new RemoveItinerariesWithShortCyclingLeg(minBikeParkingDistance));
     }
 
     if (accessibilityScore) {

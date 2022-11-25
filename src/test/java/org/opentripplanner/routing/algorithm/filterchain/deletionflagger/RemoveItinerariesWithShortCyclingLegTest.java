@@ -7,9 +7,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.PlanTestConstants;
 
-class RemoveBikeParkWithShortBikeFilterTest implements PlanTestConstants {
+class RemoveItinerariesWithShortCyclingLegTest implements PlanTestConstants {
 
-  RemoveBikeParkWithShortBikeFilter filter = new RemoveBikeParkWithShortBikeFilter(500);
+  RemoveItinerariesWithShortCyclingLeg filter = new RemoveItinerariesWithShortCyclingLeg(500);
 
   @Test
   void noBikeDoesNothing() {
@@ -29,7 +29,7 @@ class RemoveBikeParkWithShortBikeFilterTest implements PlanTestConstants {
 
   @Test
   void zeroMinDoesNothing() {
-    var filter = new RemoveBikeParkWithShortBikeFilter(0);
+    var filter = new RemoveItinerariesWithShortCyclingLeg(0);
     var itin = newItinerary(A).bicycle(T11_05, T11_06, B).rail(30, T11_16, T11_20, C).build();
     assertEquals(300, itin.getLegs().get(0).getDistanceMeters());
     var result = filter.filter(List.of(itin));
