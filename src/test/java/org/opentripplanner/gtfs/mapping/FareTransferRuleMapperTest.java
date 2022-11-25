@@ -4,14 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareProduct;
 import org.onebusaway.gtfs.model.FareTransferRule;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 
 class FareTransferRuleMapperTest {
 
@@ -24,7 +24,7 @@ class FareTransferRuleMapperTest {
   @Test
   void addIssueForUnknownProduct() {
     var fareProductMapper = new FareProductMapper();
-    var issueStore = new DataImportIssueStore();
+    var issueStore = new DefaultDataImportIssueStore();
     var subject = new FareTransferRuleMapper(fareProductMapper, issueStore);
 
     var rule = new FareTransferRule();
@@ -33,7 +33,7 @@ class FareTransferRuleMapperTest {
     var mapped = subject.map(List.of(rule));
 
     assertTrue(mapped.isEmpty());
-    assertEquals("UnknownFareProductId", issueStore.getIssues().get(0).getType());
+    assertEquals("UnknownFareProductId", issueStore.listIssues().get(0).getType());
   }
 
   @Test
@@ -79,7 +79,7 @@ class FareTransferRuleMapperTest {
     var fareProductMapper = new FareProductMapper();
     fareProductMapper.map(fareProduct);
 
-    var subject = new FareTransferRuleMapper(fareProductMapper, noopIssueStore());
+    var subject = new FareTransferRuleMapper(fareProductMapper, DataImportIssueStore.NOOP);
 
     var mapped = subject.map(List.of(rule)).stream().toList();
 

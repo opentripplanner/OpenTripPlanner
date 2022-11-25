@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
-import static org.opentripplanner.util.geometry.GeometryUtils.getGeometryFactory;
+import static org.opentripplanner.framework.geometry.GeometryUtils.getGeometryFactory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.ZoneId;

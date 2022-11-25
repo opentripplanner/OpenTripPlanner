@@ -5,13 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,9 +26,9 @@ public class SPTWalker {
 
   private static final Logger LOG = LoggerFactory.getLogger(SPTWalker.class);
 
-  private final ShortestPathTree spt;
+  private final ShortestPathTree<State, Edge, Vertex> spt;
 
-  public SPTWalker(ShortestPathTree spt) {
+  public SPTWalker(ShortestPathTree<State, Edge, Vertex> spt) {
     this.spt = spt;
   }
 

@@ -3,10 +3,10 @@ package org.opentripplanner.routing.api.request.preference;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
-import org.opentripplanner.util.lang.DoubleUtils;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Preferences for renting a Bike, Car or other type of vehicle.

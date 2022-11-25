@@ -4,36 +4,33 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This creates a graph with trip patterns
@@ -66,7 +63,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     new DirectTransferGenerator(
       graph,
       transitModel,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
     )
@@ -88,7 +85,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     new DirectTransferGenerator(
       graph,
       transitModel,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
     )
@@ -120,7 +117,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     new DirectTransferGenerator(
       graph,
       transitModel,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
     )
@@ -156,7 +153,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     new DirectTransferGenerator(
       graph,
       transitModel,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
     )
@@ -179,7 +176,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     new DirectTransferGenerator(
       graph,
       transitModel,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
     )
@@ -211,7 +208,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     new DirectTransferGenerator(
       graph,
       transitModel,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
     )
@@ -238,7 +235,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     new DirectTransferGenerator(
       graph,
       transitModel,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
     )
@@ -267,7 +264,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     new DirectTransferGenerator(
       graph,
       transitModel,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
     )

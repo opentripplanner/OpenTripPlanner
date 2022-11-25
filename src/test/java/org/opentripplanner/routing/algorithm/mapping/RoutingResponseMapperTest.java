@@ -9,14 +9,14 @@ import static org.opentripplanner.model.plan.PlanTestConstants.B;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.model.plan.pagecursor.PageType;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.util.time.TimeUtils;
+import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.api.request.SearchParams;
 
 public class RoutingResponseMapperTest {
 

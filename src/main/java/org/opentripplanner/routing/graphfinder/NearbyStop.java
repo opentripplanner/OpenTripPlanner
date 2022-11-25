@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
@@ -34,7 +34,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
    */
   public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
     double effectiveWalkDistance = 0.0;
-    var graphPath = new GraphPath(state);
+    var graphPath = new GraphPath<>(state);
     var edges = new ArrayList<Edge>();
     for (Edge edge : graphPath.edges) {
       effectiveWalkDistance += edge.getEffectiveWalkDistance();

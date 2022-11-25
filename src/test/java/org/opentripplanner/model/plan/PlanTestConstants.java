@@ -1,10 +1,10 @@
 package org.opentripplanner.model.plan;
 
-import static org.opentripplanner.util.time.TimeUtils.time;
+import static org.opentripplanner.framework.time.TimeUtils.time;
 
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.FareZone;
-import org.opentripplanner.util.time.DurationUtils;
 
 public interface PlanTestConstants {
   int NOT_SET = -999_999;

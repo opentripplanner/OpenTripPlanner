@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
@@ -42,9 +42,7 @@ public class AlertsUpdateHandler {
   private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
   // TODO: replace this with a runtime solution
-  private final DirectionMapper directionMapper = new DirectionMapper(
-    DataImportIssueStore.noopIssueStore()
-  );
+  private final DirectionMapper directionMapper = new DirectionMapper(DataImportIssueStore.NOOP);
 
   public void update(FeedMessage message) {
     Collection<TransitAlert> alerts = new ArrayList<>();

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import org.opentripplanner.util.time.ServiceDateUtils;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 
 /**
  * Value object which represent a service date interval from a starting date until an end date.
