@@ -163,7 +163,7 @@ public class TimetableSnapshotSourceTest {
   }
 
   @Test
-  public void testHandleDelayedTrip() {
+  public void delayedTrip() {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
     final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
     final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
@@ -171,25 +171,12 @@ public class TimetableSnapshotSourceTest {
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
-    final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
-    tripDescriptorBuilder.setTripId("1.1");
-    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
+    var tripUpdateBuilder = new TripUpdateBuilder(tripId.getId(), LocalDate.now(), ScheduleRelationship.SCHEDULED, transitModel.getTimeZone());
 
-    final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
-
-    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-
-    final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
-
-    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
-    stopTimeUpdateBuilder.setStopSequence(2);
-
-    final StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-    final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-
-    arrivalBuilder.setDelay(1);
-    departureBuilder.setDelay(1);
+    int stopSequence = 2;
+    int delay = 1;
+    tripUpdateBuilder.addDelayedStopTime(stopSequence, delay);
 
     final TripUpdate tripUpdate = tripUpdateBuilder.build();
 

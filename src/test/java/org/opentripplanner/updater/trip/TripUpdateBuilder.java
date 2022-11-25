@@ -32,19 +32,34 @@ public class TripUpdateBuilder {
   }
 
   public TripUpdateBuilder addStopTime(String stopName, int minutes) {
-    return addStopTime(stopName, minutes, null);
+    return addStopTime(stopName, minutes, -1, -1, null);
+  }
+public TripUpdateBuilder addStopTime(String stopName, int minutes, GtfsRealtimeExtensions.OtpStopTimePropertiesExtension.DropOffPickupType pickDrop) {
+    return addStopTime(stopName, minutes, -1, -1, pickDrop);
+  }
+  public TripUpdateBuilder addDelayedStopTime(int stopSequence, int delay) {
+    return addStopTime(null, -1, stopSequence, delay, null);
   }
 
-  public TripUpdateBuilder addStopTime(
-    String stopName,
+  private  TripUpdateBuilder addStopTime(
+    String stopId,
     int minutes,
+    int stopSequence,
+    int delay,
     GtfsRealtimeExtensions.OtpStopTimePropertiesExtension.DropOffPickupType pickDrop
   ) {
     final GtfsRealtime.TripUpdate.StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
     stopTimeUpdateBuilder.setScheduleRelationship(
       GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
     );
-    stopTimeUpdateBuilder.setStopId(stopName);
+
+    if(stopId != null) {
+      stopTimeUpdateBuilder.setStopId(stopId);
+    }
+
+    if(stopSequence > -1){
+      stopTimeUpdateBuilder.setStopSequence(stopSequence);
+    }
 
     if (pickDrop != null) {
       var stopTimePropsBuilder = stopTimeUpdateBuilder.getStopTimePropertiesBuilder();
@@ -56,16 +71,18 @@ public class TripUpdateBuilder {
       stopTimePropsBuilder.setExtension(GtfsRealtimeExtensions.stopTimeProperties, ext);
     }
 
-    // Arrival
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-    arrivalBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (minutes * 60));
-    arrivalBuilder.setDelay(0);
-
-    // Departure
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-    departureBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (minutes * 60));
-    departureBuilder.setDelay(0);
 
+    if(minutes> -1) {
+      arrivalBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (minutes * 60));
+      departureBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (minutes * 60));
+    }
+
+    if(delay > -1)  {
+      arrivalBuilder.setDelay(delay);
+      departureBuilder.setDelay(delay);
+    }
 
     return this;
   }
@@ -90,4 +107,6 @@ public class TripUpdateBuilder {
 
     return this;
   }
+
+
 }
