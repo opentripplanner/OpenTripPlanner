@@ -454,7 +454,7 @@ removed from list.
 
 <h3 id="rd_if_flexOnlyToDestination">flexOnlyToDestination</h3>
 
-**Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** /routingDefaults/itineraryFilters 
 
 Only allow flex services that arrive very close to the destination.
@@ -475,7 +475,7 @@ having a higher cost will be filtered.
 
 <h3 id="rd_if_minBikeParkingDistance">minBikeParkingDistance</h3>
 
-**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `-1.0`  \
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `-1.0`   
 **Path:** /routingDefaults/itineraryFilters 
 
 Filter out bike park+ride results that have fewer meters of cycling than this value.
