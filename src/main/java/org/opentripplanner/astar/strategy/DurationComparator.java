@@ -1,7 +1,7 @@
 package org.opentripplanner.astar.strategy;
 
 import java.util.Comparator;
-import org.opentripplanner.astar.GraphPath;
+import org.opentripplanner.astar.model.GraphPath;
 
 public class DurationComparator implements Comparator<GraphPath<?, ?, ?>> {
 

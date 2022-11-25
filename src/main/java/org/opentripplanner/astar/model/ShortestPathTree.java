@@ -1,4 +1,4 @@
-package org.opentripplanner.astar;
+package org.opentripplanner.astar.model;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;

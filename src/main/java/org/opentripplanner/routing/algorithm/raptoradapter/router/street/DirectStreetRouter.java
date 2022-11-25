@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collections;
 import java.util.List;
-import org.opentripplanner.astar.GraphPath;
+import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -14,8 +14,8 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.search.state.State;
 
 public class DirectStreetRouter {
 

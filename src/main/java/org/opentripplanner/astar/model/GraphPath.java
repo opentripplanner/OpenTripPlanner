@@ -1,4 +1,4 @@
-package org.opentripplanner.astar;
+package org.opentripplanner.astar.model;
 
 import java.util.LinkedList;
 import org.opentripplanner.astar.spi.AStarEdge;

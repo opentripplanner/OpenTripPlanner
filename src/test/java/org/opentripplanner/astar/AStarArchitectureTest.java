@@ -19,12 +19,12 @@ public class AStarArchitectureTest {
 
   @Test
   void enforcePackageDependencies() {
-    ASTAR.dependsOn(UTILS, GOOGLE_COLLECTIONS, ASTAR_MODEL, ASTAR_SPI).verify();
+    ASTAR.dependsOn(UTILS, ASTAR_MODEL, ASTAR_SPI).verify();
   }
 
   @Test
   void enforcePackageDependenciesInModel() {
-    ASTAR_MODEL.dependsOn().verify();
+    ASTAR_MODEL.dependsOn(GOOGLE_COLLECTIONS, ASTAR_SPI).verify();
   }
 
   @Test
@@ -34,6 +34,6 @@ public class AStarArchitectureTest {
 
   @Test
   void enforcePackageDependenciesInStrategy() {
-    ASTAR_STRATEGY.dependsOn(UTILS, ASTAR, ASTAR_SPI).verify();
+    ASTAR_STRATEGY.dependsOn(ASTAR_SPI, ASTAR_MODEL).verify();
   }
 }

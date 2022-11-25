@@ -5,13 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.ShortestPathTree;
+import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,7 +5,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.astar.GraphPath;
+import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.plan.FrequencyTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;
@@ -31,11 +31,11 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.state.StateEditor;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
-import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.service.TransitService;
 
 /**

@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.traveltime;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.astar.ShortestPathTree;
+import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.ext.traveltime.geometry.AccumulativeGridSampler;
 import org.opentripplanner.ext.traveltime.geometry.AccumulativeMetric;
 import org.opentripplanner.ext.traveltime.geometry.SparseMatrixZSampleGrid;

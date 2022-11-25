@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.GraphPath;
+import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;

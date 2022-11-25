@@ -3,7 +3,7 @@ package org.opentripplanner.ext.flex.template;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.astar.GraphPath;
+import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
