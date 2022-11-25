@@ -131,7 +131,7 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void stadtnaviVehicleParkingPropertyMapperTest() {
-    StadtnaviVehicleParkingPropertyMapper mapper = new StadtnaviVehicleParkingPropertyMapper();
+    StadtnaviVehicleParkingPropertyMapper mapper = new StadtnaviVehicleParkingPropertyMapper(Locale.GERMANY);
     Map<String, Object> map = new HashMap<>();
     mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
 

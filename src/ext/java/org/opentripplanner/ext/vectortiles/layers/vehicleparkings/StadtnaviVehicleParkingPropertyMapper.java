@@ -1,71 +1,48 @@
 package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import org.json.simple.JSONObject;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.ext.vectortiles.I18NStringMapper;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.TranslatedString;
 
 public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<VehicleParking> {
 
+  private final DigitransitVehicleParkingPropertyMapper digitransitMapper;
+  private final I18NStringMapper i18NStringMapper;
+
+  public StadtnaviVehicleParkingPropertyMapper(Locale locale) {
+    i18NStringMapper = new I18NStringMapper(locale);
+    digitransitMapper = DigitransitVehicleParkingPropertyMapper.create(locale);
+  }
+
   protected static StadtnaviVehicleParkingPropertyMapper create(Locale locale) {
-    return new StadtnaviVehicleParkingPropertyMapper();
+    return new StadtnaviVehicleParkingPropertyMapper(locale);
   }
 
   @Override
   protected Collection<T2<String, Object>> map(VehicleParking vehicleParking) {
-    var items = new ArrayList<T2<String, Object>>();
+    var items = digitransitMapper.basicMapping(vehicleParking);
     items.addAll(
       List.of(
-        new T2<>("id", vehicleParking.getId().toString()),
         new T2<>("realTimeData", vehicleParking.getAvailability() != null),
         new T2<>("detailsUrl", vehicleParking.getDetailsUrl()),
         new T2<>("imageUrl", vehicleParking.getImageUrl()),
         new T2<>("tags", String.join(",", vehicleParking.getTags())),
         new T2<>("state", vehicleParking.getState().name()),
-        new T2<>("bicyclePlaces", vehicleParking.hasBicyclePlaces()),
-        new T2<>("anyCarPlaces", vehicleParking.hasAnyCarPlaces()),
-        new T2<>("carPlaces", vehicleParking.hasCarPlaces()),
-        new T2<>(
-          "wheelchairAccessibleCarPlaces",
-          vehicleParking.hasWheelchairAccessibleCarPlaces()
-        ),
-        new T2<>("realTimeData", vehicleParking.hasRealTimeData())
+        new T2<>("realTimeData", vehicleParking.hasRealTimeData()),
+        new T2<>("note", i18NStringMapper.mapToApi(vehicleParking.getNote()))
       )
     );
     if (vehicleParking.getOpeningHours() != null) {
       items.add(new T2<>("openingHours", vehicleParking.getOpeningHours().osmFormat()));
     }
-    items.addAll(mapI18NString("name", vehicleParking.getName()));
-    items.addAll(mapI18NString("note", vehicleParking.getNote()));
     items.addAll(mapPlaces("capacity", vehicleParking.getCapacity()));
     items.addAll(mapPlaces("availability", vehicleParking.getAvailability()));
-    return items;
-  }
-
-  private static List<T2<String, Object>> mapI18NString(String key, I18NString i18n) {
-    if (i18n == null) {
-      return List.of();
-    }
-
-    var items = new ArrayList<T2<String, Object>>();
-    items.add(new T2<>(key, i18n.toString()));
-
-    if (i18n instanceof TranslatedString) {
-      ((TranslatedString) i18n).getTranslations()
-        .forEach(e -> {
-          if (e.getKey() != null) {
-            items.add(new T2<>(subKey(key, e.getKey()), e.getValue()));
-          }
-        });
-    }
-
     return items;
   }
 

@@ -47,9 +47,6 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
     VehicleParkingService service = graph.getVehicleParkingService();
-    if (service == null) {
-      return List.of();
-    }
     return service
       .getVehicleParkings()
       .map(vehicleParking -> {
