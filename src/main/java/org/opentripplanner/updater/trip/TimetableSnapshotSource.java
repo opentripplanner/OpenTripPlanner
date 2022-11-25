@@ -495,11 +495,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return UpdateError.result(tripId, NO_START_DATE);
     }
 
-    // Check whether at least two stop updates exist
-    if (tripUpdate.getStopTimeUpdateCount() < 2) {
-      debug(tripId, "ADDED trip has fewer than two stops, skipping.");
-      return UpdateError.result(tripId, TOO_FEW_STOPS);
-    }
     final List<StopTimeUpdate> stopTimeUpdates = tripUpdate
       .getStopTimeUpdateList()
       .stream()
@@ -514,12 +509,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       })
       .toList();
 
+    // check if after filtering the stops we still have at least 2
     if (stopTimeUpdates.size() < 2) {
-      debug(
-        tripId,
-        "After filtering out unusable stops, trip contains fewer than 2 stops. Skipping."
-      );
-      return UpdateError.result(tripId, NO_VALID_STOPS);
+      debug(tripId, "ADDED trip has fewer than two known stops, skipping.");
+      return UpdateError.result(tripId, TOO_FEW_STOPS);
     }
 
     // Check whether all stop times are available and all stops exist
@@ -531,7 +524,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     //
     // Handle added trip
     //
-    return handleAddedTrip(tripUpdate, tripDescriptor, stops, tripId, serviceDate);
+    return handleAddedTrip(tripUpdate, stopTimeUpdates, tripDescriptor, stops, tripId, serviceDate);
   }
 
   /**
@@ -634,6 +627,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return empty Result if successful or one containing an error
    */
   private Result<?, UpdateError> handleAddedTrip(
+    final TripUpdate tripUpdate,
     final List<StopTimeUpdate> stopTimeUpdates,
     final TripDescriptor tripDescriptor,
     final List<StopLocation> stops,
@@ -738,6 +732,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return addTripToGraphAndBuffer(
       tripBuilder.build(),
       tripUpdate,
+      stopTimeUpdates,
       stops,
       serviceDate,
       RealTimeState.ADDED
@@ -1037,7 +1032,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     cancelPreviouslyAddedTrip(tripId, serviceDate);
 
     // Add new trip
-    return addTripToGraphAndBuffer(trip, tripUpdate, stops, serviceDate, RealTimeState.MODIFIED);
+    return addTripToGraphAndBuffer(trip, tripUpdate, tripUpdate.getStopTimeUpdateList(), stops, serviceDate, RealTimeState.MODIFIED);
   }
 
   private Result<?, UpdateError> handleCanceledTrip(
