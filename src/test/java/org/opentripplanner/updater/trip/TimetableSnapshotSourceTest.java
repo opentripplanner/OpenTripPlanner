@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip;
 
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -256,7 +257,63 @@ public class TimetableSnapshotSourceTest {
   }
 
   @Test
-  public void testHandleAddedTrip() {
+  public void addedTrip() {
+    // Get service date of today because old dates will be purged after applying updates
+    final LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
+
+    final String tripId = "added_trip";
+    var builder = new TripUpdateBuilder(tripId, serviceDate, ADDED, transitModel.getTimeZone());
+
+    builder.addStopTime("A", 30).addStopTime("C", 40).addStopTime("E", 55);
+
+    var tripUpdate = builder.build();
+
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel
+    );
+
+    // WHEN
+    updater.applyTripUpdates(
+      TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
+      fullDataset,
+      List.of(tripUpdate),
+      feedId
+    );
+
+    // THEN
+    // Find new pattern in graph starting from stop A
+    var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
+    // Get trip pattern of last (most recently added) outgoing edge
+    var snapshot = updater.getTimetableSnapshot();
+    var patternsAtA = snapshot.getPatternsForStop(stopA);
+
+    assertNotNull(patternsAtA, "Added trip pattern should be found");
+    assertEquals(1, patternsAtA.size());
+    var tripPattern = patternsAtA.stream().findFirst().get();
+
+    final Timetable forToday = snapshot.resolve(tripPattern, serviceDate);
+    final Timetable schedule = snapshot.resolve(tripPattern, null);
+
+    assertNotSame(forToday, schedule);
+
+    final int forTodayAddedTripIndex = forToday.getTripIndex(tripId);
+    assertTrue(
+      forTodayAddedTripIndex > -1,
+      "Added trip should be found in time table for service date"
+    );
+    assertEquals(
+      RealTimeState.ADDED,
+      forToday.getTripTimes(forTodayAddedTripIndex).getRealTimeState()
+    );
+
+    final int scheduleTripIndex = schedule.getTripIndex(tripId);
+    assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
+  }
+
+  @Test
+  public void addedTripWithNewRoute() {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
@@ -264,84 +321,16 @@ public class TimetableSnapshotSourceTest {
 
     final String addedTripId = "added_trip";
 
-    TripUpdate tripUpdate;
-    {
-      final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+    final var builder = new TripUpdateBuilder(
+      addedTripId,
+      serviceDate,
+      ADDED,
+      transitModel.getTimeZone()
+    );
 
-      tripDescriptorBuilder.setTripId(addedTripId);
-      tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.ADDED);
-      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
+    builder.addStopTime("A", 30).addStopTime("C", 40).addStopTime("E", 55);
 
-      final long midnightSecondsSinceEpoch = ServiceDateUtils
-        .asStartOfService(serviceDate, transitModel.getTimeZone())
-        .toEpochSecond();
-
-      final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
-
-      tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-
-      { // Stop A
-        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
-        stopTimeUpdateBuilder.setScheduleRelationship(
-          StopTimeUpdate.ScheduleRelationship.SCHEDULED
-        );
-        stopTimeUpdateBuilder.setStopId("A");
-
-        { // Arrival
-          final StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-          arrivalBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (30 * 60));
-          arrivalBuilder.setDelay(0);
-        }
-
-        { // Departure
-          final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-          departureBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (30 * 60));
-          departureBuilder.setDelay(0);
-        }
-      }
-
-      { // Stop C
-        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
-        stopTimeUpdateBuilder.setScheduleRelationship(
-          StopTimeUpdate.ScheduleRelationship.SCHEDULED
-        );
-        stopTimeUpdateBuilder.setStopId("C");
-
-        { // Arrival
-          final StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-          arrivalBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (40 * 60));
-          arrivalBuilder.setDelay(0);
-        }
-
-        { // Departure
-          final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-          departureBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (45 * 60));
-          departureBuilder.setDelay(0);
-        }
-      }
-
-      { // Stop E
-        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
-        stopTimeUpdateBuilder.setScheduleRelationship(
-          StopTimeUpdate.ScheduleRelationship.SCHEDULED
-        );
-        stopTimeUpdateBuilder.setStopId("E");
-
-        { // Arrival
-          final StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-          arrivalBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (55 * 60));
-          arrivalBuilder.setDelay(0);
-        }
-
-        { // Departure
-          final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-          departureBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (55 * 60));
-          departureBuilder.setDelay(0);
-        }
-      }
-
-      tripUpdate = tripUpdateBuilder.build();
-    }
+    var tripUpdate = builder.build();
 
     var updater = new TimetableSnapshotSource(
       TimetableSnapshotSourceParameters.DEFAULT,
