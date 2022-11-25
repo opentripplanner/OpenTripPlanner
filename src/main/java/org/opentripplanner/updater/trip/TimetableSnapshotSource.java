@@ -442,7 +442,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         .cancelStops(skippedStopIndices)
         .build();
 
-      final Trip trip = getTripForTripId(tripId);
+      final Trip trip = transitService.getTripForId(tripId);
       // Get cached trip pattern or create one if it doesn't exist yet
       final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
         newStopPattern,
@@ -480,7 +480,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     //
 
     // Check whether trip id already exists in graph
-    final Trip trip = getTripForTripId(tripId);
+    final Trip trip = transitService.getTripForId(tripId);
 
     if (trip != null) {
       // TODO: should we support this and add a new instantiation of this trip (making it
@@ -527,7 +527,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .filter(StopTimeUpdate::hasStopId)
       .filter(st -> {
         var stopId = new FeedScopedId(tripId.getFeedId(), st.getStopId());
-        var stopFound = getStopForStopId(stopId) != null;
+        var stopFound = transitService.getRegularStop(stopId) != null;
         if (!stopFound) {
           debug(tripId, "Stop '{}' not found in graph. Removing from ADDED trip.", st.getStopId());
         }
@@ -576,7 +576,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Find stops
       if (stopTimeUpdate.hasStopId()) {
         // Find stop
-        final var stop = getStopForStopId(
+        final var stop = transitService.getRegularStop(
           new FeedScopedId(tripId.getFeedId(), stopTimeUpdate.getStopId())
         );
         if (stop != null) {
@@ -697,7 +697,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       route = builder.build();
     } else if (tripDescriptor.hasRouteId()) {
       // Try to find route
-      route = getRouteForRouteId(new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId()));
+      route =
+        transitService.getRouteForId(
+          new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
+        );
     } else {
       // Create new Route
       FeedScopedId id = tripId;
@@ -966,7 +969,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     //
 
     // Check whether trip id already exists in graph
-    Trip trip = getTripForTripId(tripId);
+    Trip trip = transitService.getTripForId(tripId);
 
     if (trip == null) {
       // TODO: should we support this and consider it an ADDED trip?
@@ -1094,33 +1097,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private TripPattern getPatternForTripId(FeedScopedId tripId) {
     Trip trip = transitService.getTripForId(tripId);
     return transitService.getPatternForTrip(trip);
-  }
-
-  /**
-   * Retrieve route given a route id
-   *
-   * @return route or null if route can't be found in graph index
-   */
-  private Route getRouteForRouteId(FeedScopedId routeId) {
-    return transitService.getRouteForId(routeId);
-  }
-
-  /**
-   * Retrieve trip given a trip id
-   *
-   * @return trip or null if trip can't be found in graph index
-   */
-  private Trip getTripForTripId(FeedScopedId tripId) {
-    return transitService.getTripForId(tripId);
-  }
-
-  /**
-   * Retrieve stop given a stop id.
-   *
-   * @return stop or null if stop doesn't exist
-   */
-  private StopLocation getStopForStopId(FeedScopedId stopId) {
-    return transitService.getRegularStop(stopId);
   }
 
   private static void debug(FeedScopedId id, String message, Object... params) {
