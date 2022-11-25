@@ -702,10 +702,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
         );
     } else {
-      // Create new Route
-      FeedScopedId id = tripId;
-
-      var builder = Route.of(id);
+      // Create new dummy Route
+      var builder = Route.of(tripId);
 
       builder.withAgency(dummyAgency);
       // Guess the route type as it doesn't exist yet in the specifications

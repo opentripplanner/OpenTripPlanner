@@ -34,14 +34,20 @@ public class TripUpdateBuilder {
   public TripUpdateBuilder addStopTime(String stopName, int minutes) {
     return addStopTime(stopName, minutes, -1, -1, null);
   }
-public TripUpdateBuilder addStopTime(String stopName, int minutes, GtfsRealtimeExtensions.OtpStopTimePropertiesExtension.DropOffPickupType pickDrop) {
+
+  public TripUpdateBuilder addStopTime(
+    String stopName,
+    int minutes,
+    GtfsRealtimeExtensions.OtpStopTimePropertiesExtension.DropOffPickupType pickDrop
+  ) {
     return addStopTime(stopName, minutes, -1, -1, pickDrop);
   }
+
   public TripUpdateBuilder addDelayedStopTime(int stopSequence, int delay) {
     return addStopTime(null, -1, stopSequence, delay, null);
   }
 
-  private  TripUpdateBuilder addStopTime(
+  private TripUpdateBuilder addStopTime(
     String stopId,
     int minutes,
     int stopSequence,
@@ -53,11 +59,11 @@ public TripUpdateBuilder addStopTime(String stopName, int minutes, GtfsRealtimeE
       GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
     );
 
-    if(stopId != null) {
+    if (stopId != null) {
       stopTimeUpdateBuilder.setStopId(stopId);
     }
 
-    if(stopSequence > -1){
+    if (stopSequence > -1) {
       stopTimeUpdateBuilder.setStopSequence(stopSequence);
     }
 
@@ -74,12 +80,12 @@ public TripUpdateBuilder addStopTime(String stopName, int minutes, GtfsRealtimeE
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
 
-    if(minutes> -1) {
+    if (minutes > -1) {
       arrivalBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (minutes * 60));
       departureBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (minutes * 60));
     }
 
-    if(delay > -1)  {
+    if (delay > -1) {
       arrivalBuilder.setDelay(delay);
       departureBuilder.setDelay(delay);
     }
@@ -107,6 +113,4 @@ public TripUpdateBuilder addStopTime(String stopName, int minutes, GtfsRealtimeE
 
     return this;
   }
-
-
 }

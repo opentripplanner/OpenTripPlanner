@@ -171,8 +171,12 @@ public class TimetableSnapshotSourceTest {
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
-
-    var tripUpdateBuilder = new TripUpdateBuilder(tripId.getId(), LocalDate.now(), ScheduleRelationship.SCHEDULED, transitModel.getTimeZone());
+    var tripUpdateBuilder = new TripUpdateBuilder(
+      tripId.getId(),
+      LocalDate.now(),
+      ScheduleRelationship.SCHEDULED,
+      transitModel.getTimeZone()
+    );
 
     int stopSequence = 2;
     int delay = 1;
@@ -363,7 +367,6 @@ public class TimetableSnapshotSourceTest {
 
     assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getPickup(1));
     assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getDropoff(1));
-
   }
 
   @Test

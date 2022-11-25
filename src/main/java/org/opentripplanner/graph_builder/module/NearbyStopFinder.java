@@ -64,7 +64,7 @@ public class NearbyStopFinder {
   private final Duration durationLimit;
   private final DataOverlayContext dataOverlayContext;
 
-  private final Set<String> alwaysGenerateTransfersFeeds;
+  private final Set<String> feedsToExcludeFromPatternCheck;
 
   private DirectGraphFinder directGraphFinder;
 
@@ -79,13 +79,13 @@ public class NearbyStopFinder {
     Duration durationLimit,
     DataOverlayContext dataOverlayContext,
     boolean useStreets,
-    Set<String> alwaysGenerateTransfersFeeds
+    Set<String> feedsToExcludeFromPatternCheck
   ) {
     this.transitService = transitService;
     this.dataOverlayContext = dataOverlayContext;
     this.useStreets = useStreets;
     this.durationLimit = durationLimit;
-    this.alwaysGenerateTransfersFeeds = alwaysGenerateTransfersFeeds;
+    this.feedsToExcludeFromPatternCheck = feedsToExcludeFromPatternCheck;
 
     if (!useStreets) {
       // We need to accommodate straight line distance (in meters) but when streets are present we
@@ -140,7 +140,7 @@ public class NearbyStopFinder {
         }
       }
 
-      if (alwaysGenerateTransfersFeeds.contains(ts1.getId().getFeedId())) {
+      if (feedsToExcludeFromPatternCheck.contains(ts1.getId().getFeedId())) {
         overrideStops.add(nearbyStop);
       }
 
