@@ -14,12 +14,7 @@ public final class AddedRoute {
   private final Integer routeType;
   private final String routeLongName;
 
-  public AddedRoute(
-    String routeUrl,
-    String agencyId,
-    Integer routeType,
-    String routeLongName
-  ) {
+  public AddedRoute(String routeUrl, String agencyId, Integer routeType, String routeLongName) {
     this.routeUrl = routeUrl;
     this.agencyId = agencyId;
     this.routeType = routeType;
@@ -61,5 +56,4 @@ public final class AddedRoute {
       return new AddedRoute(null, null, null, null);
     }
   }
-
 }

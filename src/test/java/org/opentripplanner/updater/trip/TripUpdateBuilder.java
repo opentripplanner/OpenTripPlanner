@@ -4,7 +4,7 @@ import com.google.transit.realtime.GtfsRealtime;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.GtfsRealtimeExtensions;
-import org.opentripplanner.util.time.ServiceDateUtils;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 
 public class TripUpdateBuilder {
 

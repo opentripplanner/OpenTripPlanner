@@ -34,7 +34,6 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import javax.annotation.Nonnull;
-import org.opentripplanner.GtfsRealtimeExtensions;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;

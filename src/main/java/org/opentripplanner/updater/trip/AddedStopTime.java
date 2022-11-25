@@ -8,12 +8,14 @@ import org.opentripplanner.GtfsRealtimeExtensions.OtpStopTimePropertiesExtension
 import org.opentripplanner.model.PickDrop;
 
 final class AddedStopTime {
+
   @Nullable
   private final PickDrop pickup;
+
   @Nullable
   private final PickDrop dropOff;
 
-  public static final PickDrop DEFAULT_PICK_DROP= PickDrop.SCHEDULED;
+  public static final PickDrop DEFAULT_PICK_DROP = PickDrop.SCHEDULED;
 
   AddedStopTime(@Nullable PickDrop pickup, @Nullable PickDrop dropOff) {
     this.pickup = pickup;
@@ -49,6 +51,4 @@ final class AddedStopTime {
       case COORDINATE_WITH_DRIVER -> PickDrop.COORDINATE_WITH_DRIVER;
     };
   }
-
-
 }
