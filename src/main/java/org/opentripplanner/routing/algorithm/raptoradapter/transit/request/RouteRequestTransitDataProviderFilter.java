@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
@@ -222,12 +223,8 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       .map(AbstractTransitEntity::getId)
       .toList();
 
-    if (!bannedGroupsOfRoutes.isEmpty()) {
-      for (var id : groupOfRoutesIDs) {
-        if (bannedGroupsOfRoutes.contains(id)) {
-          return true;
-        }
-      }
+    if (!bannedGroupsOfRoutes.isEmpty() && !Collections.disjoint(bannedGroupsOfRoutes, groupOfRoutesIDs)) {
+      return true;
     }
 
     boolean whiteListed = false;
