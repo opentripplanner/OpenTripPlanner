@@ -34,6 +34,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
+import javax.annotation.Nonnull;
 import org.opentripplanner.GtfsRealtimeExtensions;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.StopTime;
@@ -495,19 +496,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return UpdateError.result(tripId, NO_START_DATE);
     }
 
-    final List<StopTimeUpdate> stopTimeUpdates = tripUpdate
-      .getStopTimeUpdateList()
-      .stream()
-      .filter(StopTimeUpdate::hasStopId)
-      .filter(st -> {
-        var stopId = new FeedScopedId(tripId.getFeedId(), st.getStopId());
-        var stopFound = getStopForStopId(stopId) != null;
-        if (!stopFound) {
-          debug(tripId, "Stop '{}' not found in graph. Removing from new trip.", st.getStopId());
-        }
-        return stopFound;
-      })
-      .toList();
+    final List<StopTimeUpdate> stopTimeUpdates = removeUnknownStops(tripUpdate, tripId);
 
     // check if after filtering the stops we still have at least 2
     if (stopTimeUpdates.size() < 2) {
@@ -525,6 +514,26 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Handle added trip
     //
     return handleAddedTrip(tripUpdate, stopTimeUpdates, tripDescriptor, stops, tripId, serviceDate);
+  }
+
+  /**
+   * Remove any stop that is not know in the static transit data.
+   */
+  @Nonnull
+  private List<StopTimeUpdate> removeUnknownStops(TripUpdate tripUpdate, FeedScopedId tripId) {
+    return tripUpdate
+      .getStopTimeUpdateList()
+      .stream()
+      .filter(StopTimeUpdate::hasStopId)
+      .filter(st -> {
+        var stopId = new FeedScopedId(tripId.getFeedId(), st.getStopId());
+        var stopFound = getStopForStopId(stopId) != null;
+        if (!stopFound) {
+          debug(tripId, "Stop '{}' not found in graph. Removing from ADDED trip.", st.getStopId());
+        }
+        return stopFound;
+      })
+      .toList();
   }
 
   /**
@@ -1032,7 +1041,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     cancelPreviouslyAddedTrip(tripId, serviceDate);
 
     // Add new trip
-    return addTripToGraphAndBuffer(trip, tripUpdate, tripUpdate.getStopTimeUpdateList(), stops, serviceDate, RealTimeState.MODIFIED);
+    return addTripToGraphAndBuffer(
+      trip,
+      tripUpdate,
+      tripUpdate.getStopTimeUpdateList(),
+      stops,
+      serviceDate,
+      RealTimeState.MODIFIED
+    );
   }
 
   private Result<?, UpdateError> handleCanceledTrip(
