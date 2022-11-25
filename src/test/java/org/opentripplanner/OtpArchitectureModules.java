@@ -9,6 +9,7 @@ public interface OtpArchitectureModules {
   Package GNU_TROVE = Package.of("gnu.trove.(*)..");
   Package JACKSON_ANNOTATIONS = Package.of("com.fasterxml.jackson.annotation");
   Package JTS_GEOM = Package.of("org.locationtech.jts.(*)..");
+  Package GOOGLE_COLLECTIONS = Package.of("com.google.common.collect");
 
   /* OTP Modules */
 
