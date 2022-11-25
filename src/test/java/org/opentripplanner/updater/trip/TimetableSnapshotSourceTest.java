@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -713,51 +714,24 @@ public class TimetableSnapshotSourceTest {
   }
 
   @Test
-  public void testHandleScheduledTripWithSkippedAndNoData() {
+  public void scheduledTripWithSkippedAndNoData() {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
     LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
     String scheduledTripId = "1.1";
 
-    TripUpdate tripUpdate;
-    {
-      final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+    var builder = new TripUpdateBuilder(
+      scheduledTripId,
+      serviceDate,
+      SCHEDULED,
+      transitModel.getTimeZone()
+    )
+      .addStopTime(1, StopTimeUpdate.ScheduleRelationship.NO_DATA)
+      .addStopTime(2, StopTimeUpdate.ScheduleRelationship.SKIPPED)
+      .addStopTime(3, StopTimeUpdate.ScheduleRelationship.NO_DATA);
 
-      tripDescriptorBuilder.setTripId(scheduledTripId);
-      tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
-      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
-
-      final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
-
-      tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-
-      { // First stop
-        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(
-          0
-        );
-        stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
-        stopTimeUpdateBuilder.setStopSequence(1);
-      }
-
-      { // Second stop
-        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(
-          1
-        );
-        stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
-        stopTimeUpdateBuilder.setStopSequence(2);
-      }
-
-      { // Last stop
-        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(
-          2
-        );
-        stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
-        stopTimeUpdateBuilder.setStopSequence(3);
-      }
-
-      tripUpdate = tripUpdateBuilder.build();
-    }
+    var tripUpdate = builder.build();
 
     var updater = new TimetableSnapshotSource(
       TimetableSnapshotSourceParameters.DEFAULT,
