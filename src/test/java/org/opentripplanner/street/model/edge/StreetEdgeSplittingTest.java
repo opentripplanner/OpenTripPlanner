@@ -43,18 +43,18 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
     );
 
     var splitResult = streetEdge1.splitDestructively(splitVtx);
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertFalse(splitResult.second.getTurnRestrictions().isEmpty());
-    assertEquals(streetEdge2, addedRestriction(splitResult.second).to);
+    assertTrue(splitResult.head().getTurnRestrictions().isEmpty());
+    assertFalse(splitResult.tail().getTurnRestrictions().isEmpty());
+    assertEquals(streetEdge2, addedRestriction(splitResult.tail()).to);
     // The turn restriction is removed when the edge is removed
     assertOriginalRestrictionExists();
 
     graph.removeEdge(streetEdge1);
     assertOriginalRestrictionMissing();
 
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertFalse(splitResult.second.getTurnRestrictions().isEmpty());
-    assertEquals(streetEdge2, addedRestriction(splitResult.second).to);
+    assertTrue(splitResult.head().getTurnRestrictions().isEmpty());
+    assertFalse(splitResult.tail().getTurnRestrictions().isEmpty());
+    assertEquals(streetEdge2, addedRestriction(splitResult.tail()).to);
   }
 
   @Test
@@ -68,16 +68,16 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
     );
 
     var splitResult = streetEdge2.splitDestructively(splitVtx);
-    assertEquals(splitResult.first, addedRestriction(streetEdge1).to);
+    assertEquals(splitResult.head(), addedRestriction(streetEdge1).to);
     // The turn restriction is removed when the edge is removed
     assertOriginalRestrictionExists();
 
     graph.removeEdge(streetEdge2);
     assertOriginalRestrictionMissing();
 
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertTrue(splitResult.second.getTurnRestrictions().isEmpty());
-    assertEquals(splitResult.first, addedRestriction(streetEdge1).to);
+    assertTrue(splitResult.head().getTurnRestrictions().isEmpty());
+    assertTrue(splitResult.tail().getTurnRestrictions().isEmpty());
+    assertEquals(splitResult.head(), addedRestriction(streetEdge1).to);
   }
 
   @Test
@@ -90,14 +90,14 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
       disposableEdgeCollection,
       LinkingDirection.BOTH_WAYS
     );
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertFalse(splitResult.second.getTurnRestrictions().isEmpty());
-    assertEquals(streetEdge2, addedRestriction(splitResult.second).to);
+    assertTrue(splitResult.head().getTurnRestrictions().isEmpty());
+    assertFalse(splitResult.tail().getTurnRestrictions().isEmpty());
+    assertEquals(streetEdge2, addedRestriction(splitResult.tail()).to);
     assertOriginalRestrictionExists();
 
     disposableEdgeCollection.disposeEdges();
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertTrue(splitResult.second.getTurnRestrictions().isEmpty());
+    assertTrue(splitResult.head().getTurnRestrictions().isEmpty());
+    assertTrue(splitResult.tail().getTurnRestrictions().isEmpty());
     assertOnlyOriginalRestrictionExists();
   }
 
@@ -111,12 +111,12 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
       disposableEdgeCollection,
       LinkingDirection.BOTH_WAYS
     );
-    assertEquals(splitResult.first, addedRestriction(streetEdge1).to);
+    assertEquals(splitResult.head(), addedRestriction(streetEdge1).to);
     assertOriginalRestrictionExists();
 
     disposableEdgeCollection.disposeEdges();
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertTrue(splitResult.second.getTurnRestrictions().isEmpty());
+    assertTrue(splitResult.head().getTurnRestrictions().isEmpty());
+    assertTrue(splitResult.tail().getTurnRestrictions().isEmpty());
     assertOnlyOriginalRestrictionExists();
   }
 
@@ -132,8 +132,8 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
     );
 
     assertOnlyOriginalRestrictionExists();
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertNull(splitResult.second);
+    assertTrue(splitResult.head().getTurnRestrictions().isEmpty());
+    assertNull(splitResult.tail());
 
     disposableEdgeCollection.disposeEdges();
     assertOnlyOriginalRestrictionExists();
@@ -154,7 +154,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
     assertEquals(2, turnRestrictions.size());
 
     assertOriginalRestrictionExists();
-    assertEquals(splitResult.first, addedRestriction(streetEdge1).to);
+    assertEquals(splitResult.head(), addedRestriction(streetEdge1).to);
 
     disposableEdgeCollection.disposeEdges();
     assertOnlyOriginalRestrictionExists();
@@ -173,12 +173,12 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
 
     assertOnlyOriginalRestrictionExists();
 
-    assertEquals(streetEdge2, addedRestriction(splitResult.second).to);
+    assertEquals(streetEdge2, addedRestriction(splitResult.tail()).to);
 
     disposableEdgeCollection.disposeEdges();
 
     assertOnlyOriginalRestrictionExists();
-    assertTrue(splitResult.second.getTurnRestrictions().isEmpty());
+    assertTrue(splitResult.tail().getTurnRestrictions().isEmpty());
   }
 
   @Test
@@ -193,7 +193,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
     );
 
     assertOnlyOriginalRestrictionExists();
-    assertTrue(splitResult.second.getTurnRestrictions().isEmpty());
+    assertTrue(splitResult.tail().getTurnRestrictions().isEmpty());
 
     disposableEdgeCollection.disposeEdges();
     assertOnlyOriginalRestrictionExists();

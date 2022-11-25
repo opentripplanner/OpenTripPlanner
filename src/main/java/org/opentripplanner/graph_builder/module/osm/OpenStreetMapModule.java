@@ -16,7 +16,6 @@ import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
@@ -629,7 +628,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
               elevationData.put(endEndpoint, elevation);
             }
           }
-          P2<StreetEdge> streets = getEdgesForStreet(
+          StreetEdgePair streets = getEdgesForStreet(
             startEndpoint,
             endEndpoint,
             way,
@@ -640,8 +639,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             geometry
           );
 
-          StreetEdge street = streets.first;
-          StreetEdge backStreet = streets.second;
+          StreetEdge street = streets.main;
+          StreetEdge backStreet = streets.back;
           applyWayProperties(street, backStreet, wayData, way);
 
           applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
@@ -1092,7 +1091,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * http://wiki.openstreetmap.org/wiki/Bicycle for various scenarios, along with
      * http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway.
      */
-    private P2<StreetEdge> getEdgesForStreet(
+    private StreetEdgePair getEdgesForStreet(
       IntersectionVertex startEndpoint,
       IntersectionVertex endEndpoint,
       OSMWay way,
@@ -1104,16 +1103,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     ) {
       // No point in returning edges that can't be traversed by anyone.
       if (permissions.allowsNothing()) {
-        return new P2<>(null, null);
+        return new StreetEdgePair(null, null);
       }
 
       LineString backGeometry = geometry.reverse();
       StreetEdge street = null, backStreet = null;
       double length = this.getGeometryLengthMeters(geometry);
 
-      P2<StreetTraversalPermission> permissionPair = OSMFilter.getPermissions(permissions, way);
-      StreetTraversalPermission permissionsFront = permissionPair.first;
-      StreetTraversalPermission permissionsBack = permissionPair.second;
+      var permissionPair = OSMFilter.getPermissions(permissions, way);
+      var permissionsFront = permissionPair.main();
+      var permissionsBack = permissionPair.back();
 
       if (permissionsFront.allowsAnything()) {
         street =
@@ -1151,7 +1150,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         if (backStreet != null) backStreet.setRoundabout(true);
       }
 
-      return new P2<>(street, backStreet);
+      return new StreetEdgePair(street, backStreet);
     }
 
     private StreetEdge getEdgeForStreet(
@@ -1247,4 +1246,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       return vertices.get(level);
     }
   }
+
+  private record StreetEdgePair(StreetEdge main, StreetEdge back) {}
 }

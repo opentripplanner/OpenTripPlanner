@@ -21,7 +21,6 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -130,7 +129,7 @@ public class WalkableAreaBuilder {
       AreaEdgeList edgeList = new AreaEdgeList(ring.jtsPolygon, references);
       // the points corresponding to concave or hole vertices
       // or those linked to ways
-      HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<>();
+      HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
 
       // we also want to fill in the edges of this area anyway, because we can,
       // and to avoid the numerical problems that they tend to cause
@@ -204,7 +203,7 @@ public class WalkableAreaBuilder {
       // the points corresponding to concave or hole vertices
       // or those linked to ways
       HashSet<OSMNode> visibilityNodes = new HashSet<>();
-      HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<>();
+      HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
       // we need to accumulate visibility points from all contained areas
       // inside this ring, but only for shared nodes; we don't care about
@@ -325,8 +324,8 @@ public class WalkableAreaBuilder {
         }
 
         for (OSMNode nodeJ : visibilityNodes) {
-          P2<OSMNode> nodePair = new P2<>(nodeI, nodeJ);
-          if (alreadyAddedEdges.contains(nodePair)) continue;
+          NodeEdge edge = new NodeEdge(nodeI, nodeJ);
+          if (alreadyAddedEdges.contains(edge)) continue;
 
           IntersectionVertex endEndpoint = handler.getVertexForOsmNode(nodeJ, areaEntity);
 
@@ -427,15 +426,15 @@ public class WalkableAreaBuilder {
     Area area,
     Ring ring,
     int i,
-    HashSet<P2<OSMNode>> alreadyAddedEdges
+    HashSet<NodeEdge> alreadyAddedEdges
   ) {
     OSMNode node = ring.nodes.get(i);
     OSMNode nextNode = ring.nodes.get((i + 1) % ring.nodes.size());
-    P2<OSMNode> nodePair = new P2<>(node, nextNode);
-    if (alreadyAddedEdges.contains(nodePair)) {
+    NodeEdge nodeEdge = new NodeEdge(node, nextNode);
+    if (alreadyAddedEdges.contains(nodeEdge)) {
       return Set.of();
     }
-    alreadyAddedEdges.add(nodePair);
+    alreadyAddedEdges.add(nodeEdge);
     IntersectionVertex startEndpoint = handler.getVertexForOsmNode(node, area.parent);
     IntersectionVertex endEndpoint = handler.getVertexForOsmNode(nextNode, area.parent);
 
@@ -699,4 +698,6 @@ public class WalkableAreaBuilder {
       return !edges.contains(edge);
     }
   }
+
+  private record NodeEdge(OSMNode from, OSMNode to) {}
 }

@@ -11,7 +11,6 @@ import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -651,7 +650,7 @@ public class StreetEdge
    * Split this street edge and return the resulting street edges. After splitting, the original
    * edge will be removed from the graph.
    */
-  public P2<StreetEdge> splitDestructively(SplitterVertex v) {
+  public SplitStreetEdge splitDestructively(SplitterVertex v) {
     SplitLineString geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
     StreetEdge e1 = new StreetEdge(
@@ -720,13 +719,13 @@ public class StreetEdge
     copyPropertiesToSplitEdge(e1, 0, e1.getDistanceMeters());
     copyPropertiesToSplitEdge(e2, e1.getDistanceMeters(), getDistanceMeters());
 
-    var splitEdges = new P2<>(e1, e2);
+    var splitEdges = new SplitStreetEdge(e1, e2);
     copyRestrictionsToSplitEdges(this, splitEdges);
     return splitEdges;
   }
 
   /** Split this street edge and return the resulting street edges. The original edge is kept. */
-  public P2<StreetEdge> splitNonDestructively(
+  public SplitStreetEdge splitNonDestructively(
     SplitterVertex v,
     DisposableEdgeCollection tempEdges,
     LinkingDirection direction
@@ -767,7 +766,7 @@ public class StreetEdge
       tempEdges.addEdge(e2);
     }
 
-    var splitEdges = new P2<>(e1, e2);
+    var splitEdges = new SplitStreetEdge(e1, e2);
     copyRestrictionsToSplitEdges(this, splitEdges);
     return splitEdges;
   }
@@ -915,9 +914,9 @@ public class StreetEdge
    * Copy restrictions having former edge as from to appropriate split edge, as well as restrictions
    * on incoming edges.
    */
-  private static void copyRestrictionsToSplitEdges(StreetEdge edge, P2<StreetEdge> splitEdges) {
+  private static void copyRestrictionsToSplitEdges(StreetEdge edge, SplitStreetEdge splitEdges) {
     // Copy turn restriction which have a .to of this edge (present on the incoming edges of fromv)
-    if (splitEdges.first != null) {
+    if (splitEdges.head() != null) {
       edge
         .getFromVertex()
         .getIncoming()
@@ -927,17 +926,17 @@ public class StreetEdge
         .flatMap(originatingEdge -> originatingEdge.getTurnRestrictions().stream())
         .filter(restriction -> restriction.to == edge)
         .forEach(restriction ->
-          applyRestrictionsToNewEdge(restriction.from, splitEdges.first, restriction)
+          applyRestrictionsToNewEdge(restriction.from, splitEdges.head(), restriction)
         );
     }
 
     // Copy turn restriction which have a .from of this edge (present on the original street edge)
-    if (splitEdges.second != null) {
+    if (splitEdges.tail() != null) {
       edge
         .getTurnRestrictions()
         .forEach(existingTurnRestriction ->
           applyRestrictionsToNewEdge(
-            splitEdges.second,
+            splitEdges.tail(),
             existingTurnRestriction.to,
             existingTurnRestriction
           )

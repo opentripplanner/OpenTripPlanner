@@ -17,7 +17,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
@@ -88,17 +87,17 @@ public class LinkingTest {
         new NonLocalizedString("split")
       );
 
-      P2<StreetEdge> sp0 = s0.splitDestructively(sv0);
-      P2<StreetEdge> sp1 = s1.splitDestructively(sv1);
+      var sp0 = s0.splitDestructively(sv0);
+      var sp1 = s1.splitDestructively(sv1);
 
       // distances expressed internally in mm so this epsilon is plenty good enough to ensure that they
       // have the same values
-      assertEquals(sp0.first.getDistanceMeters(), sp1.second.getDistanceMeters(), 0.0000001);
-      assertEquals(sp0.second.getDistanceMeters(), sp1.first.getDistanceMeters(), 0.0000001);
-      assertFalse(sp0.first.isBack());
-      assertFalse(sp0.second.isBack());
-      assertTrue(sp1.first.isBack());
-      assertTrue(sp1.second.isBack());
+      assertEquals(sp0.head().getDistanceMeters(), sp1.tail().getDistanceMeters(), 0.0000001);
+      assertEquals(sp0.tail().getDistanceMeters(), sp1.head().getDistanceMeters(), 0.0000001);
+      assertFalse(sp0.head().isBack());
+      assertFalse(sp0.tail().isBack());
+      assertTrue(sp1.head().isBack());
+      assertTrue(sp1.tail().isBack());
     }
   }
 

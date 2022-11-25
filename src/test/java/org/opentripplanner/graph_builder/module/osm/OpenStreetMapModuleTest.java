@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
@@ -152,9 +151,9 @@ public class OpenStreetMapModuleTest {
     assertFalse(iv7.trafficLight);
     assertFalse(iv8.trafficLight);
 
-    Set<P2<Vertex>> edgeEndpoints = new HashSet<>();
+    Set<VertexPair> edgeEndpoints = new HashSet<>();
     for (StreetEdge se : gg.getStreetEdges()) {
-      P2<Vertex> endpoints = new P2<>(se.getFromVertex(), se.getToVertex());
+      var endpoints = new VertexPair(se.getFromVertex(), se.getToVertex());
       // Check that we don't get any duplicate edges on this small graph.
       if (edgeEndpoints.contains(endpoints)) {
         fail();
@@ -368,4 +367,6 @@ public class OpenStreetMapModuleTest {
       assertFalse(path.states.isEmpty());
     }
   }
+
+  private record VertexPair(Vertex v0, Vertex v1) {}
 }

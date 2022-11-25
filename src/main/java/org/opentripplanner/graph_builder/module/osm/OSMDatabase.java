@@ -24,7 +24,6 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.RepeatingTimePeriod;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -403,7 +402,7 @@ public class OSMDatabase {
      * common nodes shared by different ways of different areas we only add them once, otherwise
      * we could end-up looping on creating new intersections.
      */
-    Set<P2<Long>> commonSegments = new HashSet<>();
+    Set<KeyPair> commonSegments = new HashSet<>();
     HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
     for (Area area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
       for (Ring ring : area.outermostRings) {
@@ -644,7 +643,7 @@ public class OSMDatabase {
   }
 
   private void processAreaRingForUnconnectedAreas(
-    Set<P2<Long>> commonSegments,
+    Set<KeyPair> commonSegments,
     HashGridSpatialIndex<RingSegment> spndx,
     Area area,
     Ring ring
@@ -661,8 +660,8 @@ public class OSMDatabase {
         ringSegment.nA.lat,
         ringSegment.nB.lat
       );
-      P2<Long> key1 = new P2<>(ringSegment.nA.getId(), ringSegment.nB.getId());
-      P2<Long> key2 = new P2<>(ringSegment.nB.getId(), ringSegment.nA.getId());
+      var key1 = new KeyPair(ringSegment.nA.getId(), ringSegment.nB.getId());
+      var key2 = new KeyPair(ringSegment.nB.getId(), ringSegment.nA.getId());
       if (!commonSegments.contains(key1) && !commonSegments.contains(key2)) {
         spndx.insert(env, ringSegment);
         commonSegments.add(key1);
@@ -1172,4 +1171,6 @@ public class OSMDatabase {
 
     OSMNode nB;
   }
+
+  private record KeyPair(long id0, long id1) {}
 }

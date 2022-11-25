@@ -12,7 +12,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
@@ -441,17 +440,17 @@ public class VertexLinker {
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
-    P2<StreetEdge> newEdges = scope == Scope.PERMANENT
+    var newEdges = scope == Scope.PERMANENT
       ? originalEdge.splitDestructively(v)
       : originalEdge.splitNonDestructively(v, tempEdges, direction);
 
     if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges
-      if (newEdges.first != null) {
-        edgeSpatialIndex.insert(newEdges.first.getGeometry(), newEdges.first, scope);
+      if (newEdges.head() != null) {
+        edgeSpatialIndex.insert(newEdges.head().getGeometry(), newEdges.head(), scope);
       }
-      if (newEdges.second != null) {
-        edgeSpatialIndex.insert(newEdges.second.getGeometry(), newEdges.second, scope);
+      if (newEdges.tail() != null) {
+        edgeSpatialIndex.insert(newEdges.tail().getGeometry(), newEdges.tail(), scope);
       }
 
       if (scope == Scope.PERMANENT) {
@@ -497,4 +496,6 @@ public class VertexLinker {
       return Objects.equals(item, that.item);
     }
   }
+
+  private record StreetEdgePair(StreetEdge e0, StreetEdge e1) {}
 }

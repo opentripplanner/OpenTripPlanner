@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ConflictingBikeTags;
 import org.opentripplanner.openstreetmap.model.OSMWay;
@@ -158,7 +157,7 @@ public class OSMFilter {
    * Check OSM tags for various one-way and one-way-by-mode tags and return a pair of permissions
    * for travel along and against the way.
    */
-  public static P2<StreetTraversalPermission> getPermissions(
+  public static StreetTraversalPermissionPair getPermissions(
     StreetTraversalPermission permissions,
     OSMWay way
   ) {
@@ -205,7 +204,7 @@ public class OSMFilter {
     if (way.isOpposableCycleway()) {
       permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
     }
-    return new P2<>(permissionsFront, permissionsBack);
+    return new StreetTraversalPermissionPair(permissionsFront, permissionsBack);
   }
 
   public static boolean isLink(OSMWithTags way) {
