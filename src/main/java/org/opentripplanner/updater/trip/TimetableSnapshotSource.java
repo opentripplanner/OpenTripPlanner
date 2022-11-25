@@ -671,7 +671,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
       var builder = Route.of(id);
 
-      var ext = TripExtension.ofTripDescriptor(tripDescriptor);
+      var ext = AddedRoute.ofTripDescriptor(tripDescriptor);
 
       var agency = transitService
         .getAgencies()
@@ -683,8 +683,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
       builder.withAgency(agency);
 
-      builder.withGtfsType(ext.routeTypeWithFallback());
-      var mode = TransitModeMapper.mapMode(ext.routeTypeWithFallback());
+      builder.withGtfsType(ext.routeType());
+      var mode = TransitModeMapper.mapMode(ext.routeType());
       builder.withMode(mode);
 
       // Create route name
