@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.core.intersection_model;
+package org.opentripplanner.street.search.intersection_model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -15,8 +15,6 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.intersection_model.DrivingDirection;
-import org.opentripplanner.street.search.intersection_model.SimpleIntersectionTraversalCalculator;
 
 /**
  * Tests for SimpleIntersectionTraversalModel.
