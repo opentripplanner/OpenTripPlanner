@@ -250,15 +250,15 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
   public GraphVisualizer(Graph graph, Duration streetRoutingTimeout) {
     super();
-    LOG.info("Starting up graph visualizer...");
     setTitle("GraphVisualizer");
     setExtendedState(JFrame.MAXIMIZED_BOTH);
     this.graph = graph;
     this.streetRoutingTimeout = streetRoutingTimeout;
-    init();
   }
 
   public void run() {
+    LOG.info("Starting up graph visualizer...");
+    this.init();
     this.setVisible(true);
   }
 
@@ -1313,13 +1313,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     resetSearchDateButton.addActionListener(
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          searchDate.setText(DATE_FORMAT.format(Instant.now()));
+          searchDate.setText(DATE_FORMAT.format(ZonedDateTime.now()));
         }
       }
     );
     routingPanel.add(resetSearchDateButton);
     searchDate = new JTextField();
-    searchDate.setText(DATE_FORMAT.format(Instant.now()));
+    searchDate.setText(DATE_FORMAT.format(ZonedDateTime.now()));
     routingPanel.add(searchDate);
 
     // row: launch, continue, and clear path search

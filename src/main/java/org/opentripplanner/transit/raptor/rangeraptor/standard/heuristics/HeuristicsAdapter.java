@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.HeuristicAtStop;
@@ -55,26 +54,8 @@ public class HeuristicsAdapter implements Heuristics {
   }
 
   @Override
-  public boolean reached(int stop) {
-    return times.isStopReached(stop);
-  }
-
-  @Override
-  public int bestTravelDuration(int stop) {
-    if (reached(stop)) {
-      return calculator.duration(originDepartureTime, times.time(stop));
-    }
-    return NOT_SET;
-  }
-
-  @Override
   public int[] bestTravelDurationToIntArray(int unreached) {
     return toIntArray(size(), unreached, this::bestTravelDuration);
-  }
-
-  @Override
-  public int bestNumOfTransfers(int stop) {
-    return transfers.calculateMinNumberOfTransfers(stop);
   }
 
   @Override
@@ -83,20 +64,11 @@ public class HeuristicsAdapter implements Heuristics {
   }
 
   @Override
-  public int bestGeneralizedCost(int stop) {
-    if (reached(stop)) {
-      return costCalculator.calculateMinCost(bestTravelDuration(stop), bestNumOfTransfers(stop));
-    }
-    return NOT_SET;
-  }
-
-  @Override
   public int[] bestGeneralizedCostToIntArray(int unreached) {
     return toIntArray(size(), unreached, this::bestGeneralizedCost);
   }
 
   @Override
-  @Nullable
   public HeuristicAtStop createHeuristicAtStop(int stop) {
     return reached(stop)
       ? new HeuristicAtStop(
@@ -104,7 +76,7 @@ public class HeuristicsAdapter implements Heuristics {
         bestNumOfTransfers(stop),
         bestGeneralizedCost(stop)
       )
-      : null;
+      : HeuristicAtStop.UNREACHED;
   }
 
   @Override
@@ -156,6 +128,22 @@ public class HeuristicsAdapter implements Heuristics {
         20
       )
       .toString();
+  }
+
+  private boolean reached(int stop) {
+    return times.isStopReached(stop);
+  }
+
+  private int bestTravelDuration(int stop) {
+    return calculator.duration(originDepartureTime, times.time(stop));
+  }
+
+  private int bestNumOfTransfers(int stop) {
+    return transfers.calculateMinNumberOfTransfers(stop);
+  }
+
+  private int bestGeneralizedCost(int stop) {
+    return costCalculator.calculateMinCost(bestTravelDuration(stop), bestNumOfTransfers(stop));
   }
 
   private void setUpIteration(int departureTime) {

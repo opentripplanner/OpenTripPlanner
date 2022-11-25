@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import java.util.Set;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -14,10 +14,11 @@ public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic
 
   @Override
   public void initialize(
-    RouteRequest request,
     StreetMode streetMode,
     Set<Vertex> fromVertices,
-    Set<Vertex> toVertices
+    Set<Vertex> toVertices,
+    boolean arriveBy,
+    RoutingPreferences preferences
   ) {}
 
   @Override
