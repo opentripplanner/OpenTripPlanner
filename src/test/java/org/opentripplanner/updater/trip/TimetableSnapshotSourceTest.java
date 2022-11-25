@@ -27,11 +27,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.GtfsRealtimeExtensions.OtpStopTimePropertiesExtension.DropOffPickupType;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.test.support.VariableSource;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -56,7 +59,6 @@ public class TimetableSnapshotSourceTest {
   public void setUp() {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
     transitModel = model.transitModel();
-    // fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
 
     feedId = transitModel.getFeedIds().stream().findFirst().get();
 
@@ -283,6 +285,14 @@ public class TimetableSnapshotSourceTest {
     );
 
     // THEN
+    assertAddedTrip(serviceDate, tripId, updater);
+  }
+
+  private TripPattern assertAddedTrip(
+    LocalDate serviceDate,
+    String tripId,
+    TimetableSnapshotSource updater
+  ) {
     // Find new pattern in graph starting from stop A
     var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
     // Get trip pattern of last (most recently added) outgoing edge
@@ -310,6 +320,7 @@ public class TimetableSnapshotSourceTest {
 
     final int scheduleTripIndex = schedule.getTripIndex(tripId);
     assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
+    return tripPattern;
   }
 
   @Test
@@ -327,8 +338,13 @@ public class TimetableSnapshotSourceTest {
       ADDED,
       transitModel.getTimeZone()
     );
+    // add extension to set route name, url, mode
+    builder.addTripExtension();
 
-    builder.addStopTime("A", 30).addStopTime("C", 40).addStopTime("E", 55);
+    builder
+      .addStopTime("A", 30, DropOffPickupType.PHONE_AGENCY)
+      .addStopTime("C", 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
+      .addStopTime("E", 55, DropOffPickupType.NONE);
 
     var tripUpdate = builder.build();
 
@@ -347,33 +363,20 @@ public class TimetableSnapshotSourceTest {
     );
 
     // THEN
-    // Find new pattern in graph starting from stop A
-    var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
-    // Get trip pattern of last (most recently added) outgoing edge
-    var snapshot = updater.getTimetableSnapshot();
-    var patternsAtA = snapshot.getPatternsForStop(stopA);
+    var pattern = assertAddedTrip(serviceDate, addedTripId, updater);
 
-    assertNotNull(patternsAtA, "Added trip pattern should be found");
-    assertEquals(1, patternsAtA.size());
-    var tripPattern = patternsAtA.stream().findFirst().get();
+    var route = pattern.getRoute();
+    assertEquals(TripUpdateBuilder.ROUTE_URL, route.getUrl());
+    assertEquals(TripUpdateBuilder.ROUTE_NAME, route.getName());
+    assertEquals(TransitMode.RAIL, route.getMode());
 
-    final Timetable forToday = snapshot.resolve(tripPattern, serviceDate);
-    final Timetable schedule = snapshot.resolve(tripPattern, null);
+    var stopPattern = pattern.getStopPattern();
+    assertEquals(PickDrop.CALL_AGENCY, stopPattern.getPickup(0));
+    assertEquals(PickDrop.CALL_AGENCY, stopPattern.getDropoff(0));
 
-    assertNotSame(forToday, schedule);
+    assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getPickup(1));
+    assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getDropoff(1));
 
-    final int forTodayAddedTripIndex = forToday.getTripIndex(addedTripId);
-    assertTrue(
-      forTodayAddedTripIndex > -1,
-      "Added trip should be found in time table for service date"
-    );
-    assertEquals(
-      RealTimeState.ADDED,
-      forToday.getTripTimes(forTodayAddedTripIndex).getRealTimeState()
-    );
-
-    final int scheduleTripIndex = schedule.getTripIndex(addedTripId);
-    assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
   }
 
   @Test

@@ -168,11 +168,11 @@ public final class StopPattern implements Serializable {
     return stops[stopPosInPattern];
   }
 
-  PickDrop getPickup(int stopPosInPattern) {
+  public PickDrop getPickup(int stopPosInPattern) {
     return pickups[stopPosInPattern];
   }
 
-  PickDrop getDropoff(int stopPosInPattern) {
+  public PickDrop getDropoff(int stopPosInPattern) {
     return dropoffs[stopPosInPattern];
   }
 
