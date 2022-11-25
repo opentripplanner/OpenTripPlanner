@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StreetNote;
@@ -335,25 +334,11 @@ public interface Leg {
 
   /**
    * The leg's elevation profile.
+   *
+   * The elevation profile as a comma-separated list of x,y values. x is the distance from the start
+   * of the leg, y is the elevation at this distance.
    */
-  default List<P2<Double>> getRoundedLegElevation() {
-    return null;
-  }
-
-  /**
-   * How much elevation is gained, in total, over the course of the leg, in meters. See
-   * elevationLost.
-   */
-  default Double getElevationGained() {
-    return null;
-  }
-
-  /**
-   * How much elevation is lost, in total, over the course of the leg, in meters. As an example, a
-   * trip that went from the top of Mount Everest straight down to sea level, then back up K2, then
-   * back down again would have an elevationLost of Everest + K2.
-   */
-  default Double getElevationLost() {
+  default ElevationProfile getElevationProfile() {
     return null;
   }
 

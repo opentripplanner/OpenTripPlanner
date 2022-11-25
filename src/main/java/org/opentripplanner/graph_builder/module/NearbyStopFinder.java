@@ -11,33 +11,33 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.common.MinMap;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.vehicletostopheuristics.BikeToStopSkipEdgeStrategy;
 import org.opentripplanner.ext.vehicletostopheuristics.VehicleToStopSkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.algorithm.astar.strategies.ComposingSkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestMapper;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -186,36 +186,27 @@ public class NearbyStopFinder {
   public List<NearbyStop> findNearbyStopsViaStreets(
     Set<Vertex> originVertices,
     boolean reverseDirection,
-    RouteRequest originalRequest,
+    RouteRequest request,
     StreetRequest streetRequest
   ) {
-    RouteRequest request = originalRequest.clone();
-    List<NearbyStop> stopsFound = new ArrayList<>();
-
-    request.setArriveBy(reverseDirection);
-    AStarRequest aStarRequest = AStarRequestMapper
-      .map(request)
-      .withMode(streetRequest.mode())
-      .build();
-
-    /* Add the origin vertices if they are stops */
-    for (Vertex vertex : originVertices) {
-      if (vertex instanceof TransitStopVertex tsv) {
-        stopsFound.add(
-          new NearbyStop(tsv.getStop(), 0, Collections.emptyList(), new State(vertex, aStarRequest))
-        );
-      }
-    }
+    List<NearbyStop> stopsFound = createDirectlyConnectedStops(
+      originVertices,
+      reverseDirection,
+      request,
+      streetRequest
+    );
 
     // Return only the origin vertices if there are no valid street modes
     if (streetRequest.mode() == StreetMode.NOT_SET) {
       return stopsFound;
     }
 
-    ShortestPathTree spt = AStarBuilder
-      .allDirections(getSkipEdgeStrategy(reverseDirection, request))
-      .setDominanceFunction(new DominanceFunction.MinimumWeight())
+    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
+      .of()
+      .setSkipEdgeStrategy(getSkipEdgeStrategy(reverseDirection, request))
+      .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)
+      .setArriveBy(reverseDirection)
       .setStreetRequest(streetRequest)
       .setFrom(reverseDirection ? null : originVertices)
       .setTo(reverseDirection ? originVertices : null)
@@ -281,7 +272,7 @@ public class NearbyStopFinder {
     return directGraphFinder.findClosestStops(c0, limitMeters);
   }
 
-  private SkipEdgeStrategy getSkipEdgeStrategy(
+  private SkipEdgeStrategy<State, Edge> getSkipEdgeStrategy(
     boolean reverseDirection,
     RouteRequest routingRequest
   ) {
@@ -305,16 +296,47 @@ public class NearbyStopFinder {
         transitService::getRoutesForStop,
         routingRequest.journey().transit().modes().stream().map(MainAndSubMode::mainMode).toList()
       );
-      return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
+      return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     } else if (
       OTPFeature.VehicleToStopHeuristics.isOn() &&
       routingRequest.journey().access().mode() == StreetMode.BIKE
     ) {
       var strategy = new BikeToStopSkipEdgeStrategy(transitService::getTripsForStop);
-      return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
+      return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     } else {
       return durationSkipEdgeStrategy;
     }
+  }
+
+  private static List<NearbyStop> createDirectlyConnectedStops(
+    Set<Vertex> originVertices,
+    boolean reverseDirection,
+    RouteRequest request,
+    StreetRequest streetRequest
+  ) {
+    List<NearbyStop> stopsFound = new ArrayList<>();
+
+    StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper
+      .mapToTransferRequest(request)
+      .withArriveBy(reverseDirection)
+      .withMode(streetRequest.mode())
+      .build();
+
+    /* Add the origin vertices if they are stops */
+    for (Vertex vertex : originVertices) {
+      if (vertex instanceof TransitStopVertex tsv) {
+        stopsFound.add(
+          new NearbyStop(
+            tsv.getStop(),
+            0,
+            Collections.emptyList(),
+            new State(vertex, streetSearchRequest)
+          )
+        );
+      }
+    }
+
+    return stopsFound;
   }
 
   private boolean canBoardFlex(State state, boolean reverse) {

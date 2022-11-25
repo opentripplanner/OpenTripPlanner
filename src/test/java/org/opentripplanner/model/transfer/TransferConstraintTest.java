@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
-import static org.opentripplanner.transit.raptor.api.transit.SearchDirection.FORWARD;
-import static org.opentripplanner.transit.raptor.api.transit.SearchDirection.REVERSE;
+import static org.opentripplanner.raptor.spi.SearchDirection.FORWARD;
+import static org.opentripplanner.raptor.spi.SearchDirection.REVERSE;
 import static org.opentripplanner.util.OTPFeature.MinimumTransferTimeIsDefinitive;
 
 import java.util.function.IntSupplier;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.framework.time.DurationUtils;
 
 public class TransferConstraintTest {
 

@@ -4,8 +4,8 @@ package org.opentripplanner.model.calendar;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class explicitly activate or disable a service by date. It can be used in two ways.

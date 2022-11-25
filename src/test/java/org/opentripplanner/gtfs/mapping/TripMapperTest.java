@@ -11,7 +11,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.timetable.Direction;
@@ -31,7 +31,7 @@ public class TripMapperTest {
 
   private static final Trip TRIP = new Trip();
 
-  public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.noopIssueStore();
+  public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
 
   private final TripMapper subject = new TripMapper(
     new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),

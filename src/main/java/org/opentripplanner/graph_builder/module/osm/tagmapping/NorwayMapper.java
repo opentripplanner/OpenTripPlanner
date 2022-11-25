@@ -1,13 +1,13 @@
 package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE_AND_CAR;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE_AND_CAR;
+import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;

@@ -11,8 +11,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.opentripplanner.common.model.CachedValue;
 import org.opentripplanner.ext.reportapi.model.BicycleSafetyReport;
+import org.opentripplanner.ext.reportapi.model.CachedValue;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder.GraphStats;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
@@ -50,8 +50,7 @@ public class ReportResource {
   @Path("/bicycle-safety.html")
   @Produces(MediaType.TEXT_HTML)
   public Response getBicycleSafetyPage() {
-    var is = getClass().getResourceAsStream("/reportapi/report.html");
-    try {
+    try (var is = getClass().getResourceAsStream("/reportapi/report.html")) {
       return Response.ok(new String(is.readAllBytes(), StandardCharsets.UTF_8)).build();
     } catch (IOException e) {
       return Response.serverError().build();

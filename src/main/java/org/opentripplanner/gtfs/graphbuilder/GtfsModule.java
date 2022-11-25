@@ -32,7 +32,7 @@ import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
@@ -117,7 +117,7 @@ public class GtfsModule implements GraphBuilderModule {
       bundles,
       transitModel,
       graph,
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       transitPeriodLimit,
       new DefaultFareServiceFactory(),
       false,

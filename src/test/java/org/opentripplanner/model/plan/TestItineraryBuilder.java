@@ -1,9 +1,9 @@
 package org.opentripplanner.model.plan;
 
 import static java.time.ZoneOffset.UTC;
-import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
-import static org.opentripplanner.routing.core.TraverseMode.CAR;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
+import static org.opentripplanner.street.search.TraverseMode.CAR;
+import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
@@ -21,10 +21,11 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -36,7 +37,6 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * This is a helper class to allow unit-testing on Itineraries. The builder does not necessarily

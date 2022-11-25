@@ -18,36 +18,35 @@ import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.AreaTooComplicated;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.NamedArea;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.AreaEdgeList;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.NamedArea;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.OsmVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * Theoretically, it is not correct to build the visibility graph on the joined polygon of areas
@@ -130,7 +129,7 @@ public class WalkableAreaBuilder {
       AreaEdgeList edgeList = new AreaEdgeList(ring.jtsPolygon, references);
       // the points corresponding to concave or hole vertices
       // or those linked to ways
-      HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<>();
+      HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
 
       // we also want to fill in the edges of this area anyway, because we can,
       // and to avoid the numerical problems that they tend to cause
@@ -204,7 +203,7 @@ public class WalkableAreaBuilder {
       // the points corresponding to concave or hole vertices
       // or those linked to ways
       HashSet<OSMNode> visibilityNodes = new HashSet<>();
-      HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<>();
+      HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
       // we need to accumulate visibility points from all contained areas
       // inside this ring, but only for shared nodes; we don't care about
@@ -325,8 +324,8 @@ public class WalkableAreaBuilder {
         }
 
         for (OSMNode nodeJ : visibilityNodes) {
-          P2<OSMNode> nodePair = new P2<>(nodeI, nodeJ);
-          if (alreadyAddedEdges.contains(nodePair)) continue;
+          NodeEdge edge = new NodeEdge(nodeI, nodeJ);
+          if (alreadyAddedEdges.contains(edge)) continue;
 
           IntersectionVertex endEndpoint = handler.getVertexForOsmNode(nodeJ, areaEntity);
 
@@ -387,16 +386,17 @@ public class WalkableAreaBuilder {
     RouteRequest options = new RouteRequest();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
-      ShortestPathTree spt = AStarBuilder
-        .allDirections(new ListedEdgesOnly(edges))
-        .setDominanceFunction(new DominanceFunction.EarliestArrival())
+      ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
+        .of()
+        .setSkipEdgeStrategy(new ListedEdgesOnly(edges))
+        .setDominanceFunction(new DominanceFunctions.EarliestArrival())
         .setRequest(options)
         .setStreetRequest(new StreetRequest(mode))
         .setFrom(vertex)
         .getShortestPathTree();
 
       for (Vertex endVertex : startingVertices) {
-        GraphPath path = spt.getPath(endVertex);
+        GraphPath<State, Edge, Vertex> path = spt.getPath(endVertex);
         if (path != null) {
           usedEdges.addAll(path.edges);
         }
@@ -426,15 +426,15 @@ public class WalkableAreaBuilder {
     Area area,
     Ring ring,
     int i,
-    HashSet<P2<OSMNode>> alreadyAddedEdges
+    HashSet<NodeEdge> alreadyAddedEdges
   ) {
     OSMNode node = ring.nodes.get(i);
     OSMNode nextNode = ring.nodes.get((i + 1) % ring.nodes.size());
-    P2<OSMNode> nodePair = new P2<>(node, nextNode);
-    if (alreadyAddedEdges.contains(nodePair)) {
+    NodeEdge nodeEdge = new NodeEdge(node, nextNode);
+    if (alreadyAddedEdges.contains(nodeEdge)) {
       return Set.of();
     }
-    alreadyAddedEdges.add(nodePair);
+    alreadyAddedEdges.add(nodeEdge);
     IntersectionVertex startEndpoint = handler.getVertexForOsmNode(node, area.parent);
     IntersectionVertex endEndpoint = handler.getVertexForOsmNode(nextNode, area.parent);
 
@@ -692,10 +692,12 @@ public class WalkableAreaBuilder {
     return false;
   }
 
-  record ListedEdgesOnly(Set<Edge> edges) implements SkipEdgeStrategy {
+  record ListedEdgesOnly(Set<Edge> edges) implements SkipEdgeStrategy<State, Edge> {
     @Override
     public boolean shouldSkipEdge(State current, Edge edge) {
       return !edges.contains(edge);
     }
   }
+
+  private record NodeEdge(OSMNode from, OSMNode to) {}
 }

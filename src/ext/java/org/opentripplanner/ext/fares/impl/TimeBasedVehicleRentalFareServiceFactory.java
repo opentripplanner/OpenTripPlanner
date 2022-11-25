@@ -8,7 +8,7 @@ import java.util.Currency;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.common.model.P2;
+import org.opentripplanner.ext.fares.impl.TimeBasedVehicleRentalFareService.PricingBySecond;
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.fares.FareService;
@@ -24,7 +24,7 @@ public class TimeBasedVehicleRentalFareServiceFactory implements FareServiceFact
 
   // Each entry is <max time, cents at that time>; the list is sorted in
   // ascending time order
-  private List<P2<Integer>> pricingBySecond;
+  private List<PricingBySecond> pricingBySecond;
 
   private Currency currency;
 
@@ -55,27 +55,19 @@ public class TimeBasedVehicleRentalFareServiceFactory implements FareServiceFact
       Map.Entry<String, JsonNode> kv = i.next();
       int maxTimeSec = hmToMinutes(kv.getKey()) * 60;
       int priceCent = (int) Math.round(kv.getValue().asDouble() * 100);
-      pricingBySecond.add(new P2<>(maxTimeSec, priceCent));
+      pricingBySecond.add(new PricingBySecond(maxTimeSec, priceCent));
     }
     if (pricingBySecond.isEmpty()) throw new IllegalArgumentException(
       "Missing or empty mandatory 'prices' array."
     );
     // Sort on increasing time
-    Collections.sort(
-      pricingBySecond,
-      new Comparator<>() {
-        @Override
-        public int compare(P2<Integer> o1, P2<Integer> o2) {
-          return o1.first - o2.first;
-        }
-      }
-    );
+    Collections.sort(pricingBySecond, Comparator.comparingInt(PricingBySecond::timeSec));
     // Check if price is increasing
     int seconds = -1;
     int lastCost = 0;
-    for (P2<Integer> bracket : pricingBySecond) {
-      int maxTime = bracket.first;
-      int cost = bracket.second;
+    for (PricingBySecond bracket : pricingBySecond) {
+      int maxTime = bracket.timeSec();
+      int cost = bracket.rideCost();
       if (maxTime == seconds) {
         throw new IllegalArgumentException("Bike share pricing has two entries for " + maxTime);
       }

@@ -1,33 +1,31 @@
 package org.opentripplanner.graph_builder.module;
 
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.logging.ProgressTracker;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ParkAndRideEntranceRemoved;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
-import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
-import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
-import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
+import org.opentripplanner.street.model.edge.StreetTransitStopLink;
+import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
+import org.opentripplanner.street.model.edge.VehicleParkingEdge;
+import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +58,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   /** For test only */
   public static void linkStreetsForTestOnly(Graph graph, TransitModel model) {
-    new StreetLinkerModule(graph, model, noopIssueStore(), false).buildGraph();
+    new StreetLinkerModule(graph, model, DataImportIssueStore.NOOP, false).buildGraph();
   }
 
   @Override

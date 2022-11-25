@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.time.Duration;
 import java.util.List;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
-import org.opentripplanner.util.time.DurationUtils;
 
 public interface TransitTuningParameters {
   List<Duration> PAGING_SEARCH_WINDOW_ADJUSTMENTS = DurationUtils.durations("4h 2h 1h 30m 20m 10m");

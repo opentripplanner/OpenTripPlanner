@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.FareRule;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 public class FareRuleMapperTest {
 
@@ -33,11 +33,7 @@ public class FareRuleMapperTest {
   private static final String ORIGIN_ID = "Origin Id";
 
   private final FareRuleMapper subject = new FareRuleMapper(
-    new RouteMapper(
-      new AgencyMapper(FEED_ID),
-      DataImportIssueStore.noopIssueStore(),
-      new TranslationHelper()
-    ),
+    new RouteMapper(new AgencyMapper(FEED_ID), DataImportIssueStore.NOOP, new TranslationHelper()),
     new FareAttributeMapper()
   );
 

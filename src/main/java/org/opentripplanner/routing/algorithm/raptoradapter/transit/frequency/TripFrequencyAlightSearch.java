@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
+import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 /**
  * Searches for a concrete trip time for a frequency based pattern. The {@link FrequencyEntry}s are

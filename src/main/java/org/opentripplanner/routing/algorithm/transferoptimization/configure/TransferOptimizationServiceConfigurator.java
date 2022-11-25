@@ -2,6 +2,11 @@ package org.opentripplanner.routing.algorithm.transferoptimization.configure;
 
 import java.util.function.IntFunction;
 import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.raptor.api.request.RaptorRequest;
+import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
@@ -13,11 +18,6 @@ import org.opentripplanner.routing.algorithm.transferoptimization.services.Trans
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferOptimizedFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * Responsible for assembly of the prioritized-transfer services.
