@@ -77,7 +77,6 @@ public class VehicleParkingsLayerTest {
         .note(TranslatedString.getI18NString("default note", "DE", "deutsche Notiz"))
         .tags(List.of("tag1", "tag2"))
         .openingHoursCalendar(calBuilder.build())
-        // .feeHours(null)
         .state(VehicleParkingState.OPERATIONAL)
         .capacity(VehicleParkingSpaces.builder().bicycleSpaces(5).carSpaces(6).build())
         .availability(
