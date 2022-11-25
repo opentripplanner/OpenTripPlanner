@@ -29,16 +29,18 @@ public class DigitransitVehicleParkingPropertyMapper extends PropertyMapper<Vehi
 
   @Nonnull
   protected ArrayList<T2<String, Object>> basicMapping(VehicleParking vehicleParking) {
-    return new ArrayList<>(List.of(
-      new T2<>("id", vehicleParking.getId().toString()),
-      new T2<>("bicyclePlaces", vehicleParking.hasBicyclePlaces()),
-      new T2<>("anyCarPlaces", vehicleParking.hasAnyCarPlaces()),
-      new T2<>("carPlaces", vehicleParking.hasCarPlaces()),
-      new T2<>(
-        "wheelchairAccessibleCarPlaces",
-        vehicleParking.hasWheelchairAccessibleCarPlaces()
-      ),
-      new T2<>("name", i18NStringMapper.mapToApi(vehicleParking.getName()))
-    ));
+    return new ArrayList<>(
+      List.of(
+        new T2<>("id", vehicleParking.getId().toString()),
+        new T2<>("bicyclePlaces", vehicleParking.hasBicyclePlaces()),
+        new T2<>("anyCarPlaces", vehicleParking.hasAnyCarPlaces()),
+        new T2<>("carPlaces", vehicleParking.hasCarPlaces()),
+        new T2<>(
+          "wheelchairAccessibleCarPlaces",
+          vehicleParking.hasWheelchairAccessibleCarPlaces()
+        ),
+        new T2<>("name", i18NStringMapper.mapToApi(vehicleParking.getName()))
+      )
+    );
   }
 }
