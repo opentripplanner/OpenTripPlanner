@@ -223,7 +223,10 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       .map(AbstractTransitEntity::getId)
       .toList();
 
-    if (!bannedGroupsOfRoutes.isEmpty() && !Collections.disjoint(bannedGroupsOfRoutes, groupOfRoutesIDs)) {
+    if (
+      !bannedGroupsOfRoutes.isEmpty() &&
+      !Collections.disjoint(bannedGroupsOfRoutes, groupOfRoutesIDs)
+    ) {
       return true;
     }
 
