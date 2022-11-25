@@ -500,9 +500,30 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       debug(tripId, "ADDED trip has fewer than two stops, skipping.");
       return UpdateError.result(tripId, TOO_FEW_STOPS);
     }
+    final List<StopTimeUpdate> stopTimeUpdates = tripUpdate
+      .getStopTimeUpdateList()
+      .stream()
+      .filter(StopTimeUpdate::hasStopId)
+      .filter(st -> {
+        var stopId = new FeedScopedId(tripId.getFeedId(), st.getStopId());
+        var stopFound = getStopForStopId(stopId) != null;
+        if (!stopFound) {
+          debug(tripId, "Stop '{}' not found in graph. Removing from new trip.", st.getStopId());
+        }
+        return stopFound;
+      })
+      .toList();
+
+    if (stopTimeUpdates.size() < 2) {
+      debug(
+        tripId,
+        "After filtering out unusable stops, trip contains fewer than 2 stops. Skipping."
+      );
+      return UpdateError.result(tripId, NO_VALID_STOPS);
+    }
 
     // Check whether all stop times are available and all stops exist
-    final var stops = checkNewStopTimeUpdatesAndFindStops(tripId, tripUpdate);
+    final var stops = checkNewStopTimeUpdatesAndFindStops(tripId, stopTimeUpdates);
     if (stops == null) {
       return UpdateError.result(tripId, NO_VALID_STOPS);
     }
@@ -521,11 +542,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private List<StopLocation> checkNewStopTimeUpdatesAndFindStops(
     final FeedScopedId tripId,
-    final TripUpdate tripUpdate
+    final List<StopTimeUpdate> stopTimeUpdates
   ) {
     Integer previousStopSequence = null;
     Long previousTime = null;
-    final List<StopTimeUpdate> stopTimeUpdates = tripUpdate.getStopTimeUpdateList();
     final List<StopLocation> stops = new ArrayList<>(stopTimeUpdates.size());
 
     for (int index = 0; index < stopTimeUpdates.size(); ++index) {
@@ -607,14 +627,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Handle GTFS-RT TripUpdate message containing an ADDED trip.
    *
-   * @param tripUpdate     GTFS-RT TripUpdate message
+   * @param stopTimeUpdates GTFS-RT stop time updates
    * @param tripDescriptor GTFS-RT TripDescriptor
    * @param stops          the stops of each StopTimeUpdate in the TripUpdate message
    * @param serviceDate    service date for added trip
    * @return empty Result if successful or one containing an error
    */
   private Result<?, UpdateError> handleAddedTrip(
-    final TripUpdate tripUpdate,
+    final List<StopTimeUpdate> stopTimeUpdates,
     final TripDescriptor tripDescriptor,
     final List<StopLocation> stops,
     final FeedScopedId tripId,
@@ -623,7 +643,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Preconditions
     Objects.requireNonNull(stops);
     Preconditions.checkArgument(
-      tripUpdate.getStopTimeUpdateCount() == stops.size(),
+      stopTimeUpdates.size() == stops.size(),
       "number of stop should match the number of stop time updates"
     );
 
@@ -640,11 +660,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .withName("Dummy")
       .withTimezone("Europe/Paris")
       .build();
-    Route route = null;
-    if (tripDescriptor.hasRouteId()) {
-      // Try to find route
-      route = getRouteForRouteId(new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId()));
-    } else if (tripDescriptor.hasExtension(GtfsRealtimeExtensions.tripDescriptor)) {
+    Route route;
+    if (tripDescriptor.hasExtension(GtfsRealtimeExtensions.tripDescriptor)) {
       FeedScopedId id = tripDescriptor.hasRouteId()
         ? new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
         : tripId;
@@ -675,12 +692,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       builder.withAgency(dummyAgency);
 
       route = builder.build();
-    } else if (route == null) {
+    } else if (tripDescriptor.hasRouteId()) {
+      // Try to find route
+      route = getRouteForRouteId(new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId()));
+    } else {
       // Create new Route
-      // Use route id of trip descriptor if available
-      FeedScopedId id = tripDescriptor.hasRouteId()
-        ? new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
-        : tripId;
+      FeedScopedId id = tripId;
 
       var builder = Route.of(id);
 
@@ -740,6 +757,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private Result<?, UpdateError> addTripToGraphAndBuffer(
     final Trip trip,
     final TripUpdate tripUpdate,
+    final List<StopTimeUpdate> stopTimeUpdates,
     final List<StopLocation> stops,
     final LocalDate serviceDate,
     final RealTimeState realTimeState
@@ -747,7 +765,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Preconditions
     Objects.requireNonNull(stops);
     Preconditions.checkArgument(
-      tripUpdate.getStopTimeUpdateCount() == stops.size(),
+      stopTimeUpdates.size() == stops.size(),
       "number of stop should match the number of stop time updates"
     );
 
@@ -757,9 +775,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .toEpochSecond();
 
     // Create StopTimes
-    final List<StopTime> stopTimes = new ArrayList<>(tripUpdate.getStopTimeUpdateCount());
-    for (int index = 0; index < tripUpdate.getStopTimeUpdateCount(); ++index) {
-      final StopTimeUpdate stopTimeUpdate = tripUpdate.getStopTimeUpdate(index);
+    final List<StopTime> stopTimes = new ArrayList<>(stopTimeUpdates.size());
+    for (int index = 0; index < stopTimeUpdates.size(); ++index) {
+      final StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(index);
       final var stop = stops.get(index);
 
       // Create stop time
@@ -976,7 +994,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     // Check whether all stop times are available and all stops exist
-    var stops = checkNewStopTimeUpdatesAndFindStops(tripId, tripUpdate);
+    var stops = checkNewStopTimeUpdatesAndFindStops(tripId, tripUpdate.getStopTimeUpdateList());
     if (stops == null) {
       return UpdateError.result(tripId, NO_VALID_STOPS);
     }

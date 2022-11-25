@@ -57,7 +57,7 @@ public class TransitModeMapper {
       return TransitMode.TAXI;
     } else if (routeType >= 1600 && routeType < 1700) { //Self drive
       return TransitMode.BUS;
-    } else if (routeType >= 1700 && routeType < 1800) { //Miscellaneous Service
+    } else if (routeType >= 1701 && routeType < 1800) { //Miscellaneous Service
       return null;
     }
     /* Original GTFS route types. Should these be checked before TPEG types? */
