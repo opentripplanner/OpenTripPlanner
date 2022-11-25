@@ -13,8 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
-import org.opentripplanner.common.geometry.MapTile;
-import org.opentripplanner.common.geometry.WebMercatorTile;
+import org.opentripplanner.inspector.MapTile;
 import org.opentripplanner.inspector.TileRenderer;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 

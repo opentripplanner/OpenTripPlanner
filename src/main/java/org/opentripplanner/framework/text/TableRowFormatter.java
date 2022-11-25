@@ -2,8 +2,8 @@ package org.opentripplanner.framework.text;
 
 import java.util.List;
 import java.util.function.Function;
-import org.opentripplanner.util.lang.ObjectUtils;
-import org.opentripplanner.util.lang.StringUtils;
+import org.opentripplanner.framework.lang.ObjectUtils;
+import org.opentripplanner.framework.lang.StringUtils;
 
 class TableRowFormatter {
 

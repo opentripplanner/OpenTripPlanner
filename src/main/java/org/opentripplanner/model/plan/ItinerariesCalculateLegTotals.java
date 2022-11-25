@@ -52,9 +52,10 @@ class ItinerariesCalculateLegTotals {
       if (!leg.isStreetLeg()) {
         this.streetOnly = false;
       }
-      if (leg.getElevationGained() != null && leg.getElevationLost() != null) {
-        this.totalElevationGained += leg.getElevationGained();
-        this.totalElevationLost += leg.getElevationLost();
+      if (leg.getElevationProfile() != null) {
+        var p = leg.getElevationProfile();
+        this.totalElevationGained += p.elevationGained();
+        this.totalElevationLost += p.elevationLost();
       }
     }
     this.walkingDuration = totalDuration.minus(transitDuration).minus(nonTransitDuration);

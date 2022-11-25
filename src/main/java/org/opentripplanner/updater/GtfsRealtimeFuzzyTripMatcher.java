@@ -4,7 +4,9 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import gnu.trove.set.TIntSet;
 import java.text.ParseException;
 import java.time.LocalDate;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -13,8 +15,6 @@ import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.time.ServiceDateUtils;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * This class is used for matching TripDescriptors without trip_ids to scheduled GTFS data and to
@@ -28,9 +28,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
   private final TransitService transitService;
 
   // TODO: replace this with a runtime solution
-  private final DirectionMapper directionMapper = new DirectionMapper(
-    DataImportIssueStore.noopIssueStore()
-  );
+  private final DirectionMapper directionMapper = new DirectionMapper(DataImportIssueStore.NOOP);
 
   public GtfsRealtimeFuzzyTripMatcher(TransitService transitService) {
     this.transitService = transitService;

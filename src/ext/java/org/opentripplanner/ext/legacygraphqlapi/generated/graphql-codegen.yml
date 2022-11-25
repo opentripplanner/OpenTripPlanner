@@ -46,7 +46,7 @@ config:
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
-    elevationProfileComponent: org.opentripplanner.common.model.P2#P2<Double>
+    elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step
     fare: java.util.Map#Map<String, Object>
     fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
     Feed: String

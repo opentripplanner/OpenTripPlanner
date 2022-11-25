@@ -6,7 +6,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.BitSet;
 import java.util.Objects;
-import org.opentripplanner.util.time.TimeUtils;
+import org.opentripplanner.framework.time.TimeUtils;
 
 /**
  */

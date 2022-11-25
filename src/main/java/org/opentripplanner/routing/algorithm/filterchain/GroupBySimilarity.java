@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * Group itineraries by similarity and reduce the number of itineraries down to an given maximum

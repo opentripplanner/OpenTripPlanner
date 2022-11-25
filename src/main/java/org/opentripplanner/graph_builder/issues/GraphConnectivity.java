@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
-import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.street.search.TraverseMode;
 
 public class GraphConnectivity implements DataImportIssue {
 

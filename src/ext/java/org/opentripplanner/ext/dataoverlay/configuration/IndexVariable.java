@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.dataoverlay.configuration;
 
 import java.io.Serializable;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * This class describes the variables for the incoming .nc data file
