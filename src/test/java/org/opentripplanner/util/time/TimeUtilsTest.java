@@ -48,17 +48,6 @@ public class TimeUtilsTest {
   }
 
   @Test
-  public void timeToStrCompactNoSeconds() {
-    assertEquals("0:00", TimeUtils.timeToStrCompactNoSeconds(T00_00_01));
-    assertEquals("0:01", TimeUtils.timeToStrCompactNoSeconds(T00_01_00));
-    assertEquals("1:00", TimeUtils.timeToStrCompactNoSeconds(T01_00_00));
-
-    assertEquals("13:33", TimeUtils.timeToStrCompactNoSeconds(T13_33_57));
-    assertEquals("0:58", TimeUtils.timeToStrCompactNoSeconds(T00_58_59));
-    assertEquals("", TimeUtils.timeToStrCompact(NOT_SET, NOT_SET));
-  }
-
-  @Test
   public void timeToStrLong() {
     assertEquals("00:00:01", TimeUtils.timeToStrLong(T00_00_01));
     assertEquals("00:01:00", TimeUtils.timeToStrLong(T00_01_00));

@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -115,12 +114,6 @@ public class TimeUtils {
   /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */
   public static String timeToStrCompact(int time) {
     return RelativeTime.ofSeconds(time).toCompactStr();
-  }
-
-  public static String timeToStrCompactNoSeconds(int time) {
-    return timeToStrCompact(
-      (int) Duration.ofSeconds(time).truncatedTo(ChronoUnit.MINUTES).toSeconds()
-    );
   }
 
   public static String durationToStrCompact(Duration duration) {

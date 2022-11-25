@@ -1,7 +1,9 @@
 package org.opentripplanner.model.calendar.openinghours;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.BitSet;
 import java.util.Objects;
 import org.opentripplanner.util.time.TimeUtils;
@@ -59,10 +61,14 @@ public class OpeningHours implements Comparable<OpeningHours>, Serializable {
     return (
       toOsm(periodDescription) +
       " " +
-      TimeUtils.timeToStrCompactNoSeconds(startTime) +
+      TimeUtils.timeToStrCompact(truncateToMinute(startTime)) +
       "-" +
-      TimeUtils.timeToStrCompactNoSeconds(endTime)
+      TimeUtils.timeToStrCompact(truncateToMinute(endTime))
     );
+  }
+
+  private static int truncateToMinute(long startTime) {
+    return (int) Duration.ofSeconds(startTime).truncatedTo(ChronoUnit.MINUTES).toSeconds();
   }
 
   @Override
