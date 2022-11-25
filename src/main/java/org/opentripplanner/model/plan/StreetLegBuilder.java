@@ -7,7 +7,7 @@ import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class StreetLegBuilder {

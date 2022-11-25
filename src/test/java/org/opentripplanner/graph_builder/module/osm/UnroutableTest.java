@@ -15,14 +15,14 @@ import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 /**

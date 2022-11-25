@@ -12,7 +12,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**

@@ -5,10 +5,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 

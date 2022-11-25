@@ -7,8 +7,8 @@ import java.io.Serializable;
 import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.astar.spi.AStarEdge;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 /**

@@ -9,12 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.intersection_model.DrivingDirection;
+import org.opentripplanner.street.search.intersection_model.SimpleIntersectionTraversalCalculator;
 
 /**
  * Tests for SimpleIntersectionTraversalModel.

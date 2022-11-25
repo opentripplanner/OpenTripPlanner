@@ -14,8 +14,8 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.Units;
-import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
+import org.opentripplanner.street.search.intersection_model.DrivingDirection;
+import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
 
 /**
  * This class holds preferences for street routing in general, not mode specific.

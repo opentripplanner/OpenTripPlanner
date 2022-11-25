@@ -11,15 +11,11 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.street.search.intersection_model.ConstantIntersectionTraversalCalculator;
+import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
@@ -29,7 +25,11 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 
 public class TurnCostTest {
 

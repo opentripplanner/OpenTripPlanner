@@ -3,21 +3,20 @@ package org.opentripplanner.street.search;
 import java.util.Collection;
 import java.util.Set;
 import org.opentripplanner.astar.AStarBuilder;
-import org.opentripplanner.astar.DominanceFunction;
-import org.opentripplanner.astar.DominanceFunctions;
+import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
-import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StreetSearchRequest;
-import org.opentripplanner.routing.core.StreetSearchRequestMapper;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 
 public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, StreetSearchBuilder> {
 

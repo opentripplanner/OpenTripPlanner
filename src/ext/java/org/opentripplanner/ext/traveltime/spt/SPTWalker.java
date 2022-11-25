@@ -7,11 +7,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.TraverseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

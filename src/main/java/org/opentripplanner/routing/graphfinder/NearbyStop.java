@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import org.opentripplanner.astar.GraphPath;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**

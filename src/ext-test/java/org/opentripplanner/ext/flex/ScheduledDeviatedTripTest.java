@@ -28,13 +28,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSear
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StreetSearchRequest;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.vertex.StreetLocation;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;

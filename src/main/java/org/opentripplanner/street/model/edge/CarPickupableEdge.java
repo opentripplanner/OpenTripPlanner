@@ -1,8 +1,8 @@
 package org.opentripplanner.street.model.edge;
 
-import org.opentripplanner.routing.core.CarPickupState;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.street.search.state.CarPickupState;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 
 public interface CarPickupableEdge {
   default boolean canPickupAndDrive(State state) {

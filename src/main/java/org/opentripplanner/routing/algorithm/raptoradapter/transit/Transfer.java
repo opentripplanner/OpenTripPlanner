@@ -8,10 +8,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.StreetSearchRequest;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 public class Transfer {
 

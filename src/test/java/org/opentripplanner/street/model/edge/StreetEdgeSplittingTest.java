@@ -8,8 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -19,6 +17,8 @@ import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporarySplitterVertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 class StreetEdgeSplittingTest extends GraphRoutingTest {

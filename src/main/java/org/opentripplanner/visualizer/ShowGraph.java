@@ -25,8 +25,6 @@ import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -53,6 +51,8 @@ import org.opentripplanner.street.model.vertex.TransitPathwayNodeVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.TraverseMode;
 import processing.core.PApplet;
 import processing.core.PFont;
 

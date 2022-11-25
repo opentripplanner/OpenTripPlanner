@@ -15,8 +15,8 @@ import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.core.StreetSearchRequest;
-import org.opentripplanner.routing.core.StreetSearchRequestMapper;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
 
 public class RaptorRequestTransferCache {
 

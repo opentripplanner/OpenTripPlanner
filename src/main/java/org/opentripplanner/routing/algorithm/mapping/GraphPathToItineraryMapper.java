@@ -22,8 +22,6 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.StreetLegBuilder;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
@@ -37,6 +35,8 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.util.OTPFeature;
 

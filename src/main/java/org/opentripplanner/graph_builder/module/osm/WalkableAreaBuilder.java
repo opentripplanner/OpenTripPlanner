@@ -18,7 +18,6 @@ import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
@@ -35,7 +34,6 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -46,7 +44,9 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 /**

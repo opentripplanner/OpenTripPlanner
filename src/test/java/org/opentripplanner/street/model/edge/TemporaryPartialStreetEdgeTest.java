@@ -12,9 +12,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StreetSearchRequest;
-import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
+import org.opentripplanner.street.search.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
@@ -22,6 +20,8 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 public class TemporaryPartialStreetEdgeTest {

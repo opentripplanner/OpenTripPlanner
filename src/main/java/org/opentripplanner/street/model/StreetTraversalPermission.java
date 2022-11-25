@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model;
 
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
 
 /**
  * Who can traverse a street in a single direction.

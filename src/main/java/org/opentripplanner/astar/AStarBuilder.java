@@ -9,6 +9,7 @@ import java.util.Set;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.AStarVertex;
+import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;

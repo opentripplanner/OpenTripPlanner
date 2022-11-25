@@ -1,9 +1,9 @@
 package org.opentripplanner.model.plan;
 
 import static java.time.ZoneOffset.UTC;
-import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
-import static org.opentripplanner.routing.core.TraverseMode.CAR;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
+import static org.opentripplanner.street.search.TraverseMode.CAR;
+import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
@@ -16,7 +16,7 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;

@@ -15,7 +15,6 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
 import org.opentripplanner.datastore.api.FileType;
@@ -27,16 +26,17 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParamet
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.street.search.intersection_model.ConstantIntersectionTraversalCalculator;
+import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TriangleInequalityTest {

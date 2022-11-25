@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.routing.core.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 public class RaptorTransferIndex {
 

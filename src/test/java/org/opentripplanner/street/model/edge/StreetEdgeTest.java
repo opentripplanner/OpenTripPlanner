@@ -17,12 +17,6 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData;
-import org.opentripplanner.routing.core.StreetSearchRequest;
-import org.opentripplanner.routing.core.StreetSearchRequestBuilder;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
@@ -30,6 +24,12 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateData;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 public class StreetEdgeTest {

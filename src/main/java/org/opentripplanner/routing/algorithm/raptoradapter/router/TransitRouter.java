@@ -26,10 +26,10 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.util.OTPFeature;
 
 public class TransitRouter {

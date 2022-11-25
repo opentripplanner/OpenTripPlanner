@@ -9,9 +9,9 @@ import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 import org.opentripplanner.ext.traveltime.spt.SPTVisitor;
 import org.opentripplanner.ext.traveltime.spt.SPTWalker;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

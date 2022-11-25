@@ -7,11 +7,11 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StreetSearchRequest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 public abstract class MatchState {
 

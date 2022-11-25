@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.FakeGraph.getFileForResource;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 
 import java.io.File;

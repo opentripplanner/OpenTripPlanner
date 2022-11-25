@@ -14,6 +14,7 @@ import java.util.Set;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.AStarVertex;
+import org.opentripplanner.astar.spi.DominanceFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

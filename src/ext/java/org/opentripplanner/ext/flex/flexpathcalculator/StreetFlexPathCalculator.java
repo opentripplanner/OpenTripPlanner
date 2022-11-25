@@ -3,18 +3,18 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.astar.DominanceFunctions;
 import org.opentripplanner.astar.GraphPath;
 import org.opentripplanner.astar.ShortestPathTree;
+import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.strategy.DominanceFunctions;
 
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network

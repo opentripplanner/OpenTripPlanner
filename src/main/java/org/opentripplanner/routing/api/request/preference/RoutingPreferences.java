@@ -6,7 +6,7 @@ import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
 import java.io.Serializable;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.street.search.TraverseMode;
 
 /** User/trip cost/time/slack/reluctance search config. */
 @SuppressWarnings("UnusedReturnValue")

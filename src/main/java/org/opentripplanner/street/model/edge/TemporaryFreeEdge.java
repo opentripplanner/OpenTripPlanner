@@ -1,9 +1,9 @@
 package org.opentripplanner.street.model.edge;
 
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 
 public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
 
