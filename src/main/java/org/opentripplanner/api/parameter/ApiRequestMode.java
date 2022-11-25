@@ -21,6 +21,7 @@ public enum ApiRequestMode {
   AIRPLANE(TransitMode.AIRPLANE),
   TROLLEYBUS(TransitMode.TROLLEYBUS),
   MONORAIL(TransitMode.MONORAIL),
+  CARPOOL(TransitMode.CARPOOL),
   FLEX();
 
   private final List<TransitMode> transitModes;

@@ -690,6 +690,7 @@ public class LegacyGraphQLTypes {
     BUS,
     CABLE_CAR,
     CAR,
+    CARPOOL,
     COACH,
     FERRY,
     FLEX,

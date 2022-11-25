@@ -18,9 +18,15 @@ public enum TransitMode {
   GONDOLA,
   FUNICULAR,
   TROLLEYBUS,
-  MONORAIL;
+  MONORAIL,
+  CARPOOL;
 
-  private static final Set<TransitMode> ON_STREET_MODES = EnumSet.of(COACH, BUS, TROLLEYBUS);
+  private static final Set<TransitMode> ON_STREET_MODES = EnumSet.of(
+    COACH,
+    BUS,
+    TROLLEYBUS,
+    CARPOOL
+  );
   private static final Set<TransitMode> NO_AIRPLANE_MODES = EnumSet.complementOf(
     EnumSet.of(AIRPLANE)
   );
