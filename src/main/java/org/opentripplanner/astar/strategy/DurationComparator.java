@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.astar.strategy;
 
 import java.util.Comparator;
 import org.opentripplanner.astar.GraphPath;
