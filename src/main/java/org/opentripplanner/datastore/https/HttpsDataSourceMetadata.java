@@ -9,7 +9,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * HTTPS data source metadata returned by the HTTP server (HTTP headers).

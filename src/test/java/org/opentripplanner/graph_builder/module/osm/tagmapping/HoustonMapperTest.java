@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;

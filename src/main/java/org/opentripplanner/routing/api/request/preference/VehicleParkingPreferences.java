@@ -2,7 +2,7 @@ package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * TODO VIA: Javadoc

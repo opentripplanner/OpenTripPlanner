@@ -8,9 +8,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.lang.StringUtils;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InterliningTeleport;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.Timetable;
@@ -23,7 +23,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.util.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,10 +57,10 @@ public class InterlineProcessor {
         constraint.staySeated();
         constraint.priority(TransferPriority.ALLOWED);
 
-        var fromTrip = p.getValue().first;
-        var toTrip = p.getValue().second;
+        var fromTrip = p.getValue().from();
+        var toTrip = p.getValue().to();
 
-        var from = new TripTransferPoint(fromTrip, p.getKey().first.numberOfStops() - 1);
+        var from = new TripTransferPoint(fromTrip, p.getKey().from().numberOfStops() - 1);
         var to = new TripTransferPoint(toTrip, 0);
 
         LOG.debug(
@@ -87,9 +86,9 @@ public class InterlineProcessor {
     return transfers;
   }
 
-  private boolean staySeatedAllowed(Map.Entry<P2<TripPattern>, P2<Trip>> p) {
-    var fromTrip = p.getValue().first;
-    var toTrip = p.getValue().second;
+  private boolean staySeatedAllowed(Map.Entry<TripPatternPair, TripPair> p) {
+    var fromTrip = p.getValue().from();
+    var toTrip = p.getValue().to();
     return staySeatedNotAllowed
       .stream()
       .noneMatch(t ->
@@ -100,7 +99,7 @@ public class InterlineProcessor {
   /**
    * Identify interlined trips (where a physical vehicle continues on to another logical trip).
    */
-  private Multimap<P2<TripPattern>, P2<Trip>> getInterlinedTrips(
+  private Multimap<TripPatternPair, TripPair> getInterlinedTrips(
     Collection<TripPattern> tripPatterns
   ) {
     /* Record which Pattern each interlined TripTimes belongs to. */
@@ -124,7 +123,7 @@ public class InterlineProcessor {
     }
 
     // Associate pairs of TripPatterns with lists of trips that continue from one pattern to the other.
-    Multimap<P2<TripPattern>, P2<Trip>> interlines = ArrayListMultimap.create();
+    Multimap<TripPatternPair, TripPair> interlines = ArrayListMultimap.create();
 
     // Sort trips within each block by first departure time, then iterate over trips in this block and service,
     // linking them. Has no effect on single-trip blocks.
@@ -160,8 +159,8 @@ public class InterlineProcessor {
             // Only skip this particular interline edge; there may be other valid ones in the block.
           } else {
             interlines.put(
-              new P2<>(prevPattern, currPattern),
-              new P2<>(prev.getTrip(), curr.getTrip())
+              new TripPatternPair(prevPattern, currPattern),
+              new TripPair(prev.getTrip(), curr.getTrip())
             );
           }
         }
@@ -181,4 +180,8 @@ public class InterlineProcessor {
       return new BlockIdAndServiceId(trip.getGtfsBlockId(), trip.getServiceId());
     }
   }
+
+  private record TripPatternPair(TripPattern from, TripPattern to) {}
+
+  private record TripPair(Trip from, Trip to) {}
 }

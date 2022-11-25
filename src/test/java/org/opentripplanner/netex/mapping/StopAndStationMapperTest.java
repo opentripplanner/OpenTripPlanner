@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -77,7 +77,7 @@ public class StopAndStationMapperTest {
       new HierarchicalVersionMapById<>(),
       null,
       DEFAULT_TIME_ZONE,
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       false
     );
 
@@ -157,7 +157,7 @@ public class StopAndStationMapperTest {
       quaysById,
       null,
       DEFAULT_TIME_ZONE,
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       false
     );
 
@@ -226,7 +226,7 @@ public class StopAndStationMapperTest {
       new HierarchicalVersionMapById<>(),
       null,
       DEFAULT_TIME_ZONE,
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       isolated
     );
 

@@ -29,7 +29,7 @@ import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.util.HttpUtils;
+import org.opentripplanner.framework.io.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

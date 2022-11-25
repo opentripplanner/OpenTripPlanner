@@ -37,7 +37,7 @@ Used to import NeTEx transit data files.
 
 ### Transit Routing
 
-#### [Raptor transit routing](src/main/java/org/opentripplanner/transit/raptor/package.md)
+#### [Raptor transit routing](src/main/java/org/opentripplanner/raptor/package.md)
 
 This is the OTP2 new transit routing engine implemented using the Raptor algorithm. It explains how
 Raptor works, the important concepts and the design. It might be worth reading even if you are not a
@@ -53,9 +53,9 @@ implementation is highly critical code, hence we set the bar higher with respect
 OTP provides transit data to Raptor by implementing the _raptor/api/transit_ model. The
 [RoutingService](src/main/java/org/opentripplanner/routing/RoutingService.java)
 is responsible for mapping from the OTP context to a
-[RaptorRequest](src/main/java/org/opentripplanner/transit/raptor/api/request/RaptorRequest.java)
+[RaptorRequest](src/main/java/org/opentripplanner/raptor/api/request/RaptorRequest.java)
 and then map the
-result, [Raptor Path](src/main/java/org/opentripplanner/transit/raptor/api/path/Path.java), back to
+result, [Raptor Path](src/main/java/org/opentripplanner/raptor/api/path/Path.java), back to
 the OTP internal domain. This might seem like a lot of unnecessary mapping, but mapping is simple -
 routing is not.
 

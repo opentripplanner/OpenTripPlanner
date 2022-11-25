@@ -1,7 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
+import java.util.List;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Specifies a class of OSM tagged entities (e.g. ways) by a list of tags and their values (which

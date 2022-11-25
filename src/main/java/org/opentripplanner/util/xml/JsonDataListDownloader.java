@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import org.opentripplanner.util.HttpUtils;
+import org.opentripplanner.framework.io.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
