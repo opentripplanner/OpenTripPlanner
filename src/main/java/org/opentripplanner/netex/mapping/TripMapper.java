@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.MainAndSubMode;

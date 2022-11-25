@@ -15,8 +15,8 @@ import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestMapper;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
 
 public class RaptorRequestTransferCache {
 
@@ -33,7 +33,10 @@ public class RaptorRequestTransferCache {
   public RaptorTransferIndex get(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
     try {
       return transferCache.get(
-        new CacheKey(transfersByStopIndex, AStarRequestMapper.mapToTransferRequest(request).build())
+        new CacheKey(
+          transfersByStopIndex,
+          StreetSearchRequestMapper.mapToTransferRequest(request).build()
+        )
       );
     } catch (ExecutionException e) {
       throw new RuntimeException("Failed to get item from transfer cache", e);
@@ -53,10 +56,10 @@ public class RaptorRequestTransferCache {
   private static class CacheKey {
 
     private final List<List<Transfer>> transfersByStopIndex;
-    private final AStarRequest request;
+    private final StreetSearchRequest request;
     private final StreetRelevantOptions options;
 
-    private CacheKey(List<List<Transfer>> transfersByStopIndex, AStarRequest request) {
+    private CacheKey(List<List<Transfer>> transfersByStopIndex, StreetSearchRequest request) {
       this.transfersByStopIndex = transfersByStopIndex;
       this.request = request;
       this.options = new StreetRelevantOptions(request);
@@ -99,7 +102,7 @@ public class RaptorRequestTransferCache {
     private final StreetPreferences street;
     private final WheelchairPreferences wheelchairPreferences;
 
-    public StreetRelevantOptions(AStarRequest request) {
+    public StreetRelevantOptions(StreetSearchRequest request) {
       this.transferMode = request.mode();
       this.wheelchair = request.wheelchair();
 

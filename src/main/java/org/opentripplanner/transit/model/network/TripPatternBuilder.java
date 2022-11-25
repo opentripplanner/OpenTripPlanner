@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.geometry.CompactLineStringUtils;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.SlackProvider;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.geometry.CompactLineStringUtils;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 @SuppressWarnings("UnusedReturnValue")
 public final class TripPatternBuilder

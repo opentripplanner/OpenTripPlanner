@@ -1,4 +1,4 @@
-# Vehicle Parking Updaters - OTP Sandbox Extension
+# Vehicle Parking Updaters
 
 ## Contact Info
 

@@ -107,9 +107,9 @@ version the configuration in a deployment pipeline. The `configVersion` is not u
 way, but is logged at startup and is available as part of the _server-info_ data in the REST API.
 The intended usage is to be able to check which version of the configuration the graph was build
 with and which version the router uses. In an deployment with many OTP instances it can be useful to
-ask an instance about the version, instead of tracking the deployment pipline backwards to find the
+ask an instance about the version, instead of tracking the deployment pipeline backwards to find the
 version used. How you inject a version into the configuration file is up to you, but you can do it
-in your build-pipline, at deployment time or use system environment variable substituton.
+in your build-pipeline, at deployment time or use system environment variable substitution.
 
 ## OTP Serialization version id and _Graph.obj_ file header
 
@@ -122,8 +122,8 @@ graph. The header info is available to configuration substitution:
 
 The intended usage is to be able to have a graph build pipeline which "knows" which graph that
 matches OTP planner instances. For example, you may build new graphs for every OTP serialization
-version id in use by the planning OPT instances you have deploied and plan to deploy. This way you
-can roll forward and backward new OTP instances without worring about building new graphs.
+version id in use by the planning OTP instances you have deployed and plan to deploy. This way you
+can roll forward and backward new OTP instances without worrying about building new graphs.
 
 There are various ways to access this information. To get the `Graph.obj` serialization version id
 you can run the following bash command:

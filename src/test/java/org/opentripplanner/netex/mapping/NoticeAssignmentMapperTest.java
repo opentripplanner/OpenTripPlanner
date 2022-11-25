@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -52,7 +52,7 @@ public class NoticeAssignmentMapperTest {
     routesById.add(route);
 
     NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       List.of(),
       new HierarchicalMapById<>(),
@@ -103,7 +103,7 @@ public class NoticeAssignmentMapperTest {
       .withNoticeRef(new NoticeRefStructure().withRef(NOTICE_ID));
 
     NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       serviceJourneys,
       noticesById,

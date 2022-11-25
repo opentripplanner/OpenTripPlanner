@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
 
 import java.io.BufferedOutputStream;
@@ -26,22 +25,22 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.operation.TransformException;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.logging.ProgressTracker;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ElevationFlattened;
 import org.opentripplanner.graph_builder.issues.ElevationProfileFailure;
 import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetElevationExtension;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetElevationExtension;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.geometry.GeometryUtils;
-import org.opentripplanner.util.logging.ProgressTracker;
-import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +109,7 @@ public class ElevationModule implements GraphBuilderModule {
     this(
       factory,
       graph,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       null,
       new HashMap<>(),
       false,

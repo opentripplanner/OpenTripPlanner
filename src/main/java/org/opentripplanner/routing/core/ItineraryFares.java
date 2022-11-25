@@ -11,9 +11,9 @@ import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.LegProducts;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * <p>

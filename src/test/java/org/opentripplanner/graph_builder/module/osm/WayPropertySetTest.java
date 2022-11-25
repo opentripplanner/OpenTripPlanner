@@ -2,8 +2,8 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;

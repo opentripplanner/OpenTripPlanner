@@ -3,9 +3,9 @@ package org.opentripplanner.model.modes;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 class AllowMainModesFilter implements AllowTransitModeFilter {
 

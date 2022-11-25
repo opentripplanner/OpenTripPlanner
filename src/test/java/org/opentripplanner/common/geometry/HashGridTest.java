@@ -10,6 +10,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.strtree.STRtree;
+import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 
 public class HashGridTest {
 

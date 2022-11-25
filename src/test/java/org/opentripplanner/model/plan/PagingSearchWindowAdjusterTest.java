@@ -1,14 +1,13 @@
 package org.opentripplanner.model.plan;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.util.time.DurationUtils.duration;
+import static org.opentripplanner.framework.time.DurationUtils.duration;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.common.model.P2;
 
 class PagingSearchWindowAdjusterTest {
 
@@ -69,27 +68,27 @@ class PagingSearchWindowAdjusterTest {
   void normalizeSearchWindow() {
     var cases = List.of(
       // Smallest searchWindow allowed is 10 min
-      new P2<>(10, -100),
-      new P2<>(10, 0),
-      new P2<>(10, 10),
+      new TestCase(10, -100),
+      new TestCase(10, 0),
+      new TestCase(10, 10),
       // sw <= 4h, the round up to closest 10 min
-      new P2<>(20, 11),
-      new P2<>(230, 230),
-      new P2<>(240, 231),
-      new P2<>(240, 240),
+      new TestCase(20, 11),
+      new TestCase(230, 230),
+      new TestCase(240, 231),
+      new TestCase(240, 240),
       // sw > 4h, the round up to the closest 30 min
-      new P2<>(270, 241),
-      new P2<>(300, 300),
-      new P2<>(330, 301),
+      new TestCase(270, 241),
+      new TestCase(300, 300),
+      new TestCase(330, 301),
       // Max is 24 hours
-      new P2<>(24 * 60, 24 * 60),
-      new P2<>(24 * 60, 99_999_999)
+      new TestCase(24 * 60, 24 * 60),
+      new TestCase(24 * 60, 99_999_999)
     );
 
-    for (P2<Integer> tc : cases) {
+    for (TestCase tc : cases) {
       assertEquals(
-        Duration.ofMinutes(tc.first),
-        subject.normalizeSearchWindow(tc.second * 60),
+        Duration.ofMinutes(tc.expectedMinutes()),
+        subject.normalizeSearchWindow(tc.inputMinutes() * 60),
         "[exp nSeconds, input nSeconds]: " + tc
       );
     }
@@ -113,4 +112,6 @@ class PagingSearchWindowAdjusterTest {
     assertEquals(3, PagingSearchWindowAdjuster.ceiling(3, 3));
     assertEquals(6, PagingSearchWindowAdjuster.ceiling(4, 3));
   }
+
+  private record TestCase(int expectedMinutes, int inputMinutes) {}
 }
