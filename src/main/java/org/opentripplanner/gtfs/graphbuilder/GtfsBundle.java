@@ -52,9 +52,8 @@ public class GtfsBundle {
 
   public GtfsBundle(ConfiguredDataSource<GtfsFeedParameters> configuredDataSource) {
     this.dataSource = (CompositeDataSource) configuredDataSource.dataSource();
-    if (configuredDataSource.config().feedId().isPresent()) {
-      this.feedId =
-        new GtfsFeedId.Builder().id(configuredDataSource.config().feedId().get()).build();
+    if (configuredDataSource.config().feedId() != null) {
+      this.feedId = new GtfsFeedId.Builder().id(configuredDataSource.config().feedId()).build();
     }
     this.removeRepeatedStops = configuredDataSource.config().removeRepeatedStops();
     this.stationTransferPreference = configuredDataSource.config().stationTransferPreference();
