@@ -12,7 +12,7 @@ After the graph is built, copy it into `./test/performance/${location}` and exec
 command to run the speed test:
 
 ```
-mvn exec:java -Dexec.mainClass="org.opentripplanner.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${location} -p md -n 4 -i 3 -0"
+mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${location} -p md -n 4 -i 3 -0"
 ```
 
 The results will be displayed on the console.
