@@ -146,6 +146,22 @@ public class RouteMapperTest {
       result.getGroupsOfRoutes().stream().map(g -> g.getId().getId()).toList()
     );
   }
+  @Test
+  public void carpool() {
+    Route input = new Route();
+
+    input.setId(ROUTE_ID);
+    input.setAgency(AGENCY);
+    input.setType(1700);
+    input.setShortName(SHORT_NAME);
+
+    var result = subject.map(input);
+
+    assertEquals(
+      TransitMode.CARPOOL,
+      result.getMode()
+    );
+  }
 
   /**
    * Mapping the same object twice, should return the same instance.
