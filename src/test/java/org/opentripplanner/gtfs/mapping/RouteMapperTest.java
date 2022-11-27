@@ -147,7 +147,7 @@ public class RouteMapperTest {
     );
   }
   @Test
-  public void carpool() {
+  void carpool() {
     Route input = new Route();
 
     input.setId(ROUTE_ID);
