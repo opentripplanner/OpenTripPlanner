@@ -13,7 +13,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -94,7 +93,6 @@ class OsmBoardingLocationsModuleTest {
       Set.of("ref", "ref:IFOPT"),
       graph,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       areaVisibility
     );
 

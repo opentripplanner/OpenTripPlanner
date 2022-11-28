@@ -10,8 +10,7 @@
   },
 
   "osmDefaults": {
-    "timeZone": "Europe/Rome",
-    "osmTagMapping": "atlanta"
+    "osmTagMapping": "default"
   },
   "osm": [{
     "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",

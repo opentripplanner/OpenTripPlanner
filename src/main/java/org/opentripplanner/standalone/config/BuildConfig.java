@@ -22,7 +22,7 @@ import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -148,8 +148,8 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final Boolean extraEdgesStopPlatformLink;
   public final NetexFeedParameters netexDefaults;
 
-  public final OsmDefaultParameters osmDefaults;
   public final DemExtractParameters demDefaults;
+  public final OsmExtractParameters osmDefaults;
 
   public final List<RouteRequest> transferRequests;
 
@@ -677,10 +677,9 @@ Netex data is also often supplied in a ZIP file.
         .asUri(null);
 
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
-    osm = OsmConfig.mapOsmConfig(root, "osm");
+    osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);
     demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
-
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     transitFeeds = TransitFeedConfig.mapTransitFeeds(root, "transitFeeds", netexDefaults);
 
