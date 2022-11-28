@@ -4,8 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.rutebanken.netex.model.ContactStructure;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Operator;
@@ -28,7 +29,7 @@ public class OperatorToAgencyMapperTest {
     // When mapped
     org.opentripplanner.transit.model.organization.Operator o;
     o =
-      new OperatorToAgencyMapper(DataImportIssueStore.noopIssueStore(), MappingSupport.ID_FACTORY)
+      new OperatorToAgencyMapper(DataImportIssueStore.NOOP, MappingSupport.ID_FACTORY)
         .mapOperator(operator);
 
     // Then expect
@@ -48,7 +49,7 @@ public class OperatorToAgencyMapperTest {
     // When mapped
     org.opentripplanner.transit.model.organization.Operator o;
     o =
-      new OperatorToAgencyMapper(DataImportIssueStore.noopIssueStore(), MappingSupport.ID_FACTORY)
+      new OperatorToAgencyMapper(DataImportIssueStore.NOOP, MappingSupport.ID_FACTORY)
         .mapOperator(operator);
 
     // Then expect
@@ -65,7 +66,7 @@ public class OperatorToAgencyMapperTest {
 
     // When mapped
     org.opentripplanner.transit.model.organization.Operator o;
-    DataImportIssueStore issueStore = new DataImportIssueStore();
+    DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
     o = new OperatorToAgencyMapper(issueStore, MappingSupport.ID_FACTORY).mapOperator(operator);
 
     // Then expect
@@ -73,8 +74,8 @@ public class OperatorToAgencyMapperTest {
     assertEquals(ID, o.getName());
     assertNull(o.getUrl());
     assertNull(o.getPhone());
-    assertEquals(1, issueStore.getIssues().size());
-    DataImportIssue dataImportIssue = issueStore.getIssues().get(0);
+    assertEquals(1, issueStore.listIssues().size());
+    DataImportIssue dataImportIssue = issueStore.listIssues().get(0);
     assertEquals("MissingOperatorName", dataImportIssue.getType());
   }
 }

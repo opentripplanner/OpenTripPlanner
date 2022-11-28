@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.api.request.framework;
 
-import static org.opentripplanner.util.lang.OtpNumberFormat.formatTwoDecimals;
-import static org.opentripplanner.util.lang.OtpNumberFormat.formatZeroDecimal;
+import static org.opentripplanner.framework.lang.OtpNumberFormat.formatTwoDecimals;
+import static org.opentripplanner.framework.lang.OtpNumberFormat.formatZeroDecimal;
 
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.util.lang.DoubleUtils;
 
 /**
  * This is a factory for creating functions which can be used as parameters in the {@link

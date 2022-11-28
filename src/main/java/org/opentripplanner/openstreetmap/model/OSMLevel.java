@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.FloorNumberUnknownAssumedGroundLevel;
 import org.opentripplanner.graph_builder.issues.FloorNumberUnknownGuessedFromAltitude;
 

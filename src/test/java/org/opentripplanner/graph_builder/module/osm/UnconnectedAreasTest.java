@@ -4,22 +4,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
-import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
+import org.opentripplanner.street.model.edge.VehicleParkingEdge;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -36,7 +35,7 @@ public class UnconnectedAreasTest {
    */
   @Test
   public void unconnectedCarParkAndRide() {
-    DataImportIssueStore issueStore = new DataImportIssueStore();
+    DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
     Graph gg = buildOSMGraph("P+R.osm.pbf", issueStore);
 
     assertEquals(1, getParkAndRideUnlinkedIssueCount(issueStore));
@@ -53,7 +52,7 @@ public class UnconnectedAreasTest {
 
   @Test
   public void unconnectedBikeParkAndRide() {
-    DataImportIssueStore issueStore = new DataImportIssueStore();
+    DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
     Graph gg = buildOSMGraph("B+R.osm.pbf", issueStore);
 
     assertEquals(2, getParkAndRideUnlinkedIssueCount(issueStore));
@@ -113,7 +112,7 @@ public class UnconnectedAreasTest {
    * there. Additionally, the node of the ring is duplicated to test this corner case.
    */
   @Test
-  public void testRoadPassingOverDuplicatedNode() throws URISyntaxException {
+  public void testRoadPassingOverDuplicatedNode() {
     List<String> connections = testGeometricGraphWithClasspathFile(
       "coincident_pr_dupl.osm.pbf",
       1,
@@ -145,7 +144,7 @@ public class UnconnectedAreasTest {
   }
 
   private Graph buildOSMGraph(String osmFileName) {
-    return buildOSMGraph(osmFileName, DataImportIssueStore.noopIssueStore());
+    return buildOSMGraph(osmFileName, DataImportIssueStore.NOOP);
   }
 
   private Graph buildOSMGraph(String osmFileName, DataImportIssueStore issueStore) {
@@ -163,7 +162,6 @@ public class UnconnectedAreasTest {
       Set.of(),
       graph,
       issueStore,
-      new DefaultMapper(),
       true
     );
     loader.staticParkAndRide = true;
@@ -221,9 +219,9 @@ public class UnconnectedAreasTest {
     return connections;
   }
 
-  private int getParkAndRideUnlinkedIssueCount(DataImportIssueStore issueStore) {
+  private int getParkAndRideUnlinkedIssueCount(DefaultDataImportIssueStore issueStore) {
     return (int) issueStore
-      .getIssues()
+      .listIssues()
       .stream()
       .filter(dataImportIssue -> dataImportIssue instanceof ParkAndRideUnlinked)
       .count();

@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.validation;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.netex.issues.ObjectNotFound;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.OperatingDayRefStructure;

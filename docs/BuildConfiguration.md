@@ -77,12 +77,12 @@ Sections follow that describe particular settings in more depth.
 |    [sharedGroupFilePattern](#nd_sharedGroupFilePattern)                  |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                            | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
 |    [ferryIdsNotAllowedForBicycle](#nd_ferryIdsNotAllowedForBicycle)      |  `string[]` | List ferries which do not allow bikes.                                                                                      | *Optional* |                                   |  2.0  |
 | [osm](#osm)                                                              |  `object[]` | Configure properties for a given OpenStreetMap feed.                                                                        | *Optional* |                                   |  2.2  |
-|       [osmTagMapping](#osm_0_osmTagMapping)                              |    `enum`   | The named set of mapping rules applied when parsing OSM tags.                                                               | *Optional* | `"default"`                       |  2.2  |
+|       [osmTagMapping](#osm_0_osmTagMapping)                              |    `enum`   | The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.               | *Optional* | `"default"`                       |  2.2  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
-|       timeZone                                                           | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                       | *Optional* |                                   |  2.2  |
+|       timeZone                                                           | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in `osmDefaults`.                     | *Optional* |                                   |  2.2  |
 | osmDefaults                                                              |   `object`  | Default properties for OpenStreetMap feeds.                                                                                 | *Optional* |                                   |  2.2  |
 |    [osmTagMapping](#od_osmTagMapping)                                    |    `enum`   | The named set of mapping rules applied when parsing OSM tags.                                                               | *Optional* | `"default"`                       |  2.2  |
-|    timeZone                                                              | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                       | *Optional* |                                   |  2.2  |
+|    timeZone                                                              | `time-zone` | The timezone used to resolve opening hours in OSM data.                                                                     | *Optional* |                                   |  2.2  |
 | osmNaming                                                                |   `object`  | A custom OSM namer to use.                                                                                                  | *Optional* |                                   |  2.0  |
 | [transferRequests](RouteRequest.md)                                      |  `object[]` | Routing requests to use for pre-calculating stop-to-stop transfers.                                                         | *Optional* |                                   |  2.1  |
 | [transitFeeds](#transitFeeds)                                            |  `object[]` | Scan for transit data files                                                                                                 | *Optional* |                                   |  2.2  |
@@ -936,7 +936,7 @@ the local filesystem.
 **Path:** /osm/[0]   
 **Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston`
 
-The named set of mapping rules applied when parsing OSM tags.
+The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.
 
 <h3 id="od_osmTagMapping">osmTagMapping</h3>
 
@@ -1073,8 +1073,7 @@ case where this is not the case.
     "netex" : "(?i)netex"
   },
   "osmDefaults" : {
-    "timeZone" : "Europe/Rome",
-    "osmTagMapping" : "atlanta"
+    "osmTagMapping" : "default"
   },
   "osm" : [ {
     "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",

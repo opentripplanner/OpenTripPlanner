@@ -12,11 +12,11 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
-import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
+import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -37,7 +37,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
  * <p>
  * {@see https://github.com/opentripplanner/OpenTripPlanner/pull/3906}
  */
-public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
+public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Edge> {
 
   public static final Set<StreetMode> applicableModes = Set.of(
     BIKE_TO_PARK,

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * The purpose of this class is to hold all parameters and their value in a map. It also contains
