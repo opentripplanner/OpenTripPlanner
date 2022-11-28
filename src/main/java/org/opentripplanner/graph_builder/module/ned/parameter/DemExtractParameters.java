@@ -11,6 +11,8 @@ public class DemExtractParameters implements DataSourceConfig {
 
   public static final double DEFAULT_ELEVATION_UNIT_MULTIPLIER = 1;
 
+  public static final DemExtractParameters DEFAULT = new DemExtractParametersBuilder().build();
+
   private final URI source;
 
   /**

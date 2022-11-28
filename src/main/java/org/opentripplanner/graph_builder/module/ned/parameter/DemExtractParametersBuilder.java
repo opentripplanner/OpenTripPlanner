@@ -5,13 +5,15 @@ import java.net.URI;
 public class DemExtractParametersBuilder {
 
   private URI source;
-  private Double elevationUnitMultiplier = DemExtractParameters.DEFAULT_ELEVATION_UNIT_MULTIPLIER;
+  private Double elevationUnitMultiplier;
 
   URI source() {
     return source;
   }
 
-  public DemExtractParametersBuilder() {}
+  public DemExtractParametersBuilder() {
+    this.elevationUnitMultiplier = DemExtractParameters.DEFAULT_ELEVATION_UNIT_MULTIPLIER;
+  }
 
   public DemExtractParametersBuilder(DemExtractParameters original) {
     this.elevationUnitMultiplier = original.elevationUnitMultiplier();

@@ -57,7 +57,7 @@ Sections follow that describe particular settings in more depth.
 | [boardingLocationTags](#boardingLocationTags)                            |  `string[]` | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                  | *Optional* |                                   |  2.2  |
 | [dataOverlay](sandbox/DataOverlay.md)                                    |   `object`  | Config for the DataOverlay Sandbox module                                                                                   | *Optional* |                                   |  2.2  |
 | [dem](#dem)                                                              |  `object[]` | Specify parameters for DEM extracts.                                                                                        | *Optional* |                                   |  2.2  |
-|       [elevationUnitMultiplier](#dem_0_elevationUnitMultiplier)          |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* | `1.0`                             |  2.2  |
+|       [elevationUnitMultiplier](#dem_0_elevationUnitMultiplier)          |   `double`  | Specify a multiplier to convert elevation units from source to meters. Overrides the value specified in `demDefaults`.      | *Optional* | `1.0`                             |  2.3  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
 | demDefaults                                                              |   `object`  | Default properties for DEM extracts.                                                                                        | *Optional* |                                   |  2.3  |
 |    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)       |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* | `1.0`                             |  2.3  |
@@ -731,15 +731,14 @@ the command line.
 
 <h3 id="dem_0_elevationUnitMultiplier">elevationUnitMultiplier</h3>
 
-**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`   
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`   
 **Path:** /dem/[0] 
 
-Specify a multiplier to convert elevation units from source to meters.
+Specify a multiplier to convert elevation units from source to meters. Overrides the value specified in `demDefaults`.
 
-  Unit conversion multiplier for elevation values. No conversion needed if the elevation
-  values are defined in meters in the source data. If, for example, decimetres are used
-  in the source data, this should be set to 0.1. This overrides the value specified in
-  `demDefaults`.
+Unit conversion multiplier for elevation values. No conversion needed if the elevation
+values are defined in meters in the source data. If, for example, decimetres are used
+in the source data, this should be set to 0.1.
 
 
 <h3 id="demDefaults_elevationUnitMultiplier">elevationUnitMultiplier</h3>
