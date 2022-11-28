@@ -36,7 +36,8 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                   | *Optional* |               |  2.1  |
 | [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
 | [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |   na  |
-| flex                                                                                      |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |   na  |
+| flex                                                                                      |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |  2.1  |
+|    [maxFlexTripDuration](#flex_maxFlexTripDuration)                                       |       `duration`      | How long can a non-scheduled flex trip at maximum be.                                             | *Optional* | `"PT45M"`     |  2.3  |
 |    [maxTransferDurationSeconds](#flex_maxTransferDurationSeconds)                         |       `integer`       | How long should you be allowed to walk from a flex vehicle to a transit one.                      | *Optional* | `300`         |  2.1  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
@@ -143,6 +144,15 @@ search-window.
 
 The search aborts after this duration and any paths found are returned to the client.
 
+
+<h3 id="flex_maxFlexTripDuration">maxFlexTripDuration</h3>
+
+**Since version:** `2.3` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT45M"`   
+**Path:** /flex 
+
+How long can a non-scheduled flex trip at maximum be.
+
+This is used for all trips which are of type `UnscheduledTrip`. The value includes the access/egress duration to the boarding/alighting of the flex trip, as well as the connection to the transit stop.
 
 <h3 id="flex_maxTransferDurationSeconds">maxTransferDurationSeconds</h3>
 

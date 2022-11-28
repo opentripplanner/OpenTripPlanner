@@ -32,13 +32,13 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
  */
 public class StreetFlexPathCalculator implements FlexPathCalculator {
 
-  private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
-
   private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> cache = new HashMap<>();
   private final boolean reverseDirection;
+  private final Duration maxFlexTripDuration;
 
-  public StreetFlexPathCalculator(boolean reverseDirection) {
+  public StreetFlexPathCalculator(boolean reverseDirection, Duration maxFlexTripDuration) {
     this.reverseDirection = reverseDirection;
+    this.maxFlexTripDuration = maxFlexTripDuration;
   }
 
   @Override
@@ -80,7 +80,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
     return StreetSearchBuilder
       .of()
-      .setSkipEdgeStrategy(new DurationSkipEdgeStrategy(MAX_FLEX_TRIP_DURATION))
+      .setSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxFlexTripDuration))
       .setDominanceFunction(new DominanceFunctions.EarliestArrival())
       .setRequest(routingRequest)
       .setStreetRequest(new StreetRequest(StreetMode.CAR))

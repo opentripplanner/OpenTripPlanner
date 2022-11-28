@@ -110,10 +110,7 @@ number of transit vehicles used in that itinerary.
       RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
     this.updatersParameters = new UpdatersConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
-    this.flexConfig =
-      new FlexConfig(
-        root.of("flex").since(NA).summary("Configuration for flex routing.").asObject()
-      );
+    this.flexConfig = new FlexConfig(root, "flex");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllUnusedParameters(LOG::warn);

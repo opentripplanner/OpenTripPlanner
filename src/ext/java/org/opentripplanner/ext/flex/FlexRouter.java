@@ -36,7 +36,7 @@ public class FlexRouter {
 
   private final Graph graph;
   private final TransitService transitService;
-  private final FlexParameters parameters;
+  private final FlexConfig config;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
   private final FlexIndex flexIndex;
@@ -69,7 +69,7 @@ public class FlexRouter {
   ) {
     this.graph = graph;
     this.transitService = transitService;
-    this.parameters = new FlexParameters((config.maxTransferSeconds * walkSpeed));
+    this.config = config;
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
@@ -81,8 +81,10 @@ public class FlexRouter {
       );
 
     if (graph.hasStreets) {
-      this.accessFlexPathCalculator = new StreetFlexPathCalculator(false);
-      this.egressFlexPathCalculator = new StreetFlexPathCalculator(true);
+      this.accessFlexPathCalculator =
+        new StreetFlexPathCalculator(false, config.maxFlexTripDuration());
+      this.egressFlexPathCalculator =
+        new StreetFlexPathCalculator(true, config.maxFlexTripDuration());
     } else {
       // this is only really useful in tests. in real world scenarios you're unlikely to get useful
       // results if you don't have streets
@@ -177,7 +179,7 @@ public class FlexRouter {
             .filter(date -> date.isFlexTripRunning(t2.second, this.transitService))
             // Create templates from trip, boarding at the nearbyStop
             .flatMap(date ->
-              t2.second.getFlexAccessTemplates(t2.first, date, accessFlexPathCalculator, parameters)
+              t2.second.getFlexAccessTemplates(t2.first, date, accessFlexPathCalculator, config)
             )
         )
         .collect(Collectors.toList());
@@ -199,7 +201,7 @@ public class FlexRouter {
             .filter(date -> date.isFlexTripRunning(t2.second, this.transitService))
             // Create templates from trip, alighting at the nearbyStop
             .flatMap(date ->
-              t2.second.getFlexEgressTemplates(t2.first, date, egressFlexPathCalculator, parameters)
+              t2.second.getFlexEgressTemplates(t2.first, date, egressFlexPathCalculator, config)
             )
         )
         .collect(Collectors.toList());

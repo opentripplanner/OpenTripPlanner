@@ -4,7 +4,6 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -13,6 +12,7 @@ import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -30,9 +30,9 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     StopLocation transferStop,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    FlexParameters flexParams
+    FlexConfig config
   ) {
-    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator, flexParams);
+    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator, config);
   }
 
   public Itinerary createDirectGraphPath(

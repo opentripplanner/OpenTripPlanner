@@ -96,7 +96,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
 
-    var accesses = trip.getFlexAccessTemplates(nearbyStop, flexDate, calculator, params).toList();
+    var accesses = trip
+      .getFlexAccessTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
+      .toList();
 
     assertEquals(3, accesses.size());
 
@@ -109,7 +111,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   void calculateEgressTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
-    var egresses = trip.getFlexEgressTemplates(nearbyStop, flexDate, calculator, params).toList();
+    var egresses = trip
+      .getFlexEgressTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
+      .toList();
 
     assertEquals(3, egresses.size());
 

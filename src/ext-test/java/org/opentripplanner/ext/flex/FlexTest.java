@@ -38,7 +38,6 @@ public abstract class FlexTest {
     secondsSinceMidnight,
     new TIntHashSet()
   );
-  static final FlexParameters params = new FlexParameters(300);
 
   static TestOtpModel buildFlexGraph(String fileName) {
     File file = null;
