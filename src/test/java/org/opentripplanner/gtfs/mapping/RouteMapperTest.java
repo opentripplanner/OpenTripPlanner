@@ -146,6 +146,7 @@ public class RouteMapperTest {
       result.getGroupsOfRoutes().stream().map(g -> g.getId().getId()).toList()
     );
   }
+
   @Test
   void carpool() {
     Route input = new Route();
@@ -157,10 +158,7 @@ public class RouteMapperTest {
 
     var result = subject.map(input);
 
-    assertEquals(
-      TransitMode.CARPOOL,
-      result.getMode()
-    );
+    assertEquals(TransitMode.CARPOOL, result.getMode());
   }
 
   /**

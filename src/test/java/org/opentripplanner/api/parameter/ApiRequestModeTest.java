@@ -12,5 +12,4 @@ class ApiRequestModeTest {
   void carpool() {
     assertEquals(List.of(CARPOOL), ApiRequestMode.CARPOOL.getTransitModes());
   }
-
 }
