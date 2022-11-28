@@ -9,7 +9,6 @@ import java.util.Set;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -49,7 +48,6 @@ public class FakeGraph {
       Set.of(),
       gg,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       true
     );
 

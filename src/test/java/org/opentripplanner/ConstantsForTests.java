@@ -19,7 +19,6 @@ import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -138,7 +137,6 @@ public class ConstantsForTests {
           // Need to use a mutable set here, since it is used
           graph,
           DataImportIssueStore.NOOP,
-          new DefaultMapper(),
           false
         );
         osmModule.staticBikeParkAndRide = true;
@@ -188,7 +186,6 @@ public class ConstantsForTests {
         Set.of(),
         graph,
         DataImportIssueStore.NOOP,
-        new DefaultMapper(),
         false
       );
       osmModule.buildGraph();
@@ -247,7 +244,6 @@ public class ConstantsForTests {
           Set.of(),
           graph,
           DataImportIssueStore.NOOP,
-          new DefaultMapper(),
           false
         );
         osmModule.buildGraph();
