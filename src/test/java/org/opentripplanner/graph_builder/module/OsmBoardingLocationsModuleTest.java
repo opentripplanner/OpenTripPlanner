@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 
 import java.io.File;
 import java.util.List;
@@ -12,17 +11,18 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
+import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
@@ -93,7 +93,7 @@ class OsmBoardingLocationsModuleTest {
       List.of(provider),
       Set.of("ref", "ref:IFOPT"),
       graph,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       new DefaultMapper(),
       areaVisibility
     );

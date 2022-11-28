@@ -3,8 +3,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 
 public class DefaultCostCalculatorTest {
 

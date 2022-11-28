@@ -2,8 +2,8 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.model.plan.ElevationProfile.Step;
 import org.opentripplanner.model.plan.WalkStep;
 
 public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStep {
@@ -14,8 +14,8 @@ public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Iterable<P2<Double>>> elevationProfile() {
-    return environment -> getSource(environment).getRoundedElevation();
+  public DataFetcher<Iterable<Step>> elevationProfile() {
+    return environment -> getSource(environment).getElevationProfile().steps();
   }
 
   @Override

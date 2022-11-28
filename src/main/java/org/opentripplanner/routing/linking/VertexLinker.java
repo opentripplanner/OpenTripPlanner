@@ -12,22 +12,21 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graph.index.EdgeSpatialIndex;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
+import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
+import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TemporarySplitterVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -441,17 +440,17 @@ public class VertexLinker {
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
-    P2<StreetEdge> newEdges = scope == Scope.PERMANENT
+    var newEdges = scope == Scope.PERMANENT
       ? originalEdge.splitDestructively(v)
       : originalEdge.splitNonDestructively(v, tempEdges, direction);
 
     if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges
-      if (newEdges.first != null) {
-        edgeSpatialIndex.insert(newEdges.first.getGeometry(), newEdges.first, scope);
+      if (newEdges.head() != null) {
+        edgeSpatialIndex.insert(newEdges.head().getGeometry(), newEdges.head(), scope);
       }
-      if (newEdges.second != null) {
-        edgeSpatialIndex.insert(newEdges.second.getGeometry(), newEdges.second, scope);
+      if (newEdges.tail() != null) {
+        edgeSpatialIndex.insert(newEdges.tail().getGeometry(), newEdges.tail(), scope);
       }
 
       if (scope == Scope.PERMANENT) {
@@ -497,4 +496,6 @@ public class VertexLinker {
       return Objects.equals(item, that.item);
     }
   }
+
+  private record StreetEdgePair(StreetEdge e0, StreetEdge e1) {}
 }

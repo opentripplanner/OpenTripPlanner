@@ -38,7 +38,8 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -72,14 +73,13 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLQueryTypeImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLQueryType {
 
   // TODO: figure out a runtime solution
   private static final DirectionMapper DIRECTION_MAPPER = new DirectionMapper(
-    DataImportIssueStore.noopIssueStore()
+    DataImportIssueStore.NOOP
   );
 
   public static <T> boolean hasArgument(Map<String, T> m, String name) {

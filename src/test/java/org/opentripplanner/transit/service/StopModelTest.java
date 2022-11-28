@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
@@ -17,7 +18,6 @@ import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 class StopModelTest {
 

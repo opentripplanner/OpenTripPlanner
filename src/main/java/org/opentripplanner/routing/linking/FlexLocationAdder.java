@@ -3,12 +3,12 @@ package org.opentripplanner.routing.linking;
 import java.util.HashSet;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 class FlexLocationAdder {
 

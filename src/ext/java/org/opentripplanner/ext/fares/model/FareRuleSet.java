@@ -3,16 +3,13 @@ package org.opentripplanner.ext.fares.model;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class FareRuleSet implements Serializable {
 
-  private static final long serialVersionUID = 7218355718876553028L;
-
   private FeedScopedId agency = null;
   private final Set<FeedScopedId> routes;
-  private final Set<P2<String>> originDestinations;
+  private final Set<OriginDestination> originDestinations;
 
   private final Set<RouteOriginDestination> routeOriginDestinations;
   private final Set<String> contains;
@@ -29,11 +26,7 @@ public class FareRuleSet implements Serializable {
   }
 
   public void addOriginDestination(String origin, String destination) {
-    originDestinations.add(new P2<>(origin, destination));
-  }
-
-  public Set<P2<String>> getOriginDestinations() {
-    return originDestinations;
+    originDestinations.add(new OriginDestination(origin, destination));
   }
 
   /**
@@ -85,11 +78,11 @@ public class FareRuleSet implements Serializable {
   ) {
     //check for matching origin/destination, if this ruleset has any origin/destination restrictions
     if (originDestinations.size() > 0) {
-      P2<String> od = new P2<>(startZone, endZone);
+      var od = new OriginDestination(startZone, endZone);
       if (!originDestinations.contains(od)) {
-        P2<String> od2 = new P2<>(od.first, null);
+        var od2 = new OriginDestination(od.origin, null);
         if (!originDestinations.contains(od2)) {
-          od2 = new P2<>(null, od.first);
+          od2 = new OriginDestination(null, od.origin);
           if (!originDestinations.contains(od2)) {
             return false;
           }
@@ -132,4 +125,6 @@ public class FareRuleSet implements Serializable {
   public void setAgency(FeedScopedId agency) {
     this.agency = agency;
   }
+
+  record OriginDestination(String origin, String destination) {}
 }

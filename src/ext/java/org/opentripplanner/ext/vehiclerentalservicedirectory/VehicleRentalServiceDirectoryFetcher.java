@@ -6,12 +6,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
-import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

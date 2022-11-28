@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.model;
 
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
-import static org.opentripplanner.OtpArchitectureModules.GEO_UTIL;
+import static org.opentripplanner.OtpArchitectureModules.GEO_UTILS;
 import static org.opentripplanner.OtpArchitectureModules.JACKSON_ANNOTATIONS;
-import static org.opentripplanner.OtpArchitectureModules.JTS_GEOM;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_ADAPTER_API;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
 import static org.opentripplanner.OtpArchitectureModules.TRANSIT_MODEL;
+import static org.opentripplanner.OtpArchitectureModules.UTIL;
 import static org.opentripplanner.OtpArchitectureModules.UTILS;
 
 import org.junit.jupiter.api.Disabled;
@@ -17,7 +17,7 @@ import org.opentripplanner._support.arch.Package;
 
 public class TransitModelArchitectureTest {
 
-  private static final Package FRAMEWORK = TRANSIT_MODEL.subPackage("framework");
+  private static final Package TRANSIT_FRAMEWORK = TRANSIT_MODEL.subPackage("framework");
   private static final Package BASIC = TRANSIT_MODEL.subPackage("basic");
   private static final Package ORGANIZATION = TRANSIT_MODEL.subPackage("organization");
   private static final Package NETWORK = TRANSIT_MODEL.subPackage("network");
@@ -26,19 +26,37 @@ public class TransitModelArchitectureTest {
   private static final Package LEGACY_MODEL = OTP_ROOT.subPackage("model");
 
   @Test
-  void enforcePackageDependencies() {
-    FRAMEWORK.dependsOn(UTILS).verify();
-    BASIC.dependsOn(UTILS, JTS_GEOM, FRAMEWORK).verify();
-    ORGANIZATION.dependsOn(UTILS, FRAMEWORK, BASIC).verify();
+  void enforceFrameworkPackageDependencies() {
+    TRANSIT_FRAMEWORK.dependsOn(UTILS).verify();
+  }
+
+  @Test
+  void enforceBasicPackageDependencies() {
+    // TODO Remove dependency to resources
+    var resources = UTIL.subPackage("resources");
+    BASIC.dependsOn(UTILS, GEO_UTILS, resources, TRANSIT_FRAMEWORK).verify();
+  }
+
+  @Test
+  void enforceOrganizationPackageDependencies() {
+    ORGANIZATION.dependsOn(UTILS, TRANSIT_FRAMEWORK, BASIC).verify();
+  }
+
+  @Test
+  void enforceSitePackageDependencies() {
     SITE
-      .dependsOn(UTILS, JACKSON_ANNOTATIONS, JTS_GEOM, GEO_UTIL, FRAMEWORK, BASIC, ORGANIZATION)
+      .dependsOn(UTILS, JACKSON_ANNOTATIONS, GEO_UTILS, TRANSIT_FRAMEWORK, BASIC, ORGANIZATION)
       .verify();
+  }
+
+  @Test
+  void enforceNetworkPackageDependencies() {
     // TODO OTP2 temporarily allow circular dependency between network and timetable
     NETWORK
       .dependsOn(
         UTILS,
-        JTS_GEOM,
-        FRAMEWORK,
+        GEO_UTILS,
+        TRANSIT_FRAMEWORK,
         BASIC,
         ORGANIZATION,
         SITE,
@@ -48,8 +66,12 @@ public class TransitModelArchitectureTest {
         RAPTOR_ADAPTER_API
       )
       .verify();
+  }
+
+  @Test
+  void enforceTimetablePackageDependencies() {
     TIMETABLE
-      .dependsOn(UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL)
+      .dependsOn(UTILS, TRANSIT_FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL)
       .verify();
   }
 

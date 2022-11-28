@@ -4,13 +4,13 @@ import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

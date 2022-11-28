@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.index.api;
 
-import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 
 /**
  * This interface is used to make validation rules which can be passed to a hierarchical map. The

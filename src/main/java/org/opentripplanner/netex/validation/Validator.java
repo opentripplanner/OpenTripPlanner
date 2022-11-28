@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.validation;
 
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.hierarchy.AbstractHierarchicalMap;
 import org.slf4j.Logger;

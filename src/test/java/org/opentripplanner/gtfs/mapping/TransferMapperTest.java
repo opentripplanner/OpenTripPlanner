@@ -5,7 +5,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 
@@ -15,7 +15,7 @@ public class TransferMapperTest {
 
   private static final TranslationHelper TRANSLATION_HELPER = new TranslationHelper();
 
-  public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.noopIssueStore();
+  public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
 
   private static final RouteMapper ROUTE_MAPPER = new RouteMapper(
     new AgencyMapper(FEED_ID),
@@ -61,8 +61,6 @@ public class TransferMapperTest {
 
   private static final Transfer TRANSFER = new Transfer();
 
-  private static final DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
-
   private final TransferMapper subject = new TransferMapper(
     ROUTE_MAPPER,
     STATION_MAPPER,
@@ -70,7 +68,7 @@ public class TransferMapperTest {
     TRIP_MAPPER,
     new TripStopTimes(),
     false,
-    issueStore
+    ISSUE_STORE
   );
 
   static {

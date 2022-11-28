@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.traveltime.spt;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.state.State;
 
 public interface SPTVisitor {
   /**
