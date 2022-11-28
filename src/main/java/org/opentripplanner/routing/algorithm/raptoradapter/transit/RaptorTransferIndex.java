@@ -5,10 +5,8 @@ import static java.util.stream.Collectors.toMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestMapper;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 public class RaptorTransferIndex {
 
@@ -27,7 +25,7 @@ public class RaptorTransferIndex {
 
   public static RaptorTransferIndex create(
     List<List<Transfer>> transfersByStopIndex,
-    RouteRequest request
+    StreetSearchRequest request
   ) {
     var forwardTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());
     var reversedTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());
@@ -37,18 +35,13 @@ public class RaptorTransferIndex {
       reversedTransfers.add(new ArrayList<>());
     }
 
-    final AStarRequest aStarRequest = AStarRequestMapper
-      .map(request)
-      .withMode(request.journey().transfer().mode())
-      .build();
-
     for (int fromStop = 0; fromStop < transfersByStopIndex.size(); fromStop++) {
       // The transfers are filtered so that there is only one possible directional transfer
       // for a stop pair.
       var transfers = transfersByStopIndex
         .get(fromStop)
         .stream()
-        .flatMap(s -> s.asRaptorTransfer(aStarRequest).stream())
+        .flatMap(s -> s.asRaptorTransfer(request).stream())
         .collect(
           toMap(
             RaptorTransfer::stop,

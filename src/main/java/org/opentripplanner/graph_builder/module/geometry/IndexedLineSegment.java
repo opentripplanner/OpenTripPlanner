@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 
 /** TODO Move this stuff into the geometry library */
 class IndexedLineSegment {

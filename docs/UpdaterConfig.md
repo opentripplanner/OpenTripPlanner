@@ -98,8 +98,8 @@ predicted arrival and departure times for the remainder of the trip.
 
 <h4 id="u__5__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`  \
-**Path:** /updaters/[5]  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
+**Path:** /updaters/[5]   
 **Enum values:** `required-no-data` | `required` | `always`
 
 How backwards propagation should be handled.
@@ -157,8 +157,8 @@ How backwards propagation should be handled.
 
 <h4 id="u__7__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`  \
-**Path:** /updaters/[7]  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
+**Path:** /updaters/[7]   
 **Enum values:** `required-no-data` | `required` | `always`
 
 TODO
@@ -266,7 +266,7 @@ can be configured as a json. Any header key, value can be inserted.
 
 <h4 id="u_1_allowKeepingRentedBicycleAtDestination">allowKeepingRentedBicycleAtDestination</h4>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** /updaters/[1] 
 
 If a vehicle should be allowed to be kept at the end of a station-based rental.
@@ -275,7 +275,7 @@ This behaviour is useful in towns that have only a single rental station. Withou
 
 <h4 id="u_1_network">network</h4>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[1] 
 
 The name of the network to override the one derived from the source data.
@@ -284,15 +284,15 @@ GBFS feeds must include a system_id which will be used as the default `network`.
 
 <h4 id="u_1_sourceType">sourceType</h4>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
-**Path:** /updaters/[1]  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[1]   
 **Enum values:** `gbfs` | `smoove` | `vilkku`
 
 What source of vehicle rental updater to use.
 
 <h4 id="u_1_headers">headers</h4>
 
-**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[1] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.

@@ -2,7 +2,7 @@ package org.opentripplanner.ext.dataoverlay.routing;
 
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.configuration.ParameterBinding;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 public class Parameter {
 

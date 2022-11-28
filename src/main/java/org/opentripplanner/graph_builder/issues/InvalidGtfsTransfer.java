@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.onebusaway.gtfs.model.Transfer;
-import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 
 public class InvalidGtfsTransfer implements DataImportIssue {
 

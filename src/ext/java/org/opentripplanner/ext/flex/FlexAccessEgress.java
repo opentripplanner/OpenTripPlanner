@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.flex;
 
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.routing.core.State;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 public class FlexAccessEgress {

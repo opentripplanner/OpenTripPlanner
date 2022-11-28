@@ -3,19 +3,21 @@ package org.opentripplanner.standalone.api;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.util.Locale;
+import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.TileRendererManager;
+import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
-import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.transit.raptor.configure.RaptorConfig;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -94,7 +96,7 @@ public interface OtpServerRequestContext {
    * search.
    */
   @HttpRequestScoped
-  TraverseVisitor traverseVisitor();
+  TraverseVisitor<State, Edge> traverseVisitor();
 
   default GraphFinder graphFinder() {
     return GraphFinder.getInstance(graph(), transitService()::findRegularStop);

@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 class StopPatternTest {
 

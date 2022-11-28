@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan.legreference;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
@@ -10,7 +11,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * A reference which can be used to rebuild an exact copy of a {@link ScheduledTransitLeg} using the

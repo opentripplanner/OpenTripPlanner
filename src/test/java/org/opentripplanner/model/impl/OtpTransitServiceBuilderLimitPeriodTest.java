@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.ServiceCalendar;
@@ -66,7 +66,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
   @BeforeEach
   public void setUp() {
-    subject = new OtpTransitServiceBuilder(DataImportIssueStore.noopIssueStore());
+    subject = new OtpTransitServiceBuilder(DataImportIssueStore.NOOP);
 
     // Add a service calendar that overlap with the period limit
     subject.getCalendars().add(createServiceCalendar(SERVICE_C_IN, D1, D3));

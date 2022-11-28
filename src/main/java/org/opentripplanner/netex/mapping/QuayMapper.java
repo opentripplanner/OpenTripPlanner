@@ -3,7 +3,7 @@ package org.opentripplanner.netex.mapping;
 import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.Accessibility;

@@ -21,6 +21,7 @@ import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graph.Graph;
@@ -28,7 +29,6 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class FlexRouter {
 

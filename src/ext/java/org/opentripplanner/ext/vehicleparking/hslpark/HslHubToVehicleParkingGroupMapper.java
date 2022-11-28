@@ -8,13 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

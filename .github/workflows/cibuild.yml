@@ -56,7 +56,7 @@ jobs:
         run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierCheck -P deployGitHub
 
   docs:
-    if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
+    if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     needs: build
     env:
@@ -64,6 +64,7 @@ jobs:
       LOCAL_BRANCH: local-pages
       REMOTE_BRANCH: main
       TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
+      MASTER_BRANCH_VERSION: 2.3.0
 
     steps:
       - uses: actions/checkout@v3.1.0
@@ -75,7 +76,7 @@ jobs:
         run: |
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
-          
+
           # mike, the versioning plugin for mkdocs, expects there to be a local branch to push to so
           # we are cloning one here and commit to it
           # mike has support for specifing the origin but then it tries to rebase the _local_ gh-pages
@@ -83,9 +84,16 @@ jobs:
           
           git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/docs.git 
           git fetch $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
+
           # prefix is the root folder where to deploy the HTML, we use 'en' to emulate the URL
           # structure of readthedocs
-          mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
+          
+          if [ ${{ github.ref }} = 'refs/heads/master' ]; 
+          then
+            mike deploy --branch $LOCAL_BRANCH --prefix en --title=$MASTER_BRANCH_VERSION --update-aliases v$MASTER_BRANCH_VERSION latest
+          else
+            mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
+          fi
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
   container-image:

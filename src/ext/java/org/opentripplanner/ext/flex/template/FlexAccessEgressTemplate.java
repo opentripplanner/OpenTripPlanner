@@ -12,17 +12,17 @@ import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 public abstract class FlexAccessEgressTemplate {
 

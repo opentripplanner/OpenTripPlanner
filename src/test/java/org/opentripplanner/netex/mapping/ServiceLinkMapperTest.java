@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -96,7 +96,7 @@ public class ServiceLinkMapperTest {
 
     EntityById<RegularStop> stopsById = new EntityById<>();
 
-    DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
+    DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
     QuayMapper quayMapper = new QuayMapper(ID_FACTORY, issueStore);
     StopPattern.StopPatternBuilder stopPatternBuilder = StopPattern.create(3);
 
@@ -134,7 +134,7 @@ public class ServiceLinkMapperTest {
 
     Coordinate[] coordinates = shape.get(0).getCoordinates();
 
-    assertEquals(0, issueStore.getIssues().size());
+    assertEquals(0, issueStore.listIssues().size());
 
     assertEquals(COORDINATES[0], coordinates[0].getY(), 0.000001);
     assertEquals(COORDINATES[1], coordinates[0].getX(), 0.000001);

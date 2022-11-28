@@ -23,7 +23,7 @@ import javax.ws.rs.core.UriInfo;
 import org.geotools.geometry.Envelope2D;
 import org.glassfish.grizzly.http.server.Request;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.WebMercatorTile;
+import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;

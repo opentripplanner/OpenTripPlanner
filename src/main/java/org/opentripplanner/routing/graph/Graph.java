@@ -17,13 +17,11 @@ import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.TurnRestriction;
-import org.opentripplanner.common.geometry.CompactElevationProfile;
-import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.framework.geometry.CompactElevationProfile;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
@@ -31,7 +29,10 @@ import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
@@ -171,32 +172,7 @@ public class Graph implements Serializable {
     if (e != null) {
       streetNotesService.removeStaticNotes(e);
 
-      if (e instanceof StreetEdge) {
-        ((StreetEdge) e).removeAllTurnRestrictions();
-      }
-
-      if (e.fromv != null) {
-        e.fromv
-          .getIncoming()
-          .stream()
-          .filter(StreetEdge.class::isInstance)
-          .map(StreetEdge.class::cast)
-          .forEach(otherEdge -> {
-            for (TurnRestriction turnRestriction : otherEdge.getTurnRestrictions()) {
-              if (turnRestriction.to == e) {
-                otherEdge.removeTurnRestriction(turnRestriction);
-              }
-            }
-          });
-
-        e.fromv.removeOutgoing(e);
-        e.fromv = null;
-      }
-
-      if (e.tov != null) {
-        e.tov.removeIncoming(e);
-        e.tov = null;
-      }
+      e.remove();
     }
   }
 
@@ -363,7 +339,7 @@ public class Graph implements Serializable {
    * Calculates convexHull of all the vertices during build time
    */
   public void calculateConvexHull() {
-    convexHull = GraphUtils.makeConvexHull(this);
+    convexHull = GeometryUtils.makeConvexHull(getVertices(), Vertex::getCoordinate);
   }
 
   /**
