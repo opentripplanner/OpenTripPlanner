@@ -2,11 +2,12 @@ package org.opentripplanner.gtfs;
 
 import java.io.File;
 import java.io.IOException;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.AgencyAndIdMapper;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 public class MockGtfs {
 
@@ -48,9 +49,10 @@ public class MockGtfs {
     throws IOException {
     var mapper = new GTFSToOtpTransitServiceMapper(
       "a0",
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       false,
-      reader == null ? gtfsDelegate.read() : gtfsDelegate.read(reader)
+      reader == null ? gtfsDelegate.read() : gtfsDelegate.read(reader),
+      StopTransferPriority.ALLOWED
     );
     return mapper.getBuilder();
   }

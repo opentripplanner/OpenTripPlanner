@@ -138,10 +138,10 @@ public class NetexConfig {
         config
           .of("ferryIdsNotAllowedForBicycle")
           .since(V2_0)
-          .summary("List ferries witch do not allow bikes.")
+          .summary("List ferries which do not allow bikes.")
           .description(
             """
-            Bicycles are allowed on most ferries however Nordic profile doesn't contain a place
+            Bicycles are allowed on most ferries however the Nordic profile doesn't contain a place
             where bicycle conveyance can be defined.
             
             For this reason we allow bicycles on ferries by default and allow to override the rare

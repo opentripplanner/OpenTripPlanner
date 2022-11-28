@@ -15,12 +15,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
+import org.opentripplanner.framework.geometry.CompactElevationProfile;
+import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -36,7 +37,6 @@ import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
-import org.opentripplanner.util.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,7 +149,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final Boolean extraEdgesStopPlatformLink;
   public final NetexFeedParameters netexDefaults;
 
-  public final OsmDefaultParameters osmDefaults;
+  public final OsmExtractParameters osmDefaults;
 
   public final List<RouteRequest> transferRequests;
 
@@ -690,7 +690,7 @@ Netex data is also often supplied in a ZIP file.
         .asUri(null);
 
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
-    osm = OsmConfig.mapOsmConfig(root, "osm");
+    osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);
     dem = DemConfig.mapDemConfig(root, "dem");
 
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");

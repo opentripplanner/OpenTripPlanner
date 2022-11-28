@@ -8,12 +8,12 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Preferences for transit routing.

@@ -57,8 +57,8 @@ class EntranceTest {
     assertEquals(DESCRIPTION, copy.getDescription());
     assertEquals(CODE, copy.getCode());
     assertTrue(COORDINATE.sameLocation(copy.getCoordinate()));
-    assertEquals(LEVEL.getName(), copy.getLevelName());
-    assertEquals(LEVEL.getIndex(), copy.getLevelIndex());
+    assertEquals(LEVEL.name(), copy.getLevelName());
+    assertEquals(LEVEL.index(), copy.getLevelIndex());
     assertEquals(WHEELCHAIR_ACCESSIBILITY, copy.getWheelchairAccessibility());
   }
 

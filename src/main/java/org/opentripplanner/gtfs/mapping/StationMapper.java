@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 /**
  * Responsible for mapping GTFS Stop into the OTP model.
@@ -23,9 +24,14 @@ class StationMapper {
   private final Map<org.onebusaway.gtfs.model.Stop, Station> mappedStops = new HashMap<>();
 
   private final TranslationHelper translationHelper;
+  private final StopTransferPriority stationTransferPreference;
 
-  StationMapper(TranslationHelper translationHelper) {
+  StationMapper(
+    TranslationHelper translationHelper,
+    StopTransferPriority stationTransferPreference
+  ) {
     this.translationHelper = translationHelper;
+    this.stationTransferPreference = stationTransferPreference;
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
@@ -73,6 +79,8 @@ class StationMapper {
         rhs.getUrl()
       )
     );
+
+    builder.withPriority(stationTransferPreference);
 
     if (rhs.getTimezone() != null) {
       builder.withTimezone(ZoneId.of(rhs.getTimezone()));

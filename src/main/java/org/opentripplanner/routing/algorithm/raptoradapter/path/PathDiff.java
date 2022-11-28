@@ -12,14 +12,14 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.framework.text.TableBuilder;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.PathLeg;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.routing.util.DiffTool;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.CompositeComparator;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * This class is used to diff two set of paths. You may ask for the diff result or pass in a logger

@@ -14,7 +14,7 @@ import org.opentripplanner.standalone.config.framework.JsonSupport;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer;
 import org.opentripplanner.test.support.FilePatternSource;
-import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
 
 @OnlyIfDocsExist
 public class ExampleConfigTest {

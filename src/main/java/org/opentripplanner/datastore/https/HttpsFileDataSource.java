@@ -11,7 +11,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
-import org.opentripplanner.util.HttpUtils;
+import org.opentripplanner.framework.io.HttpUtils;
 
 /**
  * This class is a wrapper around an HTTPS resource.

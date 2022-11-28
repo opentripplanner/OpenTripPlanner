@@ -3,11 +3,12 @@ package org.opentripplanner.transit.model.timetable;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
-import static org.opentripplanner.util.lang.ObjectUtils.ifNotNull;
+import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -18,7 +19,6 @@ import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.util.lang.StringUtils;
 
 public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> implements LogInfo {
 

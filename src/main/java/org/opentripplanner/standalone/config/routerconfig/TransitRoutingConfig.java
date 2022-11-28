@@ -5,11 +5,11 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.raptor.api.request.DynamicSearchWindowCoefficients;
+import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
-import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
-import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 
 /**
  * @see RaptorTuningParameters for documentaion of tuning parameters.

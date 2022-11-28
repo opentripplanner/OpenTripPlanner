@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.filterchain.api;
 
+import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
-import org.opentripplanner.util.lang.DoubleUtils;
 
 /**
  * Input parameters for {@link TransitGeneralizedCostFilter}

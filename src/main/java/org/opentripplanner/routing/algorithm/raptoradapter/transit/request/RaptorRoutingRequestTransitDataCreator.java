@@ -1,8 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import static org.opentripplanner.util.time.ServiceDateUtils.secondsSinceStartOfTime;
+import static org.opentripplanner.framework.time.ServiceDateUtils.secondsSinceStartOfTime;
 
-import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -11,18 +10,15 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,8 +65,8 @@ class RaptorRoutingRequestTransitDataCreator {
       }
     }
 
-    // Create the final list with raw int arrays, in order to get best iteration performance
-    List<int[]> result = new ArrayList<>();
+    // Create the final list with raw int arrays, in order to get the best iteration performance
+    List<int[]> result = new ArrayList<>(stopCount);
     for (var patterns : patternsForStop) {
       result.add(patterns.toArray());
     }
