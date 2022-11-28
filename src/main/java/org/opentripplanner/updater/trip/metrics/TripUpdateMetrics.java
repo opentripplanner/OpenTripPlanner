@@ -16,7 +16,7 @@ public class TripUpdateMetrics {
   TripUpdateMetrics(UrlUpdaterParameters parameters) {
     this.baseTags =
       List.of(
-        Tag.of("configRef", parameters.getConfigRef()),
+        Tag.of("configRef", parameters.configRef()),
         Tag.of("url", parameters.getUrl()),
         Tag.of("feedId", parameters.getFeedId())
       );

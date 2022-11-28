@@ -8,13 +8,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class PlatformLinkerTest {
@@ -43,11 +43,11 @@ public class PlatformLinkerTest {
       List.of(provider),
       Set.of(),
       gg,
-      DataImportIssueStore.noopIssueStore(),
-      new DefaultMapper()
+      DataImportIssueStore.NOOP,
+      new DefaultMapper(),
+      true
     );
     osmModule.platformEntriesLinking = true;
-    osmModule.skipVisibility = false;
 
     osmModule.buildGraph();
 

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR;
 
@@ -16,25 +15,28 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.intersection_model.ConstantIntersectionTraversalCalculator;
+import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TriangleInequalityTest {
@@ -73,8 +75,9 @@ public class TriangleInequalityTest {
       List.of(provider),
       Set.of(),
       graph,
-      noopIssueStore(),
-      new DefaultMapper()
+      DataImportIssueStore.NOOP,
+      new DefaultMapper(),
+      true
     );
     osmModule.buildGraph();
   }
@@ -172,9 +175,15 @@ public class TriangleInequalityTest {
     checkTriangleInequality(modes);
   }
 
-  private GraphPath getPath(RouteRequest options, Edge startBackEdge, Vertex u, Vertex v) {
-    return AStarBuilder
-      .oneToOne()
+  private GraphPath<State, Edge, Vertex> getPath(
+    RouteRequest options,
+    Edge startBackEdge,
+    Vertex u,
+    Vertex v
+  ) {
+    return StreetSearchBuilder
+      .of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setOriginBackEdge(startBackEdge)
       .setRequest(options)
       .setFrom(u)
@@ -207,16 +216,17 @@ public class TriangleInequalityTest {
       prototypeOptions.journey().setModes(modes);
     }
 
-    ShortestPathTree tree = AStarBuilder
-      .oneToOne()
-      .setDominanceFunction(new DominanceFunction.EarliestArrival())
+    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
+      .of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setDominanceFunction(new DominanceFunctions.EarliestArrival())
       .setRequest(prototypeOptions)
       .setFrom(start)
       .setTo(end)
       .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
 
-    GraphPath path = tree.getPath(end);
+    GraphPath<State, Edge, Vertex> path = tree.getPath(end);
     assertNotNull(path);
 
     double startEndWeight = path.getWeight();
@@ -231,13 +241,23 @@ public class TriangleInequalityTest {
         continue;
       }
 
-      GraphPath startIntermediatePath = getPath(prototypeOptions, null, start, intermediate);
+      GraphPath<State, Edge, Vertex> startIntermediatePath = getPath(
+        prototypeOptions,
+        null,
+        start,
+        intermediate
+      );
       if (startIntermediatePath == null) {
         continue;
       }
 
       Edge back = startIntermediatePath.states.getLast().getBackEdge();
-      GraphPath intermediateEndPath = getPath(prototypeOptions, back, intermediate, end);
+      GraphPath<State, Edge, Vertex> intermediateEndPath = getPath(
+        prototypeOptions,
+        back,
+        intermediate,
+        end
+      );
       if (intermediateEndPath == null) {
         continue;
       }

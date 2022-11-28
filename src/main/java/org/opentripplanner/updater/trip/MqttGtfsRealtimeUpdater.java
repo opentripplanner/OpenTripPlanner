@@ -64,7 +64,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     TransitModel transitModel,
     TimetableSnapshotSource snapshotSource
   ) {
-    this.configRef = parameters.getConfigRef();
+    this.configRef = parameters.configRef();
     this.url = parameters.getUrl();
     this.topic = parameters.getTopic();
     this.feedId = parameters.getFeedId();

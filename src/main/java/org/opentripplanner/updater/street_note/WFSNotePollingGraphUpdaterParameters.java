@@ -29,11 +29,11 @@ public class WFSNotePollingGraphUpdaterParameters implements PollingGraphUpdater
   }
 
   @Override
-  public int getFrequencySec() {
+  public int frequencySec() {
     return frequencySec;
   }
 
-  public String getConfigRef() {
+  public String configRef() {
     return configRef;
   }
 

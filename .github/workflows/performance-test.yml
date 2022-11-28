@@ -28,6 +28,10 @@ jobs:
           - location: skanetrafiken
             iterations: 1
             jfr-delay: "50s"
+            
+          - location: switzerland
+            iterations: 4
+            jfr-delay: "50s"
     steps:
       - uses: actions/checkout@v3.1.0
         with:
@@ -58,12 +62,11 @@ jobs:
       - name: Copy graph, run speed test
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
-          MEASUREMENT_ENVIRONMENT: CI
           SPEEDTEST_LOCATION: ${{ matrix.location }}
           MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr"
         run: |
           mv graph/graph.obj test/performance/${{ matrix.location }}
-          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
+          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
       - name: Archive travel results file
         uses: actions/upload-artifact@v3
         with:

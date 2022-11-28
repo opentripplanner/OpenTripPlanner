@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import java.util.Objects;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.Units;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Preferences for how to treat trips or stops with accessibility restrictions, like wheelchair

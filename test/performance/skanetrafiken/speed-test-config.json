@@ -3,27 +3,25 @@
   "feedId": "ST",
   "graph": "graph.obj",
 
-  "walkSpeedMeterPrSecond": 1.38,
   "tuningParameters": {
     "dynamicSearchWindow": {
-      "dynamicSearchWindow": {
-        "maxWinTimeMinutes": 1440
-      },
-      "stopTransferCost": {
-        "DISCOURAGED": 3000,
-        "ALLOWED": 150,
-        "RECOMMENDED": 60,
-        "PREFERRED": 0
-      }
+      "maxWinTimeMinutes": 1440
     },
-    "routingDefaults": {
-      "transferSlack": 180,
-      "waitReluctance": 0.175,
-      "walkReluctance": 5,
-      "maxDirectStreetDurationSeconds": 3700,
-      "boardSlackForMode": {
-        "RAIL": "PT720S"
-      }
+    "stopTransferCost": {
+      "DISCOURAGED": 3000,
+      "ALLOWED": 150,
+      "RECOMMENDED": 60,
+      "PREFERRED": 0
+    }
+  },
+  "routingDefaults": {
+    "walkSpeed": 1.38,
+    "transferSlack": 180,
+    "waitReluctance": 0.175,
+    "walkReluctance": 5,
+    "maxDirectStreetDuration": "1h1m",
+    "boardSlackForMode": {
+      "RAIL": "12m"
     }
   }
 }

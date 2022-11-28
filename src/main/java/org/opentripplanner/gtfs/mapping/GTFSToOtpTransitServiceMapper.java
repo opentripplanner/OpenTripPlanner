@@ -10,12 +10,13 @@ import java.util.Collection;
 import java.util.function.Function;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.ext.fares.model.FareRulesData;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.util.OTPFeature;
 
 /**
@@ -88,7 +89,8 @@ public class GTFSToOtpTransitServiceMapper {
     String feedId,
     DataImportIssueStore issueStore,
     boolean discardMinTransferTimes,
-    GtfsRelationalDao data
+    GtfsRelationalDao data,
+    StopTransferPriority stationTransferPreference
   ) {
     this.issueStore = issueStore;
     builder = new OtpTransitServiceBuilder(this.issueStore);
@@ -101,7 +103,7 @@ public class GTFSToOtpTransitServiceMapper {
     translationHelper = new TranslationHelper();
     feedInfoMapper = new FeedInfoMapper(feedId);
     agencyMapper = new AgencyMapper(feedId);
-    stationMapper = new StationMapper(translationHelper);
+    stationMapper = new StationMapper(translationHelper, stationTransferPreference);
     stopMapper = new StopMapper(translationHelper, stationLookup);
     entranceMapper = new EntranceMapper(translationHelper, stationLookup);
     pathwayNodeMapper = new PathwayNodeMapper(translationHelper, stationLookup);
@@ -172,8 +174,6 @@ public class GTFSToOtpTransitServiceMapper {
     fareRulesBuilder
       .fareTransferRules()
       .addAll(fareTransferRuleMapper.map(data.getAllFareTransferRules()));
-
-    mapAndAddTransfersToBuilder();
   }
 
   private void mapGtfsStopsToOtpTypes(Collection<org.onebusaway.gtfs.model.Stop> stops) {
@@ -206,7 +206,7 @@ public class GTFSToOtpTransitServiceMapper {
   /**
    * Note! Trip-pattens must be added BEFORE mapping transfers
    */
-  private void mapAndAddTransfersToBuilder() {
+  public void mapAndAddTransfersToBuilder() {
     TransferMapper transferMapper = new TransferMapper(
       routeMapper,
       stationMapper,

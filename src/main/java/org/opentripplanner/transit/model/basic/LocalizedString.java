@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.util.resources.ResourceBundleSingleton;
 
 /**
@@ -31,8 +30,8 @@ public class LocalizedString implements I18NString, Serializable {
   /**
    * Creates String which can be localized
    *
-   * @param key key of translation for this way set in {@link DefaultMapper}
-   *            and translations read from properties Files
+   * @param key key of translation for this way set in OSM and translations read from properties
+   *            files
    */
   public LocalizedString(String key) {
     this.key = key;
@@ -42,8 +41,8 @@ public class LocalizedString implements I18NString, Serializable {
   /**
    * Creates String which can be localized
    *
-   * @param key    key of translation for this way set in {@link DefaultMapper}
-   *               and translations read from properties Files
+   * @param key    key of translation for this way set in OSM and translations read from properties
+   *               files
    * @param params Values with which tagNames are replaced in translations.
    */
   public LocalizedString(String key, I18NString... params) {

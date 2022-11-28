@@ -15,14 +15,4 @@ public record VehiclePositionsUpdaterParameters(
     Objects.requireNonNull(feedId, "feedId is required");
     Objects.requireNonNull(url, "url is required");
   }
-
-  @Override
-  public int getFrequencySec() {
-    return frequencySec;
-  }
-
-  @Override
-  public String getConfigRef() {
-    return configRef;
-  }
 }

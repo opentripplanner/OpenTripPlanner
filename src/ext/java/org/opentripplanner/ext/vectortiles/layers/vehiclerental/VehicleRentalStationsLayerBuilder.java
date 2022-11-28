@@ -8,14 +8,14 @@ import java.util.Map;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper.DigitransitRealtimeVehicleRentalStationPropertyMapper;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper.DigitransitVehicleRentalStationPropertyMapper;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 
 public class VehicleRentalStationsLayerBuilder
   extends VehicleRentalLayerBuilder<VehicleRentalStation> {
 
   public VehicleRentalStationsLayerBuilder(
-    VehicleRentalStationService service,
+    VehicleRentalService service,
     VectorTilesResource.LayerParameters layerParameters,
     Locale locale
   ) {
@@ -33,9 +33,7 @@ public class VehicleRentalStationsLayerBuilder
   }
 
   @Override
-  protected Collection<VehicleRentalStation> getVehicleRentalPlaces(
-    VehicleRentalStationService service
-  ) {
+  protected Collection<VehicleRentalStation> getVehicleRentalPlaces(VehicleRentalService service) {
     return service.getVehicleRentalStations();
   }
 }

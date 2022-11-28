@@ -113,13 +113,13 @@ public abstract class StationElement<
   /** Level name for elevator descriptions */
   @Nullable
   public String getLevelName() {
-    return level == null ? null : level.getName();
+    return level == null ? null : level.name();
   }
 
   /** Level index for hop counts in elevators. Is {@code null} if not set. */
   @Nullable
   public Double getLevelIndex() {
-    return level == null ? null : level.getIndex();
+    return level == null ? null : level.index();
   }
 
   /** Parent station for the station element */

@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentripplanner.util.lang.ObjectUtils.ifNotNull;
+import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
 
 import java.io.Serializable;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.street.search.TraverseMode;
 
 /** User/trip cost/time/slack/reluctance search config. */
 @SuppressWarnings("UnusedReturnValue")

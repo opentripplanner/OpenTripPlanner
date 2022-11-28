@@ -2,11 +2,11 @@ package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
 import java.util.Comparator;
 import java.util.List;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class create a group identifier for an itinerary based on the longest legs which together

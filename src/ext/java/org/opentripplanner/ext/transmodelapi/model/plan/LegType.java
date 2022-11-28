@@ -366,7 +366,7 @@ public class LegType {
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
           .dataFetcher(env ->
-            TripTimeShortHelper.getIntermediateTripTimeShortsForLeg((env.getSource()))
+            TripTimeShortHelper.getIntermediateTripTimeShortsForLeg(env.getSource())
           )
           .build()
       )

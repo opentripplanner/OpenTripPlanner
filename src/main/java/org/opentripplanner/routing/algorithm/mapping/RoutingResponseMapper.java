@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import static org.opentripplanner.ext.realtimeresolver.RealtimeResolver.populateLegsWithRealtime;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -11,12 +13,14 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageCursorFactory;
 import org.opentripplanner.model.plan.pagecursor.PageType;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
+import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +36,17 @@ public class RoutingResponseMapper {
     Itinerary firstRemovedItinerary,
     List<Itinerary> itineraries,
     Set<RoutingError> routingErrors,
-    DebugTimingAggregator debugTimingAggregator
+    DebugTimingAggregator debugTimingAggregator,
+    TransitService transitService
   ) {
+    // Search is performed without realtime, but we still want to
+    // include realtime information in the result
+    if (
+      request.preferences().transit().ignoreRealtimeUpdates() && OTPFeature.RealtimeResolver.isOn()
+    ) {
+      populateLegsWithRealtime(itineraries, transitService);
+    }
+
     // Create response
     var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
 

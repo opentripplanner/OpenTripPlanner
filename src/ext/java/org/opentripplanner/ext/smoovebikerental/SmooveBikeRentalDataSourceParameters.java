@@ -3,7 +3,7 @@ package org.opentripplanner.ext.smoovebikerental;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 public class SmooveBikeRentalDataSourceParameters extends VehicleRentalDataSourceParameters {
@@ -20,7 +20,7 @@ public class SmooveBikeRentalDataSourceParameters extends VehicleRentalDataSourc
     boolean allowOverloading,
     @Nonnull Map<String, String> httpHeaders
   ) {
-    super(DataSourceType.SMOOVE, url, httpHeaders);
+    super(VehicleRentalSourceType.SMOOVE, url, httpHeaders);
     this.network = network;
     this.allowOverloading = allowOverloading;
   }

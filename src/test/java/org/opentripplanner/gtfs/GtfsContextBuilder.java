@@ -3,7 +3,7 @@ package org.opentripplanner.gtfs;
 import java.io.File;
 import java.io.IOException;
 import javax.annotation.Nullable;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
@@ -16,6 +16,7 @@ import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 /**
  * This class helps building GtfsContext and post process the GtfsDao by repairing
@@ -47,14 +48,16 @@ public class GtfsContextBuilder {
     GtfsFeedId feedId = gtfsImport.getFeedId();
     var mapper = new GTFSToOtpTransitServiceMapper(
       feedId.getId(),
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       false,
-      gtfsImport.getDao()
+      gtfsImport.getDao(),
+      StopTransferPriority.ALLOWED
     );
     mapper.mapStopTripAndRouteDataIntoBuilder();
+    mapper.mapAndAddTransfersToBuilder();
     OtpTransitServiceBuilder transitBuilder = mapper.getBuilder();
     return new GtfsContextBuilder(feedId, transitBuilder)
-      .withDataImportIssueStore(DataImportIssueStore.noopIssueStore());
+      .withDataImportIssueStore(DataImportIssueStore.NOOP);
   }
 
   public GtfsFeedId getFeedId() {
@@ -66,7 +69,7 @@ public class GtfsContextBuilder {
   }
 
   public GtfsContextBuilder withIssueStoreAndDeduplicator(Graph graph) {
-    return withIssueStoreAndDeduplicator(graph, DataImportIssueStore.noopIssueStore());
+    return withIssueStoreAndDeduplicator(graph, DataImportIssueStore.NOOP);
   }
 
   public GtfsContextBuilder withIssueStoreAndDeduplicator(
@@ -135,6 +138,7 @@ public class GtfsContextBuilder {
   private void repairStopTimesForEachTrip() {
     new ValidateAndInterpolateStopTimesForEachTrip(
       transitBuilder.getStopTimesSortedByTrip(),
+      true,
       true,
       issueStore
     )

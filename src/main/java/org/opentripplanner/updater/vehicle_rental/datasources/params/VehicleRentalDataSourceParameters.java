@@ -2,16 +2,16 @@ package org.opentripplanner.updater.vehicle_rental.datasources.params;
 
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 
 public class VehicleRentalDataSourceParameters {
 
-  private final DataSourceType sourceType;
+  private final VehicleRentalSourceType sourceType;
   private final String url;
   private final Map<String, String> httpHeaders;
 
   public VehicleRentalDataSourceParameters(
-    DataSourceType sourceType,
+    VehicleRentalSourceType sourceType,
     String url,
     @Nonnull Map<String, String> httpHeaders
   ) {
@@ -26,7 +26,7 @@ public class VehicleRentalDataSourceParameters {
   }
 
   @Nonnull
-  public DataSourceType getSourceType() {
+  public VehicleRentalSourceType getSourceType() {
     return sourceType;
   }
 

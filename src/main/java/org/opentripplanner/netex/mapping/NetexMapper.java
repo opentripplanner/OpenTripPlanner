@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.xml.bind.JAXBElement;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -277,7 +277,7 @@ public class NetexMapper {
   }
 
   private void mapOperators() {
-    OperatorToAgencyMapper mapper = new OperatorToAgencyMapper(idFactory);
+    OperatorToAgencyMapper mapper = new OperatorToAgencyMapper(issueStore, idFactory);
     for (org.rutebanken.netex.model.Operator operator : currentNetexIndex
       .getOperatorsById()
       .localValues()) {

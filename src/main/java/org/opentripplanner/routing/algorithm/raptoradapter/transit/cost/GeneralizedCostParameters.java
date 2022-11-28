@@ -3,11 +3,11 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import java.util.BitSet;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class define how to calculate the cost when cost is part of the multi-criteria pareto

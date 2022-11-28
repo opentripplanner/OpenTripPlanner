@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
@@ -55,7 +55,7 @@ public class TripCalendarBuilderTest {
   private static final HierarchicalMapById<OperatingPeriod> EMPTY_PERIODS = new HierarchicalMapById<>();
   public static final String OD_1 = "OD-1";
 
-  private final DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
+  private final DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
   private final CalendarServiceBuilder calendarServiceBuilder = new CalendarServiceBuilder(
     new FeedScopedIdFactory(FEED_ID)
   );
