@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -52,7 +52,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -75,7 +75,7 @@ public class RouteMapperTest {
   public void mapRouteWithAgencySpecified() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
-      DataImportIssueStore.noopIssueStore()
+      DataImportIssueStore.NOOP
     );
 
     Network network = new Network()
@@ -92,7 +92,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       transitBuilder.getAgenciesById(),
       transitBuilder.getOperatorsById(),
@@ -118,7 +118,7 @@ public class RouteMapperTest {
     line.setPresentation(new PresentationStructure().withColour(color).withTextColour(textColor));
 
     RouteMapper routeMapper = new RouteMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -143,7 +143,7 @@ public class RouteMapperTest {
     Line lineWithOutBicycles = createExampleFerry(FERRY_WITHOUT_BICYCLES_ID);
 
     RouteMapper routeMapper = new RouteMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -168,7 +168,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -189,7 +189,7 @@ public class RouteMapperTest {
   public void mapRouteWithBranding() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
-      DataImportIssueStore.noopIssueStore()
+      DataImportIssueStore.NOOP
     );
 
     transitBuilder
@@ -199,7 +199,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       transitBuilder.getAgenciesById(),
       transitBuilder.getOperatorsById(),
@@ -222,7 +222,7 @@ public class RouteMapperTest {
   public void mapRouteWithGroupOfRoutes() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
-      DataImportIssueStore.noopIssueStore()
+      DataImportIssueStore.NOOP
     );
 
     Line line = createExampleLine();
@@ -234,7 +234,7 @@ public class RouteMapperTest {
       .put(MappingSupport.ID_FACTORY.createId(LINE_ID), createGroupOfRoutes(GOL_ID_2, GOL_NAME_2));
 
     RouteMapper routeMapper = new RouteMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       transitBuilder.getAgenciesById(),
       transitBuilder.getOperatorsById(),

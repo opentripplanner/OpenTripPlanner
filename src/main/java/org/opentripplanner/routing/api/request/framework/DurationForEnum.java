@@ -6,7 +6,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
+import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 
 /**
  * This class is used to store a {@link Duration} value for each of the enum type values.

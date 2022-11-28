@@ -4,11 +4,11 @@ import java.awt.Color;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
 
 /**
  * Render walk safety for each edge using a color palette. Display the walk safety factor as label.

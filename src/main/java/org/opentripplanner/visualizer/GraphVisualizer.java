@@ -59,21 +59,22 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.astar.spi.DominanceFunction;
+import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,7 +174,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   private ShowGraph showGraph;
 
   /* The set of callbacks that display search progress on the showGraph Processing applet. */
-  public TraverseVisitor traverseVisitor;
+  public TraverseVisitor<State, Edge> traverseVisitor;
 
   /* Needed by the GraphPathFinder */
   private final Duration streetRoutingTimeout;
@@ -235,12 +236,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   private JCheckBox showMultistateVerticesCheckbox;
   private JCheckBox showHighlightedCheckbox;
   private JCheckBox showSPTCheckbox;
-  private ShortestPathTree spt;
+  private ShortestPathTree<State, Edge, Vertex> spt;
   private JTextField sptFlattening;
   private JTextField sptThickness;
   private JPopupMenu popup;
-  private GraphPath firstComparePath;
-  private GraphPath secondComparePath;
+  private GraphPath<State, Edge, Vertex> firstComparePath;
+  private GraphPath<State, Edge, Vertex> secondComparePath;
   private JList<State> firstComparePathStates;
   private JList<State> secondComparePathStates;
   private JList<String> secondStateData;
@@ -250,15 +251,15 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
   public GraphVisualizer(Graph graph, Duration streetRoutingTimeout) {
     super();
-    LOG.info("Starting up graph visualizer...");
     setTitle("GraphVisualizer");
     setExtendedState(JFrame.MAXIMIZED_BOTH);
     this.graph = graph;
     this.streetRoutingTimeout = streetRoutingTimeout;
-    init();
   }
 
   public void run() {
+    LOG.info("Starting up graph visualizer...");
+    this.init();
     this.setVisible(true);
   }
 
@@ -325,7 +326,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       }
     }
     if (target != null && spt != null) {
-      List<GraphPath> paths = spt.getPaths(target);
+      List<GraphPath<State, Edge, Vertex>> paths = spt.getPaths(target);
       showPathsInPanel(paths);
     }
   }
@@ -512,7 +513,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.journey().direct().mode()
       )
     ) {
-      List<GraphPath> paths = finder.graphPathFinderEntryPoint(options, temporaryVertices);
+      List<GraphPath<State, Edge, Vertex>> paths = finder.graphPathFinderEntryPoint(
+        options,
+        temporaryVertices
+      );
       long dt = System.currentTimeMillis() - t0;
       searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");
 
@@ -604,7 +608,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         public void actionPerformed(ActionEvent e) {
           State s1 = firstComparePathStates.getSelectedValue();
           State s2 = secondComparePathStates.getSelectedValue();
-          DominanceFunction pareto = new DominanceFunction.Pareto();
+          DominanceFunction<State> pareto = new DominanceFunctions.Pareto();
           System.out.println("s1 dominates s2:" + pareto.betterOrEqualAndComparable(s1, s2));
           System.out.println("s2 dominates s1:" + pareto.betterOrEqualAndComparable(s2, s1));
         }
@@ -1254,7 +1258,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
           if (pp == null) {
             return;
           }
-          GraphPath path = pp.gp;
+          GraphPath<State, Edge, Vertex> path = pp.gp;
 
           DefaultListModel<State> pathModel = new DefaultListModel<>();
           for (State st : path.states) {
@@ -1313,13 +1317,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     resetSearchDateButton.addActionListener(
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          searchDate.setText(DATE_FORMAT.format(Instant.now()));
+          searchDate.setText(DATE_FORMAT.format(ZonedDateTime.now()));
         }
       }
     );
     routingPanel.add(resetSearchDateButton);
     searchDate = new JTextField();
-    searchDate.setText(DATE_FORMAT.format(Instant.now()));
+    searchDate.setText(DATE_FORMAT.format(ZonedDateTime.now()));
     routingPanel.add(searchDate);
 
     // row: launch, continue, and clear path search
@@ -1364,10 +1368,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     routingPanel.add(dontUseGraphicalCallbackCheckBox);
   }
 
-  private void showPathsInPanel(List<GraphPath> paths) {
+  private void showPathsInPanel(List<GraphPath<State, Edge, Vertex>> paths) {
     // show paths in a list panel
     DefaultListModel<PathPrinter> data = new DefaultListModel<>();
-    for (GraphPath gp : paths) {
+    for (GraphPath<State, Edge, Vertex> gp : paths) {
       data.addElement(new PathPrinter(gp));
     }
     pathsList.setModel(data);
@@ -1375,9 +1379,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
   static class PathPrinter {
 
-    GraphPath gp;
+    GraphPath<State, Edge, Vertex> gp;
 
-    PathPrinter(GraphPath gp) {
+    PathPrinter(GraphPath<State, Edge, Vertex> gp) {
       this.gp = gp;
     }
 
@@ -1392,9 +1396,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         ") weight:" +
         gp.getWeight() +
         " dur:" +
-        (gp.getDuration() / 60.0) +
-        " walk:" +
-        gp.getWalkDistance()
+        (gp.getDuration() / 60.0)
+        // " walk:" +
+        // gp.getWalkDistance()
       );
     }
   }
@@ -1437,7 +1441,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       if (pp == null) {
         return;
       }
-      GraphPath path = pp.gp;
+      GraphPath<State, Edge, Vertex> path = pp.gp;
 
       firstComparePath = secondComparePath;
       secondComparePath = path;

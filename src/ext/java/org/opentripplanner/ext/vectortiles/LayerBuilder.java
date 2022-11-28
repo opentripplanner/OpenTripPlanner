@@ -11,7 +11,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters;
-import org.opentripplanner.util.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 
 public abstract class LayerBuilder<T> {
 

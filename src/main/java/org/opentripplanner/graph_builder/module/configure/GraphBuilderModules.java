@@ -14,9 +14,10 @@ import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.DataImportIssuesToHTML;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.report.DataImportIssuesToHTML;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
@@ -226,6 +227,12 @@ public class GraphBuilderModules {
   @Singleton
   static EdgeUpdaterModule provideDataOverlayFactory(BuildConfig config, Graph graph) {
     return DataOverlayFactory.create(graph, config.dataOverlay);
+  }
+
+  @Provides
+  @Singleton
+  static DataImportIssueStore provideDataImportIssuesStore() {
+    return new DefaultDataImportIssueStore();
   }
 
   @Provides

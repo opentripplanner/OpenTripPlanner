@@ -46,8 +46,17 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
-import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.raptor.RaptorService;
+import org.opentripplanner.raptor.api.request.RaptorProfile;
+import org.opentripplanner.raptor.api.request.RaptorRequest;
+import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.api.response.RaptorResponse;
+import org.opentripplanner.raptor.api.response.StopArrivals;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -56,27 +65,19 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RouteRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestMapper;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateData;
+import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.raptor.RaptorService;
-import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.transit.raptor.api.response.StopArrivals;
-import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 @Path("/traveltime")
 public class TravelTimeResource {
@@ -132,8 +133,6 @@ public class TravelTimeResource {
     LocalDate endDate = LocalDate.ofInstant(endTime, zoneId);
     startOfTime = ServiceDateUtils.asStartOfService(startDate, zoneId);
 
-    RouteRequest transferRouteRequest = routingRequest.copyAndPrepareForTransferRouting();
-
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
         transitService.getRealtimeTransitLayer(),
@@ -141,7 +140,7 @@ public class TravelTimeResource {
         0,
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
         new RouteRequestTransitDataProviderFilter(routingRequest, transitService),
-        transferRouteRequest
+        routingRequest
       );
 
     raptorService = new RaptorService<>(serverContext.raptorConfig());
@@ -244,12 +243,13 @@ public class TravelTimeResource {
 
       var arrivals = route(accessList).getArrivals();
 
-      var spt = AStarBuilder
-        .allDirectionsMaxDuration(traveltimeRequest.maxCutoff)
+      var spt = StreetSearchBuilder
+        .of()
+        .setSkipEdgeStrategy(new DurationSkipEdgeStrategy(traveltimeRequest.maxCutoff))
         .setRequest(routingRequest)
         .setStreetRequest(accessRequest.journey().access())
         .setVerticesContainer(temporaryVertices)
-        .setDominanceFunction(new DominanceFunction.EarliestArrival())
+        .setDominanceFunction(new DominanceFunctions.EarliestArrival())
         .setInitialStates(getInitialStates(arrivals, temporaryVertices))
         .getShortestPathTree();
 
@@ -278,16 +278,17 @@ public class TravelTimeResource {
   ) {
     List<State> initialStates = new ArrayList<>();
 
-    AStarRequest aStarRequest = AStarRequestMapper
+    StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper
       .map(routingRequest)
       .withMode(routingRequest.journey().egress().mode())
+      .withArriveBy(false)
       .build();
 
-    StateData stateData = StateData.getInitialStateData(aStarRequest);
+    StateData stateData = StateData.getInitialStateData(streetSearchRequest);
 
     for (var vertex : temporaryVertices.getFromVertices()) {
       // TODO StateData should be of direct mode here
-      initialStates.add(new State(vertex, startTime, stateData, aStarRequest));
+      initialStates.add(new State(vertex, startTime, stateData, streetSearchRequest));
     }
 
     // TODO - Add a method to return all Stops, not StopLocations
@@ -298,7 +299,7 @@ public class TravelTimeResource {
         Vertex v = graph.getStopVertexForStopId(stop.getId());
         if (v != null) {
           Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
-          State s = new State(v, time, stateData.clone(), aStarRequest);
+          State s = new State(v, time, stateData.clone(), streetSearchRequest);
           s.weight = startTime.until(time, ChronoUnit.SECONDS);
           initialStates.add(s);
         }

@@ -1,12 +1,14 @@
 package org.opentripplanner.routing.graph;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.TemporaryEdge;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.TemporaryEdge;
+import org.opentripplanner.street.model.vertex.TemporaryVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {

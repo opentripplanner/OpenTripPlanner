@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;

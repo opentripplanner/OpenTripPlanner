@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.astar.spi.SearchTerminationStrategy;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 
 /**
  * A termination strategy that terminates after multiple targets have been reached.
@@ -14,7 +14,7 @@ import org.opentripplanner.routing.graph.Vertex;
  *
  * @author avi
  */
-public class MultiTargetTerminationStrategy implements SearchTerminationStrategy {
+public class MultiTargetTerminationStrategy implements SearchTerminationStrategy<State> {
 
   private final Set<Vertex> unreachedTargets;
   private final Set<Vertex> reachedTargets;

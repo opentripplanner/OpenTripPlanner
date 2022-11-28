@@ -21,9 +21,9 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRoute;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -38,7 +38,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
 
@@ -500,10 +499,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       stop -> getTransitService(environment).getRoutesForStop(stop),
       station -> null
     );
-  }
-
-  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

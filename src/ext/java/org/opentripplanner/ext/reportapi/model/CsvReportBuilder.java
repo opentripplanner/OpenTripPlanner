@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.reportapi.model;
 
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.TimeUtils;
 
 /**
  * A very simple CSV builder to create CSV reports.

@@ -11,7 +11,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 

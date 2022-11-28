@@ -1,22 +1,22 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
-import static org.opentripplanner.transit.raptor.api.request.Optimization.PARALLEL;
+import static org.opentripplanner.raptor.api.request.Optimization.PARALLEL;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import org.opentripplanner.raptor.api.request.Optimization;
+import org.opentripplanner.raptor.api.request.RaptorProfile;
+import org.opentripplanner.raptor.api.request.RaptorRequest;
+import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.api.request.SearchParams;
+import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.transit.raptor.api.request.Optimization;
-import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
