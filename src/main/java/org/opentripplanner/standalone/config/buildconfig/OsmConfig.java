@@ -13,13 +13,14 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class OsmConfig {
 
   public static OsmExtractParameters mapOsmDefaults(NodeAdapter root, String parameterName) {
+    var baseDefaults = OsmExtractParameters.DEFAULT;
     var osmDefaults = root
       .of(parameterName)
       .since(V2_2)
       .summary("Default properties for OpenStreetMap feeds.")
       .asObject();
 
-    return mapOsmGenericParameters(osmDefaults);
+    return mapOsmGenericParameters(osmDefaults, baseDefaults, "").build();
   }
 
   public static OsmExtractParametersList mapOsmConfig(
@@ -48,17 +49,27 @@ public class OsmConfig {
     NodeAdapter node,
     OsmExtractParameters defaults
   ) {
-    return defaults
-      .copyOf()
+    String documentationAddition = " Overrides the value specified in `osmDefaults`.";
+    return mapOsmGenericParameters(node, defaults, documentationAddition)
       .withSource(
         node.of("source").since(V2_2).summary("The unique URI pointing to the data file.").asUri()
       )
+      .build();
+  }
+
+  public static OsmExtractParametersBuilder mapOsmGenericParameters(
+    NodeAdapter node,
+    OsmExtractParameters defaults,
+    String documentationAddition
+  ) {
+    return defaults
+      .copyOf()
       .withOsmTagMapper(
         node
           .of("osmTagMapping")
           .since(V2_2)
           .summary(
-            "The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`."
+            "The named set of mapping rules applied when parsing OSM tags." + documentationAddition
           )
           .asEnum(defaults.osmTagMapper())
       )
@@ -67,29 +78,9 @@ public class OsmConfig {
           .of("timeZone")
           .since(V2_2)
           .summary(
-            "The timezone used to resolve opening hours in OSM data. Overrides the value specified in `osmDefaults`."
+            "The timezone used to resolve opening hours in OSM data." + documentationAddition
           )
           .asZoneId(defaults.timeZone().orElse(null))
-      )
-      .build();
-  }
-
-  public static OsmExtractParameters mapOsmGenericParameters(NodeAdapter node) {
-    return new OsmExtractParametersBuilder()
-      .withOsmTagMapper(
-        node
-          .of("osmTagMapping")
-          .since(V2_2)
-          .summary("The named set of mapping rules applied when parsing OSM tags.")
-          .asEnum(OsmExtractParameters.DEFAULT_OSM_TAG_MAPPER)
-      )
-      .withTimeZone(
-        node
-          .of("timeZone")
-          .since(V2_2)
-          .summary("The timezone used to resolve opening hours in OSM data.")
-          .asZoneId(null)
-      )
-      .build();
+      );
   }
 }

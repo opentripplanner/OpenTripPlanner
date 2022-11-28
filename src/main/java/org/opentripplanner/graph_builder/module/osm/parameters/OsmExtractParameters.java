@@ -15,6 +15,8 @@ public class OsmExtractParameters implements DataSourceConfig {
 
   public static final OsmTagMapper.Source DEFAULT_OSM_TAG_MAPPER = OsmTagMapper.Source.DEFAULT;
 
+  public static final OsmExtractParameters DEFAULT = new OsmExtractParametersBuilder().build();
+
   /** See {@link org.opentripplanner.standalone.config.buildconfig.OsmConfig}. */
   private final URI source;
 

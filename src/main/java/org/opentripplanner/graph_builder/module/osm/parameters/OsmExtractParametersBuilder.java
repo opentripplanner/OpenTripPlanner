@@ -17,14 +17,16 @@ public class OsmExtractParametersBuilder {
   /**
    * Custom OSM way properties for this extract.
    */
-  private OsmTagMapper.Source osmTagMapper = OsmExtractParameters.DEFAULT_OSM_TAG_MAPPER;
+  private OsmTagMapper.Source osmTagMapper;
 
   /**
    * The timezone to use to resolve opening hours in this extract.
    */
   private ZoneId timeZone;
 
-  public OsmExtractParametersBuilder() {}
+  public OsmExtractParametersBuilder() {
+    this.osmTagMapper = OsmExtractParameters.DEFAULT_OSM_TAG_MAPPER;
+  }
 
   public OsmExtractParametersBuilder(OsmExtractParameters original) {
     this.osmTagMapper = original.osmTagMapper();
