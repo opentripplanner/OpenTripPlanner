@@ -95,7 +95,7 @@ public abstract class FlexAccessEgressTemplate {
     // transferStop is Location Area/Line
     else {
       double maxDistanceMeters =
-        flexConfig.maxTransferSeconds() *
+        flexConfig.maxTransferDuration().getSeconds() *
         accessEgress.state.getRequest().preferences().walk().speed();
 
       return getTransfersFromTransferStop(transitService)

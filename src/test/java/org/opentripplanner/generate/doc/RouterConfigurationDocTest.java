@@ -31,9 +31,10 @@ public class RouterConfigurationDocTest {
   private static final String CONFIG_PATH = "standalone/config/" + CONFIG_JSON;
   private static final SkipNodes SKIP_NODES = SkipNodes
     .of()
-    .add("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
+    .add("flex", "sandbox/Flex.md")
     .add("routingDefaults", "RouteRequest.md")
     .add("updaters", "UpdaterConfig.md")
+    .add("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
     .build();
 
   /**

@@ -72,7 +72,8 @@
     }
   },
   "flex": {
-    "maxTransferDurationSeconds": 240
+    "maxTransferDuration": "5m",
+    "maxFlexTripDuration": "45m"
   },
   "transit": {
     "maxNumberOfTransfers": 12,
