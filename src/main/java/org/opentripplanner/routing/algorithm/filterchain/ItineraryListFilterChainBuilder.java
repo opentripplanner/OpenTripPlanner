@@ -20,7 +20,7 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimi
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OtherThanSameLegsMaxGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortCyclingLeg;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
@@ -37,6 +37,7 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRou
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 
@@ -299,7 +300,9 @@ public class ItineraryListFilterChainBuilder {
     }
 
     if (minBikeParkingDistance > NOT_SET) {
-      filters.add(new RemoveItinerariesWithShortCyclingLeg(minBikeParkingDistance));
+      filters.add(
+        new RemoveItinerariesWithShortStreetLeg(minBikeParkingDistance, TraverseMode.BICYCLE)
+      );
     }
 
     if (accessibilityScore) {

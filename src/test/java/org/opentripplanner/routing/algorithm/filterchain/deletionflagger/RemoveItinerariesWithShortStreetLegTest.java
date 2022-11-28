@@ -2,14 +2,18 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.PlanTestConstants;
 
-class RemoveItinerariesWithShortCyclingLegTest implements PlanTestConstants {
+class RemoveItinerariesWithShortStreetLegTest implements PlanTestConstants {
 
-  RemoveItinerariesWithShortCyclingLeg filter = new RemoveItinerariesWithShortCyclingLeg(500);
+  RemoveItinerariesWithShortStreetLeg filter = new RemoveItinerariesWithShortStreetLeg(
+    500,
+    BICYCLE
+  );
 
   @Test
   void noBikeDoesNothing() {
@@ -29,7 +33,7 @@ class RemoveItinerariesWithShortCyclingLegTest implements PlanTestConstants {
 
   @Test
   void zeroMinDoesNothing() {
-    var filter = new RemoveItinerariesWithShortCyclingLeg(0);
+    var filter = new RemoveItinerariesWithShortStreetLeg(0, BICYCLE);
     var itin = newItinerary(A).bicycle(T11_05, T11_06, B).rail(30, T11_16, T11_20, C).build();
     assertEquals(300, itin.getLegs().get(0).getDistanceMeters());
     var result = filter.filter(List.of(itin));
