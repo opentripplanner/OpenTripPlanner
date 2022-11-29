@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import org.opentripplanner.api.mapping.I18NStringMapper;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.vectortiles.I18NStringMapper;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
