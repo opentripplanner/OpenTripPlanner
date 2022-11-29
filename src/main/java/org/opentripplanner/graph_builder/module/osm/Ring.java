@@ -130,8 +130,5 @@ public class Ring {
     return factory.createPolygon(shell, lrholes);
   }
 
-  public static class RingConstructionException extends RuntimeException {
-
-    private static final long serialVersionUID = 1L;
-  }
+  public static class RingConstructionException extends RuntimeException {}
 }

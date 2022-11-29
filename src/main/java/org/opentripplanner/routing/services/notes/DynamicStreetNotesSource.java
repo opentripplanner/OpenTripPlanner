@@ -14,8 +14,6 @@ import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
  */
 public class DynamicStreetNotesSource implements StreetNotesSource {
 
-  private static final long serialVersionUID = 1L;
-
   /**
    * Notes for street edges. Volatile in order to guarantee that the access to notesForEdge is
    * safe.

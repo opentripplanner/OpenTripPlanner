@@ -9,8 +9,6 @@ import java.util.HashMap;
  */
 public class MinMap<K, V extends Comparable<V>> extends HashMap<K, V> {
 
-  private static final long serialVersionUID = -23L;
-
   /**
    * Put the given key-value pair in the map if the map does not yet contain the key, or if the
    * value is less than the existing value for the same key.

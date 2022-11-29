@@ -21,8 +21,6 @@ import org.opentripplanner.util.OTPFeature;
  */
 public class TransferConstraint implements Serializable, RaptorTransferConstraint {
 
-  private static final long serialVersionUID = 1L;
-
   /**
    * A regular transfer is a transfer with no constraints.
    */

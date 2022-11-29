@@ -18,8 +18,6 @@ import org.opentripplanner.util.OtpAppException;
  */
 public class GraphFileHeader implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private static final String MAGIC_NUMBER = "OpenTripPlannerGraph";
   private static final char ID_PREFIX = '0';
   private static final char DELIMITER = ';';

@@ -36,14 +36,10 @@ import org.slf4j.LoggerFactory;
  */
 public class StreetNotesService implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(StreetNotesService.class);
 
   public static final NoteMatcher WHEELCHAIR_MATCHER = new NoteMatcher() {
-    private static final long serialVersionUID = 1L;
-
     @Override
     public boolean matches(State state) {
       return state.getRequest().wheelchair();
@@ -51,8 +47,6 @@ public class StreetNotesService implements Serializable {
   };
 
   public static final NoteMatcher DRIVING_MATCHER = new NoteMatcher() {
-    private static final long serialVersionUID = 1L;
-
     @Override
     public boolean matches(State state) {
       return state.getBackMode().isDriving();
@@ -60,8 +54,6 @@ public class StreetNotesService implements Serializable {
   };
 
   public static final NoteMatcher BICYCLE_MATCHER = new NoteMatcher() {
-    private static final long serialVersionUID = 1L;
-
     @Override
     public boolean matches(State state) {
       return state.getBackMode() == TraverseMode.BICYCLE;
@@ -69,8 +61,6 @@ public class StreetNotesService implements Serializable {
   };
 
   public static final NoteMatcher ALWAYS_MATCHER = new NoteMatcher() {
-    private static final long serialVersionUID = 1L;
-
     @Override
     public boolean matches(State state) {
       return true;
