@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.vectortiles;
 
 import edu.colorado.cires.cmg.mvt.VectorTile;
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -23,6 +21,7 @@ import javax.ws.rs.core.UriInfo;
 import org.geotools.geometry.Envelope2D;
 import org.glassfish.grizzly.http.server.Request;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.api.model.TileJson;
 import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
@@ -31,11 +30,9 @@ import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParking
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalPlacesLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalStationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalVehiclesLayerBuilder;
-import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.WorldEnvelope;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
@@ -161,11 +158,20 @@ public class VectorTilesResource {
     @PathParam("layers") String requestedLayers
   ) {
     return new TileJson(
-      serverContext.graph(),
-      serverContext.transitService(),
       uri,
       headers,
-      requestedLayers
+      requestedLayers,
+      ignoreRouterId,
+      "vectorTiles",
+      serverContext.graph().getEnvelope(),
+      serverContext
+        .transitService()
+        .getFeedIds()
+        .stream()
+        .map(serverContext.transitService()::getFeedInfo)
+        .filter(Predicate.not(Objects::isNull))
+        .toList(),
+      serverContext.transitService().getCenter().orElse(null)
     );
   }
 
@@ -203,75 +209,6 @@ public class VectorTilesResource {
     int cacheMaxSeconds();
 
     double expansionFactor();
-  }
-
-  private class TileJson implements Serializable {
-
-    // Some fields(all @SuppressWarnings("unused")) below are required to support the TileJSON
-    // format. See https://github.com/mapbox/tilejson-spec
-
-    @SuppressWarnings("unused")
-    public final String tilejson = "2.2.0";
-
-    @SuppressWarnings("unused")
-    public final String scheme = "xyz";
-
-    @SuppressWarnings("unused")
-    public final int minzoom = LayerParameters.MIN_ZOOM;
-
-    @SuppressWarnings("unused")
-    public final int maxzoom = LayerParameters.MAX_ZOOM;
-
-    public final String name = "OpenTripPlanner";
-    public final String attribution;
-    public final String[] tiles;
-    public final double[] bounds;
-    public final double[] center;
-
-    private TileJson(
-      Graph graph,
-      TransitService transitService,
-      UriInfo uri,
-      HttpHeaders headers,
-      String layers
-    ) {
-      attribution =
-        transitService
-          .getFeedIds()
-          .stream()
-          .map(transitService::getFeedInfo)
-          .filter(Predicate.not(Objects::isNull))
-          .map(feedInfo ->
-            "<a href='" + feedInfo.getPublisherUrl() + "'>" + feedInfo.getPublisherName() + "</a>"
-          )
-          .collect(Collectors.joining(", "));
-
-      tiles =
-        new String[] {
-          HttpUtils.getBaseAddress(uri, headers) +
-          "/otp/routers/" +
-          ignoreRouterId +
-          "/vectorTiles/" +
-          layers +
-          "/{z}/{x}/{y}.pbf",
-        };
-
-      WorldEnvelope envelope = graph.getEnvelope();
-
-      bounds =
-        new double[] {
-          envelope.getLowerLeftLongitude(),
-          envelope.getLowerLeftLatitude(),
-          envelope.getUpperRightLongitude(),
-          envelope.getUpperRightLatitude(),
-        };
-
-      center =
-        transitService
-          .getCenter()
-          .map(coordinate -> new double[] { coordinate.x, coordinate.y, 9 })
-          .orElse(null);
-    }
   }
 
   @FunctionalInterface
