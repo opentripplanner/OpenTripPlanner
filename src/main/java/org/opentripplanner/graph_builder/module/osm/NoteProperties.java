@@ -3,9 +3,9 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
+import org.opentripplanner.model.NoteMatcher;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 

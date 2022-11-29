@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.services.notes;
+package org.opentripplanner.model;
 
 import java.io.Serializable;
 import org.opentripplanner.street.search.state.State;

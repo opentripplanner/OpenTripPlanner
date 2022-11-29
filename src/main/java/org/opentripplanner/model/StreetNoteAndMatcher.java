@@ -1,11 +1,10 @@
-package org.opentripplanner.routing.services.notes;
+package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.model.StreetNote;
 
 /**
- * A container for a pair (note matcher, note).
+ * A container for a pair (note and note matcher).
  *
  * @author laurent
  */
