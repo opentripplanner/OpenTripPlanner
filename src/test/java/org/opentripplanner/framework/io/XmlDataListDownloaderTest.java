@@ -1,4 +1,4 @@
-package org.opentripplanner.util.xml;
+package org.opentripplanner.framework.io;
 
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;

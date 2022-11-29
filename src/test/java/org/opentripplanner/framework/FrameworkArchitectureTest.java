@@ -3,11 +3,20 @@ package org.opentripplanner.framework;
 import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.arch.Module;
 import org.opentripplanner._support.arch.Package;
 
 public class FrameworkArchitectureTest {
 
+
+
   private static final Package APACHE_HTTP = Package.of("org.apache.http..");
+
+  private static final Module XML_MODULES = Module.of(
+    Package.of("com.fasterxml.jackson.."),
+    Package.of("org.w3c.dom"),
+    Package.of("org.xml.sax")
+  );
   private static final Package COLLECTION = FRAMEWORK.subPackage("collection");
   private static final Package IO = FRAMEWORK.subPackage("io");
   private static final Package LANG = FRAMEWORK.subPackage("lang");
@@ -23,7 +32,7 @@ public class FrameworkArchitectureTest {
 
   @Test
   void enforceIoPackageDependencies() {
-    IO.dependsOn(APACHE_HTTP).verify();
+    IO.dependsOn(APACHE_HTTP, XML_MODULES).verify();
   }
 
   @Test

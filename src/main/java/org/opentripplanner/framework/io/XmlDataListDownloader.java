@@ -1,4 +1,4 @@
-package org.opentripplanner.util.xml;
+package org.opentripplanner.framework.io;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +16,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.opentripplanner.framework.io.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
