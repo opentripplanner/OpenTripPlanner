@@ -9,5 +9,5 @@ import org.opentripplanner.street.model.edge.Edge;
  * @author laurent
  */
 public interface StreetNotesSource {
-  Set<MatcherAndStreetNote> getNotes(Edge edge);
+  Set<StreetNoteAndMatcher> getNotes(Edge edge);
 }

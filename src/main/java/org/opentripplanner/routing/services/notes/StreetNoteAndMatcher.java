@@ -9,12 +9,12 @@ import org.opentripplanner.model.StreetNote;
  *
  * @author laurent
  */
-public class MatcherAndStreetNote implements Serializable {
+public class StreetNoteAndMatcher implements Serializable {
 
   private final NoteMatcher matcher;
   private final StreetNote note;
 
-  public MatcherAndStreetNote(StreetNote note, NoteMatcher matcher) {
+  public StreetNoteAndMatcher(StreetNote note, NoteMatcher matcher) {
     this.matcher = matcher;
     this.note = note;
   }
@@ -31,7 +31,7 @@ public class MatcherAndStreetNote implements Serializable {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    MatcherAndStreetNote that = (MatcherAndStreetNote) o;
+    StreetNoteAndMatcher that = (StreetNoteAndMatcher) o;
     return matcher.equals(that.matcher) && note.equals(that.note);
   }
 

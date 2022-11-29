@@ -98,10 +98,10 @@ public class StreetNotesService implements Serializable {
    */
   public Set<StreetNote> getNotes(State state) {
     Edge edge = state.getBackEdge();
-    Set<MatcherAndStreetNote> maas = new HashSet<>();
+    Set<StreetNoteAndMatcher> maas = new HashSet<>();
 
     for (StreetNotesSource source : sources) {
-      Set<MatcherAndStreetNote> maas2 = source.getNotes(edge);
+      Set<StreetNoteAndMatcher> maas2 = source.getNotes(edge);
       if (maas2 != null) maas.addAll(maas2);
     }
     if (maas == null || maas.isEmpty()) {
@@ -109,7 +109,7 @@ public class StreetNotesService implements Serializable {
     }
 
     Set<StreetNote> notes = new HashSet<>(maas.size());
-    for (MatcherAndStreetNote maa : maas) {
+    for (StreetNoteAndMatcher maa : maas) {
       if (maa.getMatcher().matches(state)) {
         notes.add(maa.getNote());
       }
