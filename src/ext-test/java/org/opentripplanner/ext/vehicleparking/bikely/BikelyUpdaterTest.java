@@ -2,6 +2,7 @@ package org.opentripplanner.ext.vehicleparking.bikely;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -31,7 +32,7 @@ public class BikelyUpdaterTest {
     assertEquals("Husebybadet", first.getName().toString());
     assertFalse(first.hasAnyCarPlaces());
     assertTrue(first.hasBicyclePlaces());
-    assertNull(first.getCapacity());
+
     assertEquals(
       "First 4 hour(s) is NOK0.00, afterwards NOK10.00 per 1 hour(s)",
       first.getNote().toString(Locale.ENGLISH)
@@ -47,8 +48,13 @@ public class BikelyUpdaterTest {
     var availibility = first.getAvailability();
     assertEquals(4, availibility.getBicycleSpaces());
 
+    var capacity = first.getCapacity();
+    assertEquals(10, capacity.getBicycleSpaces());
+
     var freeParkingLots = parkingLots.get(2);
     assertEquals("Free of charge", freeParkingLots.getNote().toString(Locale.ENGLISH));
+
+    assertEquals(VehicleParkingState.OPERATIONAL, first.getState());
 
     var last = parkingLots.get(99);
     assertEquals("Hamar Stasjon", last.getName().toString());
@@ -62,5 +68,9 @@ public class BikelyUpdaterTest {
       .filter(x -> x == VehicleParkingState.TEMPORARILY_CLOSED)
       .count();
     assertEquals(2, closed);
+
+    parkingLots.forEach(lot -> {
+      assertNotNull(lot.getNote().toString());
+    });
   }
 }

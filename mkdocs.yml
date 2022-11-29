@@ -8,6 +8,27 @@ site_url: https://docs.opentripplanner.org
 repo_url: https://github.com/opentripplanner/OpenTripPlanner
 docs_dir: docs
 site_dir: target/mkdocs
+strict: true
+
+theme:
+    name: material
+    features:
+        - toc.integrate
+    palette:
+        primary: blue
+        accent: blue
+        scheme: default
+
+extra:
+    version:
+        provider: mike
+
+markdown_extensions:
+    - pymdownx.highlight:
+          anchor_linenums: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences
 
 # MkDocs will automatically discover pages if you don't list them here.
 # In that case subdirectories can be used to organize pages.

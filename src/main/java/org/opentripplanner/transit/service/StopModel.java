@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.framework.collection.CollectionsView;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -18,7 +19,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
-import org.opentripplanner.util.lang.CollectionsView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

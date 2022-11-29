@@ -11,7 +11,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.base.ZipStreamDataSourceDecorator;
-import org.opentripplanner.util.HttpUtils;
+import org.opentripplanner.framework.io.HttpUtils;
 
 /**
  * This data store accesses files in read-only mode over HTTPS.

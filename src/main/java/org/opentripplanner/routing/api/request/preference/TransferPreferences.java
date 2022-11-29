@@ -1,14 +1,15 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
+import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.api.request.framework.Units;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Parameters for doing transfers between transit legs.
@@ -108,7 +109,7 @@ public final class TransferPreferences implements Serializable {
    * Ideally maxTransfers should be set in the router config, not here. Instead the client should be
    * able to pass in a parameter for the max number of additional/extra transfers relative to the
    * best trip (with the fewest possible transfers) within constraint of the other search
-   * parameters(TODO OTP2 Expose {@link org.opentripplanner.transit.raptor.api.request.SearchParams#numberOfAdditionalTransfers()}
+   * parameters(TODO OTP2 Expose {@link SearchParams#numberOfAdditionalTransfers()}
    * in APIs). This might be to complicated to explain to the customer, so we might stick to the old
    * limit, but that have side-effects that you might not find any trips on a day where a critical
    * part of the trip is not available, because of some real-time disruption.

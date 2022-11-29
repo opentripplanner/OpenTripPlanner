@@ -16,6 +16,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add Bikely vehicle parking updater [#4589](https://github.com/opentripplanner/OpenTripPlanner/pull/4589)
 - Fix interchange generation when identical consecutive stops are filtered [#4586](https://github.com/opentripplanner/OpenTripPlanner/pull/4586)
 - Add test for SpeedTestConfigs used in performance tests [#4596](https://github.com/opentripplanner/OpenTripPlanner/pull/4596)
+- Add alerts to leg when reading in a leg reference [#4595](https://github.com/opentripplanner/OpenTripPlanner/pull/4595)
+- Remove KML bike parking updater [#4602](https://github.com/opentripplanner/OpenTripPlanner/pull/4602)
+- Initial implementation of via search [#4554](https://github.com/opentripplanner/OpenTripPlanner/pull/4554)
+- Use material design theme for documentation, auto-deploy to Github Pages [#4575](https://github.com/opentripplanner/OpenTripPlanner/pull/4575)
+- Add stationTransferPreference option for GTFS feeds [#4599](https://github.com/opentripplanner/OpenTripPlanner/pull/4599)
+- Fix osmDefaults so they are used if something is not set in source [#4635](https://github.com/opentripplanner/OpenTripPlanner/pull/4635)
+- Add demDefaults [#4637](https://github.com/opentripplanner/OpenTripPlanner/pull/4637)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

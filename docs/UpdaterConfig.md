@@ -87,7 +87,7 @@ predicted arrival and departure times for the remainder of the trip.
 | Config Parameter                                                      |    Type   | Summary                                             |  Req./Opt. | Default Value        | Since |
 |-----------------------------------------------------------------------|:---------:|-----------------------------------------------------|:----------:|----------------------|:-----:|
 | type = "STOP_TIME_UPDATER"                                            |   `enum`  | The type of the updater.                            | *Required* |                      |   na  |
-| [backwardsDelayPropagationType](#u__6__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled.        | *Optional* | `"required-no-data"` |  2.2  |
+| [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled.        | *Optional* | `"required-no-data"` |  2.2  |
 | feedId                                                                |  `string` | Which feed the updates apply to.                    | *Optional* |                      |   na  |
 | frequencySec                                                          | `integer` | How often the data should be downloaded in seconds. | *Optional* | `60`                 |   na  |
 | fuzzyTripMatching                                                     | `boolean` | If the trips should be matched fuzzily.             | *Optional* | `false`              |   na  |
@@ -96,10 +96,10 @@ predicted arrival and departure times for the remainder of the trip.
 
 #### Details
 
-<h4 id="u__6__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
+<h4 id="u__5__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`  \
-**Path:** /updaters/[6]  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
+**Path:** /updaters/[5]   
 **Enum values:** `required-no-data` | `required` | `always`
 
 How backwards propagation should be handled.
@@ -147,7 +147,7 @@ How backwards propagation should be handled.
 | Config Parameter                                                      |    Type   | Summary                  |  Req./Opt. | Default Value        | Since |
 |-----------------------------------------------------------------------|:---------:|--------------------------|:----------:|----------------------|:-----:|
 | type = "WEBSOCKET_GTFS_RT_UPDATER"                                    |   `enum`  | The type of the updater. | *Required* |                      |   na  |
-| [backwardsDelayPropagationType](#u__8__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |   na  |
+| [backwardsDelayPropagationType](#u__7__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |   na  |
 | feedId                                                                |  `string` | TODO                     | *Optional* |                      |   na  |
 | reconnectPeriodSec                                                    | `integer` | TODO                     | *Optional* | `60`                 |   na  |
 | url                                                                   |  `string` | TODO                     | *Optional* |                      |   na  |
@@ -155,10 +155,10 @@ How backwards propagation should be handled.
 
 #### Details
 
-<h4 id="u__8__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
+<h4 id="u__7__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`  \
-**Path:** /updaters/[8]  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
+**Path:** /updaters/[7]   
 **Enum values:** `required-no-data` | `required` | `always`
 
 TODO
@@ -266,7 +266,7 @@ can be configured as a json. Any header key, value can be inserted.
 
 <h4 id="u_1_allowKeepingRentedBicycleAtDestination">allowKeepingRentedBicycleAtDestination</h4>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** /updaters/[1] 
 
 If a vehicle should be allowed to be kept at the end of a station-based rental.
@@ -275,7 +275,7 @@ This behaviour is useful in towns that have only a single rental station. Withou
 
 <h4 id="u_1_network">network</h4>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[1] 
 
 The name of the network to override the one derived from the source data.
@@ -284,15 +284,15 @@ GBFS feeds must include a system_id which will be used as the default `network`.
 
 <h4 id="u_1_sourceType">sourceType</h4>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
-**Path:** /updaters/[1]  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[1]   
 **Enum values:** `gbfs` | `smoove` | `vilkku`
 
 What source of vehicle rental updater to use.
 
 <h4 id="u_1_headers">headers</h4>
 
-**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[1] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.

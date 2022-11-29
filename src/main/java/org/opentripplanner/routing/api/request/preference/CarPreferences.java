@@ -3,9 +3,9 @@ package org.opentripplanner.routing.api.request.preference;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.Units;
-import org.opentripplanner.util.lang.DoubleUtils;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * The car preferences contain all speed, reluctance, cost and factor preferences for driving

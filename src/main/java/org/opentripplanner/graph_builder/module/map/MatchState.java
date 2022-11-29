@@ -5,17 +5,20 @@ import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.linearref.LinearLocation;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.state.State;
 
 public abstract class MatchState {
 
-  private static final AStarRequest REQUEST = AStarRequest.of().withMode(StreetMode.CAR).build();
+  private static final StreetSearchRequest REQUEST = StreetSearchRequest
+    .of()
+    .withMode(StreetMode.CAR)
+    .build();
 
   protected static final double NEW_SEGMENT_PENALTY = 0.1;
 

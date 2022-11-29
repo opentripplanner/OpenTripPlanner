@@ -23,7 +23,7 @@ import javax.ws.rs.core.UriInfo;
 import org.geotools.geometry.Envelope2D;
 import org.glassfish.grizzly.http.server.Request;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.WebMercatorTile;
+import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;
@@ -127,10 +127,7 @@ public class VectorTilesResource {
 
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
-    for (LayerParameters layerParameters : serverContext
-      .routerConfig()
-      .vectorTileLayers()
-      .layers()) {
+    for (LayerParameters layerParameters : serverContext.vectorTileLayers().layers()) {
       if (
         layers.contains(layerParameters.name()) &&
         layerParameters.minZoom() <= z &&

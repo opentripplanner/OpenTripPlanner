@@ -8,11 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.time.Duration;
-import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
@@ -20,7 +17,6 @@ import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
-import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,11 +158,7 @@ number of transit vehicles used in that itinerary.
     return routingRequestDefaults;
   }
 
-  public RaptorTuningParameters raptorTuningParameters() {
-    return transitConfig;
-  }
-
-  public TransitTuningParameters transitTuningParameters() {
+  public TransitRoutingConfig transitTuningConfig() {
     return transitConfig;
   }
 
@@ -178,8 +170,8 @@ number of transit vehicles used in that itinerary.
     return vectorTileLayers;
   }
 
-  public FlexParameters flexParameters(RoutingPreferences preferences) {
-    return flexConfig.toFlexParameters(preferences);
+  public FlexConfig flexConfig() {
+    return flexConfig;
   }
 
   public NodeAdapter asNodeAdapter() {

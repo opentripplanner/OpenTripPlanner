@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.service.StopModel;
 
 class DirectGraphFinderTest extends GraphRoutingTest {

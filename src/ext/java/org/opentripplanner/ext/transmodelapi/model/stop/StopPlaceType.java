@@ -363,7 +363,7 @@ public class StopPlaceType {
               ? Instant.ofEpochMilli(environment.getArgument("startTime"))
               : Instant.now();
 
-            return monoOrMultiModalStation
+            Stream<TripTimeOnDate> tripTimeOnDateStream = monoOrMultiModalStation
               .getChildStops()
               .stream()
               .flatMap(singleStop ->
@@ -382,7 +382,12 @@ public class StopPlaceType {
                 )
               )
               .sorted(TripTimeOnDate.compareByDeparture())
-              .distinct()
+              .distinct();
+
+            return limitPerLineAndDestinationDisplay(
+              tripTimeOnDateStream,
+              departuresPerLineAndDestinationDisplay
+            )
               .limit(numberOfDepartures)
               .collect(Collectors.toList());
           })
@@ -405,10 +410,6 @@ public class StopPlaceType {
     DataFetchingEnvironment environment
   ) {
     TransitService transitService = GqlUtil.getTransitService(environment);
-    boolean limitOnDestinationDisplay =
-      departuresPerLineAndDestinationDisplay != null &&
-      departuresPerLineAndDestinationDisplay > 0 &&
-      departuresPerLineAndDestinationDisplay < numberOfDepartures;
 
     List<StopTimesInPattern> stopTimesInPatterns = transitService.stopTimesForStop(
       stop,
@@ -434,21 +435,35 @@ public class StopPlaceType {
         lineIdsWhiteListed
       );
 
-    if (!limitOnDestinationDisplay) {
+    return limitPerLineAndDestinationDisplay(
+      tripTimesStream,
+      departuresPerLineAndDestinationDisplay
+    );
+  }
+
+  private static Stream<TripTimeOnDate> limitPerLineAndDestinationDisplay(
+    Stream<TripTimeOnDate> tripTimesStream,
+    Integer departuresPerLineAndDestinationDisplay
+  ) {
+    boolean limitOnDestinationDisplay =
+      departuresPerLineAndDestinationDisplay != null && departuresPerLineAndDestinationDisplay > 0;
+
+    if (limitOnDestinationDisplay) {
+      // Group by line and destination display, limit departures per group and merge
+      return tripTimesStream
+        .collect(Collectors.groupingBy(StopPlaceType::destinationDisplayPerLine))
+        .values()
+        .stream()
+        .flatMap(tripTimes ->
+          tripTimes
+            .stream()
+            .sorted(TripTimeOnDate.compareByDeparture())
+            .distinct()
+            .limit(departuresPerLineAndDestinationDisplay)
+        );
+    } else {
       return tripTimesStream;
     }
-    // Group by line and destination display, limit departures per group and merge
-    return tripTimesStream
-      .collect(Collectors.groupingBy(t -> destinationDisplayPerLine(((TripTimeOnDate) t))))
-      .values()
-      .stream()
-      .flatMap(tripTimes ->
-        tripTimes
-          .stream()
-          .sorted(TripTimeOnDate.compareByDeparture())
-          .distinct()
-          .limit(departuresPerLineAndDestinationDisplay)
-      );
   }
 
   public static MonoOrMultiModalStation fetchStopPlaceById(

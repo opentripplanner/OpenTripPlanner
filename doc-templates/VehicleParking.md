@@ -1,4 +1,4 @@
-# Vehicle Parking Updaters - OTP Sandbox Extension
+# Vehicle Parking Updaters
 
 ## Contact Info
 
@@ -15,7 +15,6 @@ Currently contains the following updaters:
 
 - [HSL Park and Ride](https://p.hsl.fi/docs/index.html)
 - [ParkAPI](https://github.com/offenesdresden/ParkAPI)
-- KML (Keyhole Markup language) placemark parks. Use name as bike park name and point coordinates.
 - [Bikely](https://www.safebikely.com/)
 
 ### Configuration
@@ -32,10 +31,6 @@ All updaters have the following parameters in common:
 
 <!-- INSERT: hsl-park -->
 
-## KML 
-
-<!-- INSERT: kml -->
-
 ## ParkAPI 
 
 <!-- INSERT: park-api -->
@@ -50,3 +45,4 @@ All updaters have the following parameters in common:
 - Create initial sandbox implementation (January 2022, [#3796](https://github.com/opentripplanner/OpenTripPlanner/pull/3796))
 - Add timeZone parameter to hsl and parkapi updaters (September 2022, [#4427](https://github.com/opentripplanner/OpenTripPlanner/pull/4427))
 - Added support for HSL parking hubs (October 2022, [#4510](https://github.com/opentripplanner/OpenTripPlanner/pull/4510))
+- Add Bikely updater (November 2022, [#4589](https://github.com/opentripplanner/OpenTripPlanner/pull/4589))

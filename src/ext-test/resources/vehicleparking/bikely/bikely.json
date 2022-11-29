@@ -3,6 +3,7 @@
     {
       "name": "Husebybadet",
       "availableParkingSpots": 4,
+      "totalParkingSpots":10,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -30,6 +31,7 @@
     {
       "name": "Sentrum P-Hus",
       "availableParkingSpots": 8,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -57,6 +59,7 @@
     {
       "name": "Skien Fritidspark",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -84,6 +87,7 @@
     {
       "name": "Trondheim Spektrum",
       "availableParkingSpots": 12,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -111,6 +115,7 @@
     {
       "name": "Amfi Steinkjer",
       "availableParkingSpots": 3,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -138,6 +143,7 @@
     {
       "name": "Tyholmen ",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 4,
@@ -165,6 +171,7 @@
     {
       "name": "AMFI Ullevål Øst",
       "availableParkingSpots": 3,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 1,
@@ -192,6 +199,7 @@
     {
       "name": "VikelvfaretPOD",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -219,6 +227,7 @@
     {
       "name": "Tveita Senter",
       "availableParkingSpots": 3,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 1,
@@ -246,6 +255,7 @@
     {
       "name": "Manglerud Senter",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 1,
@@ -273,6 +283,7 @@
     {
       "name": "Lambertseter Senter",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 1,
@@ -300,6 +311,7 @@
     {
       "name": "test sub",
       "availableParkingSpots": 1,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -326,7 +338,8 @@
     },
     {
       "name": "Lagunen Storsenter",
-      "availableParkingSpots": 8,
+      "availableParkingSpots": 9,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 3,
@@ -354,6 +367,7 @@
     {
       "name": "IMEI Test Telenor",
       "availableParkingSpots": 1,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -380,7 +394,8 @@
     },
     {
       "name": "Kolsås Sykkelhotell",
-      "availableParkingSpots": 17,
+      "availableParkingSpots": 14,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 24,
@@ -408,6 +423,7 @@
     {
       "name": "Ranheimsveien",
       "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 12,
@@ -435,6 +451,7 @@
     {
       "name": "Skien LastesykkelHotell",
       "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -461,7 +478,8 @@
     },
     {
       "name": "Sandefjord Torg",
-      "availableParkingSpots": 4,
+      "availableParkingSpots": 7,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 12,
@@ -488,7 +506,8 @@
     },
     {
       "name": "Kirkegata",
-      "availableParkingSpots": 8,
+      "availableParkingSpots": 7,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 15.0,
         "startPriceDurationHours": 12,
@@ -516,6 +535,7 @@
     {
       "name": "AMFI Ullevål Nord",
       "availableParkingSpots": 9,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 1,
@@ -543,6 +563,7 @@
     {
       "name": "CC Vest",
       "availableParkingSpots": 6,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 3,
@@ -570,6 +591,7 @@
     {
       "name": "Jekta Storsenter",
       "availableParkingSpots": 8,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 1,
@@ -596,7 +618,8 @@
     },
     {
       "name": "Bike Fixx",
-      "availableParkingSpots": 1,
+      "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -623,7 +646,8 @@
     },
     {
       "name": "Tromsø Havneterminal",
-      "availableParkingSpots": 6,
+      "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 1,
@@ -651,6 +675,7 @@
     {
       "name": "Punkt Fornebu",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 12,
@@ -678,6 +703,7 @@
     {
       "name": "Moholt Allmenning Privat",
       "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -704,7 +730,8 @@
     },
     {
       "name": "Rådhuskvartalet",
-      "availableParkingSpots": 7,
+      "availableParkingSpots": 10,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -732,6 +759,7 @@
     {
       "name": "Majorstuen test",
       "availableParkingSpots": 1,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -759,6 +787,7 @@
     {
       "name": "Vikelvfaret ",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -786,6 +815,7 @@
     {
       "name": "Gjøvik Skysstasjon",
       "availableParkingSpots": 19,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 10,
@@ -813,6 +843,7 @@
     {
       "name": "Bikely HOME",
       "availableParkingSpots": 1,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -840,6 +871,7 @@
     {
       "name": "E-bike Pool",
       "availableParkingSpots": 1,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -867,6 +899,7 @@
     {
       "name": "CC Gjøvik Strandgata",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 3,
@@ -894,6 +927,7 @@
     {
       "name": "Tranberghallen",
       "availableParkingSpots": 10,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 10,
@@ -921,6 +955,7 @@
     {
       "name": "CC Gjøvik Nord",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 3,
@@ -948,6 +983,7 @@
     {
       "name": "AtB Melhus Skysstasjon",
       "availableParkingSpots": 3,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -975,6 +1011,7 @@
     {
       "name": "Kvadrat Kjøpesenter NORD",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 1,
@@ -1002,6 +1039,7 @@
     {
       "name": "Prestegaten",
       "availableParkingSpots": 9,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 12,
@@ -1029,6 +1067,7 @@
     {
       "name": "Epsilon Cities PLC demo",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -1055,7 +1094,8 @@
     },
     {
       "name": "Prinsen Kino",
-      "availableParkingSpots": 10,
+      "availableParkingSpots": 12,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -1083,6 +1123,7 @@
     {
       "name": "P-Hus Aker Brygge - Felt C",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 1,
@@ -1110,6 +1151,7 @@
     {
       "name": "Kvadrat Kjøpesenter SØR-ØST",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 1,
@@ -1137,6 +1179,7 @@
     {
       "name": "Lillestrøm Parkering Storgata",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 20.0,
         "startPriceDurationHours": 4,
@@ -1164,6 +1207,7 @@
     {
       "name": "Kvadrat Kjøpesenter SØR-VEST",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 1,
@@ -1191,6 +1235,7 @@
     {
       "name": "City Lade",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 3,
@@ -1218,6 +1263,7 @@
     {
       "name": "Onepark Sentrum P-hus 1B",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 20.0,
         "startPriceDurationHours": 12,
@@ -1245,6 +1291,7 @@
     {
       "name": "Lerkendal Studentby Privat",
       "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -1272,6 +1319,7 @@
     {
       "name": "Nedre Berg Privat",
       "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -1299,6 +1347,7 @@
     {
       "name": "Bruveien parkering",
       "availableParkingSpots": 8,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -1325,7 +1374,8 @@
     },
     {
       "name": "Slottet sykkelparkering",
-      "availableParkingSpots": 2,
+      "availableParkingSpots": 1,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -1353,6 +1403,7 @@
     {
       "name": "Ibsenhuset",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -1379,7 +1430,8 @@
     },
     {
       "name": "Gjettum T-banestasjon",
-      "availableParkingSpots": 4,
+      "availableParkingSpots": 3,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 12,
@@ -1407,6 +1459,7 @@
     {
       "name": "Lager 11 / Grip ",
       "availableParkingSpots": 8,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 1,
@@ -1434,6 +1487,7 @@
     {
       "name": "Ringerike Rådhus",
       "availableParkingSpots": 10,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -1460,7 +1514,8 @@
     },
     {
       "name": "Leutenhaven ",
-      "availableParkingSpots": 1,
+      "availableParkingSpots": 3,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -1487,7 +1542,8 @@
     },
     {
       "name": "Bergen Bystasjon",
-      "availableParkingSpots": 5,
+      "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -1515,6 +1571,7 @@
     {
       "name": "KLP Teknobyen",
       "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 2,
@@ -1542,6 +1599,7 @@
     {
       "name": "Moholt Allmenning",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 15.0,
         "startPriceDurationHours": 2,
@@ -1569,6 +1627,7 @@
     {
       "name": "Jar T-banestasjon",
       "availableParkingSpots": 7,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 12,
@@ -1595,7 +1654,8 @@
     },
     {
       "name": "Bergen Marken",
-      "availableParkingSpots": 4,
+      "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -1623,6 +1683,7 @@
     {
       "name": "Heggedal Idrettsanlegg",
       "availableParkingSpots": 8,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -1650,6 +1711,7 @@
     {
       "name": "Majorstuen T-bane",
       "availableParkingSpots": 8,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 1,
@@ -1677,6 +1739,7 @@
     {
       "name": "Arnestad Idrettsanlegg",
       "availableParkingSpots": 9,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -1704,6 +1767,7 @@
     {
       "name": "Risenga Svømmehall",
       "availableParkingSpots": 10,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -1730,7 +1794,8 @@
     },
     {
       "name": "Farmannstorvet",
-      "availableParkingSpots": 9,
+      "availableParkingSpots": 8,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 12,
@@ -1758,6 +1823,7 @@
     {
       "name": "Thon Hotell",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 12,
@@ -1785,6 +1851,7 @@
     {
       "name": "Re-torvet",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 12,
@@ -1812,6 +1879,7 @@
     {
       "name": "Bikely kontor",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -1838,7 +1906,8 @@
     },
     {
       "name": "Jernbanebommene",
-      "availableParkingSpots": 7,
+      "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 12,
@@ -1865,7 +1934,8 @@
     },
     {
       "name": "Pirbadet",
-      "availableParkingSpots": 6,
+      "availableParkingSpots": 7,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -1892,7 +1962,8 @@
     },
     {
       "name": "Oasen Terminal",
-      "availableParkingSpots": 13,
+      "availableParkingSpots": 16,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -1920,6 +1991,7 @@
     {
       "name": "Lerkendal Studentby",
       "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 15.0,
         "startPriceDurationHours": 2,
@@ -1946,7 +2018,8 @@
     },
     {
       "name": "NAV Ringerike",
-      "availableParkingSpots": 6,
+      "availableParkingSpots": 7,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 12,
@@ -1974,6 +2047,7 @@
     {
       "name": "Sletten Senter",
       "availableParkingSpots": 9,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -2001,6 +2075,7 @@
     {
       "name": "Nedre Berg",
       "availableParkingSpots": 3,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 15.0,
         "startPriceDurationHours": 2,
@@ -2028,6 +2103,7 @@
     {
       "name": "Holmen Ishall",
       "availableParkingSpots": 11,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 12,
@@ -2054,7 +2130,8 @@
     },
     {
       "name": "Porsgrunn Stasjon",
-      "availableParkingSpots": 7,
+      "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -2081,7 +2158,8 @@
     },
     {
       "name": "Faktry",
-      "availableParkingSpots": 6,
+      "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -2108,7 +2186,8 @@
     },
     {
       "name": "Skjelsvik Terminal",
-      "availableParkingSpots": 4,
+      "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -2136,6 +2215,7 @@
     {
       "name": "Ørjaveita",
       "availableParkingSpots": 9,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -2163,6 +2243,7 @@
     {
       "name": "Botilrud",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -2189,7 +2270,8 @@
     },
     {
       "name": "Høvik Skole",
-      "availableParkingSpots": 5,
+      "availableParkingSpots": 6,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -2216,7 +2298,8 @@
     },
     {
       "name": "AtB Steinkjer Stasjon",
-      "availableParkingSpots": 2,
+      "availableParkingSpots": 3,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -2243,7 +2326,8 @@
     },
     {
       "name": "Bragernes Torg",
-      "availableParkingSpots": 6,
+      "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 10,
@@ -2271,6 +2355,7 @@
     {
       "name": "PirSenteret Elsykkel-pool",
       "availableParkingSpots": 5,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 0,
@@ -2298,6 +2383,7 @@
     {
       "name": "Sirkus Shopping",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 2,
@@ -2324,7 +2410,8 @@
     },
     {
       "name": "Stokke Stasjon",
-      "availableParkingSpots": 7,
+      "availableParkingSpots": 6,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 12,
@@ -2351,7 +2438,8 @@
     },
     {
       "name": "Lørenskog sykkelhotell",
-      "availableParkingSpots": 73,
+      "availableParkingSpots": 74,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 5.0,
         "startPriceDurationHours": 12,
@@ -2378,7 +2466,8 @@
     },
     {
       "name": "Nittedal Stasjon",
-      "availableParkingSpots": 6,
+      "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 12,
@@ -2405,7 +2494,8 @@
     },
     {
       "name": "Skien Stasjon",
-      "availableParkingSpots": 4,
+      "availableParkingSpots": 3,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -2433,6 +2523,7 @@
     {
       "name": "Skien SykkelHotell",
       "availableParkingSpots": 38,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -2459,7 +2550,8 @@
     },
     {
       "name": "Hønefoss Bussteminal",
-      "availableParkingSpots": 3,
+      "availableParkingSpots": 7,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 12,
@@ -2486,7 +2578,8 @@
     },
     {
       "name": "Østerås T-Banestasjon",
-      "availableParkingSpots": 2,
+      "availableParkingSpots": 3,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 12,
@@ -2513,7 +2606,8 @@
     },
     {
       "name": "Pirsenteret",
-      "availableParkingSpots": 5,
+      "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 1,
@@ -2541,6 +2635,7 @@
     {
       "name": "Vefsn VGS",
       "availableParkingSpots": 2,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -2568,6 +2663,7 @@
     {
       "name": "Hvervenkastet",
       "availableParkingSpots": 4,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -2594,7 +2690,8 @@
     },
     {
       "name": "Universitetsbiblioteket",
-      "availableParkingSpots": 6,
+      "availableParkingSpots": 8,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 4,
@@ -2622,6 +2719,7 @@
     {
       "name": "KLP EL-pool",
       "availableParkingSpots": 1,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -2648,7 +2746,8 @@
     },
     {
       "name": "Lier Bussterminal",
-      "availableParkingSpots": 8,
+      "availableParkingSpots": 7,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 0.0,
         "startPriceDurationHours": 0,
@@ -2676,6 +2775,7 @@
     {
       "name": "Hamar Stasjon",
       "availableParkingSpots": 10,
+      "totalParkingSpots": 0,
       "price": {
         "startPriceAmount": 10.0,
         "startPriceDurationHours": 12,

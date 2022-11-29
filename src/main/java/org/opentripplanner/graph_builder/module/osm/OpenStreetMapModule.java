@@ -16,12 +16,12 @@ import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.TurnRestriction;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.Issue;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.logging.ProgressTracker;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
@@ -34,34 +34,33 @@ import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
-import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
-import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.NamedArea;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vertextype.BarrierVertex;
-import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
-import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
-import org.opentripplanner.routing.vertextype.ExitVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.TurnRestriction;
+import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.AreaEdgeList;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
+import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
+import org.opentripplanner.street.model.edge.ElevatorHopEdge;
+import org.opentripplanner.street.model.edge.FreeEdge;
+import org.opentripplanner.street.model.edge.NamedArea;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
+import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
+import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
+import org.opentripplanner.street.model.vertex.ExitVertex;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
+import org.opentripplanner.street.model.vertex.OsmVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.util.geometry.GeometryUtils;
-import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +80,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private final List<OpenStreetMapProvider> providers;
   private final Set<String> boardingAreaRefTags;
   private final DataImportIssueStore issueStore;
-  private final OsmTagMapper osmTagMapper;
   private final Graph graph;
 
   private final boolean areaVisibility;
@@ -117,14 +115,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Set<String> boardingAreaRefTags,
     Graph graph,
     DataImportIssueStore issueStore,
-    OsmTagMapper osmTagMapper,
     boolean areaVisibility
   ) {
     this.providers = List.copyOf(providers);
     this.boardingAreaRefTags = boardingAreaRefTags;
     this.graph = graph;
     this.issueStore = issueStore;
-    this.osmTagMapper = osmTagMapper;
     this.areaVisibility = areaVisibility;
   }
 
@@ -135,14 +131,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Graph graph,
     DataImportIssueStore issueStore
   ) {
-    this(
-      List.copyOf(providers),
-      boardingAreaRefTags,
-      graph,
-      issueStore,
-      config.osmDefaults.osmOsmTagMapper,
-      config.areaVisibility
-    );
+    this(List.copyOf(providers), boardingAreaRefTags, graph, issueStore, config.areaVisibility);
     this.customNamer = config.customNamer;
     this.platformEntriesLinking = config.platformEntriesLinking;
     this.staticBikeParkAndRide = config.staticBikeParkAndRide;
@@ -158,11 +147,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
       LOG.info("Gathering OSM from provider: {}", provider);
+      LOG.info(
+        "Using OSM way configuration from {}.",
+        provider.getOsmTagMapper().getClass().getSimpleName()
+      );
       provider.readOSM(osmdb);
     }
     osmdb.postLoad();
-
-    LOG.info("Using OSM way configuration from {}.", osmTagMapper.getClass().getSimpleName());
 
     LOG.info("Building street graph from OSM");
     handler.buildGraph();
@@ -628,7 +619,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
               elevationData.put(endEndpoint, elevation);
             }
           }
-          P2<StreetEdge> streets = getEdgesForStreet(
+          StreetEdgePair streets = getEdgesForStreet(
             startEndpoint,
             endEndpoint,
             way,
@@ -639,8 +630,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             geometry
           );
 
-          StreetEdge street = streets.first;
-          StreetEdge backStreet = streets.second;
+          StreetEdge street = streets.main;
+          StreetEdge backStreet = streets.back;
           applyWayProperties(street, backStreet, wayData, way);
 
           applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
@@ -1091,7 +1082,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * http://wiki.openstreetmap.org/wiki/Bicycle for various scenarios, along with
      * http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway.
      */
-    private P2<StreetEdge> getEdgesForStreet(
+    private StreetEdgePair getEdgesForStreet(
       IntersectionVertex startEndpoint,
       IntersectionVertex endEndpoint,
       OSMWay way,
@@ -1103,16 +1094,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     ) {
       // No point in returning edges that can't be traversed by anyone.
       if (permissions.allowsNothing()) {
-        return new P2<>(null, null);
+        return new StreetEdgePair(null, null);
       }
 
       LineString backGeometry = geometry.reverse();
       StreetEdge street = null, backStreet = null;
       double length = this.getGeometryLengthMeters(geometry);
 
-      P2<StreetTraversalPermission> permissionPair = OSMFilter.getPermissions(permissions, way);
-      StreetTraversalPermission permissionsFront = permissionPair.first;
-      StreetTraversalPermission permissionsBack = permissionPair.second;
+      var permissionPair = OSMFilter.getPermissions(permissions, way);
+      var permissionsFront = permissionPair.main();
+      var permissionsBack = permissionPair.back();
 
       if (permissionsFront.allowsAnything()) {
         street =
@@ -1150,7 +1141,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         if (backStreet != null) backStreet.setRoundabout(true);
       }
 
-      return new P2<>(street, backStreet);
+      return new StreetEdgePair(street, backStreet);
     }
 
     private StreetEdge getEdgeForStreet(
@@ -1248,4 +1239,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       return vertices.get(level);
     }
   }
+
+  private record StreetEdgePair(StreetEdge main, StreetEdge back) {}
 }

@@ -9,6 +9,7 @@ import java.util.Random;
 import org.geotools.referencing.GeodeticCalculator;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.framework.geometry.DirectionUtils;
 
 public class DirectionUtilsTest {
 

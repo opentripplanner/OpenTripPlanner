@@ -1,23 +1,23 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.txConstrained;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.tx;
-import static org.opentripplanner.util.time.TimeUtils.time;
 
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
+import org.opentripplanner.raptor._data.api.TestPathBuilder;
+import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
-import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.api.PathUtils;
-import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 
 public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 

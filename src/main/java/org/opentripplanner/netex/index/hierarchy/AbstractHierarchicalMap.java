@@ -3,7 +3,7 @@ package org.opentripplanner.netex.index.hierarchy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.netex.index.api.HMapValidationRule;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 

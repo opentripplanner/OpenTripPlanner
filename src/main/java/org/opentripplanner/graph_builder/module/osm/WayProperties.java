@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Objects;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
  * Parameters applied to OSM ways, usually based on their tags: - Which modes can traverse it -
