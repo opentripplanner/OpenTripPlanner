@@ -2,27 +2,29 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * A container for a pair (note and note matcher).
  *
  * @author laurent
  */
+@SuppressWarnings("ClassCanBeRecord")
 public class StreetNoteAndMatcher implements Serializable {
 
-  private final NoteMatcher matcher;
   private final StreetNote note;
+  private final NoteMatcher matcher;
 
   public StreetNoteAndMatcher(StreetNote note, NoteMatcher matcher) {
     this.matcher = matcher;
     this.note = note;
   }
 
-  public NoteMatcher getMatcher() {
+  public NoteMatcher matcher() {
     return matcher;
   }
 
-  public StreetNote getNote() {
+  public StreetNote note() {
     return note;
   }
 
@@ -31,11 +33,20 @@ public class StreetNoteAndMatcher implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     StreetNoteAndMatcher that = (StreetNoteAndMatcher) o;
-    return matcher.equals(that.matcher) && note.equals(that.note);
+    return note.equals(that.note) && matcher.equals(that.matcher);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(matcher, note);
+    return Objects.hash(note, matcher);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(StreetNoteAndMatcher.class)
+      .addObj("note", note)
+      .addObj("matcher", matcher)
+      .toString();
   }
 }

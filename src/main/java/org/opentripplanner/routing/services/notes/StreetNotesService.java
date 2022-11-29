@@ -112,8 +112,8 @@ public class StreetNotesService implements Serializable {
 
     Set<StreetNote> notes = new HashSet<>(maas.size());
     for (StreetNoteAndMatcher maa : maas) {
-      if (maa.getMatcher().matches(state)) {
-        notes.add(maa.getNote());
+      if (maa.matcher().matches(state)) {
+        notes.add(maa.note());
       }
     }
     if (notes.isEmpty()) {

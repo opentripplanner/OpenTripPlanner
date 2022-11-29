@@ -27,6 +27,7 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -276,10 +277,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     ) {
       OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
 
-      Set<StreetNoteAndNoteMatcher> notes = way
-        .getOsmProvider()
-        .getWayPropertySet()
-        .getNoteForWay(way);
+      Set<StreetNoteAndMatcher> notes = way.getOsmProvider().getWayPropertySet().getNoteForWay(way);
 
       boolean motorVehicleNoThrough = tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(
         way

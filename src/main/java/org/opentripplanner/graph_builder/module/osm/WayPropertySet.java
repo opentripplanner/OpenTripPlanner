@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
 import org.opentripplanner.model.NoteMatcher;
+import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.transit.model.basic.I18NString;
@@ -232,8 +233,8 @@ public class WayPropertySet {
     }
   }
 
-  public Set<StreetNoteAndNoteMatcher> getNoteForWay(OSMWithTags way) {
-    HashSet<StreetNoteAndNoteMatcher> out = new HashSet<>();
+  public Set<StreetNoteAndMatcher> getNoteForWay(OSMWithTags way) {
+    HashSet<StreetNoteAndMatcher> out = new HashSet<>();
     for (NotePicker picker : notes) {
       OsmSpecifier specifier = picker.specifier;
       NoteProperties noteProperties = picker.noteProperties;
