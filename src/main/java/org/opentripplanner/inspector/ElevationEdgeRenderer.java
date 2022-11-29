@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.opentripplanner.common.model.T2;
+import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeSegmentColor;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
@@ -59,27 +59,27 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
   }
 
   @Override
-  public Iterable<T2<Double, Color>> edgeSegments(Edge edge) {
+  public Iterable<EdgeSegmentColor> edgeSegments(Edge edge) {
     if (edge instanceof StreetEdge streetEdge) {
       if (streetEdge.hasElevationExtension()) {
         var edgeLength = edge.getDistanceMeters();
         var color = Color.DARK_GRAY;
 
-        var t2 = new ArrayList<T2<Double, Color>>();
+        var list = new ArrayList<EdgeSegmentColor>();
         var profile = streetEdge.getElevationProfile();
         for (int i = 0; i < profile.size(); ++i) {
           var point = profile.getCoordinate(i);
           if (i != 0) {
-            t2.add(new T2<>(point.x / edgeLength, color));
+            list.add(new EdgeSegmentColor(point.x / edgeLength, color));
           }
           color = colorPalette.getColor(point.y);
         }
-        return t2;
+        return list;
       } else {
-        return List.of(new T2<>(1.0d, Color.GRAY));
+        return List.of(new EdgeSegmentColor(1.0d, Color.GRAY));
       }
     } else {
-      return List.of(new T2<>(1.0d, Color.LIGHT_GRAY));
+      return List.of(new EdgeSegmentColor(1.0d, Color.LIGHT_GRAY));
     }
   }
 

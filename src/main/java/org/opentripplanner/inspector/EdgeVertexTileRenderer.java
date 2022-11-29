@@ -28,7 +28,6 @@ import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.locationtech.jts.operation.buffer.OffsetCurveBuilder;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -165,11 +164,11 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         var offsetLength = offsetLine.getLength();
 
         var previousLocation = line.getStartIndex();
-        for (var p2 : evRenderer.edgeSegments(edge)) {
-          var currentLocation = locater.getLocation(offsetLength * p2.first);
+        for (var it : evRenderer.edgeSegments(edge)) {
+          var currentLocation = locater.getLocation(offsetLength * it.position());
           var segmentGeometry = line.extractLine(previousLocation, currentLocation);
           var segmentShape = shapeWriter.toShape(segmentGeometry);
-          context.graphics.setColor(p2.second);
+          context.graphics.setColor(it.color());
           context.graphics.draw(segmentShape);
 
           previousLocation = currentLocation;
@@ -270,7 +269,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
       return false;
     }
 
-    default Iterable<T2<Double, Color>> edgeSegments(Edge edge) {
+    default Iterable<EdgeSegmentColor> edgeSegments(Edge edge) {
       return List.of();
     }
 
@@ -294,4 +293,6 @@ public class EdgeVertexTileRenderer implements TileRenderer {
       return Optional.of(new VertexVisualAttributes(color, label));
     }
   }
+
+  record EdgeSegmentColor(Double position, Color color) {}
 }
