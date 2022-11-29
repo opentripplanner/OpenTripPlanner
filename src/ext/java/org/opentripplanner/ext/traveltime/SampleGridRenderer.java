@@ -1,14 +1,17 @@
 package org.opentripplanner.ext.traveltime;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.ext.traveltime.geometry.AccumulativeGridSampler;
 import org.opentripplanner.ext.traveltime.geometry.AccumulativeMetric;
 import org.opentripplanner.ext.traveltime.geometry.SparseMatrixZSampleGrid;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 import org.opentripplanner.ext.traveltime.spt.SPTVisitor;
 import org.opentripplanner.ext.traveltime.spt.SPTWalker;
-import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +20,7 @@ public class SampleGridRenderer {
   private static final Logger LOG = LoggerFactory.getLogger(SampleGridRenderer.class);
 
   public static ZSampleGrid<WTWD> getSampleGrid(
-    ShortestPathTree spt,
+    ShortestPathTree<State, Edge, Vertex> spt,
     TravelTimeRequest traveltimeRequest
   ) {
     final double offRoadDistanceMeters = traveltimeRequest.offRoadDistanceMeters;
@@ -58,7 +61,7 @@ public class SampleGridRenderer {
    * Sample a SPT using a SPTWalker and an AccumulativeGridSampler.
    */
   public static void sampleSPT(
-    final ShortestPathTree spt,
+    final ShortestPathTree<State, Edge, Vertex> spt,
     final ZSampleGrid<WTWD> sampleGrid,
     final double gridSizeMeters,
     final double offRoadDistanceMeters,

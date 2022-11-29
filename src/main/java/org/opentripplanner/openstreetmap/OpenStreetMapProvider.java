@@ -9,16 +9,15 @@ import org.openstreetmap.osmosis.osmbinary.file.BlockInputStream;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
+import org.opentripplanner.framework.logging.ProgressTracker;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.model.OSMProvider;
-import org.opentripplanner.util.lang.ToStringBuilder;
-import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,24 +52,17 @@ public class OpenStreetMapProvider implements OSMProvider {
         fileDataSource,
         new OsmExtractParametersBuilder().withSource(fileDataSource.uri()).build()
       ),
-      new OsmDefaultParameters(),
       cacheDataInMem
     );
   }
 
   public OpenStreetMapProvider(
     ConfiguredDataSource<OsmExtractParameters> osmExtractConfigConfiguredDataSource,
-    OsmDefaultParameters defaultParameters,
     boolean cacheDataInMem
   ) {
     this.source = osmExtractConfigConfiguredDataSource.dataSource();
-    this.zoneId =
-      osmExtractConfigConfiguredDataSource.config().timeZone().orElse(defaultParameters.timeZone);
-    this.osmTagMapper =
-      osmExtractConfigConfiguredDataSource
-        .config()
-        .osmTagMapper()
-        .orElse(defaultParameters.osmOsmTagMapper);
+    this.zoneId = osmExtractConfigConfiguredDataSource.config().timeZone().orElse(null);
+    this.osmTagMapper = osmExtractConfigConfiguredDataSource.config().osmTagMapper().getInstance();
     this.wayPropertySet = new WayPropertySet();
     osmTagMapper.populateProperties(wayPropertySet);
     this.cacheDataInMem = cacheDataInMem;

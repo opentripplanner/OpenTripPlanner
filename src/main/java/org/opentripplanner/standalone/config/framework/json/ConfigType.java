@@ -7,9 +7,9 @@ import java.util.EnumSet;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.text.MarkdownFormatter;
-import org.opentripplanner.util.lang.StringUtils;
-import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.framework.time.DurationUtils;
 
 /**
  * These are the types we support in the NodeAdaptor

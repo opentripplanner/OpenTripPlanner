@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.time.Duration;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.BookingInfo;
 import org.rutebanken.netex.model.BookingArrangementsStructure;
 import org.rutebanken.netex.model.ContactStructure;
@@ -31,9 +31,7 @@ public class BookingInfoMapperTest {
   private static final LocalTime FIVE_THIRTY = LocalTime.of(5, 30);
   private static final Duration THIRTY_MINUTES = Duration.ofMinutes(30);
 
-  private final BookingInfoMapper subject = new BookingInfoMapper(
-    DataImportIssueStore.noopIssueStore()
-  );
+  private final BookingInfoMapper subject = new BookingInfoMapper(DataImportIssueStore.NOOP);
 
   @Test
   public void testMapBookingInfoPrecedence() {

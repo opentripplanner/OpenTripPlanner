@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.api.request.preference;
 
-import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
+import static org.opentripplanner.framework.lang.DoubleUtils.roundTo2Decimals;
 
 /**
  * Sets the (bicycle) triangle routing parameters -- the relative importance of safety, flatness,

@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.StopTime.stopTime;
-import static org.opentripplanner.util.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.util.time.TimeUtils;
+import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.raptor._data.transit.TestTripPattern;
+import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 
 public class TripStopTimeTest {
 

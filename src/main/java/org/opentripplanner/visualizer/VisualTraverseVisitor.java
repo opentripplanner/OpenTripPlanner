@@ -1,12 +1,12 @@
 package org.opentripplanner.visualizer;
 
-import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VisualTraverseVisitor implements TraverseVisitor {
+public class VisualTraverseVisitor implements TraverseVisitor<State, Edge> {
 
   private static final Logger LOG = LoggerFactory.getLogger(VisualTraverseVisitor.class);
 

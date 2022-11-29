@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
+import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 
 class MinCostFilterChainTest {
 

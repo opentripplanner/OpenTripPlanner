@@ -3,11 +3,11 @@ package org.opentripplanner;
 import static org.opentripplanner.standalone.configure.ConstructApplication.creatTransitLayerForRaptor;
 
 import io.micrometer.core.instrument.Metrics;
+import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
-import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 

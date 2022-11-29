@@ -8,9 +8,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

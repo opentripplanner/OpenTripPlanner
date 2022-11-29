@@ -1,6 +1,6 @@
 package org.opentripplanner.model;
 
-import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 
 /**
  * This is a response model class which holds data that will be serialized and returned to the

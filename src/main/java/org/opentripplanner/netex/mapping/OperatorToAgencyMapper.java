@@ -1,10 +1,10 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.lang.StringUtils;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.organization.OperatorBuilder;
-import org.opentripplanner.util.lang.StringUtils;
 import org.rutebanken.netex.model.ContactStructure;
 
 /**

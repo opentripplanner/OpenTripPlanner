@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
  * Builder for {@link WayProperties}. Bicycle and walk safety features are nullable, but they should

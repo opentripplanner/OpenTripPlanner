@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,10 +8,10 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * A TripPattern with its TripSchedules filtered by validity on a particular date. This is to avoid

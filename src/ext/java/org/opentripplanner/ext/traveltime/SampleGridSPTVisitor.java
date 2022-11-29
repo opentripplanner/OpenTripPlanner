@@ -3,9 +3,9 @@ package org.opentripplanner.ext.traveltime;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.traveltime.geometry.AccumulativeGridSampler;
 import org.opentripplanner.ext.traveltime.spt.SPTVisitor;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.search.state.State;
 
 class SampleGridSPTVisitor implements SPTVisitor {
 

@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -17,7 +16,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
 
-  private final List<P2<FeedScopedId>> keySet;
+  private final List<FeedScopedIdPair> keySet;
 
   public GroupByAllSameStations(Itinerary itinerary) {
     keySet =
@@ -26,7 +25,10 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
         .stream()
         .filter(Leg::isTransitLeg)
         .map(leg ->
-          new P2<>(leg.getFrom().stop.getStationOrStopId(), leg.getTo().stop.getStationOrStopId())
+          new FeedScopedIdPair(
+            leg.getFrom().stop.getStationOrStopId(),
+            leg.getTo().stop.getStationOrStopId()
+          )
         )
         .collect(Collectors.toList());
   }
@@ -49,4 +51,6 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
   public GroupByAllSameStations merge(GroupByAllSameStations other) {
     return this;
   }
+
+  private record FeedScopedIdPair(FeedScopedId id0, FeedScopedId id1) {}
 }

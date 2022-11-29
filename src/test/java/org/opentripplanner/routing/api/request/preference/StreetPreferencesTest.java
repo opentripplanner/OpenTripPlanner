@@ -7,8 +7,8 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 import java.time.Duration;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
+import org.opentripplanner.street.search.intersection_model.DrivingDirection;
+import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
 
 class StreetPreferencesTest {
 

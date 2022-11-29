@@ -9,7 +9,6 @@ import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
@@ -1096,7 +1095,7 @@ public class LegacyGraphQLDataFetchers {
   public interface LegacyGraphQLStep {
     public DataFetcher<Double> distance();
 
-    public DataFetcher<Iterable<P2<Double>>> elevationProfile();
+    public DataFetcher<Iterable<org.opentripplanner.model.plan.ElevationProfile.Step>> elevationProfile();
 
     public DataFetcher<Double> lat();
 

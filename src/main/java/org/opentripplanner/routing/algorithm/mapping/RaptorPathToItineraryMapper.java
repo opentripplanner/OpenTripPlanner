@@ -5,6 +5,8 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.plan.FrequencyTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -12,6 +14,13 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.raptor.api.path.AccessPathLeg;
+import org.opentripplanner.raptor.api.path.EgressPathLeg;
+import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.PathLeg;
+import org.opentripplanner.raptor.api.path.TransferPathLeg;
+import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
@@ -20,23 +29,14 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestMapper;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
-import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
-import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * This maps the paths found by the Raptor search algorithm to the itinerary structure currently
@@ -48,7 +48,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final TransitLayer transitLayer;
 
-  private final AStarRequest request;
+  private final StreetSearchRequest request;
   private final StreetMode transferMode;
   private final ZonedDateTime transitSearchTimeZero;
 
@@ -72,7 +72,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.transferMode = request.journey().transfer().mode();
-    this.request = AStarRequestMapper.mapToTransferRequest(request).build();
+    this.request = StreetSearchRequestMapper.mapToTransferRequest(request).build();
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitService.getTimeZone(),
