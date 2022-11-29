@@ -1,6 +1,7 @@
 package org.opentripplanner.inspector;
 
 import java.awt.Color;
+import java.util.Optional;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
@@ -25,37 +26,31 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
   public BikeSafetyEdgeRenderer() {}
 
   @Override
-  public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
-    if (e instanceof StreetEdge) {
-      StreetEdge pse = (StreetEdge) e;
+  public Optional<EdgeVisualAttributes> renderEdge(Edge e) {
+    if (e instanceof StreetEdge pse) {
       if (pse.getPermission().allows(TraverseMode.BICYCLE)) {
         double bikeSafety = pse.getBicycleSafetyFactor();
-        attrs.color = palette.getColor(bikeSafety);
-        attrs.label = String.format("%.02f", bikeSafety);
+        return EdgeVisualAttributes.optional(
+          palette.getColor(bikeSafety),
+          String.format("%.02f", bikeSafety)
+        );
       } else {
-        attrs.color = Color.LIGHT_GRAY;
-        attrs.label = "no bikes";
+        return EdgeVisualAttributes.optional(Color.LIGHT_GRAY, "no bikes");
       }
     } else if (e instanceof StreetVehicleRentalLink) {
-      attrs.color = palette.getColor(1.0f);
-      attrs.label = "link";
-    } else {
-      return false;
+      return EdgeVisualAttributes.optional(palette.getColor(1.0f), "link");
     }
-    return true;
+    return Optional.empty();
   }
 
   @Override
-  public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
+  public Optional<VertexVisualAttributes> renderVertex(Vertex v) {
     if (v instanceof VehicleRentalPlaceVertex) {
-      attrs.color = VEHICLE_RENTAL_COLOR_VERTEX;
-      attrs.label = v.getDefaultName();
+      return VertexVisualAttributes.optional(VEHICLE_RENTAL_COLOR_VERTEX, v.getDefaultName());
     } else if (v instanceof IntersectionVertex) {
-      attrs.color = Color.DARK_GRAY;
-    } else {
-      return false;
+      return VertexVisualAttributes.optional(Color.DARK_GRAY, null);
     }
-    return true;
+    return Optional.empty();
   }
 
   @Override

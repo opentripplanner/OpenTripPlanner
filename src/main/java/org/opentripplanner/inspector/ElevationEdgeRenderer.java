@@ -3,6 +3,7 @@ package org.opentripplanner.inspector;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
@@ -31,19 +32,19 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
   }
 
   @Override
-  public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
-    return true;
+  public Optional<EdgeVisualAttributes> renderEdge(Edge e) {
+    return Optional.empty();
   }
 
   @Override
-  public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
+  public Optional<VertexVisualAttributes> renderVertex(Vertex v) {
     var elevation = findElevationForVertex(v);
     if (elevation != null) {
-      attrs.color = colorPalette.getColor(elevation);
-      attrs.label = elevation.toString();
-      return true;
+      return Optional.of(
+        new VertexVisualAttributes(colorPalette.getColor(elevation), elevation.toString())
+      );
     } else {
-      return false;
+      return Optional.empty();
     }
   }
 

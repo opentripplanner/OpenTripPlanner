@@ -1,6 +1,7 @@
 package org.opentripplanner.inspector;
 
 import java.awt.Color;
+import java.util.Optional;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
@@ -20,30 +21,27 @@ public class WalkSafetyEdgeRenderer implements EdgeVertexRenderer {
   public WalkSafetyEdgeRenderer() {}
 
   @Override
-  public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
+  public Optional<EdgeVisualAttributes> renderEdge(Edge e) {
     if (e instanceof StreetEdge pse) {
       if (pse.getPermission().allows(TraverseMode.WALK)) {
         double walkSafety = pse.getWalkSafetyFactor();
-        attrs.color = palette.getColor(walkSafety);
-        attrs.label = String.format("%.02f", walkSafety);
+        return EdgeVisualAttributes.optional(
+          palette.getColor(walkSafety),
+          "%.02f".formatted(walkSafety)
+        );
       } else {
-        attrs.color = Color.LIGHT_GRAY;
-        attrs.label = "no walking";
+        return EdgeVisualAttributes.optional(Color.LIGHT_GRAY, "no walking");
       }
-    } else {
-      return false;
     }
-    return true;
+    return Optional.empty();
   }
 
   @Override
-  public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
+  public Optional<VertexVisualAttributes> renderVertex(Vertex v) {
     if (v instanceof IntersectionVertex) {
-      attrs.color = Color.DARK_GRAY;
-    } else {
-      return false;
+      return VertexVisualAttributes.optional(Color.DARK_GRAY, null);
     }
-    return true;
+    return Optional.empty();
   }
 
   @Override

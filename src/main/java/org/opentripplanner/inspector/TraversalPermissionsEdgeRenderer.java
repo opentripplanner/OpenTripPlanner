@@ -1,6 +1,7 @@
 package org.opentripplanner.inspector;
 
 import java.awt.Color;
+import java.util.Optional;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
@@ -45,71 +46,71 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
   private static final Color BARRIER_COLOR_VERTEX = new Color(0.5803922f, 0.21568628f, 0.24313726f);
 
   @Override
-  public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
+  public Optional<EdgeVisualAttributes> renderEdge(Edge e) {
+    Color color;
+    String label;
+
     if (e instanceof StreetEdge pse) {
       if (pse.isStairs()) {
-        attrs.color = STAIRS_COLOR_EDGE;
-        attrs.label = "stairs";
+        color = STAIRS_COLOR_EDGE;
+        label = "stairs";
       } else {
-        attrs.color = getColor(pse.getPermission());
-        attrs.label = getLabel(pse.getPermission());
+        color = getColor(pse.getPermission());
+        label = getLabel(pse.getPermission());
       }
       if (pse.isMotorVehicleNoThruTraffic()) {
-        attrs.label += " car NTT";
+        label += " car NTT";
       }
       if (pse.isBicycleNoThruTraffic()) {
-        attrs.label += " bike NTT";
+        label += " bike NTT";
       }
       if (pse.isWalkNoThruTraffic()) {
-        attrs.label += " walk NTT";
+        label += " walk NTT";
       }
     } else if (e instanceof ElevatorHopEdge ehe) {
-      attrs.color = ELEVATOR_COLOR_EDGE;
-      attrs.label = "elevator";
+      color = ELEVATOR_COLOR_EDGE;
+      label = "elevator";
       if (ehe.isWheelchairAccessible()) {
-        attrs.label += " wheelchair";
+        label += " wheelchair";
       }
       if (ehe.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
-        attrs.label += " bike";
+        label += " bike";
       }
       if (ehe.getPermission().allows(StreetTraversalPermission.CAR)) {
-        attrs.label += " car";
+        label += " car";
       }
     } else {
-      attrs.color = LINK_COLOR_EDGE;
-      attrs.label = "link";
+      color = LINK_COLOR_EDGE;
+      label = "link";
     }
-    return true;
+    return EdgeVisualAttributes.optional(color, label);
   }
 
   @Override
-  public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
+  public Optional<VertexVisualAttributes> renderVertex(Vertex v) {
     if (v instanceof OsmBoardingLocationVertex osmV) {
-      attrs.color = OSM_BOARDING_LOCATION_VERTEX_COLOR;
-      attrs.label = "OSM refs" + osmV.references;
+      return VertexVisualAttributes.optional(
+        OSM_BOARDING_LOCATION_VERTEX_COLOR,
+        "OSM refs" + osmV.references
+      );
     } else if (v instanceof IntersectionVertex) {
-      attrs.color = STREET_COLOR_VERTEX;
       if (v instanceof BarrierVertex) {
-        attrs.color = BARRIER_COLOR_VERTEX;
+        return VertexVisualAttributes.optional(BARRIER_COLOR_VERTEX, null);
       }
+      return VertexVisualAttributes.optional(STREET_COLOR_VERTEX, null);
     } else if (
       v instanceof TransitStopVertex ||
       v instanceof TransitEntranceVertex ||
       v instanceof TransitPathwayNodeVertex ||
       v instanceof TransitBoardingAreaVertex
     ) {
-      attrs.color = TRANSIT_STOP_COLOR_VERTEX;
-      attrs.label = v.getDefaultName();
+      return VertexVisualAttributes.optional(TRANSIT_STOP_COLOR_VERTEX, v.getDefaultName());
     } else if (v instanceof VehicleRentalPlaceVertex) {
-      attrs.color = VEHICLE_RENTAL_COLOR_VERTEX;
-      attrs.label = v.getDefaultName();
+      return VertexVisualAttributes.optional(VEHICLE_RENTAL_COLOR_VERTEX, v.getDefaultName());
     } else if (v instanceof VehicleParkingEntranceVertex) {
-      attrs.color = PARK_AND_RIDE_COLOR_VERTEX;
-      attrs.label = v.getDefaultName();
-    } else {
-      return false;
+      return VertexVisualAttributes.optional(PARK_AND_RIDE_COLOR_VERTEX, v.getDefaultName());
     }
-    return true;
+    return Optional.empty();
   }
 
   @Override
