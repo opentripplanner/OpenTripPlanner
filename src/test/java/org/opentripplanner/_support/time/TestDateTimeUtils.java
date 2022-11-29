@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public class TestUtils {
+public class TestDateTimeUtils {
 
   public static final int JANUARY = 0;
   public static final int FEBRUARY = 1;

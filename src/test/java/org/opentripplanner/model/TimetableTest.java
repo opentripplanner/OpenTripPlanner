@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner._support.time.TestUtils.AUGUST;
+import static org.opentripplanner._support.time.TestDateTimeUtils.AUGUST;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner._support.time.TestUtils;
+import org.opentripplanner._support.time.TestDateTimeUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -120,11 +120,11 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
     var stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setTime(
-      TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 10, 1)
+      TestDateTimeUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 10, 1)
     );
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setTime(
-      TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 10, 0)
+      TestDateTimeUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 10, 0)
     );
     var tripUpdate = tripUpdateBuilder.build();
     var result = timetable.createUpdatedTripTimes(
@@ -150,11 +150,11 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
     var stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setTime(
-      TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 2, 0)
+      TestDateTimeUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 2, 0)
     );
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setTime(
-      TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 2, 0)
+      TestDateTimeUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 2, 0)
     );
     var tripUpdate = tripUpdateBuilder.build();
     assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));

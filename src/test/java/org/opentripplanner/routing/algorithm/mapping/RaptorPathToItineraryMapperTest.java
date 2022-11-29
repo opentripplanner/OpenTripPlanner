@@ -8,7 +8,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.opentripplanner._support.time.TestUtils;
+import org.opentripplanner._support.time.TestDateTimeUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -108,7 +108,7 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private RaptorPathToItineraryMapper<TestTripSchedule> getRaptorPathToItineraryMapper() {
-    Instant dateTime = TestUtils.dateInstant("Europe/Stockholm", 2022, 10, 10, 12, 0, 0);
+    Instant dateTime = TestDateTimeUtils.dateInstant("Europe/Stockholm", 2022, 10, 10, 12, 0, 0);
     return new RaptorPathToItineraryMapper<TestTripSchedule>(
       new Graph(),
       new DefaultTransitService(new TransitModel()),

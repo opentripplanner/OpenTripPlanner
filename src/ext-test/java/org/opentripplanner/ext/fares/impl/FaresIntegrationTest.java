@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner._support.time.TestUtils;
+import org.opentripplanner._support.time.TestDateTimeUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -36,7 +36,7 @@ public class FaresIntegrationTest {
 
     var serverContext = TestServerContext.createServerContext(graph, transitModel);
 
-    var start = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
+    var start = TestDateTimeUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
     var from = GenericLocation.fromStopId("Origin", feedId, "Millbrae Caltrain");
     var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
 
@@ -65,7 +65,7 @@ public class FaresIntegrationTest {
       "8371"
     );
 
-    Instant startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
+    Instant startTime = TestDateTimeUtils.dateInstant("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
 
     ItineraryFares fare = getFare(from, to, startTime, serverContext);
 
@@ -73,7 +73,7 @@ public class FaresIntegrationTest {
 
     // long trip
 
-    startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 2, 14, 0, 0);
+    startTime = TestDateTimeUtils.dateInstant("America/Los_Angeles", 2009, 11, 2, 14, 0, 0);
 
     from = GenericLocation.fromStopId("Origin", portlandId, "8389");
     to = GenericLocation.fromStopId("Destination", portlandId, "1252");
@@ -107,7 +107,7 @@ public class FaresIntegrationTest {
 
     Money tenUSD = new Money(USD, 1000);
 
-    var dateTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 0, 0, 0);
+    var dateTime = TestDateTimeUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 0, 0, 0);
 
     // A -> B, base case
 

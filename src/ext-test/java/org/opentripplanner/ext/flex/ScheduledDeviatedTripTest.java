@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner._support.time.TestUtils;
+import org.opentripplanner._support.time.TestDateTimeUtils;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
@@ -233,7 +233,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     OtpServerRequestContext serverContext
   ) {
     RouteRequest request = new RouteRequest();
-    Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);
+    Instant dateTime = TestDateTimeUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);
     request.setDateTime(dateTime);
     request.setFrom(from);
     request.setTo(to);

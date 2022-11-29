@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner._support.time.TestUtils;
+import org.opentripplanner._support.time.TestDateTimeUtils;
 import org.opentripplanner.api.mapping.ItineraryMapper;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
@@ -104,7 +104,7 @@ public abstract class SnapshotTestBase {
 
     RouteRequest request = serverContext.defaultRouteRequest();
     request.setDateTime(
-      TestUtils.dateInstant(
+      TestDateTimeUtils.dateInstant(
         serverContext.transitService().getTimeZone().getId(),
         year,
         month,
