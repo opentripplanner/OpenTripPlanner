@@ -179,7 +179,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
     if (interned != null) {
       return interned;
     }
-    MatcherAndStreetNote ret = new MatcherAndStreetNote(noteMatcher, note);
+    MatcherAndStreetNote ret = new MatcherAndStreetNote(note, noteMatcher);
     uniqueMatchers.put(key, ret);
     return ret;
   }

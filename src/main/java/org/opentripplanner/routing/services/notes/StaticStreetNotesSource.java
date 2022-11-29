@@ -87,7 +87,7 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
     if (interned != null) {
       return interned;
     }
-    MatcherAndStreetNote ret = new MatcherAndStreetNote(noteMatcher, note);
+    MatcherAndStreetNote ret = new MatcherAndStreetNote(note, noteMatcher);
     uniqueMatchers.put(key, ret);
     return ret;
   }
