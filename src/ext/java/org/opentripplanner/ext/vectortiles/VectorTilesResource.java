@@ -292,4 +292,14 @@ public class VectorTilesResource {
           .orElse(null);
     }
   }
+
+  @FunctionalInterface
+  private interface LayerBuilderFactory {
+    LayerBuilder<?> create(
+      Graph graph,
+      TransitService transitService,
+      LayerParameters layerParameters,
+      Locale locale
+    );
+  }
 }
