@@ -63,7 +63,7 @@ public class ParameterBuilder {
    * parameters, and the default value is just a fallback. In these cases we temporarily need to
    * keep the doc-default-value.
    */
-  private Object docDefaultValue = null;
+  private Object docDefaultValue = DefaultValue.UNDEFINED;
 
   public ParameterBuilder(NodeAdapter target, String paramName) {
     this.target = target;
@@ -518,7 +518,7 @@ public class ParameterBuilder {
   }
 
   private String getDocDefaultValue(Object realDefaultValue) {
-    Object value = docDefaultValue == null ? realDefaultValue : docDefaultValue;
+    Object value = docDefaultValue == DefaultValue.UNDEFINED ? realDefaultValue : docDefaultValue;
 
     if (value == null) {
       return null;
@@ -651,5 +651,9 @@ public class ParameterBuilder {
 
   private OtpAppException error(String message, Exception e) {
     return target.createException(message, paramName(), e);
+  }
+
+  private enum DefaultValue {
+    UNDEFINED,
   }
 }
