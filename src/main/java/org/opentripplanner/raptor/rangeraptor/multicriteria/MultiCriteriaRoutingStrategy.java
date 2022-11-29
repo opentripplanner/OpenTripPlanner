@@ -3,10 +3,13 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 import static org.opentripplanner.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
 import java.util.function.IntConsumer;
+import org.opentripplanner.raptor.rangeraptor.TimeBasedRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
@@ -21,11 +24,10 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
-  implements RoutingStrategy<T> {
+  extends TimeBasedRoutingStrategy<T> {
 
   private final McRangeRaptorWorkerState<T> state;
   private final CostCalculator<T> costCalculator;
-  private final SlackProvider slackProvider;
   private final ParetoSet<PatternRide<T>> patternRides;
 
   private AbstractStopArrival<T> prevArrival;
@@ -34,10 +36,13 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     McRangeRaptorWorkerState<T> state,
     SlackProvider slackProvider,
     CostCalculator<T> costCalculator,
-    DebugHandlerFactory<T> debugHandlerFactory
+    TransitCalculator<T> calculator,
+    RoundProvider roundProvider,
+    DebugHandlerFactory<T> debugHandlerFactory,
+    WorkerLifeCycle lifecycle
   ) {
+    super(slackProvider, calculator, roundProvider, lifecycle);
     this.state = state;
-    this.slackProvider = slackProvider;
     this.costCalculator = costCalculator;
     this.patternRides =
       new ParetoSet<>(
@@ -47,12 +52,15 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void setAccessToStop(
-    RaptorAccessEgress accessPath,
-    int iterationDepartureTime,
-    int timeDependentDepartureTime
-  ) {
-    state.setAccessToStop(accessPath, timeDependentDepartureTime);
+  public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
+    int departureTime = getTimeDependentDepartureTime(accessPath, iterationDepartureTime);
+
+    // This access is not available after the iteration departure time
+    if (departureTime == -1) {
+      return;
+    }
+
+    state.setAccessToStop(accessPath, departureTime);
   }
 
   @Override

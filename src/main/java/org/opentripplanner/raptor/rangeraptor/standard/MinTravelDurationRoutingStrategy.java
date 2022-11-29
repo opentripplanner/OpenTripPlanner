@@ -1,7 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
 import java.util.function.IntConsumer;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.raptor.rangeraptor.TimeBasedRoutingStrategy;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
@@ -22,11 +25,10 @@ import org.opentripplanner.raptor.spi.TransitArrival;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule>
-  implements RoutingStrategy<T> {
+  extends TimeBasedRoutingStrategy<T> {
 
   private static final int NOT_SET = -1;
 
-  private final TransitCalculator<T> calculator;
   private final StdWorkerState<T> state;
 
   private int onTripIndex;
@@ -36,20 +38,18 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   private int onTripTimeShift;
 
   public MinTravelDurationRoutingStrategy(
+    StdWorkerState<T> state,
+    SlackProvider slackProvider,
     TransitCalculator<T> calculator,
-    StdWorkerState<T> state
+    RoundProvider roundProvider,
+    WorkerLifeCycle lifecycle
   ) {
-    this.calculator = calculator;
+    super(slackProvider, calculator, roundProvider, lifecycle);
     this.state = state;
   }
 
   @Override
-  public void setAccessToStop(
-    RaptorAccessEgress accessPath,
-    int iterationDepartureTime,
-    int timeDependentDepartureTime
-  ) {
-    // Pass in the original departure time, as wait time should not be included
+  public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
     state.setAccessToStop(accessPath, iterationDepartureTime);
   }
 
@@ -80,9 +80,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
 
   @Override
   public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
-    if (state.isStopReachedInPreviousRound(stopIndex)) {
-      prevStopArrivalTimeConsumer.accept(state.bestTimePreviousRound(stopIndex));
-    }
+    prevStopArrivalTimeConsumer.accept(state.bestTimePreviousRound(stopIndex));
   }
 
   @Override

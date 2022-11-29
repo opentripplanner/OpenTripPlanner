@@ -1,7 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
 import java.util.function.IntConsumer;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.raptor.rangeraptor.TimeBasedRoutingStrategy;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
@@ -21,11 +24,10 @@ import org.opentripplanner.raptor.spi.TransitArrival;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
-  implements RoutingStrategy<T> {
+  extends TimeBasedRoutingStrategy<T> {
 
   private static final int NOT_SET = -1;
 
-  private final TransitCalculator<T> calculator;
   private final StdWorkerState<T> state;
 
   private int onTripIndex;
@@ -33,18 +35,26 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   private int onTripBoardStop;
   private T onTrip;
 
-  public ArrivalTimeRoutingStrategy(TransitCalculator<T> calculator, StdWorkerState<T> state) {
-    this.calculator = calculator;
+  public ArrivalTimeRoutingStrategy(
+    StdWorkerState<T> state,
+    TransitCalculator<T> calculator,
+    SlackProvider slackProvider,
+    RoundProvider roundProvider,
+    WorkerLifeCycle lifecycle
+  ) {
+    super(slackProvider, calculator, roundProvider, lifecycle);
     this.state = state;
   }
 
-  @Override
-  public void setAccessToStop(
-    RaptorAccessEgress accessPath,
-    int iterationDepartureTime,
-    int timeDependentDepartureTime
-  ) {
-    state.setAccessToStop(accessPath, timeDependentDepartureTime);
+  public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
+    int departureTime = getTimeDependentDepartureTime(accessPath, iterationDepartureTime);
+
+    // This access is not available after the iteration departure time
+    if (departureTime == -1) {
+      return;
+    }
+
+    state.setAccessToStop(accessPath, departureTime);
   }
 
   @Override
@@ -65,11 +75,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
 
   @Override
   public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
-    // Don't attempt to board if this stop was not reached in the last round.
-    // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
-    if (state.isStopReachedInPreviousRound(stopIndex)) {
-      prevStopArrivalTimeConsumer.accept(state.bestTimePreviousRound(stopIndex));
-    }
+    prevStopArrivalTimeConsumer.accept(state.bestTimePreviousRound(stopIndex));
   }
 
   @Override
