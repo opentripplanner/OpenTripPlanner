@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.framework.collection;
 
 import gnu.trove.map.TLongObjectMap;
 import java.util.Collection;

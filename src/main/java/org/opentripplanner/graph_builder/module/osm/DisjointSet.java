@@ -9,7 +9,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.framework.collection.MapUtils;
 
 /** Basic union-find data structure with path compression */
 public class DisjointSet<T> {

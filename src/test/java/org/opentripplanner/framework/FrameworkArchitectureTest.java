@@ -1,6 +1,7 @@
 package org.opentripplanner.framework;
 
 import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK;
+import static org.opentripplanner.OtpArchitectureModules.GNU_TROVE;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.arch.Module;
@@ -25,7 +26,7 @@ public class FrameworkArchitectureTest {
 
   @Test
   void enforceCollectionPackageDependencies() {
-    COLLECTION.verify();
+    COLLECTION.dependsOn(GNU_TROVE).verify();
   }
 
   @Test
