@@ -20,6 +20,7 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.lang.ObjectUtils;
+import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
@@ -112,8 +113,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   /** See {@link S3BucketConfig}. */
   public final S3BucketConfig elevationBucket;
 
-  public final double elevationUnitMultiplier;
-
   /**
    * A specific fares service to use.
    */
@@ -149,6 +148,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final Boolean extraEdgesStopPlatformLink;
   public final NetexFeedParameters netexDefaults;
 
+  public final DemExtractParameters demDefaults;
   public final OsmExtractParameters osmDefaults;
 
   public final List<RouteRequest> transferRequests;
@@ -245,19 +245,6 @@ public class BuildConfig implements OtpDataStoreConfig {
         )
         .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     elevationBucket = S3BucketConfig.fromConfig(root, "elevationBucket");
-    elevationUnitMultiplier =
-      root
-        .of("elevationUnitMultiplier")
-        .since(V2_0)
-        .summary("Specify a multiplier to convert elevation units from source to meters.")
-        .description(
-          """
-            Unit conversion multiplier for elevation values. No conversion needed if the elevation
-            values are defined in meters in the source data. If, for example, decimetres are used
-            in the source data, this should be set to 0.1.
-            """
-        )
-        .asDouble(1);
     embedRouterConfig =
       root
         .of("embedRouterConfig")
@@ -691,8 +678,8 @@ Netex data is also often supplied in a ZIP file.
 
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);
-    dem = DemConfig.mapDemConfig(root, "dem");
-
+    demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
+    dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     transitFeeds = TransitFeedConfig.mapTransitFeeds(root, "transitFeeds", netexDefaults);
 

@@ -28,7 +28,6 @@ Sections follow that describe particular settings in more depth.
 | [dataImportReport](#dataImportReport)                                    |  `boolean`  | Generate nice HTML report of Graph errors/warnings                                                                          | *Optional* | `false`                           |  2.0  |
 | [discardMinTransferTimes](#discardMinTransferTimes)                      |  `boolean`  | Should minimum transfer times in GTFS files be discarded.                                                                   | *Optional* | `false`                           |  2.2  |
 | [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)      |   `double`  | The distance between elevation samples in meters.                                                                           | *Optional* | `10.0`                            |  2.0  |
-| [elevationUnitMultiplier](#elevationUnitMultiplier)                      |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* | `1.0`                             |  2.0  |
 | embedRouterConfig                                                        |  `boolean`  | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                | *Optional* | `true`                            |  2.0  |
 | extraEdgesStopPlatformLink                                               |  `boolean`  | Add extra edges when linking a stop to a platform, to prevent detours along the platform edge.                              | *Optional* | `false`                           |  2.0  |
 | [graph](#graph)                                                          |    `uri`    | URI to the graph object file for reading and writing.                                                                       | *Optional* |                                   |  2.0  |
@@ -58,8 +57,10 @@ Sections follow that describe particular settings in more depth.
 | [boardingLocationTags](#boardingLocationTags)                            |  `string[]` | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                  | *Optional* |                                   |  2.2  |
 | [dataOverlay](sandbox/DataOverlay.md)                                    |   `object`  | Config for the DataOverlay Sandbox module                                                                                   | *Optional* |                                   |  2.2  |
 | [dem](#dem)                                                              |  `object[]` | Specify parameters for DEM extracts.                                                                                        | *Optional* |                                   |  2.2  |
-|       [elevationUnitMultiplier](#dem_0_elevationUnitMultiplier)          |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* |                                   |  2.2  |
+|       [elevationUnitMultiplier](#dem_0_elevationUnitMultiplier)          |   `double`  | Specify a multiplier to convert elevation units from source to meters. Overrides the value specified in `demDefaults`.      | *Optional* | `1.0`                             |  2.3  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
+| demDefaults                                                              |   `object`  | Default properties for DEM extracts.                                                                                        | *Optional* |                                   |  2.3  |
+|    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)       |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* | `1.0`                             |  2.3  |
 | [elevationBucket](#elevationBucket)                                      |   `object`  | Used to download NED elevation tiles from the given AWS S3 bucket.                                                          | *Optional* |                                   |   na  |
 | [fares](sandbox/Fares.md)                                                |   `object`  | Fare configuration.                                                                                                         | *Optional* |                                   |  2.0  |
 | [localFileNamePatterns](#localFileNamePatterns)                          |   `object`  | Patterns for matching OTP file types in the base directory                                                                  | *Optional* |                                   |  2.0  |
@@ -479,18 +480,6 @@ The distance between elevation samples in meters.
 
 The default is the approximate resolution of 1/3 arc-second NED data. This should not be smaller than the horizontal resolution of the height data used.
 
-<h3 id="elevationUnitMultiplier">elevationUnitMultiplier</h3>
-
-**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`   
-**Path:** / 
-
-Specify a multiplier to convert elevation units from source to meters.
-
-Unit conversion multiplier for elevation values. No conversion needed if the elevation
-values are defined in meters in the source data. If, for example, decimetres are used
-in the source data, this should be set to 0.1.
-
-
 <h3 id="graph">graph</h3>
 
 **Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`   
@@ -742,15 +731,26 @@ the command line.
 
 <h3 id="dem_0_elevationUnitMultiplier">elevationUnitMultiplier</h3>
 
-**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`   
 **Path:** /dem/[0] 
+
+Specify a multiplier to convert elevation units from source to meters. Overrides the value specified in `demDefaults`.
+
+Unit conversion multiplier for elevation values. No conversion needed if the elevation
+values are defined in meters in the source data. If, for example, decimetres are used
+in the source data, this should be set to 0.1.
+
+
+<h3 id="demDefaults_elevationUnitMultiplier">elevationUnitMultiplier</h3>
+
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`   
+**Path:** /demDefaults 
 
 Specify a multiplier to convert elevation units from source to meters.
 
-  Unit conversion multiplier for elevation values. No conversion needed if the elevation
-  values are defined in meters in the source data. If, for example, decimetres are used
-  in the source data, this should be set to 0.1. This overrides the value specified in
-  [`elevationUnitMultiplier`](#elevationUnitMultiplier) in the build config at root level.
+Unit conversion multiplier for elevation values. No conversion needed if the elevation
+values are defined in meters in the source data. If, for example, decimetres are used
+in the source data, this should be set to 0.1.
 
 
 <h3 id="elevationBucket">elevationBucket</h3>
@@ -1080,6 +1080,9 @@ case where this is not the case.
     "timeZone" : "Europe/Oslo",
     "osmTagMapping" : "norway"
   } ],
+  "demDefaults" : {
+    "elevationUnitMultiplier" : 1.0
+  },
   "dem" : [ {
     "source" : "gs://my-bucket/otp-work-dir/norway.dem.tiff",
     "elevationUnitMultiplier" : 2.5
