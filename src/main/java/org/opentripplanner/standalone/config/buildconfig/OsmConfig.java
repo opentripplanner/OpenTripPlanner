@@ -82,8 +82,8 @@ public class OsmConfig {
           .summary(
             "The timezone used to resolve opening hours in OSM data." + documentationAddition
           )
-          .docDefaultValue(docDefaults.timeZone().orElse(null))
-          .asZoneId(defaults.timeZone().orElse(null))
+          .docDefaultValue(docDefaults.timeZone())
+          .asZoneId(defaults.timeZone())
       );
   }
 }
