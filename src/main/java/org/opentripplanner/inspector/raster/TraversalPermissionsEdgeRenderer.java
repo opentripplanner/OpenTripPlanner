@@ -1,9 +1,9 @@
-package org.opentripplanner.inspector;
+package org.opentripplanner.inspector.raster;
 
 import java.awt.Color;
-import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
-import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
-import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
+import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.EdgeVertexRenderer;
+import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.EdgeVisualAttributes;
+import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.VertexVisualAttributes;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;

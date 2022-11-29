@@ -1,4 +1,4 @@
-package org.opentripplanner.inspector;
+package org.opentripplanner.inspector.raster;
 
 import com.jhlabs.awt.ShapeStroke;
 import com.jhlabs.awt.TextStroke;

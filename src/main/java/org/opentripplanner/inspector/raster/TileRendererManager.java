@@ -1,4 +1,4 @@
-package org.opentripplanner.inspector;
+package org.opentripplanner.inspector.raster;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import org.geotools.geometry.Envelope2D;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.util.AffineTransformation;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
-import org.opentripplanner.inspector.TileRenderer.TileRenderContext;
+import org.opentripplanner.inspector.raster.TileRenderer.TileRenderContext;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;

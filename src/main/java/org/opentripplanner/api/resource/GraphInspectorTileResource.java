@@ -13,8 +13,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
-import org.opentripplanner.inspector.MapTile;
-import org.opentripplanner.inspector.TileRenderer;
+import org.opentripplanner.inspector.raster.MapTile;
+import org.opentripplanner.inspector.raster.TileRenderer;
+import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
@@ -35,7 +36,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
  * given layer.
  *
  * @author laurent
- * @see org.opentripplanner.inspector.TileRendererManager
+ * @see TileRendererManager
  * @see TileRenderer
  */
 @Path("/routers/{ignoreRouterId}/inspector")
