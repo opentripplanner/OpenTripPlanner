@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.api.model.TravelOption;
+import org.opentripplanner.api.model.TravelOptionsMaker;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**

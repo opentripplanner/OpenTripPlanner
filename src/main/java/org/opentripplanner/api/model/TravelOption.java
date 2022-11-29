@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.api.model;
 
 import java.util.HashSet;
 import java.util.Objects;

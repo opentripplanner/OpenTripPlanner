@@ -10,8 +10,6 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.TravelOption;
-import org.opentripplanner.util.TravelOptionsMaker;
 import org.opentripplanner.util.WorldEnvelope;
 
 public class ApiRouterInfo {
