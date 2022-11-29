@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.NoteMatcher;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.StreetNoteAndMatcher;
@@ -23,8 +22,6 @@ import org.slf4j.LoggerFactory;
  */
 public class StaticStreetNotesSource implements StreetNotesSource, Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private static final Logger LOG = LoggerFactory.getLogger(StaticStreetNotesSource.class);
 
   /**
@@ -37,7 +34,7 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
    * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
    * are identical).
    */
-  private final transient Map<T2<NoteMatcher, StreetNote>, StreetNoteAndMatcher> uniqueMatchers = new HashMap<>();
+  private final transient Map<StreetNoteAndMatcher, StreetNoteAndMatcher> uniqueMatchers = new HashMap<>();
 
   StaticStreetNotesSource() {}
 
@@ -84,13 +81,8 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
    * instances.
    */
   private StreetNoteAndMatcher buildMatcherAndAlert(NoteMatcher noteMatcher, StreetNote note) {
-    T2<NoteMatcher, StreetNote> key = new T2<>(noteMatcher, note);
-    StreetNoteAndMatcher interned = uniqueMatchers.get(key);
-    if (interned != null) {
-      return interned;
-    }
-    StreetNoteAndMatcher ret = new StreetNoteAndMatcher(note, noteMatcher);
-    uniqueMatchers.put(key, ret);
-    return ret;
+    var candidate = new StreetNoteAndMatcher(note, noteMatcher);
+    var interned = uniqueMatchers.putIfAbsent(candidate, candidate);
+    return interned == null ? candidate : interned;
   }
 }
