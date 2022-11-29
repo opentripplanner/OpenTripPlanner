@@ -30,6 +30,8 @@ public record GtfsFeedParameters(
 
   public static final int DEFAULT_MAX_INTERLINE_DISTANCE = 200;
 
+  public static final GtfsFeedParameters DEFAULT = new GtfsFeedParametersBuilder().build();
+
   GtfsFeedParameters(GtfsFeedParametersBuilder builder) {
     this(
       builder.source(),

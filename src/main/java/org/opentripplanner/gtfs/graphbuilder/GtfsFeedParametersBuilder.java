@@ -10,14 +10,19 @@ public class GtfsFeedParametersBuilder {
 
   private URI source;
   private String feedId;
-  private boolean removeRepeatedStops = GtfsFeedParameters.DEFAULT_REMOVE_REPEATED_STOPS;
-  private StopTransferPriority stationTransferPreference =
-    GtfsFeedParameters.DEFAULT_STATION_TRANSFER_PREFERENCE;
-  private boolean discardMinTransferTimes = GtfsFeedParameters.DEFAULT_DISCARD_MIN_TRANSFER_TIMES;
-  private boolean blockBasedInterlining = GtfsFeedParameters.DEFAULT_BLOCK_BASED_INTERLINING;
-  private int maxInterlineDistance = GtfsFeedParameters.DEFAULT_MAX_INTERLINE_DISTANCE;
+  private boolean removeRepeatedStops;
+  private StopTransferPriority stationTransferPreference;
+  private boolean discardMinTransferTimes;
+  private boolean blockBasedInterlining;
+  private int maxInterlineDistance;
 
-  public GtfsFeedParametersBuilder() {}
+  public GtfsFeedParametersBuilder() {
+    this.removeRepeatedStops = GtfsFeedParameters.DEFAULT_REMOVE_REPEATED_STOPS;
+    this.stationTransferPreference = GtfsFeedParameters.DEFAULT_STATION_TRANSFER_PREFERENCE;
+    this.discardMinTransferTimes = GtfsFeedParameters.DEFAULT_DISCARD_MIN_TRANSFER_TIMES;
+    this.blockBasedInterlining = GtfsFeedParameters.DEFAULT_BLOCK_BASED_INTERLINING;
+    this.maxInterlineDistance = GtfsFeedParameters.DEFAULT_MAX_INTERLINE_DISTANCE;
+  }
 
   public GtfsFeedParametersBuilder(GtfsFeedParameters original) {
     this.removeRepeatedStops = original.removeRepeatedStops();
