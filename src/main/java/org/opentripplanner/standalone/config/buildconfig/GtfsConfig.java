@@ -49,6 +49,7 @@ public class GtfsConfig {
     GtfsFeedParameters defaults,
     String documentationAddition
   ) {
+    var docDefaults = GtfsFeedParameters.DEFAULT;
     return defaults
       .copyOf()
       .withRemoveRepeatedStops(
@@ -59,6 +60,7 @@ public class GtfsConfig {
             "Should consecutive identical stops be merged into one stop time entry." +
             documentationAddition
           )
+          .docDefaultValue(docDefaults.removeRepeatedStops())
           .asBoolean(defaults.removeRepeatedStops())
       )
       .withStationTransferPreference(
@@ -75,6 +77,7 @@ public class GtfsConfig {
             with the `stopTransferCost` parameter in the router configuration.
             """
           )
+          .docDefaultValue(docDefaults.stationTransferPreference())
           .asEnum(defaults.stationTransferPreference())
       )
       .withDiscardMinTransferTimes(
@@ -90,6 +93,7 @@ public class GtfsConfig {
             but we want to calculate the transfers always from OSM data.
             """
           )
+          .docDefaultValue(docDefaults.discardMinTransferTimes())
           .asBoolean(defaults.discardMinTransferTimes())
       )
       .withBlockBasedInterlining(
@@ -100,6 +104,7 @@ public class GtfsConfig {
             "Whether to create stay-seated transfers in between two trips with the same block id." +
             documentationAddition
           )
+          .docDefaultValue(docDefaults.blockBasedInterlining())
           .asBoolean(defaults.blockBasedInterlining())
       )
       .withMaxInterlineDistance(
@@ -110,6 +115,7 @@ public class GtfsConfig {
             "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle." +
             documentationAddition
           )
+          .docDefaultValue(docDefaults.maxInterlineDistance())
           .asInt(defaults.maxInterlineDistance())
       );
   }

@@ -1102,6 +1102,7 @@ case where this is not the case.
     "netex" : "(?i)netex"
   },
   "osmDefaults" : {
+    "timeZone" : "Europe/Rome",
     "osmTagMapping" : "default"
   },
   "osm" : [ {
@@ -1125,7 +1126,7 @@ case where this is not the case.
     "ferryIdsNotAllowedForBicycle" : [ "RUT:B107", "RUT:B209" ]
   },
   "gtfsDefaults" : {
-    "stationTransferPreference" : "allowed",
+    "stationTransferPreference" : "recommended",
     "removeRepeatedStops" : true,
     "discardMinTransferTimes" : false,
     "blockBasedInterlining" : true,

@@ -10,6 +10,7 @@
   },
 
   "osmDefaults": {
+    "timeZone": "Europe/Rome",
     "osmTagMapping": "default"
   },
   "osm": [{
@@ -33,7 +34,7 @@
     "ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
   },
   "gtfsDefaults" : {
-    "stationTransferPreference" : "allowed",
+    "stationTransferPreference" : "recommended",
     "removeRepeatedStops" : true,
     "discardMinTransferTimes": false,
     "blockBasedInterlining": true,
