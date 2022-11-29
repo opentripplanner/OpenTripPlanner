@@ -13,10 +13,8 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
-import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -234,8 +232,8 @@ public class WayPropertySet {
     }
   }
 
-  public Set<T2<StreetNote, NoteMatcher>> getNoteForWay(OSMWithTags way) {
-    HashSet<T2<StreetNote, NoteMatcher>> out = new HashSet<>();
+  public Set<StreetNoteAndNoteMatcher> getNoteForWay(OSMWithTags way) {
+    HashSet<StreetNoteAndNoteMatcher> out = new HashSet<>();
     for (NotePicker picker : notes) {
       OsmSpecifier specifier = picker.specifier;
       NoteProperties noteProperties = picker.noteProperties;

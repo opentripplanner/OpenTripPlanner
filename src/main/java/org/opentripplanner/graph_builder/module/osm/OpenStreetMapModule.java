@@ -16,7 +16,6 @@ import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.logging.ProgressTracker;
@@ -28,14 +27,12 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
-import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -279,10 +276,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     ) {
       OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
 
-      Set<T2<StreetNote, NoteMatcher>> notes = way
+      Set<StreetNoteAndNoteMatcher> notes = way
         .getOsmProvider()
         .getWayPropertySet()
         .getNoteForWay(way);
+
       boolean motorVehicleNoThrough = tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(
         way
       );
@@ -301,11 +299,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           bestWalkSafety = (float) walkSafety;
         }
         if (notes != null) {
-          for (T2<StreetNote, NoteMatcher> note : notes) graph.streetNotesService.addStaticNote(
-            street,
-            note.first,
-            note.second
-          );
+          for (var it : notes) {
+            graph.streetNotesService.addStaticNote(street, it.note(), it.matcher());
+          }
         }
         street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
         street.setBicycleNoThruTraffic(bicycleNoThrough);
@@ -324,11 +320,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
         backStreet.setWalkSafetyFactor((float) walkSafety);
         if (notes != null) {
-          for (T2<StreetNote, NoteMatcher> note : notes) graph.streetNotesService.addStaticNote(
-            backStreet,
-            note.first,
-            note.second
-          );
+          for (var it : notes) {
+            graph.streetNotesService.addStaticNote(backStreet, it.note(), it.matcher());
+          }
         }
         backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
         backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
