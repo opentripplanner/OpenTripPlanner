@@ -31,6 +31,7 @@ import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParking
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalPlacesLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalStationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalVehiclesLayerBuilder;
+import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
@@ -168,26 +169,6 @@ public class VectorTilesResource {
     );
   }
 
-  private String getBaseAddress(UriInfo uri, HttpHeaders headers) {
-    String protocol;
-    if (headers.getRequestHeader("X-Forwarded-Proto") != null) {
-      protocol = headers.getRequestHeader("X-Forwarded-Proto").get(0);
-    } else {
-      protocol = uri.getRequestUri().getScheme();
-    }
-
-    String host;
-    if (headers.getRequestHeader("X-Forwarded-Host") != null) {
-      host = headers.getRequestHeader("X-Forwarded-Host").get(0);
-    } else if (headers.getRequestHeader("Host") != null) {
-      host = headers.getRequestHeader("Host").get(0);
-    } else {
-      host = uri.getBaseUri().getHost() + ":" + uri.getBaseUri().getPort();
-    }
-
-    return protocol + "://" + host;
-  }
-
   public enum LayerType {
     Stop,
     AreaStop,
@@ -267,7 +248,7 @@ public class VectorTilesResource {
 
       tiles =
         new String[] {
-          getBaseAddress(uri, headers) +
+          HttpUtils.getBaseAddress(uri, headers) +
           "/otp/routers/" +
           ignoreRouterId +
           "/vectorTiles/" +

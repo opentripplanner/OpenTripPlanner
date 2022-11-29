@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.UriInfo;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -106,6 +108,31 @@ public class HttpUtils {
       // Local file probably, try standard java
       return downloadUrl.openStream();
     }
+  }
+
+  /**
+   * Get the canonical url of a request, either based on headers or the URI. See
+   * <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host">here</a>
+   * for details
+   */
+  public static String getBaseAddress(UriInfo uri, HttpHeaders headers) {
+    String protocol;
+    if (headers.getRequestHeader("X-Forwarded-Proto") != null) {
+      protocol = headers.getRequestHeader("X-Forwarded-Proto").get(0);
+    } else {
+      protocol = uri.getRequestUri().getScheme();
+    }
+
+    String host;
+    if (headers.getRequestHeader("X-Forwarded-Host") != null) {
+      host = headers.getRequestHeader("X-Forwarded-Host").get(0);
+    } else if (headers.getRequestHeader("Host") != null) {
+      host = headers.getRequestHeader("Host").get(0);
+    } else {
+      host = uri.getBaseUri().getHost() + ":" + uri.getBaseUri().getPort();
+    }
+
+    return protocol + "://" + host;
   }
 
   private static HttpResponse getResponse(
