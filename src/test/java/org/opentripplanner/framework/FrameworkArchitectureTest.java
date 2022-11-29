@@ -8,8 +8,6 @@ import org.opentripplanner._support.arch.Package;
 
 public class FrameworkArchitectureTest {
 
-
-
   private static final Package APACHE_HTTP = Package.of("org.apache.http..");
 
   private static final Module XML_MODULES = Module.of(
