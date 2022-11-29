@@ -49,7 +49,10 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
       state,
       context.slackProvider(),
       context.costCalculator(),
-      context.debugFactory()
+      context.calculator(),
+      context.roundProvider(),
+      context.debugFactory(),
+      context.lifeCycle()
     );
   }
 
