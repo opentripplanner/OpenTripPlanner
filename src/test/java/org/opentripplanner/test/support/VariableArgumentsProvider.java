@@ -1,6 +1,7 @@
 package org.opentripplanner.test.support;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
@@ -50,6 +51,12 @@ class VariableArgumentsProvider implements ArgumentsProvider, AnnotationConsumer
 
     field.setAccessible(accessible);
 
-    return value == null ? null : (Stream<Arguments>) value;
+    if (value instanceof Stream stream) {
+      return (Stream<Arguments>) stream;
+    } else if (value instanceof List list) {
+      return list.stream();
+    } else {
+      return null;
+    }
   }
 }

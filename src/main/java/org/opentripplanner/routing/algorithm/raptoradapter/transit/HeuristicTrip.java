@@ -11,6 +11,7 @@ import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -20,7 +21,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * pattern. It is useful for computing the heuristic for the path pruning, as no schedule searches
  * need to be done.
  */
-public final class HeuristicTrip implements RaptorTripSchedule {
+public final class HeuristicTrip implements DefaultTripSchedule {
 
   static final Deduplicator DEDUPLICATOR = new Deduplicator();
 
@@ -136,6 +137,16 @@ public final class HeuristicTrip implements RaptorTripSchedule {
   @Override
   public int hashCode() {
     return Objects.hash(pattern, Arrays.hashCode(arrivalTimes), Arrays.hashCode(departureTimes));
+  }
+
+  @Override
+  public int transitReluctanceFactorIndex() {
+    return pattern.slackIndex();
+  }
+
+  @Override
+  public Accessibility wheelchairBoarding() {
+    return Accessibility.POSSIBLE;
   }
 
   private static void updateTimes(

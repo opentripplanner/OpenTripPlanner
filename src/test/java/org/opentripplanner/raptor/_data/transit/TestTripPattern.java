@@ -17,7 +17,7 @@ public class TestTripPattern implements DefaultTripPattern {
    * improves the performance.
    */
   private int slackIndex = 0;
-
+  private int transitReluctanceFactorIndex = 0;
   private int patternIndex = 0;
 
   /**
@@ -54,6 +54,11 @@ public class TestTripPattern implements DefaultTripPattern {
 
   TestTripPattern withPatternIndex(int index) {
     this.patternIndex = index;
+    return this;
+  }
+
+  public TestTripPattern withTransitReluctanceFactorIndex(int index) {
+    this.transitReluctanceFactorIndex = index;
     return this;
   }
 
@@ -115,6 +120,11 @@ public class TestTripPattern implements DefaultTripPattern {
   @Override
   public int slackIndex() {
     return slackIndex;
+  }
+
+  @Override
+  public int transitReluctanceFactorIndex() {
+    return transitReluctanceFactorIndex;
   }
 
   @Override

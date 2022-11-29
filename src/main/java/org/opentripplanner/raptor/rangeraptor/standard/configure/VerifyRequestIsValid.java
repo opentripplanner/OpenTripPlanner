@@ -40,7 +40,11 @@ class VerifyRequestIsValid {
 
   private boolean minTravelDurationStrategy() {
     return profile()
-      .isOneOf(RaptorProfile.MIN_TRAVEL_DURATION, RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME);
+      .isOneOf(
+        RaptorProfile.MIN_TRAVEL_DURATION,
+        RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME,
+        RaptorProfile.MIN_TRAVEL_DURATION_AND_COST_BEST_TIME
+      );
   }
 
   private boolean oneIteration() {

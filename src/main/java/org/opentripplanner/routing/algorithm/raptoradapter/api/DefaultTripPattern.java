@@ -10,4 +10,6 @@ public interface DefaultTripPattern extends RaptorTripPattern {
    * give unpreferred routes or agencies a generalized-cost penalty.
    */
   Route route();
+
+  int transitReluctanceFactorIndex();
 }

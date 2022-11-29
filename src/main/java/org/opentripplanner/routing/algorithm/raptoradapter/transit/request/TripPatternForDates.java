@@ -179,6 +179,7 @@ public class TripPatternForDates
     return tripPattern.slackIndex();
   }
 
+  @Override
   public int transitReluctanceFactorIndex() {
     return tripPattern.transitReluctanceFactorIndex();
   }

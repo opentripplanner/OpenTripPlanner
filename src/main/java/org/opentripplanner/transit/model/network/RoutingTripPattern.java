@@ -100,6 +100,7 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
     return slackIndex;
   }
 
+  @Override
   public int transitReluctanceFactorIndex() {
     return transitReluctanceFactorIndex;
   }
