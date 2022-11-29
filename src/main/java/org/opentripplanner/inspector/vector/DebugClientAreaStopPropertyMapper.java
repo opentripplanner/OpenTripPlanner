@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles.layers.areastops;
+package org.opentripplanner.inspector.vector;
 
 import java.util.Collection;
 import java.util.List;
