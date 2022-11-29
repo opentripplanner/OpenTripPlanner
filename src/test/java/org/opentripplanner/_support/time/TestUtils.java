@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner._support.time;
 
 import java.time.Instant;
 import java.time.ZoneId;

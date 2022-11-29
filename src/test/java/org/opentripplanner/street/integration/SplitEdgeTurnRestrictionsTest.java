@@ -2,6 +2,7 @@ package org.opentripplanner.street.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner._support.time.TestDateTimeUtils.dateInstant;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Duration;
@@ -21,7 +22,6 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.TestUtils;
 
 /*
  * When bus stops are added to graph they split an existing edge in two parts so that an artificial
@@ -32,7 +32,7 @@ import org.opentripplanner.util.TestUtils;
  */
 public class SplitEdgeTurnRestrictionsTest {
 
-  static final Instant dateTime = TestUtils.dateInstant("Europe/Berlin", 2020, 3, 3, 7, 0, 0);
+  static final Instant dateTime = dateInstant("Europe/Berlin", 2020, 3, 3, 7, 0, 0);
   // Deufringen
   static final GenericLocation hardtheimerWeg = new GenericLocation(48.67765, 8.87212);
   static final GenericLocation steinhaldenWeg = new GenericLocation(48.67815, 8.87305);
