@@ -57,6 +57,14 @@ public class ParameterBuilder {
    */
   private final NodeAdapter target;
 
+  /**
+   * Sometimes we want to use a different default value in the documentation than in the
+   * returned parameters. This is the case when the default value is derived from other
+   * parameters, and the default value is just a fallback. In these cases we temporarily need to
+   * keep the doc-default-value.
+   */
+  private Object docDefaultValue = null;
+
   public ParameterBuilder(NodeAdapter target, String paramName) {
     this.target = target;
     info.withName(paramName);
@@ -77,6 +85,22 @@ public class ParameterBuilder {
   /** Add documentation detail description to a parameter. */
   public ParameterBuilder description(String description) {
     this.info.withDescription(description);
+    return this;
+  }
+
+  /**
+   * Add documentation for optional field with default value to a parameter.
+   * <p>
+   * <b>Note!</b> This is only required if the default value in the documentation should be
+   * different from the value passed in with {@code #asNnnn(defaultValue)}. This may be the case if
+   * the value passed to {@code #asNnnn(defaultValue)} is derived from other parameters and the
+   * <em>code</em> default is just a fallback.
+   * <p>
+   * If the given default value is not of type String, then {@code String.valueOf(defaultValue)}
+   * is applied, there is
+   */
+  public ParameterBuilder docDefaultValue(Object defaultValue) {
+    this.docDefaultValue = defaultValue;
     return this;
   }
 
@@ -166,7 +190,8 @@ public class ParameterBuilder {
   }
 
   public <T> List<T> asObjects(List<T> defaultValues, Function<NodeAdapter, T> mapper) {
-    info.withOptional(defaultValues.isEmpty() ? "[]" : defaultValues.toString()).withArray(OBJECT);
+    setInfoOptional(defaultValues);
+    info.withArray(OBJECT);
     return buildAndListComplexArrayElements(defaultValues, mapper);
   }
 
@@ -178,9 +203,8 @@ public class ParameterBuilder {
   /** Get optional enum value. Parser is not case sensitive. */
   @SuppressWarnings("unchecked")
   public <T extends Enum<T>> T asEnum(T defaultValue) {
-    info
-      .withEnum((Class<? extends Enum<?>>) defaultValue.getClass())
-      .withOptional(EnumMapper.toString(defaultValue));
+    info.withEnum((Class<? extends Enum<?>>) defaultValue.getClass());
+    setInfoOptional(defaultValue);
     // Do not inline the node, calling the build is required.
     var node = build();
     return exist() ? parseEnum(node.asText(), (Class<T>) defaultValue.getClass()) : defaultValue;
@@ -328,7 +352,8 @@ public class ParameterBuilder {
   }
 
   public List<FeedScopedId> asFeedScopedIds(List<FeedScopedId> defaultValues) {
-    info.withOptional(defaultValues.toString()).withArray(FEED_SCOPED_ID);
+    setInfoOptional(defaultValues);
+    info.withArray(FEED_SCOPED_ID);
     return buildAndListSimpleArrayElements(defaultValues, it -> FeedScopedId.parseId(it.asText()));
   }
 
@@ -372,7 +397,8 @@ public class ParameterBuilder {
     Function<JsonNode, T> body,
     Function<T, String> toText
   ) {
-    info.withType(type).withOptional(defaultValue == null ? null : toText.apply(defaultValue));
+    setInfoOptional(defaultValue == null ? null : toText.apply(defaultValue));
+    info.withType(type);
     // Do not inline the build() call, if not called the metadata is not saved.
     var node = build();
     return exist() ? body.apply(node) : defaultValue;
@@ -387,7 +413,8 @@ public class ParameterBuilder {
     String defaultValueAsString,
     Function<String, T> mapper
   ) {
-    info.withType(type).withOptional(defaultValueAsString);
+    setInfoOptional(defaultValueAsString);
+    info.withType(type);
     // Do not inline the build() call, if not called the metadata is not saved.
     var node = build();
     return exist()
@@ -400,7 +427,8 @@ public class ParameterBuilder {
     List<T> defaultValue,
     Function<JsonNode, T> mapper
   ) {
-    info.withOptional(String.valueOf(defaultValue)).withArray(elementType);
+    setInfoOptional(defaultValue);
+    info.withArray(elementType);
     return buildAndListSimpleArrayElements(defaultValue, mapper);
   }
 
@@ -423,11 +451,12 @@ public class ParameterBuilder {
   }
 
   private JsonNode build() {
+    this.docDefaultValue = null;
     return target.addAndValidateParameterNode(info.build());
   }
 
   private NodeAdapter buildObject() {
-    JsonNode node = target.addAndValidateParameterNode(info.build());
+    JsonNode node = build();
     return target.path(paramName(), node);
   }
 
@@ -482,6 +511,25 @@ public class ParameterBuilder {
       ++i;
     }
     return values;
+  }
+
+  private void setInfoOptional(Object realDefaultValue) {
+    info.withOptional(getDocDefaultValue(realDefaultValue));
+  }
+
+  private String getDocDefaultValue(Object realDefaultValue) {
+    Object value = docDefaultValue == null ? realDefaultValue : docDefaultValue;
+
+    if (value == null) {
+      return null;
+    }
+    if (value instanceof List list && list.isEmpty()) {
+      return "[]";
+    }
+    if (value instanceof Enum enumValue) {
+      return EnumMapper.toString(enumValue);
+    }
+    return String.valueOf(value);
   }
 
   /* parse/map from string to a specific type, handle parse error */

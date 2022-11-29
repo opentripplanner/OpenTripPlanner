@@ -50,9 +50,10 @@ public class NetexConfig {
 
   private static NetexFeedParameters.Builder mapFilePatternParameters(
     NodeAdapter config,
-    NetexFeedParameters original
+    NetexFeedParameters base
   ) {
-    return original
+    var dft = NetexFeedParameters.DEFAULT;
+    return base
       .copyOf()
       .withSharedFilePattern(
         config
@@ -74,7 +75,8 @@ public class NetexConfig {
                - `groupFilePattern`
               """
           )
-          .asPattern(original.sharedFilePattern().pattern())
+          .docDefaultValue(dft.sharedFilePattern().pattern())
+          .asPattern(base.sharedFilePattern().pattern())
       )
       .withSharedGroupFilePattern(
         config
@@ -94,7 +96,8 @@ public class NetexConfig {
             The pattern `"(\\w{3})-.*-shared\\.xml"` matches `"RUT-shared.xml"` with group `"RUT"`.
             """
           )
-          .asPattern(original.sharedGroupFilePattern().pattern())
+          .docDefaultValue(dft.sharedGroupFilePattern().pattern())
+          .asPattern(base.sharedGroupFilePattern().pattern())
       )
       .withGroupFilePattern(
         config
@@ -110,7 +113,8 @@ public class NetexConfig {
             with group `"RUT"`.
             """
           )
-          .asPattern(original.groupFilePattern().pattern())
+          .docDefaultValue(dft.groupFilePattern().pattern())
+          .asPattern(base.groupFilePattern().pattern())
       )
       .withIgnoreFilePattern(
         config
@@ -123,7 +127,8 @@ public class NetexConfig {
               The *ignored* files are *not* loaded.
               """
           )
-          .asPattern(original.ignoreFilePattern().pattern())
+          .docDefaultValue(dft.ignoreFilePattern().pattern())
+          .asPattern(base.ignoreFilePattern().pattern())
       )
       .withNoTransfersOnIsolatedStops(
         config
@@ -132,7 +137,8 @@ public class NetexConfig {
           .summary(
             "Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED"
           )
-          .asBoolean(original.noTransfersOnIsolatedStops())
+          .docDefaultValue(dft.noTransfersOnIsolatedStops())
+          .asBoolean(base.noTransfersOnIsolatedStops())
       )
       .addFerryIdsNotAllowedForBicycle(
         config
@@ -148,14 +154,16 @@ public class NetexConfig {
             case where this is not the case.
             """
           )
-          .asStringSet(original.ferryIdsNotAllowedForBicycle())
+          .docDefaultValue(dft.ferryIdsNotAllowedForBicycle())
+          .asStringSet(base.ferryIdsNotAllowedForBicycle())
       )
       .withIgnoreFareFrame(
         config
           .of("ignoreFareFrame")
           .since(V2_3)
           .summary("Ignore contents of the FareFrame")
-          .asBoolean(original.ignoreFareFrame())
+          .docDefaultValue(base.ignoreFareFrame())
+          .asBoolean(base.ignoreFareFrame())
       );
   }
 
