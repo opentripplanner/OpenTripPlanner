@@ -6,8 +6,8 @@ import java.util.Locale;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opentripplanner.api.mapping.I18NStringMapper;
+import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.vectortiles.PropertyMapper;
 
 public class DigitransitVehicleParkingGroupPropertyMapper
   extends PropertyMapper<VehicleParkingAndGroup> {

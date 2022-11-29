@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles;
+package org.opentripplanner.api.mapping;
 
 import edu.colorado.cires.cmg.mvt.VectorTile;
 import edu.colorado.cires.cmg.mvt.adapt.jts.IUserDataConverter;
