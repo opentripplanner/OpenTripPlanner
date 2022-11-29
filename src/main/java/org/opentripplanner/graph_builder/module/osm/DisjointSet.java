@@ -1,4 +1,4 @@
-package org.opentripplanner.common;
+package org.opentripplanner.graph_builder.module.osm;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;

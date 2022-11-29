@@ -15,7 +15,6 @@ import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionException;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
