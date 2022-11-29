@@ -174,7 +174,9 @@ public class FlexRouter {
             .filter(date -> date.isFlexTripRunning(it.flexTrip(), this.transitService))
             // Create templates from trip, boarding at the nearbyStop
             .flatMap(date ->
-              it.flexTrip().getFlexAccessTemplates(it.accessEgress(), date, accessFlexPathCalculator, config)
+              it
+                .flexTrip()
+                .getFlexAccessTemplates(it.accessEgress(), date, accessFlexPathCalculator, config)
             )
         )
         .collect(Collectors.toList());

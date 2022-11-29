@@ -6,8 +6,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.I18NStringMapper;
+import org.opentripplanner.ext.vectortiles.KeyValue;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
@@ -32,13 +32,13 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
   }
 
   @Override
-  public Collection<T2<String, Object>> map(Station station) {
+  public Collection<KeyValue> map(Station station) {
     var childStops = station.getChildStops();
 
     return List.of(
-      new T2<>("gtfsId", station.getId().toString()),
-      new T2<>("name", i18NStringMapper.mapNonnullToApi(station.getName())),
-      new T2<>(
+      new KeyValue("gtfsId", station.getId().toString()),
+      new KeyValue("name", i18NStringMapper.mapNonnullToApi(station.getName())),
+      new KeyValue(
         "type",
         childStops
           .stream()
@@ -47,13 +47,13 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
           .distinct()
           .collect(Collectors.joining(","))
       ),
-      new T2<>(
+      new KeyValue(
         "stops",
         JSONArray.toJSONString(
           childStops.stream().map(StopLocation::getId).map(FeedScopedId::toString).toList()
         )
       ),
-      new T2<>(
+      new KeyValue(
         "routes",
         JSONArray.toJSONString(
           childStops
