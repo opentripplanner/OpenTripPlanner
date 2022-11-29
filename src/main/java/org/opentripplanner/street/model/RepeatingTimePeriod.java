@@ -1,4 +1,4 @@
-package org.opentripplanner.common;
+package org.opentripplanner.street.model;
 
 import java.io.Serializable;
 import java.time.DayOfWeek;

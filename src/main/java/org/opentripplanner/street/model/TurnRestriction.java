@@ -1,7 +1,6 @@
 package org.opentripplanner.street.model;
 
 import java.io.Serializable;
-import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseModeSet;
 
