@@ -1,4 +1,4 @@
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.framework.geometry;
 
 import java.util.HashSet;
 import java.util.List;
@@ -10,7 +10,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.strtree.STRtree;
-import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 
 public class HashGridTest {
 
