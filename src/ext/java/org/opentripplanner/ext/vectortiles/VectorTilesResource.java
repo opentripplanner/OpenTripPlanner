@@ -127,10 +127,7 @@ public class VectorTilesResource {
 
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
-    for (LayerParameters layerParameters : serverContext
-      .routerConfig()
-      .vectorTileLayers()
-      .layers()) {
+    for (LayerParameters layerParameters : serverContext.vectorTileLayers().layers()) {
       if (
         layers.contains(layerParameters.name()) &&
         layerParameters.minZoom() <= z &&

@@ -32,6 +32,7 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.vertex.StreetLocation;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -128,9 +129,10 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var router = new FlexRouter(
       graph,
       new DefaultTransitService(transitModel),
-      new FlexParameters(300),
+      FlexConfig.DEFAULT,
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
       false,
+      1.0,
       1,
       1,
       List.of(from),

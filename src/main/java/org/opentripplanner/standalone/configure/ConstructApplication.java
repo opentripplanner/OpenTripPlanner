@@ -9,6 +9,7 @@ import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
@@ -129,7 +130,7 @@ public class ConstructApplication {
     // Create MetricsLogging
     factory.metricsLogging();
 
-    creatTransitLayerForRaptor(transitModel(), routerConfig());
+    creatTransitLayerForRaptor(transitModel(), routerConfig().transitTuningConfig());
 
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(graph(), transitModel(), routerConfig().updaterConfig());
@@ -155,7 +156,7 @@ public class ConstructApplication {
    */
   public static void creatTransitLayerForRaptor(
     TransitModel transitModel,
-    RouterConfig routerConfig
+    TransitTuningParameters tuningParameters
   ) {
     if (!transitModel.hasTransit() || transitModel.getTransitModelIndex() == null) {
       LOG.warn(
@@ -163,9 +164,7 @@ public class ConstructApplication {
       );
     }
     LOG.info("Creating transit layer for Raptor routing.");
-    transitModel.setTransitLayer(
-      TransitLayerMapper.map(routerConfig.transitTuningParameters(), transitModel)
-    );
+    transitModel.setTransitLayer(TransitLayerMapper.map(tuningParameters, transitModel));
     transitModel.setRealtimeTransitLayer(new TransitLayer(transitModel.getTransitLayer()));
     transitModel.setTransitLayerUpdater(
       new TransitLayerUpdater(

@@ -26,12 +26,17 @@ public class ConstructApplicationModule {
     @Nullable TraverseVisitor<?, ?> traverseVisitor
   ) {
     return DefaultServerRequestContext.create(
-      routerConfig,
+      routerConfig.transitTuningConfig(),
+      routerConfig.routingRequestDefaults(),
+      routerConfig.streetRoutingTimeout(),
       raptorConfig,
       graph,
       transitService,
       Metrics.globalRegistry,
-      traverseVisitor
+      routerConfig.vectorTileLayers(),
+      routerConfig.flexConfig(),
+      traverseVisitor,
+      routerConfig.requestLogFile()
     );
   }
 

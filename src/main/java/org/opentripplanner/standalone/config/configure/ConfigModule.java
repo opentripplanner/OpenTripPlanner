@@ -35,6 +35,6 @@ public class ConfigModule {
   @Provides
   @Singleton
   static RaptorConfig<TripSchedule> providesRaptorConfig(ConfigModel config) {
-    return new RaptorConfig<>(config.routerConfig().raptorTuningParameters());
+    return new RaptorConfig<>(config.routerConfig().transitTuningConfig());
   }
 }
