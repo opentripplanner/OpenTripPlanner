@@ -1,4 +1,4 @@
-package org.opentripplanner.common;
+package org.opentripplanner.graph_builder.module;
 
 import java.util.HashMap;
 
@@ -7,7 +7,7 @@ import java.util.HashMap;
  * this does not change the meaning of the 'put' method. It adds two new methods that add the
  * min/max behavior. This class used to be inside SimpleIsochrone.
  */
-public class MinMap<K, V extends Comparable<V>> extends HashMap<K, V> {
+class MinMap<K, V extends Comparable<V>> extends HashMap<K, V> {
 
   /**
    * Put the given key-value pair in the map if the map does not yet contain the key, or if the
@@ -15,7 +15,7 @@ public class MinMap<K, V extends Comparable<V>> extends HashMap<K, V> {
    *
    * @return whether the key-value pair was inserted in the map.
    */
-  public boolean putMin(K key, V value) {
+  boolean putMin(K key, V value) {
     V oldValue = this.get(key);
     if (oldValue == null || value.compareTo(oldValue) < 0) {
       this.put(key, value);
@@ -30,7 +30,7 @@ public class MinMap<K, V extends Comparable<V>> extends HashMap<K, V> {
    *
    * @return whether the key-value pair was inserted in the map.
    */
-  public boolean putMax(K key, V value) {
+  boolean putMax(K key, V value) {
     V oldValue = this.get(key);
     if (oldValue == null || value.compareTo(oldValue) > 0) {
       this.put(key, value);
