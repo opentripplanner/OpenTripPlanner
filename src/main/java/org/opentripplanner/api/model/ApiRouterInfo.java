@@ -10,11 +10,10 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.WorldEnvelope;
 
 public class ApiRouterInfo {
 
-  private final WorldEnvelope envelope;
+  private final ApiWorldEnvelope envelope;
   public final boolean hasBikePark;
   public final boolean hasCarPark;
   public final boolean hasVehicleParking;
@@ -41,7 +40,14 @@ public class ApiRouterInfo {
     this.transitServiceStarts = transitService.getTransitServiceStarts().toEpochSecond();
     this.transitServiceEnds = transitService.getTransitServiceEnds().toEpochSecond();
     this.transitModes = ModeMapper.mapToApi(transitService.getTransitModes());
-    this.envelope = graph.getEnvelope();
+    var ev = graph.getEnvelope();
+    this.envelope =
+      new ApiWorldEnvelope(
+        ev.getLowerLeftLatitude(),
+        ev.getLowerLeftLongitude(),
+        ev.getUpperRightLatitude(),
+        ev.getUpperRightLongitude()
+      );
     this.hasBikeSharing = mapHasBikeSharing(vehicleRentalService);
     this.hasBikePark = mapHasBikePark(vehicleParkingService);
     this.hasCarPark = mapHasCarPark(vehicleParkingService);

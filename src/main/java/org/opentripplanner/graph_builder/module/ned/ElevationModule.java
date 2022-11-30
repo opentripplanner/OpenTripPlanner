@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
+import static org.opentripplanner.street.model.elevation.ElevationUtils.computeEllipsoidToGeoidDifference;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

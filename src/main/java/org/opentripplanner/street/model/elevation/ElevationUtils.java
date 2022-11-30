@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.street.model.elevation;
 
 import org.geotools.geometry.DirectPosition3D;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
