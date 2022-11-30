@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Collection;
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -105,7 +106,7 @@ public class GsIntegrationTest {
 
     //assertFalse(ds.exists());
     assertEquals(tempDir + "/ds.txt", ds.name());
-    assertEquals(GsHelper.toUriString(BUCKET_NAME, tempDir + "/ds.txt"), ds.path());
+    Assertions.assertEquals(GsHelper.toUriString(BUCKET_NAME, tempDir + "/ds.txt"), ds.path());
     assertEquals(FileType.UNKNOWN, ds.type());
     assertTrue(ds.isWritable());
     assertFalse(ds.exists());

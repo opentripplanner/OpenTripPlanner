@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.google.cloud.storage.BlobId;
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class GsHelperTest {
