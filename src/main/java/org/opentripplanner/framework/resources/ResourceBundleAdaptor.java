@@ -1,4 +1,4 @@
-package org.opentripplanner.util.resources;
+package org.opentripplanner.framework.resources;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
