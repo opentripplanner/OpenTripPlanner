@@ -1,4 +1,4 @@
-package org.opentripplanner.datastore.base;
+package org.opentripplanner.datastore.file;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.datastore.file.TemporaryFileDataSource;
 
 class ZipStreamDataSourceDecoratorTest {
 

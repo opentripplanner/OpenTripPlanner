@@ -1,4 +1,4 @@
-package org.opentripplanner.datastore.base;
+package org.opentripplanner.datastore.file;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,7 +17,7 @@ import org.apache.commons.io.IOUtils;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.datastore.file.TemporaryFileDataSource;
+import org.opentripplanner.datastore.base.ByteArrayDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,10 +139,11 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
   @Override
   public void close() {
     if (content != null) {
-      content
-        .stream()
-        .filter(TemporaryFileDataSource.class::isInstance)
-        .forEach(dataSource -> ((TemporaryFileDataSource) dataSource).deleteFile());
+      for (DataSource dataSource : content) {
+        if (dataSource instanceof TemporaryFileDataSource tempDataSource) {
+          tempDataSource.deleteFile();
+        }
+      }
     }
     // Make the content available for GC.
     content = null;
