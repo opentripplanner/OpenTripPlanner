@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.framework.geometry;
 
 import java.io.Serializable;
 import org.locationtech.jts.geom.Coordinate;

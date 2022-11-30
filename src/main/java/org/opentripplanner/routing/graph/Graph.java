@@ -21,6 +21,7 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.index.StreetIndex;
@@ -36,7 +37,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
