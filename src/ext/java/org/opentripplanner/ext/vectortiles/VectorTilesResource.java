@@ -2,10 +2,8 @@ package org.opentripplanner.ext.vectortiles;
 
 import edu.colorado.cires.cmg.mvt.VectorTile;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import javax.ws.rs.GET;
@@ -39,56 +37,10 @@ import org.opentripplanner.transit.service.TransitService;
 public class VectorTilesResource {
 
   public static final String APPLICATION_X_PROTOBUF = "application/x-protobuf";
-  private static final Map<LayerType, LayerBuilderFactory> layers = new HashMap<>();
+
   private final OtpServerRequestContext serverContext;
   private final String ignoreRouterId;
   private final Locale locale;
-
-  static {
-    layers.put(
-      LayerType.Stop,
-      (graph, transitService, layerParameters, locale) ->
-        new StopsLayerBuilder(transitService, layerParameters, locale)
-    );
-    layers.put(
-      LayerType.Station,
-      (graph, transitService, layerParameters, locale) ->
-        new StationsLayerBuilder(transitService, layerParameters, locale)
-    );
-    layers.put(
-      LayerType.VehicleRental,
-      (graph, transitService, layerParameters, locale) ->
-        new VehicleRentalPlacesLayerBuilder(
-          graph.getVehicleRentalService(),
-          layerParameters,
-          locale
-        )
-    );
-    layers.put(
-      LayerType.VehicleRentalStation,
-      (graph, transitService, layerParameters, locale) ->
-        new VehicleRentalStationsLayerBuilder(
-          graph.getVehicleRentalService(),
-          layerParameters,
-          locale
-        )
-    );
-    layers.put(
-      LayerType.VehicleRentalVehicle,
-      (graph, transitService, layerParameters, locale) ->
-        new VehicleRentalVehiclesLayerBuilder(graph.getVehicleRentalService(), layerParameters)
-    );
-    layers.put(
-      LayerType.VehicleParking,
-      (graph, transitService, layerParameters, locale) ->
-        new VehicleParkingsLayerBuilder(graph, layerParameters, locale)
-    );
-    layers.put(
-      LayerType.VehicleParkingGroup,
-      (graph, transitService, layerParameters, locale) ->
-        new VehicleParkingGroupsLayerBuilder(graph, layerParameters, locale)
-    );
-  }
 
   public VectorTilesResource(
     @Context OtpServerRequestContext serverContext,
@@ -134,8 +86,7 @@ public class VectorTilesResource {
       ) {
         cacheMaxSeconds = Math.min(cacheMaxSeconds, layerParameters.cacheMaxSeconds());
         mvtBuilder.addLayers(
-          VectorTilesResource.layers
-            .get(layerParameters.type())
+          getLayerFactory(layerParameters.type())
             .create(serverContext.graph(), serverContext.transitService(), layerParameters, locale)
             .build(envelope, layerParameters)
         );
@@ -176,9 +127,35 @@ public class VectorTilesResource {
     );
   }
 
+  private static LayerBuilderFactory getLayerFactory(LayerType layerType) {
+    return switch (layerType) {
+      case Stop -> (graph, transitService, layerParameters, locale) ->
+        new StopsLayerBuilder(transitService, layerParameters, locale);
+      case Station -> (graph, transitService, layerParameters, locale) ->
+        new StationsLayerBuilder(transitService, layerParameters, locale);
+      case VehicleRental -> (graph, transitService, layerParameters, locale) ->
+        new VehicleRentalPlacesLayerBuilder(
+          graph.getVehicleRentalService(),
+          layerParameters,
+          locale
+        );
+      case VehicleRentalStation -> (graph, transitService, layerParameters, locale) ->
+        new VehicleRentalStationsLayerBuilder(
+          graph.getVehicleRentalService(),
+          layerParameters,
+          locale
+        );
+      case VehicleRentalVehicle -> (graph, transitService, layerParameters, locale) ->
+        new VehicleRentalVehiclesLayerBuilder(graph.getVehicleRentalService(), layerParameters);
+      case VehicleParking -> (graph, transitService, layerParameters, locale) ->
+        new VehicleParkingsLayerBuilder(graph, layerParameters, locale);
+      case VehicleParkingGroup -> (graph, transitService, layerParameters, locale) ->
+        new VehicleParkingGroupsLayerBuilder(graph, layerParameters, locale);
+    };
+  }
+
   public enum LayerType {
     Stop,
-    AreaStop,
     Station,
     VehicleRental,
     VehicleRentalVehicle,
