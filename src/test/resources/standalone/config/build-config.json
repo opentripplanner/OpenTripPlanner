@@ -17,6 +17,9 @@
     "timeZone" : "Europe/Oslo",
     "osmTagMapping" : "norway"
   }],
+  "demDefaults": {
+    "elevationUnitMultiplier" : 1.0
+  },
   "dem": [{
     "source" : "gs://my-bucket/otp-work-dir/norway.dem.tiff",
     "elevationUnitMultiplier" : 2.5
