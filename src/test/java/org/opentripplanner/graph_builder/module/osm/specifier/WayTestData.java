@@ -13,7 +13,7 @@ public class WayTestData {
     tunnel.addTag("layer", "-1");
     tunnel.addTag("lit", "yes");
     tunnel.addTag("maxspeed", "30 mph");
-    tunnel.addTag("nam", "San Jacinto Street");
+    tunnel.addTag("name", "San Jacinto Street");
     tunnel.addTag("note:lanes", "right lane is hov");
     tunnel.addTag("oneway", "yes");
     tunnel.addTag("surface", "concrete");
@@ -74,6 +74,13 @@ public class WayTestData {
     OSMWithTags way = new OSMWithTags();
     way.addTag("highway", "primary");
     way.addTag("lanes", "5");
+    return way;
+  }
+
+  public static OSMWithTags threeLanes() {
+    OSMWithTags way = new OSMWithTags();
+    way.addTag("highway", "primary");
+    way.addTag("lanes", "3");
     return way;
   }
 

@@ -10,6 +10,7 @@ import static org.opentripplanner.graph_builder.module.osm.specifier.WayTestData
 import static org.opentripplanner.graph_builder.module.osm.specifier.WayTestData.cyclewayLeft;
 import static org.opentripplanner.graph_builder.module.osm.specifier.WayTestData.fiveLanes;
 import static org.opentripplanner.graph_builder.module.osm.specifier.WayTestData.pedestrianTunnel;
+import static org.opentripplanner.graph_builder.module.osm.specifier.WayTestData.threeLanes;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,6 +18,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.graph_builder.module.osm.specifier.Condition.Absent;
 import org.opentripplanner.graph_builder.module.osm.specifier.Condition.Equals;
 import org.opentripplanner.graph_builder.module.osm.specifier.Condition.GreaterThan;
+import org.opentripplanner.graph_builder.module.osm.specifier.Condition.LessThan;
 import org.opentripplanner.graph_builder.module.osm.specifier.Condition.MatchResult;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.test.support.VariableSource;
@@ -28,6 +30,7 @@ class ConditionTest {
 
   static Condition cyclewayAbsent = new Absent("cycleway");
   static Condition moreThanFourLanes = new GreaterThan("lanes", 4);
+  static Condition lessThanFourLanes = new LessThan("lanes", 4);
 
   static Stream<Arguments> equalsCases = Stream.of(
     Arguments.of(cyclewayLeft(), cyclewayLane, EXACT, NONE),
@@ -54,7 +57,11 @@ class ConditionTest {
     Arguments.of(cycleway(), moreThanFourLanes, NONE),
     Arguments.of(carTunnel(), moreThanFourLanes, NONE),
     Arguments.of(pedestrianTunnel(), moreThanFourLanes, NONE),
-    Arguments.of(fiveLanes(), moreThanFourLanes, EXACT)
+    Arguments.of(fiveLanes(), moreThanFourLanes, EXACT),
+    Arguments.of(fiveLanes(), lessThanFourLanes, NONE),
+    Arguments.of(threeLanes(), lessThanFourLanes, EXACT),
+    Arguments.of(carTunnel(), lessThanFourLanes, NONE),
+    Arguments.of(cycleway(), lessThanFourLanes, NONE)
   );
 
   @ParameterizedTest(name = "way {0} with op {1} should have a result {2}")

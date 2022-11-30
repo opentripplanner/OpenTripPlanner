@@ -34,7 +34,10 @@ public class PortlandMapper implements OsmTagMapper {
     props.setMixinProperties("sidewalk=left", withModes(ALL).walkSafety(0.9));
     props.setMixinProperties("sidewalk=right", withModes(ALL).walkSafety(0.9));
     props.setMixinProperties("surface=unpaved", withModes(ALL).walkSafety(1.4));
+
     // high penalty for streets with no sidewalk
+    // these are using the exact() call to generate a ExactMatch. without it several of these
+    // would apply to the same way that is tagged with sidewalk=no
     props.setMixinProperties(exact("sidewalk=no;maxspeed=55 mph"), withModes(ALL).walkSafety(6));
     props.setMixinProperties(exact("sidewalk=no;maxspeed=50 mph"), withModes(ALL).walkSafety(5));
     props.setMixinProperties(exact("sidewalk=no;maxspeed=45 mph"), withModes(ALL).walkSafety(4));

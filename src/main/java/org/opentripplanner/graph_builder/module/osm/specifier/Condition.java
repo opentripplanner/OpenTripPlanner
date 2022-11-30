@@ -152,4 +152,26 @@ public sealed interface Condition {
       throw new UnsupportedOperationException("Not implemented.");
     }
   }
+
+  record LessThan(String key, int value) implements Condition {
+    @Override
+    public MatchResult match(OSMWithTags way) {
+      var maybeInt = way.getTagAsInt(key, ignored -> {});
+      if (maybeInt.isPresent() && maybeInt.getAsInt() < value) {
+        return EXACT;
+      } else {
+        return NONE;
+      }
+    }
+
+    @Override
+    public MatchResult matchLeft(OSMWithTags way) {
+      throw new UnsupportedOperationException("Not implemented.");
+    }
+
+    @Override
+    public MatchResult matchRight(OSMWithTags way) {
+      throw new UnsupportedOperationException("Not implemented.");
+    }
+  }
 }
