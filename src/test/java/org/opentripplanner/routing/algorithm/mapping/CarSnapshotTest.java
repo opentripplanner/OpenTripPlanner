@@ -67,7 +67,8 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_TO_PARK);
-    request.journey().transit().setModes(List.of());
+    // TODO: 2022-11-29 filters: fix
+//    request.journey().transit().setModes(List.of());
     request.setFrom(p1);
     request.setTo(p2);
 
@@ -82,7 +83,8 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_PICKUP);
-    request.journey().transit().setModes(List.of());
+    // TODO: 2022-11-29 filters: fix
+//    request.journey().transit().setModes(List.of());
     request.setFrom(p3);
     request.setTo(p4);
 
@@ -97,7 +99,8 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_PICKUP);
-    request.journey().transit().setModes(List.of());
+    // TODO: 2022-11-29 filters: fix
+//    request.journey().transit().setModes(List.of());
     request.setFrom(p3);
     request.setTo(p4);
     request.setArriveBy(true);
@@ -113,7 +116,8 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_PICKUP);
-    request.journey().transit().setModes(List.of());
+    // TODO: 2022-11-29 filters: fix
+//    request.journey().transit().setModes(List.of());
     request.setFrom(p1);
     request.setTo(p2);
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));

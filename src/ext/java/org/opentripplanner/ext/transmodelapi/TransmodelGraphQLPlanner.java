@@ -129,16 +129,18 @@ public class TransmodelGraphQLPlanner {
       (Collection<String> authorities) ->
         request.journey().transit().setUnpreferredAgencies(mapIDsToDomain(authorities))
     );
-    callWith.argument(
-      "whiteListed.authorities",
-      (Collection<String> authorities) ->
-        request.journey().transit().setWhiteListedAgencies(mapIDsToDomain(authorities))
-    );
-    callWith.argument(
-      "banned.authorities",
-      (Collection<String> authorities) ->
-        request.journey().transit().setBannedAgencies(mapIDsToDomain(authorities))
-    );
+
+    // TODO: 2022-11-29 filters: fix
+//    callWith.argument(
+//      "whiteListed.authorities",
+//      (Collection<String> authorities) ->
+//        request.journey().transit().setWhiteListedAgencies(mapIDsToDomain(authorities))
+//    );
+//    callWith.argument(
+//      "banned.authorities",
+//      (Collection<String> authorities) ->
+//        request.journey().transit().setBannedAgencies(mapIDsToDomain(authorities))
+//    );
 
     callWith.argument(
       "preferred.lines",
@@ -149,24 +151,26 @@ public class TransmodelGraphQLPlanner {
       (List<String> lines) ->
         request.journey().transit().setUnpreferredRoutes(mapIDsToDomain(lines))
     );
-    callWith.argument(
-      "whiteListed.lines",
-      (List<String> lines) ->
-        request
-          .journey()
-          .transit()
-          .setWhiteListedRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)))
-    );
-    callWith.argument(
-      "banned.lines",
-      (List<String> lines) ->
-        request.journey().transit().setBannedRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)))
-    );
-    callWith.argument(
-      "banned.serviceJourneys",
-      (Collection<String> serviceJourneys) ->
-        request.journey().transit().setBannedTrips(mapIDsToDomain(serviceJourneys))
-    );
+
+    // TODO: 2022-11-29 filters: fix
+//    callWith.argument(
+//      "whiteListed.lines",
+//      (List<String> lines) ->
+//        request
+//          .journey()
+//          .transit()
+//          .setWhiteListedRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)))
+//    );
+//    callWith.argument(
+//      "banned.lines",
+//      (List<String> lines) ->
+//        request.journey().transit().setBannedRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)))
+//    );
+//    callWith.argument(
+//      "banned.serviceJourneys",
+//      (Collection<String> serviceJourneys) ->
+//        request.journey().transit().setBannedTrips(mapIDsToDomain(serviceJourneys))
+//    );
 
     // callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
     // callWith.argument("banned.quaysHard", quaysHard -> request.setBannedStopsHard(mappingUtil.prepareListOfFeedScopedId((List<String>) quaysHard)));

@@ -734,9 +734,10 @@ public class LegacyGraphQLQueryTypeImpl
         "unpreferred.agencies",
         request.journey().transit()::setUnpreferredAgenciesFromString
       );
-      callWith.argument("banned.routes", request.journey().transit()::setBannedRoutesFromString);
-      callWith.argument("banned.agencies", request.journey().transit()::setBannedAgenciesFromSting);
-      callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
+      // TODO: 2022-11-29 filters: fix
+//      callWith.argument("banned.routes", request.journey().transit()::setBannedRoutesFromString);
+//      callWith.argument("banned.agencies", request.journey().transit()::setBannedAgenciesFromSting);
+//      callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
       // callWith.argument("banned.stops", request::setBannedStops);
       // callWith.argument("banned.stopsHard", request::setBannedStopsHard);
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);

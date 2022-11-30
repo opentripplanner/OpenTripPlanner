@@ -709,15 +709,16 @@ public abstract class RoutingResource {
         // Filter Agencies
         setIfNotNull(preferredAgencies, transit::setPreferredAgenciesFromString);
         setIfNotNull(unpreferredAgencies, transit::setUnpreferredAgenciesFromString);
-        setIfNotNull(bannedAgencies, transit::setBannedAgenciesFromSting);
-        setIfNotNull(whiteListedAgencies, transit::setWhiteListedAgenciesFromSting);
+        // TODO: 2022-11-29 filters: fix
+//        setIfNotNull(bannedAgencies, transit::setBannedAgenciesFromSting);
+//        setIfNotNull(whiteListedAgencies, transit::setWhiteListedAgenciesFromSting);
         // Filter Routes
         setIfNotNull(preferredRoutes, transit::setPreferredRoutesFromString);
         setIfNotNull(unpreferredRoutes, transit::setUnpreferredRoutesFromString);
-        setIfNotNull(bannedRoutes, transit::setBannedRoutesFromString);
-        setIfNotNull(whiteListedRoutes, transit::setWhiteListedRoutesFromString);
+//        setIfNotNull(bannedRoutes, transit::setBannedRoutesFromString);
+//        setIfNotNull(whiteListedRoutes, transit::setWhiteListedRoutesFromString);
         // Filter Trips
-        setIfNotNull(bannedTrips, transit::setBannedTripsFromString);
+//        setIfNotNull(bannedTrips, transit::setBannedTripsFromString);
       }
       {
         var debugRaptor = journey.transit().raptorDebugging();

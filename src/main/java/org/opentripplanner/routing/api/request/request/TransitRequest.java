@@ -11,17 +11,21 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 // TODO VIA: Javadoc
 public class TransitRequest implements Cloneable, Serializable {
 
-  private List<MainAndSubMode> modes = MainAndSubMode.all();
+  private final List<FilterRequest> filters = new ArrayList<>();
 
-  private List<FeedScopedId> whiteListedAgencies = List.of();
-  private List<FeedScopedId> bannedAgencies = List.of();
+
+  // TODO: 2022-11-29 filters: cleanup
+//  private List<MainAndSubMode> modes = MainAndSubMode.all();
+
+//  private List<FeedScopedId> whiteListedAgencies = List.of();
+//  private List<FeedScopedId> bannedAgencies = List.of();
 
   @Deprecated
   private List<FeedScopedId> preferredAgencies = List.of();
 
   private List<FeedScopedId> unpreferredAgencies = List.of();
-  private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
-  private RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
+//  private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
+//  private RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
   /**
    * @deprecated TODO OTP2 Needs to be implemented
@@ -30,53 +34,53 @@ public class TransitRequest implements Cloneable, Serializable {
   private List<FeedScopedId> preferredRoutes = List.of();
 
   private List<FeedScopedId> unpreferredRoutes = List.of();
-  private List<FeedScopedId> bannedTrips = List.of();
+//  private List<FeedScopedId> bannedTrips = List.of();
   private DebugRaptor raptorDebugging = new DebugRaptor();
 
-  public void setModes(List<MainAndSubMode> modes) {
-    this.modes = modes;
-  }
+//  public void setModes(List<MainAndSubMode> modes) {
+//    this.modes = modes;
+//  }
+//
+//  public List<MainAndSubMode> modes() {
+//    return modes;
+//  }
 
-  public List<MainAndSubMode> modes() {
-    return modes;
-  }
+//  public void setWhiteListedAgenciesFromSting(String s) {
+//    if (!s.isEmpty()) {
+//      whiteListedAgencies = FeedScopedId.parseListOfIds(s);
+//    }
+//  }
+//
+//  /**
+//   * Only use certain named agencies
+//   */
+//  public void setWhiteListedAgencies(List<FeedScopedId> whiteListedAgencies) {
+//    this.whiteListedAgencies = whiteListedAgencies;
+//  }
 
-  public void setWhiteListedAgenciesFromSting(String s) {
-    if (!s.isEmpty()) {
-      whiteListedAgencies = FeedScopedId.parseListOfIds(s);
-    }
-  }
+//  public List<FeedScopedId> whiteListedAgencies() {
+//    return whiteListedAgencies;
+//  }
+//
+//  /**
+//   * Do not use certain named agencies
+//   */
+//  public void setBannedAgenciesFromSting(String s) {
+//    if (!s.isEmpty()) {
+//      bannedAgencies = FeedScopedId.parseListOfIds(s);
+//    }
+//  }
 
-  /**
-   * Only use certain named agencies
-   */
-  public void setWhiteListedAgencies(List<FeedScopedId> whiteListedAgencies) {
-    this.whiteListedAgencies = whiteListedAgencies;
-  }
-
-  public List<FeedScopedId> whiteListedAgencies() {
-    return whiteListedAgencies;
-  }
-
-  /**
-   * Do not use certain named agencies
-   */
-  public void setBannedAgenciesFromSting(String s) {
-    if (!s.isEmpty()) {
-      bannedAgencies = FeedScopedId.parseListOfIds(s);
-    }
-  }
-
-  /**
-   * Do not use certain named agencies
-   */
-  public void setBannedAgencies(List<FeedScopedId> bannedAgencies) {
-    this.bannedAgencies = bannedAgencies;
-  }
-
-  public List<FeedScopedId> bannedAgencies() {
-    return bannedAgencies;
-  }
+//  /**
+//   * Do not use certain named agencies
+//   */
+//  public void setBannedAgencies(List<FeedScopedId> bannedAgencies) {
+//    this.bannedAgencies = bannedAgencies;
+//  }
+//
+//  public List<FeedScopedId> bannedAgencies() {
+//    return bannedAgencies;
+//  }
 
   @Deprecated
   public void setPreferredAgenciesFromString(String s) {
@@ -115,56 +119,56 @@ public class TransitRequest implements Cloneable, Serializable {
     return unpreferredAgencies;
   }
 
-  /**
-   * Only use certain named routes
-   */
-  public void setWhiteListedRoutesFromString(String s) {
-    if (!s.isEmpty()) {
-      whiteListedRoutes = RouteMatcher.parse(s);
-    } else {
-      whiteListedRoutes = RouteMatcher.emptyMatcher();
-    }
-  }
+//  /**
+//   * Only use certain named routes
+//   */
+//  public void setWhiteListedRoutesFromString(String s) {
+//    if (!s.isEmpty()) {
+//      whiteListedRoutes = RouteMatcher.parse(s);
+//    } else {
+//      whiteListedRoutes = RouteMatcher.emptyMatcher();
+//    }
+//  }
+//
+//  /**
+//   * Only use certain named routes
+//   */
+//  public void setWhiteListedRoutes(RouteMatcher whiteListedRoutes) {
+//    this.whiteListedRoutes = whiteListedRoutes;
+//  }
+//
+//  /**
+//   * Only use certain named routes
+//   */
+//  public RouteMatcher whiteListedRoutes() {
+//    return whiteListedRoutes;
+//  }
+//
+//  /**
+//   * Do not use certain named routes. The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
+//   * This parameter format is completely nonstandard and should be revised for the 2.0 API, see
+//   * issue #1671.
+//   */
+//  public void setBannedRoutesFromString(String s) {
+//    if (!s.isEmpty()) {
+//      bannedRoutes = RouteMatcher.parse(s);
+//    } else {
+//      bannedRoutes = RouteMatcher.emptyMatcher();
+//    }
+//  }
 
-  /**
-   * Only use certain named routes
-   */
-  public void setWhiteListedRoutes(RouteMatcher whiteListedRoutes) {
-    this.whiteListedRoutes = whiteListedRoutes;
-  }
-
-  /**
-   * Only use certain named routes
-   */
-  public RouteMatcher whiteListedRoutes() {
-    return whiteListedRoutes;
-  }
-
-  /**
-   * Do not use certain named routes. The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
-   * This parameter format is completely nonstandard and should be revised for the 2.0 API, see
-   * issue #1671.
-   */
-  public void setBannedRoutesFromString(String s) {
-    if (!s.isEmpty()) {
-      bannedRoutes = RouteMatcher.parse(s);
-    } else {
-      bannedRoutes = RouteMatcher.emptyMatcher();
-    }
-  }
-
-  /**
-   * Do not use certain named routes. The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
-   * This parameter format is completely nonstandard and should be revised for the 2.0 API, see
-   * issue #1671.
-   */
-  public void setBannedRoutes(RouteMatcher bannedRoutes) {
-    this.bannedRoutes = bannedRoutes;
-  }
-
-  public RouteMatcher bannedRoutes() {
-    return bannedRoutes;
-  }
+//  /**
+//   * Do not use certain named routes. The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
+//   * This parameter format is completely nonstandard and should be revised for the 2.0 API, see
+//   * issue #1671.
+//   */
+//  public void setBannedRoutes(RouteMatcher bannedRoutes) {
+//    this.bannedRoutes = bannedRoutes;
+//  }
+//
+//  public RouteMatcher bannedRoutes() {
+//    return bannedRoutes;
+//  }
 
   @Deprecated
   public void setPreferredRoutesFromString(String s) {
@@ -207,25 +211,25 @@ public class TransitRequest implements Cloneable, Serializable {
     return unpreferredRoutes;
   }
 
-  /**
-   * Do not use certain trips
-   */
-  public void setBannedTripsFromString(String ids) {
-    if (!ids.isEmpty()) {
-      bannedTrips = FeedScopedId.parseListOfIds(ids);
-    }
-  }
+//  /**
+//   * Do not use certain trips
+//   */
+//  public void setBannedTripsFromString(String ids) {
+//    if (!ids.isEmpty()) {
+//      bannedTrips = FeedScopedId.parseListOfIds(ids);
+//    }
+//  }
 
-  /**
-   * Do not use certain trips
-   */
-  public void setBannedTrips(List<FeedScopedId> bannedTrips) {
-    this.bannedTrips = bannedTrips;
-  }
-
-  public List<FeedScopedId> bannedTrips() {
-    return bannedTrips;
-  }
+//  /**
+//   * Do not use certain trips
+//   */
+//  public void setBannedTrips(List<FeedScopedId> bannedTrips) {
+//    this.bannedTrips = bannedTrips;
+//  }
+//
+//  public List<FeedScopedId> bannedTrips() {
+//    return bannedTrips;
+//  }
 
   public void setRaptorDebugging(DebugRaptor raptorDebugging) {
     this.raptorDebugging = raptorDebugging;
@@ -236,19 +240,21 @@ public class TransitRequest implements Cloneable, Serializable {
   }
 
   public TransitRequest clone() {
+    // TODO: 2022-11-29 filters: clone filters
+
     try {
       var clone = (TransitRequest) super.clone();
 
-      clone.modes = new ArrayList<>(this.modes);
-      clone.whiteListedAgencies = List.copyOf(this.whiteListedAgencies);
-      clone.bannedAgencies = List.copyOf(this.bannedAgencies);
+//      clone.modes = new ArrayList<>(this.modes);
+//      clone.whiteListedAgencies = List.copyOf(this.whiteListedAgencies);
+//      clone.bannedAgencies = List.copyOf(this.bannedAgencies);
       clone.preferredAgencies = List.copyOf(this.preferredAgencies);
       clone.unpreferredAgencies = List.copyOf(this.unpreferredAgencies);
-      clone.whiteListedRoutes = this.whiteListedRoutes.clone();
-      clone.bannedRoutes = this.bannedRoutes.clone();
+//      clone.whiteListedRoutes = this.whiteListedRoutes.clone();
+//      clone.bannedRoutes = this.bannedRoutes.clone();
       clone.preferredRoutes = List.copyOf(this.preferredRoutes);
       clone.unpreferredRoutes = List.copyOf(this.unpreferredRoutes);
-      clone.bannedTrips = List.copyOf(this.bannedTrips);
+//      clone.bannedTrips = List.copyOf(this.bannedTrips);
       clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
 
       return clone;

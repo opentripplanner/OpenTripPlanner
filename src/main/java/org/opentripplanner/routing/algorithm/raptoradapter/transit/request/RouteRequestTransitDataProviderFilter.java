@@ -59,21 +59,39 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     RouteRequest request,
     TransitService transitService
   ) {
+    // TODO: 2022-11-29 filters: fix
+
     this(
       request.journey().transfer().mode() == StreetMode.BIKE,
       request.wheelchair(),
       request.preferences().wheelchair(),
       request.preferences().transit().includePlannedCancellations(),
-      request.journey().transit().modes(),
+      List.of(),
       bannedRoutes(
-        request.journey().transit().bannedAgencies(),
-        request.journey().transit().bannedRoutes(),
-        request.journey().transit().whiteListedAgencies(),
-        request.journey().transit().whiteListedRoutes(),
+        List.of(),
+        RouteMatcher.emptyMatcher(),
+        List.of(),
+        RouteMatcher.emptyMatcher(),
         transitService.getAllRoutes()
       ),
-      request.journey().transit().bannedTrips()
+      List.of()
     );
+
+//    this(
+//      request.journey().transfer().mode() == StreetMode.BIKE,
+//      request.wheelchair(),
+//      request.preferences().wheelchair(),
+//      request.preferences().transit().includePlannedCancellations(),
+//      request.journey().transit().modes(),
+//      bannedRoutes(
+//        request.journey().transit().bannedAgencies(),
+//        request.journey().transit().bannedRoutes(),
+//        request.journey().transit().whiteListedAgencies(),
+//        request.journey().transit().whiteListedRoutes(),
+//        transitService.getAllRoutes()
+//      ),
+//      request.journey().transit().bannedTrips()
+//    );
   }
 
   public static BikeAccess bikeAccessForTrip(Trip trip) {
