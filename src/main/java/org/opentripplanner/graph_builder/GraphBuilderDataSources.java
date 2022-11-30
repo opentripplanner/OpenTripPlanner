@@ -22,7 +22,6 @@ import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParamete
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParametersBuilder;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -120,7 +119,11 @@ public class GraphBuilderDataSources {
       .stream()
       .filter(osmExtractConfig -> uriMatch(osmExtractConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new OsmExtractParametersBuilder().withSource(dataSource.uri()).build());
+      .orElse(
+        new OsmExtractParametersBuilder(buildConfig.osmDefaults)
+          .withSource(dataSource.uri())
+          .build()
+      );
   }
 
   public Iterable<ConfiguredDataSource<DemExtractParameters>> getDemConfiguredDatasource() {
@@ -137,7 +140,11 @@ public class GraphBuilderDataSources {
       .stream()
       .filter(demExtractConfig -> uriMatch(demExtractConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new DemExtractParametersBuilder().withSource(dataSource.uri()).build());
+      .orElse(
+        new DemExtractParametersBuilder(buildConfig.demDefaults)
+          .withSource(dataSource.uri())
+          .build()
+      );
   }
 
   public Iterable<ConfiguredDataSource<GtfsFeedParameters>> getGtfsConfiguredDatasource() {
