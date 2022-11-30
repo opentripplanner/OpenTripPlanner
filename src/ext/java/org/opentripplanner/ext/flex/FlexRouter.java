@@ -26,6 +26,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -35,7 +36,7 @@ public class FlexRouter {
 
   private final Graph graph;
   private final TransitService transitService;
-  private final FlexParameters config;
+  private final FlexParameters parameters;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
   private final FlexIndex flexIndex;
@@ -57,9 +58,10 @@ public class FlexRouter {
   public FlexRouter(
     Graph graph,
     TransitService transitService,
-    FlexParameters config,
+    FlexConfig config,
     Instant searchInstant,
     boolean arriveBy,
+    double walkSpeed,
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     Collection<NearbyStop> streetAccesses,
@@ -67,7 +69,7 @@ public class FlexRouter {
   ) {
     this.graph = graph;
     this.transitService = transitService;
-    this.config = config;
+    this.parameters = new FlexParameters((config.maxTransferSeconds * walkSpeed));
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
@@ -175,7 +177,7 @@ public class FlexRouter {
             .filter(date -> date.isFlexTripRunning(t2.second, this.transitService))
             // Create templates from trip, boarding at the nearbyStop
             .flatMap(date ->
-              t2.second.getFlexAccessTemplates(t2.first, date, accessFlexPathCalculator, config)
+              t2.second.getFlexAccessTemplates(t2.first, date, accessFlexPathCalculator, parameters)
             )
         )
         .collect(Collectors.toList());
@@ -197,7 +199,7 @@ public class FlexRouter {
             .filter(date -> date.isFlexTripRunning(t2.second, this.transitService))
             // Create templates from trip, alighting at the nearbyStop
             .flatMap(date ->
-              t2.second.getFlexEgressTemplates(t2.first, date, egressFlexPathCalculator, config)
+              t2.second.getFlexEgressTemplates(t2.first, date, egressFlexPathCalculator, parameters)
             )
         )
         .collect(Collectors.toList());

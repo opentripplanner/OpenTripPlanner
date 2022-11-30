@@ -23,7 +23,6 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -57,7 +56,6 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       gg,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       true
     );
 
@@ -125,7 +123,6 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       gg,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       true
     );
 
@@ -303,7 +300,6 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       graph,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       false
     );
     module.staticParkAndRide = true;
@@ -342,7 +338,6 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       graph,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       !skipVisibility
     );
 
