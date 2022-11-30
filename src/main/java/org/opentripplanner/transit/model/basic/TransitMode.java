@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.basic;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -34,6 +33,10 @@ public enum TransitMode {
     EnumSet.of(AIRPLANE)
   );
 
+  private static final Set<TransitMode> NO_CARPOOL_MODES = EnumSet.complementOf(
+    EnumSet.of(CARPOOL)
+  );
+
   public static Set<TransitMode> transitModesExceptAirplane() {
     return NO_AIRPLANE_MODES;
   }
@@ -43,10 +46,7 @@ public enum TransitMode {
    * carpool.
    */
   public static TransitMode[] modesConsideredTransitByUsers() {
-    return Arrays
-      .stream(TransitMode.values())
-      .filter(m -> m != CARPOOL)
-      .toArray(TransitMode[]::new);
+    return NO_CARPOOL_MODES.toArray(TransitMode[]::new);
   }
 
   public boolean onStreet() {
