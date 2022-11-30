@@ -153,7 +153,7 @@ public class RouteMapperTest {
 
     input.setId(ROUTE_ID);
     input.setAgency(AGENCY);
-    input.setType(1550);
+    input.setType(1551);
     input.setShortName(SHORT_NAME);
 
     var result = subject.map(input);
