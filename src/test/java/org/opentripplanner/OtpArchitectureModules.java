@@ -6,10 +6,13 @@ import org.opentripplanner._support.arch.Package;
 public interface OtpArchitectureModules {
   /* Third party libs*/
 
+  Package GEO_JSON = Package.of("org.geojson..");
+  Package GEO_TOOLS = Package.of("org.geotools..");
   Package GNU_TROVE = Package.of("gnu.trove.(*)..");
+  Package GOOGLE_COLLECTIONS = Package.of("com.google.common.collect");
+  Package OPEN_GIS = Package.of("org.opengis..");
   Package JACKSON_ANNOTATIONS = Package.of("com.fasterxml.jackson.annotation");
   Package JTS_GEOM = Package.of("org.locationtech.jts.(*)..");
-  Package GOOGLE_COLLECTIONS = Package.of("com.google.common.collect");
 
   /* OTP Modules */
 

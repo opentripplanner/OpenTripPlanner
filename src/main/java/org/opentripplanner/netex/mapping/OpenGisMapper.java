@@ -10,7 +10,7 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.framework.geometry.CoordinateArrayListSequence;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 
 /**

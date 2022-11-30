@@ -43,7 +43,8 @@ public class ApiApiTravelOptionsMakerTest {
 
     hasBikeRide = true;
 
-    options = ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
+    options =
+      ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
     expected = new HashSet<>();
     expected.add(new ApiTravelOption("TRANSIT,WALK", "TRANSIT"));
     expected.add(new ApiTravelOption("BUS,WALK", "BUS"));
@@ -61,7 +62,8 @@ public class ApiApiTravelOptionsMakerTest {
 
     hasBikeShare = true;
 
-    options = ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
+    options =
+      ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
     expected = new HashSet<>();
     expected.add(new ApiTravelOption("TRANSIT,WALK", "TRANSIT"));
     expected.add(new ApiTravelOption("BUS,WALK", "BUS"));
@@ -79,7 +81,8 @@ public class ApiApiTravelOptionsMakerTest {
     hasBikeShare = false;
     hasParkRide = true;
 
-    options = ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
+    options =
+      ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
     expected = new HashSet<>();
     expected.add(new ApiTravelOption("TRANSIT,WALK", "TRANSIT"));
     expected.add(new ApiTravelOption("BUS,WALK", "BUS"));
@@ -97,7 +100,8 @@ public class ApiApiTravelOptionsMakerTest {
     hasParkRide = true;
     hasBikeRide = true;
 
-    options = ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
+    options =
+      ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
     expected = new HashSet<>();
     expected.add(new ApiTravelOption("TRANSIT,WALK", "TRANSIT"));
     expected.add(new ApiTravelOption("BUS,WALK", "BUS"));
@@ -116,7 +120,8 @@ public class ApiApiTravelOptionsMakerTest {
 
     transitModes = new HashSet<>();
 
-    options = ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
+    options =
+      ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
     expected = new HashSet<>();
     expected.add(new ApiTravelOption("WALK", "WALK"));
     expected.add(new ApiTravelOption("BICYCLE", "BICYCLE"));
@@ -129,7 +134,8 @@ public class ApiApiTravelOptionsMakerTest {
     hasParkRide = false;
     hasBikeShare = false;
 
-    options = ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
+    options =
+      ApiTravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
     expected = new HashSet<>();
     expected.add(new ApiTravelOption("WALK", "WALK"));
     expected.add(new ApiTravelOption("BICYCLE", "BICYCLE"));

@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.model;
 
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
+import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK;
 import static org.opentripplanner.OtpArchitectureModules.GEO_UTILS;
 import static org.opentripplanner.OtpArchitectureModules.JACKSON_ANNOTATIONS;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_ADAPTER_API;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
 import static org.opentripplanner.OtpArchitectureModules.TRANSIT_MODEL;
-import static org.opentripplanner.OtpArchitectureModules.UTIL;
 import static org.opentripplanner.OtpArchitectureModules.UTILS;
 
 import org.junit.jupiter.api.Disabled;
@@ -32,8 +32,7 @@ public class TransitModelArchitectureTest {
 
   @Test
   void enforceBasicPackageDependencies() {
-    // TODO Remove dependency to resources
-    var resources = UTIL.subPackage("resources");
+    var resources = FRAMEWORK.subPackage("resources");
     BASIC.dependsOn(UTILS, GEO_UTILS, resources, TRANSIT_FRAMEWORK).verify();
   }
 

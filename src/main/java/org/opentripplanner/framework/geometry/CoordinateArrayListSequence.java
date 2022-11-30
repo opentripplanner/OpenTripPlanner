@@ -1,4 +1,4 @@
-package org.opentripplanner.api.resource;
+package org.opentripplanner.framework.geometry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
