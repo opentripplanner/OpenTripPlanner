@@ -6,13 +6,14 @@ import org.opentripplanner._support.arch.Package;
 public interface OtpArchitectureModules {
   /* Third party libs*/
 
+  Package DAGGER = Package.of("dagger..");
   Package GEO_JSON = Package.of("org.geojson..");
   Package GEO_TOOLS = Package.of("org.geotools..");
   Package GNU_TROVE = Package.of("gnu.trove.(*)..");
   Package GOOGLE_COLLECTIONS = Package.of("com.google.common.collect");
-  Package OPEN_GIS = Package.of("org.opengis..");
   Package JACKSON_ANNOTATIONS = Package.of("com.fasterxml.jackson.annotation");
   Package JTS_GEOM = Package.of("org.locationtech.jts.(*)..");
+  Package OPEN_GIS = Package.of("org.opengis..");
 
   /* OTP Modules */
 
@@ -36,7 +37,8 @@ public interface OtpArchitectureModules {
    * This is a bag of TRUE util classes - no dependencies to other OTP classes or frameworks
    * (except true utilities like slf4j).
    */
-  Module UTILS = Module.of(
+  Module FRAMEWORK_UTILS = Module.of(
+    FRAMEWORK.subPackage("application"),
     FRAMEWORK.subPackage("lang"),
     FRAMEWORK.subPackage("logging"),
     FRAMEWORK.subPackage("text"),

@@ -20,6 +20,7 @@ public class FrameworkArchitectureTest {
     Package.of("org.w3c.dom"),
     Package.of("org.xml.sax")
   );
+  private static final Package APPLICATION = FRAMEWORK.subPackage("application");
   private static final Package COLLECTION = FRAMEWORK.subPackage("collection");
   private static final Package GEOMETRY = FRAMEWORK.subPackage("geometry");
   private static final Package IO = FRAMEWORK.subPackage("io");
@@ -29,6 +30,11 @@ public class FrameworkArchitectureTest {
   private static final Package TEXT = FRAMEWORK.subPackage("text");
   private static final Package TIME = FRAMEWORK.subPackage("time");
   private static final Package TO_STRING = FRAMEWORK.subPackage("tostring");
+
+  @Test
+  void enforceApplicationPackageDependencies() {
+    APPLICATION.verify();
+  }
 
   @Test
   void enforceCollectionPackageDependencies() {
