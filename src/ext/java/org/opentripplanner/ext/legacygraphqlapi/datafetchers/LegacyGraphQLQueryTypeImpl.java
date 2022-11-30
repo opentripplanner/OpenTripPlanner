@@ -48,6 +48,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.request.FilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareType;
@@ -63,6 +64,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -734,14 +736,19 @@ public class LegacyGraphQLQueryTypeImpl
         "unpreferred.agencies",
         request.journey().transit()::setUnpreferredAgenciesFromString
       );
-      // TODO: 2022-11-29 filters: fix
-//      callWith.argument("banned.routes", request.journey().transit()::setBannedRoutesFromString);
-//      callWith.argument("banned.agencies", request.journey().transit()::setBannedAgenciesFromSting);
-//      callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
+
       // callWith.argument("banned.stops", request::setBannedStops);
       // callWith.argument("banned.stopsHard", request::setBannedStopsHard);
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
+
+      var filterRequest = new FilterRequest();
+      var include = filterRequest.getInclude();
+      var exclude = filterRequest.getExclude();
+
+      callWith.argument("banned.routes", exclude::setRoutesFromString);
+      callWith.argument("banned.agencies", exclude::setAgenciesFromString);
+      callWith.argument("banned.trips", exclude::setTripsFromString);
 
       if (hasArgument(environment, "transportModes")) {
         QualifiedModeSet modes = new QualifiedModeSet("WALK");
@@ -758,7 +765,23 @@ public class LegacyGraphQLQueryTypeImpl
             )
             .collect(Collectors.toSet());
 
-        request.journey().setModes(modes.getRequestModes());
+        var requestModes = modes.getRequestModes();
+        request.journey().access().setMode(requestModes.accessMode);
+        request.journey().egress().setMode(requestModes.egressMode);
+        request.journey().direct().setMode(requestModes.directMode);
+        request.journey().transfer().setMode(requestModes.transferMode);
+
+        // TODO: 2022-11-30 filters: double check that this is correct
+        var mainModes = requestModes.transitModes.stream()
+          .map(MainAndSubMode::mainMode)
+          .collect(Collectors.toList());
+        include.setModes(mainModes);
+
+        var submodes = requestModes.transitModes.stream()
+          .map(MainAndSubMode::subMode)
+          .filter(Objects::nonNull)
+          .collect(Collectors.toList());
+        include.setSubModes(submodes);
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {

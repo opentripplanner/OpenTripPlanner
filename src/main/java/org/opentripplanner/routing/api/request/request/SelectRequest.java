@@ -15,4 +15,72 @@ public class SelectRequest {
   // TODO: 2022-11-29 group of routes
   private List<FeedScopedId> trips = new ArrayList<>();
   private List<String> feeds = new ArrayList<>();
+
+  public List<TransitMode> getModes() {
+    return modes;
+  }
+
+  public void setModes(List<TransitMode> modes) {
+    this.modes = modes;
+  }
+
+  public List<SubMode> getSubModes() {
+    return subModes;
+  }
+
+  public void setSubModes(List<SubMode> subModes) {
+    this.subModes = subModes;
+  }
+
+  public void setAgencies(List<FeedScopedId> agencies) {
+    this.agencies = agencies;
+  }
+
+  public void setAgenciesFromString(String s) {
+    if (!s.isEmpty()) {
+      this.agencies = FeedScopedId.parseListOfIds(s);
+    }
+  }
+
+  public List<FeedScopedId> agencies() {
+    return agencies;
+  }
+
+  public void setRoutesFromString(String s) {
+    if (!s.isEmpty()) {
+      this.routes = RouteMatcher.parse(s);
+    } else {
+      this.routes = RouteMatcher.emptyMatcher();
+    }
+  }
+
+  public void setRoutes(RouteMatcher routes) {
+    this.routes = routes;
+  }
+
+  public RouteMatcher routes() {
+    return this.routes;
+  }
+
+  public void setTripsFromString(String ids) {
+    if (!ids.isEmpty()) {
+      this.trips = FeedScopedId.parseListOfIds(ids);
+    }
+  }
+
+  public void setTrips(List<FeedScopedId> trips) {
+    this.trips = trips;
+  }
+
+  public List<FeedScopedId> trips() {
+    return trips;
+  }
+
+  public List<String> feeds() {
+    return feeds;
+  }
+
+  public void setFeeds(List<String> feeds) {
+    this.feeds = feeds;
+  }
 }
