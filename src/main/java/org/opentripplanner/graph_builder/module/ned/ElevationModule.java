@@ -26,6 +26,7 @@ import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.operation.TransformException;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -40,7 +41,6 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetElevationExtension;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

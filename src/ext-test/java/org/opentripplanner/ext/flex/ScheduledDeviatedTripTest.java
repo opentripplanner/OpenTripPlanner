@@ -21,6 +21,8 @@ import org.opentripplanner._support.time.TestDateTimeUtils;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
@@ -42,8 +44,6 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.model.EncodedPolyline;
 
 /**
  * This tests that the feed for the Cobb County Flex service is processed correctly. This service

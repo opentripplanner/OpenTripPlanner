@@ -1,4 +1,4 @@
-package org.opentripplanner.util.model;
+package org.opentripplanner.framework.geometry;
 
 import java.io.Serializable;
 

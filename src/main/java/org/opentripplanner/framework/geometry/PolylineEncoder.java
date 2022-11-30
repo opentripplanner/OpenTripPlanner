@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.framework.geometry;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -6,7 +6,6 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.util.model.EncodedPolyline;
 
 /**
  * This encodes geometries to the Google Polyline encoding

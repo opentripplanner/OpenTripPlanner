@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.framework.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.util.model.EncodedPolyline;
 
 public class PolylineEncoderTest {
 

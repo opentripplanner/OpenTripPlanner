@@ -50,6 +50,8 @@ import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.api.model.ApiTripTimeShort;
 import org.opentripplanner.api.support.SemanticHash;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -63,8 +65,6 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.model.EncodedPolyline;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
