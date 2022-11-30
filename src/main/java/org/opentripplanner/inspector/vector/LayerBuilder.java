@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles;
+package org.opentripplanner.inspector.vector;
 
 import edu.colorado.cires.cmg.mvt.VectorTile;
 import edu.colorado.cires.cmg.mvt.adapt.jts.JtsAdapter;
@@ -32,7 +32,7 @@ public abstract class LayerBuilder<T> {
    */
   protected abstract List<Geometry> getGeometries(Envelope query);
 
-  VectorTile.Tile.Layer build(Envelope envelope, LayerParameters params) {
+  public VectorTile.Tile.Layer build(Envelope envelope, LayerParameters params) {
     Envelope query = new Envelope(envelope);
     query.expandBy(
       envelope.getWidth() * params.expansionFactor(),
