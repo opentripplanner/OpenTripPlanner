@@ -17,16 +17,20 @@ public interface OtpArchitectureModules {
   /* OTP Modules */
 
   Package OTP_ROOT = Package.of("org.opentripplanner");
+  Package DATASTORE = OTP_ROOT.subPackage("datastore");
   Package FRAMEWORK = OTP_ROOT.subPackage("framework");
-  Package UTIL = OTP_ROOT.subPackage("util");
-
   Module GEO_UTILS = Module.of(JTS_GEOM, FRAMEWORK.subPackage("geometry"));
-
   Package RAPTOR_ADAPTER = OTP_ROOT
     .subPackage("routing")
     .subPackage("algorithm")
     .subPackage("raptoradapter");
   Package RAPTOR_ADAPTER_API = RAPTOR_ADAPTER.subPackage("api");
+  Package TRANSIT = OTP_ROOT.subPackage("transit");
+  Package TRANSIT_MODEL = TRANSIT.subPackage("model");
+
+  /* The Raptor module */
+  Package RAPTOR_ROOT = OTP_ROOT.subPackage("raptor");
+  Package RAPTOR_API = RAPTOR_ROOT.subPackage("api..");
 
   /**
    * This is a bag of TRUE util classes - no dependencies to other OTP classes or frameworks
@@ -39,11 +43,4 @@ public interface OtpArchitectureModules {
     FRAMEWORK.subPackage("time"),
     FRAMEWORK.subPackage("tostring")
   );
-
-  Package TRANSIT = OTP_ROOT.subPackage("transit");
-  Package TRANSIT_MODEL = TRANSIT.subPackage("model");
-
-  /* The Raptor module */
-  Package RAPTOR_ROOT = OTP_ROOT.subPackage("raptor");
-  Package RAPTOR_API = RAPTOR_ROOT.subPackage("api.(*)..");
 }

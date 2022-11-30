@@ -2,6 +2,7 @@ package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
 
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,11 @@ class TransitModelTest {
           new DefaultFareServiceFactory(),
           null
         ),
-      "The graph contains agencies with different time zones. Please configure the one to be used in the build-config.json"
+      (
+        "The graph contains agencies with different time zones. " +
+        "Please configure the one to be used in the " +
+        BUILD_CONFIG_FILENAME
+      )
     );
   }
 
