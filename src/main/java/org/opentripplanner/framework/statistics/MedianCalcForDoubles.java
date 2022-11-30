@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.framework.statistics;
 
 import java.util.Arrays;
 

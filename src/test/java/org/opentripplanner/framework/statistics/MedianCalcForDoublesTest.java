@@ -1,10 +1,9 @@
-package org.opentripplanner.framework.lang;
+package org.opentripplanner.framework.statistics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.util.MedianCalcForDoubles;
 
 class MedianCalcForDoublesTest {
 
