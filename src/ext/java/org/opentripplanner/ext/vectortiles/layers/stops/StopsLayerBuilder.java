@@ -28,7 +28,8 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
   ) {
     super(
       layerParameters.name(),
-      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitService, locale)
+      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitService, locale),
+      layerParameters.expansionFactor()
     );
     this.transitService = transitService;
   }

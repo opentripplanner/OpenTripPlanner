@@ -85,11 +85,15 @@ public class VectorTilesResource {
         z <= layerParameters.maxZoom()
       ) {
         cacheMaxSeconds = Math.min(cacheMaxSeconds, layerParameters.cacheMaxSeconds());
-        mvtBuilder.addLayers(
-          getLayerFactory(layerParameters.type())
-            .create(serverContext.graph(), serverContext.transitService(), layerParameters, locale)
-            .build(envelope, layerParameters)
-        );
+        VectorTile.Tile.Layer layer = crateLayerBuilder(
+          layerParameters.type(),
+          serverContext.graph(),
+          serverContext.transitService(),
+          layerParameters,
+          locale
+        )
+          .build(envelope);
+        mvtBuilder.addLayers(layer);
       }
     }
 
@@ -127,30 +131,36 @@ public class VectorTilesResource {
     );
   }
 
-  private static LayerBuilderFactory getLayerFactory(LayerType layerType) {
+  private static LayerBuilder<?> crateLayerBuilder(
+    LayerType layerType,
+    Graph graph,
+    TransitService transitService,
+    LayerParameters layerParameters,
+    Locale locale
+  ) {
     return switch (layerType) {
-      case Stop -> (graph, transitService, layerParameters, locale) ->
-        new StopsLayerBuilder(transitService, layerParameters, locale);
-      case Station -> (graph, transitService, layerParameters, locale) ->
-        new StationsLayerBuilder(transitService, layerParameters, locale);
-      case VehicleRental -> (graph, transitService, layerParameters, locale) ->
-        new VehicleRentalPlacesLayerBuilder(
-          graph.getVehicleRentalService(),
-          layerParameters,
-          locale
-        );
-      case VehicleRentalStation -> (graph, transitService, layerParameters, locale) ->
-        new VehicleRentalStationsLayerBuilder(
-          graph.getVehicleRentalService(),
-          layerParameters,
-          locale
-        );
-      case VehicleRentalVehicle -> (graph, transitService, layerParameters, locale) ->
-        new VehicleRentalVehiclesLayerBuilder(graph.getVehicleRentalService(), layerParameters);
-      case VehicleParking -> (graph, transitService, layerParameters, locale) ->
-        new VehicleParkingsLayerBuilder(graph, layerParameters, locale);
-      case VehicleParkingGroup -> (graph, transitService, layerParameters, locale) ->
-        new VehicleParkingGroupsLayerBuilder(graph, layerParameters, locale);
+      case Stop -> new StopsLayerBuilder(transitService, layerParameters, locale);
+      case Station -> new StationsLayerBuilder(transitService, layerParameters, locale);
+      case VehicleRental -> new VehicleRentalPlacesLayerBuilder(
+        graph.getVehicleRentalService(),
+        layerParameters,
+        locale
+      );
+      case VehicleRentalStation -> new VehicleRentalStationsLayerBuilder(
+        graph.getVehicleRentalService(),
+        layerParameters,
+        locale
+      );
+      case VehicleRentalVehicle -> new VehicleRentalVehiclesLayerBuilder(
+        graph.getVehicleRentalService(),
+        layerParameters
+      );
+      case VehicleParking -> new VehicleParkingsLayerBuilder(graph, layerParameters, locale);
+      case VehicleParkingGroup -> new VehicleParkingGroupsLayerBuilder(
+        graph,
+        layerParameters,
+        locale
+      );
     };
   }
 
@@ -187,15 +197,5 @@ public class VectorTilesResource {
     int cacheMaxSeconds();
 
     double expansionFactor();
-  }
-
-  @FunctionalInterface
-  private interface LayerBuilderFactory {
-    LayerBuilder<?> create(
-      Graph graph,
-      TransitService transitService,
-      LayerParameters layerParameters,
-      Locale locale
-    );
   }
 }

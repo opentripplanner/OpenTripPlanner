@@ -23,7 +23,11 @@ abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends L
     Map<MapperType, PropertyMapper<T>> mappers,
     VectorTilesResource.LayerParameters layerParameters
   ) {
-    super(layerParameters.name(), mappers.get(MapperType.valueOf(layerParameters.mapper())));
+    super(
+      layerParameters.name(),
+      mappers.get(MapperType.valueOf(layerParameters.mapper())),
+      layerParameters.expansionFactor()
+    );
     this.service = service;
   }
 

@@ -11,7 +11,6 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.api.mapping.PropertyMapper;
-import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 
 public abstract class LayerBuilder<T> {
@@ -20,10 +19,12 @@ public abstract class LayerBuilder<T> {
   private final MvtLayerProps layerProps = new MvtLayerProps();
   private final VectorTile.Tile.Layer.Builder layerBuilder;
   private final PropertyMapper<T> mapper;
+  private final double expansionFactor;
 
-  public LayerBuilder(String layerName, PropertyMapper<T> mapper) {
+  public LayerBuilder(String layerName, PropertyMapper<T> mapper, double expansionFactor) {
     this.mapper = mapper;
     this.layerBuilder = MvtLayerBuild.newLayerBuilder(layerName, MvtLayerParams.DEFAULT);
+    this.expansionFactor = expansionFactor;
   }
 
   /**
@@ -32,12 +33,9 @@ public abstract class LayerBuilder<T> {
    */
   protected abstract List<Geometry> getGeometries(Envelope query);
 
-  public VectorTile.Tile.Layer build(Envelope envelope, LayerParameters params) {
+  public final VectorTile.Tile.Layer build(Envelope envelope) {
     Envelope query = new Envelope(envelope);
-    query.expandBy(
-      envelope.getWidth() * params.expansionFactor(),
-      envelope.getHeight() * params.expansionFactor()
-    );
+    query.expandBy(envelope.getWidth() * expansionFactor, envelope.getHeight() * expansionFactor);
 
     TileGeomResult tileGeom = JtsAdapter.createTileGeom(
       getGeometries(query),

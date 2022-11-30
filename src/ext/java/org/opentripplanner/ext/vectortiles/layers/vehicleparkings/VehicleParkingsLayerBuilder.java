@@ -17,7 +17,6 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 
 public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
@@ -39,18 +38,16 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
       layerParameters.name(),
       mappers
         .get(VehicleParkingsLayerBuilder.MapperType.valueOf(layerParameters.mapper()))
-        .apply(locale)
+        .apply(locale),
+      layerParameters.expansionFactor()
     );
     this.graph = graph;
   }
 
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
-    VehicleParkingService service = graph.getVehicleParkingService();
-    if (service == null) {
-      return List.of();
-    }
-    return service
+    return graph
+      .getVehicleParkingService()
       .getVehicleParkings()
       .map(vehicleParking -> {
         Coordinate coordinate = vehicleParking.getCoordinate().asJtsCoordinate();

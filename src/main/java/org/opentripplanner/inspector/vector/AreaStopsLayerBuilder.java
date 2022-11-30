@@ -28,7 +28,8 @@ public class AreaStopsLayerBuilder extends LayerBuilder<AreaStop> {
   ) {
     super(
       layerParameters.name(),
-      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitService, locale)
+      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitService, locale),
+      layerParameters.expansionFactor()
     );
     this.findAreaStops = transitService::findAreaStops;
   }
