@@ -1446,8 +1446,11 @@ enum Mode {
     """TRAM"""
     TRAM
 
-    """Sharing a your own private car with others as passengers."""
+    """Sharing a private car with others."""
     CARPOOL
+
+    """A taxi, possibly operated by a public transport agency."""
+    TAXI
 
     """A special transport mode, which includes all public transport."""
     TRANSIT

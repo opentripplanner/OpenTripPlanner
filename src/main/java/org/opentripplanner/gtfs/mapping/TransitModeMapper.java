@@ -45,14 +45,18 @@ public class TransitModeMapper {
       return TransitMode.FERRY;
     } else if (routeType >= 1300 && routeType < 1400) { //Telecabin Service
       return TransitMode.GONDOLA;
-    } else if (routeType >= 1400 && routeType < 1500) { //Funicalar Service
+    } else if (routeType >= 1400 && routeType < 1500) { //Funicular Service
       return TransitMode.FUNICULAR;
-    } else if (routeType >= 1500 && routeType < 1600) { //Taxi Service
-      return null;
+    } else if (routeType >= 1500 && routeType < 1549) { //Taxi Service
+      return TransitMode.TAXI;
+      // Carpooling, not defined anywhere, so we've chosen this number space
+      // see https://groups.google.com/g/gtfs-changes/c/keT5rTPS7Y0/m/71uMz2l6ke0J for an effort to
+      // standardise
+    } else if (routeType >= 1550 && routeType < 1599) {
+      return TransitMode.CARPOOL;
     } else if (routeType >= 1600 && routeType < 1700) { //Self drive
       return TransitMode.BUS;
-      // 1700 is mapped to CARPOOL further down
-    } else if (routeType >= 1701 && routeType < 1800) { //Miscellaneous Service
+    } else if (routeType >= 1700 && routeType < 1800) { //Miscellaneous Service
       return null;
     }
     /* Original GTFS route types. Should these be checked before TPEG types? */
@@ -67,7 +71,6 @@ public class TransitModeMapper {
       case 7 -> TransitMode.FUNICULAR;
       case 11 -> TransitMode.TROLLEYBUS;
       case 12 -> TransitMode.MONORAIL;
-      case 1700 -> TransitMode.CARPOOL;
       default -> throw new IllegalArgumentException("unknown gtfs route type " + routeType);
     };
   }
