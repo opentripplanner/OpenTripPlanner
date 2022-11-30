@@ -7,31 +7,16 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
 
 /** An instance of CoordinateSequence that can be efficiently extended */
-public class CoordinateArrayListSequence implements CoordinateSequence, Cloneable {
+public final class CoordinateArrayListSequence implements CoordinateSequence, Cloneable {
 
-  ArrayList<Coordinate> coordinates;
+  private ArrayList<Coordinate> coordinates;
 
   public CoordinateArrayListSequence() {
     coordinates = new ArrayList<>();
   }
 
-  @SuppressWarnings("unchecked")
   public CoordinateArrayListSequence(ArrayList<Coordinate> coordinates) {
-    this.coordinates = (ArrayList<Coordinate>) coordinates.clone();
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public CoordinateArrayListSequence clone() {
-    CoordinateArrayListSequence clone;
-    try {
-      clone = (CoordinateArrayListSequence) super.clone();
-    } catch (CloneNotSupportedException e) {
-      /* never happens since super is Object */
-      throw new RuntimeException(e);
-    }
-    clone.coordinates = (ArrayList<Coordinate>) coordinates.clone();
-    return clone;
+    this.coordinates = new ArrayList<>(coordinates);
   }
 
   @Override
@@ -68,8 +53,13 @@ public class CoordinateArrayListSequence implements CoordinateSequence, Cloneabl
 
   @Override
   public double getOrdinate(int index, int ordinateIndex) {
-    // TODO Auto-generated method stub
-    return ordinateIndex == 0 ? coordinates.get(index).x : coordinates.get(index).y;
+    return switch (ordinateIndex) {
+      case 0 -> coordinates.get(index).x;
+      case 1 -> coordinates.get(index).y;
+      default -> throw new IllegalArgumentException(
+        "ordinateIndex out of range[0,1]: " + ordinateIndex
+      );
+    };
   }
 
   @Override
@@ -80,14 +70,9 @@ public class CoordinateArrayListSequence implements CoordinateSequence, Cloneabl
   @Override
   public void setOrdinate(int index, int ordinateIndex, double value) {
     switch (ordinateIndex) {
-      case 0:
-        coordinates.get(index).x = value;
-        break;
-      case 1:
-        coordinates.get(index).y = value;
-        break;
-      default:
-        throw new UnsupportedOperationException();
+      case 0 -> coordinates.get(index).x = value;
+      case 1 -> coordinates.get(index).y = value;
+      default -> throw new UnsupportedOperationException();
     }
   }
 
@@ -106,15 +91,13 @@ public class CoordinateArrayListSequence implements CoordinateSequence, Cloneabl
 
   @Override
   public CoordinateSequence copy() {
-    CoordinateArrayListSequence clone;
-    try {
-      clone = (CoordinateArrayListSequence) super.clone();
-    } catch (CloneNotSupportedException e) {
-      /* never happens since super is Object */
-      throw new RuntimeException(e);
-    }
-    clone.coordinates = (ArrayList<Coordinate>) coordinates.clone();
-    return clone;
+    return new CoordinateArrayListSequence(coordinates);
+  }
+
+  @SuppressWarnings("MethodDoesntCallSuperMethod")
+  @Override
+  public CoordinateArrayListSequence clone() {
+    return new CoordinateArrayListSequence(coordinates);
   }
 
   public void extend(Coordinate[] newCoordinates) {
