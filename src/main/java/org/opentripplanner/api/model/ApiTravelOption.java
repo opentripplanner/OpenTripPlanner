@@ -14,17 +14,17 @@ import java.util.Objects;
  * <p>
  * Travel options are created from {@link org.opentripplanner.routing.graph.Graph} transitModes
  * variable and based if park &amp; ride, bike &amp; ride, bike sharing is supported. List itself is
- * created in {@link TravelOptionsMaker#makeOptions(HashSet, boolean, boolean, boolean)}
+ * created in {@link ApiTravelOptionsMaker#makeOptions(HashSet, boolean, boolean, boolean)}
  *
- * @see TravelOptionsMaker#makeOptions(HashSet, boolean, boolean, boolean) * Created by mabu on
+ * @see ApiTravelOptionsMaker#makeOptions(HashSet, boolean, boolean, boolean) * Created by mabu on
  * 28.7.2015.
  */
-public class TravelOption {
+public class ApiTravelOption {
 
   public String value;
   public String name;
 
-  public TravelOption(String value, String name) {
+  public ApiTravelOption(String value, String name) {
     this.value = value;
     this.name = name;
   }
@@ -32,7 +32,7 @@ public class TravelOption {
   /**
    * Creates TravelOption where value and name are same
    */
-  public TravelOption(String value) {
+  public ApiTravelOption(String value) {
     this.value = value;
     this.name = value;
   }
@@ -50,7 +50,7 @@ public class TravelOption {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TravelOption that = (TravelOption) o;
+    ApiTravelOption that = (ApiTravelOption) o;
     return Objects.equals(value, that.value) && Objects.equals(name, that.name);
   }
 

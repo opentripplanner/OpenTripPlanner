@@ -27,7 +27,7 @@ public class ApiRouterInfo {
   public double centerLongitude;
   public boolean hasParkRide;
   public boolean hasBikeSharing;
-  public List<TravelOption> travelOptions;
+  public List<ApiTravelOption> travelOptions;
 
   /** TODO: Do not pass in the graph here, do this in a mapper instead. */
   public ApiRouterInfo(String routerId, Graph graph, TransitService transitService) {
@@ -53,7 +53,7 @@ public class ApiRouterInfo {
     this.hasCarPark = mapHasCarPark(vehicleParkingService);
     this.hasParkRide = this.hasCarPark;
     this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
-    this.travelOptions = TravelOptionsMaker.makeOptions(graph, transitService);
+    this.travelOptions = ApiTravelOptionsMaker.makeOptions(graph, transitService);
     transitService.getCenter().ifPresentOrElse(this::setCenter, this::calculateCenter);
   }
 

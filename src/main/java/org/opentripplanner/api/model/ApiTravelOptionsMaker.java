@@ -14,18 +14,18 @@ import org.opentripplanner.transit.service.TransitService;
  * <p>
  * This list is then returned to the client which shows it in UI. Created by mabu on 28.7.2015.
  */
-public final class TravelOptionsMaker {
+public final class ApiTravelOptionsMaker {
 
-  private static final List<TravelOption> staticTravelOptions;
+  private static final List<ApiTravelOption> staticTravelOptions;
 
   static {
     staticTravelOptions = new ArrayList<>(3);
-    staticTravelOptions.add(new TravelOption(ApiRequestMode.WALK.toString()));
-    staticTravelOptions.add(new TravelOption(ApiRequestMode.BICYCLE.toString()));
-    staticTravelOptions.add(new TravelOption(ApiRequestMode.CAR.toString()));
+    staticTravelOptions.add(new ApiTravelOption(ApiRequestMode.WALK.toString()));
+    staticTravelOptions.add(new ApiTravelOption(ApiRequestMode.BICYCLE.toString()));
+    staticTravelOptions.add(new ApiTravelOption(ApiRequestMode.CAR.toString()));
   }
 
-  public static List<TravelOption> makeOptions(Graph graph, TransitService transitService) {
+  public static List<ApiTravelOption> makeOptions(Graph graph, TransitService transitService) {
     var service = graph.getVehicleParkingService();
     return makeOptions(
       transitService.getTransitModes(),
@@ -35,18 +35,18 @@ public final class TravelOptionsMaker {
     );
   }
 
-  public static List<TravelOption> makeOptions(
+  public static List<ApiTravelOption> makeOptions(
     Set<TransitMode> transitModes,
     boolean hasBikeSharing,
     boolean hasBikeRide,
     boolean hasParkRide
   ) {
-    List<TravelOption> travelOptions = new ArrayList<>(16);
+    List<ApiTravelOption> travelOptions = new ArrayList<>(16);
 
     //Adds Transit, and all the transit modes
     if (!transitModes.isEmpty()) {
       travelOptions.add(
-        new TravelOption(
+        new ApiTravelOption(
           String.join(",", ApiRequestMode.TRANSIT.toString(), ApiRequestMode.WALK.toString()),
           ApiRequestMode.TRANSIT.toString()
         )
@@ -54,7 +54,7 @@ public final class TravelOptionsMaker {
 
       for (TransitMode transitMode : transitModes) {
         travelOptions.add(
-          new TravelOption(
+          new ApiTravelOption(
             String.join(",", transitMode.toString(), ApiRequestMode.WALK.toString()),
             transitMode.toString()
           )
@@ -66,7 +66,7 @@ public final class TravelOptionsMaker {
 
     if (hasBikeSharing) {
       travelOptions.add(
-        new TravelOption(
+        new ApiTravelOption(
           String.join(",", ApiRequestMode.WALK.toString(), "BICYCLE_RENT"),
           "BICYCLERENT"
         )
@@ -77,14 +77,14 @@ public final class TravelOptionsMaker {
     if (!transitModes.isEmpty()) {
       //Adds bicycle transit mode
       travelOptions.add(
-        new TravelOption(
+        new ApiTravelOption(
           String.join(",", ApiRequestMode.TRANSIT.toString(), ApiRequestMode.BICYCLE.toString()),
           String.join("_", ApiRequestMode.TRANSIT.toString(), ApiRequestMode.BICYCLE.toString())
         )
       );
       if (hasBikeSharing) {
         travelOptions.add(
-          new TravelOption(
+          new ApiTravelOption(
             String.join(
               ",",
               ApiRequestMode.TRANSIT.toString(),
@@ -97,7 +97,7 @@ public final class TravelOptionsMaker {
       }
       if (hasParkRide) {
         travelOptions.add(
-          new TravelOption(
+          new ApiTravelOption(
             String.join(
               ",",
               "CAR_PARK",
@@ -110,7 +110,7 @@ public final class TravelOptionsMaker {
       }
       if (hasBikeRide) {
         travelOptions.add(
-          new TravelOption(
+          new ApiTravelOption(
             String.join(
               ",",
               "BICYCLE_PARK",
@@ -122,7 +122,7 @@ public final class TravelOptionsMaker {
         );
       }
       travelOptions.add(
-        new TravelOption(
+        new ApiTravelOption(
           String.join(
             ",",
             ApiRequestMode.CAR.toString(),
