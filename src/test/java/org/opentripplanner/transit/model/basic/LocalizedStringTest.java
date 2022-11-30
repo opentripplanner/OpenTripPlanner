@@ -1,11 +1,9 @@
-package org.opentripplanner.util;
+package org.opentripplanner.transit.model.basic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model.basic.LocalizedString;
-import org.opentripplanner.transit.model.basic.TranslatedString;
 
 class LocalizedStringTest {
 
