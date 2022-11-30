@@ -98,7 +98,8 @@ otp.util.Itin = {
             || mode === "FUNICULAR"
             || mode === "TROLLEYBUS"
             || mode === "MONORAIL"
-            || mode === "CARPOOL";
+            || mode === "CARPOOL"
+            || mode === "TAXI";
     },
 
     includesTransit : function(mode) {
@@ -358,6 +359,7 @@ otp.util.Itin = {
         if(mode === "FUNICULAR") return '#f0f';
         if(mode === "MONORAIL") return '#f0f';
         if(mode === "CARPOOL") return '#61980a';
+        if(mode === "TAXI") return '#ecc029';
         return '#aaa';
     },
 

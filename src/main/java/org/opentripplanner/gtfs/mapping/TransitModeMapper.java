@@ -48,11 +48,12 @@ public class TransitModeMapper {
     } else if (routeType >= 1400 && routeType < 1500) { //Funicular Service
       return TransitMode.FUNICULAR;
     } else if (routeType >= 1551 && routeType < 1561) {
-      return TransitMode.CARPOOL;
-    } else if (routeType >= 1500 && routeType < 1599) { //Taxi Service
       // Carpooling, not defined anywhere, so we've chosen this number space
       // see https://groups.google.com/g/gtfs-changes/c/keT5rTPS7Y0/m/71uMz2l6ke0J for an effort to
       // standardise
+      return TransitMode.CARPOOL;
+    } else if (routeType >= 1500 && routeType < 1599) {
+      //Taxi Service
       return TransitMode.TAXI;
     } else if (routeType >= 1600 && routeType < 1700) { //Self drive
       return TransitMode.BUS;

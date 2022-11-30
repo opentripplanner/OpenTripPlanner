@@ -24,7 +24,7 @@ public class RouteTypeMapper {
       case TROLLEYBUS -> 11;
       case MONORAIL -> 12;
       case TAXI -> 1500;
-      case CARPOOL -> 1550;
+      case CARPOOL -> 1551;
     };
   }
 }
