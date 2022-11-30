@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.datastore.OtpDataStore;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
@@ -33,7 +34,6 @@ import org.opentripplanner.transit.speed_test.model.testcase.TestCaseInput;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.util.OtpAppException;
 
 /**
  * Test response times for a large batch of origin/destination points. Also demonstrates how to run

@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Locale;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.RoutingService;
@@ -15,7 +16,6 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 
 /**

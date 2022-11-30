@@ -23,8 +23,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.OtpAppException;
 
 public class NodeAdapterTest {
 

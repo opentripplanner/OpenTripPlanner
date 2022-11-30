@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.apache.commons.io.IOUtils;
-import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

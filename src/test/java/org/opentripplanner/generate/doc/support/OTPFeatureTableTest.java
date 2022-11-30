@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.generate.doc.support.OTPFeatureTable.otpFeaturesTable;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.framework.application.OTPFeature;
 
 public class OTPFeatureTableTest {
 

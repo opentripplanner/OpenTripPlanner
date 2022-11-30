@@ -19,6 +19,7 @@ import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.vehicletostopheuristics.BikeToStopSkipEdgeStrategy;
 import org.opentripplanner.ext.vehicletostopheuristics.VehicleToStopSkipEdgeStrategy;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
@@ -43,7 +44,6 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.OTPFeature;
 
 /**
  * These library functions are used by the streetless and streetful stop linkers, and in profile

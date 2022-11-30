@@ -20,8 +20,8 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**

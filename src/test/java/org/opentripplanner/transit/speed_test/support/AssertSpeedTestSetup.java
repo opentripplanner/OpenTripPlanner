@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.speed_test.support;
 
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.util.OtpAppException;
 
 public class AssertSpeedTestSetup {
 

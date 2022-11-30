@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.framework.application;
 
 import java.util.Arrays;
 import java.util.IllegalFormatException;

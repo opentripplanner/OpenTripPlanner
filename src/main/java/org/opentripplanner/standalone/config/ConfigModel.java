@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.node.MissingNode;
-import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
