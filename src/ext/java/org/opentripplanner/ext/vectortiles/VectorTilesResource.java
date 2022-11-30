@@ -29,6 +29,7 @@ import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalPla
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalStationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalVehiclesLayerBuilder;
 import org.opentripplanner.inspector.vector.LayerBuilder;
+import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
@@ -78,7 +79,7 @@ public class VectorTilesResource {
 
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
-    for (LayerParameters layerParameters : serverContext.vectorTileLayers().layers()) {
+    for (LayerParameters<LayerType> layerParameters : serverContext.vectorTileLayers().layers()) {
       if (
         layers.contains(layerParameters.name()) &&
         layerParameters.minZoom() <= z &&
@@ -135,7 +136,7 @@ public class VectorTilesResource {
     LayerType layerType,
     Graph graph,
     TransitService transitService,
-    LayerParameters layerParameters,
+    LayerParameters<LayerType> layerParameters,
     Locale locale
   ) {
     return switch (layerType) {
@@ -174,28 +175,7 @@ public class VectorTilesResource {
     VehicleParkingGroup,
   }
 
-  public interface LayersParameters {
-    List<LayerParameters> layers();
-  }
-
-  public interface LayerParameters {
-    int MIN_ZOOM = 9;
-    int MAX_ZOOM = 20;
-    int CACHE_MAX_SECONDS = -1;
-    double EXPANSION_FACTOR = 0.25d;
-
-    String name();
-
-    LayerType type();
-
-    String mapper();
-
-    int maxZoom();
-
-    int minZoom();
-
-    int cacheMaxSeconds();
-
-    double expansionFactor();
+  public interface LayersParameters<T extends Enum<T>> {
+    List<LayerParameters<T>> layers();
   }
 }

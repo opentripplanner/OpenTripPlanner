@@ -10,6 +10,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.vector.LayerBuilder;
+import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -23,7 +24,7 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
 
   public StopsLayerBuilder(
     TransitService transitService,
-    VectorTilesResource.LayerParameters layerParameters,
+    LayerParameters<VectorTilesResource.LayerType> layerParameters,
     Locale locale
   ) {
     super(

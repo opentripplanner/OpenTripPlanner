@@ -166,7 +166,7 @@ number of transit vehicles used in that itinerary.
     return updatersParameters;
   }
 
-  public VectorTilesResource.LayersParameters vectorTileLayers() {
+  public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
     return vectorTileLayers;
   }
 

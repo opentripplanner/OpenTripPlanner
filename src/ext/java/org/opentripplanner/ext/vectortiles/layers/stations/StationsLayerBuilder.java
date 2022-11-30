@@ -13,6 +13,7 @@ import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
+import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -26,7 +27,7 @@ public class StationsLayerBuilder extends LayerBuilder<Station> {
 
   public StationsLayerBuilder(
     TransitService transitService,
-    VectorTilesResource.LayerParameters layerParameters,
+    LayerParameters<VectorTilesResource.LayerType> layerParameters,
     Locale locale
   ) {
     super(

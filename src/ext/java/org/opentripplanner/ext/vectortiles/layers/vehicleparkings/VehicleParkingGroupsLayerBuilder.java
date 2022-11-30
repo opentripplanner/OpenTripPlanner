@@ -12,6 +12,7 @@ import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
+import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.graph.Graph;
 
 public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkingAndGroup> {
@@ -24,7 +25,7 @@ public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkin
 
   public VehicleParkingGroupsLayerBuilder(
     Graph graph,
-    VectorTilesResource.LayerParameters layerParameters,
+    LayerParameters<VectorTilesResource.LayerType> layerParameters,
     Locale locale
   ) {
     super(

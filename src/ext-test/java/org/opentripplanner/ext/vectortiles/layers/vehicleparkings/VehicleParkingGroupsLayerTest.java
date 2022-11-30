@@ -17,6 +17,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
+import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
@@ -180,7 +181,7 @@ public class VehicleParkingGroupsLayerTest {
 
     public VehicleParkingGroupsLayerBuilderWithPublicGeometry(
       Graph graph,
-      VectorTilesResource.LayerParameters layerParameters,
+      LayerParameters<VectorTilesResource.LayerType> layerParameters,
       Locale locale
     ) {
       super(graph, layerParameters, locale);
