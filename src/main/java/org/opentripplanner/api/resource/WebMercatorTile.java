@@ -2,6 +2,7 @@ package org.opentripplanner.api.resource;
 
 import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.Envelope;
 
 /* http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames */
 public class WebMercatorTile {
@@ -37,5 +38,13 @@ public class WebMercatorTile {
       maxLon - minLon,
       maxLat - minLat
     );
+  }
+
+  public static Envelope tile2JtsEnvelope(int x, int y, int zoom) {
+    double maxLat = tile2lat(y, zoom);
+    double minLat = tile2lat(y + 1, zoom);
+    double minLon = tile2lon(x, zoom);
+    double maxLon = tile2lon(x + 1, zoom);
+    return new Envelope(maxLon, minLon, maxLat, minLat);
   }
 }

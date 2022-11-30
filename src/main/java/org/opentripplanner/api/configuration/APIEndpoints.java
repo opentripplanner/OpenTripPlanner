@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
+import org.opentripplanner.api.resource.GraphInspectorVectorTileResource;
 import org.opentripplanner.api.resource.PlannerResource;
 import org.opentripplanner.api.resource.Routers;
 import org.opentripplanner.api.resource.ServerInfo;
@@ -52,6 +53,7 @@ public class APIEndpoints {
     addIfEnabled(APIBikeRental, BikeRental.class);
     addIfEnabled(APIServerInfo, ServerInfo.class);
     addIfEnabled(APIGraphInspectorTile, GraphInspectorTileResource.class);
+    addIfEnabled(APIGraphInspectorTile, GraphInspectorVectorTileResource.class);
     addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
 
     // Sandbox extension APIs

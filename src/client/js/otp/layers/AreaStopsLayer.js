@@ -23,7 +23,7 @@ otp.layers.AreaStopsLayer = otp.Class({
     otp.config.hostname +
     "/" +
     otp.config.restService +
-    "/vectorTiles/debugAreaStops/{z}/{x}/{y}.pbf",
+    "/inspector/vectortile/areaStops/{z}/{x}/{y}.pbf",
 
   initialize: function (module) {
     this.module = module;
