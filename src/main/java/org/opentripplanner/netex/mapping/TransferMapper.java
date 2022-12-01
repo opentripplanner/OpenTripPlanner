@@ -21,21 +21,6 @@ import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 public class TransferMapper {
 
-  private enum Label {
-    FROM("from"),
-    TO("to");
-
-    private String label;
-
-    Label(String label) {
-      this.label = label;
-    }
-
-    public String getLabel() {
-      return label;
-    }
-  }
-
   private final FeedScopedIdFactory idFactory;
   private final DataImportIssueStore issueStore;
   private final ArrayListMultimap<String, String> scheduledStopPointsIndex;
@@ -105,7 +90,7 @@ public class TransferMapper {
   private Trip findTrip(Label label, String fieldName, String rootId, String sjId) {
     var tripId = createId(sjId);
     Trip trip = trips.get(tripId);
-    return assertRefExist(label.getLabel() + fieldName, rootId, sjId, trip) ? trip : null;
+    return assertRefExist(label.label(fieldName), rootId, sjId, trip) ? trip : null;
   }
 
   private TransferConstraint mapConstraint(ServiceJourneyInterchange it) {
@@ -174,7 +159,7 @@ public class TransferMapper {
       new InterchangePointMappingFailed(
         detailedMsg,
         interchangeId,
-        label.getLabel() + fieldName,
+        label.label(fieldName),
         sjId,
         sspId
       )
@@ -197,5 +182,20 @@ public class TransferMapper {
       return false;
     }
     return true;
+  }
+
+  private enum Label {
+    FROM("from"),
+    TO("to");
+
+    private String label;
+
+    Label(String label) {
+      this.label = label;
+    }
+
+    String label(String fieldName) {
+      return label + fieldName;
+    }
   }
 }

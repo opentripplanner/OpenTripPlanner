@@ -236,7 +236,12 @@ class TransferMapper {
     if (trip != null) {
       // A trip may visit the same stop twice, but we ignore that and only add the first stop
       // we find. Pattern that start and end at the same stop is supported.
-      int stopPositionInPattern = stopPosition(trip, stop, station, boardTrip);
+      int stopPositionInPattern;
+      if (boardTrip) {
+        stopPositionInPattern = boardStopPosition(trip, stop, station);
+      } else {
+        stopPositionInPattern = alightStopPosition(trip, stop, station);
+      }
       return stopPositionInPattern < 0 ? null : new TripTransferPoint(trip, stopPositionInPattern);
     } else if (route != null) {
       if (stop != null) {
@@ -285,6 +290,46 @@ class TransferMapper {
       }
     }
     return index;
+  }
+
+  private int boardStopPosition(Trip trip, RegularStop stop, Station station) {
+    List<StopTime> stopTimes = stopTimesByTrip.get(trip);
+
+    for (int i = 0; i < stopTimes.size() - 1; i++) {
+      StopTime stopTime = stopTimes.get(i);
+      if (stopTime.getPickupType().isNotRoutable()) {
+        continue;
+      }
+
+      Predicate<StopLocation> stopMatches = station != null
+        ? s -> (s instanceof RegularStop && ((RegularStop) s).getParentStation() == station)
+        : s -> s == stop;
+
+      if (stopMatches.test(stopTime.getStop())) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private int alightStopPosition(Trip trip, RegularStop stop, Station station) {
+    List<StopTime> stopTimes = stopTimesByTrip.get(trip);
+
+    for (int i = 1; i < stopTimes.size(); i++) {
+      StopTime stopTime = stopTimes.get(i);
+      if (stopTime.getDropOffType().isNotRoutable()) {
+        continue;
+      }
+
+      Predicate<StopLocation> stopMatches = station != null
+        ? s -> (s instanceof RegularStop && ((RegularStop) s).getParentStation() == station)
+        : s -> s == stop;
+
+      if (stopMatches.test(stopTime.getStop())) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   private boolean sameBlockId(Trip a, Trip b) {
