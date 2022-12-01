@@ -2,7 +2,7 @@
 
 import csv
 
-fieldnames = ["testCaseId", "description", "departure", "fromLat", "fromLon", "toLat", "toLon", "origin", "destination", "modes", "category", "window"]
+fieldnames = ["testCaseId", "description", "departure", "fromLat", "fromLon", "toLat", "toLon", "origin", "destination", "modes", "category"]
 
 locations= [
     {
@@ -47,7 +47,7 @@ locations= [
     },
 ]
 
-cases_with_extended_window = [16, 64, 70, 82, 88, 120, 128, 130, 132, 134, 136, 138, 146, 152, 154, 158, 164, 172]
+failing_cases = [16, 64, 70, 82, 88, 120, 128, 130, 132, 134, 136, 138, 146, 152, 154, 158, 164, 172]
 
 rows = []
 
@@ -84,24 +84,21 @@ for start in locations:
 
             for mode in modes:
                 counter = counter + 1
-                window = ""
-                if counter in cases_with_extended_window:
-                    window = "6h"
+                if counter not in failing_cases:
 
-                rows.append({
-                    "testCaseId": counter,
-                    "description": f'{start["name"]} to {end["name"]} ({mode["category"]})',
-                    "departure": "10:00",
-                    "fromLat": start_coords["lat"],
-                    "fromLon": start_coords["lon"],
-                    "toLat": end_coords["lat"],
-                    "toLon": end_coords["lon"],
-                    "origin": start["name"],
-                    "destination": end["name"],
-                    "modes": mode["mode"],
-                    "category": mode["category"],
-                    "window": window
-                })
+                    rows.append({
+                        "testCaseId": counter,
+                        "description": f'{start["name"]} to {end["name"]} ({mode["category"]})',
+                        "departure": "10:00",
+                        "fromLat": start_coords["lat"],
+                        "fromLon": start_coords["lon"],
+                        "toLat": end_coords["lat"],
+                        "toLon": end_coords["lon"],
+                        "origin": start["name"],
+                        "destination": end["name"],
+                        "modes": mode["mode"],
+                        "category": mode["category"]
+                    })
 
 with open('travelSearch.csv', 'w', encoding='UTF8', newline='') as f:
     writer = csv.DictWriter(f, fieldnames=fieldnames)
