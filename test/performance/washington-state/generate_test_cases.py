@@ -2,7 +2,7 @@
 
 import csv
 
-fieldnames = ["testCaseId", "description", "departure", "fromLat", "fromLon", "toLat", "toLon", "origin", "destination", "modes", "category"]
+fieldnames = ["testCaseId", "description", "departure", "fromLat", "fromLon", "toLat", "toLon", "origin", "destination", "modes", "category", "window"]
 
 locations= [
     {
@@ -47,16 +47,20 @@ locations= [
     },
 ]
 
+cases_with_extended_window = [16, 64, 70, 82, 88, 120, 128, 130, 132, 134, 136, 138, 146, 152, 154, 158, 164, 172]
+
 rows = []
 
 modes = [
     {
         "mode": "TRANSIT|WALK",
-        "category": "transit"
+        "category": "transit",
+        "window": ""
     },
     {
         "mode": "FLEX_ACCESS|FLEX_EGRESS|TRANSIT",
-        "category": "flex"
+        "category": "flex",
+        "window": "6h"
     }
 ]
 
@@ -77,8 +81,13 @@ for start in locations:
             start_coords = parse_coords(start["coordinates"])
             end_coords = parse_coords(end["coordinates"])
 
+
             for mode in modes:
                 counter = counter + 1
+                window = ""
+                if counter in cases_with_extended_window:
+                    window = "6h"
+
                 rows.append({
                     "testCaseId": counter,
                     "description": f'{start["name"]} to {end["name"]} ({mode["category"]})',
@@ -90,7 +99,8 @@ for start in locations:
                     "origin": start["name"],
                     "destination": end["name"],
                     "modes": mode["mode"],
-                    "category": mode["category"]
+                    "category": mode["category"],
+                    "window": window
                 })
 
 with open('travelSearch.csv', 'w', encoding='UTF8', newline='') as f:
