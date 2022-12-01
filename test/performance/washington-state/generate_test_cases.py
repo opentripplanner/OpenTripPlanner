@@ -51,11 +51,11 @@ rows = []
 
 modes = [
     {
-        "mode": "TRANSIT,WALK",
+        "mode": "TRANSIT|WALK",
         "category": "transit"
     },
     {
-        "mode": "FLEX_ACCESS,FLEX_EGRESS,TRANSIT",
+        "mode": "FLEX_ACCESS|FLEX_EGRESS|TRANSIT",
         "category": "flex"
     }
 ]
