@@ -258,40 +258,6 @@ class TransferMapper {
     throw new IllegalStateException("Should not get here!");
   }
 
-  private int stopPosition(Trip trip, RegularStop stop, Station station, boolean boardTrip) {
-    List<StopTime> stopTimes = stopTimesByTrip.get(trip);
-
-    // We can board at the first stop, but not alight.
-    final int firstStopPos = boardTrip ? 0 : 1;
-    // We can alight at the last stop, but not board, the lastStopPos is exclusive
-    final int lastStopPos = stopTimes.size() - (boardTrip ? 1 : 0);
-
-    Predicate<StopLocation> stopMatches = station != null
-      ? s -> (s instanceof RegularStop && ((RegularStop) s).getParentStation() == station)
-      : s -> s == stop;
-
-    int index = -1;
-    for (int i = firstStopPos; i < lastStopPos; i++) {
-      StopTime stopTime = stopTimes.get(i);
-      if (boardTrip && stopTime.getPickupType().isNotRoutable()) {
-        continue;
-      }
-      if (!boardTrip && stopTime.getDropOffType().isNotRoutable()) {
-        continue;
-      }
-
-      if (stopMatches.test(stopTime.getStop())) {
-        if (boardTrip) {
-          return i;
-        } else {
-          // If boardTrip is false we need to continue looping and use the last matching stop.
-          index = i;
-        }
-      }
-    }
-    return index;
-  }
-
   private int boardStopPosition(Trip trip, RegularStop stop, Station station) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
 
