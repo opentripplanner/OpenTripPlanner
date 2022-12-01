@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>76</otp.serialization.version.id>
+        <otp.serialization.version.id>77</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>27.1</geotools.version>
         <google.dagger.version>2.44</google.dagger.version>
@@ -184,7 +184,7 @@
             <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
                 <artifactId>enunciate-maven-plugin</artifactId>
-                <version>2.13.3</version>
+                <version>2.14.0</version>
                 <executions>
                     <execution>
                         <!-- override default binding to process-sources phase (enunciate generates web services). -->
@@ -282,7 +282,6 @@
                         --add-opens java.base/java.util.concurrent.locks=ALL-UNNAMED
                         --add-opens java.base/java.util.regex=ALL-UNNAMED
                         --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
-                        --add-opens java.base/java.util.logging=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.loader=ALL-UNNAMED

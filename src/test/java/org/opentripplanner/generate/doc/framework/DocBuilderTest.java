@@ -29,7 +29,7 @@ class DocBuilderTest {
       """
       Section
          
-      **Label** `code` ∙ Text  \\
+      **Label** `code` ∙ Text\s\s\s
       More text\s
       
       <h1 id="anchor">Header</h1>

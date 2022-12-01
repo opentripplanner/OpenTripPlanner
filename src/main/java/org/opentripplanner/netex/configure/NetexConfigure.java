@@ -7,7 +7,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.config.NetexFeedParameters;
@@ -74,7 +74,8 @@ public class NetexConfigure {
       hierarchy(source, config),
       config.ferryIdsNotAllowedForBicycle(),
       buildParams.maxStopToShapeSnapDistance,
-      config.noTransfersOnIsolatedStops()
+      config.noTransfersOnIsolatedStops(),
+      config.ignoreFareFrame()
     );
   }
 

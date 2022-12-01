@@ -1,9 +1,15 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import gnu.trove.list.TIntList;
 import java.util.BitSet;
-import java.util.List;
 import java.util.function.IntUnaryOperator;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorRoute;
+import org.opentripplanner.raptor.spi.RaptorTimeTable;
+import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.spi.SearchDirection;
+import org.opentripplanner.raptor.util.IntIterators;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -12,14 +18,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.Tri
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
-import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
-import org.opentripplanner.transit.raptor.util.IntIterators;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of
@@ -64,14 +62,14 @@ public class TripPatternForDates
 
   TripPatternForDates(
     RoutingTripPattern tripPattern,
-    List<TripPatternForDate> tripPatternForDates,
-    TIntList offsets,
+    TripPatternForDate[] tripPatternForDates,
+    int[] offsets,
     BitSet boardingPossible,
     BitSet alightningPossible
   ) {
     this.tripPattern = tripPattern;
-    this.tripPatternForDates = tripPatternForDates.toArray(new TripPatternForDate[] {});
-    this.offsets = offsets.toArray();
+    this.tripPatternForDates = tripPatternForDates;
+    this.offsets = offsets;
     this.boardingPossible = boardingPossible;
     this.alightingPossible = alightningPossible;
 

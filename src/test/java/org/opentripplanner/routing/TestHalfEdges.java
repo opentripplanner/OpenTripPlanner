@@ -16,42 +16,42 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
-import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestBuilder;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.linking.DisposableEdgeCollection;
+import org.opentripplanner.routing.linking.SameEdgeAdjuster;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class TestHalfEdges {
 
@@ -196,7 +196,7 @@ public class TestHalfEdges {
     turns.add(left);
     turns.add(leftBack);
 
-    TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocationForTest(
+    TemporaryStreetLocation start = StreetIndex.createTemporaryStreetLocationForTest(
       "start",
       new NonLocalizedString("start"),
       filter(turns, StreetEdge.class),
@@ -209,7 +209,7 @@ public class TestHalfEdges {
     endTurns.add(right);
     endTurns.add(rightBack);
 
-    TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocationForTest(
+    TemporaryStreetLocation end = StreetIndex.createTemporaryStreetLocationForTest(
       "end",
       new NonLocalizedString("end"),
       filter(endTurns, StreetEdge.class),
@@ -227,41 +227,44 @@ public class TestHalfEdges {
 
     long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
     options.setDateTime(Instant.ofEpochSecond(startTime));
-    ShortestPathTree spt1 = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt1 = StreetSearchBuilder
+      .of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
       .setFrom(br)
       .setTo(end)
       .getShortestPathTree();
 
-    GraphPath pathBr = spt1.getPath(end);
+    GraphPath<State, Edge, Vertex> pathBr = spt1.getPath(end);
     assertNotNull(pathBr, "There must be a path from br to end");
 
-    ShortestPathTree spt2 = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt2 = StreetSearchBuilder
+      .of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
       .setFrom(tr)
       .setTo(end)
       .getShortestPathTree();
 
-    GraphPath pathTr = spt2.getPath(end);
+    GraphPath<State, Edge, Vertex> pathTr = spt2.getPath(end);
     assertNotNull(pathTr, "There must be a path from tr to end");
     assertTrue(
       pathBr.getWeight() > pathTr.getWeight(),
       "path from bottom to end must be longer than path from top to end"
     );
 
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
+      .of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
 
-    GraphPath path = spt.getPath(end);
+    GraphPath<State, Edge, Vertex> path = spt.getPath(end);
     assertNotNull(path, "There must be a path from start to end");
 
     // the bottom is not part of the shortest path
@@ -272,8 +275,9 @@ public class TestHalfEdges {
 
     options.setArriveBy(true);
     spt =
-      AStarBuilder
-        .oneToOne()
+      StreetSearchBuilder
+        .of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setStreetRequest(options.journey().direct())
         .setFrom(start)
@@ -302,7 +306,7 @@ public class TestHalfEdges {
     options = new RouteRequest();
     options.journey().direct().setMode(StreetMode.BIKE);
     start =
-      StreetVertexIndex.createTemporaryStreetLocationForTest(
+      StreetIndex.createTemporaryStreetLocationForTest(
         "start1",
         new NonLocalizedString("start1"),
         filter(turns, StreetEdge.class),
@@ -311,7 +315,7 @@ public class TestHalfEdges {
         tempEdges
       );
     end =
-      StreetVertexIndex.createTemporaryStreetLocationForTest(
+      StreetIndex.createTemporaryStreetLocationForTest(
         "end1",
         new NonLocalizedString("end1"),
         filter(turns, StreetEdge.class),
@@ -321,8 +325,9 @@ public class TestHalfEdges {
       );
 
     spt =
-      AStarBuilder
-        .oneToOne()
+      StreetSearchBuilder
+        .of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(options)
         .setStreetRequest(options.journey().direct())
         .setFrom(start)
@@ -344,7 +349,7 @@ public class TestHalfEdges {
     assertEquals(nEdges, graph.getEdges().size());
 
     start =
-      StreetVertexIndex.createTemporaryStreetLocationForTest(
+      StreetIndex.createTemporaryStreetLocationForTest(
         "start2",
         new NonLocalizedString("start2"),
         filter(turns, StreetEdge.class),
@@ -353,7 +358,7 @@ public class TestHalfEdges {
         tempEdges
       );
     end =
-      StreetVertexIndex.createTemporaryStreetLocationForTest(
+      StreetIndex.createTemporaryStreetLocationForTest(
         "end2",
         new NonLocalizedString("end2"),
         filter(turns, StreetEdge.class),
@@ -363,7 +368,13 @@ public class TestHalfEdges {
       );
 
     spt =
-      AStarBuilder.oneToOne().setRequest(options).setFrom(start).setTo(end).getShortestPathTree();
+      StreetSearchBuilder
+        .of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
+        .setRequest(options)
+        .setFrom(start)
+        .setTo(end)
+        .getShortestPathTree();
 
     path = spt.getPath(start);
     assertNotNull(path, "There must be a path from top to bottom");
@@ -389,7 +400,7 @@ public class TestHalfEdges {
     turns.add(left);
     turns.add(leftBack);
 
-    TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocationForTest(
+    TemporaryStreetLocation start = StreetIndex.createTemporaryStreetLocationForTest(
       "start",
       new NonLocalizedString("start"),
       filter(turns, StreetEdge.class),
@@ -398,7 +409,7 @@ public class TestHalfEdges {
       tempEdges
     );
 
-    TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocationForTest(
+    TemporaryStreetLocation end = StreetIndex.createTemporaryStreetLocationForTest(
       "end",
       new NonLocalizedString("end"),
       filter(turns, StreetEdge.class),
@@ -418,15 +429,16 @@ public class TestHalfEdges {
 
     long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
     options.setDateTime(Instant.ofEpochSecond(startTime));
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
+      .of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
 
-    GraphPath path = spt.getPath(end);
+    GraphPath<State, Edge, Vertex> path = spt.getPath(end);
     assertNotNull(path, "There must be a path from start to end");
     assertEquals(1, path.edges.size());
     tempEdges.disposeEdges();
@@ -442,7 +454,7 @@ public class TestHalfEdges {
     HashSet<Edge> turns = new HashSet<>();
     turns.add(left);
 
-    TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocationForTest(
+    TemporaryStreetLocation start = StreetIndex.createTemporaryStreetLocationForTest(
       "start",
       new NonLocalizedString("start"),
       filter(turns, StreetEdge.class),
@@ -451,7 +463,7 @@ public class TestHalfEdges {
       tempEdges
     );
 
-    TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocationForTest(
+    TemporaryStreetLocation end = StreetIndex.createTemporaryStreetLocationForTest(
       "end",
       new NonLocalizedString("end"),
       filter(turns, StreetEdge.class),
@@ -470,15 +482,16 @@ public class TestHalfEdges {
 
     long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
     options.setDateTime(Instant.ofEpochSecond(startTime));
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
+    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
+      .of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
 
-    GraphPath path = spt.getPath(end);
+    GraphPath<State, Edge, Vertex> path = spt.getPath(end);
     assertNotNull(path, "There must be a path from start to end");
     assertTrue(path.edges.size() > 1);
     tempEdges.disposeEdges();
@@ -504,7 +517,7 @@ public class TestHalfEdges {
     graph.streetNotesService.addStaticNote(left, alert, StreetNotesService.ALWAYS_MATCHER);
     graph.streetNotesService.addStaticNote(leftBack, alert, StreetNotesService.ALWAYS_MATCHER);
 
-    TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocationForTest(
+    TemporaryStreetLocation start = StreetIndex.createTemporaryStreetLocationForTest(
       "start",
       new NonLocalizedString("start"),
       filter(turns, StreetEdge.class),
@@ -515,7 +528,7 @@ public class TestHalfEdges {
 
     // The alert should be preserved
     // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
-    AStarRequestBuilder req = AStarRequest.of();
+    StreetSearchRequestBuilder req = StreetSearchRequest.of();
     State traversedOne = new State(start, req.build());
     State currentState;
     for (Edge e : start.getOutgoing()) {
@@ -551,7 +564,7 @@ public class TestHalfEdges {
     req.withWheelchair(true);
 
     start =
-      StreetVertexIndex.createTemporaryStreetLocationForTest(
+      StreetIndex.createTemporaryStreetLocationForTest(
         "start",
         new NonLocalizedString("start"),
         filter(turns, StreetEdge.class),
@@ -577,7 +590,7 @@ public class TestHalfEdges {
 
   @Test
   public void testStreetLocationFinder() {
-    StreetVertexIndex finder = graph.getStreetIndex();
+    StreetIndex finder = graph.getStreetIndex();
     GraphFinder graphFinder = new DirectGraphFinder(transitModel.getStopModel()::findRegularStops);
     Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
     // test that the local stop finder finds stops
@@ -638,12 +651,15 @@ public class TestHalfEdges {
     ) {
       assertNotNull(container.getFromVertices());
       assertNotNull(container.getToVertices());
-      ShortestPathTree spt = AStarBuilder
-        .oneToOne()
+      ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
+        .of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(walking)
         .setVerticesContainer(container)
         .getShortestPathTree();
-      GraphPath path = spt.getPath(container.getToVertices().iterator().next());
+      GraphPath<State, Edge, Vertex> path = spt.getPath(
+        container.getToVertices().iterator().next()
+      );
       for (State s : path.states) {
         assertNotSame(s.getBackEdge(), top);
       }

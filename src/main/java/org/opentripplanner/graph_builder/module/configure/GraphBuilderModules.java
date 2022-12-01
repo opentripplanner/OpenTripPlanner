@@ -14,9 +14,10 @@ import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.DataImportIssuesToHTML;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.report.DataImportIssuesToHTML;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
@@ -55,13 +56,7 @@ public class GraphBuilderModules {
   ) {
     List<OpenStreetMapProvider> providers = new ArrayList<>();
     for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
-      providers.add(
-        new OpenStreetMapProvider(
-          osmConfiguredDataSource,
-          config.osmDefaults,
-          config.osmCacheDataInMem
-        )
-      );
+      providers.add(new OpenStreetMapProvider(osmConfiguredDataSource, config.osmCacheDataInMem));
     }
 
     return new OpenStreetMapModule(
@@ -170,10 +165,7 @@ public class GraphBuilderModules {
       );
     } else if (dataSources.has(DEM)) {
       gridCoverageFactories.addAll(
-        createDemGeotiffGridCoverageFactories(
-          dataSources.getDemConfiguredDatasource(),
-          config.elevationUnitMultiplier
-        )
+        createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDatasource())
       );
     }
     // Refactoring this class, it was made clear that this allows for adding multiple elevation
@@ -236,6 +228,12 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
+  static DataImportIssueStore provideDataImportIssuesStore() {
+    return new DefaultDataImportIssueStore();
+  }
+
+  @Provides
+  @Singleton
   static DataImportIssuesToHTML provideDataImportIssuesToHTML(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
@@ -264,15 +262,11 @@ public class GraphBuilderModules {
   }
 
   private static List<ElevationGridCoverageFactory> createDemGeotiffGridCoverageFactories(
-    Iterable<ConfiguredDataSource<DemExtractParameters>> dataSources,
-    double defaultElevationUnitMultiplier
+    Iterable<ConfiguredDataSource<DemExtractParameters>> dataSources
   ) {
     List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
     for (ConfiguredDataSource<DemExtractParameters> demSource : dataSources) {
-      double elevationUnitMultiplier = demSource
-        .config()
-        .elevationUnitMultiplier()
-        .orElse(defaultElevationUnitMultiplier);
+      double elevationUnitMultiplier = demSource.config().elevationUnitMultiplier();
       elevationGridCoverageFactories.add(
         createGeotiffGridCoverageFactoryImpl(demSource.dataSource(), elevationUnitMultiplier)
       );

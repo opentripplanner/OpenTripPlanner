@@ -23,7 +23,7 @@ import javax.ws.rs.core.UriInfo;
 import org.geotools.geometry.Envelope2D;
 import org.glassfish.grizzly.http.server.Request;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.WebMercatorTile;
+import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;
@@ -60,7 +60,7 @@ public class VectorTilesResource {
       LayerType.VehicleRental,
       (graph, transitService, layerParameters, locale) ->
         new VehicleRentalPlacesLayerBuilder(
-          graph.getVehicleRentalStationService(),
+          graph.getVehicleRentalService(),
           layerParameters,
           locale
         )
@@ -69,7 +69,7 @@ public class VectorTilesResource {
       LayerType.VehicleRentalStation,
       (graph, transitService, layerParameters, locale) ->
         new VehicleRentalStationsLayerBuilder(
-          graph.getVehicleRentalStationService(),
+          graph.getVehicleRentalService(),
           layerParameters,
           locale
         )
@@ -77,10 +77,7 @@ public class VectorTilesResource {
     layers.put(
       LayerType.VehicleRentalVehicle,
       (graph, transitService, layerParameters, locale) ->
-        new VehicleRentalVehiclesLayerBuilder(
-          graph.getVehicleRentalStationService(),
-          layerParameters
-        )
+        new VehicleRentalVehiclesLayerBuilder(graph.getVehicleRentalService(), layerParameters)
     );
     layers.put(
       LayerType.VehicleParking,
@@ -130,10 +127,7 @@ public class VectorTilesResource {
 
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
-    for (LayerParameters layerParameters : serverContext
-      .routerConfig()
-      .vectorTileLayers()
-      .layers()) {
+    for (LayerParameters layerParameters : serverContext.vectorTileLayers().layers()) {
       if (
         layers.contains(layerParameters.name()) &&
         layerParameters.minZoom() <= z &&

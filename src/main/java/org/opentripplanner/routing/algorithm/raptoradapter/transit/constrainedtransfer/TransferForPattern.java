@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
 /**
  * Encapsulate the information needed to identify a transfer during a Raptor search for a given

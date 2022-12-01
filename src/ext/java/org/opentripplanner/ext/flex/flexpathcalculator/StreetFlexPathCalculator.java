@@ -3,15 +3,18 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.DominanceFunctions;
 
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network
@@ -31,7 +34,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
   private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
 
-  private final Map<Vertex, ShortestPathTree> cache = new HashMap<>();
+  private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> cache = new HashMap<>();
   private final boolean reverseDirection;
 
   public StreetFlexPathCalculator(boolean reverseDirection) {
@@ -45,7 +48,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     Vertex originVertex = reverseDirection ? tov : fromv;
     Vertex destinationVertex = reverseDirection ? fromv : tov;
 
-    ShortestPathTree shortestPathTree;
+    ShortestPathTree<State, Edge, Vertex> shortestPathTree;
     if (cache.containsKey(originVertex)) {
       shortestPathTree = cache.get(originVertex);
     } else {
@@ -53,27 +56,32 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       cache.put(originVertex, shortestPathTree);
     }
 
-    GraphPath path = shortestPathTree.getPath(destinationVertex);
+    GraphPath<State, Edge, Vertex> path = shortestPathTree.getPath(destinationVertex);
     if (path == null) {
       return null;
     }
 
-    int distance = (int) path.getDistanceMeters();
+    int distance = (int) path.edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
     int duration = path.getDuration();
 
     // computing the linestring from the graph path is a surprisingly expensive operation
     // so we delay it until it's actually needed. since most flex paths are never shown to the user
     // this improves performance quite a bit.
-    return new FlexPath(distance, duration, path::getGeometry);
+    return new FlexPath(
+      distance,
+      duration,
+      () -> GeometryUtils.concatenateLineStrings(path.edges, Edge::getGeometry)
+    );
   }
 
-  private ShortestPathTree routeToMany(Vertex vertex) {
+  private ShortestPathTree<State, Edge, Vertex> routeToMany(Vertex vertex) {
     RouteRequest routingRequest = new RouteRequest();
     routingRequest.setArriveBy(reverseDirection);
 
-    return AStarBuilder
-      .allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION)
-      .setDominanceFunction(new DominanceFunction.EarliestArrival())
+    return StreetSearchBuilder
+      .of()
+      .setSkipEdgeStrategy(new DurationSkipEdgeStrategy(MAX_FLEX_TRIP_DURATION))
+      .setDominanceFunction(new DominanceFunctions.EarliestArrival())
       .setRequest(routingRequest)
       .setStreetRequest(new StreetRequest(StreetMode.CAR))
       .setFrom(reverseDirection ? null : vertex)

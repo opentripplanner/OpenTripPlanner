@@ -2,7 +2,7 @@ package org.opentripplanner.netex;
 
 import java.util.List;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
@@ -109,7 +109,7 @@ public class NetexModule implements GraphBuilderModule {
   }
 
   private void validateStopTimesForEachTrip(TripStopTimes stopTimesByTrip) {
-    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, false, issueStore).run();
+    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, false, false, issueStore).run();
   }
 
   @Override

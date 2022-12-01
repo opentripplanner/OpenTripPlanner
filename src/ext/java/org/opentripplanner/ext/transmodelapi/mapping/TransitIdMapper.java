@@ -48,7 +48,7 @@ public class TransitIdMapper {
   }
 
   public static FeedScopedId mapIDToDomain(String id) {
-    if (id == null) {
+    if (id == null || id.isBlank()) {
       return null;
     }
     if (fixedFeedId != null) {

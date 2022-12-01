@@ -3,15 +3,15 @@ package org.opentripplanner.ext.flex;
 import java.util.HashSet;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Point;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.graph.index.StreetIndex;
+import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.geometry.GeometryUtils;
-import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
       return;
     }
 
-    StreetVertexIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
+    StreetIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
 
     ProgressTracker progress = ProgressTracker.track(
       "Add flex locations to street vertices",

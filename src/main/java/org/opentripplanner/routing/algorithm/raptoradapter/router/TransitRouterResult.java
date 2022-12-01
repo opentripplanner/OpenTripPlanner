@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
+import org.opentripplanner.raptor.api.request.SearchParams;
 
 public class TransitRouterResult {
 

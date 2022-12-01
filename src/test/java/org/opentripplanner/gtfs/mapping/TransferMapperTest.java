@@ -1,21 +1,14 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Collections;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPriority;
 
@@ -27,6 +20,7 @@ public class TransferMapperTest {
 
   private static final TranslationHelper TRANSLATION_HELPER = new TranslationHelper();
 
+  public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
   private static RouteMapper ROUTE_MAPPER;
 
   private static TripMapper TRIP_MAPPER;

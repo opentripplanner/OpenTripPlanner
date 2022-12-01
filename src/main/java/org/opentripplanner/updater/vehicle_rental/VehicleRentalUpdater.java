@@ -9,18 +9,19 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
-import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.graph_builder.linking.VertexLinker;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
-import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.DisposableEdgeCollection;
+import org.opentripplanner.routing.linking.LinkingDirection;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
+import org.opentripplanner.street.model.edge.VehicleRentalEdge;
+import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.DataSource;
@@ -28,7 +29,6 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.UpdaterConstructionException;
 import org.opentripplanner.updater.WriteToGraphCallback;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,13 +45,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
   private VertexLinker linker;
 
-  private VehicleRentalStationService service;
+  private VehicleRentalService service;
 
   public VehicleRentalUpdater(
     VehicleRentalUpdaterParameters parameters,
     DataSource<VehicleRentalPlace> source,
     VertexLinker vertexLinker,
-    VehicleRentalStationService vehicleRentalStationService
+    VehicleRentalService vehicleRentalStationService
   ) throws IllegalArgumentException {
     super(parameters);
     // Configure updater
@@ -69,7 +69,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       // Do any setup if needed
       source.setup();
     } catch (UpdaterConstructionException e) {
-      LOG.warn("Unable to setup updater: {}", parameters.getConfigRef(), e);
+      LOG.warn("Unable to setup updater: {}", parameters.configRef(), e);
     }
 
     if (pollingPeriodSeconds() <= 0) {

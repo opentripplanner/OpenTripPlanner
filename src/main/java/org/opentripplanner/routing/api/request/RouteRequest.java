@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
+import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -9,13 +9,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.time.DateUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
-import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +23,9 @@ import org.slf4j.LoggerFactory;
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
  * itineraries.
  * <p>
- * All defaults should be specified here in the RouteRequest, NOT as annotations on query
- * parameters in web services that create RouteRequests. This establishes a priority chain for
- * default values: RouteRequest field initializers, then JSON router config, then query
- * parameters.
+ * All defaults should be specified here in the RouteRequest, NOT as annotations on query parameters
+ * in web services that create RouteRequests. This establishes a priority chain for default values:
+ * RouteRequest field initializers, then JSON router config, then query parameters.
  *
  * @Deprecated tag is added to all parameters that are not currently functional in either the Raptor
  * router or other non-transit routing (walk, bike, car etc.)
@@ -79,6 +78,10 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /* ACCESSOR/SETTER METHODS */
 
+  public void setJourney(JourneyRequest journey) {
+    this.journey = journey;
+  }
+
   public void setArriveBy(boolean arriveBy) {
     this.arriveBy = arriveBy;
   }
@@ -95,6 +98,13 @@ public class RouteRequest implements Cloneable, Serializable {
     this.preferences = preferences.copyOf().apply(body).build();
   }
 
+  void setPreferences(RoutingPreferences preferences) {
+    this.preferences = preferences;
+  }
+
+  /**
+   * Whether the trip must be wheelchair-accessible
+   */
   public boolean wheelchair() {
     return wheelchair;
   }
@@ -194,15 +204,6 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   /* INSTANCE METHODS */
-
-  public RouteRequest copyAndPrepareForTransferRouting() {
-    var rr = clone();
-    rr.setArriveBy(false);
-    rr.setDateTime(Instant.ofEpochSecond(0));
-    rr.setFrom(null);
-    rr.setTo(null);
-    return rr;
-  }
 
   /**
    * This method is used to clone the default message, and insert a current time. A typical use-case

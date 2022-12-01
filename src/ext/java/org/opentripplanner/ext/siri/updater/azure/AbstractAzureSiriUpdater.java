@@ -55,7 +55,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   protected int timeout;
 
   public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config, TransitModel transitModel) {
-    this.configRef = config.getConfigRef();
+    this.configRef = config.configRef();
     this.serviceBusUrl = config.getServiceBusUrl();
     this.topicName = config.getTopicName();
     this.dataInitializationUrl = config.getDataInitializationUrl();

@@ -1,17 +1,17 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.transit.TestRoute;
-import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
-import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
+import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.transit.TestRoute;
+import org.opentripplanner.raptor._data.transit.TestTripPattern;
+import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 public class TripScheduleBoardSearchTest implements RaptorTestConstants {
 

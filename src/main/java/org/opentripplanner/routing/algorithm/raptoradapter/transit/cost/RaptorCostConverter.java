@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import org.opentripplanner.util.lang.OtpNumberFormat;
+import org.opentripplanner.framework.lang.OtpNumberFormat;
 
 /**
  * Convert Raptor internal cost to OTP domain model cost, and back.

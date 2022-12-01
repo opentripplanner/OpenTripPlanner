@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import java.time.ZonedDateTime;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * This class is used to represent a stop arrival event mostly for intermediate visits to a stops

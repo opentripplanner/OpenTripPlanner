@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.api.response;
 
 import java.util.List;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class RoutingResponse {
 

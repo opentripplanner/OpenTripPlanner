@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import java.util.List;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
@@ -9,6 +10,7 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParametersBuilder;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 public class TransitFeedConfig {
 
@@ -68,6 +70,28 @@ public class TransitFeedConfig {
       )
       .withSource(
         node.of("source").since(NA).summary("The unique URI pointing to the data file.").asUri()
+      )
+      .withRemoveRepeatedStops(
+        node
+          .of("removeRepeatedStops")
+          .since(V2_3)
+          .summary("Should consecutive identical stops be merged into one stop time entry")
+          .asBoolean(true)
+      )
+      .withStationTransferPreference(
+        node
+          .of("stationTransferPreference")
+          .since(V2_3)
+          .summary(
+            "Should there be some preference or aversion for transfers at stops that are part of a station."
+          )
+          .description(
+            """
+            This parameter sets the generic level of preference. What is the actual cost can be changed
+            with the `stopTransferCost` parameter in the router configuration.
+            """
+          )
+          .asEnum(StopTransferPriority.ALLOWED)
       )
       .build();
   }

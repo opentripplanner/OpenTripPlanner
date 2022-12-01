@@ -5,10 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import java.io.File;
 import java.net.URLDecoder;
@@ -18,22 +17,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.common.model.P2;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -55,8 +55,8 @@ public class OpenStreetMapModuleTest {
       List.of(provider),
       Set.of(),
       gg,
-      noopIssueStore(),
-      new DefaultMapper()
+      DataImportIssueStore.NOOP,
+      true
     );
 
     osmModule.buildGraph();
@@ -122,8 +122,8 @@ public class OpenStreetMapModuleTest {
       List.of(provider),
       Set.of(),
       gg,
-      noopIssueStore(),
-      new DefaultMapper()
+      DataImportIssueStore.NOOP,
+      true
     );
 
     osmModule.buildGraph();
@@ -148,9 +148,9 @@ public class OpenStreetMapModuleTest {
     assertFalse(iv7.trafficLight);
     assertFalse(iv8.trafficLight);
 
-    Set<P2<Vertex>> edgeEndpoints = new HashSet<>();
+    Set<VertexPair> edgeEndpoints = new HashSet<>();
     for (StreetEdge se : gg.getStreetEdges()) {
-      P2<Vertex> endpoints = new P2<>(se.getFromVertex(), se.getToVertex());
+      var endpoints = new VertexPair(se.getFromVertex(), se.getToVertex());
       // Check that we don't get any duplicate edges on this small graph.
       if (edgeEndpoints.contains(endpoints)) {
         fail();
@@ -160,12 +160,12 @@ public class OpenStreetMapModuleTest {
   }
 
   @Test
-  public void testBuildAreaWithoutVisibility() throws Exception {
+  public void testBuildAreaWithoutVisibility() {
     testBuildingAreas(true);
   }
 
   @Test
-  public void testBuildAreaWithVisibility() throws Exception {
+  public void testBuildAreaWithVisibility() {
     testBuildingAreas(false);
   }
 
@@ -286,6 +286,31 @@ public class OpenStreetMapModuleTest {
     assertEquals("Kreuzung first mit second", localizedString.toString(new Locale("de")));
   }
 
+  @Test
+  void addParkingLotsToService() {
+    var graph = new Graph();
+    var providers = Stream
+      .of("B+R.osm.pbf", "P+R.osm.pbf")
+      .map(f -> new File(getClass().getResource(f).getFile()))
+      .map(f -> new OpenStreetMapProvider(f, false))
+      .toList();
+    var module = new OpenStreetMapModule(
+      providers,
+      Set.of(),
+      graph,
+      DataImportIssueStore.NOOP,
+      false
+    );
+    module.staticParkAndRide = true;
+    module.staticBikeParkAndRide = true;
+    module.buildGraph();
+
+    var service = graph.getVehicleParkingService();
+    assertEquals(8, service.getVehicleParkings().count());
+    assertEquals(4, service.getBikeParks().count());
+    assertEquals(4, service.getCarParks().count());
+  }
+
   /**
    * This reads test file with area and tests if it can be routed if visibility is used and if it
    * isn't
@@ -311,10 +336,9 @@ public class OpenStreetMapModuleTest {
       List.of(provider),
       Set.of(),
       graph,
-      noopIssueStore(),
-      new DefaultMapper()
+      DataImportIssueStore.NOOP,
+      !skipVisibility
     );
-    loader.skipVisibility = skipVisibility;
 
     loader.buildGraph();
 
@@ -326,7 +350,7 @@ public class OpenStreetMapModuleTest {
     Vertex topV = graph.getVertex("osm:node:559271124");
 
     GraphPathFinder graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
-    List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(
+    List<GraphPath<State, Edge, Vertex>> pathList = graphPathFinder.graphPathFinderEntryPoint(
       request,
       Set.of(bottomV),
       Set.of(topV)
@@ -334,22 +358,10 @@ public class OpenStreetMapModuleTest {
 
     assertNotNull(pathList);
     assertFalse(pathList.isEmpty());
-    for (GraphPath path : pathList) {
+    for (GraphPath<State, Edge, Vertex> path : pathList) {
       assertFalse(path.states.isEmpty());
     }
   }
-  // disabled pending discussion with author (AMB)
-  // @Test
-  // public void testMultipolygon() throws Exception {
-  // Graph gg = new Graph();
-  // OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
-  //
-  // FileBasedOpenStreetMapProviderImpl pr = new FileBasedOpenStreetMapProviderImpl();
-  // pr.setPath(new File(getClass().getResource("otp-multipolygon-test.osm").getPath()));
-  // loader.setProvider(pr);
-  //
-  // loader.buildGraph(gg, extra);
-  //
-  // assertNotNull(gg.getVertex("way -3535 from 4"));
-  // }
+
+  private record VertexPair(Vertex v0, Vertex v1) {}
 }

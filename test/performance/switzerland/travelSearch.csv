@@ -1,0 +1,188 @@
+testCaseId,description,departure,fromPlace,toPlace,fromLat,fromLon,toLat,toLon,origin,destination,modes,category
+0,"Landoltstrasse, Bern to Chamerstrasse, Bern",08:00,,,46.9366068,7.4395359,47.1757968,8.4274963,Landoltstrasse,Chamerstrasse,TRANSIT|WALK,street-to-street
+1,"Rue de Parcouret, Conthey to Friedstrasse, Conthey",08:00,,,46.2322777,7.3087882,47.2561509,8.1868878,Rue de Parcouret,Friedstrasse,TRANSIT|WALK,street-to-street
+2,"Weierweg, Aarwangen to Gerstengraben, Aarwangen",08:00,,,47.2398217,7.7861326,46.9568035,7.9174124,Weierweg,Gerstengraben,TRANSIT|WALK,street-to-street
+3,"A Torascia, Claro to Mühlestrasse, Claro",08:00,,,46.2518615,9.020366,47.1484763,7.2686009,A Torascia,Mühlestrasse,TRANSIT|WALK,street-to-street
+4,"Seetalstrasse, Muri AG to Rütistrasse, Muri AG",08:00,,,47.2728113,8.3353111,47.5965846,8.5005516,Seetalstrasse,Rütistrasse,TRANSIT|WALK,street-to-street
+5,"Wiesenstrasse, Weinfelden to Ritterstrasse, Weinfelden",08:00,,,47.5660408,9.1012724,46.9792894,7.4377003,Wiesenstrasse,Ritterstrasse,TRANSIT|WALK,street-to-street
+6,"Langfuri, Roggwil TG to Haldenstrasse, Roggwil TG",08:00,,,47.4941417,9.3971668,47.486081,8.2847274,Langfuri,Haldenstrasse,TRANSIT|WALK,street-to-street
+7,"Unterdorfstrasse, Kriessern to Eichweg, Kriessern",08:00,,,47.367746,9.6127465,47.4104396,8.059585,Unterdorfstrasse,Eichweg,TRANSIT|WALK,street-to-street
+8,"Tardisstrasse, Zizers to Tuor, Zizers",08:00,,,46.9532125,9.5561049,46.7757257,10.1998933,Tardisstrasse,Tuor,TRANSIT|WALK,street-to-street
+9,"Rue de la Ville, Finhaut to Murimoos, Finhaut",08:00,,,46.0826238,6.9766867,47.2942211,8.3384373,Rue de la Ville,Murimoos,TRANSIT|WALK,street-to-street
+10,"Ledipark, Root to Regensdorferstrasse, Root",08:00,,,47.1060741,8.3856371,47.4207383,8.435305,Ledipark,Regensdorferstrasse,TRANSIT|WALK,street-to-street
+11,"Untere Bühlstrasse, Weinfelden to Hauptstrasse, Weinfelden",08:00,,,47.5709772,9.1149042,47.1172369,7.2468258,Untere Bühlstrasse,Hauptstrasse,TRANSIT|WALK,street-to-street
+12,"Chemin du Crozet, Nyon to Moosgasse, Nyon",08:00,,,46.383972,6.2416646,47.1782345,8.1088492,Chemin du Crozet,Moosgasse,TRANSIT|WALK,street-to-street
+13,"Chemin de Dronchire, Servion to Route de Cossonay, Servion",08:00,,,46.5706412,6.77819,46.6011346,6.5358903,Chemin de Dronchire,Route de Cossonay,TRANSIT|WALK,street-to-street
+14,"Sandweidli, Lauterbrunnen to Bühlstrasse, Lauterbrunnen",08:00,,,46.613524,7.9013004,47.4967087,8.0797773,Sandweidli,Bühlstrasse,TRANSIT|WALK,street-to-street
+15,"Fontanixstrasse, Wangs to Via Mondonico, Wangs",08:00,,,47.0306135,9.4264374,46.0078973,8.900655,Fontanixstrasse,Via Mondonico,TRANSIT|WALK,street-to-street
+16,"Hueb, Sax to Place de la Maison de Commune, Sax",08:00,,,47.2361986,9.459501,46.1874587,7.206489,Hueb,Place de la Maison de Commune,TRANSIT|WALK,street-to-street
+17,"Alpenblick, Alterswil FR to Hühneralp, Alterswil FR",08:00,,,46.7949795,7.2646873,46.9443445,7.7985859,Alpenblick,Hühneralp,TRANSIT|WALK,street-to-street
+18,"Boschetto, Cevio to Halde, Cevio",08:00,,,46.3058144,8.605651,47.0455706,8.4211897,Boschetto,Halde,TRANSIT|WALK,street-to-street
+19,"Route de Fruence, Châtel-St-Denis to Geuenseestrasse, Châtel-St-Denis",08:00,,,46.5223886,6.9092257,47.1779143,8.1125319,Route de Fruence,Geuenseestrasse,TRANSIT|WALK,street-to-street
+20,"Route de Roumaz, Savièse to Via Tondü, Savièse",08:00,,,46.2487705,7.3483076,46.1638197,8.6183028,Route de Roumaz,Via Tondü,TRANSIT|WALK,street-to-street
+21,"Ober-Hereschnabel, Schüpfheim to Sonnenrainstrasse, Schüpfheim",08:00,,,46.9545579,8.0414596,46.8223992,8.0401093,Ober-Hereschnabel,Sonnenrainstrasse,TRANSIT|WALK,street-to-street
+22,"Oberdorf, Altishofen to Rietstrasse, Altishofen",08:00,,,47.2014272,7.9624254,47.3859638,9.5593754,Oberdorf,Rietstrasse,TRANSIT|WALK,street-to-street
+23,"Via generale Arcioni, Lugano to Aumattstrasse, Lugano",08:00,,,46.0062154,8.9676064,47.4904221,7.5977093,Via generale Arcioni,Aumattstrasse,TRANSIT|WALK,street-to-street
+24,"Robert-Walser-Strasse, Wädenswil to Résidences du Golf, Wädenswil",08:00,,,47.2348076,8.6538256,46.4069011,6.2732434,Robert-Walser-Strasse,Résidences du Golf,TRANSIT|WALK,street-to-street
+25,"Könizstrasse, Liebefeld to Allmendhagweg, Liebefeld",08:00,,,46.9324133,7.415965,46.9943399,7.1432323,Könizstrasse,Allmendhagweg,TRANSIT|WALK,street-to-street
+26,"Oberhof, Hofen SH to Buggrütistrasse, Hofen SH",08:00,,,47.7824984,8.6755252,47.1886832,9.020471,Oberhof,Buggrütistrasse,TRANSIT|WALK,street-to-street
+27,"Cadra, Riom to Obertannberg, Riom",08:00,,,46.6102944,9.5824583,47.1842673,8.1354602,Cadra,Obertannberg,TRANSIT|WALK,street-to-street
+28,"Isenbachweg, Breitenbach to Schulstrasse, Breitenbach",08:00,,,47.4095178,7.5518677,47.3633729,9.0427066,Isenbachweg,Schulstrasse,TRANSIT|WALK,street-to-street
+29,"Hertensteinstrasse, Weggis to Sturzeneggstrasse, Weggis",08:00,,,47.0291086,8.4164362,47.404904,9.3180729,Hertensteinstrasse,Sturzeneggstrasse,TRANSIT|WALK,street-to-street
+30,"Buchzelgstrasse, Zürich to Hauptstrasse, Zürich",08:00,,,47.3600591,8.5868056,47.1296644,7.4477376,Buchzelgstrasse,Hauptstrasse,TRANSIT|WALK,street-to-street
+31,"Route de la Magine, Savièse to Wybergliweg, Savièse",08:00,,,46.249229,7.3438549,47.0684814,8.5299347,Route de la Magine,Wybergliweg,TRANSIT|WALK,street-to-street
+32,"Dorfmatt, Sins to Route de Palézieux, Sins",08:00,,,47.1903246,8.3923272,46.5682832,6.8311365,Dorfmatt,Route de Palézieux,TRANSIT|WALK,street-to-street
+33,"Langgrütstrasse, Zürich to Obere Matten, Zürich",08:00,,,47.3733212,8.5001008,47.4065853,7.7859351,Langgrütstrasse,Obere Matten,TRANSIT|WALK,street-to-street
+34,"Reimenweg, Vitznau to Chemin de la Planche, Vitznau",08:00,,,47.0124381,8.4830481,46.5898885,6.8696706,Reimenweg,Chemin de la Planche,TRANSIT|WALK,street-to-street
+35,"Aarbergergasse, Bern to Meienbergstrasse, Bern",08:00,,,46.9496585,7.4414903,47.2391725,8.8274266,Aarbergergasse,Meienbergstrasse,TRANSIT|WALK,street-to-street
+36,"Chatzenackerstrasse, Lommiswil to Spiegelbergweg, Lommiswil",08:00,,,47.2241706,7.4695979,47.0507808,8.6173671,Chatzenackerstrasse,Spiegelbergweg,TRANSIT|WALK,street-to-street
+37,"Route d'Aubonne, Gimel to Konstanzerstrasse, Gimel",08:00,,,46.5082925,6.3169375,47.6598168,9.1404613,Route d'Aubonne,Konstanzerstrasse,TRANSIT|WALK,street-to-street
+38,"Waldstrasse, Utzenstorf to Landwasserstrasse, Utzenstorf",08:00,,,47.1261537,7.5470754,46.6881606,9.6740654,Waldstrasse,Landwasserstrasse,TRANSIT|WALK,street-to-street
+39,"Gartenstrasse, Flums to Alte Ossingerstrasse, Flums",08:00,,,47.0942898,9.3420843,47.6225235,8.6784501,Gartenstrasse,Alte Ossingerstrasse,TRANSIT|WALK,street-to-street
+40,"Rue du Bordamon, Boulens to Dagerdinge, Boulens",08:00,,,46.6821336,6.7184999,47.0738458,7.7894578,Rue du Bordamon,Dagerdinge,TRANSIT|WALK,street-to-street
+41,"Altweg, Arni AG to Riedstrasse, Arni AG",08:00,,,47.3206093,8.426571,47.3275097,9.4046603,Altweg,Riedstrasse,TRANSIT|WALK,street-to-street
+42,"Oertli, Gunten to Route des Carolins, Gunten",08:00,,,46.7171372,7.6893197,46.2225009,7.3643828,Oertli,Route des Carolins,TRANSIT|WALK,street-to-street
+43,"Grosswis, Winkel to Ateliergasse, Winkel",08:00,,,47.479002,8.5633966,47.3914749,8.1737609,Grosswis,Ateliergasse,TRANSIT|WALK,street-to-street
+44,"Luanna, Fidaz to Via Municipio, Fidaz",08:00,,,46.8397401,9.3188445,46.134217,8.807379,Luanna,Via Municipio,TRANSIT|WALK,street-to-street
+45,"Niderdorf, Hinteregg to Rietwies, Hinteregg",08:00,,,47.307132,8.6869634,47.2162625,9.0408648,Niderdorf,Rietwies,TRANSIT|WALK,street-to-street
+46,"Allmeindstrasse, Wangen SZ to Arisdörferstrasse, Wangen SZ",08:00,,,47.1920396,8.8824042,47.4843293,7.7481306,Allmeindstrasse,Arisdörferstrasse,TRANSIT|WALK,street-to-street
+47,"Chemin des Usses, Collonge-Bellerive to Sanatoriumstrasse, Collonge-Bellerive",08:00,,,46.2642585,6.2114158,47.2782929,8.923674,Chemin des Usses,Sanatoriumstrasse,TRANSIT|WALK,street-to-street
+48,"Austrasse, Trachslau to Via Surrein, Trachslau",08:00,,,47.115234,8.7355681,46.7333844,8.956049,Austrasse,Via Surrein,TRANSIT|WALK,street-to-street
+49,"Wispilenstrasse, Gstaad to Buchenweg, Gstaad",08:00,,,46.4650905,7.2896023,47.4583848,7.5842711,Wispilenstrasse,Buchenweg,TRANSIT|WALK,street-to-street
+50,"Wassermattweg, Neuenegg to Avrona, Neuenegg",08:00,,,46.8938893,7.3063189,46.7805855,10.291419,Wassermattweg,Avrona,TRANSIT|WALK,street-to-street
+51,"Chemin du Levant, Crissier to Dorf, Crissier",08:00,,,46.5458605,6.5797366,47.1821119,7.8813382,Chemin du Levant,Dorf,TRANSIT|WALK,street-to-street
+52,"Adelrainstrasse, Frutigen to Derrière les Neufs Prés, Frutigen",08:00,,,46.5716493,7.6447582,47.3286005,7.3350594,Adelrainstrasse,Derrière les Neufs Prés,TRANSIT|WALK,street-to-street
+53,"Gärtlerweg, Münchwilen AG to Chemin des Pilouvis, Münchwilen AG",08:00,,,47.5401534,7.9623606,47.0798802,7.0689476,Gärtlerweg,Chemin des Pilouvis,TRANSIT|WALK,street-to-street
+54,"Gempenring, Dornach to Widenbüelstrasse, Dornach",08:00,,,47.4766267,7.6122955,47.3103483,8.7237807,Gempenring,Widenbüelstrasse,TRANSIT|WALK,street-to-street
+55,"Sonnenstrasse, Port to Route du Raffort, Port",08:00,,,47.1133901,7.2588924,46.6070949,6.5629546,Sonnenstrasse,Route du Raffort,TRANSIT|WALK,street-to-street
+56,"Schulstrasse, Weinfelden to Chemin de Grange-Grèche, Weinfelden",08:00,,,47.5674704,9.1071683,46.4532488,6.2659846,Schulstrasse,Chemin de Grange-Grèche,TRANSIT|WALK,street-to-street
+57,"In der Pünt, Tagelswangen to Rue de l'Eglise, Tagelswangen",08:00,,,47.4297438,8.6749102,46.2385522,7.291944,In der Pünt,Rue de l'Eglise,TRANSIT|WALK,street-to-street
+58,"Heuweg, Boniswil to Route de Fribourg, Boniswil",08:00,,,47.3161708,8.190675,46.8754558,7.0588896,Heuweg,Route de Fribourg,TRANSIT|WALK,street-to-street
+59,"Hauptstrasse, Jaun to Bühlstrasse, Jaun",08:00,,,46.611449,7.2771127,47.3298276,8.5772938,Hauptstrasse,Bühlstrasse,TRANSIT|WALK,street-to-street
+60,"Fineta, Cordast to Hauptstrasse, Cordast",08:00,,,46.8714571,7.1525304,46.3173207,7.9597491,Fineta,Hauptstrasse,TRANSIT|WALK,street-to-street
+61,"Lättenstrasse, Aeugst am Albis to Zugerstrasse, Aeugst am Albis",08:00,,,47.2684736,8.4831056,47.1377829,8.5814564,Lättenstrasse,Zugerstrasse,TRANSIT|WALK,street-to-street
+62,"Burggasse, Lüchingen to Buchholzweg, Lüchingen",08:00,,,47.3904863,9.5530966,47.0077367,7.1633177,Burggasse,Buchholzweg,TRANSIT|WALK,street-to-street
+63,"Stempach, Roggliswil to Hübel, Roggliswil",08:00,,,47.2143762,7.8676173,47.5135283,7.7651159,Stempach,Hübel,TRANSIT|WALK,street-to-street
+64,"Brunnenweg, Rünenberg to Iglingerhof, Rünenberg",08:00,,,47.4333419,7.8848869,47.5101603,7.822092,Brunnenweg,Iglingerhof,TRANSIT|WALK,street-to-street
+65,"Ruelle du Betty, Orsières to Bahnhofstrasse, Orsières",08:00,,,46.0331877,7.1457476,47.473316,9.415457,Ruelle du Betty,Bahnhofstrasse,TRANSIT|WALK,street-to-street
+66,"Rossweid, Bürglen TG to Spitalsheimbergweg, Bürglen TG",08:00,,,47.5476397,9.1682949,46.8063478,7.6157086,Rossweid,Spitalsheimbergweg,TRANSIT|WALK,street-to-street
+67,"Brühlstrasse, Muhen to Ryn, Muhen",08:00,,,47.3415149,8.0574049,47.2051721,8.1915867,Brühlstrasse,Ryn,TRANSIT|WALK,street-to-street
+69,"Bachmatte, Oberstocken to Böcklinstrasse, Oberstocken",08:00,,,46.7184647,7.5533236,47.3630218,8.5619224,Bachmatte,Böcklinstrasse,TRANSIT|WALK,street-to-street
+70,"Allmendingen-Allee, Thun to Wildhus, Thun",08:00,,,46.7448367,7.6007356,47.4225647,9.2587516,Allmendingen-Allee,Wildhus,TRANSIT|WALK,street-to-street
+71,"Hauptstrasse, Ziefen to Wasenstrasse, Ziefen",08:00,,,47.4323241,7.713304,46.3391488,8.0095858,Hauptstrasse,Wasenstrasse,TRANSIT|WALK,street-to-street
+72,"Via Valmaggina, Cevio to el Rïaa, Cevio",08:00,,,46.319495,8.6018287,46.1865669,8.9943843,Via Valmaggina,el Rïaa,TRANSIT|WALK,street-to-street
+73,"Bucheggweg, Thun to Moosbrunnenstrasse, Thun",08:00,,,46.7361619,7.6115254,47.4893947,8.5908981,Bucheggweg,Moosbrunnenstrasse,TRANSIT|WALK,street-to-street
+74,"Kirchbühlstrasse, Muri AG to Bachmatte, Muri AG",08:00,,,47.2707595,8.3388407,46.6618605,7.5517328,Kirchbühlstrasse,Bachmatte,TRANSIT|WALK,street-to-street
+75,"Via al Casello, Pollegio to Avenue de la Fusion, Pollegio",08:00,,,46.3642972,8.9424576,46.0949418,7.0617837,Via al Casello,Avenue de la Fusion,TRANSIT|WALK,street-to-street
+77,"Seestrasse, Vitznau to Via da Sottsassa, Vitznau",08:00,,,47.008848,8.4829294,46.3251616,10.0597898,Seestrasse,Via da Sottsassa,TRANSIT|WALK,street-to-street
+78,"Mittelstrasse, Zürich to Mont Girod, Zürich",08:00,,,47.3573269,8.5521825,47.2539488,7.3049468,Mittelstrasse,Mont Girod,TRANSIT|WALK,street-to-street
+80,"Krattigstrasse, Leissigen to Hauptstrasse, Leissigen",08:00,,,46.6547402,7.7664264,47.176595,7.5974092,Krattigstrasse,Hauptstrasse,TRANSIT|WALK,street-to-street
+81,"Via San Gottardo, Balerna to Via della Pieve, Balerna",08:00,,,45.8419984,9.0142002,46.064959,8.9568604,Via San Gottardo,Via della Pieve,TRANSIT|WALK,street-to-street
+82,"Spycherstrasse, Oberwil (Dägerlen) to Mürtschenstrasse, Oberwil (Dägerlen)",08:00,,,47.5727939,8.7151197,47.2649703,8.9294649,Spycherstrasse,Mürtschenstrasse,TRANSIT|WALK,street-to-street
+83,"Chemin de Perruet, Bex to Kübachstrasse, Bex",08:00,,,46.2506218,7.0048981,47.4271471,9.6109059,Chemin de Perruet,Kübachstrasse,TRANSIT|WALK,street-to-street
+84,"Säge, Eriswil to Wolfwilerstrasse, Eriswil",08:00,,,47.0790673,7.8494313,47.2743744,7.8293226,Säge,Wolfwilerstrasse,TRANSIT|WALK,street-to-street
+85,"Rieslingstrasse, Ettingen to Rue de la Patinoire, Ettingen",08:00,,,47.486276,7.5455121,47.1538371,7.275523,Rieslingstrasse,Rue de la Patinoire,TRANSIT|WALK,street-to-street
+87,"al Vial dal Lisciándro, Giumaglio to Wattenwilweg, Giumaglio",08:00,,,46.275011,8.6815387,46.7382249,7.6207297,al Vial dal Lisciándro,Wattenwilweg,TRANSIT|WALK,street-to-street
+88,"Route des Grands-Bois, Epagny to Avenue Charles Ferdinand Ramuz, Epagny",08:00,,,46.5978542,7.0912362,46.5099654,6.6515667,Route des Grands-Bois,Avenue Charles Ferdinand Ramuz,TRANSIT|WALK,street-to-street
+89,"Aarburgerstrasse, Boningen to Früehof, Boningen",08:00,,,47.3102341,7.8598915,47.3242551,9.1977077,Aarburgerstrasse,Früehof,TRANSIT|WALK,street-to-street
+90,"Chemin de Trembley, Prangins to Lärchhof, Prangins",08:00,,,46.3907406,6.2436604,47.5603177,8.521003,Chemin de Trembley,Lärchhof,TRANSIT|WALK,street-to-street
+91,"Juonweg, Brig to Gibriststrasse, Brig",08:00,,,46.3180491,7.9973474,47.5745475,8.2024177,Juonweg,Gibriststrasse,TRANSIT|WALK,street-to-street
+92,"Vogelherd, Gettnau to Steinrieselnstrasse, Gettnau",08:00,,,47.1357195,7.9711538,47.3862823,9.2909244,Vogelherd,Steinrieselnstrasse,TRANSIT|WALK,street-to-street
+93,"Nebione, Castel San Pietro to Lungolago P. Roncaioli, Castel San Pietro",08:00,,,45.8528963,9.0084722,45.9254931,8.9357259,Nebione,Lungolago P. Roncaioli,TRANSIT|WALK,street-to-street
+94,"Hägelstrasse, Hüttikon to Lupsingerstrasse, Hüttikon",08:00,,,47.4440118,8.3891324,47.4327055,7.7037209,Hägelstrasse,Lupsingerstrasse,TRANSIT|WALK,street-to-street
+95,"Walter-Fürststrasse, Attinghausen to Birrwilerstrasse, Attinghausen",08:00,,,46.8622809,8.6269854,47.3088385,8.1758896,Walter-Fürststrasse,Birrwilerstrasse,TRANSIT|WALK,street-to-street
+96,"Bergwerkstrasse, Herznach to Route Sur Cou, Herznach",08:00,,,47.4733008,8.0446445,46.1847154,6.8654189,Bergwerkstrasse,Route Sur Cou,TRANSIT|WALK,street-to-street
+97,"Allmendstrasse, Mühlethurnen to Amselweg, Mühlethurnen",08:00,,,46.8163543,7.5139686,47.4693603,7.591072,Allmendstrasse,Amselweg,TRANSIT|WALK,street-to-street
+98,"Säntisstrasse, Balgach to Via Lugano, Balgach",08:00,,,47.403362,9.6054944,46.0473199,8.9471618,Säntisstrasse,Via Lugano,TRANSIT|WALK,street-to-street
+100,"Hildisrieden, Dorf to Ascona, Albergo Ascona",08:00,8589987,8591509,47.1513052269666,8.22815477864949,46.158901722937,8.76988381081317,"Hildisrieden, Dorf","Ascona, Albergo Ascona",TRANSIT|WALK,stop-to-stop
+101,"Windisch, Habsburgstrasse to Romont FR, La Halle",08:00,8500786,8577688,47.4737992437562,8.20871523589844,46.679726044045,6.90847572717716,"Windisch, Habsburgstrasse","Romont FR, La Halle",TRANSIT|WALK,stop-to-stop
+102,"Savigny, Clair-Matin to Villy, village",08:00,8592229,8504447,46.5502319035569,6.74698558852852,46.2831630876127,6.99676215331272,"Savigny, Clair-Matin","Villy, village",TRANSIT|WALK,stop-to-stop
+103,"Würenlingen, Sonne to Unterhörstetten, Dorf",08:00,8580164,8506978,47.5324216264835,8.25292133103611,47.6182584980276,8.97915533943079,"Würenlingen, Sonne","Unterhörstetten, Dorf",TRANSIT|WALK,stop-to-stop
+104,"Aigle-Place-du-Marché to Däniken, Hogenweid",08:00,8501554,8583099,46.3172417659187,6.97034270080309,47.3512094618268,7.96881115608808,Aigle-Place-du-Marché,"Däniken, Hogenweid",TRANSIT|WALK,stop-to-stop
+105,"Burgdorf, Gyri Ost to Biogno, Paese",08:00,8588909,8575854,47.064136063233,7.63189800873216,45.9972466240269,8.84172208409422,"Burgdorf, Gyri Ost","Biogno, Paese",TRANSIT|WALK,stop-to-stop
+107,"La Sagne-Eglise to Ollon VD, Valerette",08:00,8504384,8505196,47.0508987258012,6.81851843461291,46.2921952892287,6.99404025800146,La Sagne-Eglise,"Ollon VD, Valerette",TRANSIT|WALK,stop-to-stop
+108,"Chur, Salvatorenstrasse to Delémont, Righi",08:00,8594981,8571967,46.8498431498875,9.51486565919004,47.3633802761019,7.35624996376171,"Chur, Salvatorenstrasse","Delémont, Righi",TRANSIT|WALK,stop-to-stop
+109,"Sierre, Résidence Plantzette to Euseigne, Ritzé",08:00,8594634,8570901,46.288383943859,7.53900322518843,46.1540979153624,7.45129172083479,"Sierre, Résidence Plantzette","Euseigne, Ritzé",TRANSIT|WALK,stop-to-stop
+110,"Schmerikon, Mürtschenstrasse to Brenles, village",08:00,8573856,8504696,47.2268884806352,8.95463133217091,46.6718859815305,6.85310357305633,"Schmerikon, Mürtschenstrasse","Brenles, village",TRANSIT|WALK,stop-to-stop
+112,"Zuchwil, Kornfeld to Paradiso, La Sguancia",08:00,8500467,8575541,47.2051970111037,7.55913447070835,45.987185970674,8.93904556198927,"Zuchwil, Kornfeld","Paradiso, La Sguancia",TRANSIT|WALK,stop-to-stop
+113,"Sierre, Itagne to Maladers, Schule",08:00,8594632,8583391,46.2870492895451,7.53135856211951,46.8361655497456,9.56150618874802,"Sierre, Itagne","Maladers, Schule",TRANSIT|WALK,stop-to-stop
+114,"Zürich, Friedackerstrasse to Emmetten (Niederbauenbahn)",08:00,8591140,8530385,47.4059377800205,8.5531921979477,46.9558828469888,8.5190113013822,"Zürich, Friedackerstrasse",Emmetten (Niederbauenbahn),TRANSIT|WALK,stop-to-stop
+115,"Vaduz, Schalunstrasse to Boécourt, Pâquerettes",08:00,8508146,8505035,47.1547812052105,9.51477582766161,47.3526761937075,7.21272613079796,"Vaduz, Schalunstrasse","Boécourt, Pâquerettes",TRANSIT|WALK,stop-to-stop
+117,"Wilen bei Wil, Lerchenfeld to Schwarzenburg, Waldgasse",08:00,8578823,8571667,47.453399578363,9.03804888946586,46.8033952002185,7.32658759307596,"Wilen bei Wil, Lerchenfeld","Schwarzenburg, Waldgasse",TRANSIT|WALK,stop-to-stop
+118,"Wattwil, Rietwis to Lützelflüh-Goldbach, Bahnhof",08:00,8578584,8571765,47.2955287382696,9.09415766211978,47.0050843106562,7.68189823745321,"Wattwil, Rietwis","Lützelflüh-Goldbach, Bahnhof",TRANSIT|WALK,stop-to-stop
+119,"Neuheim, Hinterburg to Puidoux, village",08:00,8577570,8570569,47.1977387098186,8.57055663239215,46.5007801838709,6.78261277270166,"Neuheim, Hinterburg","Puidoux, village",TRANSIT|WALK,stop-to-stop
+120,"Les Genevez JU, bif.Le Prédame to Benzenschwil, Bahnhof",08:00,8500885,8572636,47.253674803142,7.11281550488428,47.248034456132,8.36386326864032,"Les Genevez JU, bif.Le Prédame","Benzenschwil, Bahnhof",TRANSIT|WALK,stop-to-stop
+121,"La Roche FR, La Berra to Wengen",08:00,8595973,Parent8507372,46.6866960877153,7.15486564333977,46.6049032845108,7.92100281666059,"La Roche FR, La Berra",Wengen,TRANSIT|WALK,stop-to-stop
+122,"Münsingen, Zwischengiesse to Oberdorf SO, Dorfplatz",08:00,8578967,8578058,46.8710347061394,7.54947758140272,47.2298349070139,7.50375333343467,"Münsingen, Zwischengiesse","Oberdorf SO, Dorfplatz",TRANSIT|WALK,stop-to-stop
+123,"Erlinsbach, Sagi to Effingen, Schwerzbrünneli",08:00,8578651,8572457,47.4080535061833,8.00447427287259,47.4871801354505,8.10024366532591,"Erlinsbach, Sagi","Effingen, Schwerzbrünneli",TRANSIT|WALK,stop-to-stop
+124,"Schwarzsee, Bad to Thierrens, La Croix",08:00,8577851,8570355,46.665992858803,7.27478175063357,46.7013111543557,6.75904097964308,"Schwarzsee, Bad","Thierrens, La Croix",TRANSIT|WALK,stop-to-stop
+125,"Vaduz, Ebenholz/Universität to Thalwil, Ebnet",08:00,8509614,8503791,47.1494296926094,9.51205393235035,47.2883695343036,8.55718970096259,"Vaduz, Ebenholz/Universität","Thalwil, Ebnet",TRANSIT|WALK,stop-to-stop
+126,"Beckenried (See) to Balerna, Rimessa AMSA",08:00,8508467,8591482,46.9669736757386,8.4756047068475,45.8401497274471,9.01874409400745,Beckenried (See),"Balerna, Rimessa AMSA",TRANSIT|WALK,stop-to-stop
+127,"Wald ZH, Abzw. Oberholz to Wattwil, Vorderer Hummelwald",08:00,8573600,8503976,47.2787228786315,8.93220938267617,47.2851460529022,9.0815273492233,"Wald ZH, Abzw. Oberholz","Wattwil, Vorderer Hummelwald",TRANSIT|WALK,stop-to-stop
+128,"Mendrisio, Morgana to Ipsach, Bahnweg",08:00,8591494,8583217,45.8776301286967,8.98661135629002,47.1164718084418,7.23574995153314,"Mendrisio, Morgana","Ipsach, Bahnweg",TRANSIT|WALK,stop-to-stop
+129,"St. Gallen, Vogelherd to Haute-Nendaz, télécabine",08:00,8589639,8501259,47.4339764081287,9.41516164579173,46.180513667519,7.29151736437905,"St. Gallen, Vogelherd","Haute-Nendaz, télécabine",TRANSIT|WALK,stop-to-stop
+132,"Murg West (See) to St-Ursanne, l'écluse",08:00,8530666,8582940,47.1132256387117,9.21116322789264,47.3667815167179,7.16092927150842,Murg West (See),"St-Ursanne, l'écluse",TRANSIT|WALK,stop-to-stop
+133,"Mairengo, Paese to Lumino, Al Dazio",08:00,8575717,8575227,46.4890116992658,8.78813757738903,46.2304610961744,9.07319996653835,"Mairengo, Paese","Lumino, Al Dazio",TRANSIT|WALK,stop-to-stop
+134,"Preonzo, Piazza to Balsthal, Brauerei",08:00,8575194,8572316,46.2625355304267,9.00212526124892,47.3190102146404,7.69948725071872,"Preonzo, Piazza","Balsthal, Brauerei",TRANSIT|WALK,stop-to-stop
+135,"Oberhof, Benkenhöfe to Eschenz, Bornhausen",08:00,8572405,8506719,47.4440989800393,8.02874675185288,47.6268744047102,8.87859792651245,"Oberhof, Benkenhöfe","Eschenz, Bornhausen",TRANSIT|WALK,stop-to-stop
+136,"Genève, Goulart to Hermrigen, Dorf",08:00,8592831,8571212,46.207538415511,6.14144922172494,47.0810833793667,7.24378089017429,"Genève, Goulart","Hermrigen, Dorf",TRANSIT|WALK,stop-to-stop
+137,"Kloten, Wohnheim to Mendrisio, Stand di Tiro",08:00,8580438,8505923,47.4536243275317,8.59325705962501,45.8778615265555,8.97748447300209,"Kloten, Wohnheim","Mendrisio, Stand di Tiro",TRANSIT|WALK,stop-to-stop
+138,"Balsthal, Post to Blonay, Antiquaire",08:00,8572314,8593905,47.313949330869,7.69352243723134,46.4625588772231,6.88692514350814,"Balsthal, Post","Blonay, Antiquaire",TRANSIT|WALK,stop-to-stop
+139,"Bolken, Dorf to Eschenbach SG, Säge",08:00,8500477,8578538,47.1938748731072,7.66344684151483,47.2357394672346,8.91687514077412,"Bolken, Dorf","Eschenbach SG, Säge",TRANSIT|WALK,stop-to-stop
+140,"Buchs SG, Sekundarschule to Maladers, Sax",08:00,8591461,8574715,47.1612010874275,9.47223161579979,46.8389800035748,9.57605889635278,"Buchs SG, Sekundarschule","Maladers, Sax",TRANSIT|WALK,stop-to-stop
+141,"Collonge-Bellerive, Bois-Caran to Küttigen, Aabach",08:00,8592725,8578660,46.2483239560402,6.20081887886066,47.4068862194991,8.05843607199716,"Collonge-Bellerive, Bois-Caran","Küttigen, Aabach",TRANSIT|WALK,stop-to-stop
+142,"Flumserberg Saxli, Rutz to Vessy, Plateau de Pinchat",08:00,8574771,8587036,47.0759324548208,9.34807546036435,46.1717243415511,6.14247330114898,"Flumserberg Saxli, Rutz","Vessy, Plateau de Pinchat",TRANSIT|WALK,stop-to-stop
+143,"Zollikon, Bahnhof to Fribourg, Jura Chassotte",08:00,8576184,8592379,47.337763534695,8.56977509809486,46.8108657203812,7.13941462045076,"Zollikon, Bahnhof","Fribourg, Jura Chassotte",TRANSIT|WALK,stop-to-stop
+144,"Gy, La Chêna to Ravecchia, Belsoggiorno",08:00,8592955,8583026,46.2495912214885,6.25469084645681,46.1861983006762,9.02347821555542,"Gy, La Chêna","Ravecchia, Belsoggiorno",TRANSIT|WALK,stop-to-stop
+145,"La Plaine, gare to Selkingen",08:00,8587073,8579352,46.1784921847432,5.99976693509389,46.4537033421229,8.21369190257315,"La Plaine, gare",Selkingen,TRANSIT|WALK,stop-to-stop
+146,"Sattel (Talstat. Hochstuckli) to Brissago, S. Giorgio",08:00,8530411,8587114,47.078403981947,8.63437295018488,46.111423949577,8.70216880468682,Sattel (Talstat. Hochstuckli),"Brissago, S. Giorgio",TRANSIT|WALK,stop-to-stop
+147,"Gossau SG, Eichen to Piotta, Bivio Funicolare Ritom",08:00,8590327,8581686,47.4180412609853,9.23555248785988,46.5172690923574,8.67193151221915,"Gossau SG, Eichen","Piotta, Bivio Funicolare Ritom",TRANSIT|WALK,stop-to-stop
+148,"Meiringen, Bahnhof to Balterswil, Rietwies",08:00,8571581,8587256,46.7274137248837,8.18495479663017,47.4544929436672,8.93958455115982,"Meiringen, Bahnhof","Balterswil, Rietwies",TRANSIT|WALK,stop-to-stop
+149,"Altstätten SG, Tannenbaum to Biberegg",08:00,8578471,8503290,47.3870262239484,9.52213302983958,47.0933224742349,8.66913775168515,"Altstätten SG, Tannenbaum",Biberegg,TRANSIT|WALK,stop-to-stop
+150,"Fribourg, Champ-des-Fontaines to Altdorf UR, Allmend",08:00,8592369,8573089,46.8090642824664,7.14248685872287,46.8830272621613,8.62717744475808,"Fribourg, Champ-des-Fontaines","Altdorf UR, Allmend",TRANSIT|WALK,stop-to-stop
+151,"Affoltern a.A., Stigeli to Wallisellen, Zielacker",08:00,8502574,8590900,47.2784669105587,8.45910265507593,47.4145764602134,8.60488125940313,"Affoltern a.A., Stigeli","Wallisellen, Zielacker",TRANSIT|WALK,stop-to-stop
+152,"Hauteville, Le Ruz to Bex, Pont-Neuf",08:00,8504930,8510820,46.6786043438254,7.11660639538379,46.2503552938602,7.02017224962013,"Hauteville, Le Ruz","Bex, Pont-Neuf",TRANSIT|WALK,stop-to-stop
+153,"Frauenfeld, Mittelrüti to Arth, Feld",08:00,8594740,8577406,47.5517174824385,8.91718056797076,47.0590508174806,8.53063550116032,"Frauenfeld, Mittelrüti","Arth, Feld",TRANSIT|WALK,stop-to-stop
+154,"Montana (télécab. rte Vermala) to Choëx, ch. de la Montagne",08:00,8530163,8509015,46.3128737308505,7.47918441041058,46.2348170634987,6.94867533614711,Montana (télécab. rte Vermala),"Choëx, ch. de la Montagne",TRANSIT|WALK,stop-to-stop
+155,"St. Gallen, Gröblistrasse to Mairengo, Campasc",08:00,8589578,8580129,47.4078224827469,9.33603803555547,46.4863892622245,8.79288966524268,"St. Gallen, Gröblistrasse","Mairengo, Campasc",TRANSIT|WALK,stop-to-stop
+156,"Maschwanden, Dorf to Indemini, Pezze",08:00,8502882,8575542,47.2349160401508,8.42645787764648,46.0989734834629,8.83278384701598,"Maschwanden, Dorf","Indemini, Pezze",TRANSIT|WALK,stop-to-stop
+157,"Castagnola, S. Michele to Vex, Sindy",08:00,8591594,8570893,46.0035554430503,8.97389121186512,46.2209215009693,7.39956672676799,"Castagnola, S. Michele","Vex, Sindy",TRANSIT|WALK,stop-to-stop
+158,"Wädenswil, Hintere Rüti Ost to Heiden, Waldegg Heiden",08:00,8595520,8574079,47.23523931305,8.63606178291926,47.4353922271018,9.52645392635679,"Wädenswil, Hintere Rüti Ost","Heiden, Waldegg Heiden",TRANSIT|WALK,stop-to-stop
+159,"Neumühle, Dorf to Simplon Dorf, Eggen",08:00,8588633,8571180,46.967396663488,7.75197581277713,46.2049583933784,8.04329945945764,"Neumühle, Dorf","Simplon Dorf, Eggen",TRANSIT|WALK,stop-to-stop
+160,"Echallens, collège/parc to Saanenmöser, Mösching",08:00,8580485,8581097,46.6389107580625,6.64843141869405,46.5125337573899,7.30183900699502,"Echallens, collège/parc","Saanenmöser, Mösching",TRANSIT|WALK,stop-to-stop
+161,"Canobbio, Paese to Says, Büel",08:00,8594259,8574918,46.0360553604468,8.96325515889966,46.9035490063291,9.57550194087655,"Canobbio, Paese","Says, Büel",TRANSIT|WALK,stop-to-stop
+162,"Rindal, Landhaus to Premier, village",08:00,8573974,8570228,47.4053419567425,9.12135864892671,46.703479663645,6.44664285639419,"Rindal, Landhaus","Premier, village",TRANSIT|WALK,stop-to-stop
+163,"Thayngen, Schule to Ferrera, Plan Davains",08:00,8595531,8576261,47.7493291916392,8.70965177100458,46.5419961658391,9.43568815003672,"Thayngen, Schule","Ferrera, Plan Davains",TRANSIT|WALK,stop-to-stop
+164,"Corban, bas du village to Uitikon Waldegg, Bahnhof",08:00,8571977,8575014,47.3471924770421,7.4743424910285,47.3662217569523,8.46503153595194,"Corban, bas du village","Uitikon Waldegg, Bahnhof",TRANSIT|WALK,stop-to-stop
+165,"Ristis (Brunni-Bahnen) to Goumoens-la-Ville, Eclagnens",08:00,8508368,8570189,46.8320787986949,8.40714409903522,46.6568066897676,6.60245564244641,Ristis (Brunni-Bahnen),"Goumoens-la-Ville, Eclagnens",TRANSIT|WALK,stop-to-stop
+166,"Cormondrèche, Prieuré to Horgen, Dorfgasse",08:00,8593542,8590651,46.9824013687965,6.87095309775427,47.2601010177207,8.59901526059702,"Cormondrèche, Prieuré","Horgen, Dorfgasse",TRANSIT|WALK,stop-to-stop
+167,"Luc (Ayent), centre to Baar, Grund",08:00,8570807,8589202,46.2839018596816,7.41953627553674,47.1927333698816,8.52993481523861,"Luc (Ayent), centre","Baar, Grund",TRANSIT|WALK,stop-to-stop
+168,"Volketswil, Wallberg to Basel, Friedrich-Miescher-Str.",08:00,8576129,8578146,47.3894650404757,8.68706812475867,47.5738789377083,7.5648387727633,"Volketswil, Wallberg","Basel, Friedrich-Miescher-Str.",TRANSIT|WALK,stop-to-stop
+169,"Bassecourt, Paddock to Ausserberg, Giblätt",08:00,8505024,8571083,47.3351518642357,7.2366931825816,46.3092251616197,7.84601145673185,"Bassecourt, Paddock","Ausserberg, Giblätt",TRANSIT|WALK,stop-to-stop
+170,"Seengen, Unterdorf to Zugerberg",08:00,8507903,8502292,47.3238818469886,8.20428654154711,47.1440898610408,8.53282739045388,"Seengen, Unterdorf",Zugerberg,TRANSIT|WALK,stop-to-stop
+171,"Küsnacht ZH, Oberwacht to Lengnau BE, Rado",08:00,8576216,8577949,47.3193999617596,8.58450746875647,47.1805843012286,7.36277173272533,"Küsnacht ZH, Oberwacht","Lengnau BE, Rado",TRANSIT|WALK,stop-to-stop
+172,"Ascona, Baraggie to Oberbottigen, Chäs und Brot",08:00,8591512,8571439,46.1588395001312,8.77221044739937,46.9356510323124,7.35536961478315,"Ascona, Baraggie","Oberbottigen, Chäs und Brot",TRANSIT|WALK,stop-to-stop
+173,"Orbe, Montchoisi to Schaffhausen, Pilgerbrunnen",08:00,8570247,8588885,46.7321179890558,6.53170433065931,47.713662553412,8.63093240264623,"Orbe, Montchoisi","Schaffhausen, Pilgerbrunnen",TRANSIT|WALK,stop-to-stop
+174,"Wikon, Hotel Adelboden to Immensee, Dorf",08:00,8502374,8587771,47.2684770941892,7.96188514524656,47.0978235028704,8.46232760694636,"Wikon, Hotel Adelboden","Immensee, Dorf",TRANSIT|WALK,stop-to-stop
+175,"Camuns, vitg to Nottwil, Abzw. Bahnhof",08:00,8575044,8577330,46.7033626156515,9.19712255999989,47.1361035513784,8.13507134889607,"Camuns, vitg","Nottwil, Abzw. Bahnhof",TRANSIT|WALK,stop-to-stop
+176,"Grubenwald, Cholplatz to Rolle, déchetterie",08:00,8594785,8583530,46.5799640661851,7.38820303842229,46.4631343443393,6.32541520878539,"Grubenwald, Cholplatz","Rolle, déchetterie",TRANSIT|WALK,stop-to-stop
+177,"Bort (Firstbahn) to Erlenbach ZH, Bahnhofstrasse",08:00,8507352,8587966,46.6467432693028,8.0517346399767,47.3037895597272,8.59134364806957,Bort (Firstbahn),"Erlenbach ZH, Bahnhofstrasse",TRANSIT|WALK,stop-to-stop
+178,"Soral, village to Bottmingen, Bodenackerstrasse",08:00,8595044,8588067,46.1442089656157,6.04346099051954,47.5266472559549,7.58279609529535,"Soral, village","Bottmingen, Bodenackerstrasse",TRANSIT|WALK,stop-to-stop
+179,"Itschnach, Rebweg to Porsel, Les Bois",08:00,8590668,8577676,47.3265914980472,8.59808999585425,46.6026135526596,6.87119564288102,"Itschnach, Rebweg","Porsel, Les Bois",TRANSIT|WALK,stop-to-stop
+180,"Schwyz, Grundstrasse to Therwil, Känelmatt",08:00,8592410,8588795,47.0137517735576,8.65789982747925,47.495083217035,7.55468781005134,"Schwyz, Grundstrasse","Therwil, Känelmatt",TRANSIT|WALK,stop-to-stop
+181,"Antagnes, Le Boët to Gstaad (Talstation Wispile)",08:00,8504439,8530288,46.2809777539312,7.00884449388581,46.4636417404062,7.2848608481228,"Antagnes, Le Boët",Gstaad (Talstation Wispile),TRANSIT|WALK,stop-to-stop
+182,"St. Margrethen SG, Rheinpark to Vucherens, Closy",08:00,8506445,8591934,47.4495847702884,9.65148144761795,46.6282332808017,6.78303498088525,"St. Margrethen SG, Rheinpark","Vucherens, Closy",TRANSIT|WALK,stop-to-stop
+183,"Pizy, village to Schwyz, Grossfeld",08:00,8583896,8588120,46.4918752066264,6.35510452892967,47.0270411927194,8.64189184911401,"Pizy, village","Schwyz, Grossfeld",TRANSIT|WALK,stop-to-stop
+184,"Rueyres-les-Prés, bif. to Döttingen, Bahnhof",08:00,8577639,8572494,46.8660170557593,6.91285950576428,47.5756485402434,8.25580492309854,"Rueyres-les-Prés, bif.","Döttingen, Bahnhof",TRANSIT|WALK,stop-to-stop
+185,"Moutier, Neusté to Genestrerio, Piazza",08:00,8581147,8575608,47.2805877514994,7.36701178086696,45.8550047730149,8.96072190979809,"Moutier, Neusté","Genestrerio, Piazza",TRANSIT|WALK,stop-to-stop
+186,"Vuisternens-dt-Romont, forge to Schaan, Zollstrasse",08:00,8577673,8574386,46.6434685541208,6.93994371158425,47.1685607020042,9.50152567721901,"Vuisternens-dt-Romont, forge","Schaan, Zollstrasse",TRANSIT|WALK,stop-to-stop
+187,"Romoos, Talherrenburg to Adelboden, Schreiner Bärtschi",08:00,8572854,8592315,47.0082451879783,8.02185667362272,46.487372690931,7.53426012048762,"Romoos, Talherrenburg","Adelboden, Schreiner Bärtschi",TRANSIT|WALK,stop-to-stop
+188,"Basse-Nendaz, La Poya to Wädenswil, Mugern",08:00,8570860,8573583,46.1890155213541,7.30819009605463,47.2176516231191,8.6351814339407,"Basse-Nendaz, La Poya","Wädenswil, Mugern",TRANSIT|WALK,stop-to-stop
+189,"Wagen, alte Post to Davos Platz, Horlauben",08:00,8578537,8592601,47.2310488114402,8.88961127189729,46.8013659908853,9.83269858990861,"Wagen, alte Post","Davos Platz, Horlauben",TRANSIT|WALK,stop-to-stop
+190,"Egliswil, Waageplatz to Les Salines",08:00,8502678,8530067,47.3495661868217,8.18482004933753,46.2548401219499,7.02763724963221,"Egliswil, Waageplatz",Les Salines,TRANSIT|WALK,stop-to-stop
+193,"Kandersteg, Pfadizentrum to Lenzburg, Friedweg",08:00,8589517,8578750,46.4825543389455,7.66533330361174,47.384076382357,8.18067881587716,"Kandersteg, Pfadizentrum","Lenzburg, Friedweg",TRANSIT|WALK,stop-to-stop
+194,"Schaffhausen, Heuberg to Wassen, Pfaffensprung",08:00,8573462,8587430,47.715880723836,8.62088025461553,46.7142285158559,8.60837570585885,"Schaffhausen, Heuberg","Wassen, Pfaffensprung",TRANSIT|WALK,stop-to-stop
+195,"La Chaux-de-F, Armes-Réunies to Schafisheim, Milchgasse",08:00,8593658,8578702,47.0992789171391,6.82231830826527,47.3741734389936,8.14322805167701,"La Chaux-de-F, Armes-Réunies","Schafisheim, Milchgasse",TRANSIT|WALK,stop-to-stop
+196,"Endingen, Schöntal to Hemmiken, Junkerschloss",08:00,8572588,8580467,47.5330402713334,8.29661538646177,47.4884245551376,7.89994630639789,"Endingen, Schöntal","Hemmiken, Junkerschloss",TRANSIT|WALK,stop-to-stop
+197,"Biel-Benken BL, Unterdorf to Ostermundigen, Oberdorf",08:00,8578205,8590070,47.5062438383656,7.52503442251842,46.9541414577694,7.48542770163608,"Biel-Benken BL, Unterdorf","Ostermundigen, Oberdorf",TRANSIT|WALK,stop-to-stop
+198,"Castro, Molino di Castro to Uster, Buchholz",08:00,8578864,8503565,46.4669396995734,8.92868798676193,47.3584757756574,8.72887571808741,"Castro, Molino di Castro","Uster, Buchholz",TRANSIT|WALK,stop-to-stop

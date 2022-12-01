@@ -21,6 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
@@ -30,7 +31,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
