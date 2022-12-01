@@ -1,13 +1,10 @@
 package org.opentripplanner.gtfs.mapping;
 
-import java.util.List;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.model.TripStopTimes;
 
 /**
  * Create a valid Agency, Route and Trip
