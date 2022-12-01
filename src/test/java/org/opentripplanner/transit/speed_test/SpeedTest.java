@@ -63,7 +63,7 @@ public class SpeedTest {
   private SpeedTest(SpeedTestCmdLineOpts opts) {
     this.opts = opts;
     this.config = SpeedTestConfig.config(opts.rootDir());
-    
+
     var features = new OtpConfigLoader(opts.rootDir()).loadOtpConfig();
     OTPFeature.enableFeatures(features.otpFeatures);
     OTPFeature.logFeatureSetup();

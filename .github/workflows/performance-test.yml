@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - seattle-speed-test
 
 jobs:
   perf-test:
@@ -13,25 +14,29 @@ jobs:
       matrix:
         include:
 
-          - location: germany # all of Germany (500k stops, 200k patterns) but no OSM
-            iterations: 1
-            jfr-delay: "50s"
+#          - location: germany # all of Germany (500k stops, 200k patterns) but no OSM
+#            iterations: 1
+#            jfr-delay: "50s"
+#
+#          - location: norway
+#            iterations: 4
+#            jfr-delay: "35s"
+#
+#          - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
+#            iterations: 4
+#            jfr-delay: "50s"
+#
+#          - location: skanetrafiken
+#            iterations: 1
+#            jfr-delay: "50s"
+#
+#          - location: switzerland
+#            iterations: 4
+#            jfr-delay: "50s"
 
-          - location: norway
-            iterations: 4
-            jfr-delay: "35s"
-
-          - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
-            iterations: 4
-            jfr-delay: "50s"
-
-          - location: skanetrafiken
-            iterations: 1
-            jfr-delay: "50s"
-            
-          - location: switzerland
-            iterations: 4
-            jfr-delay: "50s"
+           - location: washington-state
+             iterations: 1
+             jfr-delay: "50s"
     steps:
       - uses: actions/checkout@v3.1.0
         with:
