@@ -442,7 +442,6 @@ Http headers.
       "transitGeneralizedCostLimit" : "3600 + 2.5 x",
       "bikeRentalDistanceRatio" : 0.3,
       "accessibilityScore" : true,
-      "flexOnlyToDestination" : true,
       "minBikeParkingDistance" : 300
     },
     "carDecelerationSpeed" : 2.9,
