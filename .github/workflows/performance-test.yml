@@ -61,6 +61,7 @@ jobs:
         run: |
           mkdir graph
           cp test/performance/${{ matrix.location }}/build-config.json graph/build-config.json
+          cp test/performance/${{ matrix.location }}/otp-config.json graph/otp-config.json
           cp target/otp-*-SNAPSHOT-shaded.jar otp.jar
           java -Xmx32G -jar otp.jar --build --save graph
 
