@@ -1,5 +1,13 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -8,9 +16,9 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPriority;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 public class TransferMapperTest {
 
@@ -66,21 +74,12 @@ public class TransferMapperTest {
 
   @BeforeEach
   void prepare() {
-    ROUTE_MAPPER =
-      new RouteMapper(
-        new AgencyMapper(FEED_ID),
-        DataImportIssueStore.noopIssueStore(),
-        new TranslationHelper()
-      );
+    ROUTE_MAPPER = new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper());
 
     TRIP_MAPPER =
-      new TripMapper(
-        ROUTE_MAPPER,
-        new DirectionMapper(DataImportIssueStore.noopIssueStore()),
-        TRANSLATION_HELPER
-      );
+      new TripMapper(ROUTE_MAPPER, new DirectionMapper(ISSUE_STORE), TRANSLATION_HELPER);
 
-    STATION_MAPPER = new StationMapper(TRANSLATION_HELPER);
+    STATION_MAPPER = new StationMapper(TRANSLATION_HELPER, StopTransferPriority.ALLOWED);
 
     STOP_TIME_MAPPER =
       new StopTimeMapper(
@@ -88,12 +87,8 @@ public class TransferMapperTest {
         LOCATION_MAPPER,
         LOCATION_GROUP_MAPPER,
         new TripMapper(
-          new RouteMapper(
-            new AgencyMapper(FEED_ID),
-            DataImportIssueStore.noopIssueStore(),
-            TRANSLATION_HELPER
-          ),
-          new DirectionMapper(DataImportIssueStore.noopIssueStore()),
+          new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, TRANSLATION_HELPER),
+          new DirectionMapper(ISSUE_STORE),
           TRANSLATION_HELPER
         ),
         BOOKING_RULE_MAPPER,
@@ -125,7 +120,7 @@ public class TransferMapperTest {
       TRIP_MAPPER,
       tripStopTimes,
       false,
-      DataImportIssueStore.noopIssueStore()
+      ISSUE_STORE
     );
     assertTrue(transferMapper.map(Collections.emptyList()).constrainedTransfers().isEmpty());
   }
@@ -141,7 +136,7 @@ public class TransferMapperTest {
       TRIP_MAPPER,
       tripStopTimes,
       false,
-      DataImportIssueStore.noopIssueStore()
+      ISSUE_STORE
     );
     assertEquals(
       1,
@@ -163,7 +158,7 @@ public class TransferMapperTest {
       TRIP_MAPPER,
       tripStopTimes,
       false,
-      DataImportIssueStore.noopIssueStore()
+      ISSUE_STORE
     );
     ConstrainedTransfer result = transferMapper.map(transfer);
 
@@ -185,7 +180,7 @@ public class TransferMapperTest {
       TRIP_MAPPER,
       tripStopTimes,
       false,
-      DataImportIssueStore.noopIssueStore()
+      ISSUE_STORE
     );
     ConstrainedTransfer result = transferMapper.map(transfer);
     assertNotNull(result.getFrom());
@@ -235,7 +230,7 @@ public class TransferMapperTest {
       TRIP_MAPPER,
       tripStopTimes,
       false,
-      DataImportIssueStore.noopIssueStore()
+      ISSUE_STORE
     )
       .map(transfer);
 
