@@ -74,6 +74,9 @@ public class ConstantsForTests {
   public static final String FARE_COMPONENT_GTFS =
     "src/test/resources/gtfs/farecomponents.gtfs.zip";
 
+  public static final String SHAPE_DIST_GTFS =
+    "src/test/resources/gtfs/shape_dist_traveled_gtfs.zip";
+
   private static final String NETEX_DIR = "src/test/resources/netex";
 
   private static final String NETEX_FILENAME = "netex_minimal.zip";
