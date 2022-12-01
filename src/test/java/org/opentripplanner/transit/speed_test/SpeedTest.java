@@ -22,6 +22,7 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -33,6 +34,7 @@ import org.opentripplanner.transit.speed_test.model.testcase.TestCaseInput;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.OtpAppException;
 
 /**
@@ -61,6 +63,11 @@ public class SpeedTest {
   private SpeedTest(SpeedTestCmdLineOpts opts) {
     this.opts = opts;
     this.config = SpeedTestConfig.config(opts.rootDir());
+    
+    var features = new OtpConfigLoader(opts.rootDir()).loadOtpConfig();
+    OTPFeature.enableFeatures(features.otpFeatures);
+    OTPFeature.logFeatureSetup();
+
     var model = loadGraph(opts.rootDir(), config.graph);
     this.transitModel = model.transitModel();
     this.buildConfig = model.buildConfig();
