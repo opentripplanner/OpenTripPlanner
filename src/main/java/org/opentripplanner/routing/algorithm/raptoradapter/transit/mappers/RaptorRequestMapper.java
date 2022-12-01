@@ -103,7 +103,7 @@ public class RaptorRequestMapper {
     }
 
     searchParams.relaxCostAtDestination(
-      preferences.transit().raptor().relaxTransitSearchCostCriteria()
+      preferences.transit().raptor().relaxTransitSearchGeneralizedCostAtDestination()
     );
 
     for (Optimization optimization : preferences.transit().raptor().optimizations()) {

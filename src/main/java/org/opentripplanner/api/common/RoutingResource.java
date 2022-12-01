@@ -485,7 +485,7 @@ public abstract class RoutingResource {
 
   /**
    * The maximum number of additional transfers (that is, one plus the maximum number of boardings)
-   * in additiona to hte result with the least number of transfers that a trip will be allowed.
+   * in addition to the result with the least number of transfers that a trip will be allowed.
    * <p>
    * Consider using the {@link #transferPenalty} instead of this parameter.
    */
@@ -647,11 +647,13 @@ public abstract class RoutingResource {
   protected Boolean useVehicleParkingAvailabilityInformation;
 
   /**
-   * Whether we want to return non-optimal transit paths, this should be set to over 1.0
+   * Whether non-optimal transit paths at the destination should be returned.
+   * If the value is less than 0.0 a normal '<' comparison is performed.
+   * Values greater than 2.0 are not supported, due to performance reasons.
    * {@link SearchParams#relaxCostAtDestination()}
    */
-  @QueryParam("relaxTransitSearchCostCriteria")
-  protected Double relaxTransitSearchCostCriteria;
+  @QueryParam("relaxTransitSearchGeneralizedCostAtDestination")
+  protected Double relaxTransitSearchGeneralizedCostAtDestination;
 
   @QueryParam("debugRaptorStops")
   private String debugRaptorStops;

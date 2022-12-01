@@ -34,14 +34,14 @@ public final class RaptorPreferences implements Serializable {
 
   private final Instant timeLimit;
 
-  private final double relaxTransitSearchCostCriteria;
+  private final double relaxTransitSearchGeneralizedCostAtDestination;
 
   private RaptorPreferences() {
     this.optimizations = EnumSet.of(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
     this.profile = RaptorProfile.MULTI_CRITERIA;
     this.searchDirection = SearchDirection.FORWARD;
     this.timeLimit = null;
-    this.relaxTransitSearchCostCriteria = SearchParams.NOT_SET;
+    this.relaxTransitSearchGeneralizedCostAtDestination = SearchParams.NOT_SET;
   }
 
   private RaptorPreferences(RaptorPreferences.Builder builder) {
@@ -49,9 +49,9 @@ public final class RaptorPreferences implements Serializable {
     this.profile = Objects.requireNonNull(builder.profile);
     this.searchDirection = Objects.requireNonNull(builder.searchDirection);
     this.timeLimit = builder.timeLimit;
-    this.relaxTransitSearchCostCriteria =
+    this.relaxTransitSearchGeneralizedCostAtDestination =
       Units.reluctance(
-        builder.relaxTransitSearchCostCriteria,
+        builder.relaxTransitSearchGeneralizedCostAtDestination,
         Double.NEGATIVE_INFINITY,
         MAX_RELAX_COST_AT_DESTINATION_VALUE
       );
@@ -86,8 +86,8 @@ public final class RaptorPreferences implements Serializable {
     return timeLimit;
   }
 
-  public double relaxTransitSearchCostCriteria() {
-    return relaxTransitSearchCostCriteria;
+  public double relaxTransitSearchGeneralizedCostAtDestination() {
+    return relaxTransitSearchGeneralizedCostAtDestination;
   }
 
   @Override
@@ -100,7 +100,8 @@ public final class RaptorPreferences implements Serializable {
       profile == that.profile &&
       searchDirection == that.searchDirection &&
       Objects.equals(timeLimit, that.timeLimit) &&
-      relaxTransitSearchCostCriteria == that.relaxTransitSearchCostCriteria
+      relaxTransitSearchGeneralizedCostAtDestination ==
+      that.relaxTransitSearchGeneralizedCostAtDestination
     );
   }
 
@@ -111,7 +112,7 @@ public final class RaptorPreferences implements Serializable {
       profile,
       searchDirection,
       timeLimit,
-      relaxTransitSearchCostCriteria
+      relaxTransitSearchGeneralizedCostAtDestination
     );
   }
 
@@ -125,9 +126,9 @@ public final class RaptorPreferences implements Serializable {
       // Ignore time limit if null (default value)
       .addDateTime("timeLimit", timeLimit)
       .addNum(
-        "relaxTransitSearchCostCriteria",
-        relaxTransitSearchCostCriteria,
-        DEFAULT.relaxTransitSearchCostCriteria
+        "relaxTransitSearchGeneralizedCostAtDestination",
+        relaxTransitSearchGeneralizedCostAtDestination,
+        DEFAULT.relaxTransitSearchGeneralizedCostAtDestination
       )
       .toString();
   }
@@ -140,7 +141,7 @@ public final class RaptorPreferences implements Serializable {
     private SearchDirection searchDirection;
     private Set<Optimization> optimizations;
     private Instant timeLimit;
-    private double relaxTransitSearchCostCriteria;
+    private double relaxTransitSearchGeneralizedCostAtDestination;
 
     public Builder(RaptorPreferences original) {
       this.original = original;
@@ -148,7 +149,8 @@ public final class RaptorPreferences implements Serializable {
       this.searchDirection = original.searchDirection;
       this.optimizations = null;
       this.timeLimit = original.timeLimit;
-      this.relaxTransitSearchCostCriteria = original.relaxTransitSearchCostCriteria;
+      this.relaxTransitSearchGeneralizedCostAtDestination =
+        original.relaxTransitSearchGeneralizedCostAtDestination;
     }
 
     public RaptorPreferences original() {
@@ -175,8 +177,11 @@ public final class RaptorPreferences implements Serializable {
       return this;
     }
 
-    public Builder withRelaxTransitSearchCostCriteria(double relaxTransitSearchCostCriteria) {
-      this.relaxTransitSearchCostCriteria = relaxTransitSearchCostCriteria;
+    public Builder withRelaxTransitSearchGeneralizedCostAtDestination(
+      double relaxTransitSearchGeneralizedCostAtDestination
+    ) {
+      this.relaxTransitSearchGeneralizedCostAtDestination =
+        relaxTransitSearchGeneralizedCostAtDestination;
       return this;
     }
 
