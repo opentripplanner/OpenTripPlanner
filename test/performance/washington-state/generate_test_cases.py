@@ -2,7 +2,7 @@
 
 import csv
 
-fieldnames = ["testCaseId", "description", "departure", "fromPlace", "toPlace", "fromLat", "fromLon", "toLat", "toLon", "origin", "destination", "modes", "category"]
+fieldnames = ["testCaseId", "description", "departure", "fromLat", "fromLon", "toLat", "toLon", "origin", "destination", "modes", "category"]
 
 locations= [
     {
