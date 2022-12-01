@@ -138,7 +138,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
     edge.setStairs(true);
 
-    var req = AStarRequest.of();
+    var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withBike(b -> b.withStairsReluctance(stairsReluctance)));
     req.withMode(StreetMode.BIKE);
     var result = traverse(edge, req.build());
