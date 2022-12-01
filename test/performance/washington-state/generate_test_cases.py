@@ -26,8 +26,8 @@ locations= [
         "name": "Federal Way"
     },
     {
-        "coordinates":  "47.187262622,-122.166767120361",
-        "name": "Bonney Lake"
+        "coordinates":  "47.571024,-122.3877811",
+        "name": "West Seattle"
     },
     {
         "coordinates":  "47.18399599096,-122.28950500488",
