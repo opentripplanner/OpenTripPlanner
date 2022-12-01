@@ -30,7 +30,6 @@ public final class ItineraryFilterPreferences {
   private final boolean filterItinerariesWithSameFirstOrLastTrip;
   private final boolean accessibilityScore;
   private final boolean removeItinerariesWithSameRoutesAndStops;
-  private final boolean flexOnlyToDestination;
   private final double minBikeParkingDistance;
 
   private ItineraryFilterPreferences() {
@@ -46,7 +45,6 @@ public final class ItineraryFilterPreferences {
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.accessibilityScore = false;
     this.removeItinerariesWithSameRoutesAndStops = false;
-    this.flexOnlyToDestination = false;
     this.minBikeParkingDistance = NOT_SET;
   }
 
@@ -65,7 +63,6 @@ public final class ItineraryFilterPreferences {
       builder.filterItinerariesWithSameFirstOrLastTrip;
     this.accessibilityScore = builder.accessibilityScore;
     this.removeItinerariesWithSameRoutesAndStops = builder.removeItinerariesWithSameRoutesAndStops;
-    this.flexOnlyToDestination = builder.flexOnlyToDestination;
     this.minBikeParkingDistance = builder.minBikeParkingDistance;
   }
 
@@ -117,10 +114,6 @@ public final class ItineraryFilterPreferences {
     return removeItinerariesWithSameRoutesAndStops;
   }
 
-  public boolean flexOnlyToDestination() {
-    return flexOnlyToDestination;
-  }
-
   public boolean useAccessibilityScore() {
     return accessibilityScore;
   }
@@ -143,7 +136,6 @@ public final class ItineraryFilterPreferences {
     private boolean filterItinerariesWithSameFirstOrLastTrip;
     private boolean removeItinerariesWithSameRoutesAndStops;
     private boolean accessibilityScore;
-    private boolean flexOnlyToDestination;
     public double minBikeParkingDistance;
 
     public ItineraryFilterPreferences original() {
@@ -215,11 +207,6 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
-    public Builder withFlexOnlyToDestination(boolean b) {
-      this.flexOnlyToDestination = b;
-      return this;
-    }
-
     public Builder withMinBikeParkingDistance(double distance) {
       this.minBikeParkingDistance = distance;
       return this;
@@ -241,7 +228,6 @@ public final class ItineraryFilterPreferences {
       this.removeItinerariesWithSameRoutesAndStops =
         original.removeItinerariesWithSameRoutesAndStops;
       this.accessibilityScore = original.accessibilityScore;
-      this.flexOnlyToDestination = original.flexOnlyToDestination;
       this.minBikeParkingDistance = original.minBikeParkingDistance;
     }
 

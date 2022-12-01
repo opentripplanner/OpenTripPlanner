@@ -14,7 +14,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.FlexOnlyToDestinationFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
@@ -69,7 +68,6 @@ public class ItineraryListFilterChainBuilder {
   private TransitAlertService transitAlertService;
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
-  private boolean flexOnlyToDestination;
   private double minBikeParkingDistance;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
@@ -265,11 +263,6 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withFlexOnlyToDestination(boolean flexOnlyToDestination) {
-    this.flexOnlyToDestination = flexOnlyToDestination;
-    return this;
-  }
-
   public ItineraryListFilterChainBuilder withMinBikeParkingDistance(double distance) {
     this.minBikeParkingDistance = distance;
     return this;
@@ -293,10 +286,6 @@ public class ItineraryListFilterChainBuilder {
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
       filters.add(new SameFirstOrLastTripFilter());
-    }
-
-    if (flexOnlyToDestination) {
-      filters.add(new FlexOnlyToDestinationFilter());
     }
 
     if (minBikeParkingDistance > NOT_SET) {

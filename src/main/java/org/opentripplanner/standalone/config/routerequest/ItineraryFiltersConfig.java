@@ -233,16 +233,6 @@ removed from list.
           )
           .asBoolean(dft.useAccessibilityScore())
       )
-      .withFlexOnlyToDestination(
-        c
-          .of("flexOnlyToDestination")
-          .since(V2_3)
-          .summary("Only allow flex services that arrive very close to the destination.")
-          .description(
-            "Useful for when you advertise the service as \"driving the passenger home\". \"Close\" is defined as less than 2 minutes of walking."
-          )
-          .asBoolean(dft.flexOnlyToDestination())
-      )
       .withMinBikeParkingDistance(
         c
           .of("minBikeParkingDistance")

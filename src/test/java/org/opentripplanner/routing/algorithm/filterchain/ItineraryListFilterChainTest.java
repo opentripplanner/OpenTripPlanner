@@ -69,17 +69,6 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void withFlexOnlyToDestination() {
-    // Given a "default" chain
-    ItineraryListFilterChain chain = createBuilder(false, false, 10)
-      .withFlexOnlyToDestination(true)
-      .build();
-    var flex = newItinerary(A).flex(T11_16, T11_20, C).walk(600, D).build();
-    // should do nothing to non-flex trips but remove flex with long walking
-    assertEquals(List.of(i1), chain.filter(List.of(i1, flex)));
-  }
-
-  @Test
   public void withMinBikeParkingDistance() {
     // Given a "default" chain
     ItineraryListFilterChain chain = createBuilder(false, false, 10)

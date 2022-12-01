@@ -131,9 +131,6 @@ public class RoutingWorker {
       request.journey().direct().mode() == StreetMode.FLEXIBLE;
 
     var modes = request.journey().modes();
-    boolean hasFlex = List
-      .of(modes.directMode, modes.accessMode, modes.egressMode)
-      .contains(StreetMode.FLEXIBLE);
     boolean hasBikePark = List
       .of(modes.accessMode, modes.egressMode)
       .contains(StreetMode.BIKE_TO_PARK);
@@ -155,7 +152,6 @@ public class RoutingWorker {
       request.wheelchair(),
       request.preferences().wheelchair().maxSlope(),
       serverContext.graph().getFareService(),
-      hasFlex && request.preferences().itineraryFilter().flexOnlyToDestination(),
       minBikeParkingDistance,
       serverContext.transitService().getTransitAlertService(),
       serverContext.transitService()::getMultiModalStationForStation
