@@ -1,4 +1,5 @@
 {
+  "transitModelTimeZone": "America/Los_Angeles",
   "transitFeeds": [
     {
       "type": "gtfs",
