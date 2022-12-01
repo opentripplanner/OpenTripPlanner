@@ -1,5 +1,7 @@
 package org.opentripplanner.api.resource;
 
+import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -30,8 +32,6 @@ import org.opentripplanner.transit.service.TransitService;
  */
 @Path("/routers/{ignoreRouterId}/inspector/vectortile")
 public class GraphInspectorVectorTileResource {
-
-  public static final String APPLICATION_X_PROTOBUF = "application/x-protobuf";
 
   private static final List<LayerParameters<LayerType>> DEBUG_LAYERS = List.of(
     new LayerParams("areaStops", LayerType.AreaStop)

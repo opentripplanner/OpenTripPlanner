@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vectortiles;
 
+import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -32,8 +34,6 @@ import org.opentripplanner.transit.service.TransitService;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
-
-  public static final String APPLICATION_X_PROTOBUF = "application/x-protobuf";
 
   private final OtpServerRequestContext serverContext;
   private final String ignoreRouterId;
