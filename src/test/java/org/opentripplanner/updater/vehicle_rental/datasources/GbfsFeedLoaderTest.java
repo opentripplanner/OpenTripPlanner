@@ -30,8 +30,6 @@ import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.io.HttpUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS correctly,
@@ -42,7 +40,6 @@ class GbfsFeedLoaderTest {
 
   public static final String LANGUAGE_NB = "nb";
   public static final String LANGUAGE_EN = "en";
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoaderTest.class);
 
   @Test
   void getV22FeedWithExplicitLanguage() {
@@ -118,6 +115,22 @@ class GbfsFeedLoaderTest {
   @Disabled
   void testSpin() {
     new GbfsFeedLoader("https://gbfs.spin.pm/api/gbfs/v2_2/edmonton/gbfs", Map.of(), null).update();
+  }
+
+  @Test
+  void geofencingZones() {
+    GbfsFeedLoader loader = new GbfsFeedLoader(
+      "file:src/test/resources/gbfs/tieroslo/gbfs.json",
+      Map.of(),
+      LANGUAGE_EN
+    );
+
+    loader.update();
+    var zones = loader.getFeed(GBFSGeofencingZones.class);
+    var features = zones.getData().getGeofencingZones().getFeatures();
+    var f = features.get(0);
+    f.getGeometry().
+    assertNotNull(f);
   }
 
   private void validateV22Feed(GbfsFeedLoader loader) {
