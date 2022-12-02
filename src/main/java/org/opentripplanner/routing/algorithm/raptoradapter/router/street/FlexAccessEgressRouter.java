@@ -50,7 +50,7 @@ public class FlexAccessEgressRouter {
         new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
         true,
-        serverContext.flexConfig().maxAccessWalkDuration()
+        serverContext.flexConfig().maxEgressWalkDuration()
       )
       : List.of();
 
