@@ -235,9 +235,6 @@ public class StreetEdge
    * It is used in {@link #canTraverse(TraverseMode)}
    */
   public boolean canTraverse(TraverseMode mode) {
-    if (mode.isCycling() && isStairs()) {
-      return false;
-    }
     StreetTraversalPermission permission = getPermission();
     if (fromv instanceof BarrierVertex) {
       permission = permission.intersection(((BarrierVertex) fromv).getBarrierPermissions());

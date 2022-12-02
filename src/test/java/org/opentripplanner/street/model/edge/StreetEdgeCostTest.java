@@ -135,7 +135,15 @@ class StreetEdgeCostTest extends GraphRoutingTest {
   @VariableSource("bikeStairsCases")
   public void bikeStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    var edge = new StreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.PEDESTRIAN,
+      false
+    );
     edge.setStairs(true);
 
     var req = StreetSearchRequest.of();
@@ -148,7 +156,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
 
     edge.setStairs(false);
     var notStairsResult = traverse(edge, req.build());
-    assertEquals(4, (long) notStairsResult.weight);
+    assertEquals(37, (long) notStairsResult.weight);
   }
 
   static Stream<Arguments> walkSafetyCases = Stream.of(

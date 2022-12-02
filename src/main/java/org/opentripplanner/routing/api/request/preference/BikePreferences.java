@@ -165,7 +165,7 @@ public final class BikePreferences implements Serializable {
       parkCost == that.parkCost &&
       optimizeType == that.optimizeType &&
       optimizeTriangle.equals(that.optimizeTriangle) &&
-      doubleEquals(stairsReluctance,that.stairsReluctance)
+      doubleEquals(stairsReluctance, that.stairsReluctance)
     );
   }
 
