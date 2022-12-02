@@ -4,28 +4,19 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.routing.api.request.DebugRaptor;
-import org.opentripplanner.routing.core.RouteMatcher;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.routing.api.request.request.filter.FilterPredicate;
+import org.opentripplanner.routing.api.request.request.filter.FilterRequest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 // TODO VIA: Javadoc
 public class TransitRequest implements Cloneable, Serializable {
 
-  private List<FilterRequest> filters = new ArrayList<>();
-
-
-  // TODO: 2022-11-29 filters: cleanup
-//  private List<MainAndSubMode> modes = MainAndSubMode.all();
-
-//  private List<FeedScopedId> whiteListedAgencies = List.of();
-//  private List<FeedScopedId> bannedAgencies = List.of();
+  private List<FilterPredicate> filters = new ArrayList<>();
 
   @Deprecated
   private List<FeedScopedId> preferredAgencies = List.of();
 
   private List<FeedScopedId> unpreferredAgencies = List.of();
-//  private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
-//  private RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
   /**
    * @deprecated TODO OTP2 Needs to be implemented
@@ -34,22 +25,13 @@ public class TransitRequest implements Cloneable, Serializable {
   private List<FeedScopedId> preferredRoutes = List.of();
 
   private List<FeedScopedId> unpreferredRoutes = List.of();
-//  private List<FeedScopedId> bannedTrips = List.of();
   private DebugRaptor raptorDebugging = new DebugRaptor();
 
-//  public void setModes(List<MainAndSubMode> modes) {
-//    this.modes = modes;
-//  }
-//
-//  public List<MainAndSubMode> modes() {
-//    return modes;
-//  }
-
-  public List<FilterRequest> filters() {
+  public List<FilterPredicate> filters() {
     return filters;
   }
 
-  public void setFilters(List<FilterRequest> filters) {
+  public void setFilters(List<FilterPredicate> filters) {
     this.filters = filters;
   }
 
@@ -141,22 +123,20 @@ public class TransitRequest implements Cloneable, Serializable {
   }
 
   public TransitRequest clone() {
-    // TODO: 2022-11-29 filters: clone filters
-
     try {
       var clone = (TransitRequest) super.clone();
 
-//      clone.modes = new ArrayList<>(this.modes);
-//      clone.whiteListedAgencies = List.copyOf(this.whiteListedAgencies);
-//      clone.bannedAgencies = List.copyOf(this.bannedAgencies);
       clone.preferredAgencies = List.copyOf(this.preferredAgencies);
       clone.unpreferredAgencies = List.copyOf(this.unpreferredAgencies);
-//      clone.whiteListedRoutes = this.whiteListedRoutes.clone();
-//      clone.bannedRoutes = this.bannedRoutes.clone();
       clone.preferredRoutes = List.copyOf(this.preferredRoutes);
       clone.unpreferredRoutes = List.copyOf(this.unpreferredRoutes);
-//      clone.bannedTrips = List.copyOf(this.bannedTrips);
       clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
+
+      var cloneFilters = new ArrayList<FilterPredicate>();
+      for (var filterRequest : this.filters) {
+        cloneFilters.add(filterRequest.clone());
+      }
+      clone.setFilters(cloneFilters);
 
       return clone;
     } catch (CloneNotSupportedException e) {

@@ -24,19 +24,17 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.request.FilterRequest;
-import org.opentripplanner.routing.api.request.request.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.FilterRequest;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -165,28 +163,35 @@ public class TransmodelGraphQLPlanner {
     // callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
     // callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
-// TODO: 2022-11-30 filters: set access/egress/direct & transfer
-    RequestModes modes = getModes(environment, callWith);
-    if (modes != null) {
-      request.journey().setModes(modes);
+    // TODO: 2022-12-01 filters: this is weird
+    if (GqlUtil.hasArgument(environment, "modes")) {
+      ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
+      ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
+      ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
+      callWith.argument("modes.accessMode", accessMode::set);
+      callWith.argument("modes.egressMode", egressMode::set);
+      callWith.argument("modes.directMode", directMode::set);
+
+       var requestModes = RequestModes
+        .of()
+        .withAccessMode(accessMode.get())
+        .withEgressMode(egressMode.get())
+        .withDirectMode(directMode.get())
+        .withTransferMode(accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK)
+         .build();
+
+       request.journey().setModes(requestModes);
+    }
+
+    if (GqlUtil.hasArgument(environment, "filters")) {
+      mapFilterNewWay(environment, callWith, request);
+    } else {
+      mapFilterOldWay(environment, callWith, request);
     }
 
     request.withPreferences(preferences -> {
       mapPreferences(environment, callWith, preferences);
     });
-
-    /*
-        List<Map<String, ?>> transportSubmodeFilters = environment.getArgument("transportSubmodes");
-        if (transportSubmodeFilters != null) {
-            request.transportSubmodes = new HashMap<>();
-            for (Map<String, ?> transportSubmodeFilter : transportSubmodeFilters) {
-                TraverseMode transportMode = (TraverseMode) transportSubmodeFilter.get("transportMode");
-                List<TransmodelTransportSubmode> transportSubmodes = (List<TransmodelTransportSubmode>) transportSubmodeFilter.get("transportSubmodes");
-                if (!CollectionUtils.isEmpty(transportSubmodes)) {
-                    request.transportSubmodes.put(transportMode, new HashSet<>(transportSubmodes));
-                }
-            }
-        }*/
 
     return request;
   }
@@ -266,11 +271,11 @@ public class TransmodelGraphQLPlanner {
         var filterRequest = new FilterRequest();
 
         if (filterInput.containsKey("include")) {
-          filterRequest.setInclude(mapSelectRequest((LinkedHashMap<String, List<String>>) filterInput.get("include")));
+          filterRequest.setInclude(mapSelectRequest((LinkedHashMap<String, List<?>>) filterInput.get("include")));
         }
 
         if (filterInput.containsKey("exclude")) {
-          filterRequest.setExclude(mapSelectRequest((LinkedHashMap<String, List<String>>) filterInput.get("exclude")));
+          filterRequest.setExclude(mapSelectRequest((LinkedHashMap<String, List<?>>) filterInput.get("exclude")));
         }
 
         filterRequests.add(filterRequest);
@@ -280,35 +285,38 @@ public class TransmodelGraphQLPlanner {
     }
   }
 
-  private SelectRequest mapSelectRequest(LinkedHashMap<String, List<String>> input) {
+  @SuppressWarnings("unchecked")
+  private SelectRequest mapSelectRequest(LinkedHashMap<String, List<?>> input) {
     var selectRequest = new SelectRequest();
 
     if (input.containsKey("lines")) {
-      selectRequest.setRoutes(RouteMatcher.idMatcher(mapIDsToDomain(input.get("lines"))));
+      var lines = (List<String>) input.get("lines");
+      selectRequest.setRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)));
     }
 
     if (input.containsKey("authorities")) {
-      selectRequest.setAgencies(mapIDsToDomain(input.get("authorities")));
+      var authorities = (List<String>) input.get("authorities");
+      selectRequest.setAgencies(mapIDsToDomain(authorities));
     }
 
     if (input.containsKey("feeds")) {
-      selectRequest.setFeeds(input.get("feeds"));
+      var feeds = (List<String>) input.get("feeds");
+      selectRequest.setFeeds(feeds);
     }
 
     if (input.containsKey("serviceJourneys")) {
-      selectRequest.setTrips(mapIDsToDomain(input.get("serviceJourneys")));
+      var serviceJourneys = (List<String>) input.get("serviceJourneys");
+      selectRequest.setTrips(mapIDsToDomain(serviceJourneys));
     }
 
     if (input.containsKey("modes")) {
-      selectRequest.setModes(input.get("modes").stream()
-        .map(TransitMode::valueOf)
-        .collect(Collectors.toList()));
+      var modes = (List<TransitMode>) input.get("modes");
+      selectRequest.setModes(modes);
     }
 
     if (input.containsKey("subModes")) {
-      selectRequest.setSubModes(input.get("subModes").stream()
-        .map(SubMode::of)
-        .collect(Collectors.toList()));
+      var subModes = (List<TransmodelTransportSubmode>) input.get("subModes");
+      selectRequest.setSubModes(subModes.stream().map(sm -> SubMode.of(sm.getValue())).collect(Collectors.toList()));
     }
 
     return selectRequest;
@@ -386,56 +394,6 @@ public class TransmodelGraphQLPlanner {
         rental::withUseAvailabilityInformation
       )
     );
-  }
-
-  @SuppressWarnings("unchecked")
-  private RequestModes getModes(
-    DataFetchingEnvironment environment,
-    DataFetcherDecorator callWith
-  ) {
-    if (GqlUtil.hasArgument(environment, "modes")) {
-      ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
-      ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
-      ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
-      ElementWrapper<List<LinkedHashMap<String, ?>>> transportModes = new ElementWrapper<>();
-      callWith.argument("modes.accessMode", accessMode::set);
-      callWith.argument("modes.egressMode", egressMode::set);
-      callWith.argument("modes.directMode", directMode::set);
-      callWith.argument("modes.transportModes", transportModes::set);
-
-      RequestModesBuilder mBuilder = RequestModes
-        .of()
-        .withAccessMode(accessMode.get())
-        .withEgressMode(egressMode.get())
-        .withDirectMode(directMode.get());
-
-      mBuilder.withTransferMode(
-        accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK
-      );
-
-      if (transportModes.get() == null) {
-        mBuilder.withTransitModes(MainAndSubMode.all());
-      } else {
-        mBuilder.clearTransitModes();
-        for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
-          if (modeWithSubmodes.containsKey("transportMode")) {
-            TransitMode mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
-            if (modeWithSubmodes.containsKey("transportSubModes")) {
-              var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
-                "transportSubModes"
-              );
-              for (TransmodelTransportSubmode submode : transportSubModes) {
-                mBuilder.withTransitMode(mainMode, submode.getValue());
-              }
-            } else {
-              mBuilder.withTransitMode(mainMode);
-            }
-          }
-        }
-      }
-      return mBuilder.build();
-    }
-    return null;
   }
 
   /**
