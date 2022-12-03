@@ -23,14 +23,12 @@ public class RemoveItinerariesWithShortStreetLeg implements ItineraryListFilter 
 
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
-    return itineraries.stream().filter(this::filterItinerariesWithShortCyclingLeg).toList();
+    return itineraries.stream().filter(this::filterItinerariesWithShortStreetLeg).toList();
   }
 
-  private boolean filterItinerariesWithShortCyclingLeg(Itinerary itinerary) {
+  private boolean filterItinerariesWithShortStreetLeg(Itinerary itinerary) {
     var hasLegsOfMode = itinerary.getStreetLegs().anyMatch(l -> l.getMode().equals(traverseMode));
     if (hasLegsOfMode && itinerary.hasTransit()) {
-      double cylingDistance = 0;
-
       var distance = itinerary
         .getStreetLegs()
         .filter(l -> l.getMode().equals(traverseMode))
