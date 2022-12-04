@@ -7,7 +7,6 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +17,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.TestDateTimeUtils;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
@@ -240,7 +240,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     request.setFrom(from);
     request.setTo(to);
 
-    var time = dateTime.atZone(ZoneId.of("America/New_York"));
+    var time = dateTime.atZone(ZoneIds.NEW_YORK);
     var additionalSearchDays = AdditionalSearchDays.defaults(time);
 
     var result = TransitRouter.route(

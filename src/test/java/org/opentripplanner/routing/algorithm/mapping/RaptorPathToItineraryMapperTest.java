@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.TestDateTimeUtils;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -113,7 +113,7 @@ public class RaptorPathToItineraryMapperTest {
       new Graph(),
       new DefaultTransitService(new TransitModel()),
       null,
-      dateTime.atZone(ZoneId.of("CET")),
+      dateTime.atZone(ZoneIds.CET),
       new RouteRequest()
     );
   }

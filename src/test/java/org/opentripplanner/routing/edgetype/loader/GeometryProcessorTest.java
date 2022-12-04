@@ -9,13 +9,13 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import com.google.common.collect.Iterables;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner._support.time.TestDateTimeUtils;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -304,7 +304,7 @@ public class GeometryProcessorTest {
     // from stop A to stop D would normally be trip 1.1 to trip 2.1, arriving at 00:30. But trip
     // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00
     LocalDateTime ldt = LocalDateTime.of(2009, 7, 18, 0, 0, 0);
-    ZonedDateTime zdt = ZonedDateTime.of(ldt, ZoneId.of("America/New_York"));
+    ZonedDateTime zdt = ZonedDateTime.of(ldt, ZoneIds.NEW_YORK);
     options.setDateTime(zdt.toInstant());
     spt =
       StreetSearchBuilder
@@ -334,7 +334,7 @@ public class GeometryProcessorTest {
     // test is designed such that transfers must be instantaneous
     options.withPreferences(pref -> pref.withTransfer(tx -> tx.withSlack(0)));
     LocalDateTime ldt = LocalDateTime.of(2009, 10, 2, 8, 30, 0);
-    ZonedDateTime startTime = ZonedDateTime.of(ldt, ZoneId.of("America/New_York"));
+    ZonedDateTime startTime = ZonedDateTime.of(ldt, ZoneIds.NEW_YORK);
     options.setDateTime(startTime.toInstant());
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()

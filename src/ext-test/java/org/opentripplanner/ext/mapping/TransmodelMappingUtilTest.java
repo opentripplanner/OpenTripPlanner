@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -15,7 +14,7 @@ public class TransmodelMappingUtilTest {
 
   @Test
   public void resolveFixedFeedIdTest() {
-    Assertions.assertEquals("UNKNOWN_FEED", TransitIdMapper.setupFixedFeedId(List.of()));
+    assertEquals("UNKNOWN_FEED", TransitIdMapper.setupFixedFeedId(List.of()));
     assertEquals("F", TransitIdMapper.setupFixedFeedId(List.of(agency("F", 1))));
     assertEquals("A", TransitIdMapper.setupFixedFeedId(List.of(agency("A", 1), agency("A", 2))));
     assertEquals(

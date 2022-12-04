@@ -7,11 +7,11 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -158,7 +158,7 @@ public class SplitEdgeTurnRestrictionsTest {
     var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      ZoneId.of("Europe/Berlin"),
+      ZoneIds.BERLIN,
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );

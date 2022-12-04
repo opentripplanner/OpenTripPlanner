@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.TestDateTimeUtils;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -31,7 +32,7 @@ import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 
 public class TimetableTest {
 
-  private static final ZoneId timeZone = ZoneId.of("America/New_York");
+  private static final ZoneId timeZone = ZoneIds.NEW_YORK;
   private static final LocalDate serviceDate = LocalDate.of(2009, 8, 7);
   private static Map<FeedScopedId, TripPattern> patternIndex;
   private static Timetable timetable;
