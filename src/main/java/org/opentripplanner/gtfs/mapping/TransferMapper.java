@@ -268,7 +268,7 @@ class TransferMapper {
       }
 
       Predicate<StopLocation> stopMatches = station != null
-        ? s -> (s instanceof RegularStop && ((RegularStop) s).getParentStation() == station)
+        ? s -> ((s instanceof RegularStop regStop) && regStop.getParentStation() == station)
         : s -> s == stop;
 
       if (stopMatches.test(stopTime.getStop())) {
