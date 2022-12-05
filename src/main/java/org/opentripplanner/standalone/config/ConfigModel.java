@@ -1,7 +1,8 @@
 package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.node.MissingNode;
-import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.application.OtpFileNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,13 +11,8 @@ import org.slf4j.LoggerFactory;
  * OTP load the config from the {@code baseDirectory}, and then if not found the config is read
  * from the serialized graph.
  * <p>
- * OTP load the following configuration files:
- * <ol>
- *     <li>{@code otp-config.json}</li>
- *     <li>{@code build-config.json}</li>
- *     <li>{@code router-config.json}</li>
- * </ol>
- * All files are loaded from the same base directory.
+ * OTP load the following configuration files, see {@link OtpFileNames}. All files are loaded from
+ * the same base directory.
  * <p>
  * Comments and unquoted keys are allowed in the these configuration files. The configuration is
  * cached, and not reloaded even if it is changed on the filesystem. Changing some parameters would

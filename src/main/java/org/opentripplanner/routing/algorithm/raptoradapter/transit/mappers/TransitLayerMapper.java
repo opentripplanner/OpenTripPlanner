@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
@@ -27,7 +28,6 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

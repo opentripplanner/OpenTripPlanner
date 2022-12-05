@@ -50,9 +50,11 @@ import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.api.model.ApiTripTimeShort;
 import org.opentripplanner.api.support.SemanticHash;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.framework.geometry.PolylineEncoder;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -63,9 +65,6 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.model.EncodedPolyline;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
@@ -626,10 +625,6 @@ public class IndexAPI {
   private TripPattern tripPattern(Trip trip) {
     var pattern = transitService().getPatternForTrip(trip);
     return validateExist("TripPattern", pattern, "trip", trip.getId());
-  }
-
-  private RoutingService routingService() {
-    return serverContext.routingService();
   }
 
   private TransitService transitService() {

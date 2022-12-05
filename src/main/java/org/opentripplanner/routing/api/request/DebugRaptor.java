@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *         done by adding an {@code *} to the stop: {@code [1010,1183,3211*,492]}.
  *     </li>
  *     To list stops you need to know the Raptor stop index. Enable log {@code level="debug"} for
- *     the {@code org.opentripplanner.transit.raptor} package to list all paths found by Raptor.
+ *     the {@code org.opentripplanner.raptor} package to list all paths found by Raptor.
  *     The paths will contain the stop index. For paths not listed you will have to do some
  *     research.
  * </ol>
@@ -38,9 +38,8 @@ import org.slf4j.LoggerFactory;
 public class DebugRaptor implements Serializable {
 
   @Serial
-  private static final long serialVersionUID = 1L;
-
   private static final Logger LOG = LoggerFactory.getLogger(DebugRaptor.class);
+
   private static final Pattern FIRST_STOP_PATTERN = Pattern.compile("(\\d+)\\*");
   private static final int FIRST_STOP_INDEX = 0;
 

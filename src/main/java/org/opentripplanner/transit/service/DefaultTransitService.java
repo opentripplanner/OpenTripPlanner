@@ -531,6 +531,11 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
+  public Collection<AreaStop> findAreaStops(Envelope envelope) {
+    return transitModel.getStopModel().queryLocationIndex(envelope);
+  }
+
+  @Override
   public GraphUpdaterStatus getUpdaterStatus() {
     return transitModel.getUpdaterManager();
   }

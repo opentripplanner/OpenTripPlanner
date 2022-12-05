@@ -63,7 +63,7 @@ public class StopsLayerTest {
     );
 
     Map<String, Object> map = new HashMap<>();
-    mapper.map(stop).forEach(o -> map.put(o.first, o.second));
+    mapper.map(stop).forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals("F:name", map.get("gtfsId"));
     assertEquals("name", map.get("name"));
@@ -83,7 +83,7 @@ public class StopsLayerTest {
     );
 
     Map<String, Object> map = new HashMap<>();
-    mapper.map(stop).forEach(o -> map.put(o.first, o.second));
+    mapper.map(stop).forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals("nameDE", map.get("name"));
     assertEquals("descDE", map.get("desc"));

@@ -5,9 +5,13 @@ import javax.ws.rs.core.Application;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
+import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
@@ -20,10 +24,9 @@ import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPWebApplication;
-import org.opentripplanner.transit.raptor.configure.RaptorConfig;
+import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
-import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,12 +132,12 @@ public class ConstructApplication {
     // Create MetricsLogging
     factory.metricsLogging();
 
-    creatTransitLayerForRaptor(transitModel(), routerConfig());
+    creatTransitLayerForRaptor(transitModel(), routerConfig().transitTuningConfig());
 
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(graph(), transitModel(), routerConfig().updaterConfig());
 
-    graph().initEllipsoidToGeoidDifference();
+    initEllipsoidToGeoidDifference();
 
     if (OTPFeature.SandboxAPITransmodelApi.isOn()) {
       TransmodelAPI.setUp(
@@ -150,12 +153,24 @@ public class ConstructApplication {
     }
   }
 
+  private void initEllipsoidToGeoidDifference() {
+    try {
+      WorldEnvelope env = graph().getEnvelope();
+      double lat = env.calcCenterLatitude();
+      double lon = env.calcCenterLongitude();
+      double value = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
+      graph().initEllipsoidToGeoidDifference(value, lat, lon);
+    } catch (Exception e) {
+      LOG.error("Error computing ellipsoid/geoid difference");
+    }
+  }
+
   /**
    * Create transit layer for Raptor routing. Here we map the scheduled timetables.
    */
   public static void creatTransitLayerForRaptor(
     TransitModel transitModel,
-    RouterConfig routerConfig
+    TransitTuningParameters tuningParameters
   ) {
     if (!transitModel.hasTransit() || transitModel.getTransitModelIndex() == null) {
       LOG.warn(
@@ -163,9 +178,7 @@ public class ConstructApplication {
       );
     }
     LOG.info("Creating transit layer for Raptor routing.");
-    transitModel.setTransitLayer(
-      TransitLayerMapper.map(routerConfig.transitTuningParameters(), transitModel)
-    );
+    transitModel.setTransitLayer(TransitLayerMapper.map(tuningParameters, transitModel));
     transitModel.setRealtimeTransitLayer(new TransitLayer(transitModel.getTransitLayer()));
     transitModel.setTransitLayerUpdater(
       new TransitLayerUpdater(

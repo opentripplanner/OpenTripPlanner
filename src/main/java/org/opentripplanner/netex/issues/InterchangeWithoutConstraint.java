@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.issues;
 
-import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 
 public class InterchangeWithoutConstraint implements DataImportIssue {

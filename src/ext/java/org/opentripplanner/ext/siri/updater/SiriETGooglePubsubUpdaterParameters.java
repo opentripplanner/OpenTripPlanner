@@ -4,8 +4,8 @@ import java.time.Duration;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 public record SiriETGooglePubsubUpdaterParameters(
   @Nonnull String configRef,

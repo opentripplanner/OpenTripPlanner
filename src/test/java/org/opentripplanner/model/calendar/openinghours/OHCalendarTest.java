@@ -12,11 +12,12 @@ import java.time.LocalTime;
 import java.time.Month;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 class OHCalendarTest {
 
-  private final ZoneId zoneId = ZoneId.of("Europe/Paris");
+  private final ZoneId zoneId = ZoneIds.PARIS;
 
   @Test
   void simpleCase() {

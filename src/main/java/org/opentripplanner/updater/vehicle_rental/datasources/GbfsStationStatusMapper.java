@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.entur.gbfs.v2_2.station_status.GBFSStation;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
@@ -61,9 +60,9 @@ public class GbfsStationStatusMapper {
             available
               .getVehicleTypeIds()
               .stream()
-              .map(t -> new T2<>(vehicleTypes.get(t), available.getCount().intValue()))
+              .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount().intValue()))
           )
-          .collect(Collectors.toMap(t -> t.first, t -> t.second))
+          .collect(Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count))
         : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), station.spacesAvailable);
 
     station.spacesDisabled =
@@ -78,4 +77,6 @@ public class GbfsStationStatusMapper {
         ? Instant.ofEpochSecond(status.getLastReported().longValue())
         : null;
   }
+
+  private record VehicleTypeCount(RentalVehicleType type, int count) {}
 }

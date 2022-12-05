@@ -2,10 +2,10 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.util.List;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Represents a transfer between stops with the street network path attatched to it.
@@ -18,8 +18,6 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  *      where this class is used
  */
 public class PathTransfer implements Serializable {
-
-  private static final long serialVersionUID = 20200316L;
 
   public final StopLocation from;
 

@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.framework;
 
-import static org.opentripplanner.util.lang.StringUtils.assertHasValue;
+import static org.opentripplanner.framework.lang.StringUtils.assertHasValue;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -21,8 +21,6 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   private static final char ID_SEPARATOR = ':';
 
   @Serial
-  private static final long serialVersionUID = 1L;
-
   private final String feedId;
 
   private final String id;

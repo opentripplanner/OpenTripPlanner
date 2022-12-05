@@ -3,10 +3,9 @@ package org.opentripplanner.ext.flex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 import static org.opentripplanner.graph_builder.module.FakeGraph.getFileForResource;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 
 import java.io.File;
@@ -23,6 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
@@ -34,7 +35,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OTPFeature;
 
 /**
  * This test checks the combination of transit and flex works.
@@ -207,7 +207,7 @@ public class FlexIntegrationTest {
     new DirectTransferGenerator(
       graph,
       transitModel,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       Duration.ofMinutes(10),
       List.of(req)
     )

@@ -3,12 +3,14 @@ package org.opentripplanner.standalone.config.routerequest;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
 import static org.opentripplanner.standalone.config.routerequest.WheelchairConfig.mapWheelchairPreferences;
 
 import java.time.Duration;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -26,7 +28,6 @@ import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -429,6 +430,15 @@ ferries, where the check-in process needs to be done in good time before ride.
               .summary("For bike triangle routing, how much safety matters (range 0-1).")
               .asDouble(it.safety())
           )
+      )
+      .withStairsReluctance(
+        c
+          .of("bikeStairsReluctance")
+          .since(V2_3)
+          .summary(
+            "How bad is it to walk the bicycle up/down a flight of stairs compared to taking a detour."
+          )
+          .asDouble(dft.stairsReluctance())
       );
   }
 

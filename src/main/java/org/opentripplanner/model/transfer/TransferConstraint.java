@@ -9,10 +9,10 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.IntSupplier;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
-import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
-import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 /**
  * This class holds transfer constraint information.
@@ -20,8 +20,6 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * The class is immutable.
  */
 public class TransferConstraint implements Serializable, RaptorTransferConstraint {
-
-  private static final long serialVersionUID = 1L;
 
   /**
    * A regular transfer is a transfer with no constraints.

@@ -4,11 +4,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 public class DataOverlayParameterBindings implements Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   private final List<ParameterBinding> parameters;
 

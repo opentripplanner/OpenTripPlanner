@@ -1,12 +1,10 @@
 package org.opentripplanner.model.transfer;
 
 import java.io.Serializable;
+import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 public final class StationTransferPoint implements TransferPoint, Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   private final Station station;
 

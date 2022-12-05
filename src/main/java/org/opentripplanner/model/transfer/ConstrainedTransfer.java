@@ -3,9 +3,9 @@ package org.opentripplanner.model.transfer;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A constrained transfer is a transfer which is restricted in one ore more ways by the transit data
@@ -16,7 +16,6 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  */
 public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Serializable {
 
-  private static final long serialVersionUID = 1L;
   private static final int FROM_RANKING_COEFFICIENT = 11;
   private static final int TO_RANKING_COEFFICIENT = 10;
 

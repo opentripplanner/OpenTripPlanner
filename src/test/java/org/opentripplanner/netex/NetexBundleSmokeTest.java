@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -60,7 +60,7 @@ public class NetexBundleSmokeTest {
     // When
     OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(
       new Deduplicator(),
-      DataImportIssueStore.noopIssueStore()
+      DataImportIssueStore.NOOP
     );
 
     // Then - smoke test model

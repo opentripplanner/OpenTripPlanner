@@ -11,6 +11,14 @@ public class DemExtractParametersBuilder {
     return source;
   }
 
+  public DemExtractParametersBuilder() {
+    this.elevationUnitMultiplier = DemExtractParameters.DEFAULT_ELEVATION_UNIT_MULTIPLIER;
+  }
+
+  public DemExtractParametersBuilder(DemExtractParameters original) {
+    this.elevationUnitMultiplier = original.elevationUnitMultiplier();
+  }
+
   public DemExtractParametersBuilder withSource(URI source) {
     this.source = source;
     return this;

@@ -4,13 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -21,7 +22,6 @@ import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
 
@@ -35,10 +35,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     LocalDate second = LocalDate.of(2019, 3, 31);
     LocalDate third = LocalDate.of(2019, 4, 1);
 
-    ZonedDateTime startOfTime = ServiceDateUtils.asStartOfService(
-      second,
-      ZoneId.of("Europe/London")
-    );
+    ZonedDateTime startOfTime = ServiceDateUtils.asStartOfService(second, ZoneIds.LONDON);
 
     List<TripTimes> tripTimes = List.of(createTripTimesForTest());
 

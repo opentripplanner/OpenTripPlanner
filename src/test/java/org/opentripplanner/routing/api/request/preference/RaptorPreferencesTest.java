@@ -8,12 +8,12 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.ZoneId;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor.api.request.Optimization;
-import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
-import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
+import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.raptor.api.request.Optimization;
+import org.opentripplanner.raptor.api.request.RaptorProfile;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 class RaptorPreferencesTest {
 
@@ -22,7 +22,7 @@ class RaptorPreferencesTest {
   private static final Set<Optimization> OPTIMIZATIONS = Set.of(Optimization.PARALLEL);
   private static final Instant TIME_LIMIT = LocalDate
     .of(2020, Month.JUNE, 9)
-    .atStartOfDay(ZoneId.of("UTC"))
+    .atStartOfDay(ZoneIds.UTC)
     .toInstant();
 
   private final RaptorPreferences subject = RaptorPreferences

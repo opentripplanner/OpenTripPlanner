@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.google.common.collect.ArrayListMultimap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -32,7 +32,7 @@ public class TripPatternMapperTest {
     NetexTestDataSample sample = new NetexTestDataSample();
 
     TripPatternMapper tripPatternMapper = new TripPatternMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       sample.getStopsById(),
@@ -92,7 +92,7 @@ public class TripPatternMapperTest {
     datedServiceJourneys.addAll(sample.getDatedServiceJourneyBySjId().values());
 
     TripPatternMapper tripPatternMapper = new TripPatternMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       sample.getStopsById(),

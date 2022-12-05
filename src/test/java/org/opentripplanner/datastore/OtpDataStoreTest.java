@@ -11,6 +11,8 @@ import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 import static org.opentripplanner.datastore.api.FileType.REPORT;
 import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
+import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,13 +35,11 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.configure.DataStoreModule;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
-import org.opentripplanner.util.lang.StringUtils;
 
 public class OtpDataStoreTest {
 
-  private static final String BUILD_CONFIG_FILENAME = "build-config.json";
-  private static final String ROUTER_CONFIG_FILENAME = "router-config.json";
   private static final String OSM_FILENAME = "osm.pbf";
   private static final String DEM_FILENAME = "dem.tif";
   private static final String NETEX_FILENAME = "netex.zip";

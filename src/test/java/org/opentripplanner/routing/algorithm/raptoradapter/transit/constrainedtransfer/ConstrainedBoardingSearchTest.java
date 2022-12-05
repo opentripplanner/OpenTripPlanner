@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.RouteStationTransferPoint;
 import org.opentripplanner.model.transfer.RouteStopTransferPoint;
@@ -23,6 +24,7 @@ import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TripTransferPoint;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestRouteData;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -31,8 +33,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.util.OTPFeature;
 
 public class ConstrainedBoardingSearchTest {
 

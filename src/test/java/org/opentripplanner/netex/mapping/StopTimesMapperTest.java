@@ -13,7 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
@@ -44,7 +44,7 @@ public class StopTimesMapperTest {
     NetexTestDataSample sample = new NetexTestDataSample();
 
     StopTimesMapper stopTimesMapper = new StopTimesMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       sample.getStopsById(),
       new EntityById<>(),
@@ -134,7 +134,7 @@ public class StopTimesMapperTest {
     fourthPassingTime.setWaitingTime(Duration.ofSeconds(-5));
 
     StopTimesMapper stopTimesMapper = new StopTimesMapper(
-      DataImportIssueStore.noopIssueStore(),
+      DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       netexSample.getStopsById(),
       new EntityById<>(),

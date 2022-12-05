@@ -3,9 +3,9 @@ package org.opentripplanner.routing.graph.index;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.linking.Scope;
+import org.opentripplanner.street.model.edge.Edge;
 
 /**
  * Manages edge spatial indexes by scope. When linking vertices, visibility is as follows:
@@ -60,5 +60,9 @@ public class EdgeSpatialIndex {
         realTimeEdgeIndex.query(envelope).stream()
       );
     };
+  }
+
+  public void compact() {
+    permanentEdgeIndex.compact();
   }
 }

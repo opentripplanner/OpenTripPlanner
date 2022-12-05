@@ -1,13 +1,10 @@
 package org.opentripplanner.netex.configure;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.datastore.api.CompositeDataSource;
-import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.config.NetexFeedParameters;
@@ -35,12 +32,6 @@ public class NetexConfigure {
     this.buildParams = builderParams;
   }
 
-  public static NetexBundle netexBundleForTest(BuildConfig builderParams, File netexZipFile) {
-    ZipFileDataSource dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
-    var configuredDataSource = new ConfiguredDataSource<>(dataSource, builderParams.netexDefaults);
-    return new NetexConfigure(builderParams).netexBundle(configuredDataSource);
-  }
-
   public NetexModule createNetexModule(
     Iterable<ConfiguredDataSource<NetexFeedParameters>> netexSources,
     TransitModel transitModel,
@@ -64,7 +55,7 @@ public class NetexConfigure {
   }
 
   /** public to enable testing */
-  private NetexBundle netexBundle(ConfiguredDataSource<NetexFeedParameters> configuredDataSource) {
+  public NetexBundle netexBundle(ConfiguredDataSource<NetexFeedParameters> configuredDataSource) {
     var source = (CompositeDataSource) configuredDataSource.dataSource();
     var config = configuredDataSource.config();
 

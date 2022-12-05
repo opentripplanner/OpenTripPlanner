@@ -1,13 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.performance;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import java.util.Collection;
-import java.util.List;
+import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.routing.framework.MicrometerUtils;
-import org.opentripplanner.transit.raptor.api.debug.RaptorTimers;
 
 public class PerformanceTimersForRaptor implements RaptorTimers {
 

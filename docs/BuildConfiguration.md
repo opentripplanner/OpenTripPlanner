@@ -28,7 +28,6 @@ Sections follow that describe particular settings in more depth.
 | [dataImportReport](#dataImportReport)                                    |  `boolean`  | Generate nice HTML report of Graph errors/warnings                                                                          | *Optional* | `false`                           |  2.0  |
 | [discardMinTransferTimes](#discardMinTransferTimes)                      |  `boolean`  | Should minimum transfer times in GTFS files be discarded.                                                                   | *Optional* | `false`                           |  2.2  |
 | [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)      |   `double`  | The distance between elevation samples in meters.                                                                           | *Optional* | `10.0`                            |  2.0  |
-| [elevationUnitMultiplier](#elevationUnitMultiplier)                      |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* | `1.0`                             |  2.0  |
 | embedRouterConfig                                                        |  `boolean`  | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                | *Optional* | `true`                            |  2.0  |
 | extraEdgesStopPlatformLink                                               |  `boolean`  | Add extra edges when linking a stop to a platform, to prevent detours along the platform edge.                              | *Optional* | `false`                           |  2.0  |
 | [graph](#graph)                                                          |    `uri`    | URI to the graph object file for reading and writing.                                                                       | *Optional* |                                   |  2.0  |
@@ -58,8 +57,10 @@ Sections follow that describe particular settings in more depth.
 | [boardingLocationTags](#boardingLocationTags)                            |  `string[]` | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                  | *Optional* |                                   |  2.2  |
 | [dataOverlay](sandbox/DataOverlay.md)                                    |   `object`  | Config for the DataOverlay Sandbox module                                                                                   | *Optional* |                                   |  2.2  |
 | [dem](#dem)                                                              |  `object[]` | Specify parameters for DEM extracts.                                                                                        | *Optional* |                                   |  2.2  |
-|       [elevationUnitMultiplier](#dem_0_elevationUnitMultiplier)          |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* |                                   |  2.2  |
+|       [elevationUnitMultiplier](#dem_0_elevationUnitMultiplier)          |   `double`  | Specify a multiplier to convert elevation units from source to meters. Overrides the value specified in `demDefaults`.      | *Optional* | `1.0`                             |  2.3  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
+| demDefaults                                                              |   `object`  | Default properties for DEM extracts.                                                                                        | *Optional* |                                   |  2.3  |
+|    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)       |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* | `1.0`                             |  2.3  |
 | [elevationBucket](#elevationBucket)                                      |   `object`  | Used to download NED elevation tiles from the given AWS S3 bucket.                                                          | *Optional* |                                   |   na  |
 | [fares](sandbox/Fares.md)                                                |   `object`  | Fare configuration.                                                                                                         | *Optional* |                                   |  2.0  |
 | [localFileNamePatterns](#localFileNamePatterns)                          |   `object`  | Patterns for matching OTP file types in the base directory                                                                  | *Optional* |                                   |  2.0  |
@@ -75,14 +76,14 @@ Sections follow that describe particular settings in more depth.
 |    noTransfersOnIsolatedStops                                            |  `boolean`  | Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED                                    | *Optional* | `false`                           |  2.2  |
 |    [sharedFilePattern](#nd_sharedFilePattern)                            |   `regexp`  | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                  | *Optional* | `"shared-data\.xml"`              |  2.0  |
 |    [sharedGroupFilePattern](#nd_sharedGroupFilePattern)                  |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                            | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
-|    [ferryIdsNotAllowedForBicycle](#nd_ferryIdsNotAllowedForBicycle)      |  `string[]` | List ferries witch do not allow bikes.                                                                                      | *Optional* |                                   |  2.0  |
+|    [ferryIdsNotAllowedForBicycle](#nd_ferryIdsNotAllowedForBicycle)      |  `string[]` | List ferries which do not allow bikes.                                                                                      | *Optional* |                                   |  2.0  |
 | [osm](#osm)                                                              |  `object[]` | Configure properties for a given OpenStreetMap feed.                                                                        | *Optional* |                                   |  2.2  |
-|       [osmTagMapping](#osm_0_osmTagMapping)                              |    `enum`   | The named set of mapping rules applied when parsing OSM tags.                                                               | *Optional* | `"default"`                       |  2.2  |
+|       [osmTagMapping](#osm_0_osmTagMapping)                              |    `enum`   | The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.               | *Optional* | `"default"`                       |  2.2  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
-|       timeZone                                                           | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                       | *Optional* |                                   |  2.2  |
+|       timeZone                                                           | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in `osmDefaults`.                     | *Optional* |                                   |  2.2  |
 | osmDefaults                                                              |   `object`  | Default properties for OpenStreetMap feeds.                                                                                 | *Optional* |                                   |  2.2  |
 |    [osmTagMapping](#od_osmTagMapping)                                    |    `enum`   | The named set of mapping rules applied when parsing OSM tags.                                                               | *Optional* | `"default"`                       |  2.2  |
-|    timeZone                                                              | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                       | *Optional* |                                   |  2.2  |
+|    timeZone                                                              | `time-zone` | The timezone used to resolve opening hours in OSM data.                                                                     | *Optional* |                                   |  2.2  |
 | osmNaming                                                                |   `object`  | A custom OSM namer to use.                                                                                                  | *Optional* |                                   |  2.0  |
 | [transferRequests](RouteRequest.md)                                      |  `object[]` | Routing requests to use for pre-calculating stop-to-stop transfers.                                                         | *Optional* |                                   |  2.1  |
 | [transitFeeds](#transitFeeds)                                            |  `object[]` | Scan for transit data files                                                                                                 | *Optional* |                                   |  2.2  |
@@ -91,17 +92,18 @@ Sections follow that describe particular settings in more depth.
 |       feedId                                                             |   `string`  | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                     | *Optional* |                                   |   na  |
 |       removeRepeatedStops                                                |  `boolean`  | Should consecutive identical stops be merged into one stop time entry                                                       | *Optional* | `true`                            |  2.3  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |   na  |
+|       [stationTransferPreference](#tf_0_stationTransferPreference)       |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                              | *Optional* | `"allowed"`                       |  2.3  |
 |    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                    | *Optional* |                                   |  2.2  |
 |       type = "NETEX"                                                     |    `enum`   | The feed input format.                                                                                                      | *Required* |                                   |  2.2  |
 |       feedId                                                             |   `string`  | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt. | *Required* |                                   |  2.2  |
-|       [groupFilePattern](#tf_1_groupFilePattern)                         |   `regexp`  | Pattern for matching group NeTEx files.                                                                                     | *Optional* | `"(\w{3})_.*\.xml"`               |  2.0  |
+|       [groupFilePattern](#tf_1_groupFilePattern)                         |   `regexp`  | Pattern for matching group NeTEx files.                                                                                     | *Optional* | `"(\w{3})-.*\.xml"`               |  2.0  |
 |       ignoreFareFrame                                                    |  `boolean`  | Ignore contents of the FareFrame                                                                                            | *Optional* | `false`                           |  2.3  |
-|       [ignoreFilePattern](#tf_1_ignoreFilePattern)                       |   `regexp`  | Pattern for matching ignored files in a NeTEx bundle.                                                                       | *Optional* | `"(temp¦tmp)"`                    |  2.0  |
+|       [ignoreFilePattern](#tf_1_ignoreFilePattern)                       |   `regexp`  | Pattern for matching ignored files in a NeTEx bundle.                                                                       | *Optional* | `"$^"`                            |  2.0  |
 |       noTransfersOnIsolatedStops                                         |  `boolean`  | Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED                                    | *Optional* | `false`                           |  2.2  |
-|       [sharedFilePattern](#tf_1_sharedFilePattern)                       |   `regexp`  | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                  | *Optional* | `"_stops.xml"`                    |  2.0  |
-|       [sharedGroupFilePattern](#tf_1_sharedGroupFilePattern)             |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                            | *Optional* | `"_(\w{3})_shared_data.xml"`      |  2.0  |
+|       [sharedFilePattern](#tf_1_sharedFilePattern)                       |   `regexp`  | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                  | *Optional* | `"shared-data\.xml"`              |  2.0  |
+|       [sharedGroupFilePattern](#tf_1_sharedGroupFilePattern)             |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                            | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
-|       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle) |  `string[]` | List ferries witch do not allow bikes.                                                                                      | *Optional* |                                   |  2.0  |
+|       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle) |  `string[]` | List ferries which do not allow bikes.                                                                                      | *Optional* |                                   |  2.0  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -411,7 +413,7 @@ See [writeCachedElevations](#writeCachedElevations) for details.
 
 <h3 id="areaVisibility">areaVisibility</h3>
 
-**Since version:** `1.5` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `1.5` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** / 
 
 Perform visibility calculations.
@@ -422,7 +424,7 @@ shortest way rather than around the edge of it. (These calculations can be time 
 
 <h3 id="buildReportDir">buildReportDir</h3>
 
-**Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 URI to the directory where the graph build report should be written to.
@@ -433,7 +435,7 @@ If it does not exist, it is created.
 
 <h3 id="configVersion">configVersion</h3>
 
-**Since version:** `2.1` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.1` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Deployment version of the *build-config.json*.
@@ -451,7 +453,7 @@ Be aware that OTP uses the config embedded in the loaded graph if no new config 
 
 <h3 id="dataImportReport">dataImportReport</h3>
 
-**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** / 
 
 Generate nice HTML report of Graph errors/warnings
@@ -460,7 +462,7 @@ The reports are stored in the same location as the graph.
 
 <h3 id="discardMinTransferTimes">discardMinTransferTimes</h3>
 
-**Since version:** `2.2` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.2` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** / 
 
 Should minimum transfer times in GTFS files be discarded.
@@ -471,28 +473,16 @@ but we want to calculate the transfers always from OSM data.
 
 <h3 id="distanceBetweenElevationSamples">distanceBetweenElevationSamples</h3>
 
-**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10.0`  \
+**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10.0`   
 **Path:** / 
 
 The distance between elevation samples in meters.
 
 The default is the approximate resolution of 1/3 arc-second NED data. This should not be smaller than the horizontal resolution of the height data used.
 
-<h3 id="elevationUnitMultiplier">elevationUnitMultiplier</h3>
-
-**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`  \
-**Path:** / 
-
-Specify a multiplier to convert elevation units from source to meters.
-
-Unit conversion multiplier for elevation values. No conversion needed if the elevation
-values are defined in meters in the source data. If, for example, decimetres are used
-in the source data, this should be set to 0.1.
-
-
 <h3 id="graph">graph</h3>
 
-**Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 URI to the graph object file for reading and writing.
@@ -501,7 +491,7 @@ The file is created or overwritten if OTP saves the graph to the file.
 
 <h3 id="gsCredentials">gsCredentials</h3>
 
-**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Local file system path to Google Cloud Platform service accounts credentials file.
@@ -515,7 +505,7 @@ This is a path to a file on the local file system, not an URI.
 
 <h3 id="includeEllipsoidToGeoidDifference">includeEllipsoidToGeoidDifference</h3>
 
-**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** / 
 
 Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.
@@ -531,7 +521,7 @@ all of the elevation values in the street edges.
 
 <h3 id="islandWithStopsMaxSize">islandWithStopsMaxSize</h3>
 
-**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `5`  \
+**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `5`   
 **Path:** / 
 
 When a graph island with stops in it should be pruned.
@@ -542,7 +532,7 @@ size will be pruned.
 
 <h3 id="islandWithoutStopsMaxSize">islandWithoutStopsMaxSize</h3>
 
-**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`  \
+**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`   
 **Path:** / 
 
 When a graph island without stops should be pruned.
@@ -553,7 +543,7 @@ this size will be pruned.
 
 <h3 id="maxDataImportIssuesPerFile">maxDataImportIssuesPerFile</h3>
 
-**Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1000`  \
+**Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1000`   
 **Path:** / 
 
 When to split the import report.
@@ -564,7 +554,7 @@ When to split the import report.
 
 <h3 id="maxStopToShapeSnapDistance">maxStopToShapeSnapDistance</h3>
 
-**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `150.0`  \
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `150.0`   
 **Path:** / 
 
 Maximum distance between route shapes and their stops.
@@ -576,7 +566,7 @@ default to simple stop-to-stop geometry instead.
 
 <h3 id="multiThreadElevationCalculations">multiThreadElevationCalculations</h3>
 
-**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** / 
 
 Configuring multi-threading during elevation calculations.
@@ -588,7 +578,7 @@ Configuring multi-threading during elevation calculations.
 
 <h3 id="osmCacheDataInMem">osmCacheDataInMem</h3>
 
-**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** / 
 
 If OSM data should be cached in memory during processing.
@@ -603,7 +593,7 @@ data, and to `false` to read the stream from the source each time.
 
 <h3 id="readCachedElevations">readCachedElevations</h3>
 
-**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`   
 **Path:** / 
 
 Whether to read cached elevation data.
@@ -615,7 +605,7 @@ recalculating them all over again.
 
 <h3 id="streetGraph">streetGraph</h3>
 
-**Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 URI to the street graph object file for reading and writing.
@@ -624,7 +614,7 @@ The file is created or overwritten if OTP saves the graph to the file
 
 <h3 id="subwayAccessTime">subwayAccessTime</h3>
 
-**Since version:** `1.5` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`  \
+**Since version:** `1.5` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`   
 **Path:** / 
 
 Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
@@ -645,7 +635,7 @@ to check in to a flight (2-3 hours for international flights) than to alight and
 
 <h3 id="transitModelTimeZone">transitModelTimeZone</h3>
 
-**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Time zone for the graph.
@@ -654,7 +644,7 @@ This is used to store the timetables in the transit model, and to interpret time
 
 <h3 id="transitServiceEnd">transitServiceEnd</h3>
 
-**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"P3Y"`  \
+**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"P3Y"`   
 **Path:** / 
 
 Limit the import of transit services to the given end date.
@@ -670,7 +660,7 @@ Use an empty string to make it unbounded.
 
 <h3 id="transitServiceStart">transitServiceStart</h3>
 
-**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"-P1Y"`  \
+**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"-P1Y"`   
 **Path:** / 
 
 Limit the import of transit services to the given START date.
@@ -686,7 +676,7 @@ Use an empty string to make unbounded.
 
 <h3 id="writeCachedElevations">writeCachedElevations</h3>
 
-**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** / 
 
 Reusing elevation data from previous builds
@@ -716,7 +706,7 @@ recommended.
 
 <h3 id="boardingLocationTags">boardingLocationTags</h3>
 
-**Since version:** `2.2` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 What OSM tags should be looked on for the source of matching stops to platforms and stops.
@@ -725,7 +715,7 @@ What OSM tags should be looked on for the source of matching stops to platforms 
 
 <h3 id="dem">dem</h3>
 
-**Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Specify parameters for DEM extracts.
@@ -741,20 +731,31 @@ the command line.
 
 <h3 id="dem_0_elevationUnitMultiplier">elevationUnitMultiplier</h3>
 
-**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`   
 **Path:** /dem/[0] 
+
+Specify a multiplier to convert elevation units from source to meters. Overrides the value specified in `demDefaults`.
+
+Unit conversion multiplier for elevation values. No conversion needed if the elevation
+values are defined in meters in the source data. If, for example, decimetres are used
+in the source data, this should be set to 0.1.
+
+
+<h3 id="demDefaults_elevationUnitMultiplier">elevationUnitMultiplier</h3>
+
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`   
+**Path:** /demDefaults 
 
 Specify a multiplier to convert elevation units from source to meters.
 
-  Unit conversion multiplier for elevation values. No conversion needed if the elevation
-  values are defined in meters in the source data. If, for example, decimetres are used
-  in the source data, this should be set to 0.1. This overrides the value specified in
-  [`elevationUnitMultiplier`](#elevationUnitMultiplier) in the build config at root level.
+Unit conversion multiplier for elevation values. No conversion needed if the elevation
+values are defined in meters in the source data. If, for example, decimetres are used
+in the source data, this should be set to 0.1.
 
 
 <h3 id="elevationBucket">elevationBucket</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Used to download NED elevation tiles from the given AWS S3 bucket.
@@ -780,7 +781,7 @@ to specify your NED tile cache location.
 
 <h3 id="localFileNamePatterns">localFileNamePatterns</h3>
 
-**Since version:** `2.0` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Patterns for matching OTP file types in the base directory
@@ -797,7 +798,7 @@ Netex data is also often supplied in a ZIP file.
 
 <h3 id="lfp_dem">dem</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)\.tiff?$"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)\.tiff?$"`   
 **Path:** /localFileNamePatterns 
 
 Pattern for matching elevation DEM files.
@@ -808,7 +809,7 @@ considered a match. Any legal Java Regular expression is allowed.
 
 <h3 id="lfp_gtfs">gtfs</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)gtfs"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)gtfs"`   
 **Path:** /localFileNamePatterns 
 
 Patterns for matching GTFS zip-files or directories.
@@ -819,7 +820,7 @@ Any legal Java Regular expression is allowed.
 
 <h3 id="lfp_netex">netex</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)netex"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)netex"`   
 **Path:** /localFileNamePatterns 
 
 Patterns for matching NeTEx zip files or directories.
@@ -830,7 +831,7 @@ pattern it is considered a match. Any legal Java Regular expression is allowed.
 
 <h3 id="lfp_osm">osm</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)(\.pbf|\.osm|\.osm\.xml)$"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)(\.pbf|\.osm|\.osm\.xml)$"`   
 **Path:** /localFileNamePatterns 
 
 Pattern for matching Open Street Map input files.
@@ -841,7 +842,7 @@ it is considered a match. Any legal Java Regular expression is allowed.
 
 <h3 id="nd_groupFilePattern">groupFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})-.*\.xml"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})-.*\.xml"`   
 **Path:** /netexDefaults 
 
 Pattern for matching group NeTEx files.
@@ -855,7 +856,7 @@ with group `"RUT"`.
 
 <h3 id="nd_ignoreFilePattern">ignoreFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"$^"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"$^"`   
 **Path:** /netexDefaults 
 
 Pattern for matching ignored files in a NeTEx bundle.
@@ -866,7 +867,7 @@ The *ignored* files are *not* loaded.
 
 <h3 id="nd_sharedFilePattern">sharedFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"shared-data\.xml"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"shared-data\.xml"`   
 **Path:** /netexDefaults 
 
 Pattern for matching shared NeTEx files in a NeTEx bundle.
@@ -886,7 +887,7 @@ File names are matched in the following order - and treated accordingly to the f
 
 <h3 id="nd_sharedGroupFilePattern">sharedGroupFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})-.*-shared\.xml"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})-.*-shared\.xml"`   
 **Path:** /netexDefaults 
 
 Pattern for matching shared group NeTEx files in a NeTEx bundle.
@@ -904,12 +905,12 @@ The pattern `"(\w{3})-.*-shared\.xml"` matches `"RUT-shared.xml"` with group `"R
 
 <h3 id="nd_ferryIdsNotAllowedForBicycle">ferryIdsNotAllowedForBicycle</h3>
 
-**Since version:** `2.0` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** /netexDefaults 
 
-List ferries witch do not allow bikes.
+List ferries which do not allow bikes.
 
-Bicycles are allowed on most ferries however Nordic profile doesn't contain a place
+Bicycles are allowed on most ferries however the Nordic profile doesn't contain a place
 where bicycle conveyance can be defined.
 
 For this reason we allow bicycles on ferries by default and allow to override the rare
@@ -918,7 +919,7 @@ case where this is not the case.
 
 <h3 id="osm">osm</h3>
 
-**Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Configure properties for a given OpenStreetMap feed.
@@ -931,23 +932,23 @@ the local filesystem.
 
 <h3 id="osm_0_osmTagMapping">osmTagMapping</h3>
 
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`  \
-**Path:** /osm/[0]  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
+**Path:** /osm/[0]   
 **Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston`
 
-The named set of mapping rules applied when parsing OSM tags.
+The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.
 
 <h3 id="od_osmTagMapping">osmTagMapping</h3>
 
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`  \
-**Path:** /osmDefaults  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
+**Path:** /osmDefaults   
 **Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston`
 
 The named set of mapping rules applied when parsing OSM tags.
 
 <h3 id="transitFeeds">transitFeeds</h3>
 
-**Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Scan for transit data files
@@ -961,9 +962,21 @@ When a feed of a particular type (`netex` or `gtfs`) is specified in the transit
 section, auto-scanning in the base directory for this feed type will be disabled.
 
 
+<h3 id="tf_0_stationTransferPreference">stationTransferPreference</h3>
+
+**Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`   
+**Path:** /transitFeeds/[0]   
+**Enum values:** `discouraged` | `allowed` | `recommended` | `preferred`
+
+Should there be some preference or aversion for transfers at stops that are part of a station.
+
+This parameter sets the generic level of preference. What is the actual cost can be changed
+with the `stopTransferCost` parameter in the router configuration.
+
+
 <h3 id="tf_1_groupFilePattern">groupFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})_.*\.xml"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})-.*\.xml"`   
 **Path:** /transitFeeds/[1] 
 
 Pattern for matching group NeTEx files.
@@ -977,7 +990,7 @@ with group `"RUT"`.
 
 <h3 id="tf_1_ignoreFilePattern">ignoreFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(temp|tmp)"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"$^"`   
 **Path:** /transitFeeds/[1] 
 
 Pattern for matching ignored files in a NeTEx bundle.
@@ -988,7 +1001,7 @@ The *ignored* files are *not* loaded.
 
 <h3 id="tf_1_sharedFilePattern">sharedFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"_stops.xml"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"shared-data\.xml"`   
 **Path:** /transitFeeds/[1] 
 
 Pattern for matching shared NeTEx files in a NeTEx bundle.
@@ -1008,7 +1021,7 @@ File names are matched in the following order - and treated accordingly to the f
 
 <h3 id="tf_1_sharedGroupFilePattern">sharedGroupFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"_(\w{3})_shared_data.xml"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})-.*-shared\.xml"`   
 **Path:** /transitFeeds/[1] 
 
 Pattern for matching shared group NeTEx files in a NeTEx bundle.
@@ -1026,12 +1039,12 @@ The pattern `"(\w{3})-.*-shared\.xml"` matches `"RUT-shared.xml"` with group `"R
 
 <h3 id="tf_1_ferryIdsNotAllowedForBicycle">ferryIdsNotAllowedForBicycle</h3>
 
-**Since version:** `2.0` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** /transitFeeds/[1] 
 
-List ferries witch do not allow bikes.
+List ferries which do not allow bikes.
 
-Bicycles are allowed on most ferries however Nordic profile doesn't contain a place
+Bicycles are allowed on most ferries however the Nordic profile doesn't contain a place
 where bicycle conveyance can be defined.
 
 For this reason we allow bicycles on ferries by default and allow to override the rare
@@ -1060,14 +1073,16 @@ case where this is not the case.
     "netex" : "(?i)netex"
   },
   "osmDefaults" : {
-    "timeZone" : "Europe/Rome",
-    "osmTagMapping" : "atlanta"
+    "osmTagMapping" : "default"
   },
   "osm" : [ {
     "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",
     "timeZone" : "Europe/Oslo",
     "osmTagMapping" : "norway"
   } ],
+  "demDefaults" : {
+    "elevationUnitMultiplier" : 1.0
+  },
   "dem" : [ {
     "source" : "gs://my-bucket/otp-work-dir/norway.dem.tiff",
     "elevationUnitMultiplier" : 2.5

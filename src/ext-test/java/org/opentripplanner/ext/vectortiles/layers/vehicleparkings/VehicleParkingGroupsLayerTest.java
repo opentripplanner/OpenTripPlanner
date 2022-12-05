@@ -15,8 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
+import org.opentripplanner.inspector.vector.KeyValue;
+import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
@@ -146,7 +147,7 @@ public class VehicleParkingGroupsLayerTest {
     Map<String, Object> map = new HashMap<>();
     mapper
       .map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))
-      .forEach(o -> map.put(o.first, o.second));
+      .forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals(ID.toString(), map.get("id").toString());
     assertEquals("groupName", map.get("name").toString());
@@ -165,7 +166,7 @@ public class VehicleParkingGroupsLayerTest {
     Map<String, Object> map = new HashMap<>();
     mapper
       .map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))
-      .forEach(o -> map.put(o.first, o.second));
+      .forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals("groupDE", map.get("name").toString());
 
@@ -180,7 +181,7 @@ public class VehicleParkingGroupsLayerTest {
 
     public VehicleParkingGroupsLayerBuilderWithPublicGeometry(
       Graph graph,
-      VectorTilesResource.LayerParameters layerParameters,
+      LayerParameters<VectorTilesResource.LayerType> layerParameters,
       Locale locale
     ) {
       super(graph, layerParameters, locale);
@@ -200,7 +201,7 @@ public class VehicleParkingGroupsLayerTest {
     }
 
     @Override
-    public Collection<T2<String, Object>> map(VehicleParkingAndGroup vehicleParkingAndGroup) {
+    public Collection<KeyValue> map(VehicleParkingAndGroup vehicleParkingAndGroup) {
       return super.map(vehicleParkingAndGroup);
     }
   }

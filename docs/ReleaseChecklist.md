@@ -23,6 +23,10 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * Check in any changes, and push to GitHub
     * It is important to finalize the documentation before tagging the release, to ensure the 
       published documentation is associated with the release tag 
+* Update the variable MASTER_BRANCH_VERSION in `cibuild.yml`
+    * This tells the GH Action that pushes the documentation on master what the name of the 
+      current version is. 
+      For version 2.3.0 Leonard has already done it: [Example commit](https://github.com/opentripplanner/OpenTripPlanner/commit/3cb061ab1e4253c3977a5d08fa5abab1b0baefd7)
 * Check [on GH Actions](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/) that
   the build is currently passing
 * Switch to the HEAD of master branch, and ensure it's up to date with no uncommitted changes
@@ -93,16 +97,10 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * `git checkout dev-2.x`
     * `git merge master`
     * `git push`
-* Make sure the main documentation is built
-    * For some reason it doesn't always build automatically
-    * Go
-      to [builds of docs.opentripplanner.org](http://readthedocs.org/projects/opentripplanner/builds/)
-    * Click "build version: latest"
 * Email the OTP dev and users mailing lists
     * Mention the new version number.
     * Provide links to the new developer documentation.
     * Provide links to the artifacts directory on Maven Central.
-    * Trigger build of latest OTP documentation on Readthedocs.
 
 ## Artifact Signing
 

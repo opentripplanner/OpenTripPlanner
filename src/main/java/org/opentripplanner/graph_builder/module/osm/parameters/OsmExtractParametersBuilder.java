@@ -17,19 +17,28 @@ public class OsmExtractParametersBuilder {
   /**
    * Custom OSM way properties for this extract.
    */
-  private OsmTagMapper osmTagMapper;
+  private OsmTagMapper.Source osmTagMapper;
 
   /**
    * The timezone to use to resolve opening hours in this extract.
    */
   private ZoneId timeZone;
 
+  public OsmExtractParametersBuilder() {
+    this.osmTagMapper = OsmExtractParameters.DEFAULT_OSM_TAG_MAPPER;
+  }
+
+  public OsmExtractParametersBuilder(OsmExtractParameters original) {
+    this.osmTagMapper = original.osmTagMapper();
+    this.timeZone = original.timeZone().orElse(null);
+  }
+
   public OsmExtractParametersBuilder withSource(URI source) {
     this.source = source;
     return this;
   }
 
-  public OsmExtractParametersBuilder withOsmTagMapper(OsmTagMapper mapper) {
+  public OsmExtractParametersBuilder withOsmTagMapper(OsmTagMapper.Source mapper) {
     this.osmTagMapper = mapper;
     return this;
   }
@@ -43,7 +52,7 @@ public class OsmExtractParametersBuilder {
     return source;
   }
 
-  public OsmTagMapper getOsmTagMapper() {
+  public OsmTagMapper.Source getOsmTagMapper() {
     return osmTagMapper;
   }
 

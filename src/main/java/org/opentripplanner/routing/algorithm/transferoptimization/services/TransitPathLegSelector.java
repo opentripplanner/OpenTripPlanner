@@ -2,10 +2,10 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * This class takes a list of transit legs and returns the best leg based on the {@link

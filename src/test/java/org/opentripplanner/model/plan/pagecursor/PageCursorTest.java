@@ -14,10 +14,11 @@ import java.util.TimeZone;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 
 public class PageCursorTest {
 
-  private static final ZoneId ZONE_ID = ZoneId.of("GMT");
+  private static final ZoneId ZONE_ID = ZoneIds.GMT;
   private static final String EDT_STR = "2021-01-31T12:20:00Z";
   private static final String LAT_STR = "2021-01-31T15:00:00Z";
   private static final Instant EDT = Instant.parse(EDT_STR);

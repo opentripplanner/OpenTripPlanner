@@ -1,16 +1,16 @@
 package org.opentripplanner.netex.loader.parser;
 
-import static org.opentripplanner.util.logging.MaxCountLogger.maxCount;
+import static org.opentripplanner.framework.logging.MaxCountLogger.maxCount;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.logging.MaxCountLogger;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
-import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.logging.MaxCountLogger;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplaysInFrame_RelStructure;
 import org.rutebanken.netex.model.FlexibleLine;
