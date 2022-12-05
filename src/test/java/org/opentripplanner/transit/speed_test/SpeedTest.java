@@ -36,6 +36,7 @@ import org.opentripplanner.transit.speed_test.model.testcase.TestCaseInput;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.updater.configure.UpdaterConfigurator;
 
 /**
  * Test response times for a large batch of origin/destination points. Also demonstrates how to run
@@ -76,6 +77,9 @@ public class SpeedTest {
 
     // Read Test-case definitions and expected results from file
     this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
+
+    UpdaterConfigurator.configure(model.graph(), transitModel, config.updatersConfig);
+    transitModel.getUpdaterManager().startUpdaters();
 
     this.serverContext =
       DefaultServerRequestContext.create(

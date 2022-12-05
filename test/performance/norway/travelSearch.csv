@@ -44,3 +44,9 @@ testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon
 105,"P+R into Oslo, Hønefoss",10:00,,3h,Hønefoss,,60.1688416,10.2612305,Oslo,,59.9299041,10.74874,p-and-r,CAR_PARK|TRANSIT|WALK
 106,"P+R into Oslo, Moss",10:00,,3h,Moss,,59.4318080,10.6649780,Oslo,,59.9299041,10.74874,p-and-r,CAR_PARK|TRANSIT|WALK
 107,"P+R Drammen to Ålesund",10:00,,3h,Drammen,,59.7176376,10.2612305,Ålesund,,62.4869530,6.1303710,p-and-r,CAR_PARK|TRANSIT|WALK
+201,Jordal to Lille Tøyen,10:00,,,Jordal,,59.90947,10.78350,Lille Tøyen,,59.9204,10.7866,scooter-rent,WALK|SCOOTER_RENT
+202,Jordal to Briskeby,10:00,,,Jordal,,59.90947,10.78350,Briskeby,,59.9211,10.7167,scooter-rent,WALK|SCOOTER_RENT
+203,Lille Tøyen to Jordal,10:00,,,Lille Tøyen,,59.9204,10.7866,Jordal,,59.90947,10.78350,scooter-rent,WALK|SCOOTER_RENT
+204,Lille Tøyen to Briskeby,10:00,,,Lille Tøyen,,59.9204,10.7866,Briskeby,,59.9211,10.7167,scooter-rent,WALK|SCOOTER_RENT
+205,Briskeby to Jordal,10:00,,,Briskeby,,59.9211,10.7167,Jordal,,59.90947,10.78350,scooter-rent,WALK|SCOOTER_RENT
+206,Briskeby to Lille Tøyen,10:00,,,Briskeby,,59.9211,10.7167,Lille Tøyen,,59.9204,10.7866,scooter-rent,WALK|SCOOTER_RENT

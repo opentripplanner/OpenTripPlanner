@@ -56,5 +56,14 @@
     "transitReluctanceForMode": {
       "RAIL": 1.0
     }
-  }
+  },
+  "updaters": [
+    {
+      "type" : "vehicle-rental",
+      "sourceType" : "gbfs",
+      "frequencySec" : 3600,
+      "url" : "https://api.entur.io/mobility/v2/gbfs/tieroslo/gbfs"
+    }
+  ]
+
 }
