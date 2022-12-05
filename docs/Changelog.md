@@ -25,6 +25,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add demDefaults [#4637](https://github.com/opentripplanner/OpenTripPlanner/pull/4637)
 - Add carpool and taxi modes [#4641](https://github.com/opentripplanner/OpenTripPlanner/pull/4641)
 - Add vector tile and layer in debug client for AreaStops [#4565](https://github.com/opentripplanner/OpenTripPlanner/pull/4565)
+- Prevent bicycles from using stairs [#4614](https://github.com/opentripplanner/OpenTripPlanner/pull/4614)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
