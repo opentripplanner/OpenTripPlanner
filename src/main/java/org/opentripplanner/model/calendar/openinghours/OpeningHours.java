@@ -1,9 +1,7 @@
 package org.opentripplanner.model.calendar.openinghours;
 
 import java.io.Serializable;
-import java.time.Duration;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.BitSet;
 import java.util.Objects;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -57,20 +55,6 @@ public class OpeningHours implements Comparable<OpeningHours>, Serializable {
     );
   }
 
-  public String osmFormat() {
-    return (
-      toOsm(periodDescription) +
-      " " +
-      TimeUtils.timeToStrCompact(truncateToMinute(startTime)) +
-      "-" +
-      TimeUtils.timeToStrCompact(truncateToMinute(endTime))
-    );
-  }
-
-  private static int truncateToMinute(long startTime) {
-    return (int) Duration.ofSeconds(startTime).truncatedTo(ChronoUnit.MINUTES).toSeconds();
-  }
-
   @Override
   public int compareTo(OpeningHours other) {
     return this.startTime == other.startTime
@@ -89,17 +73,15 @@ public class OpeningHours implements Comparable<OpeningHours>, Serializable {
     );
   }
 
-  private static String toOsm(String description) {
-    return switch (description.toLowerCase()) {
-      case "business days" -> "Mo-Fr";
-      case "monday" -> "Mo";
-      case "tuesday" -> "Tu";
-      case "wednesday" -> "We";
-      case "thursday" -> "Th";
-      case "friday" -> "Fr";
-      case "saturday" -> "Sa";
-      case "sunday" -> "Su";
-      default -> description;
-    };
+  public String periodDescription() {
+    return periodDescription;
+  }
+
+  public long startTime() {
+    return startTime;
+  }
+
+  public long endTime() {
+    return endTime;
   }
 }

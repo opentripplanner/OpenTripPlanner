@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 import org.opentripplanner.api.mapping.I18NStringMapper;
 import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
+import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 
@@ -39,7 +40,12 @@ public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<Vehicl
       )
     );
     if (vehicleParking.getOpeningHours() != null) {
-      items.add(new KeyValue("openingHours", vehicleParking.getOpeningHours().osmFormat()));
+      items.add(
+        new KeyValue(
+          "openingHours",
+          OsmOpeningHoursSupport.osmFormat(vehicleParking.getOpeningHours())
+        )
+      );
     }
     items.addAll(mapPlaces("capacity", vehicleParking.getCapacity()));
     items.addAll(mapPlaces("availability", vehicleParking.getAvailability()));
