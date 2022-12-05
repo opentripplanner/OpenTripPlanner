@@ -87,3 +87,11 @@ Data used:
 - Switzerland GTFS national data
 
 [build-config](switzerland/build-config.json)
+
+### Washington State
+
+This data set tests a lot of overlapping flex routes in and around Seattle in Washington State.
+
+[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=flex&var-location=washington-state&var-branch=dev-2.x&from=1669892798000&to=now)
+
+[build-config](washington-state/build-config.json)

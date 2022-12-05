@@ -1,0 +1,8 @@
+{
+  // Run all test-cases on the given date
+  "testDate": "2022-11-01",
+  "feedId": "1",
+  // Default: "graph.obj"
+  "graph": "graph.obj"
+
+}
