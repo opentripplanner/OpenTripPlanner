@@ -36,10 +36,8 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
     Locale locale
   ) {
     super(
+      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(locale),
       layerParameters.name(),
-      mappers
-        .get(VehicleParkingsLayerBuilder.MapperType.valueOf(layerParameters.mapper()))
-        .apply(locale),
       layerParameters.expansionFactor()
     );
     this.graph = graph;

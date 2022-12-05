@@ -31,8 +31,8 @@ public class StationsLayerBuilder extends LayerBuilder<Station> {
     Locale locale
   ) {
     super(
-      layerParameters.name(),
       mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitService, locale),
+      layerParameters.name(),
       layerParameters.expansionFactor()
     );
     this.transitModel = transitService;

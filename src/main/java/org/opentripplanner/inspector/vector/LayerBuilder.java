@@ -21,7 +21,7 @@ public abstract class LayerBuilder<T> {
   private final PropertyMapper<T> mapper;
   private final double expansionFactor;
 
-  public LayerBuilder(String layerName, PropertyMapper<T> mapper, double expansionFactor) {
+  public LayerBuilder(PropertyMapper<T> mapper, String layerName, double expansionFactor) {
     this.mapper = mapper;
     this.layerBuilder = MvtLayerBuild.newLayerBuilder(layerName, MvtLayerParams.DEFAULT);
     this.expansionFactor = expansionFactor;
