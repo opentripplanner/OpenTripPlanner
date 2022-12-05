@@ -1175,6 +1175,10 @@ public class StreetEdge
       if (walkingBike) {
         // take slopes into account when walking bikes
         time = weight = (getEffectiveBikeDistance() / speed);
+        if (isStairs()) {
+          // we do allow walking the bike across a stairs but there is a very high default penalty
+          weight *= preferences.bike().stairsReluctance();
+        }
       } else {
         // take slopes into account when walking
         time = getEffectiveWalkDistance() / speed;

@@ -874,9 +874,9 @@
             <version>1.2.5</version>
         </dependency>
         <dependency>
-            <groupId>com.wdtinc</groupId>
+            <groupId>io.github.ci-cmg</groupId>
             <artifactId>mapbox-vector-tile</artifactId>
-            <version>3.1.0</version>
+            <version>4.0.5</version>
         </dependency>
         <dependency>
             <groupId>net.objecthunter</groupId>
