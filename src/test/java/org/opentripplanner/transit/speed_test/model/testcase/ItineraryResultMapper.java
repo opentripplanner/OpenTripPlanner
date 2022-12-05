@@ -7,11 +7,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -122,6 +125,19 @@ class ItineraryResultMapper {
       }
       if (it.getTo().stop != null) {
         stops.add(it.getTo().stop.getId().toString());
+      }
+      if (it instanceof StreetLeg streetLeg) {
+        var rentalNetwork = streetLeg.getVehicleRentalNetwork();
+        if (rentalNetwork != null) {
+          routes.add(rentalNetwork);
+        }
+
+        Stream
+          .of(streetLeg.getFrom().vehicleRentalPlace, streetLeg.getTo().vehicleRentalPlace)
+          .filter(Objects::nonNull)
+          .forEach(p -> {
+            stops.add(p.getId().toString());
+          });
       }
     }
 

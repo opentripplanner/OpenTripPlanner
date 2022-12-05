@@ -81,7 +81,6 @@ public class SpeedTest {
     UpdaterConfigurator.configure(model.graph(), transitModel, config.updatersConfig);
     transitModel.getUpdaterManager().startUpdaters();
 
-
     this.serverContext =
       DefaultServerRequestContext.create(
         config.transitRoutingParams,
