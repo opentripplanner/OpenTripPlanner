@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.framework.application.OtpAppException;
 
 /**
  * Replaces environment variable placeholders specified on the format ${variable} in a text with the

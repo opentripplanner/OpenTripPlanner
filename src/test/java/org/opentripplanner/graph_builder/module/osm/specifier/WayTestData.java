@@ -49,6 +49,21 @@ public class WayTestData {
     return way;
   }
 
+  public static OSMWithTags stairs() {
+    // https://www.openstreetmap.org/way/1058669389
+    var way = new OSMWithTags();
+    way.addTag("handrail", "yes");
+    way.addTag("highway", "steps");
+    way.addTag("incline", "down");
+    way.addTag("ramp", "yes");
+    way.addTag("ramp:bicycle", "yes");
+    way.addTag("oneway", "no");
+    way.addTag("step_count", "38");
+    way.addTag("surface", "metal");
+
+    return way;
+  }
+
   public static OSMWithTags southeastLaBonitaWay() {
     // https://www.openstreetmap.org/way/5302874
     var way = new OSMWithTags();

@@ -6,7 +6,8 @@ import java.util.Locale;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
-import org.opentripplanner.inspector.TileRendererManager;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.RoutingService;
@@ -19,7 +20,6 @@ import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 
 /**
@@ -104,7 +104,7 @@ public interface OtpServerRequestContext {
 
   FlexConfig flexConfig();
 
-  VectorTilesResource.LayersParameters vectorTileLayers();
+  VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers();
 
   default DataOverlayContext dataOverlayContext(RouteRequest request) {
     return OTPFeature.DataOverlay.isOnElseNull(() ->

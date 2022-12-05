@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.fares.impl;
 
-import java.io.Serial;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -21,9 +20,6 @@ import org.slf4j.LoggerFactory;
  */
 
 public class HSLFareServiceImpl extends DefaultFareService {
-
-  @Serial
-  private static final long serialVersionUID = 20131259L;
 
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
 

@@ -64,7 +64,6 @@ import processing.core.PFont;
 public class ShowGraph extends PApplet implements MouseWheelListener {
 
   private static final int FRAME_RATE = 30;
-  private static final long serialVersionUID = -8336165356756970127L;
   private static final boolean VIDEO = false;
   private static final String VIDEO_PATH = "/home/syncopate/pathimage/";
   private static final DecimalFormat latFormatter = new DecimalFormat("00.0000°N ; 00.0000°S");

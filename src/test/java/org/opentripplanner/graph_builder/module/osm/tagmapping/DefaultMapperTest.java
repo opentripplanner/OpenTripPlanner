@@ -2,26 +2,30 @@ package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.SpeedPicker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
+import org.opentripplanner.graph_builder.module.osm.specifier.WayTestData;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public class DefaultMapperTest {
 
-  WayPropertySet wps = new WayPropertySet();
+  static WayPropertySet wps = new WayPropertySet();
   float epsilon = 0.01f;
+
+  static {
+    DefaultMapper source = new DefaultMapper();
+    source.populateProperties(wps);
+  }
 
   /**
    * Test that car speeds are calculated accurately
    */
   @Test
   public void testCarSpeeds() {
-    DefaultMapper source = new DefaultMapper();
-    source.populateProperties(wps);
-
     OSMWithTags way;
 
     way = new OSMWithTags();
@@ -98,6 +102,13 @@ public class DefaultMapperTest {
     assertSpeed(4.305559158325195, "15.5 km/h");
     assertSpeed(22.347200393676758, "50 mph");
     assertSpeed(22.347200393676758, "50.0 mph");
+  }
+
+  @Test
+  void stairs() {
+    // there is no special handling for stairs with ramps yet
+    var props = wps.getDataForWay(WayTestData.stairs());
+    assertEquals(PEDESTRIAN, props.getPermission());
   }
 
   /**

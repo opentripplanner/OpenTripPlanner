@@ -24,7 +24,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -546,15 +545,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     FeedScopedId routeId = new FeedScopedId(feedId, lineRef);
     Route route = transitModel.getTransitModelIndex().getRouteForId(routeId);
 
-    T2<TransitMode, String> transitMode = getTransitMode(
-      estimatedVehicleJourney.getVehicleModes(),
-      replacedRoute
-    );
+    Mode transitMode = getTransitMode(estimatedVehicleJourney.getVehicleModes(), replacedRoute);
 
     if (route == null) { // Route is unknown - create new
       var routeBuilder = Route.of(routeId);
-      routeBuilder.withMode(transitMode.first);
-      routeBuilder.withNetexSubmode(transitMode.second);
+      routeBuilder.withMode(transitMode.mode);
+      routeBuilder.withNetexSubmode(transitMode.submode);
       routeBuilder.withOperator(operator);
 
       // TODO - SIRI: Is there a better way to find authority/Agency?
@@ -589,8 +585,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     tripBuilder.withRoute(route);
 
     // Explicitly set TransitMode on Trip - in case it differs from Route
-    tripBuilder.withMode(transitMode.first);
-    tripBuilder.withNetexSubmode(transitMode.second);
+    tripBuilder.withMode(transitMode.mode());
+    tripBuilder.withNetexSubmode(transitMode.submode());
 
     LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
@@ -812,15 +808,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Resolves TransitMode from SIRI VehicleMode
    */
-  private T2<TransitMode, String> getTransitMode(
-    List<VehicleModesEnumeration> vehicleModes,
-    Route replacedRoute
-  ) {
+  private Mode getTransitMode(List<VehicleModesEnumeration> vehicleModes, Route replacedRoute) {
     TransitMode transitMode = mapTransitMainMode(vehicleModes);
 
     String transitSubMode = resolveTransitSubMode(transitMode, replacedRoute);
 
-    return new T2<>(transitMode, transitSubMode);
+    return new Mode(transitMode, transitSubMode);
   }
 
   /**
@@ -1532,4 +1525,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return null;
     }
   }
+
+  private record Mode(TransitMode mode, String submode) {}
 }

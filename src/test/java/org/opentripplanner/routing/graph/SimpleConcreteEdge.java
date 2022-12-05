@@ -11,8 +11,6 @@ import org.opentripplanner.transit.model.basic.I18NString;
 
 public class SimpleConcreteEdge extends Edge {
 
-  private static final long serialVersionUID = 1L;
-
   /**
    * Constructor without ID.
    */

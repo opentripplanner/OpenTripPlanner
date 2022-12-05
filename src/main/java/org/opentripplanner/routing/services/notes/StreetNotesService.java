@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.model.NoteMatcher;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -34,14 +36,10 @@ import org.slf4j.LoggerFactory;
  */
 public class StreetNotesService implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(StreetNotesService.class);
 
   public static final NoteMatcher WHEELCHAIR_MATCHER = new NoteMatcher() {
-    private static final long serialVersionUID = 1L;
-
     @Override
     public boolean matches(State state) {
       return state.getRequest().wheelchair();
@@ -49,8 +47,6 @@ public class StreetNotesService implements Serializable {
   };
 
   public static final NoteMatcher DRIVING_MATCHER = new NoteMatcher() {
-    private static final long serialVersionUID = 1L;
-
     @Override
     public boolean matches(State state) {
       return state.getBackMode().isDriving();
@@ -58,8 +54,6 @@ public class StreetNotesService implements Serializable {
   };
 
   public static final NoteMatcher BICYCLE_MATCHER = new NoteMatcher() {
-    private static final long serialVersionUID = 1L;
-
     @Override
     public boolean matches(State state) {
       return state.getBackMode() == TraverseMode.BICYCLE;
@@ -67,8 +61,6 @@ public class StreetNotesService implements Serializable {
   };
 
   public static final NoteMatcher ALWAYS_MATCHER = new NoteMatcher() {
-    private static final long serialVersionUID = 1L;
-
     @Override
     public boolean matches(State state) {
       return true;
@@ -98,10 +90,10 @@ public class StreetNotesService implements Serializable {
    */
   public Set<StreetNote> getNotes(State state) {
     Edge edge = state.getBackEdge();
-    Set<MatcherAndStreetNote> maas = new HashSet<>();
+    Set<StreetNoteAndMatcher> maas = new HashSet<>();
 
     for (StreetNotesSource source : sources) {
-      Set<MatcherAndStreetNote> maas2 = source.getNotes(edge);
+      Set<StreetNoteAndMatcher> maas2 = source.getNotes(edge);
       if (maas2 != null) maas.addAll(maas2);
     }
     if (maas == null || maas.isEmpty()) {
@@ -109,9 +101,9 @@ public class StreetNotesService implements Serializable {
     }
 
     Set<StreetNote> notes = new HashSet<>(maas.size());
-    for (MatcherAndStreetNote maa : maas) {
-      if (maa.getMatcher().matches(state)) {
-        notes.add(maa.getNote());
+    for (StreetNoteAndMatcher maa : maas) {
+      if (maa.matcher().matches(state)) {
+        notes.add(maa.note());
       }
     }
     if (notes.isEmpty()) {

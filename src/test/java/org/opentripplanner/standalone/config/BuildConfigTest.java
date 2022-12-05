@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeForTest;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
@@ -20,7 +21,7 @@ public class BuildConfigTest {
    */
   @Test
   void validateExample() {
-    var node = jsonNodeFromResource("standalone/config/build-config.json");
+    var node = jsonNodeFromResource("standalone/config/" + BUILD_CONFIG_FILENAME);
 
     // Setup so we get access to the NodeAdapter
     var a = new NodeAdapter(node, SOURCE);

@@ -3,10 +3,10 @@ package org.opentripplanner.model.transfer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.framework.application.OTPFeature.MinimumTransferTimeIsDefinitive;
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 import static org.opentripplanner.raptor.spi.SearchDirection.FORWARD;
 import static org.opentripplanner.raptor.spi.SearchDirection.REVERSE;
-import static org.opentripplanner.util.OTPFeature.MinimumTransferTimeIsDefinitive;
 
 import java.util.function.IntSupplier;
 import org.junit.jupiter.api.Test;

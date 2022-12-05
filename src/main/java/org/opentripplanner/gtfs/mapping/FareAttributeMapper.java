@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareAttributeBuilder;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS FareAttribute into the OTP model. */
 class FareAttributeMapper {

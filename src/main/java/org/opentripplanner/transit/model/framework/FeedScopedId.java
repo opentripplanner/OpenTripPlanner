@@ -21,8 +21,6 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   private static final char ID_SEPARATOR = ':';
 
   @Serial
-  private static final long serialVersionUID = 1L;
-
   private final String feedId;
 
   private final String id;

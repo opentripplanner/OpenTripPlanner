@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper.DigitransitRentalVehiclePropertyMapper;
+import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 
@@ -14,7 +15,7 @@ public class VehicleRentalVehiclesLayerBuilder
 
   public VehicleRentalVehiclesLayerBuilder(
     VehicleRentalService service,
-    VectorTilesResource.LayerParameters layerParameters
+    LayerParameters<VectorTilesResource.LayerType> layerParameters
   ) {
     super(
       service,

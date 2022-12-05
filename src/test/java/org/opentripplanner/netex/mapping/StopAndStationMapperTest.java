@@ -13,6 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -33,7 +34,7 @@ import org.rutebanken.netex.model.VehicleModeEnumeration;
 
 public class StopAndStationMapperTest {
 
-  public static final ZoneId DEFAULT_TIME_ZONE = ZoneId.of("Europe/Oslo");
+  public static final ZoneId DEFAULT_TIME_ZONE = ZoneIds.OSLO;
 
   @Test
   public void testWheelChairBoarding() {

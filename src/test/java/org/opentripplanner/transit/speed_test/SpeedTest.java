@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.datastore.OtpDataStore;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
@@ -22,6 +24,7 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -33,7 +36,6 @@ import org.opentripplanner.transit.speed_test.model.testcase.TestCaseInput;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.util.OtpAppException;
 
 /**
  * Test response times for a large batch of origin/destination points. Also demonstrates how to run
@@ -61,6 +63,11 @@ public class SpeedTest {
   private SpeedTest(SpeedTestCmdLineOpts opts) {
     this.opts = opts;
     this.config = SpeedTestConfig.config(opts.rootDir());
+
+    var features = new OtpConfigLoader(opts.rootDir()).loadOtpConfig();
+    OTPFeature.enableFeatures(features.otpFeatures);
+    OTPFeature.logFeatureSetup();
+
     var model = loadGraph(opts.rootDir(), config.graph);
     this.transitModel = model.transitModel();
     this.buildConfig = model.buildConfig();

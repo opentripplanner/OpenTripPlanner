@@ -45,39 +45,34 @@ public class TransitModeMapper {
       return TransitMode.FERRY;
     } else if (routeType >= 1300 && routeType < 1400) { //Telecabin Service
       return TransitMode.GONDOLA;
-    } else if (routeType >= 1400 && routeType < 1500) { //Funicalar Service
+    } else if (routeType >= 1400 && routeType < 1500) { //Funicular Service
       return TransitMode.FUNICULAR;
-    } else if (routeType >= 1500 && routeType < 1600) { //Taxi Service
-      return null;
+    } else if (routeType >= 1551 && routeType < 1561) {
+      // Carpooling, not defined anywhere, so we've chosen this number space
+      // see https://groups.google.com/g/gtfs-changes/c/keT5rTPS7Y0/m/71uMz2l6ke0J for an effort to
+      // standardise
+      return TransitMode.CARPOOL;
+    } else if (routeType >= 1500 && routeType < 1599) {
+      //Taxi Service
+      return TransitMode.TAXI;
     } else if (routeType >= 1600 && routeType < 1700) { //Self drive
       return TransitMode.BUS;
     } else if (routeType >= 1700 && routeType < 1800) { //Miscellaneous Service
       return null;
     }
     /* Original GTFS route types. Should these be checked before TPEG types? */
-    switch (routeType) {
-      case 0:
-        return TransitMode.TRAM;
-      case 1:
-        return TransitMode.SUBWAY;
-      case 2:
-        return TransitMode.RAIL;
-      case 3:
-        return TransitMode.BUS;
-      case 4:
-        return TransitMode.FERRY;
-      case 5:
-        return TransitMode.CABLE_CAR;
-      case 6:
-        return TransitMode.GONDOLA;
-      case 7:
-        return TransitMode.FUNICULAR;
-      case 11:
-        return TransitMode.TROLLEYBUS;
-      case 12:
-        return TransitMode.MONORAIL;
-      default:
-        throw new IllegalArgumentException("unknown gtfs route type " + routeType);
-    }
+    return switch (routeType) {
+      case 0 -> TransitMode.TRAM;
+      case 1 -> TransitMode.SUBWAY;
+      case 2 -> TransitMode.RAIL;
+      case 3 -> TransitMode.BUS;
+      case 4 -> TransitMode.FERRY;
+      case 5 -> TransitMode.CABLE_CAR;
+      case 6 -> TransitMode.GONDOLA;
+      case 7 -> TransitMode.FUNICULAR;
+      case 11 -> TransitMode.TROLLEYBUS;
+      case 12 -> TransitMode.MONORAIL;
+      default -> throw new IllegalArgumentException("unknown gtfs route type " + routeType);
+    };
   }
 }

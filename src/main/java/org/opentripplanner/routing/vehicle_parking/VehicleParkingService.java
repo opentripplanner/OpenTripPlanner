@@ -19,8 +19,6 @@ import java.util.stream.Stream;
  */
 public class VehicleParkingService implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   /**
    * To ensure that his is thread-safe, the set stored here should always be immutable.
    */

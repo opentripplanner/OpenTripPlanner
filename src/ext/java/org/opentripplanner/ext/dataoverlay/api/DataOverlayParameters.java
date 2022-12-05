@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
@@ -33,9 +32,9 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
  */
 public class DataOverlayParameters implements Serializable {
 
-  private final Map<T2<ParameterName, ParameterType>, Double> values;
+  private final Map<Parameter, Double> values;
 
-  public DataOverlayParameters(Map<T2<ParameterName, ParameterType>, Double> values) {
+  public DataOverlayParameters(Map<Parameter, Double> values) {
     // Make a defencive copy to protect the map entries, this make this class immutable
     // and thread safe
     this.values = Map.copyOf(values);
@@ -83,15 +82,15 @@ public class DataOverlayParameters implements Serializable {
   }
 
   public Double get(ParameterName name, ParameterType type) {
-    return values.get(new T2<>(name, type));
+    return values.get(new Parameter(name, type));
   }
 
   public Iterable<ParameterName> listParameterNames() {
-    return values.keySet().stream().map(it -> it.first).collect(Collectors.toSet());
+    return values.keySet().stream().map(Parameter::name).collect(Collectors.toSet());
   }
 
   @Nullable
-  static T2<ParameterName, ParameterType> resolveKey(String parameter) {
+  static Parameter resolveKey(String parameter) {
     try {
       int pos = parameter.lastIndexOf('_');
       if (pos < 0 || pos > parameter.length() - 2) {
@@ -99,14 +98,10 @@ public class DataOverlayParameters implements Serializable {
       }
       var name = ParameterName.valueOf(parameter.substring(0, pos).toUpperCase());
       var type = ParameterType.valueOf(parameter.substring(pos + 1).toUpperCase());
-      return new T2<>(name, type);
+      return new Parameter(name, type);
     } catch (IllegalArgumentException ignore) {
       return null;
     }
-  }
-
-  static String keyAsString(T2<ParameterName, ParameterType> key) {
-    return key.first.name() + '_' + key.second.name();
   }
 
   @Nullable
@@ -118,7 +113,7 @@ public class DataOverlayParameters implements Serializable {
     }
   }
 
-  private Double get(T2<ParameterName, ParameterType> param) {
+  private Double get(Parameter param) {
     return values.get(param);
   }
 
@@ -126,7 +121,7 @@ public class DataOverlayParameters implements Serializable {
   public String toString() {
     var buf = ToStringBuilder.of(DataOverlayParameters.class);
     // Map keys to String and sort to make the toSting() deterministic
-    var keys = values.keySet().stream().map(DataOverlayParameters::keyAsString).sorted().toList();
+    var keys = values.keySet().stream().map(Parameter::keyString).sorted().toList();
     for (String key : keys) {
       buf.addObj(key, get(key));
     }

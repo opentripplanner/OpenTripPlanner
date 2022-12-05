@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
  */
 public class TripTimes implements Serializable, Comparable<TripTimes> {
 
-  private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
   /** The trips whose arrivals and departures are represented by this TripTimes */

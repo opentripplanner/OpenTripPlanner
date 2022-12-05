@@ -8,8 +8,6 @@ import org.opentripplanner.transit.model.site.StationElement;
 
 public class TransitBoardingAreaVertex extends StationElementVertex {
 
-  private static final long serialVersionUID = 1L;
-
   private final boolean wheelchairAccessible;
 
   private final BoardingArea boardingArea;
