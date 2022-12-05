@@ -13,9 +13,9 @@ import org.opentripplanner.transit.service.TransitService;
 /**
  * Common functionality for creating a vector tile response.
  */
-public class VectorTileUtils {
+public class VectorTileResponseFactory {
 
-  public static <LayerType extends Enum<LayerType>> Response createVectorTile(
+  public static <LayerType extends Enum<LayerType>> Response create(
     int x,
     int y,
     int z,

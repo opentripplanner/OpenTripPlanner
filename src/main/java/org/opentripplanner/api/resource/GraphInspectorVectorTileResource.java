@@ -21,7 +21,7 @@ import org.opentripplanner.api.model.TileJson;
 import org.opentripplanner.inspector.vector.AreaStopsLayerBuilder;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.inspector.vector.VectorTileUtils;
+import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
@@ -62,7 +62,7 @@ public class GraphInspectorVectorTileResource {
     @PathParam("z") int z,
     @PathParam("layers") String requestedLayers
   ) {
-    return VectorTileUtils.createVectorTile(
+    return VectorTileResponseFactory.create(
       x,
       y,
       z,
