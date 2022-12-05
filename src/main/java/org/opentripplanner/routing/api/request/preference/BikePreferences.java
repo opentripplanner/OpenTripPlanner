@@ -47,7 +47,7 @@ public final class BikePreferences implements Serializable {
     this.optimizeType = BicycleOptimizeType.SAFE;
     this.optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
     // very high reluctance to carry the bike up/down a flight of stairs
-    this.stairsReluctance = 100;
+    this.stairsReluctance = 10;
   }
 
   private BikePreferences(Builder builder) {
