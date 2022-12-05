@@ -81,6 +81,7 @@ public class SpeedTest {
     UpdaterConfigurator.configure(model.graph(), transitModel, config.updatersConfig);
     transitModel.getUpdaterManager().startUpdaters();
 
+
     this.serverContext =
       DefaultServerRequestContext.create(
         config.transitRoutingParams,
@@ -113,6 +114,8 @@ public class SpeedTest {
 
       // and run it
       speedTest.runTest();
+
+      speedTest.transitModel.getUpdaterManager().stop();
     } catch (OtpAppException ae) {
       System.err.println(ae.getMessage());
       System.exit(1);
