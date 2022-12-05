@@ -261,15 +261,15 @@ class TransferMapper {
   private int boardStopPosition(Trip trip, RegularStop stop, Station station) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
 
+    Predicate<StopLocation> stopMatches = station != null
+      ? s -> ((s instanceof RegularStop regStop) && regStop.getParentStation() == station)
+      : s -> s == stop;
+
     for (int i = 0; i < stopTimes.size() - 1; i++) {
       StopTime stopTime = stopTimes.get(i);
       if (stopTime.getPickupType().isNotRoutable()) {
         continue;
       }
-
-      Predicate<StopLocation> stopMatches = station != null
-        ? s -> ((s instanceof RegularStop regStop) && regStop.getParentStation() == station)
-        : s -> s == stop;
 
       if (stopMatches.test(stopTime.getStop())) {
         return i;
@@ -281,15 +281,15 @@ class TransferMapper {
   private int alightStopPosition(Trip trip, RegularStop stop, Station station) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
 
-    for (int i = 1; i < stopTimes.size(); i++) {
+    Predicate<StopLocation> stopMatches = station != null
+      ? s -> (s instanceof RegularStop && ((RegularStop) s).getParentStation() == station)
+      : s -> s == stop;
+
+    for (int i = stopTimes.size() -1; i > 0; i--) {
       StopTime stopTime = stopTimes.get(i);
       if (stopTime.getDropOffType().isNotRoutable()) {
         continue;
       }
-
-      Predicate<StopLocation> stopMatches = station != null
-        ? s -> (s instanceof RegularStop && ((RegularStop) s).getParentStation() == station)
-        : s -> s == stop;
 
       if (stopMatches.test(stopTime.getStop())) {
         return i;
