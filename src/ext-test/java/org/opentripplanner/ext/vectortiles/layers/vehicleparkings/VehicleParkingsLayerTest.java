@@ -82,10 +82,10 @@ public class VehicleParkingsLayerTest {
         ]
       }
       """;
-    NodeAdapter nodeAdapter = newNodeAdapterForTest(config);
+    var nodeAdapter = newNodeAdapterForTest(config);
     var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTileLayers");
     assertEquals(1, tiles.layers().size());
-    VehicleParkingsLayerBuilder builder = new VehicleParkingsLayerBuilder(
+    var builder = new VehicleParkingsLayerBuilder(
       graph,
       tiles.layers().get(0),
       Locale.US
