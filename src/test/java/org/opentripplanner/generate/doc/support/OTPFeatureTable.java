@@ -4,9 +4,9 @@ import static org.opentripplanner.framework.text.MarkdownFormatter.checkMark;
 import static org.opentripplanner.framework.text.Table.Align.Center;
 import static org.opentripplanner.framework.text.Table.Align.Left;
 
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.framework.text.Table;
-import org.opentripplanner.util.OTPFeature;
 
 @SuppressWarnings("NewClassNamingConvention")
 public class OTPFeatureTable {

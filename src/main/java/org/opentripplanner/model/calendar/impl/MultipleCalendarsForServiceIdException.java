@@ -5,8 +5,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class MultipleCalendarsForServiceIdException extends RuntimeException {
 
-  private static final long serialVersionUID = 1L;
-
   MultipleCalendarsForServiceIdException(FeedScopedId serviceId) {
     super("multiple calendars found for serviceId=" + serviceId);
   }

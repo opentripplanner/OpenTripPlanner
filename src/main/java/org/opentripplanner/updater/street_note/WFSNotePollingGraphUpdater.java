@@ -17,13 +17,12 @@ import org.locationtech.jts.geom.Geometry;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.model.NoteMatcher;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.notes.DynamicStreetNotesSource;
-import org.opentripplanner.routing.services.notes.MatcherAndStreetNote;
-import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -65,13 +64,13 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
   private final Query query;
   private final Graph graph;
   private WriteToGraphCallback saveResultOnGraph;
-  private SetMultimap<Edge, MatcherAndStreetNote> notesForEdge;
+  private SetMultimap<Edge, StreetNoteAndMatcher> notesForEdge;
 
   /**
    * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
    * are identical).
    */
-  private Map<T2<NoteMatcher, StreetNote>, MatcherAndStreetNote> uniqueMatchers;
+  private Map<StreetNoteAndMatcher, StreetNoteAndMatcher> uniqueMatchers;
 
   /**
    * The property 'frequencySec' is already read and used by the abstract base class.
@@ -173,15 +172,10 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
    * Note: we use the default Object.equals() for matchers, as they are mostly already singleton
    * instances.
    */
-  private MatcherAndStreetNote buildMatcherAndStreetNote(NoteMatcher noteMatcher, StreetNote note) {
-    T2<NoteMatcher, StreetNote> key = new T2<>(noteMatcher, note);
-    MatcherAndStreetNote interned = uniqueMatchers.get(key);
-    if (interned != null) {
-      return interned;
-    }
-    MatcherAndStreetNote ret = new MatcherAndStreetNote(noteMatcher, note);
-    uniqueMatchers.put(key, ret);
-    return ret;
+  private StreetNoteAndMatcher buildMatcherAndStreetNote(NoteMatcher noteMatcher, StreetNote note) {
+    var candidate = new StreetNoteAndMatcher(note, noteMatcher);
+    var interned = uniqueMatchers.putIfAbsent(candidate, candidate);
+    return interned == null ? candidate : interned;
   }
 
   /**

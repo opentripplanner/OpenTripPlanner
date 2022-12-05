@@ -30,7 +30,7 @@ public class TransitFeedConfig {
         You can specify data located outside the local filesystem (including cloud storage services)
         or at various different locations around the local filesystem.
         
-        When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds 
+        When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds
         section, auto-scanning in the base directory for this feed type will be disabled.
         """
       )

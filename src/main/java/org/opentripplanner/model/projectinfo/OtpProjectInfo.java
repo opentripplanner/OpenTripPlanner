@@ -7,7 +7,6 @@ import org.opentripplanner.standalone.config.RouterConfig;
 
 public class OtpProjectInfo implements Serializable {
 
-  private static final long serialVersionUID = 1;
   static final String UNKNOWN = "UNKNOWN";
   private static final OtpProjectInfo INSTANCE = OtpProjectInfoParser.loadFromProperties();
   /** Info derived from version string */

@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serializable, Cloneable {
 
-  private static final long serialVersionUID = 1L;
-
   private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
 
   /**

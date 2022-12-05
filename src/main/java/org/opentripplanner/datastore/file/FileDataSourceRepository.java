@@ -10,7 +10,6 @@ import static org.opentripplanner.datastore.api.FileType.OSM;
 import static org.opentripplanner.datastore.api.FileType.REPORT;
 import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
 import static org.opentripplanner.datastore.base.LocalDataSourceRepository.isCurrentDir;
-import static org.opentripplanner.standalone.config.OtpConfigLoader.isConfigFile;
 
 import java.io.File;
 import java.net.URI;
@@ -22,7 +21,8 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.base.LocalDataSourceRepository;
-import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.framework.application.OtpFileNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -194,7 +194,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     if (name.equals(BUILD_REPORT_DIR)) {
       return REPORT;
     }
-    if (isConfigFile(name)) {
+    if (OtpFileNames.isConfigFile(name)) {
       return CONFIG;
     }
     return UNKNOWN;

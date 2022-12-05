@@ -8,8 +8,6 @@ import org.opentripplanner.transit.model.site.StationElement;
 
 public class TransitEntranceVertex extends StationElementVertex {
 
-  private static final long serialVersionUID = 1L;
-
   private final Accessibility wheelchairAccessibility;
 
   private final Entrance entrance;

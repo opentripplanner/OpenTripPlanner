@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
@@ -20,7 +21,6 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

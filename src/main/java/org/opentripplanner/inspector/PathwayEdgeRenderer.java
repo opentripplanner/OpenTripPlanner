@@ -1,6 +1,7 @@
 package org.opentripplanner.inspector;
 
 import java.awt.Color;
+import java.util.Optional;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
@@ -14,9 +15,9 @@ import org.opentripplanner.transit.model.site.StationElement;
 public class PathwayEdgeRenderer implements EdgeVertexRenderer {
 
   @Override
-  public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
+  public Optional<EdgeVisualAttributes> renderEdge(Edge e) {
     if (!(e instanceof PathwayEdge pwe)) {
-      return false;
+      return Optional.empty();
     }
 
     StringBuilder sb = new StringBuilder();
@@ -42,9 +43,7 @@ public class PathwayEdgeRenderer implements EdgeVertexRenderer {
       sb.setLength(sb.length() - 2);
     }
 
-    attrs.label = sb.toString();
-
-    attrs.color =
+    var color =
       switch (pwe.getMode()) {
         case WALKWAY -> new Color(145, 217, 38);
         case STAIRS -> Color.CYAN;
@@ -57,16 +56,16 @@ public class PathwayEdgeRenderer implements EdgeVertexRenderer {
       };
 
     if (!pwe.isWheelchairAccessible()) {
-      attrs.color = attrs.color.darker();
+      color = color.darker();
     }
 
-    return true;
+    return EdgeVisualAttributes.optional(color, sb.toString());
   }
 
   @Override
-  public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
+  public Optional<VertexVisualAttributes> renderVertex(Vertex v) {
     if (!(v instanceof StationElementVertex stationElementVertex)) {
-      return false;
+      return Optional.empty();
     }
     StationElement<?, ?> stationElement = stationElementVertex.getStationElement();
 
@@ -82,8 +81,7 @@ public class PathwayEdgeRenderer implements EdgeVertexRenderer {
       sb.append(" (").append(stationElement.getCode()).append(")");
     }
 
-    attrs.label = sb.toString();
-    attrs.color =
+    Color color =
       switch (stationElement.getClass().getSimpleName()) {
         case "Stop" -> Color.ORANGE;
         case "PathwayNode" -> new Color(217, 38, 145);
@@ -92,7 +90,7 @@ public class PathwayEdgeRenderer implements EdgeVertexRenderer {
         default -> Color.LIGHT_GRAY;
       };
 
-    return true;
+    return VertexVisualAttributes.optional(color, sb.toString());
   }
 
   @Override

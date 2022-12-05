@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import org.locationtech.jts.awt.IdentityPointTransformation;
 import org.locationtech.jts.awt.PointShapeFactory;
 import org.locationtech.jts.awt.ShapeWriter;
@@ -27,7 +28,6 @@ import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.locationtech.jts.operation.buffer.OffsetCurveBuilder;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -126,10 +126,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
     bufParams.setJoinStyle(BufferParameters.JOIN_BEVEL);
 
     // Render all edges
-    EdgeVisualAttributes evAttrs = new EdgeVisualAttributes();
     for (Edge edge : edges) {
-      evAttrs.color = null;
-      evAttrs.label = null;
       Geometry edgeGeom = edge.getGeometry();
       boolean hasGeom = true;
       if (edgeGeom == null) {
@@ -141,8 +138,12 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         hasGeom = false;
       }
 
-      boolean render = evRenderer.renderEdge(edge, evAttrs);
-      if (!render) continue;
+      var evAttrsOpt = evRenderer.renderEdge(edge);
+
+      if (evAttrsOpt.isEmpty()) {
+        continue;
+      }
+      EdgeVisualAttributes evAttrs = evAttrsOpt.get();
 
       Geometry midLineGeom = context.transform.transform(edgeGeom);
       OffsetCurveBuilder offsetBuilder = new OffsetCurveBuilder(new PrecisionModel(), bufParams);
@@ -163,11 +164,11 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         var offsetLength = offsetLine.getLength();
 
         var previousLocation = line.getStartIndex();
-        for (var p2 : evRenderer.edgeSegments(edge)) {
-          var currentLocation = locater.getLocation(offsetLength * p2.first);
+        for (var it : evRenderer.edgeSegments(edge)) {
+          var currentLocation = locater.getLocation(offsetLength * it.position());
           var segmentGeometry = line.extractLine(previousLocation, currentLocation);
           var segmentShape = shapeWriter.toShape(segmentGeometry);
-          context.graphics.setColor(p2.second);
+          context.graphics.setColor(it.color());
           context.graphics.draw(segmentShape);
 
           previousLocation = currentLocation;
@@ -201,13 +202,14 @@ public class EdgeVertexTileRenderer implements TileRenderer {
     }
 
     // Render all vertices
-    VertexVisualAttributes vvAttrs = new VertexVisualAttributes();
     for (Vertex vertex : vertices) {
-      vvAttrs.color = null;
-      vvAttrs.label = null;
       Point point = GeometryUtils.getGeometryFactory().createPoint(vertex.getCoordinate());
-      boolean render = evRenderer.renderVertex(vertex, vvAttrs);
-      if (!render) continue;
+      var vvAttrsOp = evRenderer.renderVertex(vertex);
+
+      if (vvAttrsOp.isEmpty()) {
+        continue;
+      }
+      var vvAttrs = vvAttrsOp.get();
 
       Point tilePoint = (Point) context.transform.transform(point);
       Shape shape = shapeWriter.toShape(tilePoint);
@@ -245,18 +247,16 @@ public class EdgeVertexTileRenderer implements TileRenderer {
       .thenComparing(e -> e instanceof StreetEdge);
 
     /**
-     * @param e     The edge being rendered.
-     * @param attrs The edge visual attributes to fill-in.
-     * @return True to render this edge, false otherwise.
+     * @param e The edge being rendered.
+     * @return  edge to render, or empty otherwise.
      */
-    boolean renderEdge(Edge e, EdgeVisualAttributes attrs);
+    Optional<EdgeVisualAttributes> renderEdge(Edge e);
 
     /**
-     * @param v     The vertex being rendered.
-     * @param attrs The vertex visual attributes to fill-in.
-     * @return True to render this vertex, false otherwise.
+     * @param v The vertex being rendered.
+     * @return  vertex to render, or empty otherwise.
      */
-    boolean renderVertex(Vertex v, VertexVisualAttributes attrs);
+    Optional<VertexVisualAttributes> renderVertex(Vertex v);
 
     /**
      * Name of this tile Render which would be shown in frontend
@@ -269,7 +269,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
       return false;
     }
 
-    default Iterable<T2<Double, Color>> edgeSegments(Edge edge) {
+    default Iterable<EdgeSegmentColor> edgeSegments(Edge edge) {
       return List.of();
     }
 
@@ -282,17 +282,17 @@ public class EdgeVertexTileRenderer implements TileRenderer {
     }
   }
 
-  public static class EdgeVisualAttributes {
-
-    public Color color;
-
-    public String label;
+  public record EdgeVisualAttributes(Color color, String label) {
+    public static Optional<EdgeVisualAttributes> optional(Color color, String label) {
+      return Optional.of(new EdgeVisualAttributes(color, label));
+    }
   }
 
-  public static class VertexVisualAttributes {
-
-    public Color color;
-
-    public String label;
+  public record VertexVisualAttributes(Color color, String label) {
+    public static Optional<VertexVisualAttributes> optional(Color color, String label) {
+      return Optional.of(new VertexVisualAttributes(color, label));
+    }
   }
+
+  record EdgeSegmentColor(Double position, Color color) {}
 }

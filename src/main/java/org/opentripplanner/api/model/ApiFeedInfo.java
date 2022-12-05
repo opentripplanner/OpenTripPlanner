@@ -5,8 +5,6 @@ import java.util.Objects;
 
 public final class ApiFeedInfo implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   public String id;
   public String publisherName;
   public String publisherUrl;

@@ -1,6 +1,7 @@
 package org.opentripplanner.inspector;
 
 import java.awt.Color;
+import java.util.Optional;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
@@ -28,38 +29,36 @@ public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
   public NoThruTrafficEdgeRenderer() {}
 
   @Override
-  public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
-    if (e instanceof StreetEdge) {
-      StreetEdge pse = (StreetEdge) e;
+  public Optional<EdgeVisualAttributes> renderEdge(Edge e) {
+    if (e instanceof StreetEdge pse) {
       int colorIndex = 0;
 
-      attrs.label = "";
+      String label = "";
 
       if (pse.isWalkNoThruTraffic()) {
-        attrs.label = " walk ";
+        label = " walk ";
         colorIndex += 1;
       }
       if (pse.isBicycleNoThruTraffic()) {
-        attrs.label += " bike";
+        label += " bike";
         colorIndex += 2;
       }
       if (pse.isMotorVehicleNoThruTraffic()) {
-        attrs.label += " car";
+        label += " car";
         colorIndex += 4;
       }
-      attrs.color = colors[colorIndex];
-      if (!attrs.label.equals("")) {
-        attrs.label = "No" + attrs.label + " thru traffic";
+      if (!label.equals("")) {
+        label = "No" + label + " thru traffic";
       }
-    } else {
-      return false;
+
+      return EdgeVisualAttributes.optional(colors[colorIndex], label);
     }
-    return true;
+    return Optional.empty();
   }
 
   @Override
-  public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
-    return false;
+  public Optional<VertexVisualAttributes> renderVertex(Vertex v) {
+    return Optional.empty();
   }
 
   @Override

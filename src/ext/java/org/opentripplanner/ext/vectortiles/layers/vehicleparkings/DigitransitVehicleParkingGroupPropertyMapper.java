@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Locale;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.I18NStringMapper;
+import org.opentripplanner.ext.vectortiles.KeyValue;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 
 public class DigitransitVehicleParkingGroupPropertyMapper
@@ -23,7 +23,7 @@ public class DigitransitVehicleParkingGroupPropertyMapper
   }
 
   @Override
-  protected Collection<T2<String, Object>> map(VehicleParkingAndGroup parkingAndGroup) {
+  protected Collection<KeyValue> map(VehicleParkingAndGroup parkingAndGroup) {
     var group = parkingAndGroup.vehicleParkingGroup();
     String parking = JSONArray.toJSONString(
       parkingAndGroup
@@ -40,9 +40,9 @@ public class DigitransitVehicleParkingGroupPropertyMapper
         .toList()
     );
     return List.of(
-      new T2<>("id", group.id().toString()),
-      new T2<>("name", i18NStringMapper.mapToApi(group.name())),
-      new T2<>("vehicleParking", parking)
+      new KeyValue("id", group.id().toString()),
+      new KeyValue("name", i18NStringMapper.mapToApi(group.name())),
+      new KeyValue("vehicleParking", parking)
     );
   }
 }
