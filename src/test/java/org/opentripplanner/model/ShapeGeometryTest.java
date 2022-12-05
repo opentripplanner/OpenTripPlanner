@@ -7,7 +7,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.TestUtils;
 
 public class ShapeGeometryTest {
 
