@@ -27,7 +27,7 @@ public class VectorTileUtils {
     TransitService transitService
   ) {
     VectorTile.Tile.Builder mvtBuilder = VectorTile.Tile.newBuilder();
-    Envelope envelope = WebMercatorTile.tile2JtsEnvelope(x, y, z);
+    Envelope envelope = WebMercatorTile.tile2Envelope(x, y, z);
 
     int cacheMaxSeconds = Integer.MAX_VALUE;
 

@@ -3,7 +3,6 @@ package org.opentripplanner.inspector.raster;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
-import org.geotools.geometry.Envelope2D;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.util.AffineTransformation;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
@@ -56,8 +55,8 @@ public class TileRendererManager {
       public Envelope expandPixels(double marginXPixels, double marginYPixels) {
         Envelope retval = new Envelope(bbox);
         retval.expandBy(
-          marginXPixels / mapTile.width * (bbox.getMaxX() - bbox.getMinX()),
-          marginYPixels / mapTile.height * (bbox.getMaxY() - bbox.getMinY())
+          marginXPixels / mapTile.width() * (bbox.getMaxX() - bbox.getMinX()),
+          marginYPixels / mapTile.height() * (bbox.getMaxY() - bbox.getMinY())
         );
         return retval;
       }
@@ -70,31 +69,28 @@ public class TileRendererManager {
 
     // The best place for caching tiles may be here
     BufferedImage image = new BufferedImage(
-      mapTile.width,
-      mapTile.height,
+      mapTile.width(),
+      mapTile.height(),
       renderer.getColorModel()
     );
     context.graphics = image.createGraphics();
-    Envelope2D trbb = mapTile.bbox;
-    context.bbox = new Envelope(trbb.x, trbb.x + trbb.width, trbb.y, trbb.y + trbb.height);
+    context.bbox = mapTile.bbox();
     context.transform = new AffineTransformation();
-    double xScale = mapTile.width / trbb.width;
-    double yScale = mapTile.height / trbb.height;
+    double xScale = mapTile.width() / context.bbox.getWidth();
+    double yScale = mapTile.height() / context.bbox.getHeight();
 
-    context.transform.translate(-trbb.x, -trbb.y - trbb.height);
+    context.transform.translate(
+      -context.bbox.getMinX(),
+      -context.bbox.getMinY() - context.bbox.getHeight()
+    );
     context.transform.scale(xScale, -yScale);
-    context.metersPerPixel = Math.toRadians(trbb.height) * 6371000 / mapTile.height;
-    context.tileWidth = mapTile.width;
-    context.tileHeight = mapTile.height;
+    context.metersPerPixel = Math.toRadians(context.bbox.getHeight()) * 6371000 / mapTile.height();
+    context.tileWidth = mapTile.width();
+    context.tileHeight = mapTile.height();
 
     long start = System.currentTimeMillis();
     renderer.renderTile(context);
-    LOG.debug(
-      "Rendered tile at {},{} in {} ms",
-      mapTile.bbox.y,
-      mapTile.bbox.x,
-      System.currentTimeMillis() - start
-    );
+    LOG.debug("Rendered tile at {} in {} ms", mapTile.bbox(), System.currentTimeMillis() - start);
     return image;
   }
 
