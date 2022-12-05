@@ -16,10 +16,11 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 
 public class ServiceDateUtilsTest {
 
-  private static final ZoneId ZONE_ID = ZoneId.of("Europe/Paris");
+  private static final ZoneId ZONE_ID = ZoneIds.PARIS;
   private static final LocalTime TIME = LocalTime.of(10, 26);
 
   private static final LocalDate D2019_03_30 = LocalDate.of(2019, 3, 30);
@@ -99,7 +100,7 @@ public class ServiceDateUtilsTest {
 
   @Test
   public void getStartOfService() {
-    var zone = ZoneId.of("Europe/Oslo");
+    var zone = ZoneIds.OSLO;
     LocalDate d = LocalDate.of(2020, 8, 25);
 
     assertEquals(
@@ -136,8 +137,8 @@ public class ServiceDateUtilsTest {
   @Test
   public void secondsSinceStartOfTimeWithZoneId() {
     var dateTime = ZonedDateTime.parse("2022-05-12T00:43:00+02:00");
-    var operatingDayDate = dateTime.minusDays(1).withZoneSameInstant(ZoneId.of("UTC"));
-    var zoneId = ZoneId.of("CET");
+    var operatingDayDate = dateTime.minusDays(1).withZoneSameInstant(ZoneIds.UTC);
+    var zoneId = ZoneIds.CET;
     var startOfService = ZonedDateTime.of(2022, 5, 11, 0, 0, 0, 0, zoneId);
 
     var desiredDuration = Duration.between(startOfService, dateTime).toSeconds();

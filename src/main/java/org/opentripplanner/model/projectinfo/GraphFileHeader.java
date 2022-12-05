@@ -5,7 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.framework.application.OtpAppException;
 
 /**
  * The Graph.obj file start with file header. The header have two things:
@@ -17,8 +17,6 @@ import org.opentripplanner.util.OtpAppException;
  * This class represent the header and contain logic to parse and validate it.
  */
 public class GraphFileHeader implements Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   private static final String MAGIC_NUMBER = "OpenTripPlannerGraph";
   private static final char ID_PREFIX = '0';

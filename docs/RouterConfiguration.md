@@ -408,6 +408,7 @@ Http headers.
     "walkReluctance" : 4.0,
     "bikeReluctance" : 5.0,
     "bikeWalkingReluctance" : 10.0,
+    "bikeStairsReluctance" : 150.0,
     "carReluctance" : 10.0,
     "stairsReluctance" : 1.65,
     "turnReluctance" : 1.0,

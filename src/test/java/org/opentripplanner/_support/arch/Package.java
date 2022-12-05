@@ -30,6 +30,10 @@ public class Package implements ArchComponent {
     return packageIdentifier;
   }
 
+  public String packageIdentifierAllSubPackages() {
+    return packageIdentifier + ".(**)";
+  }
+
   public Package dependsOn(ArchComponent... allowedDependencies) {
     for (ArchComponent it : allowedDependencies) {
       this.allowedPackages.addAll(it.packages());

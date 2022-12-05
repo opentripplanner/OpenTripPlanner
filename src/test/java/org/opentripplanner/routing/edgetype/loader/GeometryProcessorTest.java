@@ -9,12 +9,13 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import com.google.common.collect.Iterables;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Month;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -38,7 +39,6 @@ import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuris
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.TestUtils;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
@@ -148,7 +148,9 @@ public class GeometryProcessorTest {
     RouteRequest options = new RouteRequest();
 
     // Friday evening
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 23, 20, 0));
+    options.setDateTime(
+      LocalDateTime.of(2009, Month.AUGUST, 18, 23, 20).atZone(ZoneIds.NEW_YORK).toInstant()
+    );
 
     spt =
       StreetSearchBuilder
@@ -164,7 +166,10 @@ public class GeometryProcessorTest {
     assertEquals(4, path.states.size());
 
     // Saturday morning
-    long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 0, 5, 0);
+    long startTime = LocalDateTime
+      .of(2009, Month.SEPTEMBER, 19, 0, 5)
+      .atZone(ZoneIds.NEW_YORK)
+      .toEpochSecond();
     options.setDateTime(Instant.ofEpochSecond(startTime));
     spt =
       StreetSearchBuilder
@@ -189,7 +194,9 @@ public class GeometryProcessorTest {
     assertEquals(2, stop_o.getOutgoing().size());
 
     RouteRequest options = new RouteRequest();
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 19, 12, 0, 0));
+    options.setDateTime(
+      LocalDateTime.of(2009, Month.AUGUST, 19, 12, 0).atZone(ZoneIds.NEW_YORK).toInstant()
+    );
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
@@ -199,10 +206,15 @@ public class GeometryProcessorTest {
       .getShortestPathTree();
     GraphPath<State, Edge, Vertex> path = spt.getPath(stop_p);
     assertNotNull(path);
-    long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 10, 0);
+    long endTime = LocalDateTime
+      .of(2009, Month.SEPTEMBER, 19, 12, 10)
+      .atZone(ZoneIds.NEW_YORK)
+      .toEpochSecond();
     assertEquals(endTime, path.getEndTime());
 
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 19, 12, 0, 1));
+    options.setDateTime(
+      LocalDateTime.of(2009, 8, 19, 12, 0, 1).atZone(ZoneIds.NEW_YORK).toInstant()
+    );
     spt =
       StreetSearchBuilder
         .of()
@@ -213,7 +225,8 @@ public class GeometryProcessorTest {
         .getShortestPathTree();
     path = spt.getPath(stop_p);
     assertNotNull(path);
-    endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 15, 10, 0);
+    endTime =
+      LocalDateTime.of(2009, Month.SEPTEMBER, 19, 15, 10).atZone(ZoneIds.NEW_YORK).toEpochSecond();
     assertEquals(endTime, path.getEndTime());
   }
 
@@ -222,7 +235,9 @@ public class GeometryProcessorTest {
     Vertex stop_d = graph.getVertex(feedId + ":D");
     Vertex stop_c = graph.getVertex(feedId + ":C");
     RouteRequest options = new RouteRequest();
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 1, 10, 0, 0));
+    options.setDateTime(
+      LocalDateTime.of(2009, Month.AUGUST, 1, 10, 0).atZone(ZoneIds.NEW_YORK).toInstant()
+    );
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
@@ -234,7 +249,7 @@ public class GeometryProcessorTest {
     GraphPath<State, Edge, Vertex> path = spt.getPath(stop_c);
     assertNotNull(path);
     assertEquals(
-      TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 11, 0, 0),
+      LocalDateTime.of(2009, Month.SEPTEMBER, 1, 11, 0).atZone(ZoneIds.NEW_YORK).toEpochSecond(),
       path.getEndTime()
     );
   }
@@ -257,7 +272,9 @@ public class GeometryProcessorTest {
 
     RouteRequest options = new RouteRequest();
     options.setWheelchair(true);
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 0, 0, 0));
+    options.setDateTime(
+      LocalDateTime.of(2009, Month.AUGUST, 18, 0, 0).atZone(ZoneIds.NEW_YORK).toInstant()
+    );
 
     ShortestPathTree<State, Edge, Vertex> spt;
     GraphPath<State, Edge, Vertex> path;
@@ -304,7 +321,7 @@ public class GeometryProcessorTest {
     // from stop A to stop D would normally be trip 1.1 to trip 2.1, arriving at 00:30. But trip
     // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00
     LocalDateTime ldt = LocalDateTime.of(2009, 7, 18, 0, 0, 0);
-    ZonedDateTime zdt = ZonedDateTime.of(ldt, ZoneId.of("America/New_York"));
+    ZonedDateTime zdt = ZonedDateTime.of(ldt, ZoneIds.NEW_YORK);
     options.setDateTime(zdt.toInstant());
     spt =
       StreetSearchBuilder
@@ -333,8 +350,8 @@ public class GeometryProcessorTest {
     RouteRequest options = new RouteRequest();
     // test is designed such that transfers must be instantaneous
     options.withPreferences(pref -> pref.withTransfer(tx -> tx.withSlack(0)));
-    LocalDateTime ldt = LocalDateTime.of(2009, 10, 2, 8, 30, 0);
-    ZonedDateTime startTime = ZonedDateTime.of(ldt, ZoneId.of("America/New_York"));
+    LocalDateTime ldt = LocalDateTime.of(2009, 10, 2, 8, 30);
+    ZonedDateTime startTime = ZonedDateTime.of(ldt, ZoneIds.NEW_YORK);
     options.setDateTime(startTime.toInstant());
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()
@@ -358,7 +375,9 @@ public class GeometryProcessorTest {
     GraphPath<State, Edge, Vertex> path;
 
     RouteRequest options = new RouteRequest();
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 0, 0, 0));
+    options.setDateTime(
+      LocalDateTime.of(2009, Month.AUGUST, 7, 0, 0).atZone(ZoneIds.NEW_YORK).toInstant()
+    );
 
     // U to V - original stop times - shouldn't be used
     spt =
@@ -372,11 +391,13 @@ public class GeometryProcessorTest {
     path = spt.getPath(stop_v);
     assertNotNull(path);
     assertEquals(4, path.states.size());
-    long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 6, 40, 0);
+    long endTime = LocalDateTime.of(2009, 8 + 1, 7, 6, 40).atZone(ZoneIds.NEW_YORK).toEpochSecond();
     assertEquals(endTime, path.getEndTime());
 
     // U to V - first frequency
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 7, 0, 0));
+    options.setDateTime(
+      LocalDateTime.of(2009, Month.AUGUST, 7, 7, 0).atZone(ZoneIds.NEW_YORK).toInstant()
+    );
     spt =
       StreetSearchBuilder
         .of()
@@ -388,11 +409,14 @@ public class GeometryProcessorTest {
     path = spt.getPath(stop_v);
     assertNotNull(path);
     assertEquals(4, path.states.size());
-    endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 40, 0);
+    endTime =
+      LocalDateTime.of(2009, Month.SEPTEMBER, 7, 7, 40).atZone(ZoneIds.NEW_YORK).toEpochSecond();
     assertEquals(endTime, path.getEndTime());
 
     // U to V - second frequency
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 14, 0, 0));
+    options.setDateTime(
+      LocalDateTime.of(2009, Month.AUGUST, 7, 14, 0).atZone(ZoneIds.NEW_YORK).toInstant()
+    );
     spt =
       StreetSearchBuilder
         .of()
@@ -404,7 +428,8 @@ public class GeometryProcessorTest {
     path = spt.getPath(stop_v);
     assertNotNull(path);
     assertEquals(4, path.states.size());
-    endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 14, 40, 0);
+    endTime =
+      LocalDateTime.of(2009, Month.SEPTEMBER, 7, 14, 40).atZone(ZoneIds.NEW_YORK).toEpochSecond();
     assertEquals(endTime, path.getEndTime());
     // TODO more detailed testing of frequencies
 
@@ -418,7 +443,9 @@ public class GeometryProcessorTest {
     assertNotNull(stop);
 
     RouteRequest options = new RouteRequest();
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 1, 16, 0, 0));
+    options.setDateTime(
+      LocalDateTime.of(2009, Month.AUGUST, 1, 16, 0).atZone(ZoneIds.NEW_YORK).toInstant()
+    );
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
@@ -430,7 +457,10 @@ public class GeometryProcessorTest {
     GraphPath<State, Edge, Vertex> path = spt.getPath(stop);
     assertNotNull(path);
     assertEquals(
-      TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 34),
+      LocalDateTime
+        .of(2009, Month.SEPTEMBER, 1, 16, 0, 34)
+        .atZone(ZoneIds.NEW_YORK)
+        .toEpochSecond(),
       path.getEndTime()
     );
   }

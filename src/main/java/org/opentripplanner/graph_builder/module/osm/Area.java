@@ -237,8 +237,5 @@ class Area {
     return false;
   }
 
-  public static class AreaConstructionException extends RuntimeException {
-
-    private static final long serialVersionUID = 1L;
-  }
+  public static class AreaConstructionException extends RuntimeException {}
 }

@@ -19,8 +19,6 @@ import org.opentripplanner.transit.model.site.AreaStop;
  */
 public abstract class StreetVertex extends Vertex {
 
-  private static final long serialVersionUID = 1L;
-
   /** All locations for flex transit, which this vertex is part of */
   public Set<AreaStop> areaStops;
 

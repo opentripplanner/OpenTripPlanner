@@ -19,8 +19,6 @@ import org.opentripplanner.transit.model.site.StopLocation;
  */
 public class PathTransfer implements Serializable {
 
-  private static final long serialVersionUID = 20200316L;
-
   public final StopLocation from;
 
   public final StopLocation to;

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.graph.Graph;
@@ -41,7 +42,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

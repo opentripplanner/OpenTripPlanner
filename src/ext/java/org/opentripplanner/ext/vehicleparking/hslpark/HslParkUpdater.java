@@ -3,6 +3,7 @@ package org.opentripplanner.ext.vehicleparking.hslpark;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.io.JsonDataListDownloader;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
@@ -10,7 +11,6 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces.VehicleParkingSpacesBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.DataSource;
-import org.opentripplanner.util.xml.JsonDataListDownloader;
 
 /**
  * Vehicle parking updater class for https://github.com/HSLdevcom/parkandrideAPI format APIs. There

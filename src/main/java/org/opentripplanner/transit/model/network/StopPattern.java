@@ -10,7 +10,6 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -41,7 +40,6 @@ import org.opentripplanner.transit.model.site.StopLocation;
  */
 public final class StopPattern implements Serializable {
 
-  private static final long serialVersionUID = 20140101L;
   public static final int NOT_FOUND = -1;
 
   private final StopLocation[] stops;

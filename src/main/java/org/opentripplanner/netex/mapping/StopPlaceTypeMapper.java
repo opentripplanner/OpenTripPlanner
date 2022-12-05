@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.common.model.T2;
+import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.rutebanken.netex.model.StopPlace;
 
@@ -12,73 +12,64 @@ import org.rutebanken.netex.model.StopPlace;
  */
 class StopPlaceTypeMapper {
 
-  public T2<TransitMode, String> map(StopPlace stopPlace) {
-    T2<TransitMode, String> submode = getSubmodeAsString(stopPlace);
+  public NetexMainAndSubMode map(StopPlace stopPlace) {
+    NetexMainAndSubMode submode = getSubmodeAsString(stopPlace);
     if (submode != null) {
       return submode;
     }
     TransitMode mode = mapVehicleMode(stopPlace);
-    return new T2<>(mode, null);
+    return new NetexMainAndSubMode(mode, null);
   }
 
   private TransitMode mapVehicleMode(StopPlace stopPlace) {
     if (stopPlace.getTransportMode() == null) {
       return null;
     }
-    switch (stopPlace.getTransportMode()) {
-      case AIR:
-        return TransitMode.AIRPLANE;
-      case BUS:
-        return TransitMode.BUS;
-      case TROLLEY_BUS:
-        return TransitMode.TROLLEYBUS;
-      case CABLEWAY:
-        return TransitMode.CABLE_CAR;
-      case COACH:
-        return TransitMode.COACH;
-      case FUNICULAR:
-        return TransitMode.FUNICULAR;
-      case METRO:
-        return TransitMode.SUBWAY;
-      case RAIL:
-        return TransitMode.RAIL;
-      case TRAM:
-        return TransitMode.TRAM;
-      case WATER:
-      case FERRY:
-        return TransitMode.FERRY;
-      default:
-        return null;
-    }
+    return switch (stopPlace.getTransportMode()) {
+      case AIR -> TransitMode.AIRPLANE;
+      case BUS -> TransitMode.BUS;
+      case TROLLEY_BUS -> TransitMode.TROLLEYBUS;
+      case CABLEWAY -> TransitMode.CABLE_CAR;
+      case COACH -> TransitMode.COACH;
+      case FUNICULAR -> TransitMode.FUNICULAR;
+      case METRO -> TransitMode.SUBWAY;
+      case RAIL -> TransitMode.RAIL;
+      case TRAM -> TransitMode.TRAM;
+      case WATER, FERRY -> TransitMode.FERRY;
+      case LIFT, OTHER, SNOW_AND_ICE -> null;
+    };
   }
 
-  private T2<TransitMode, String> getSubmodeAsString(StopPlace stopPlace) {
+  private NetexMainAndSubMode getSubmodeAsString(StopPlace stopPlace) {
     if (stopPlace.getAirSubmode() != null) {
-      return new T2<>(TransitMode.AIRPLANE, stopPlace.getAirSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.AIRPLANE, stopPlace.getAirSubmode().value());
     }
     if (stopPlace.getBusSubmode() != null) {
-      return new T2<>(TransitMode.BUS, stopPlace.getBusSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.BUS, stopPlace.getBusSubmode().value());
     }
     if (stopPlace.getTelecabinSubmode() != null) {
-      return new T2<>(TransitMode.GONDOLA, stopPlace.getTelecabinSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.GONDOLA, stopPlace.getTelecabinSubmode().value());
     }
     if (stopPlace.getCoachSubmode() != null) {
-      return new T2<>(TransitMode.COACH, stopPlace.getCoachSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.COACH, stopPlace.getCoachSubmode().value());
     }
     if (stopPlace.getFunicularSubmode() != null) {
-      return new T2<>(TransitMode.FUNICULAR, stopPlace.getFunicularSubmode().value());
+      return new NetexMainAndSubMode(
+        TransitMode.FUNICULAR,
+        stopPlace.getFunicularSubmode().value()
+      );
     }
     if (stopPlace.getMetroSubmode() != null) {
-      return new T2<>(TransitMode.SUBWAY, stopPlace.getMetroSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.SUBWAY, stopPlace.getMetroSubmode().value());
     }
     if (stopPlace.getRailSubmode() != null) {
-      return new T2<>(TransitMode.RAIL, stopPlace.getRailSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.RAIL, stopPlace.getRailSubmode().value());
     }
     if (stopPlace.getTramSubmode() != null) {
-      return new T2<>(TransitMode.TRAM, stopPlace.getTramSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.TRAM, stopPlace.getTramSubmode().value());
     }
     if (stopPlace.getWaterSubmode() != null) {
-      return new T2<>(TransitMode.FERRY, stopPlace.getWaterSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.FERRY, stopPlace.getWaterSubmode().value());
     }
     return null;
   }
