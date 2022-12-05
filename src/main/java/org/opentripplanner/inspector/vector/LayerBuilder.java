@@ -1,28 +1,34 @@
-package org.opentripplanner.ext.vectortiles;
+package org.opentripplanner.inspector.vector;
 
-import com.wdtinc.mapbox_vector_tile.VectorTile;
-import com.wdtinc.mapbox_vector_tile.adapt.jts.JtsAdapter;
-import com.wdtinc.mapbox_vector_tile.adapt.jts.TileGeomResult;
-import com.wdtinc.mapbox_vector_tile.build.MvtLayerBuild;
-import com.wdtinc.mapbox_vector_tile.build.MvtLayerParams;
-import com.wdtinc.mapbox_vector_tile.build.MvtLayerProps;
+import edu.colorado.cires.cmg.mvt.VectorTile;
+import edu.colorado.cires.cmg.mvt.adapt.jts.JtsAdapter;
+import edu.colorado.cires.cmg.mvt.adapt.jts.TileGeomResult;
+import edu.colorado.cires.cmg.mvt.build.MvtLayerBuild;
+import edu.colorado.cires.cmg.mvt.build.MvtLayerParams;
+import edu.colorado.cires.cmg.mvt.build.MvtLayerProps;
 import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters;
+import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 
+/**
+ * Common functionality for creating a vector tile from a data source able to supply a set of JTS
+ * geometries with userData of type {@link T} for an {@link Envelope}.
+ */
 public abstract class LayerBuilder<T> {
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
   private final MvtLayerProps layerProps = new MvtLayerProps();
   private final VectorTile.Tile.Layer.Builder layerBuilder;
   private final PropertyMapper<T> mapper;
+  private final double expansionFactor;
 
-  public LayerBuilder(String layerName, PropertyMapper<T> mapper) {
+  public LayerBuilder(PropertyMapper<T> mapper, String layerName, double expansionFactor) {
     this.mapper = mapper;
     this.layerBuilder = MvtLayerBuild.newLayerBuilder(layerName, MvtLayerParams.DEFAULT);
+    this.expansionFactor = expansionFactor;
   }
 
   /**
@@ -31,12 +37,9 @@ public abstract class LayerBuilder<T> {
    */
   protected abstract List<Geometry> getGeometries(Envelope query);
 
-  VectorTile.Tile.Layer build(Envelope envelope, LayerParameters params) {
+  final VectorTile.Tile.Layer build(Envelope envelope) {
     Envelope query = new Envelope(envelope);
-    query.expandBy(
-      envelope.getWidth() * params.expansionFactor(),
-      envelope.getHeight() * params.expansionFactor()
-    );
+    query.expandBy(envelope.getWidth() * expansionFactor, envelope.getHeight() * expansionFactor);
 
     TileGeomResult tileGeom = JtsAdapter.createTileGeom(
       getGeometries(query),

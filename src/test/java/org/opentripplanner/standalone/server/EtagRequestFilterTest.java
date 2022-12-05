@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.server;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.ext.vectortiles.VectorTilesResource.APPLICATION_X_PROTOBUF;
+import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

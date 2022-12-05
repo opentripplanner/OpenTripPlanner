@@ -7,7 +7,7 @@ import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.inspector.TileRendererManager;
+import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.RoutingService;
@@ -104,7 +104,7 @@ public interface OtpServerRequestContext {
 
   FlexConfig flexConfig();
 
-  VectorTilesResource.LayersParameters vectorTileLayers();
+  VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers();
 
   default DataOverlayContext dataOverlayContext(RouteRequest request) {
     return OTPFeature.DataOverlay.isOnElseNull(() ->

@@ -6,7 +6,7 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
-import org.opentripplanner.inspector.TileRendererManager;
+import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.RoutingService;
@@ -35,7 +35,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final RaptorConfig<TripSchedule> raptorConfig;
   private final Logger requestLogger;
   private final TileRendererManager tileRendererManager;
-  private final VectorTilesResource.LayersParameters vectorTileLayers;
+  private final VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers;
   private final FlexConfig flexConfig;
   private final TraverseVisitor traverseVisitor;
 
@@ -52,7 +52,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     RaptorConfig<TripSchedule> raptorConfig,
     Logger requestLogger,
     TileRendererManager tileRendererManager,
-    VectorTilesResource.LayersParameters vectorTileLayers,
+    VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
     FlexConfig flexConfig,
     TraverseVisitor traverseVisitor
   ) {
@@ -81,7 +81,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     Graph graph,
     TransitService transitService,
     MeterRegistry meterRegistry,
-    VectorTilesResource.LayersParameters vectorTileLayers,
+    VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
     FlexConfig flexConfig,
     @Nullable TraverseVisitor traverseVisitor,
     @Nullable String requestLogFile
@@ -180,7 +180,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public VectorTilesResource.LayersParameters vectorTileLayers() {
+  public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
     return vectorTileLayers;
   }
 }

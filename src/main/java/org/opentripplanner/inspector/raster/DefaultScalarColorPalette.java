@@ -1,4 +1,4 @@
-package org.opentripplanner.inspector;
+package org.opentripplanner.inspector.raster;
 
 import java.awt.Color;
 
