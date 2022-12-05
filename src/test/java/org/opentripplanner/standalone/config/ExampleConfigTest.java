@@ -43,6 +43,12 @@ public class ExampleConfigTest {
     testConfig(filename, SpeedTestConfig::new);
   }
 
+  @FilePatternSource(pattern = "test/performance/**/otp-config.json")
+  @ParameterizedTest(name = "Check validity of {0}")
+  void otpConfig(Path filename) {
+    testConfig(filename, json -> new OtpConfig(json.rawNode(), json.toJson(), true));
+  }
+
   @FilePatternSource(pattern = { "src/test/resources/standalone/config/invalid-config.json" })
   @ParameterizedTest(name = "Fail when parsing an invalid config from {0}")
   void failInvalidConfig(Path filename) {

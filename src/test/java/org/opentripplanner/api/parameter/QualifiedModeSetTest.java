@@ -7,11 +7,25 @@ import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
+import static org.opentripplanner.transit.model.basic.TransitMode.AIRPLANE;
+import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
+import static org.opentripplanner.transit.model.basic.TransitMode.CABLE_CAR;
+import static org.opentripplanner.transit.model.basic.TransitMode.CARPOOL;
+import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
+import static org.opentripplanner.transit.model.basic.TransitMode.FUNICULAR;
+import static org.opentripplanner.transit.model.basic.TransitMode.GONDOLA;
+import static org.opentripplanner.transit.model.basic.TransitMode.MONORAIL;
+import static org.opentripplanner.transit.model.basic.TransitMode.SUBWAY;
+import static org.opentripplanner.transit.model.basic.TransitMode.TRAM;
+import static org.opentripplanner.transit.model.basic.TransitMode.TROLLEYBUS;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.ws.rs.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class QualifiedModeSetTest {
 
@@ -157,5 +171,63 @@ public class QualifiedModeSetTest {
         .build(),
       modeSet.getRequestModes()
     );
+  }
+
+  @Test
+  void walkTransitExcludesCarpool() {
+    QualifiedModeSet modeSet = new QualifiedModeSet("WALK,TRANSIT");
+    assertEquals(Set.of(new QualifiedMode("WALK"), new QualifiedMode("TRANSIT")), modeSet.qModes);
+
+    Set<TransitMode> expected = Set.of(
+      TransitMode.RAIL,
+      TransitMode.COACH,
+      SUBWAY,
+      BUS,
+      TRAM,
+      FERRY,
+      AIRPLANE,
+      CABLE_CAR,
+      GONDOLA,
+      FUNICULAR,
+      TROLLEYBUS,
+      MONORAIL,
+      TransitMode.TAXI
+    );
+    var mainModes = modeSet
+      .getRequestModes()
+      .transitModes.stream()
+      .map(MainAndSubMode::mainMode)
+      .collect(Collectors.toSet());
+
+    assertEquals(mainModes, expected);
+  }
+
+  @Test
+  void specificallyRequestCarpool() {
+    QualifiedModeSet modeSet = new QualifiedModeSet("WALK,TRANSIT,CARPOOL");
+
+    Set<TransitMode> expected = Set.of(
+      TransitMode.RAIL,
+      TransitMode.COACH,
+      SUBWAY,
+      BUS,
+      TRAM,
+      FERRY,
+      AIRPLANE,
+      CABLE_CAR,
+      GONDOLA,
+      FUNICULAR,
+      TROLLEYBUS,
+      CARPOOL,
+      MONORAIL,
+      TransitMode.TAXI
+    );
+    var mainModes = modeSet
+      .getRequestModes()
+      .transitModes.stream()
+      .map(MainAndSubMode::mainMode)
+      .collect(Collectors.toSet());
+
+    assertEquals(mainModes, expected);
   }
 }

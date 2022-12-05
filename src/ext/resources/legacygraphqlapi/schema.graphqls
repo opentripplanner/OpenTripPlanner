@@ -1446,6 +1446,12 @@ enum Mode {
     """TRAM"""
     TRAM
 
+    """"Private car trips shared with others."""
+    CARPOOL
+
+    """A taxi, possibly operated by a public transport agency."""
+    TAXI
+
     """A special transport mode, which includes all public transport."""
     TRANSIT
 
