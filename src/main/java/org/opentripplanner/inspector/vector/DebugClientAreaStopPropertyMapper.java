@@ -9,6 +9,9 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TransitService;
 
+/**
+ * A {@link PropertyMapper} for the {@link AreaStopsLayerBuilder} for the OTP debug client.
+ */
 public class DebugClientAreaStopPropertyMapper extends PropertyMapper<AreaStop> {
 
   private final I18NStringMapper i18NStringMapper;

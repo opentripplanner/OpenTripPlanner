@@ -10,11 +10,11 @@ import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitService;
 
+/**
+ * Common functionality for creating a vector tile response.
+ */
 public class VectorTileUtils {
 
-  /**
-   * Common functionality for creating a vector tile response.
-   */
   public static <LayerType extends Enum<LayerType>> Response createVectorTile(
     int x,
     int y,

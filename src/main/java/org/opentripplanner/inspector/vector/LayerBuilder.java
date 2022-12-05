@@ -13,6 +13,10 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 
+/**
+ * Common functionality for creating a vector tile from a data source able to supply a set of JTS
+ * geometries with userData of type {@link T} for an {@link Envelope}.
+ */
 public abstract class LayerBuilder<T> {
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
@@ -33,7 +37,7 @@ public abstract class LayerBuilder<T> {
    */
   protected abstract List<Geometry> getGeometries(Envelope query);
 
-  public final VectorTile.Tile.Layer build(Envelope envelope) {
+  final VectorTile.Tile.Layer build(Envelope envelope) {
     Envelope query = new Envelope(envelope);
     query.expandBy(envelope.getWidth() * expansionFactor, envelope.getHeight() * expansionFactor);
 

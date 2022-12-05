@@ -11,6 +11,9 @@ import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TransitService;
 
+/**
+ * A vector tile layer containing all {@link AreaStop}s inside the vector tile bounds.
+ */
 public class AreaStopsLayerBuilder extends LayerBuilder<AreaStop> {
 
   private static final Map<MapperType, MapperFactory> mappers = Map.of(
