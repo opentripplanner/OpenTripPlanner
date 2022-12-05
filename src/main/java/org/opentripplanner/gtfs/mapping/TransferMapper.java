@@ -282,10 +282,10 @@ class TransferMapper {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
 
     Predicate<StopLocation> stopMatches = station != null
-      ? s -> (s instanceof RegularStop && ((RegularStop) s).getParentStation() == station)
+      ? s -> ((s instanceof RegularStop regStop) && regStop.getParentStation() == station)
       : s -> s == stop;
 
-    for (int i = stopTimes.size() -1; i > 0; i--) {
+    for (int i = stopTimes.size() - 1; i > 0; i--) {
       StopTime stopTime = stopTimes.get(i);
       if (stopTime.getDropOffType().isNotRoutable()) {
         continue;
