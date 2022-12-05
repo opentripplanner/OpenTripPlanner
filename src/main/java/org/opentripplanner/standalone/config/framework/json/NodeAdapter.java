@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
-import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.framework.application.OtpAppException;
 
 /**
  * This class wrap a {@link JsonNode} and decorate it with type-safe parsing of types used in OTP

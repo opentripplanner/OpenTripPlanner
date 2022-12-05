@@ -6,8 +6,6 @@ import java.util.Objects;
 
 public final class ApiRoute implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   public String id;
   public ApiAgency agency;
   public String shortName;

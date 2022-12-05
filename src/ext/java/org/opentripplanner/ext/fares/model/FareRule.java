@@ -8,8 +8,6 @@ import org.opentripplanner.transit.model.network.Route;
 
 public final class FareRule implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private FareAttribute fare;
 
   private Route route;

@@ -6,11 +6,13 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -20,8 +22,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.TestUtils;
 
 /*
  * When bus stops are added to graph they split an existing edge in two parts so that an artificial
@@ -32,7 +32,10 @@ import org.opentripplanner.util.TestUtils;
  */
 public class SplitEdgeTurnRestrictionsTest {
 
-  static final Instant dateTime = TestUtils.dateInstant("Europe/Berlin", 2020, 3, 3, 7, 0, 0);
+  static final Instant dateTime = LocalDateTime
+    .of(2020, 3, 3, 7, 0)
+    .atZone(ZoneIds.BERLIN)
+    .toInstant();
   // Deufringen
   static final GenericLocation hardtheimerWeg = new GenericLocation(48.67765, 8.87212);
   static final GenericLocation steinhaldenWeg = new GenericLocation(48.67815, 8.87305);
@@ -158,7 +161,7 @@ public class SplitEdgeTurnRestrictionsTest {
     var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      ZoneId.of("Europe/Berlin"),
+      ZoneIds.BERLIN,
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );

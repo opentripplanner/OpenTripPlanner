@@ -2,6 +2,7 @@ package org.opentripplanner.datastore.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -17,7 +18,9 @@ import org.slf4j.LoggerFactory;
  * This is a wrapper around a ZipFile, it can be used to read the content, but not write to it. The
  * {@link #asOutputStream()} is throwing an exception.
  */
-public class ZipFileDataSource extends AbstractFileDataSource implements CompositeDataSource {
+public class ZipFileDataSource
+  extends AbstractFileDataSource
+  implements CompositeDataSource, ZipFileEntryParent {
 
   private static final Logger LOG = LoggerFactory.getLogger(ZipFileDataSource.class);
   private final Collection<DataSource> content = new ArrayList<>();
@@ -62,6 +65,15 @@ public class ZipFileDataSource extends AbstractFileDataSource implements Composi
    */
   ZipFile zipFile() {
     return zipFile;
+  }
+
+  @Override
+  public InputStream entryStream(ZipEntry entry) {
+    try {
+      return zipFile.getInputStream(entry);
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to read " + path() + ": " + e.getLocalizedMessage(), e);
+    }
   }
 
   private void loadContent() {

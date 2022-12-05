@@ -7,8 +7,6 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 public class VersionControlInfo implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   public final String commit;
   public final String branch;
   public final String commitTime;

@@ -6,11 +6,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.UnsupportedGeometryException;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

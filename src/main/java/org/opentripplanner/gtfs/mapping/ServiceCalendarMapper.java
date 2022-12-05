@@ -5,8 +5,8 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.model.calendar.ServiceCalendar;
-import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS ServiceCalendar into the OTP model. */
 class ServiceCalendarMapper {

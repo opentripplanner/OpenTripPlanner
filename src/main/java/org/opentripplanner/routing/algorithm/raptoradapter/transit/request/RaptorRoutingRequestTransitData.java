@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.raptor.spi.CostCalculator;
@@ -27,7 +28,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalc
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
-import org.opentripplanner.util.OTPFeature;
 
 /**
  * This is the data provider for the Range Raptor search engine. It uses data from the TransitLayer,

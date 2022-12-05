@@ -6,6 +6,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
@@ -15,8 +16,6 @@ import org.opentripplanner.standalone.configure.LoadApplication;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
-import org.opentripplanner.util.OtpAppException;
-import org.opentripplanner.util.ThrowableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -196,7 +195,8 @@ public class OTPMain {
         } catch (Throwable throwable) {
           LOG.error(
             "An uncaught error occurred inside OTP. Restarting server. Error was: {}",
-            ThrowableUtils.detailedString(throwable)
+            throwable.getMessage(),
+            throwable
           );
         }
         logLocationOfRequestLog(app.routerConfig().requestLogFile());

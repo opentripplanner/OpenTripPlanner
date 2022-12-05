@@ -8,8 +8,6 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
  */
 public class IndexVariable implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private final String name;
   private final String displayName;
   private final String variable;

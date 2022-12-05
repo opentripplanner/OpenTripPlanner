@@ -27,7 +27,7 @@ public class ByteArrayDataSource implements DataSource {
   private ByteArrayOutputStream out = null;
   private byte[] buffer;
 
-  ByteArrayDataSource(
+  public ByteArrayDataSource(
     String path,
     String name,
     FileType type,
@@ -96,7 +96,7 @@ public class ByteArrayDataSource implements DataSource {
    * Clean any existing data, and return a new {@link OutputStream} which can be used to insert data
    * into the byte array.
    * <p>
-   * If the source is created with {@code writable = false} then the {@link #asOutputStream()} will
+   * If the source is created with {@code writable = false} then this method will
    * throw an exception, instead use the {@link #withBytes(byte[])} to inject data.
    */
   @Override
@@ -122,7 +122,7 @@ public class ByteArrayDataSource implements DataSource {
   /**
    * Clean any existing data, and set the byte array.
    */
-  ByteArrayDataSource withBytes(byte[] buffer) {
+  public ByteArrayDataSource withBytes(byte[] buffer) {
     this.buffer = buffer;
     this.out = null;
     return this;

@@ -3,7 +3,6 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 
@@ -17,12 +16,11 @@ import org.opentripplanner.transit.model.network.Route;
 // TODO VIA Part 2 - Cleanup this class - Depends on Model, contains parsing logic
 public class RouteMatcher implements Cloneable, Serializable {
 
-  private static final long serialVersionUID = 8066547338465440312L;
   private static final RouteMatcher EMPTY_MATCHER = new RouteMatcher();
   /* Set of full matching route ids (agency ID + route ID) */
   private final HashSet<FeedScopedId> agencyAndRouteIds = new HashSet<>();
   /* Set of full matching route code/names (agency ID + route code/name) */
-  private final HashSet<T2<String, String>> agencyIdAndRouteNames = new HashSet<>();
+  private final HashSet<AgencyIdAndRouteName> agencyIdAndRouteNames = new HashSet<>();
   /* Set of matching route names (without specifying an agency ID) */
   private final HashSet<String> routeNames = new HashSet<>();
 
@@ -88,7 +86,7 @@ public class RouteMatcher implements Cloneable, Serializable {
         retval.agencyAndRouteIds.add(new FeedScopedId(agencyId, routeId));
       } else if (agencyId != null && routeName != null && routeId == null) {
         // Case 2: specified agency ID and route name but no route ID
-        retval.agencyIdAndRouteNames.add(new T2<>(agencyId, routeName));
+        retval.agencyIdAndRouteNames.add(new AgencyIdAndRouteName(agencyId, routeName));
       } else if (agencyId == null && routeName != null && routeId == null) {
         // Case 3: specified route name only
         retval.routeNames.add(routeName);
@@ -111,7 +109,8 @@ public class RouteMatcher implements Cloneable, Serializable {
     }
     if (route.getName() != null) {
       String routeName = route.getName().replace("_", " ");
-      if (agencyIdAndRouteNames.contains(new T2<>(route.getId().getFeedId(), routeName))) {
+      var candidate = new AgencyIdAndRouteName(route.getId().getFeedId(), routeName);
+      if (agencyIdAndRouteNames.contains(candidate)) {
         return true;
       }
       if (routeNames.contains(routeName)) {
@@ -133,8 +132,8 @@ public class RouteMatcher implements Cloneable, Serializable {
       builder.append(id.getFeedId() + "__" + id.getId());
       builder.append(",");
     }
-    for (T2<String, String> agencyIdAndRouteName : agencyIdAndRouteNames) {
-      builder.append(agencyIdAndRouteName.first + "_" + agencyIdAndRouteName.second);
+    for (var it : agencyIdAndRouteNames) {
+      builder.append(it.agencyId() + "_" + it.route());
       builder.append(",");
     }
     for (String routeName : routeNames) {
@@ -186,4 +185,6 @@ public class RouteMatcher implements Cloneable, Serializable {
       routeNames
     );
   }
+
+  private record AgencyIdAndRouteName(String agencyId, String route) {}
 }

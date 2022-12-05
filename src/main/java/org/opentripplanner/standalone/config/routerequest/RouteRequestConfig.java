@@ -9,6 +9,7 @@ import static org.opentripplanner.standalone.config.routerequest.WheelchairConfi
 
 import java.time.Duration;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -26,7 +27,6 @@ import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

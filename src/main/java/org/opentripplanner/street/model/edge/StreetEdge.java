@@ -16,6 +16,7 @@ import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.SplitLineString;
+import org.opentripplanner.framework.lang.BitSetUtils;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -33,7 +34,6 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.util.BitSetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

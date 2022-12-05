@@ -28,7 +28,6 @@ class JavaImmutableMapSerializer extends Serializer<Map<?, ?>> {
 
   private static class ImmSerMap implements Serializable {
 
-    private static final long serialVersionUID = 1L;
     private final ImmSerMapEntry<?, ?>[] array;
 
     private ImmSerMap(ImmSerMapEntry[] array) {

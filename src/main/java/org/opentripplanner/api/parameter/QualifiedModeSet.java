@@ -25,8 +25,6 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 public class QualifiedModeSet implements Serializable {
 
   @Serial
-  private static final long serialVersionUID = 1L;
-
   public Set<QualifiedMode> qModes = new HashSet<>();
 
   public QualifiedModeSet(String[] modes) {

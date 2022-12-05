@@ -55,7 +55,6 @@ public class DirectFlexRouter {
         serverContext.flexConfig(),
         request.dateTime(),
         request.arriveBy(),
-        request.preferences().walk().speed(),
         additionalSearchDays.additionalSearchDaysInPast(),
         additionalSearchDays.additionalSearchDaysInFuture(),
         accessStops,

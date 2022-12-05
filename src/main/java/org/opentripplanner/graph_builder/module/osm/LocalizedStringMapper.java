@@ -8,12 +8,12 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.framework.resources.ResourceBundleSingleton;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.util.resources.ResourceBundleSingleton;
 
 class LocalizedStringMapper {
 

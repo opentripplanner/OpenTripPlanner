@@ -9,8 +9,6 @@ import java.util.Objects;
  */
 public class MavenProjectVersion implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   /** The maven version string "as is" */
   public final String version;
 

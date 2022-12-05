@@ -17,10 +17,12 @@ public enum ApiRequestMode {
   CABLE_CAR(TransitMode.CABLE_CAR),
   GONDOLA(TransitMode.GONDOLA),
   FUNICULAR(TransitMode.FUNICULAR),
-  TRANSIT(TransitMode.values()),
+  TRANSIT(TransitMode.modesConsideredTransitByUsers()),
   AIRPLANE(TransitMode.AIRPLANE),
   TROLLEYBUS(TransitMode.TROLLEYBUS),
   MONORAIL(TransitMode.MONORAIL),
+  CARPOOL(TransitMode.CARPOOL),
+  TAXI(TransitMode.TAXI),
   FLEX();
 
   private final List<TransitMode> transitModes;
