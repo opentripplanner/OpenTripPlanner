@@ -74,10 +74,6 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    // TODO: 2022-11-29 filters: fix
-//    if (request.journey().transit().modes().isEmpty()) {
-//      return new TransitRouterResult(List.of(), null);
-//    }
 
     if (!serverContext.transitService().transitFeedCovers(request.dateTime())) {
       throw new RoutingValidationException(

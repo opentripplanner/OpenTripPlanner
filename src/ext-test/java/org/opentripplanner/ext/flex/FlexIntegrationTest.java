@@ -235,6 +235,7 @@ public class FlexIntegrationTest {
     request.setNumItineraries(10);
     request.setSearchWindow(Duration.ofHours(2));
 
+    // TODO: 2022-12-05 filters: handle transit modes in right way
     var modes = request.journey().modes().copyOf();
     modes.withEgressMode(FLEXIBLE);
 

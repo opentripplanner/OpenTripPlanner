@@ -291,16 +291,10 @@ public class NearbyStopFinder {
         routingRequest.journey().access().mode()
       )
     ) {
-      // TODO: 2022-11-29 filters: fix. How should we handle it?
-
       var strategy = new VehicleToStopSkipEdgeStrategy(
         transitService::getRoutesForStop,
-        List.of()
+        routingRequest.journey().transit().filters()
       );
-//      var strategy = new VehicleToStopSkipEdgeStrategy(
-//        transitService::getRoutesForStop,
-//        routingRequest.journey().transit().modes().stream().map(MainAndSubMode::mainMode).toList()
-//      );
 
       return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     } else if (

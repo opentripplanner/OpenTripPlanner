@@ -771,17 +771,7 @@ public class LegacyGraphQLQueryTypeImpl
         request.journey().direct().setMode(requestModes.directMode);
         request.journey().transfer().setMode(requestModes.transferMode);
 
-        // TODO: 2022-11-30 filters: double check that this is correct
-        var mainModes = requestModes.transitModes.stream()
-          .map(MainAndSubMode::mainMode)
-          .collect(Collectors.toList());
-        include.setModes(mainModes);
-
-        var submodes = requestModes.transitModes.stream()
-          .map(MainAndSubMode::subMode)
-          .filter(Objects::nonNull)
-          .collect(Collectors.toList());
-        include.setSubModes(submodes);
+        include.setTransportModes(requestModes.transitModes);
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {

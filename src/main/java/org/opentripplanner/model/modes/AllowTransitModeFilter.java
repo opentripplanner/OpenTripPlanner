@@ -14,6 +14,7 @@ public interface AllowTransitModeFilter extends Serializable {
     return FilterFactory.create(modes);
   }
 
+  // TODO: 2022-12-05 this is not the best name since this interface is used both for whitelist and blacklist
   /**
    * Check if this filter allows the provided TransitMode
    */

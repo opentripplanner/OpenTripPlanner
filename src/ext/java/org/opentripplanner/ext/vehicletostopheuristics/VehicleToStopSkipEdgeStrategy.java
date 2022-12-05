@@ -7,13 +7,16 @@ import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
 import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.filter.FilterPredicate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.state.State;
@@ -49,16 +52,16 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Ed
   );
   private final Function<RegularStop, Set<Route>> getRoutesForStop;
   private final int maxScore;
-  private final EnumSet<TransitMode> allowedModes;
+  private final List<FilterPredicate> filters;
   private double sumOfScores;
 
   private final Set<FeedScopedId> stopsCounted = new HashSet<>();
 
   public VehicleToStopSkipEdgeStrategy(
     Function<RegularStop, Set<Route>> getRoutesForStop,
-    Collection<TransitMode> allowedModes
+    Collection<FilterPredicate> filters
   ) {
-    this.allowedModes = EnumSet.copyOf(allowedModes);
+    this.filters = new ArrayList<>(filters);
     this.maxScore = 300;
     this.getRoutesForStop = getRoutesForStop;
   }
@@ -70,12 +73,15 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Ed
         current.getVertex() instanceof TransitStopVertex stopVertex &&
         !stopsCounted.contains(stopVertex.getStop().getId())
       ) {
+
+        // TODO: 2022-12-05 filters: check performance on that
+        // TODO: 2022-12-05 filters: verify that this is right. Previously we were filtering just on modes
         var stop = stopVertex.getStop();
         var score = getRoutesForStop
           .apply(stop)
           .stream()
+          .filter(route -> filters.stream().anyMatch(f -> f.routePredicate(route)))
           .map(Route::getMode)
-          .filter(allowedModes::contains)
           .mapToInt(VehicleToStopSkipEdgeStrategy::score)
           .sum();
 

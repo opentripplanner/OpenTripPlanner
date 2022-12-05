@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.request.filter;
 
 import java.io.Serializable;
+import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
@@ -49,22 +50,12 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
 
   @Override
   public boolean routePredicate(Route route) {
-    // skip subModes here, we are going to check it on trip level
-    if (
-      include.modes().isEmpty() &&
-        exclude.modes().isEmpty() &&
-        include.agencies().isEmpty() &&
-        exclude.agencies().isEmpty() &&
-        include.routes().isEmpty() &&
-        exclude.routes().isEmpty() &&
-        include.feeds().isEmpty() &&
-        exclude.feeds().isEmpty()
-    ) {
-      // everything is empty. Do not have to check
-      return true;
-    }
-    var allowedModes = include.modes();
-    var bannedModes = exclude.modes();
+    // Route is accepted if it:
+    //  matches with all allow-lists (empty list means match all)
+    //  does not match with any ban-list
+
+    var allowedModes = include.transportModes();
+    var bannedModes = exclude.transportModes();
     var allowedAgencies = include.agencies();
     var bannedAgencies = exclude.agencies();
     var allowedRoutes = include.routes();
@@ -72,7 +63,22 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
     var allowedFeeds = include.feeds();
     var bannedFeeds = exclude.feeds();
 
-    if (bannedModes.contains(route.getMode())) {
+    if (
+      allowedModes.isEmpty() &&
+        bannedModes.isEmpty() &&
+        allowedAgencies.isEmpty() &&
+        bannedAgencies.isEmpty() &&
+        allowedRoutes.isEmpty() &&
+        bannedRoutes.isEmpty() &&
+        allowedFeeds.isEmpty() &&
+        bannedFeeds.isEmpty()
+    ) {
+      // everything is empty. Do not have to check
+      return true;
+    }
+
+    if (!bannedModes.isEmpty() &&
+      AllowTransitModeFilter.of(bannedModes).allows(route.getMode(), route.getNetexSubmode())) {
       return false;
     }
 
@@ -88,47 +94,39 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
       return false;
     }
 
-    boolean allowed = false;
-    boolean allowListInUse = false;
 
-    if (!allowedModes.isEmpty() ) {
-      allowListInUse = true;
-      if (allowedModes.contains(route.getMode())) {
-        allowed = true;
-      }
+    if (!allowedModes.isEmpty() &&
+      !AllowTransitModeFilter.of(allowedModes).allows(route.getMode(), route.getNetexSubmode())) {
+      return false;
     }
 
-    if (!allowedAgencies.isEmpty()) {
-      allowListInUse = true;
-      if (allowedAgencies.contains(route.getAgency().getId())) {
-        allowed = true;
-      }
+    if (!allowedAgencies.isEmpty() &&
+      !allowedAgencies.contains(route.getAgency().getId())) {
+      return false;
     }
 
-    if (!allowedRoutes.isEmpty()) {
-      allowListInUse = true;
-      if (allowedRoutes.matches(route)) {
-        allowed = true;
-      }
+    if (!allowedRoutes.isEmpty() &&
+      !allowedRoutes.matches(route)) {
+      return false;
     }
 
-    if (!allowedFeeds.isEmpty()) {
-      allowListInUse = true;
-      if (allowedFeeds.contains(route.getId().getFeedId())) {
-        allowed = true;
-      }
+    if (!allowedFeeds.isEmpty() &&
+      !allowedFeeds.contains(route.getId().getFeedId())) {
+      return false;
     }
 
-    return !allowListInUse || allowed;
+    return true;
   }
 
   @Override
   public boolean tripTimesPredicate(TripTimes tripTimes) {
+    // trip is accepted if it:
+    //  matches with all allow-lists (empty list means match all)
+    //  does not match with any ban-list
+
     // TODO: 2022-12-01 filters: this should be optimized
-    var allowedModes = include.modes();
-    var bannedModes = exclude.modes();
-    var allowedSubModes = include.subModes();
-    var bannedSubModes = exclude.subModes();
+    var allowedModes = include.transportModes();
+    var bannedModes = exclude.transportModes();
     var allowedAgencies = include.agencies();
     var bannedAgencies = exclude.agencies();
     var allowedRoutes = include.routes();
@@ -142,18 +140,16 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
 
     if (allowedTrips.isEmpty() &&
       bannedTrips.isEmpty() &&
-      allowedSubModes.isEmpty() &&
-      bannedSubModes.isEmpty()) {
+      allowedModes.isEmpty() &&
+      bannedModes.isEmpty()) {
       // no trip-specific filters specified
       // all irrelevant trips were already filtered out by routePredicate
       return true;
     }
 
-    if (bannedModes.contains(trip.getMode())) {
-      return false;
-    }
 
-    if (bannedSubModes.contains(trip.getNetexSubMode())) {
+    if (!bannedModes.isEmpty() &&
+      AllowTransitModeFilter.of(bannedModes).allows(trip.getMode(), trip.getNetexSubMode())) {
       return false;
     }
 
@@ -173,51 +169,32 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
       return false;
     }
 
-    boolean allowed = false;
-    boolean allowListInUse = false;
 
-    if (!allowedModes.isEmpty()) {
-      allowListInUse = true;
-      if (allowedModes.contains(trip.getMode())) {
-        allowed = true;
-      }
+    if (!allowedModes.isEmpty() &&
+      !AllowTransitModeFilter.of(allowedModes).allows(trip.getMode(), trip.getNetexSubMode())) {
+      return false;
     }
 
-    if (!allowedSubModes.isEmpty()) {
-      allowListInUse = true;
-      if (allowedSubModes.contains(trip.getNetexSubMode())) {
-        allowed = true;
-      }
+    if (!allowedAgencies.isEmpty() &&
+      !allowedAgencies.contains(trip.getRoute().getAgency().getId())) {
+      return false;
     }
 
-    if (!allowedAgencies.isEmpty()) {
-      allowListInUse = true;
-      if (allowedAgencies.contains(trip.getRoute().getAgency().getId())) {
-        allowed = true;
-      }
+    if (!allowedRoutes.isEmpty() &&
+      !allowedRoutes.matches(trip.getRoute())) {
+      return false;
     }
 
-    if (!allowedRoutes.isEmpty()) {
-      allowListInUse = true;
-      if (allowedRoutes.matches(trip.getRoute())) {
-        allowed = true;
-      }
+    if (!allowedFeeds.isEmpty() &&
+      !allowedFeeds.contains(trip.getId().getFeedId())) {
+      return false;
     }
 
-    if (!allowedFeeds.isEmpty()) {
-      allowListInUse = true;
-      if (allowedFeeds.contains(trip.getId().getFeedId())) {
-        allowed = true;
-      }
+    if (!allowedTrips.isEmpty() &&
+      !allowedTrips.contains(trip.getId())) {
+      return false;
     }
 
-    if (!allowedTrips.isEmpty()) {
-      allowListInUse = true;
-      if (allowedTrips.contains(trip.getId())) {
-        allowed = true;
-      }
-    }
-
-    return !allowListInUse || allowed;
+    return true;
   }
 }

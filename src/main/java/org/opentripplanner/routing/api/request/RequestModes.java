@@ -9,6 +9,8 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 
+// TODO: 2022-12-05 filters: it no longer makes sense to have transit mode here
+//  since now transit modes are combined with other filters. We should remove transit modes from here.
 public class RequestModes {
 
   /**

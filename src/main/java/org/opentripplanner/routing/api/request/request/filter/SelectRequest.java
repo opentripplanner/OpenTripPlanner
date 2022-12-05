@@ -4,33 +4,25 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.routing.core.RouteMatcher;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class SelectRequest implements Cloneable, Serializable {
-  private List<TransitMode> modes = new ArrayList<>();
-  private List<SubMode> subModes = new ArrayList<>();
+  private List<MainAndSubMode> transportModes = new ArrayList<>();
   private List<FeedScopedId> agencies = new ArrayList<>();
   private RouteMatcher routes = RouteMatcher.emptyMatcher();
   // TODO: 2022-11-29 group of routes
   private List<FeedScopedId> trips = new ArrayList<>();
   private List<String> feeds = new ArrayList<>();
 
-  public List<TransitMode> modes() {
-    return modes;
+  public List<MainAndSubMode> transportModes() {
+    return transportModes;
   }
 
-  public void setModes(List<TransitMode> modes) {
-    this.modes = modes;
-  }
-
-  public List<SubMode> subModes() {
-    return subModes;
-  }
-
-  public void setSubModes(List<SubMode> subModes) {
-    this.subModes = subModes;
+  public void setTransportModes(List<MainAndSubMode> transportModes) {
+    this.transportModes = transportModes;
   }
 
   public void setAgencies(List<FeedScopedId> agencies) {
@@ -88,8 +80,7 @@ public class SelectRequest implements Cloneable, Serializable {
   @Override
   public String toString() {
     return "SelectRequest{" +
-      "modes=" + modes +
-      ", subModes=" + subModes +
+      "transportModes=" + transportModes +
       ", agencies=" + agencies +
       ", routes=" + routes +
       ", trips=" + trips +
@@ -102,8 +93,7 @@ public class SelectRequest implements Cloneable, Serializable {
     try {
       var clone = (SelectRequest) super.clone();
 
-      clone.modes = List.copyOf(this.modes);
-      clone.subModes = List.copyOf(this.subModes);
+      clone.transportModes = List.copyOf(this.transportModes);
       clone.agencies = List.copyOf(this.agencies);
       clone.routes = this.routes.clone();
       clone.trips = List.copyOf(this.trips);

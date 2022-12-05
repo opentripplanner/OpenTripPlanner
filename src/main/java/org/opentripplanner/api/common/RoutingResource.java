@@ -6,6 +6,7 @@ import static org.opentripplanner.api.common.RequestToPreferencesMapper.setIfNot
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -21,6 +22,7 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.filter.FilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
@@ -709,16 +711,21 @@ public abstract class RoutingResource {
         // Filter Agencies
         setIfNotNull(preferredAgencies, transit::setPreferredAgenciesFromString);
         setIfNotNull(unpreferredAgencies, transit::setUnpreferredAgenciesFromString);
-        // TODO: 2022-11-29 filters: fix
-//        setIfNotNull(bannedAgencies, transit::setBannedAgenciesFromSting);
-//        setIfNotNull(whiteListedAgencies, transit::setWhiteListedAgenciesFromSting);
+
+        var filter = new FilterRequest();
+        filter.getInclude().setTransportModes(modes.getRequestModes().transitModes);
+
+        setIfNotNull(bannedAgencies, filter.getExclude()::setAgenciesFromString);
+        setIfNotNull(whiteListedAgencies, filter.getInclude()::setAgenciesFromString);
+
         // Filter Routes
         setIfNotNull(preferredRoutes, transit::setPreferredRoutesFromString);
         setIfNotNull(unpreferredRoutes, transit::setUnpreferredRoutesFromString);
-//        setIfNotNull(bannedRoutes, transit::setBannedRoutesFromString);
-//        setIfNotNull(whiteListedRoutes, transit::setWhiteListedRoutesFromString);
+        setIfNotNull(bannedRoutes, filter.getExclude()::setRoutesFromString);
+        setIfNotNull(whiteListedRoutes, filter.getInclude()::setRoutesFromString);
         // Filter Trips
-//        setIfNotNull(bannedTrips, transit::setBannedTripsFromString);
+        setIfNotNull(bannedTrips, filter.getExclude()::setTripsFromString);
+        transit.filters().add(filter);
       }
       {
         var debugRaptor = journey.transit().raptorDebugging();

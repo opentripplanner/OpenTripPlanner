@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SUBMODE;
 import static org.opentripplanner.ext.transmodelapi.support.GqlUtil.newIdListInputField;
 
 import graphql.schema.GraphQLInputObjectField;
@@ -10,7 +8,7 @@ import graphql.schema.GraphQLList;
 
 public class FilterInputType {
 
-  // TODO: 2022-11-29 move to separate class
+  // TODO: 2022-11-29 filters: move to separate class
   static final GraphQLInputObjectType SELECT_INPUT_TYPE = GraphQLInputObjectType
     .newInputObject()
     .name("TripFilterSelectInput")
@@ -22,23 +20,19 @@ public class FilterInputType {
     .field(
       GraphQLInputObjectField
         .newInputObjectField()
-        .name("modes")
-        .description("Set of transport modes that should be included in/excluded from search")
-        .type(new GraphQLList(TRANSPORT_MODE))
+        .name("transportModes")
+        .description(
+          "The allowed modes for the transit part of the trip. Use an empty list to " +
+            "disallow transit for this search. If the element is not present or null, it will " +
+            "default to all transport modes."
+        )
+        .type(new GraphQLList(ModeAndSubModeInputType.INPUT_TYPE))
         .build()
     )
-    .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
-        .name("subModes")
-        .description("Set of transport sub modes that should be included in/excluded from search")
-        .type(new GraphQLList(TRANSPORT_SUBMODE))
-        .build()
-    )
-    // TODO: 2022-11-29 planned cancellations?
-    // TODO: 2022-11-29 bikes ?
-    // TODO: 2022-11-29 wheelchair?
-    // TODO: 2022-11-29 groups of lines
+    // TODO: 2022-11-29 filters: planned cancellations?
+    // TODO: 2022-11-29 filters: bikes ?
+    // TODO: 2022-11-29 filters: wheelchair?
+    // TODO: 2022-11-29 filters: groups of lines
     .build();
 
   static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType

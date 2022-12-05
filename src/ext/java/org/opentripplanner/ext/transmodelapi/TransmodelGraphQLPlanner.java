@@ -27,6 +27,8 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.filter.AllowAllFilter;
+import org.opentripplanner.routing.api.request.request.filter.FilterPredicate;
 import org.opentripplanner.routing.api.request.request.filter.FilterRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -35,6 +37,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -189,6 +192,10 @@ public class TransmodelGraphQLPlanner {
       mapFilterOldWay(environment, callWith, request);
     }
 
+    if (request.journey().transit().filters().isEmpty()) {
+      request.journey().transit().filters().add(new AllowAllFilter());
+    }
+
     request.withPreferences(preferences -> {
       mapPreferences(environment, callWith, preferences);
     });
@@ -232,25 +239,25 @@ public class TransmodelGraphQLPlanner {
       callWith.argument("modes.transportModes", transportModes::set);
 
       if (transportModes.get() != null) {
-        var mainModes = new ArrayList<TransitMode>();
-        var subModes = new ArrayList<SubMode>();
+        var tModes = new ArrayList<MainAndSubMode>();
 
         for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
           if (modeWithSubmodes.containsKey("transportMode")) {
-            mainModes.add((TransitMode) modeWithSubmodes.get("transportMode"));
+            var mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
 
             if (modeWithSubmodes.containsKey("transportSubModes")) {
               var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
                 "transportSubModes"
               );
               for (TransmodelTransportSubmode submode : transportSubModes) {
-                subModes.add(SubMode.of(submode.getValue()));
+                tModes.add(new MainAndSubMode(mainMode, SubMode.of(submode.getValue())));
               }
+            } else {
+              tModes.add(new MainAndSubMode(mainMode));
             }
           }
         }
-        include.setModes(mainModes);
-        include.setSubModes(subModes);
+        include.setTransportModes(tModes);
       }
     }
 
@@ -265,7 +272,7 @@ public class TransmodelGraphQLPlanner {
       ElementWrapper<List<LinkedHashMap<String, ?>>> filtersInput = new ElementWrapper<>();
       callWith.argument("filters", filtersInput::set);
 
-      var filterRequests = new ArrayList<FilterRequest>();
+      var filterRequests = new ArrayList<FilterPredicate>();
 
       for (var filterInput : filtersInput.get()) {
         var filterRequest = new FilterRequest();
@@ -309,14 +316,25 @@ public class TransmodelGraphQLPlanner {
       selectRequest.setTrips(mapIDsToDomain(serviceJourneys));
     }
 
-    if (input.containsKey("modes")) {
-      var modes = (List<TransitMode>) input.get("modes");
-      selectRequest.setModes(modes);
-    }
+    if (input.containsKey("transportModes") ) {
+      var tModes = new ArrayList<MainAndSubMode>();
 
-    if (input.containsKey("subModes")) {
-      var subModes = (List<TransmodelTransportSubmode>) input.get("subModes");
-      selectRequest.setSubModes(subModes.stream().map(sm -> SubMode.of(sm.getValue())).collect(Collectors.toList()));
+      var transportModes = (List<LinkedHashMap<String, ?>>) input.get("transportModes");
+      for (LinkedHashMap<String, ?> modeWithSubModes : transportModes) {
+        var mainMode = (TransitMode) modeWithSubModes.get("transportMode");
+        if (modeWithSubModes.containsKey("transportSubModes")) {
+          var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubModes.get(
+            "transportSubModes"
+          );
+
+          for (var subMode : transportSubModes) {
+            tModes.add(new MainAndSubMode(mainMode, SubMode.of(subMode.getValue())));
+          }
+        } else {
+          tModes.add(new MainAndSubMode(mainMode));
+        }
+      }
+      selectRequest.setTransportModes(tModes);
     }
 
     return selectRequest;
