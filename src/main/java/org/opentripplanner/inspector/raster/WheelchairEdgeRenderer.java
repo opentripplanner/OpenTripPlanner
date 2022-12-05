@@ -1,14 +1,16 @@
 package org.opentripplanner.inspector.raster;
 
 import java.awt.Color;
+import java.util.Optional;
 import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.EdgeVertexRenderer;
+import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.EdgeVisualAttributes;
+import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.VertexVisualAttributes;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
  * Render important information for debugging wheelchair access (street slopes and transit stop
@@ -29,47 +31,39 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
   }
 
   @Override
-  public boolean renderEdge(Edge e, EdgeVertexTileRenderer.EdgeVisualAttributes attrs) {
+  public Optional<EdgeVisualAttributes> renderEdge(Edge e) {
     if (e instanceof StreetEdge pse) {
       if (!pse.isWheelchairAccessible()) {
-        attrs.color = NO_WHEELCHAIR_COLOR;
-        attrs.label = "wheelchair=no";
+        return EdgeVisualAttributes.optional(NO_WHEELCHAIR_COLOR, "wheelchair=no");
       } else {
-        attrs.color = slopePalette.getColor(pse.getMaxSlope());
-        attrs.label = String.format("%.02f", pse.getMaxSlope());
+        return EdgeVisualAttributes.optional(
+          slopePalette.getColor(pse.getMaxSlope()),
+          String.format("%.02f", pse.getMaxSlope())
+        );
       }
     } else if (e instanceof ElevatorHopEdge ehe) {
       if (!ehe.isWheelchairAccessible()) {
-        attrs.color = NO_WHEELCHAIR_COLOR;
-        attrs.label = "wheelchair=no";
+        return EdgeVisualAttributes.optional(NO_WHEELCHAIR_COLOR, "wheelchair=no");
       } else {
-        attrs.color = Color.GREEN;
-        attrs.label = "elevator";
+        return EdgeVisualAttributes.optional(Color.GREEN, "elevator");
       }
-    } else {
-      return false;
     }
-    return true;
+    return Optional.empty();
   }
 
   @Override
-  public boolean renderVertex(Vertex v, EdgeVertexTileRenderer.VertexVisualAttributes attrs) {
+  public Optional<VertexVisualAttributes> renderVertex(Vertex v) {
     if (v instanceof TransitStopVertex) {
-      if (
-        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() ==
-        Accessibility.NO_INFORMATION
-      ) attrs.color = NO_WHEELCHAIR_INFORMATION_COLOR;
-      if (
-        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() == Accessibility.POSSIBLE
-      ) attrs.color = YES_WHEELCHAIR_COLOR;
-      if (
-        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() == Accessibility.NOT_POSSIBLE
-      ) attrs.color = NO_WHEELCHAIR_COLOR;
-      attrs.label = v.getDefaultName();
-    } else {
-      return false;
+      var accessibility = ((TransitStopVertex) v).getStop().getWheelchairAccessibility();
+      var color =
+        switch (accessibility) {
+          case NO_INFORMATION -> NO_WHEELCHAIR_INFORMATION_COLOR;
+          case POSSIBLE -> YES_WHEELCHAIR_COLOR;
+          case NOT_POSSIBLE -> NO_WHEELCHAIR_COLOR;
+        };
+      return VertexVisualAttributes.optional(color, v.getDefaultName());
     }
-    return true;
+    return Optional.empty();
   }
 
   @Override

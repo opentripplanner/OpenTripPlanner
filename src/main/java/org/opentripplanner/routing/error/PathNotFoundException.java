@@ -6,7 +6,4 @@ package org.opentripplanner.routing.error;
  *
  * @see org.opentripplanner.api.resource.PlannerResource for where this is (locally) thrown.
  */
-public class PathNotFoundException extends RuntimeException {
-
-  private static final long serialVersionUID = 1L;
-}
+public class PathNotFoundException extends RuntimeException {}

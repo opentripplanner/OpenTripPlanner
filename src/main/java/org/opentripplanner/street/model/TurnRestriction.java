@@ -1,13 +1,11 @@
 package org.opentripplanner.street.model;
 
 import java.io.Serializable;
-import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseModeSet;
 
 public class TurnRestriction implements Serializable {
 
-  private static final long serialVersionUID = 6072427988268244536L;
   public final TurnRestrictionType type;
   public final StreetEdge from;
   public final StreetEdge to;

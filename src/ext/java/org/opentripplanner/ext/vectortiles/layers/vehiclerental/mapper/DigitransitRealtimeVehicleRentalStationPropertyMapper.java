@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.api.mapping.I18NStringMapper;
 import org.opentripplanner.api.mapping.PropertyMapper;
-import org.opentripplanner.common.model.T2;
+import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
 public class DigitransitRealtimeVehicleRentalStationPropertyMapper
@@ -22,15 +22,15 @@ public class DigitransitRealtimeVehicleRentalStationPropertyMapper
   }
 
   @Override
-  protected Collection<T2<String, Object>> map(VehicleRentalStation station) {
-    var items = new ArrayList<T2<String, Object>>();
+  protected Collection<KeyValue> map(VehicleRentalStation station) {
+    var items = new ArrayList<KeyValue>();
     items.addAll(getFeedScopedIdAndNetwork(station));
     items.addAll(getNameAndFormFactors(station, i18NStringMapper));
     items.addAll(
       List.of(
-        new T2<>("vehiclesAvailable", station.getVehiclesAvailable()),
-        new T2<>("spacesAvailable", station.getSpacesAvailable()),
-        new T2<>("operative", station.isAllowPickup() && station.isAllowDropoff())
+        new KeyValue("vehiclesAvailable", station.getVehiclesAvailable()),
+        new KeyValue("spacesAvailable", station.getSpacesAvailable()),
+        new KeyValue("operative", station.isAllowPickup() && station.isAllowDropoff())
       )
     );
     return items;

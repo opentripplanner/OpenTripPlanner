@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.mapping.I18NStringMapper;
 import org.opentripplanner.api.mapping.PropertyMapper;
-import org.opentripplanner.common.model.T2;
+import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
@@ -21,30 +21,28 @@ public class DigitransitVehicleRentalStationPropertyMapper
   }
 
   @Override
-  protected Collection<T2<String, Object>> map(VehicleRentalStation station) {
-    var items = new ArrayList<T2<String, Object>>();
+  protected Collection<KeyValue> map(VehicleRentalStation station) {
+    var items = new ArrayList<KeyValue>();
     items.addAll(getFeedScopedIdAndNetwork(station));
     items.addAll(getNameAndFormFactors(station, i18NStringMapper));
     return items;
   }
 
-  protected static List<T2<String, Object>> getFeedScopedIdAndNetwork(
-    VehicleRentalPlace vehicleRentalPlace
-  ) {
+  protected static List<KeyValue> getFeedScopedIdAndNetwork(VehicleRentalPlace vehicleRentalPlace) {
     return List.of(
-      new T2<>("id", vehicleRentalPlace.getId().toString()),
-      new T2<>("network", vehicleRentalPlace.getNetwork())
+      new KeyValue("id", vehicleRentalPlace.getId().toString()),
+      new KeyValue("network", vehicleRentalPlace.getNetwork())
     );
   }
 
-  protected static List<T2<String, Object>> getNameAndFormFactors(
+  protected static List<KeyValue> getNameAndFormFactors(
     VehicleRentalStation vehicleRentalStation,
     I18NStringMapper i18NStringMapper
   ) {
     return List.of(
-      new T2<>("name", i18NStringMapper.mapToApi(vehicleRentalStation.getName())),
+      new KeyValue("name", i18NStringMapper.mapToApi(vehicleRentalStation.getName())),
       // a station can potentially have multiple form factors that's why this is plural
-      new T2<>(
+      new KeyValue(
         "formFactors",
         vehicleRentalStation
           .formFactors()

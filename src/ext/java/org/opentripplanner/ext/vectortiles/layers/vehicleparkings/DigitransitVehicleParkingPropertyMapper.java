@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.api.mapping.I18NStringMapper;
 import org.opentripplanner.api.mapping.PropertyMapper;
-import org.opentripplanner.common.model.T2;
+import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
 public class DigitransitVehicleParkingPropertyMapper extends PropertyMapper<VehicleParking> {
@@ -22,21 +22,19 @@ public class DigitransitVehicleParkingPropertyMapper extends PropertyMapper<Vehi
   }
 
   @Override
-  protected Collection<T2<String, Object>> map(VehicleParking vehicleParking) {
-    var items = new ArrayList<T2<String, Object>>();
-    items.addAll(
+  protected Collection<KeyValue> map(VehicleParking vehicleParking) {
+    return new ArrayList<KeyValue>(
       List.of(
-        new T2<>("id", vehicleParking.getId().toString()),
-        new T2<>("bicyclePlaces", vehicleParking.hasBicyclePlaces()),
-        new T2<>("anyCarPlaces", vehicleParking.hasAnyCarPlaces()),
-        new T2<>("carPlaces", vehicleParking.hasCarPlaces()),
-        new T2<>(
+        new KeyValue("id", vehicleParking.getId().toString()),
+        new KeyValue("bicyclePlaces", vehicleParking.hasBicyclePlaces()),
+        new KeyValue("anyCarPlaces", vehicleParking.hasAnyCarPlaces()),
+        new KeyValue("carPlaces", vehicleParking.hasCarPlaces()),
+        new KeyValue(
           "wheelchairAccessibleCarPlaces",
           vehicleParking.hasWheelchairAccessibleCarPlaces()
         ),
-        new T2<>("name", i18NStringMapper.mapToApi(vehicleParking.getName()))
+        new KeyValue("name", i18NStringMapper.mapToApi(vehicleParking.getName()))
       )
     );
-    return items;
   }
 }

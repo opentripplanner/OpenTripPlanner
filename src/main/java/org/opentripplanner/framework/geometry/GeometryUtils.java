@@ -23,7 +23,6 @@ import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

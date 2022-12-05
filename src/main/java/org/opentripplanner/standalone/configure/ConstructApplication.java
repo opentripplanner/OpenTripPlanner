@@ -5,6 +5,8 @@ import javax.ws.rs.core.Application;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -22,9 +24,9 @@ import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPWebApplication;
+import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
-import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +137,7 @@ public class ConstructApplication {
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(graph(), transitModel(), routerConfig().updaterConfig());
 
-    graph().initEllipsoidToGeoidDifference();
+    initEllipsoidToGeoidDifference();
 
     if (OTPFeature.SandboxAPITransmodelApi.isOn()) {
       TransmodelAPI.setUp(
@@ -148,6 +150,18 @@ public class ConstructApplication {
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Creating debug client geocoder lucene index");
       LuceneIndex.forServer(createServerContext());
+    }
+  }
+
+  private void initEllipsoidToGeoidDifference() {
+    try {
+      WorldEnvelope env = graph().getEnvelope();
+      double lat = env.calcCenterLatitude();
+      double lon = env.calcCenterLongitude();
+      double value = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
+      graph().initEllipsoidToGeoidDifference(value, lat, lon);
+    } catch (Exception e) {
+      LOG.error("Error computing ellipsoid/geoid difference");
     }
   }
 

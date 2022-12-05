@@ -1,5 +1,6 @@
 package org.opentripplanner.generate.doc;
 
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
@@ -25,7 +26,7 @@ public class VehicleParkingDocTest {
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "VehicleParking.md");
   private static final File OUT_FILE = new File(DOCS_ROOT + "/sandbox", "VehicleParking.md");
 
-  private static final String ROUTER_CONFIG_FILENAME = "standalone/config/router-config.json";
+  private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 
   @Test
@@ -50,8 +51,8 @@ public class VehicleParkingDocTest {
   }
 
   private NodeAdapter readVehicleUpdaters() {
-    var json = jsonNodeFromResource(ROUTER_CONFIG_FILENAME);
-    var conf = new RouterConfig(json, ROUTER_CONFIG_FILENAME, false);
+    var json = jsonNodeFromResource(ROUTER_CONFIG_PATH);
+    var conf = new RouterConfig(json, ROUTER_CONFIG_PATH, false);
     return conf.asNodeAdapter().child("updaters");
   }
 
@@ -82,7 +83,7 @@ public class VehicleParkingDocTest {
   private void addExample(DocBuilder buf, NodeAdapter node) {
     buf.addSection("##### Example configuration");
     buf.addExample(
-      "router-config.json",
+      ROUTER_CONFIG_FILENAME,
       """
       "updaters": [
         %s

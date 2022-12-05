@@ -5,7 +5,7 @@ import edu.colorado.cires.cmg.mvt.adapt.jts.IUserDataConverter;
 import edu.colorado.cires.cmg.mvt.adapt.jts.UserDataKeyValueMapConverter;
 import edu.colorado.cires.cmg.mvt.build.MvtLayerProps;
 import java.util.Collection;
-import org.opentripplanner.common.model.T2;
+import org.opentripplanner.inspector.vector.KeyValue;
 
 /**
  * This class is used for adding data for each object in the vector layer from the userData in the
@@ -22,15 +22,12 @@ public abstract class PropertyMapper<T> implements IUserDataConverter {
     VectorTile.Tile.Feature.Builder featureBuilder
   ) {
     if (userData != null) {
-      for (T2<String, Object> e : map((T) userData)) {
-        final String key = e.first;
-        final Object value = e.second;
-
-        if (key != null && value != null) {
-          final int valueIndex = layerProps.addValue(value);
+      for (var e : map((T) userData)) {
+        if (e.key() != null && e.value() != null) {
+          final int valueIndex = layerProps.addValue(e.value());
 
           if (valueIndex >= 0) {
-            featureBuilder.addTags(layerProps.addKey(key));
+            featureBuilder.addTags(layerProps.addKey(e.key()));
             featureBuilder.addTags(valueIndex);
           }
         }
@@ -41,5 +38,5 @@ public abstract class PropertyMapper<T> implements IUserDataConverter {
   /**
    * The return type is to allow null values.
    */
-  protected abstract Collection<T2<String, Object>> map(T input);
+  protected abstract Collection<KeyValue> map(T input);
 }

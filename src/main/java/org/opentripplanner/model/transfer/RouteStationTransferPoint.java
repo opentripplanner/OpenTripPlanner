@@ -6,8 +6,6 @@ import org.opentripplanner.transit.model.site.Station;
 
 public final class RouteStationTransferPoint implements TransferPoint, Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private final Route route;
   private final Station station;
 

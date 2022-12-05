@@ -11,7 +11,6 @@ import org.opentripplanner.transit.model.basic.NonLocalizedString;
  */
 public class StreetLocation extends StreetVertex {
 
-  private static final long serialVersionUID = 1L;
   private boolean wheelchairAccessible;
 
   // maybe name should just be pulled from street being split

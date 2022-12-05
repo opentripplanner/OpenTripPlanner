@@ -1,6 +1,5 @@
 package org.opentripplanner.datastore.file;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.zip.ZipEntry;
@@ -9,11 +8,11 @@ import org.opentripplanner.datastore.api.FileType;
 
 public class ZipFileEntryDataSource implements DataSource {
 
-  private final ZipFileDataSource dataSource;
+  private final ZipFileEntryParent parent;
   private final ZipEntry entry;
 
-  ZipFileEntryDataSource(ZipFileDataSource dataSource, ZipEntry entry) {
-    this.dataSource = dataSource;
+  ZipFileEntryDataSource(ZipFileEntryParent parent, ZipEntry entry) {
+    this.parent = parent;
     this.entry = entry;
   }
 
@@ -24,7 +23,7 @@ public class ZipFileEntryDataSource implements DataSource {
 
   @Override
   public String path() {
-    return name() + " (" + dataSource.path() + ")";
+    return name() + " (" + parent.path() + ")";
   }
 
   @Override
@@ -34,7 +33,7 @@ public class ZipFileEntryDataSource implements DataSource {
 
   @Override
   public FileType type() {
-    return dataSource.type();
+    return parent.type();
   }
 
   @Override
@@ -54,11 +53,7 @@ public class ZipFileEntryDataSource implements DataSource {
 
   @Override
   public InputStream asInputStream() {
-    try {
-      return dataSource.zipFile().getInputStream(entry);
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to read " + path() + ": " + e.getLocalizedMessage(), e);
-    }
+    return parent.entryStream(entry);
   }
 
   @Override

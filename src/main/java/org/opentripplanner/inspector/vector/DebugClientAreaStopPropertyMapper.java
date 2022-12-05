@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.api.mapping.I18NStringMapper;
 import org.opentripplanner.api.mapping.PropertyMapper;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -25,10 +24,10 @@ public class DebugClientAreaStopPropertyMapper extends PropertyMapper<AreaStop> 
   }
 
   @Override
-  protected Collection<T2<String, Object>> map(AreaStop input) {
+  protected Collection<KeyValue> map(AreaStop input) {
     return List.of(
-      new T2<>("id", input.getId().toString()),
-      new T2<>("name", i18NStringMapper.mapNonnullToApi(input.getName()))
+      new KeyValue("id", input.getId().toString()),
+      new KeyValue("name", i18NStringMapper.mapNonnullToApi(input.getName()))
     );
   }
 }

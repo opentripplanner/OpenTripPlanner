@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 public class TransitStopVertex extends StationElementVertex {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitStopVertex.class);
-  private static final long serialVersionUID = 1L;
   // Do we actually need a set of modes for each stop?
   // It's nice to have for the index web API but can be generated on demand.
   private final Set<TransitMode> modes;

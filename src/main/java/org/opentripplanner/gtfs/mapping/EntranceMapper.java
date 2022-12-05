@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.util.MapUtils;
 
 /**
  * Responsible for mapping GTFS Entrance into the OTP model.

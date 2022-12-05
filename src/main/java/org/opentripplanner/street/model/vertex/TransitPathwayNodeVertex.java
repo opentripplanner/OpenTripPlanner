@@ -12,8 +12,6 @@ public class TransitPathwayNodeVertex extends StationElementVertex {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitPathwayNodeVertex.class);
 
-  private static final long serialVersionUID = 1L;
-
   private final boolean wheelchairEntrance;
 
   private final PathwayNode node;

@@ -8,11 +8,11 @@ import ch.poole.openinghoursparser.OpeningHoursParseException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -27,7 +27,7 @@ public class OSMOpeningHoursParserTest {
 
   static OSMOpeningHoursParser osmOpeningHoursParser = new OSMOpeningHoursParser(
     openingHoursCalendarService,
-    ZoneId.of("Europe/Paris")
+    ZoneIds.PARIS
   );
 
   static Stream<Arguments> osmOpeningHoursTestCases = Stream.of(

@@ -3,9 +3,9 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS Agency into the OTP model. */
 class AgencyMapper {

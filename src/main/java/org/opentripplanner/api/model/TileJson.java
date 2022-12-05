@@ -7,9 +7,9 @@ import javax.annotation.Nullable;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.util.WorldEnvelope;
 
 /**
  * Container for <a href="https://github.com/mapbox/tilejson-spec">TileJSON</a> response

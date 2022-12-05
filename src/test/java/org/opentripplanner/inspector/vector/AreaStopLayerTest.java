@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
@@ -43,7 +42,7 @@ class AreaStopLayerBuilderTest {
     var properties = subject.map(AREA_STOP);
 
     assertEquals(2, properties.size());
-    assertTrue(properties.contains(new T2<String, Object>("id", ID.toString())));
-    assertTrue(properties.contains(new T2<String, Object>("name", NAME.toString())));
+    assertTrue(properties.contains(new KeyValue("id", ID.toString())));
+    assertTrue(properties.contains(new KeyValue("name", NAME.toString())));
   }
 }
