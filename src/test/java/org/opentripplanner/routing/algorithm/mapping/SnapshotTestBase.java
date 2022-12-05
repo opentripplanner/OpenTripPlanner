@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -35,7 +36,6 @@ import java.util.stream.Stream;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner._support.time.TestDateTimeUtils;
 import org.opentripplanner.api.mapping.ItineraryMapper;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
@@ -104,15 +104,10 @@ public abstract class SnapshotTestBase {
 
     RouteRequest request = serverContext.defaultRouteRequest();
     request.setDateTime(
-      TestDateTimeUtils.dateInstant(
-        serverContext.transitService().getTimeZone().getId(),
-        year,
-        month,
-        day,
-        hour,
-        minute,
-        second
-      )
+      LocalDateTime
+        .of(year, month, day, hour, minute, second)
+        .atZone(ZoneId.of(serverContext.transitService().getTimeZone().getId()))
+        .toInstant()
     );
 
     request.withPreferences(pref -> pref.withTransfer(tx -> tx.withMaxTransfers(6)));

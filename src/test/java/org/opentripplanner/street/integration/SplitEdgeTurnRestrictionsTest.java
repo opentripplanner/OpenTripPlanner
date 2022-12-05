@@ -2,11 +2,11 @@ package org.opentripplanner.street.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner._support.time.TestDateTimeUtils.dateInstant;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
@@ -32,7 +32,10 @@ import org.opentripplanner.street.search.TraverseMode;
  */
 public class SplitEdgeTurnRestrictionsTest {
 
-  static final Instant dateTime = dateInstant("Europe/Berlin", 2020, 3, 3, 7, 0, 0);
+  static final Instant dateTime = LocalDateTime
+    .of(2020, 3, 3, 7, 0)
+    .atZone(ZoneIds.BERLIN)
+    .toInstant();
   // Deufringen
   static final GenericLocation hardtheimerWeg = new GenericLocation(48.67765, 8.87212);
   static final GenericLocation steinhaldenWeg = new GenericLocation(48.67815, 8.87305);

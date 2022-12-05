@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner._support.time.TestDateTimeUtils;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -235,7 +236,10 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     OtpServerRequestContext serverContext
   ) {
     RouteRequest request = new RouteRequest();
-    Instant dateTime = TestDateTimeUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);
+    Instant dateTime = LocalDateTime
+      .of(2021, Month.DECEMBER, 16, 12, 0)
+      .atZone(ZoneIds.NEW_YORK)
+      .toInstant();
     request.setDateTime(dateTime);
     request.setFrom(from);
     request.setTo(to);

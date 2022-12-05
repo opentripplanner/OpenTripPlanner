@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner._support.time.TestDateTimeUtils.AUGUST;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
@@ -14,6 +13,8 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner._support.time.TestDateTimeUtils;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -121,11 +121,14 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
     var stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setTime(
-      TestDateTimeUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 10, 1)
+      LocalDateTime.of(2009, Month.AUGUST, 7, 0, 10, 1, 0).atZone(ZoneIds.NEW_YORK).toEpochSecond()
     );
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setTime(
-      TestDateTimeUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 10, 0)
+      LocalDateTime
+        .of(2009, Month.AUGUST, 7, 0, 10, 0, 0)
+        .atZone(ZoneId.of("America/New_York"))
+        .toEpochSecond()
     );
     var tripUpdate = tripUpdateBuilder.build();
     var result = timetable.createUpdatedTripTimes(
@@ -151,11 +154,14 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
     var stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setTime(
-      TestDateTimeUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 2, 0)
+      LocalDateTime.of(2009, Month.AUGUST, 7, 0, 2, 0, 0).atZone(ZoneIds.NEW_YORK).toEpochSecond()
     );
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setTime(
-      TestDateTimeUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 2, 0)
+      LocalDateTime
+        .of(2009, Month.AUGUST.getValue() - 1 + 1, 7, 0, 2, 0, 0)
+        .atZone(ZoneId.of("America/New_York"))
+        .toEpochSecond()
     );
     var tripUpdate = tripUpdateBuilder.build();
     assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));

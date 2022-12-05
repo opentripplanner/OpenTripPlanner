@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +18,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
-import org.opentripplanner._support.time.TestDateTimeUtils;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -225,7 +227,10 @@ public class TestHalfEdges {
 
     assertEquals(2, edges.size());
 
-    long startTime = TestDateTimeUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
+    long startTime = LocalDateTime
+      .of(2009, Month.DECEMBER, 1, 12, 34, 25)
+      .atZone(ZoneIds.NEW_YORK)
+      .toEpochSecond();
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree<State, Edge, Vertex> spt1 = StreetSearchBuilder
       .of()
@@ -427,7 +432,10 @@ public class TestHalfEdges {
 
     assertEquals(3, edges.size());
 
-    long startTime = TestDateTimeUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
+    long startTime = LocalDateTime
+      .of(2009, Month.DECEMBER, 1, 12, 34, 25)
+      .atZone(ZoneIds.NEW_YORK)
+      .toEpochSecond();
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()
@@ -480,7 +488,10 @@ public class TestHalfEdges {
     Collection<Edge> edges = end.getIncoming();
     assertEquals(1, edges.size());
 
-    long startTime = TestDateTimeUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
+    long startTime = LocalDateTime
+      .of(2009, Month.DECEMBER, 1, 12, 34, 25)
+      .atZone(ZoneIds.NEW_YORK)
+      .toEpochSecond();
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()

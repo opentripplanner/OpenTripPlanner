@@ -4,10 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.opentripplanner._support.time.TestDateTimeUtils;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
@@ -108,7 +109,10 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private RaptorPathToItineraryMapper<TestTripSchedule> getRaptorPathToItineraryMapper() {
-    Instant dateTime = TestDateTimeUtils.dateInstant("Europe/Stockholm", 2022, 10, 10, 12, 0, 0);
+    Instant dateTime = LocalDateTime
+      .of(2022, Month.OCTOBER, 10, 12, 0, 0)
+      .atZone(ZoneIds.STOCKHOLM)
+      .toInstant();
     return new RaptorPathToItineraryMapper<TestTripSchedule>(
       new Graph(),
       new DefaultTransitService(new TransitModel()),
