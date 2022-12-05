@@ -8,15 +8,6 @@ import org.locationtech.jts.geom.Envelope;
  */
 public class WebMercatorTile {
 
-  public static double tile2lon(int x, int z) {
-    return x / Math.pow(2.0, z) * 360.0 - 180;
-  }
-
-  public static double tile2lat(int y, int z) {
-    double n = Math.PI - (2.0 * Math.PI * y) / Math.pow(2.0, z);
-    return Math.toDegrees(Math.atan(Math.sinh(n)));
-  }
-
   /**
    * Implements https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Tile_numbers_to_lon./lat.
    */
@@ -26,5 +17,14 @@ public class WebMercatorTile {
     double minLon = tile2lon(x, zoom);
     double maxLon = tile2lon(x + 1, zoom);
     return new Envelope(maxLon, minLon, maxLat, minLat);
+  }
+
+  private static double tile2lon(int x, int z) {
+    return x / Math.pow(2.0, z) * 360.0 - 180;
+  }
+
+  private static double tile2lat(int y, int z) {
+    double n = Math.PI - (2.0 * Math.PI * y) / Math.pow(2.0, z);
+    return Math.toDegrees(Math.atan(Math.sinh(n)));
   }
 }
