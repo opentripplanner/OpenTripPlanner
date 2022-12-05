@@ -17,6 +17,22 @@ locations= [
         "coordinates":  "59.9211/10.7167",
         "name": "Briskeby"
     },
+    {
+        "coordinates":  "59.9109/10.7423",
+        "name": "Kvadraturen"
+    },
+    {
+        "coordinates":  "59.94770/10.74223",
+        "name": "Bergskogen"
+    },
+    {
+        "coordinates":  "59.9388/10.8012",
+        "name": "Refstad"
+    },
+    {
+        "coordinates":  "59.9463/10.6263",
+        "name": "Eiksmarka"
+    }
 ]
 
 rows = []
