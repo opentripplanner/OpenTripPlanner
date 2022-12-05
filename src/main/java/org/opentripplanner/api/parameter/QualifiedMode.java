@@ -8,8 +8,6 @@ import javax.ws.rs.BadRequestException;
 
 public class QualifiedMode implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   public final ApiRequestMode mode;
   public final Set<Qualifier> qualifiers;
 

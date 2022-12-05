@@ -16,7 +16,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Serializable {
 
-  private static final long serialVersionUID = 1L;
   private static final int FROM_RANKING_COEFFICIENT = 11;
   private static final int TO_RANKING_COEFFICIENT = 10;
 

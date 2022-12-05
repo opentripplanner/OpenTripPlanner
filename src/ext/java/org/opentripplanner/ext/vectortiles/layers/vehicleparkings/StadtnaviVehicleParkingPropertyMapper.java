@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import org.json.simple.JSONObject;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.I18NStringMapper;
+import org.opentripplanner.ext.vectortiles.KeyValue;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -25,28 +25,28 @@ public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<Vehicl
   }
 
   @Override
-  protected Collection<T2<String, Object>> map(VehicleParking vehicleParking) {
+  protected Collection<KeyValue> map(VehicleParking vehicleParking) {
     var items = digitransitMapper.basicMapping(vehicleParking);
     items.addAll(
       List.of(
-        new T2<>("realTimeData", vehicleParking.getAvailability() != null),
-        new T2<>("detailsUrl", vehicleParking.getDetailsUrl()),
-        new T2<>("imageUrl", vehicleParking.getImageUrl()),
-        new T2<>("tags", String.join(",", vehicleParking.getTags())),
-        new T2<>("state", vehicleParking.getState().name()),
-        new T2<>("realTimeData", vehicleParking.hasRealTimeData()),
-        new T2<>("note", i18NStringMapper.mapToApi(vehicleParking.getNote()))
+        new KeyValue("realTimeData", vehicleParking.getAvailability() != null),
+        new KeyValue("detailsUrl", vehicleParking.getDetailsUrl()),
+        new KeyValue("imageUrl", vehicleParking.getImageUrl()),
+        new KeyValue("tags", String.join(",", vehicleParking.getTags())),
+        new KeyValue("state", vehicleParking.getState().name()),
+        new KeyValue("realTimeData", vehicleParking.hasRealTimeData()),
+        new KeyValue("note", i18NStringMapper.mapToApi(vehicleParking.getNote()))
       )
     );
     if (vehicleParking.getOpeningHours() != null) {
-      items.add(new T2<>("openingHours", vehicleParking.getOpeningHours().osmFormat()));
+      items.add(new KeyValue("openingHours", vehicleParking.getOpeningHours().osmFormat()));
     }
     items.addAll(mapPlaces("capacity", vehicleParking.getCapacity()));
     items.addAll(mapPlaces("availability", vehicleParking.getAvailability()));
     return items;
   }
 
-  private static List<T2<String, Object>> mapPlaces(String key, VehicleParkingSpaces places) {
+  private static List<KeyValue> mapPlaces(String key, VehicleParkingSpaces places) {
     if (places == null) {
       return List.of();
     }
@@ -57,10 +57,10 @@ public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<Vehicl
     json.put("wheelchairAccessibleCarPlaces", places.getWheelchairAccessibleCarSpaces());
 
     return List.of(
-      new T2<>(key, JSONObject.toJSONString(json)),
-      new T2<>(subKey(key, "bicyclePlaces"), places.getBicycleSpaces()),
-      new T2<>(subKey(key, "carPlaces"), places.getCarSpaces()),
-      new T2<>(
+      new KeyValue(key, JSONObject.toJSONString(json)),
+      new KeyValue(subKey(key, "bicyclePlaces"), places.getBicycleSpaces()),
+      new KeyValue(subKey(key, "carPlaces"), places.getCarSpaces()),
+      new KeyValue(
         subKey(key, "wheelchairAccessibleCarPlaces"),
         places.getWheelchairAccessibleCarSpaces()
       )

@@ -21,6 +21,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Initial implementation of via search [#4554](https://github.com/opentripplanner/OpenTripPlanner/pull/4554)
 - Use material design theme for documentation, auto-deploy to Github Pages [#4575](https://github.com/opentripplanner/OpenTripPlanner/pull/4575)
 - Add stationTransferPreference option for GTFS feeds [#4599](https://github.com/opentripplanner/OpenTripPlanner/pull/4599)
+- Fix osmDefaults so they are used if something is not set in source [#4635](https://github.com/opentripplanner/OpenTripPlanner/pull/4635)
+- Add demDefaults [#4637](https://github.com/opentripplanner/OpenTripPlanner/pull/4637)
+- Add carpool and taxi modes [#4641](https://github.com/opentripplanner/OpenTripPlanner/pull/4641)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

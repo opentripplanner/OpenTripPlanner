@@ -16,8 +16,6 @@ import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.DirectPosition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Stitches together multiple elevation maps into a single elevation map, hackily.  This is
@@ -26,10 +24,6 @@ import org.slf4j.LoggerFactory;
  * @author novalis
  */
 public class UnifiedGridCoverage extends AbstractCoverage {
-
-  private static final long serialVersionUID = -7798801307087575896L;
-
-  private static final Logger log = LoggerFactory.getLogger(UnifiedGridCoverage.class);
 
   /**
    * A spatial index of the intersection of all regions and datums. For smaller-scale deployments,

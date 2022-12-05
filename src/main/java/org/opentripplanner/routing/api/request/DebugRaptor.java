@@ -38,9 +38,8 @@ import org.slf4j.LoggerFactory;
 public class DebugRaptor implements Serializable {
 
   @Serial
-  private static final long serialVersionUID = 1L;
-
   private static final Logger LOG = LoggerFactory.getLogger(DebugRaptor.class);
+
   private static final Pattern FIRST_STOP_PATTERN = Pattern.compile("(\\d+)\\*");
   private static final int FIRST_STOP_INDEX = 0;
 

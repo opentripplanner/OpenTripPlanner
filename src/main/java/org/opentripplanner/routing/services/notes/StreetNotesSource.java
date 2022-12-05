@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.services.notes;
 
 import java.util.Set;
+import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.edge.Edge;
 
 /**
@@ -9,5 +10,5 @@ import org.opentripplanner.street.model.edge.Edge;
  * @author laurent
  */
 public interface StreetNotesSource {
-  Set<MatcherAndStreetNote> getNotes(Edge edge);
+  Set<StreetNoteAndMatcher> getNotes(Edge edge);
 }

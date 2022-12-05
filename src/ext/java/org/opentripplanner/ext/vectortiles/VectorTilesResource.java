@@ -31,10 +31,10 @@ import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParking
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalPlacesLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalStationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalVehiclesLayerBuilder;
+import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.WorldEnvelope;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
@@ -127,10 +127,7 @@ public class VectorTilesResource {
 
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
-    for (LayerParameters layerParameters : serverContext
-      .routerConfig()
-      .vectorTileLayers()
-      .layers()) {
+    for (LayerParameters layerParameters : serverContext.vectorTileLayers().layers()) {
       if (
         layers.contains(layerParameters.name()) &&
         layerParameters.minZoom() <= z &&

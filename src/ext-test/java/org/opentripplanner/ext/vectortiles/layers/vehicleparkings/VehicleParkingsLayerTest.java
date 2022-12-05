@@ -139,7 +139,7 @@ public class VehicleParkingsLayerTest {
       Locale.GERMANY
     );
     Map<String, Object> map = new HashMap<>();
-    mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
+    mapper.map(vehicleParking).forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals(ID.toString(), map.get("id").toString());
     assertEquals("deutscher Name", map.get("name").toString());
@@ -181,7 +181,7 @@ public class VehicleParkingsLayerTest {
       Locale.US
     );
     Map<String, Object> map = new HashMap<>();
-    mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
+    mapper.map(vehicleParking).forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals(ID.toString(), map.get("id").toString());
     assertEquals("default name", map.get("name").toString());
@@ -198,7 +198,7 @@ public class VehicleParkingsLayerTest {
       new Locale("de")
     );
     Map<String, Object> map = new HashMap<>();
-    mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
+    mapper.map(vehicleParking).forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals("deutscher Name", map.get("name").toString());
   }

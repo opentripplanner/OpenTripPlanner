@@ -6,7 +6,7 @@ import static org.opentripplanner.model.projectinfo.GraphFileHeader.CHARSET;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.framework.application.OtpAppException;
 
 public class GraphFileHeaderTest {
 
