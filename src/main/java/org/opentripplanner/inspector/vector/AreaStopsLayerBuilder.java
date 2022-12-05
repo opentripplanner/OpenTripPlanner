@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -14,7 +13,7 @@ import org.opentripplanner.transit.service.TransitService;
 
 public class AreaStopsLayerBuilder extends LayerBuilder<AreaStop> {
 
-  private static final Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<AreaStop>>> mappers = Map.of(
+  private static final Map<MapperType, MapperFactory> mappers = Map.of(
     MapperType.DebugClient,
     DebugClientAreaStopPropertyMapper::create
   );
@@ -27,7 +26,7 @@ public class AreaStopsLayerBuilder extends LayerBuilder<AreaStop> {
   ) {
     super(
       layerParameters.name(),
-      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitService, locale),
+      mappers.get(MapperType.valueOf(layerParameters.mapper())).build(transitService, locale),
       layerParameters.expansionFactor()
     );
     this.findAreaStops = transitService::findAreaStops;
@@ -50,5 +49,10 @@ public class AreaStopsLayerBuilder extends LayerBuilder<AreaStop> {
 
   enum MapperType {
     DebugClient,
+  }
+
+  @FunctionalInterface
+  private interface MapperFactory {
+    PropertyMapper<AreaStop> build(TransitService transitService, Locale locale);
   }
 }
