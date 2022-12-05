@@ -24,6 +24,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix osmDefaults so they are used if something is not set in source [#4635](https://github.com/opentripplanner/OpenTripPlanner/pull/4635)
 - Add demDefaults [#4637](https://github.com/opentripplanner/OpenTripPlanner/pull/4637)
 - Add carpool and taxi modes [#4641](https://github.com/opentripplanner/OpenTripPlanner/pull/4641)
+- Add vector tile and layer in debug client for AreaStops [#4565](https://github.com/opentripplanner/OpenTripPlanner/pull/4565)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
