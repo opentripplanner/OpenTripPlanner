@@ -2,11 +2,11 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
+import org.opentripplanner.model.NoteMatcher;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 
@@ -26,7 +26,7 @@ public class NoteProperties {
     this.noteMatcher = noteMatcher;
   }
 
-  public T2<StreetNote, NoteMatcher> generateNote(OSMWithTags way) {
+  public StreetNoteAndMatcher generateNote(OSMWithTags way) {
     I18NString text;
     //TODO: this could probably be made without patternMatch for {} since all notes (at least currently) have {note} as notePattern
     if (patternMatcher.matcher(notePattern).matches()) {
@@ -38,6 +38,6 @@ public class NoteProperties {
     }
     StreetNote note = new StreetNote(text);
 
-    return new T2<>(note, noteMatcher);
+    return new StreetNoteAndMatcher(note, noteMatcher);
   }
 }

@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 
 public class DateUtilsTest {
 
@@ -28,7 +29,7 @@ public class DateUtilsTest {
   private static final int N08_07 = -(8 * 60 + 7) * 60;
   private static final int N08_47 = -(8 * 60 + 47) * 60;
 
-  public static final ZoneId UTC = ZoneId.of("UTC");
+  public static final ZoneId UTC = ZoneIds.UTC;
 
   @Test
   public final void testToDate() {

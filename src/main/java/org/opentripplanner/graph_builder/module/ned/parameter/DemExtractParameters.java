@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.module.ned.parameter;
 
 import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
 
 /**
@@ -10,6 +8,10 @@ import org.opentripplanner.graph_builder.model.DataSourceConfig;
  * {@code "dem" : [ {source: "file:///path/to/otp/norway-dem.tif"} ] }
  */
 public class DemExtractParameters implements DataSourceConfig {
+
+  public static final double DEFAULT_ELEVATION_UNIT_MULTIPLIER = 1;
+
+  public static final DemExtractParameters DEFAULT = new DemExtractParametersBuilder().build();
 
   private final URI source;
 
@@ -21,7 +23,7 @@ public class DemExtractParameters implements DataSourceConfig {
   private final Double elevationUnitMultiplier;
 
   DemExtractParameters(DemExtractParametersBuilder builder) {
-    source = Objects.requireNonNull(builder.source());
+    source = builder.source();
     elevationUnitMultiplier = builder.elevationUnitMultiplier();
   }
 
@@ -31,9 +33,13 @@ public class DemExtractParameters implements DataSourceConfig {
   }
 
   /**
-   * Returns the custom elevation unit multiplier for this feed. Overrides {@link org.opentripplanner.standalone.config.BuildConfig#elevationUnitMultiplier}
+   * Returns the custom elevation unit multiplier for this feed.
    */
-  public Optional<Double> elevationUnitMultiplier() {
-    return Optional.ofNullable(elevationUnitMultiplier);
+  public Double elevationUnitMultiplier() {
+    return elevationUnitMultiplier;
+  }
+
+  public DemExtractParametersBuilder copyOf() {
+    return new DemExtractParametersBuilder(this);
   }
 }

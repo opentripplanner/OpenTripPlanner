@@ -3,10 +3,9 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS TripMapper into the OTP model. */
 class TripMapper {

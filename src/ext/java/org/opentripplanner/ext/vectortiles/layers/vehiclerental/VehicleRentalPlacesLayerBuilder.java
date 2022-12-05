@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.Map;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper.DigitransitVehicleRentalPropertyMapper;
+import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 
@@ -12,7 +13,7 @@ public class VehicleRentalPlacesLayerBuilder extends VehicleRentalLayerBuilder<V
 
   public VehicleRentalPlacesLayerBuilder(
     VehicleRentalService service,
-    VectorTilesResource.LayerParameters layerParameters,
+    LayerParameters<VectorTilesResource.LayerType> layerParameters,
     Locale locale
   ) {
     super(

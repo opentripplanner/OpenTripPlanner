@@ -11,6 +11,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -22,7 +23,7 @@ public class HslParkUpdaterTest {
     var facilitiesUrl = "file:src/ext-test/resources/vehicleparking/hslpark/facilities.json";
     var hubsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/hubs.json";
     var utilizationsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/utilizations.json";
-    var timeZone = ZoneId.of("Europe/Helsinki");
+    var timeZone = ZoneIds.HELSINKI;
 
     var parameters = new HslParkUpdaterParameters(
       "",

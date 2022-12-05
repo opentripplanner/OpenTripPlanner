@@ -17,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -30,7 +31,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 public class VehiclePositionsMatcherTest {
 
   public static final Route ROUTE = TransitModelForTest.route("1").build();
-  ZoneId zoneId = ZoneId.of("Europe/Berlin");
+  ZoneId zoneId = ZoneIds.BERLIN;
   String tripId = "trip1";
   FeedScopedId scopedTripId = TransitModelForTest.id(tripId);
 

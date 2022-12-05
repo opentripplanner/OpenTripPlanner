@@ -1,5 +1,9 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
+import static org.opentripplanner.framework.application.OtpFileNames.OTP_CONFIG_FILENAME;
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import javax.annotation.Nullable;
@@ -16,10 +20,6 @@ import org.slf4j.LoggerFactory;
 public class OtpConfigLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(OtpConfigLoader.class);
-
-  private static final String OTP_CONFIG_FILENAME = "otp-config.json";
-  private static final String BUILD_CONFIG_FILENAME = "build-config.json";
-  private static final String ROUTER_CONFIG_FILENAME = "router-config.json";
 
   @Nullable
   private final File configDir;
@@ -46,18 +46,6 @@ public class OtpConfigLoader {
    */
   public static OtpConfigLoader fromString(String json) {
     return new OtpConfigLoader(null, json);
-  }
-
-  /**
-   * Check if a file is a config file using the configuration file name. This method returns {@code
-   * true} if the file match {@code (otp|build|router)-config.json}.
-   */
-  public static boolean isConfigFile(String filename) {
-    return (
-      OTP_CONFIG_FILENAME.equals(filename) ||
-      BUILD_CONFIG_FILENAME.equals(filename) ||
-      ROUTER_CONFIG_FILENAME.equals(filename)
-    );
   }
 
   /**

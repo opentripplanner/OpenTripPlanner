@@ -9,8 +9,6 @@ import org.opentripplanner.transit.model.basic.NonLocalizedString;
  */
 public class IntersectionVertex extends StreetVertex {
 
-  private static final long serialVersionUID = 1L;
-
   /**
    * Does this intersection have a traffic light?
    */

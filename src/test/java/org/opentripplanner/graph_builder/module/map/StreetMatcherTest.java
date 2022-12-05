@@ -164,8 +164,6 @@ public class StreetMatcherTest {
   /* TODO explain why this exists and is "simple" */
   private static class SimpleEdge extends StreetEdge {
 
-    private static final long serialVersionUID = 1L;
-
     public SimpleEdge(StreetVertex v1, StreetVertex v2) {
       super(v1, v2, null, (NonLocalizedString) null, 0, null, false);
     }

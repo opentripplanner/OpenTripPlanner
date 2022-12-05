@@ -12,8 +12,6 @@ import org.opentripplanner.transit.model.basic.I18NString;
  */
 public class OsmVertex extends IntersectionVertex {
 
-  private static final long serialVersionUID = 1L;
-
   /** The OSM node ID from whence this came */
   public final long nodeId;
 

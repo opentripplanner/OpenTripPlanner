@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.collection.CompositeComparator;
 import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.framework.text.TableBuilder;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -19,7 +20,6 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.routing.util.DiffTool;
-import org.opentripplanner.util.CompositeComparator;
 
 /**
  * This class is used to diff two set of paths. You may ask for the diff result or pass in a logger

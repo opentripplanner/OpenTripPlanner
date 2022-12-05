@@ -15,8 +15,6 @@ import org.opentripplanner.transit.model.basic.Money;
  */
 class TimeBasedVehicleRentalFareService implements FareService, Serializable {
 
-  private static final long serialVersionUID = 5226621661906177942L;
-
   // Each entry is <max time, cents at that time>; the list is sorted in
   // ascending time order
   private final List<PricingBySecond> pricing_by_second;

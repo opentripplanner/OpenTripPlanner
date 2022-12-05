@@ -114,7 +114,7 @@ public class VehicleParkingsLayerTest {
   public void stadtnaviVehicleParkingPropertyMapperTest() {
     StadtnaviVehicleParkingPropertyMapper mapper = new StadtnaviVehicleParkingPropertyMapper();
     Map<String, Object> map = new HashMap<>();
-    mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
+    mapper.map(vehicleParking).forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals(ID.toString(), map.get("id").toString());
     assertEquals("name", map.get("name").toString());
@@ -157,7 +157,7 @@ public class VehicleParkingsLayerTest {
       Locale.US
     );
     Map<String, Object> map = new HashMap<>();
-    mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
+    mapper.map(vehicleParking).forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals(ID.toString(), map.get("id").toString());
     assertEquals("name", map.get("name").toString());
@@ -174,7 +174,7 @@ public class VehicleParkingsLayerTest {
       new Locale("de")
     );
     Map<String, Object> map = new HashMap<>();
-    mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
+    mapper.map(vehicleParking).forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals("DE", map.get("name").toString());
   }

@@ -10,7 +10,6 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.FakeGraph;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -44,7 +43,6 @@ public class PlatformLinkerTest {
       Set.of(),
       gg,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       true
     );
     osmModule.platformEntriesLinking = true;

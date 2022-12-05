@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.UriInfo;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,6 +22,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 public class HttpUtils {
 
   private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
+  public static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
+  public static final String HEADER_X_FORWARDED_HOST = "X-Forwarded-Host";
+  public static final String HEADER_HOST = "Host";
+  public static final String APPLICATION_X_PROTOBUF = "application/x-protobuf";
 
   public static InputStream getData(URI uri) throws IOException {
     return getData(uri, null);
@@ -106,6 +112,31 @@ public class HttpUtils {
       // Local file probably, try standard java
       return downloadUrl.openStream();
     }
+  }
+
+  /**
+   * Get the canonical url of a request, either based on headers or the URI. See
+   * <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host">here</a>
+   * for details
+   */
+  public static String getBaseAddress(UriInfo uri, HttpHeaders headers) {
+    String protocol;
+    if (headers.getRequestHeader(HEADER_X_FORWARDED_PROTO) != null) {
+      protocol = headers.getRequestHeader(HEADER_X_FORWARDED_PROTO).get(0);
+    } else {
+      protocol = uri.getRequestUri().getScheme();
+    }
+
+    String host;
+    if (headers.getRequestHeader(HEADER_X_FORWARDED_HOST) != null) {
+      host = headers.getRequestHeader(HEADER_X_FORWARDED_HOST).get(0);
+    } else if (headers.getRequestHeader(HEADER_HOST) != null) {
+      host = headers.getRequestHeader(HEADER_HOST).get(0);
+    } else {
+      host = uri.getBaseUri().getHost() + ":" + uri.getBaseUri().getPort();
+    }
+
+    return protocol + "://" + host;
   }
 
   private static HttpResponse getResponse(
