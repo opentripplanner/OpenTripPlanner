@@ -348,7 +348,7 @@ public class DefaultRouteRequestType {
           .newFieldDefinition()
           .name("maxAdditionalTransfers")
           .description(
-            "Maximum number of transfers in addition to the result with least transfers allowed"
+            "Maximum number of transfers allowed in addition to the result with least number of transfers"
           )
           .type(Scalars.GraphQLInt)
           .dataFetcher(env -> preferences.transfer().maxAdditionalTransfers())

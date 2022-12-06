@@ -484,8 +484,7 @@ public abstract class RoutingResource {
   protected Integer maxTransfers;
 
   /**
-   * The maximum number of additional transfers (that is, one plus the maximum number of boardings)
-   * in addition to the result with the least number of transfers that a trip will be allowed.
+   * The maximum number of additional transfers in addition to the result with the least number of transfers.
    * <p>
    * Consider using the {@link #transferPenalty} instead of this parameter.
    */
