@@ -14,7 +14,8 @@ public class FlexConfig {
   private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
 
   private static final Duration MAX_ACCESS_EGRESS_DURATION = Duration.ofMinutes(45);
-  public static final String ACCESS_EGRESS_DESCRIPTION = """
+  public static final String ACCESS_EGRESS_DESCRIPTION =
+    """
     If you have multiple overlapping flex zones the high default value can lead to performance problems.
     A lower value means faster routing.
     
@@ -79,7 +80,9 @@ public class FlexConfig {
       json
         .of("maxAccessWalkDuration")
         .since(V2_3)
-        .summary("The maximum duration the passenger will be allowed to walk to reach a flex stop or zone.")
+        .summary(
+          "The maximum duration the passenger will be allowed to walk to reach a flex stop or zone."
+        )
         .description(ACCESS_EGRESS_DESCRIPTION)
         .asDuration(MAX_ACCESS_EGRESS_DURATION);
 
@@ -87,7 +90,9 @@ public class FlexConfig {
       json
         .of("maxEgressWalkDuration")
         .since(V2_3)
-        .summary("The maximum duration the passenger will be allowed to walk after leaving the flex vehicle at the final destination.")
+        .summary(
+          "The maximum duration the passenger will be allowed to walk after leaving the flex vehicle at the final destination."
+        )
         .description(ACCESS_EGRESS_DESCRIPTION)
         .asDuration(MAX_ACCESS_EGRESS_DURATION);
   }

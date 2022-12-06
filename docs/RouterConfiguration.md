@@ -460,7 +460,9 @@ Http headers.
   },
   "flex" : {
     "maxTransferDuration" : "5m",
-    "maxFlexTripDuration" : "45m"
+    "maxFlexTripDuration" : "45m",
+    "maxAccessWalkDuration" : "15m",
+    "maxEgressWalkDuration" : "15m"
   },
   "transit" : {
     "maxNumberOfTransfers" : 12,

@@ -25,7 +25,9 @@ the [GTFS-Flex v2.1 draft](https://github.com/MobilityData/gtfs-flex/blob/master
 {
     "flex": {
       "maxTransferDuration" : "5m",
-      "maxFlexTripDuration" : "45m"
+      "maxFlexTripDuration" : "45m",
+      "maxAccessWalkDuration" : "15m",
+      "maxEgressWalkDuration" : "15m"
     }
 
 }
