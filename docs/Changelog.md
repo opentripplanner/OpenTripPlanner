@@ -29,6 +29,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Bugfix for interchanges that start and end from the same stop [#4597](https://github.com/opentripplanner/OpenTripPlanner/pull/4597)
 - Add option to define gtfsDefaults and move some parameters from root to gtfs config [#4624](https://github.com/opentripplanner/OpenTripPlanner/pull/4624)
 - fix: forBoarding and forAlighting on cancelled calls in transmodel api [#4639](https://github.com/opentripplanner/OpenTripPlanner/pull/4639)
+- Add test for keeping Transmodel GraphQL schema in sync [#4658](https://github.com/opentripplanner/OpenTripPlanner/pull/4658)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
