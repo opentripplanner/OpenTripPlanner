@@ -10,6 +10,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class SelectRequest implements Cloneable, Serializable {
+
   private List<MainAndSubMode> transportModes = new ArrayList<>();
   private List<FeedScopedId> agencies = new ArrayList<>();
   private RouteMatcher routes = RouteMatcher.emptyMatcher();
@@ -79,13 +80,20 @@ public class SelectRequest implements Cloneable, Serializable {
 
   @Override
   public String toString() {
-    return "SelectRequest{" +
-      "transportModes=" + transportModes +
-      ", agencies=" + agencies +
-      ", routes=" + routes +
-      ", trips=" + trips +
-      ", feeds=" + feeds +
-      '}';
+    return (
+      "SelectRequest{" +
+      "transportModes=" +
+      transportModes +
+      ", agencies=" +
+      agencies +
+      ", routes=" +
+      routes +
+      ", trips=" +
+      trips +
+      ", feeds=" +
+      feeds +
+      '}'
+    );
   }
 
   @Override

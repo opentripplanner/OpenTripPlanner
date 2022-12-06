@@ -18,42 +18,41 @@ public class InterliningTest extends GtfsTest {
   public String getFeedName() {
     return "gtfs/interlining";
   }
-
-//  @Test
-//  public void interlineOnSameRoute() {
-//    // We should arrive at the destination using two legs, both of which are on
-//    // the same route and with zero transfers.
-//    Itinerary itinerary = plan(time, "stop0", "stop3", null, false, false, null, null, null, 2);
-//
-//    assertEquals(itinerary.getLegs().get(0).getRoute().getId().getId(), "route1");
-//
-//    var secondLeg = itinerary.getLegs().get(1);
-//    assertEquals(secondLeg.getRoute().getId().getId(), "route1");
-//    assertTrue(secondLeg.isInterlinedWithPreviousLeg());
-//    assertEquals(0, itinerary.getNumberOfTransfers());
-//  }
-//
-//  @Test
-//  public void interlineOnDifferentRoute() {
-//    var itinerary = plan(time, "stop0", "stop6", null, false, false, null, null, null, 2);
-//
-//    assertEquals(itinerary.getLegs().get(0).getRoute().getId().getId(), "route0");
-//
-//    var secondLeg = itinerary.getLegs().get(1);
-//    assertEquals(secondLeg.getRoute().getId().getId(), "route3");
-//    assertTrue(secondLeg.isInterlinedWithPreviousLeg());
-//    assertEquals(0, itinerary.getNumberOfTransfers());
-//  }
-//
-//  @Test
-//  public void staySeatedNotAllowed() {
-//    var itinerary = plan(time, "stop0", "stop5", null, false, false, null, null, null, 2);
-//
-//    assertEquals(itinerary.getLegs().get(0).getRoute().getId().getId(), "route2");
-//
-//    var secondLeg = itinerary.getLegs().get(1);
-//    assertEquals(secondLeg.getRoute().getId().getId(), "route2");
-//    assertFalse(secondLeg.isInterlinedWithPreviousLeg());
-//    assertEquals(1, itinerary.getNumberOfTransfers());
-//  }
+  //  @Test
+  //  public void interlineOnSameRoute() {
+  //    // We should arrive at the destination using two legs, both of which are on
+  //    // the same route and with zero transfers.
+  //    Itinerary itinerary = plan(time, "stop0", "stop3", null, false, false, null, null, null, 2);
+  //
+  //    assertEquals(itinerary.getLegs().get(0).getRoute().getId().getId(), "route1");
+  //
+  //    var secondLeg = itinerary.getLegs().get(1);
+  //    assertEquals(secondLeg.getRoute().getId().getId(), "route1");
+  //    assertTrue(secondLeg.isInterlinedWithPreviousLeg());
+  //    assertEquals(0, itinerary.getNumberOfTransfers());
+  //  }
+  //
+  //  @Test
+  //  public void interlineOnDifferentRoute() {
+  //    var itinerary = plan(time, "stop0", "stop6", null, false, false, null, null, null, 2);
+  //
+  //    assertEquals(itinerary.getLegs().get(0).getRoute().getId().getId(), "route0");
+  //
+  //    var secondLeg = itinerary.getLegs().get(1);
+  //    assertEquals(secondLeg.getRoute().getId().getId(), "route3");
+  //    assertTrue(secondLeg.isInterlinedWithPreviousLeg());
+  //    assertEquals(0, itinerary.getNumberOfTransfers());
+  //  }
+  //
+  //  @Test
+  //  public void staySeatedNotAllowed() {
+  //    var itinerary = plan(time, "stop0", "stop5", null, false, false, null, null, null, 2);
+  //
+  //    assertEquals(itinerary.getLegs().get(0).getRoute().getId().getId(), "route2");
+  //
+  //    var secondLeg = itinerary.getLegs().get(1);
+  //    assertEquals(secondLeg.getRoute().getId().getId(), "route2");
+  //    assertFalse(secondLeg.isInterlinedWithPreviousLeg());
+  //    assertEquals(1, itinerary.getNumberOfTransfers());
+  //  }
 }

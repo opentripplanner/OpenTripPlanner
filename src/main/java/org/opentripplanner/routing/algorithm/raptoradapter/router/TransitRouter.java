@@ -74,7 +74,6 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-
     if (!serverContext.transitService().transitFeedCovers(request.dateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))

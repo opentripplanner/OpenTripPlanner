@@ -175,15 +175,15 @@ public class TransmodelGraphQLPlanner {
       callWith.argument("modes.egressMode", egressMode::set);
       callWith.argument("modes.directMode", directMode::set);
 
-       var requestModes = RequestModes
+      var requestModes = RequestModes
         .of()
         .withAccessMode(accessMode.get())
         .withEgressMode(egressMode.get())
         .withDirectMode(directMode.get())
         .withTransferMode(accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK)
-         .build();
+        .build();
 
-       request.journey().setModes(requestModes);
+      request.journey().setModes(requestModes);
     }
 
     if (GqlUtil.hasArgument(environment, "filters")) {
@@ -204,7 +204,11 @@ public class TransmodelGraphQLPlanner {
   }
 
   @SuppressWarnings("unchecked")
-  private void mapFilterOldWay (DataFetchingEnvironment environment, DataFetcherDecorator callWith, RouteRequest request) {
+  private void mapFilterOldWay(
+    DataFetchingEnvironment environment,
+    DataFetcherDecorator callWith,
+    RouteRequest request
+  ) {
     var filter = new FilterRequest();
     var include = filter.getInclude();
     var exclude = filter.getExclude();
@@ -265,9 +269,11 @@ public class TransmodelGraphQLPlanner {
   }
 
   @SuppressWarnings("unchecked")
-  private void mapFilterNewWay (DataFetchingEnvironment environment,
-                                DataFetcherDecorator callWith,
-                                RouteRequest request) {
+  private void mapFilterNewWay(
+    DataFetchingEnvironment environment,
+    DataFetcherDecorator callWith,
+    RouteRequest request
+  ) {
     if (GqlUtil.hasArgument(environment, "filters")) {
       ElementWrapper<List<LinkedHashMap<String, ?>>> filtersInput = new ElementWrapper<>();
       callWith.argument("filters", filtersInput::set);
@@ -278,11 +284,15 @@ public class TransmodelGraphQLPlanner {
         var filterRequest = new FilterRequest();
 
         if (filterInput.containsKey("include")) {
-          filterRequest.setInclude(mapSelectRequest((LinkedHashMap<String, List<?>>) filterInput.get("include")));
+          filterRequest.setInclude(
+            mapSelectRequest((LinkedHashMap<String, List<?>>) filterInput.get("include"))
+          );
         }
 
         if (filterInput.containsKey("exclude")) {
-          filterRequest.setExclude(mapSelectRequest((LinkedHashMap<String, List<?>>) filterInput.get("exclude")));
+          filterRequest.setExclude(
+            mapSelectRequest((LinkedHashMap<String, List<?>>) filterInput.get("exclude"))
+          );
         }
 
         filterRequests.add(filterRequest);
@@ -316,7 +326,7 @@ public class TransmodelGraphQLPlanner {
       selectRequest.setTrips(mapIDsToDomain(serviceJourneys));
     }
 
-    if (input.containsKey("transportModes") ) {
+    if (input.containsKey("transportModes")) {
       var tModes = new ArrayList<MainAndSubMode>();
 
       var transportModes = (List<LinkedHashMap<String, ?>>) input.get("transportModes");

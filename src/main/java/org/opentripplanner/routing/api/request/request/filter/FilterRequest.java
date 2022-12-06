@@ -6,6 +6,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
+
   private SelectRequest include = new SelectRequest();
   private SelectRequest exclude = new SelectRequest();
 
@@ -27,10 +28,7 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
 
   @Override
   public String toString() {
-    return "FilterRequest{" +
-      "include=" + include +
-      ", exclude=" + exclude +
-      '}';
+    return "FilterRequest{" + "include=" + include + ", exclude=" + exclude + '}';
   }
 
   @Override
@@ -65,20 +63,22 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
 
     if (
       allowedModes.isEmpty() &&
-        bannedModes.isEmpty() &&
-        allowedAgencies.isEmpty() &&
-        bannedAgencies.isEmpty() &&
-        allowedRoutes.isEmpty() &&
-        bannedRoutes.isEmpty() &&
-        allowedFeeds.isEmpty() &&
-        bannedFeeds.isEmpty()
+      bannedModes.isEmpty() &&
+      allowedAgencies.isEmpty() &&
+      bannedAgencies.isEmpty() &&
+      allowedRoutes.isEmpty() &&
+      bannedRoutes.isEmpty() &&
+      allowedFeeds.isEmpty() &&
+      bannedFeeds.isEmpty()
     ) {
       // everything is empty. Do not have to check
       return true;
     }
 
-    if (!bannedModes.isEmpty() &&
-      AllowTransitModeFilter.of(bannedModes).allows(route.getMode(), route.getNetexSubmode())) {
+    if (
+      !bannedModes.isEmpty() &&
+      AllowTransitModeFilter.of(bannedModes).allows(route.getMode(), route.getNetexSubmode())
+    ) {
       return false;
     }
 
@@ -94,24 +94,22 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
       return false;
     }
 
-
-    if (!allowedModes.isEmpty() &&
-      !AllowTransitModeFilter.of(allowedModes).allows(route.getMode(), route.getNetexSubmode())) {
+    if (
+      !allowedModes.isEmpty() &&
+      !AllowTransitModeFilter.of(allowedModes).allows(route.getMode(), route.getNetexSubmode())
+    ) {
       return false;
     }
 
-    if (!allowedAgencies.isEmpty() &&
-      !allowedAgencies.contains(route.getAgency().getId())) {
+    if (!allowedAgencies.isEmpty() && !allowedAgencies.contains(route.getAgency().getId())) {
       return false;
     }
 
-    if (!allowedRoutes.isEmpty() &&
-      !allowedRoutes.matches(route)) {
+    if (!allowedRoutes.isEmpty() && !allowedRoutes.matches(route)) {
       return false;
     }
 
-    if (!allowedFeeds.isEmpty() &&
-      !allowedFeeds.contains(route.getId().getFeedId())) {
+    if (!allowedFeeds.isEmpty() && !allowedFeeds.contains(route.getId().getFeedId())) {
       return false;
     }
 
@@ -138,22 +136,25 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
 
     var trip = tripTimes.getTrip();
 
-    if (allowedTrips.isEmpty() &&
+    if (
+      allowedTrips.isEmpty() &&
       bannedTrips.isEmpty() &&
       allowedModes.isEmpty() &&
-      bannedModes.isEmpty()) {
+      bannedModes.isEmpty()
+    ) {
       // no trip-specific filters specified
       // all irrelevant trips were already filtered out by routePredicate
       return true;
     }
 
-
-    if (!bannedModes.isEmpty() &&
-      AllowTransitModeFilter.of(bannedModes).allows(trip.getMode(), trip.getNetexSubMode())) {
+    if (
+      !bannedModes.isEmpty() &&
+      AllowTransitModeFilter.of(bannedModes).allows(trip.getMode(), trip.getNetexSubMode())
+    ) {
       return false;
     }
 
-    if (bannedAgencies.contains(trip.getRoute().getAgency().getId())){
+    if (bannedAgencies.contains(trip.getRoute().getAgency().getId())) {
       return false;
     }
 
@@ -169,29 +170,28 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
       return false;
     }
 
-
-    if (!allowedModes.isEmpty() &&
-      !AllowTransitModeFilter.of(allowedModes).allows(trip.getMode(), trip.getNetexSubMode())) {
+    if (
+      !allowedModes.isEmpty() &&
+      !AllowTransitModeFilter.of(allowedModes).allows(trip.getMode(), trip.getNetexSubMode())
+    ) {
       return false;
     }
 
-    if (!allowedAgencies.isEmpty() &&
-      !allowedAgencies.contains(trip.getRoute().getAgency().getId())) {
+    if (
+      !allowedAgencies.isEmpty() && !allowedAgencies.contains(trip.getRoute().getAgency().getId())
+    ) {
       return false;
     }
 
-    if (!allowedRoutes.isEmpty() &&
-      !allowedRoutes.matches(trip.getRoute())) {
+    if (!allowedRoutes.isEmpty() && !allowedRoutes.matches(trip.getRoute())) {
       return false;
     }
 
-    if (!allowedFeeds.isEmpty() &&
-      !allowedFeeds.contains(trip.getId().getFeedId())) {
+    if (!allowedFeeds.isEmpty() && !allowedFeeds.contains(trip.getId().getFeedId())) {
       return false;
     }
 
-    if (!allowedTrips.isEmpty() &&
-      !allowedTrips.contains(trip.getId())) {
+    if (!allowedTrips.isEmpty() && !allowedTrips.contains(trip.getId())) {
       return false;
     }
 

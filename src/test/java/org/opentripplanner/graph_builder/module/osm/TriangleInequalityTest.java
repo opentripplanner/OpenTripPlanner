@@ -87,87 +87,87 @@ public class TriangleInequalityTest {
     checkTriangleInequality();
   }
 
-//  @Test
-//  public void testTriangleInequalityWalkingOnly() {
-//    RequestModes modes = RequestModes.of().clearTransitModes().build();
-//    checkTriangleInequality(modes);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityDrivingOnly() {
-//    RequestModes modes = RequestModes.of().withDirectMode(CAR).clearTransitModes().build();
-//    checkTriangleInequality(modes);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityWalkTransit() {
-//    RequestModes modes = RequestModes.defaultRequestModes();
-//    checkTriangleInequality(modes);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityWalkBike() {
-//    RequestModes modes = RequestModes.of().withDirectMode(BIKE).clearTransitModes().build();
-//    checkTriangleInequality(modes);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityDefaultModesBasicSPT() {
-//    checkTriangleInequality(null);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityWalkingOnlyBasicSPT() {
-//    RequestModes modes = RequestModes.of().clearTransitModes().build();
-//    checkTriangleInequality(modes);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityDrivingOnlyBasicSPT() {
-//    RequestModes modes = RequestModes.of().withDirectMode(CAR).clearTransitModes().build();
-//    checkTriangleInequality(modes);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityWalkTransitBasicSPT() {
-//    RequestModes modes = RequestModes.defaultRequestModes();
-//    checkTriangleInequality(modes);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityWalkBikeBasicSPT() {
-//    RequestModes modes = RequestModes.of().withDirectMode(BIKE).clearTransitModes().build();
-//    checkTriangleInequality(modes);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityDefaultModesMultiSPT() {
-//    checkTriangleInequality(null);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityWalkingOnlyMultiSPT() {
-//    RequestModes modes = RequestModes.of().clearTransitModes().build();
-//    checkTriangleInequality(modes);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityDrivingOnlyMultiSPT() {
-//    RequestModes modes = RequestModes.of().withDirectMode(CAR).clearTransitModes().build();
-//    checkTriangleInequality(modes);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityWalkTransitMultiSPT() {
-//    RequestModes modes = RequestModes.defaultRequestModes();
-//    checkTriangleInequality(modes);
-//  }
-//
-//  @Test
-//  public void testTriangleInequalityWalkBikeMultiSPT() {
-//    RequestModes modes = RequestModes.of().withDirectMode(BIKE).clearTransitModes().build();
-//    checkTriangleInequality(modes);
-//  }
+  //  @Test
+  //  public void testTriangleInequalityWalkingOnly() {
+  //    RequestModes modes = RequestModes.of().clearTransitModes().build();
+  //    checkTriangleInequality(modes);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityDrivingOnly() {
+  //    RequestModes modes = RequestModes.of().withDirectMode(CAR).clearTransitModes().build();
+  //    checkTriangleInequality(modes);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityWalkTransit() {
+  //    RequestModes modes = RequestModes.defaultRequestModes();
+  //    checkTriangleInequality(modes);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityWalkBike() {
+  //    RequestModes modes = RequestModes.of().withDirectMode(BIKE).clearTransitModes().build();
+  //    checkTriangleInequality(modes);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityDefaultModesBasicSPT() {
+  //    checkTriangleInequality(null);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityWalkingOnlyBasicSPT() {
+  //    RequestModes modes = RequestModes.of().clearTransitModes().build();
+  //    checkTriangleInequality(modes);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityDrivingOnlyBasicSPT() {
+  //    RequestModes modes = RequestModes.of().withDirectMode(CAR).clearTransitModes().build();
+  //    checkTriangleInequality(modes);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityWalkTransitBasicSPT() {
+  //    RequestModes modes = RequestModes.defaultRequestModes();
+  //    checkTriangleInequality(modes);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityWalkBikeBasicSPT() {
+  //    RequestModes modes = RequestModes.of().withDirectMode(BIKE).clearTransitModes().build();
+  //    checkTriangleInequality(modes);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityDefaultModesMultiSPT() {
+  //    checkTriangleInequality(null);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityWalkingOnlyMultiSPT() {
+  //    RequestModes modes = RequestModes.of().clearTransitModes().build();
+  //    checkTriangleInequality(modes);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityDrivingOnlyMultiSPT() {
+  //    RequestModes modes = RequestModes.of().withDirectMode(CAR).clearTransitModes().build();
+  //    checkTriangleInequality(modes);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityWalkTransitMultiSPT() {
+  //    RequestModes modes = RequestModes.defaultRequestModes();
+  //    checkTriangleInequality(modes);
+  //  }
+  //
+  //  @Test
+  //  public void testTriangleInequalityWalkBikeMultiSPT() {
+  //    RequestModes modes = RequestModes.of().withDirectMode(BIKE).clearTransitModes().build();
+  //    checkTriangleInequality(modes);
+  //  }
 
   private GraphPath<State, Edge, Vertex> getPath(
     RouteRequest options,

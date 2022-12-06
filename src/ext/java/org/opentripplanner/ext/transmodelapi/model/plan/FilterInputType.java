@@ -13,18 +13,38 @@ public class FilterInputType {
     .newInputObject()
     .name("TripFilterSelectInput")
     .description("TODO")
-    .field(newIdListInputField("lines", "Set of ids for lines that should be included in/excluded from search"))
-    .field(newIdListInputField("authorities", "Set of ids for authorities that should be included in/excluded from search"))
-    .field(newIdListInputField("feeds", "Set of ids for feeds that should be should be included in/excluded from search"))
-    .field(newIdListInputField("serviceJourneys", "Set of ids for service journeys that should be included in /excluded from search"))
+    .field(
+      newIdListInputField(
+        "lines",
+        "Set of ids for lines that should be included in/excluded from search"
+      )
+    )
+    .field(
+      newIdListInputField(
+        "authorities",
+        "Set of ids for authorities that should be included in/excluded from search"
+      )
+    )
+    .field(
+      newIdListInputField(
+        "feeds",
+        "Set of ids for feeds that should be should be included in/excluded from search"
+      )
+    )
+    .field(
+      newIdListInputField(
+        "serviceJourneys",
+        "Set of ids for service journeys that should be included in /excluded from search"
+      )
+    )
     .field(
       GraphQLInputObjectField
         .newInputObjectField()
         .name("transportModes")
         .description(
           "The allowed modes for the transit part of the trip. Use an empty list to " +
-            "disallow transit for this search. If the element is not present or null, it will " +
-            "default to all transport modes."
+          "disallow transit for this search. If the element is not present or null, it will " +
+          "default to all transport modes."
         )
         .type(new GraphQLList(ModeAndSubModeInputType.INPUT_TYPE))
         .build()

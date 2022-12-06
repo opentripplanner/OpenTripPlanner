@@ -232,11 +232,11 @@ public class TripQuery {
       )
       .argument(
         GraphQLArgument
-        .newArgument()
-        .name("filters")
-        .description("TODO")
-        .type(new GraphQLList(FilterInputType.INPUT_TYPE))
-        .build()
+          .newArgument()
+          .name("filters")
+          .description("TODO")
+          .type(new GraphQLList(FilterInputType.INPUT_TYPE))
+          .build()
       )
       .argument(
         GraphQLArgument

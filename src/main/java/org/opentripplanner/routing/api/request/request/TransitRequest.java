@@ -113,7 +113,6 @@ public class TransitRequest implements Cloneable, Serializable {
     return unpreferredRoutes;
   }
 
-
   public void setRaptorDebugging(DebugRaptor raptorDebugging) {
     this.raptorDebugging = raptorDebugging;
   }

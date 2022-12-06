@@ -273,7 +273,7 @@ public abstract class SnapshotTestBase {
       .toLocalDateTime();
 
     // TODO: 2022-11-29 filters: fix
-//    var transitModes = mapModes(request.journey().transit().modes());
+    //    var transitModes = mapModes(request.journey().transit().modes());
     List<ApiRequestMode> transitModes = List.of();
 
     var modes = Stream

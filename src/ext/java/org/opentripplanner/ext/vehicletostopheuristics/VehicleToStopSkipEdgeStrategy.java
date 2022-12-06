@@ -73,7 +73,6 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Ed
         current.getVertex() instanceof TransitStopVertex stopVertex &&
         !stopsCounted.contains(stopVertex.getStop().getId())
       ) {
-
         // TODO: 2022-12-05 filters: check performance on that
         // TODO: 2022-12-05 filters: verify that this is right. Previously we were filtering just on modes
         var stop = stopVertex.getStop();

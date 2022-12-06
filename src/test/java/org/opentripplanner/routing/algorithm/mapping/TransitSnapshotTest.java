@@ -68,7 +68,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
 
     request.journey().direct().setMode(StreetMode.WALK);
     // TODO: 2022-11-29 filters: fix
-//    request.journey().transit().setModes(List.of());
+    //    request.journey().transit().setModes(List.of());
     request.setFrom(p0);
     request.setTo(p2);
 
@@ -84,7 +84,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     request.journey().direct().setMode(StreetMode.WALK);
     request.journey().transfer().setMode(StreetMode.WALK);
     // TODO: 2022-11-29 filters: fix
-//    request.journey().transit().setModes(List.of());
+    //    request.journey().transit().setModes(List.of());
     request.setFrom(ps);
     request.setTo(p2);
 
@@ -100,7 +100,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     request.journey().direct().setMode(StreetMode.WALK);
     request.journey().transfer().setMode(StreetMode.WALK);
     // TODO: 2022-11-29 filters: fix
-//    request.journey().transit().setModes(List.of());
+    //    request.journey().transit().setModes(List.of());
     request.setFrom(ptc);
     request.setTo(p3);
 
@@ -117,7 +117,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     request.journey().direct().setMode(StreetMode.WALK);
     request.journey().transfer().setMode(StreetMode.WALK);
     // TODO: 2022-11-29 filters: fix
-//    request.journey().transit().setModes(MainAndSubMode.all());
+    //    request.journey().transit().setModes(MainAndSubMode.all());
     request.setFrom(p1);
     request.setTo(p2);
 
@@ -133,7 +133,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     request.journey().direct().setMode(StreetMode.WALK);
     request.journey().transfer().setMode(StreetMode.WALK);
     // TODO: 2022-11-29 filters: fix
-//    request.journey().transit().setModes(MainAndSubMode.all());
+    //    request.journey().transit().setModes(MainAndSubMode.all());
 
     request.setFrom(ps);
     request.setTo(p3);
@@ -151,7 +151,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     request.journey().direct().setMode(StreetMode.WALK);
     request.journey().transfer().setMode(StreetMode.WALK);
     // TODO: 2022-11-29 filters: fix
-//    request.journey().transit().setModes(MainAndSubMode.all());
+    //    request.journey().transit().setModes(MainAndSubMode.all());
     request.setFrom(ptc);
     request.setTo(p3);
 

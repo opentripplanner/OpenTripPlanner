@@ -21,58 +21,57 @@ import org.opentripplanner.transit.model.organization.Agency;
  * TODO This does not test the that banning/whitelisting affects the routing correctly.
  */
 public class TestBanning {
-
   // TODO: 2022-11-29 filters:
 
-//  @Test
-//  public void testSetBannedOnRequest() {
-//    Collection<Route> routes = getTestRoutes();
-//
-//    final TransitRequest transit = new TransitRequest();
-//    transit.setBannedRoutes(RouteMatcher.parse("F__RUT:Route:1"));
-//    transit.setBannedAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
-//
-//    Collection<FeedScopedId> bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
-//      Set.copyOf(transit.bannedAgencies()),
-//      transit.bannedRoutes(),
-//      Set.copyOf(transit.whiteListedAgencies()),
-//      transit.whiteListedRoutes(),
-//      routes
-//    );
-//
-//    assertEquals(2, bannedRoutes.size());
-//    assertTrue(bannedRoutes.contains(id("RUT:Route:1")));
-//    assertTrue(bannedRoutes.contains(id("RUT:Route:3")));
-//  }
-//
-//  @Test
-//  public void testSetWhiteListedOnRequest() {
-//    Collection<Route> routes = getTestRoutes();
-//
-//    TransitRequest transit = new TransitRequest();
-//    transit.setWhiteListedRoutes(RouteMatcher.parse("F__RUT:Route:1"));
-//    transit.setWhiteListedAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
-//
-//    Collection<FeedScopedId> bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
-//      Set.copyOf(transit.bannedAgencies()),
-//      transit.bannedRoutes(),
-//      Set.copyOf(transit.whiteListedAgencies()),
-//      transit.whiteListedRoutes(),
-//      routes
-//    );
-//
-//    assertEquals(1, bannedRoutes.size());
-//    assertTrue(bannedRoutes.contains(id("RUT:Route:2")));
-//  }
-//
-//  private List<Route> getTestRoutes() {
-//    Agency agency1 = TransitModelForTest.agency("A").copy().withId(id("RUT:Agency:1")).build();
-//    Agency agency2 = TransitModelForTest.agency("B").copy().withId(id("RUT:Agency:2")).build();
-//
-//    return List.of(
-//      TransitModelForTest.route("RUT:Route:1").withAgency(agency1).build(),
-//      TransitModelForTest.route("RUT:Route:2").withAgency(agency1).build(),
-//      TransitModelForTest.route("RUT:Route:3").withAgency(agency2).build()
-//    );
-//  }
+  //  @Test
+  //  public void testSetBannedOnRequest() {
+  //    Collection<Route> routes = getTestRoutes();
+  //
+  //    final TransitRequest transit = new TransitRequest();
+  //    transit.setBannedRoutes(RouteMatcher.parse("F__RUT:Route:1"));
+  //    transit.setBannedAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
+  //
+  //    Collection<FeedScopedId> bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
+  //      Set.copyOf(transit.bannedAgencies()),
+  //      transit.bannedRoutes(),
+  //      Set.copyOf(transit.whiteListedAgencies()),
+  //      transit.whiteListedRoutes(),
+  //      routes
+  //    );
+  //
+  //    assertEquals(2, bannedRoutes.size());
+  //    assertTrue(bannedRoutes.contains(id("RUT:Route:1")));
+  //    assertTrue(bannedRoutes.contains(id("RUT:Route:3")));
+  //  }
+  //
+  //  @Test
+  //  public void testSetWhiteListedOnRequest() {
+  //    Collection<Route> routes = getTestRoutes();
+  //
+  //    TransitRequest transit = new TransitRequest();
+  //    transit.setWhiteListedRoutes(RouteMatcher.parse("F__RUT:Route:1"));
+  //    transit.setWhiteListedAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
+  //
+  //    Collection<FeedScopedId> bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
+  //      Set.copyOf(transit.bannedAgencies()),
+  //      transit.bannedRoutes(),
+  //      Set.copyOf(transit.whiteListedAgencies()),
+  //      transit.whiteListedRoutes(),
+  //      routes
+  //    );
+  //
+  //    assertEquals(1, bannedRoutes.size());
+  //    assertTrue(bannedRoutes.contains(id("RUT:Route:2")));
+  //  }
+  //
+  //  private List<Route> getTestRoutes() {
+  //    Agency agency1 = TransitModelForTest.agency("A").copy().withId(id("RUT:Agency:1")).build();
+  //    Agency agency2 = TransitModelForTest.agency("B").copy().withId(id("RUT:Agency:2")).build();
+  //
+  //    return List.of(
+  //      TransitModelForTest.route("RUT:Route:1").withAgency(agency1).build(),
+  //      TransitModelForTest.route("RUT:Route:2").withAgency(agency1).build(),
+  //      TransitModelForTest.route("RUT:Route:3").withAgency(agency2).build()
+  //    );
+  //  }
 }

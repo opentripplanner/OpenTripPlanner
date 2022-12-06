@@ -716,7 +716,11 @@ public abstract class RoutingResource {
         setIfNotNull(unpreferredAgencies, transit::setUnpreferredAgenciesFromString);
 
         var filter = new FilterRequest();
-        filter.getInclude().setTransportModes(modes.getTransitModes().stream().map(MainAndSubMode::new).collect(Collectors.toList()));
+        filter
+          .getInclude()
+          .setTransportModes(
+            modes.getTransitModes().stream().map(MainAndSubMode::new).collect(Collectors.toList())
+          );
 
         setIfNotNull(bannedAgencies, filter.getExclude()::setAgenciesFromString);
         setIfNotNull(whiteListedAgencies, filter.getInclude()::setAgenciesFromString);

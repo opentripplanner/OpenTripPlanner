@@ -35,7 +35,6 @@ public class RequestModes {
   @Nonnull
   public final StreetMode transferMode;
 
-
   private RequestModes(
     StreetMode accessMode,
     StreetMode egressMode,
@@ -49,12 +48,7 @@ public class RequestModes {
   }
 
   public RequestModes(RequestModesBuilder builder) {
-    this(
-      builder.accessMode(),
-      builder.egressMode(),
-      builder.directMode(),
-      builder.transferMode()
-    );
+    this(builder.accessMode(), builder.egressMode(), builder.directMode(), builder.transferMode());
   }
 
   /**

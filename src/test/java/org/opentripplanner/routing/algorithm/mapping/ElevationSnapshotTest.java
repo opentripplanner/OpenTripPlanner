@@ -67,7 +67,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
 
     request.journey().direct().setMode(StreetMode.WALK);
     // TODO: 2022-11-29 filters: fix
-//    request.journey().transit().setModes(List.of());
+    //    request.journey().transit().setModes(List.of());
     request.setFrom(p1);
     request.setTo(p4);
 
@@ -81,7 +81,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
 
     request.journey().direct().setMode(StreetMode.BIKE_RENTAL);
     // TODO: 2022-11-29 filters: fix
-//    request.journey().transit().setModes(List.of());
+    //    request.journey().transit().setModes(List.of());
     request.setFrom(p1);
     request.setTo(p2);
 
@@ -103,7 +103,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
 
     request.journey().direct().setMode(StreetMode.BIKE);
     // TODO: 2022-11-29 filters: fix
-//    request.journey().transit().setModes(List.of());
+    //    request.journey().transit().setModes(List.of());
     request.setFrom(p1);
     request.setTo(p4);
     request.setArriveBy(true);
@@ -121,7 +121,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     request.journey().direct().setMode(StreetMode.NOT_SET);
     request.journey().transfer().setMode(StreetMode.WALK);
     // TODO: 2022-11-29 filters: fix
-//    request.journey().transit().setModes(MainAndSubMode.all());
+    //    request.journey().transit().setModes(MainAndSubMode.all());
     request.setFrom(p1);
     request.setTo(p3);
 
@@ -142,7 +142,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     request.journey().transfer().setMode(StreetMode.WALK);
     request.journey().direct().setMode(StreetMode.NOT_SET);
     // TODO: 2022-11-29 filters: fix
-//    request.journey().transit().setModes(MainAndSubMode.all());
+    //    request.journey().transit().setModes(MainAndSubMode.all());
     request.setFrom(p3);
     request.setTo(p1);
 
