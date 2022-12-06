@@ -12,7 +12,6 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.openstreetmap.spi.OSMDatabase;
 import org.opentripplanner.openstreetmap.spi.OSMProvider;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
@@ -42,12 +41,7 @@ public class OpenStreetMapProvider implements OSMProvider {
 
   /** For tests */
   public OpenStreetMapProvider(File file, boolean cacheDataInMem) {
-    this(
-      new FileDataSource(file, FileType.OSM),
-      OsmExtractParameters.DEFAULT.osmTagMapper(),
-      OsmExtractParameters.DEFAULT.timeZone(),
-      cacheDataInMem
-    );
+    this(new FileDataSource(file, FileType.OSM), OsmTagMapper.Source.DEFAULT, null, cacheDataInMem);
   }
 
   public OpenStreetMapProvider(
