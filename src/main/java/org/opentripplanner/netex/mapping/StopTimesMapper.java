@@ -202,8 +202,7 @@ class StopTimesMapper {
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern();
 
     for (PointInLinkSequence_VersionedChildStructure point : points) {
-      if (point instanceof StopPointInJourneyPattern) {
-        StopPointInJourneyPattern stopPoint = (StopPointInJourneyPattern) point;
+      if (point instanceof StopPointInJourneyPattern stopPoint) {
         if (stopPoint.getId().equals(pointInJourneyPatterRef)) {
           return stopPoint;
         }
