@@ -169,9 +169,9 @@ type EstimatedCall {
   expectedArrivalTime: DateTime!
   "Expected time of departure from quay. Updated with real time information if available. Will be null if an actualDepartureTime exists"
   expectedDepartureTime: DateTime!
-  "Whether vehicle may be alighted at quay according to the planned data. If the cancellation flag is set, alighting is not possible, even if this field is set to true."
+  "Whether vehicle may be alighted at quay."
   forAlighting: Boolean!
-  "Whether vehicle may be boarded at quay according to the planned data. If the cancellation flag is set, boarding is not possible, even if this field is set to true."
+  "Whether vehicle may be boarded at quay."
   forBoarding: Boolean!
   notices: [Notice!]!
   occupancyStatus: OccupancyStatus!
@@ -714,6 +714,8 @@ type QueryType {
     dateTime: DateTime,
     "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters."
     debugItineraryFilter: Boolean = false,
+    "TODO"
+    filters: [TripFilterInput],
     "The start location"
     from: Location!,
     "When true, realtime updates are ignored during this search."
@@ -1731,4 +1733,26 @@ input TriangleFactors {
   slope: Float!
   "How important is time expressed as a fraction of 1. Note that what this really optimises for is distance (even if that means going over terrible surfaces, so I might be slower than the safe route)."
   time: Float!
+}
+
+"TODO"
+input TripFilterInput {
+  "TODO"
+  exclude: TripFilterSelectInput
+  "TODO"
+  include: TripFilterSelectInput
+}
+
+"TODO"
+input TripFilterSelectInput {
+  "Set of ids for authorities that should be included in/excluded from search"
+  authorities: [ID] = []
+  "Set of ids for feeds that should be should be included in/excluded from search"
+  feeds: [ID] = []
+  "Set of ids for lines that should be included in/excluded from search"
+  lines: [ID] = []
+  "Set of ids for service journeys that should be included in /excluded from search"
+  serviceJourneys: [ID] = []
+  "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
+  transportModes: [TransportModes]
 }
