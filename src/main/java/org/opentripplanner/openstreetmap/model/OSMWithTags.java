@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
+import org.opentripplanner.openstreetmap.TemplateLibrary;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;

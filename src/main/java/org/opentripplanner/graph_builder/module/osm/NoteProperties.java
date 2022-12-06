@@ -6,6 +6,7 @@ import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.model.NoteMatcher;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.StreetNoteAndMatcher;
+import org.opentripplanner.openstreetmap.TemplateLibrary;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TranslatedString;

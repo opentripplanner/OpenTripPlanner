@@ -1,11 +1,10 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.openstreetmap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
