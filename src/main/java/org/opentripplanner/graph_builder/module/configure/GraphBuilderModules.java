@@ -21,6 +21,7 @@ import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueSto
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.geometry.CalculateWorldEnvelopeModule;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
@@ -244,6 +245,15 @@ public class GraphBuilderModules {
       dataSources.getBuildReportDir(),
       config.maxDataImportIssuesPerFile
     );
+  }
+
+  @Provides
+  @Singleton
+  static CalculateWorldEnvelopeModule provideCalculateWorldEnvelopeModule(
+    Graph graph,
+    TransitModel transitModel
+  ) {
+    return new CalculateWorldEnvelopeModule(graph, transitModel);
   }
 
   /* private methods */

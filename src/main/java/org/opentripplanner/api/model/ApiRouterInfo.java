@@ -5,15 +5,16 @@ import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.ModeMapper;
+import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
 public class ApiRouterInfo {
 
-  private final ApiWorldEnvelope envelope;
+  /** Keep ref to domain object, but avoid exposing it */
+  private final WorldEnvelope envelope;
   public final boolean hasBikePark;
   public final boolean hasCarPark;
   public final boolean hasVehicleParking;
@@ -40,14 +41,7 @@ public class ApiRouterInfo {
     this.transitServiceStarts = transitService.getTransitServiceStarts().toEpochSecond();
     this.transitServiceEnds = transitService.getTransitServiceEnds().toEpochSecond();
     this.transitModes = ModeMapper.mapToApi(transitService.getTransitModes());
-    var ev = graph.getEnvelope();
-    this.envelope =
-      new ApiWorldEnvelope(
-        ev.getLowerLeftLatitude(),
-        ev.getLowerLeftLongitude(),
-        ev.getUpperRightLatitude(),
-        ev.getUpperRightLongitude()
-      );
+    this.envelope = graph.getEnvelope();
     this.hasBikeSharing = mapHasBikeSharing(vehicleRentalService);
     this.hasBikePark = mapHasBikePark(vehicleParkingService);
     this.hasCarPark = mapHasCarPark(vehicleParkingService);
@@ -107,8 +101,8 @@ public class ApiRouterInfo {
    */
   public void calculateCenter() {
     // Does not work around 180th parallel.
-    centerLatitude = (getUpperRightLatitude() + getLowerLeftLatitude()) / 2;
-    centerLongitude = (getUpperRightLongitude() + getLowerLeftLongitude()) / 2;
+    centerLatitude = envelope.centerLatitude();
+    centerLongitude = envelope.centerLongitude();
   }
 
   public double getLowerLeftLatitude() {

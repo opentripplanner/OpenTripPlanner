@@ -19,6 +19,7 @@ import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.graph_builder.module.TripPatternNamer;
+import org.opentripplanner.graph_builder.module.geometry.CalculateWorldEnvelopeModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
@@ -49,6 +50,7 @@ public interface GraphBuilderFactory {
   GraphCoherencyCheckerModule graphCoherencyCheckerModule();
   EdgeUpdaterModule dataOverlayFactory();
   DataImportIssuesToHTML dataImportIssuesToHTML();
+  CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
 
   @Component.Builder
   interface Builder {

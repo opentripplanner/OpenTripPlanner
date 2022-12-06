@@ -153,6 +153,8 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModuleOptional(factory.dataOverlayFactory());
     }
 
+    graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
+
     return graphBuilder;
   }
 

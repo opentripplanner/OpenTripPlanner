@@ -43,12 +43,19 @@ public class FrameworkArchitectureTest {
 
   @Test
   void enforceGeometryPackageDependencies() {
-    GEOMETRY.dependsOn(GEO_JSON, GEO_TOOLS, GNU_TROVE, JTS_GEOM, OPEN_GIS).verify();
+    GEOMETRY
+      .dependsOn(GEO_JSON, GEO_TOOLS, GNU_TROVE, JTS_GEOM, OPEN_GIS, LANG, TO_STRING)
+      .verify();
   }
 
   @Test
   void enforceIoPackageDependencies() {
     IO.dependsOn(APACHE_HTTP, XML_MODULES).verify();
+  }
+
+  @Test
+  void enforceLangPackageDependencies() {
+    LANG.verify();
   }
 
   @Test

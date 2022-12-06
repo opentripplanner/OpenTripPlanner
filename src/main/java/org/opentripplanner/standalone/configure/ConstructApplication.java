@@ -156,8 +156,8 @@ public class ConstructApplication {
   private void initEllipsoidToGeoidDifference() {
     try {
       WorldEnvelope env = graph().getEnvelope();
-      double lat = env.calcCenterLatitude();
-      double lon = env.calcCenterLongitude();
+      double lat = env.centerLatitude();
+      double lon = env.centerLongitude();
       double value = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
       graph().initEllipsoidToGeoidDifference(value, lat, lon);
     } catch (Exception e) {

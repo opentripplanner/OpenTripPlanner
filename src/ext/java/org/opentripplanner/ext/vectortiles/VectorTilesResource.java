@@ -83,13 +83,14 @@ public class VectorTilesResource {
     @Context HttpHeaders headers,
     @PathParam("layers") String requestedLayers
   ) {
+    var envelope = serverContext.graph().getEnvelope();
     return new TileJson(
       uri,
       headers,
       requestedLayers,
       ignoreRouterId,
       "vectorTiles",
-      serverContext.graph().getEnvelope(),
+      envelope,
       serverContext
         .transitService()
         .getFeedIds()

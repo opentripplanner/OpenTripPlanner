@@ -40,8 +40,6 @@ public class TransitStopVertex extends StationElementVertex {
     this.stop = stop;
     this.modes = modes != null ? modes : new HashSet<>();
     this.wheelchairAccessibility = stop.getWheelchairAccessibility();
-    //Adds this vertex into graph envelope so that we don't need to loop over all vertices
-    graph.expandToInclude(stop.getLon(), stop.getLat());
   }
 
   public Accessibility getWheelchairAccessibility() {
