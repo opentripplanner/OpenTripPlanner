@@ -6,7 +6,6 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -155,11 +154,9 @@ public class ConstructApplication {
 
   private void initEllipsoidToGeoidDifference() {
     try {
-      WorldEnvelope env = graph().getEnvelope();
-      double lat = env.centerLatitude();
-      double lon = env.centerLongitude();
-      double value = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
-      graph().initEllipsoidToGeoidDifference(value, lat, lon);
+      var c = graph().getEnvelope().meanCenter();
+      double value = ElevationUtils.computeEllipsoidToGeoidDifference(c.latitude(), c.longitude());
+      graph().initEllipsoidToGeoidDifference(value, c.latitude(), c.longitude());
     } catch (Exception e) {
       LOG.error("Error computing ellipsoid/geoid difference");
     }

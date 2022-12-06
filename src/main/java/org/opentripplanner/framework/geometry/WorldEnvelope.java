@@ -1,10 +1,10 @@
 package org.opentripplanner.framework.geometry;
 
-import static org.opentripplanner.framework.lang.OtpNumberFormat.formatTwoDecimals;
-
 import java.io.Serializable;
-import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.lang.DoubleUtils;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Function;
+import org.opentripplanner.framework.statistics.MedianCalcForDoubles;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
@@ -13,82 +13,89 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
  */
 public class WorldEnvelope implements Serializable {
 
-  private static final double LAT_MIN = -90;
-  private static final double LAT_MAX = 90;
-  private static final double LON_MIN = -180;
-  private static final double LON_MAX = 180;
-
-  private final double lowerLeftLatitude;
-  private final double lowerLeftLongitude;
-  private final double upperRightLatitude;
-  private final double upperRightLongitude;
-
-  private final double centerLatitude;
-  private final double centerLongitude;
+  private final WgsCoordinate lowerLeft;
+  private final WgsCoordinate upperRight;
+  private final WgsCoordinate meanCenter;
+  private final WgsCoordinate transitMedianCenter;
 
   private WorldEnvelope(
     double lowerLeftLongitude,
     double lowerLeftLatitude,
     double upperRightLongitude,
-    double upperRightLatitude
+    double upperRightLatitude,
+    WgsCoordinate transitMedianCenter
   ) {
-    this.lowerLeftLatitude =
-      DoubleUtils.assertInRange(lowerLeftLatitude, LAT_MIN, LAT_MAX, "lowerLeftLatitude");
-    this.lowerLeftLongitude =
-      DoubleUtils.assertInRange(lowerLeftLongitude, LON_MIN, LON_MAX, "lowerLeftLongitude");
-    this.upperRightLatitude =
-      DoubleUtils.assertInRange(upperRightLatitude, LAT_MIN, LAT_MAX, "upperRightLatitude");
-    this.upperRightLongitude =
-      DoubleUtils.assertInRange(upperRightLongitude, LON_MIN, LON_MAX, "upperRightLongitude");
-    this.centerLatitude = lowerLeftLatitude + (upperRightLatitude - lowerLeftLatitude) / 2.0;
-
-    // Split normally at 180 degrees
-    this.centerLongitude =
-      (lowerLeftLongitude < upperRightLongitude)
-        ? lowerLeftLongitude + (upperRightLongitude - lowerLeftLongitude) / 2.0
-        : lowerLeftLongitude + (360 - lowerLeftLongitude + upperRightLongitude) / 2.0;
+    this.transitMedianCenter = transitMedianCenter;
+    this.lowerLeft = new WgsCoordinate(lowerLeftLatitude, lowerLeftLongitude);
+    this.upperRight = new WgsCoordinate(upperRightLatitude, upperRightLongitude);
+    this.meanCenter = calculateMeanCenter(lowerLeft, upperRight);
   }
 
   public static WorldEnvelope.Builder of() {
     return new Builder();
   }
 
-  public double getLowerLeftLongitude() {
-    return lowerLeftLongitude;
+  public WgsCoordinate lowerLeft() {
+    return lowerLeft;
   }
 
-  public double getLowerLeftLatitude() {
-    return lowerLeftLatitude;
+  public WgsCoordinate upperRight() {
+    return upperRight;
   }
 
-  public double getUpperRightLongitude() {
-    return upperRightLongitude;
+  /**
+   * This is the center of the Envelope including both street vertexes and transit stops
+   * if they exist.
+   */
+  public WgsCoordinate meanCenter() {
+    return meanCenter;
   }
 
-  public double getUpperRightLatitude() {
-    return upperRightLatitude;
+  /**
+   * If transit data exist, then this is the median center of the transit stops. The median
+   * is computed independently for the longitude and latitude.
+   * <p>
+   * If not transit data exist this return `empty`.
+   */
+  public WgsCoordinate center() {
+    return transitMedianCenter().orElse(meanCenter);
   }
 
-  public double centerLatitude() {
-    return centerLatitude;
-  }
-
-  public double centerLongitude() {
-    return centerLongitude;
+  /**
+   * Return the transit median center [if it exist] or the mean center.
+   */
+  public Optional<WgsCoordinate> transitMedianCenter() {
+    return Optional.ofNullable(transitMedianCenter);
   }
 
   @Override
   public String toString() {
     return ToStringBuilder
       .of(WorldEnvelope.class)
-      .addObj("lowerLeft", coordinateToString(lowerLeftLatitude, lowerLeftLongitude))
-      .addObj("upperRight", coordinateToString(upperRightLatitude, upperRightLongitude))
-      .addObj("center", coordinateToString(centerLatitude, centerLongitude))
+      .addObj("lowerLeft", lowerLeft)
+      .addObj("upperRight", upperRight)
+      .addObj("meanCenter", meanCenter)
+      .addObj("transitMedianCenter", transitMedianCenter)
       .toString();
   }
 
-  private static String coordinateToString(double lat, double lon) {
-    return "(" + formatTwoDecimals(lat) + " " + formatTwoDecimals(lon) + ")";
+  private static WgsCoordinate calculateMeanCenter(
+    WgsCoordinate lowerLeft,
+    WgsCoordinate upperRight
+  ) {
+    var llLatitude = lowerLeft.latitude();
+    var llLongitude = lowerLeft.longitude();
+    var urLatitude = upperRight.latitude();
+    var urLongitude = upperRight.longitude();
+
+    double centerLatitude = llLatitude + (urLatitude - llLatitude) / 2.0;
+
+    // Split normally at 180 degrees
+    double centerLongitude = (llLongitude < urLongitude)
+      ? llLongitude + (urLongitude - llLongitude) / 2.0
+      : llLongitude + (360 - llLongitude + urLongitude) / 2.0;
+
+    return new WgsCoordinate(centerLatitude, centerLongitude);
   }
 
   /**
@@ -108,12 +115,68 @@ public class WorldEnvelope implements Serializable {
     private double minLonEast = MIN_NOT_SET;
     private double maxLonEast = MAX_NOT_SET;
 
-    public Builder expandToInclude(Coordinate c) {
-      return this.expandToInclude(c.y, c.x);
+    private WgsCoordinate transitMedianCenter = null;
+
+    public Builder expandToIncludeStreetEntities(double latitude, double longitude) {
+      return this.expandToInclude(latitude, longitude);
     }
 
-    // TODO - Swap args
-    public Builder expandToInclude(double latitude, double longitude) {
+    /**
+     * Calculates the center from median of coordinates of the elements in the given collection.
+     * <p>
+     * This speeds up calculation, but problem is that median needs to have all latitudes/longitudes
+     * in memory, this can become problematic in large installations. It works without a issues on
+     * New York State.
+     */
+    public <T> Builder expandToIncludeTransitEntities(
+      Collection<T> collection,
+      Function<T, Double> latProvider,
+      Function<T, Double> lonProvider
+    ) {
+      if (collection.isEmpty()) {
+        return this;
+      }
+
+      // Expand Envelope
+      for (T it : collection) {
+        expandToInclude(latProvider.apply(it), lonProvider.apply(it));
+      }
+
+      // we need this check because there could be only AreaStops (which don't have vertices)
+      // in the graph
+      var medianCalculator = new MedianCalcForDoubles(collection.size());
+
+      collection.forEach(v -> medianCalculator.add(lonProvider.apply(v)));
+      double lon = medianCalculator.median();
+
+      medianCalculator.reset();
+      collection.forEach(v -> medianCalculator.add(latProvider.apply(v)));
+      double lat = medianCalculator.median();
+
+      this.transitMedianCenter = new WgsCoordinate(lat, lon);
+      return this;
+    }
+
+    public WorldEnvelope build() {
+      if (minLonWest == MIN_NOT_SET) {
+        return new WorldEnvelope(minLonEast, minLat, maxLonEast, maxLat, transitMedianCenter);
+      } else if (minLonEast == MIN_NOT_SET) {
+        return new WorldEnvelope(minLonWest, minLat, maxLonWest, maxLat, transitMedianCenter);
+      } else {
+        double dist0 = minLonEast - minLonWest;
+        double dist180 = 360d - maxLonEast + minLonWest;
+
+        // A small gap between the east and west longitude at 0 degrees implies that the Envelope
+        // should include the 0 degrees longitude(meridian), and be split at 180 degrees.
+        if (dist0 < dist180) {
+          return new WorldEnvelope(maxLonWest, minLat, maxLonEast, maxLat, transitMedianCenter);
+        } else {
+          return new WorldEnvelope(minLonEast, minLat, minLonWest, maxLat, transitMedianCenter);
+        }
+      }
+    }
+
+    private Builder expandToInclude(double latitude, double longitude) {
       minLat = Math.min(minLat, latitude);
       maxLat = Math.max(maxLat, latitude);
 
@@ -125,25 +188,6 @@ public class WorldEnvelope implements Serializable {
         maxLonEast = Math.max(maxLonEast, longitude);
       }
       return this;
-    }
-
-    public WorldEnvelope build() {
-      if (minLonWest == MIN_NOT_SET) {
-        return new WorldEnvelope(minLonEast, minLat, maxLonEast, maxLat);
-      } else if (minLonEast == MIN_NOT_SET) {
-        return new WorldEnvelope(minLonWest, minLat, maxLonWest, maxLat);
-      } else {
-        double dist0 = minLonEast - minLonWest;
-        double dist180 = 360d - maxLonEast + minLonWest;
-
-        // A small gap between the east and west longitude at 0 degrees implies that the Envelope
-        // should include the 0 degrees longitude(meridian), and be split at 180 degrees.
-        if (dist0 < dist180) {
-          return new WorldEnvelope(maxLonWest, minLat, maxLonEast, maxLat);
-        } else {
-          return new WorldEnvelope(minLonEast, minLat, minLonWest, maxLat);
-        }
-      }
     }
   }
 }

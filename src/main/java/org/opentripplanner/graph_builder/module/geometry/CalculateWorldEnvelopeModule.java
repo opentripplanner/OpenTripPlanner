@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -46,14 +45,20 @@ public class CalculateWorldEnvelopeModule implements GraphBuilderModule {
     var e = WorldEnvelope.of();
 
     for (Vertex v : vertices) {
-      e.expandToInclude(v.getCoordinate());
+      var c = v.getCoordinate();
+      e.expandToIncludeStreetEntities(c.y, c.x);
       progressTracker.step(msg -> LOG.info(msg));
     }
-    for (var s : stops) {
-      WgsCoordinate c = s.getCoordinate();
-      e.expandToInclude(c.latitude(), c.longitude());
-      progressTracker.step(msg -> LOG.info(msg));
-    }
+
+    // We need to iterate over the stops several times to compute bounding-box
+    // and median center; Hence the awkward method call.
+    e.expandToIncludeTransitEntities(
+      stops,
+      s -> s.getCoordinate().latitude(),
+      s -> s.getCoordinate().longitude()
+    );
+    progressTracker.steps(stops.size(), msg -> LOG.info(msg));
+
     graph.setEnvelope(e.build());
 
     LOG.info(progressTracker.completeMessage());

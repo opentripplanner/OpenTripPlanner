@@ -1,9 +1,10 @@
 package org.opentripplanner.framework.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
 
 class WorldEnvelopeTest {
 
@@ -16,59 +17,83 @@ class WorldEnvelopeTest {
   private static final int W60 = -60;
   private static final int W170 = -170;
 
-  private static final Coordinate S10E50 = new Coordinate(E50, S10);
-  private static final Coordinate S20E160 = new Coordinate(E160, S20);
-  private static final Coordinate N30W60 = new Coordinate(W60, N30);
-  private static final Coordinate N40W170 = new Coordinate(W170, N40);
-
   private static final WorldEnvelope EAST = WorldEnvelope
     .of()
-    .expandToInclude(S10E50)
-    .expandToInclude(S20E160)
+    .expandToIncludeStreetEntities(S10, E50)
+    .expandToIncludeStreetEntities(S20, E160)
     .build();
   private static final WorldEnvelope WEST = WorldEnvelope
     .of()
-    .expandToInclude(N30W60)
-    .expandToInclude(N40W170)
+    .expandToIncludeStreetEntities(N30, W60)
+    .expandToIncludeStreetEntities(N40, W170)
     .build();
   private static final WorldEnvelope GREENWICH = WorldEnvelope
     .of()
-    .expandToInclude(N30W60)
-    .expandToInclude(S10E50)
+    .expandToIncludeStreetEntities(N30, W60)
+    .expandToIncludeStreetEntities(S10, E50)
     .build();
   private static final WorldEnvelope MERIDIAN_180 = WorldEnvelope
     .of()
-    .expandToInclude(N40W170)
-    .expandToInclude(S20E160)
+    .expandToIncludeStreetEntities(N40, W170)
+    .expandToIncludeStreetEntities(S20, E160)
     .build();
 
   @Test
-  void testToString() {
+  void testEast() {
+    var expectedCenter = new WgsCoordinate(-15d, 105d);
+
+    assertEquals(S20, EAST.lowerLeft().latitude());
+    assertEquals(E50, EAST.lowerLeft().longitude());
+    assertEquals(S10, EAST.upperRight().latitude());
+    assertEquals(E160, EAST.upperRight().longitude());
+    assertEquals(expectedCenter, EAST.meanCenter());
+    assertEquals(expectedCenter, EAST.center());
+    assertTrue(EAST.transitMedianCenter().isEmpty());
+  }
+
+  @Test
+  void transitMedianCenter() {
+    var expectedCenter = new WgsCoordinate(S10, E50);
+
+    var subject = WorldEnvelope
+      .of()
+      .expandToIncludeTransitEntities(
+        List.of(
+          new WgsCoordinate(S10, E50),
+          new WgsCoordinate(S20, E160),
+          new WgsCoordinate(N40, W60)
+        ),
+        WgsCoordinate::latitude,
+        WgsCoordinate::longitude
+      )
+      .build();
+
+    assertTrue(subject.transitMedianCenter().isPresent(), subject.transitMedianCenter().toString());
+    assertEquals(expectedCenter, subject.transitMedianCenter().get());
+    assertEquals(expectedCenter, subject.center());
     assertEquals(
-      "WorldEnvelope{lowerLeft: (-20.0 50.0), upperRight: (-10.0 160.0), center: (-15.0 105.0)}",
-      EAST.toString()
-    );
-    assertEquals(
-      "WorldEnvelope{lowerLeft: (30.0 -170.0), upperRight: (40.0 -60.0), center: (35.0 -115.0)}",
-      WEST.toString()
-    );
-    assertEquals(
-      "WorldEnvelope{lowerLeft: (-10.0 -60.0), upperRight: (30.0 50.0), center: (10.0 -5.0)}",
-      GREENWICH.toString()
-    );
-    assertEquals(
-      "WorldEnvelope{lowerLeft: (-20.0 160.0), upperRight: (40.0 -170.0), center: (10.0 175.0)}",
-      MERIDIAN_180.toString()
+      "WorldEnvelope{lowerLeft: (-20.0, -60.0), upperRight: (40.0, 160.0), meanCenter: (10.0, 50.0), transitMedianCenter: (-10.0, 50.0)}",
+      subject.toString()
     );
   }
 
   @Test
-  void testEast() {
-    assertEquals(S20, EAST.getLowerLeftLatitude());
-    assertEquals(E50, EAST.getLowerLeftLongitude());
-    assertEquals(S10, EAST.getUpperRightLatitude());
-    assertEquals(E160, EAST.getUpperRightLongitude());
-    assertEquals(-15d, EAST.centerLatitude());
-    assertEquals(105d, EAST.centerLongitude());
+  void testToString() {
+    assertEquals(
+      "WorldEnvelope{lowerLeft: (-20.0, 50.0), upperRight: (-10.0, 160.0), meanCenter: (-15.0, 105.0)}",
+      EAST.toString()
+    );
+    assertEquals(
+      "WorldEnvelope{lowerLeft: (30.0, -170.0), upperRight: (40.0, -60.0), meanCenter: (35.0, -115.0)}",
+      WEST.toString()
+    );
+    assertEquals(
+      "WorldEnvelope{lowerLeft: (-10.0, -60.0), upperRight: (30.0, 50.0), meanCenter: (10.0, -5.0)}",
+      GREENWICH.toString()
+    );
+    assertEquals(
+      "WorldEnvelope{lowerLeft: (-20.0, 160.0), upperRight: (40.0, -170.0), meanCenter: (10.0, 175.0)}",
+      MERIDIAN_180.toString()
+    );
   }
 }

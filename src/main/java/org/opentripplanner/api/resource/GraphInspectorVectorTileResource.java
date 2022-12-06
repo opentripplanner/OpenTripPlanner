@@ -96,8 +96,7 @@ public class GraphInspectorVectorTileResource {
         .stream()
         .map(serverContext.transitService()::getFeedInfo)
         .filter(Predicate.not(Objects::isNull))
-        .toList(),
-      serverContext.transitService().getCenter().orElse(null)
+        .toList()
     );
   }
 

@@ -3,10 +3,8 @@ package org.opentripplanner.api.model;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
-import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.model.FeedInfo;
@@ -42,9 +40,8 @@ public class TileJson implements Serializable {
     String layers,
     String ignoreRouterId,
     String path,
-    WorldEnvelope graphEnvelope,
-    Collection<FeedInfo> feedInfos,
-    @Nullable Coordinate transitServiceCenter
+    WorldEnvelope envelope,
+    Collection<FeedInfo> feedInfos
   ) {
     attribution =
       feedInfos
@@ -66,16 +63,19 @@ public class TileJson implements Serializable {
 
     bounds =
       new double[] {
-        graphEnvelope.getLowerLeftLongitude(),
-        graphEnvelope.getLowerLeftLatitude(),
-        graphEnvelope.getUpperRightLongitude(),
-        graphEnvelope.getUpperRightLatitude(),
+        envelope.lowerLeft().longitude(),
+        envelope.lowerLeft().latitude(),
+        envelope.upperRight().longitude(),
+        envelope.upperRight().latitude(),
       };
 
-    if (transitServiceCenter == null) {
-      center = null;
+    // TODO: Should we replace this with a fallback to the mean center
+    //       if median transit center do not exist?
+    if (envelope.transitMedianCenter().isPresent()) {
+      var c = envelope.transitMedianCenter().get();
+      center = new double[] { c.longitude(), c.latitude(), 9 };
     } else {
-      center = new double[] { transitServiceCenter.x, transitServiceCenter.y, 9 };
+      center = null;
     }
   }
 }

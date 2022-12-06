@@ -44,7 +44,7 @@ public class FrameworkArchitectureTest {
   @Test
   void enforceGeometryPackageDependencies() {
     GEOMETRY
-      .dependsOn(GEO_JSON, GEO_TOOLS, GNU_TROVE, JTS_GEOM, OPEN_GIS, LANG, TO_STRING)
+      .dependsOn(GEO_JSON, GEO_TOOLS, GNU_TROVE, JTS_GEOM, OPEN_GIS, LANG, TO_STRING, STATISTICS)
       .verify();
   }
 

@@ -70,7 +70,6 @@ class StopModelTest {
     assertEquals(STOP, m.getStopLocation(ID));
     assertEquals(EXP_STOPS, m.listRegularStops().toString());
     assertEquals(EXP_STOPS, m.listStopLocations().toString());
-    assertEquals(COOR_A, m.stopLocationCenter().orElseThrow());
     assertEquals(STOP, m.stopByIndex(STOP.getIndex()));
     assertEquals(COOR_A, m.getCoordinateById(ID));
     assertFalse(m.hasAreaStops());
@@ -84,7 +83,6 @@ class StopModelTest {
     assertEquals("[AreaStop{F:A Name}]", m.listAreaStops().toString());
     assertEquals("[AreaStop{F:A Name}]", m.listStopLocations().toString());
     assertEquals(STOP_AREA, m.stopByIndex(STOP_AREA.getIndex()));
-    assertEquals(COOR_A, m.stopLocationCenter().orElseThrow());
     assertEquals(COOR_A, m.getCoordinateById(ID));
     assertTrue(m.hasAreaStops());
   }
@@ -95,7 +93,6 @@ class StopModelTest {
     assertEquals("[GroupStop{F:A}]", m.listGroupStops().toString());
     assertEquals("[GroupStop{F:A}]", m.listStopLocations().toString());
     assertEquals(STOP_GROUP, m.stopByIndex(STOP_GROUP.getIndex()));
-    assertEquals(COOR_A, m.stopLocationCenter().orElseThrow());
     assertEquals(COOR_A, m.getCoordinateById(ID));
     assertFalse(m.hasAreaStops());
   }
@@ -109,7 +106,6 @@ class StopModelTest {
     assertEquals(EXP_STOPS, m.findStopOrChildStops(ID).toString());
     assertEquals(EXP_STATIONS, m.listStopLocationGroups().toString());
     assertEquals(COOR_B, m.getCoordinateById(ID));
-    assertTrue(m.stopLocationCenter().isEmpty());
     assertFalse(m.hasAreaStops());
   }
 
@@ -123,7 +119,6 @@ class StopModelTest {
     assertEquals(EXP_STOPS, m.findStopOrChildStops(ID).toString());
     assertEquals(EXP_MM_STATIONS, m.listStopLocationGroups().toString());
     assertEquals(COOR_B, m.getCoordinateById(ID));
-    assertTrue(m.stopLocationCenter().isEmpty());
     assertFalse(m.hasAreaStops());
   }
 
@@ -135,7 +130,6 @@ class StopModelTest {
     assertEquals(EXP_STOPS, m.findStopOrChildStops(ID).toString());
     assertEquals(EXP_GROUP_OF_STATION, m.listStopLocationGroups().toString());
     assertEquals(COOR_B, m.getCoordinateById(ID));
-    assertTrue(m.stopLocationCenter().isEmpty());
     assertFalse(m.hasAreaStops());
   }
 }
