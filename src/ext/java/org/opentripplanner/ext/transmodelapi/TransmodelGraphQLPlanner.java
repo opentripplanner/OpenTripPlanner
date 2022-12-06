@@ -166,7 +166,9 @@ public class TransmodelGraphQLPlanner {
     // callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
     // callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
-    // TODO: 2022-12-01 filters: this is weird
+    // This only maps access, egress, direct & transfer.
+    // Transport modes are now part of filters.
+    // Only in case filters are not present we will use this mapping
     if (GqlUtil.hasArgument(environment, "modes")) {
       ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
       ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
@@ -192,13 +194,7 @@ public class TransmodelGraphQLPlanner {
       mapFilterOldWay(environment, callWith, request);
     }
 
-    if (request.journey().transit().filters().isEmpty()) {
-      request.journey().transit().filters().add(new AllowAllFilter());
-    }
-
-    request.withPreferences(preferences -> {
-      mapPreferences(environment, callWith, preferences);
-    });
+    request.withPreferences(preferences -> mapPreferences(environment, callWith, preferences));
 
     return request;
   }
@@ -212,6 +208,14 @@ public class TransmodelGraphQLPlanner {
     var filter = new FilterRequest();
     var include = filter.getInclude();
     var exclude = filter.getExclude();
+
+    if (
+      !GqlUtil.hasArgument(environment, "modes.transportModes") &&
+      GqlUtil.hasArgument(environment, "whiteListed") &&
+      GqlUtil.hasArgument(environment, "banned")
+    ) {
+      request.journey().transit().setFilters(List.of(new AllowAllFilter()));
+    }
 
     callWith.argument(
       "whiteListed.authorities",
@@ -299,6 +303,8 @@ public class TransmodelGraphQLPlanner {
       }
 
       request.journey().transit().setFilters(filterRequests);
+    } else {
+      request.journey().transit().setFilters(List.of(new AllowAllFilter()));
     }
   }
 

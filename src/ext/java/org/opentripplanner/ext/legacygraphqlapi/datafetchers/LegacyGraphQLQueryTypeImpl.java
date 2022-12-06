@@ -48,6 +48,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.request.filter.AllowAllFilter;
 import org.opentripplanner.routing.api.request.request.filter.FilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -742,37 +743,47 @@ public class LegacyGraphQLQueryTypeImpl
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
 
-      var filterRequest = new FilterRequest();
-      var include = filterRequest.getInclude();
-      var exclude = filterRequest.getExclude();
+      if (!hasArgument(environment, "banned") && !hasArgument(environment, "transportModes")) {
+        request.journey().transit().setFilters(List.of(new AllowAllFilter()));
+      } else {
+        var filterRequest = new FilterRequest();
+        var include = filterRequest.getInclude();
+        var exclude = filterRequest.getExclude();
 
-      callWith.argument("banned.routes", exclude::setRoutesFromString);
-      callWith.argument("banned.agencies", exclude::setAgenciesFromString);
-      callWith.argument("banned.trips", exclude::setTripsFromString);
+        callWith.argument("banned.routes", exclude::setRoutesFromString);
+        callWith.argument("banned.agencies", exclude::setAgenciesFromString);
+        callWith.argument("banned.trips", exclude::setTripsFromString);
 
-      if (hasArgument(environment, "transportModes")) {
-        QualifiedModeSet modes = new QualifiedModeSet("WALK");
+        if (hasArgument(environment, "transportModes")) {
+          QualifiedModeSet modes = new QualifiedModeSet("WALK");
 
-        modes.qModes =
-          environment
-            .<List<Map<String, String>>>getArgument("transportModes")
-            .stream()
-            .map(transportMode ->
-              new QualifiedMode(
-                transportMode.get("mode") +
-                (transportMode.get("qualifier") == null ? "" : "_" + transportMode.get("qualifier"))
+          modes.qModes =
+            environment
+              .<List<Map<String, String>>>getArgument("transportModes")
+              .stream()
+              .map(transportMode ->
+                new QualifiedMode(
+                  transportMode.get("mode") +
+                  (
+                    transportMode.get("qualifier") == null
+                      ? ""
+                      : "_" + transportMode.get("qualifier")
+                  )
+                )
               )
-            )
-            .collect(Collectors.toSet());
+              .collect(Collectors.toSet());
 
-        var requestModes = modes.getRequestModes();
-        request.journey().access().setMode(requestModes.accessMode);
-        request.journey().egress().setMode(requestModes.egressMode);
-        request.journey().direct().setMode(requestModes.directMode);
-        request.journey().transfer().setMode(requestModes.transferMode);
-        include.setTransportModes(
-          modes.getTransitModes().stream().map(MainAndSubMode::new).collect(Collectors.toList())
-        );
+          var requestModes = modes.getRequestModes();
+          request.journey().access().setMode(requestModes.accessMode);
+          request.journey().egress().setMode(requestModes.egressMode);
+          request.journey().direct().setMode(requestModes.directMode);
+          request.journey().transfer().setMode(requestModes.transferMode);
+          include.setTransportModes(
+            modes.getTransitModes().stream().map(MainAndSubMode::new).collect(Collectors.toList())
+          );
+        }
+
+        request.journey().transit().setFilters(List.of(filterRequest));
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {
