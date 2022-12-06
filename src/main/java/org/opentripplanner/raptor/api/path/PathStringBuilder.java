@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.api.path;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
@@ -56,6 +57,13 @@ public class PathStringBuilder {
 
   public PathStringBuilder walk(int duration) {
     return start().append("Walk").duration(duration).end();
+  }
+
+  public PathStringBuilder vehicleRental(String vehicleId, Duration duration) {
+    return start()
+      .append("Vehicle rental %s".formatted(vehicleId))
+      .duration((int) duration.toSeconds())
+      .end();
   }
 
   public PathStringBuilder flex(int duration, int nRides) {

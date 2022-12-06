@@ -7,11 +7,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -84,6 +82,10 @@ class ItineraryResultMapper {
 
       if (leg.isWalkingLeg()) {
         buf.walk((int) leg.getDuration().toSeconds());
+      } else if (
+        leg instanceof StreetLeg streetLeg && streetLeg.getFrom().vehicleRentalPlace != null
+      ) {
+        buf.vehicleRental(streetLeg.getFrom().vehicleRentalPlace.getStationId(), leg.getDuration());
       } else if (leg instanceof TransitLeg transitLeg) {
         buf.transit(
           transitLeg.getMode().name() + " " + leg.getRoute().getShortName(),
@@ -125,19 +127,6 @@ class ItineraryResultMapper {
       }
       if (it.getTo().stop != null) {
         stops.add(it.getTo().stop.getId().toString());
-      }
-      if (it instanceof StreetLeg streetLeg) {
-        var rentalNetwork = streetLeg.getVehicleRentalNetwork();
-        if (rentalNetwork != null) {
-          routes.add(rentalNetwork);
-        }
-
-        Stream
-          .of(streetLeg.getFrom().vehicleRentalPlace, streetLeg.getTo().vehicleRentalPlace)
-          .filter(Objects::nonNull)
-          .forEach(p -> {
-            stops.add(p.getId().toString());
-          });
       }
     }
 

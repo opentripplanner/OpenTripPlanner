@@ -61,7 +61,7 @@
     {
       "type" : "vehicle-rental",
       "sourceType" : "gbfs",
-      "frequencySec" : 3600,
+      "frequencySec" : -1,
       "url" : "https://otp-performance.leonard.io/data/norway/tieroslo/gbfs.json"
     }
   ]
