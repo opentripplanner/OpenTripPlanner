@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.openstreetmap.wayproperty;
 
 import org.opentripplanner.street.model.StreetTraversalPermission;
 

@@ -1,6 +1,6 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.openstreetmap.wayproperty;
 
-import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 
 /**
  * Choose a speed that should be applied to a given segment

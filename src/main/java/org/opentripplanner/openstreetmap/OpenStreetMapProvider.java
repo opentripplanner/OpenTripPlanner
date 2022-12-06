@@ -12,11 +12,11 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.spi.OSMDatabase;
 import org.opentripplanner.openstreetmap.spi.OSMProvider;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.SpeedPicker;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
-import org.opentripplanner.graph_builder.module.osm.specifier.WayTestData;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.wayproperty.SpeedPicker;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
 
 public class DefaultMapperTest {
 

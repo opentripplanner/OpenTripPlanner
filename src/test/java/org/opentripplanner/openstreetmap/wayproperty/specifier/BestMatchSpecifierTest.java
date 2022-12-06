@@ -1,9 +1,6 @@
-package org.opentripplanner.graph_builder.module.osm.specifier;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 class BestMatchSpecifierTest extends SpecifierTest {
 

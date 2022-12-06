@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 /**
  * Interface for populating a {@link WayPropertySet} that determine how OSM streets can be traversed

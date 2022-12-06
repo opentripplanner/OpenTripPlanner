@@ -1,6 +1,6 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.openstreetmap.wayproperty;
 
-import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 
 import java.util.ArrayList;
@@ -13,11 +13,11 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
-import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
 import org.opentripplanner.model.NoteMatcher;
 import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.slf4j.Logger;

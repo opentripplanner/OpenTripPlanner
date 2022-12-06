@@ -1,8 +1,7 @@
-package org.opentripplanner.graph_builder.module.osm.specifier;
+package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.HoustonMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
@@ -15,7 +14,7 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * If you'd use a {@link BestMatchSpecifier} then the likelihood of the long spec matching unwanted
  * ways would be high.
  *
- * @see HoustonMapper
+ * @see org.opentripplanner.graph_builder.module.osm.tagmapping.HoustonMapper
  */
 public class ExactMatchSpecifier implements OsmSpecifier {
 

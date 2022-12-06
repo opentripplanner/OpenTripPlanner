@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm.specifier;
+package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
 import java.util.Arrays;
 import java.util.List;

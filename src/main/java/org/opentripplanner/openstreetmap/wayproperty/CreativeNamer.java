@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.openstreetmap.wayproperty;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.transit.model.basic.I18NString;

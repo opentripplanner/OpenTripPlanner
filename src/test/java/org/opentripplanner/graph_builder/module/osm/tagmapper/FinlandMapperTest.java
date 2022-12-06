@@ -3,9 +3,9 @@ package org.opentripplanner.graph_builder.module.osm.tagmapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.FinlandMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 public class FinlandMapperTest {
 

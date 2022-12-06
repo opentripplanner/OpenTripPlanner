@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
-import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 /**
  * OSM way properties for UK roads. The main differences compared to the default property set are:

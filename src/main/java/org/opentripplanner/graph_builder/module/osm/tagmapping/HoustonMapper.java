@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
-import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.specifier.ExactMatchSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.ExactMatchSpecifier;
 
 /**
  * OSM way properties for the Houston, Texas, USA area.

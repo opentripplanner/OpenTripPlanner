@@ -3,9 +3,9 @@ package org.opentripplanner.graph_builder.module.osm.tagmapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.GermanyMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class GermanyMapperTest {

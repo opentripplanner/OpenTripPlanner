@@ -1,16 +1,16 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.openstreetmap.wayproperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.specifier.ExactMatchSpecifier;
-import org.opentripplanner.graph_builder.module.osm.specifier.WayTestData;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.ExactMatchSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
 
 class WayPropertySetTest {
 

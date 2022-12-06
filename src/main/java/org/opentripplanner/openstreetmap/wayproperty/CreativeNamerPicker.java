@@ -1,6 +1,6 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.openstreetmap.wayproperty;
 
-import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 
 /**
  * Describes how unnamed OSM ways are to be named based on the tags they possess. The CreativeNamer

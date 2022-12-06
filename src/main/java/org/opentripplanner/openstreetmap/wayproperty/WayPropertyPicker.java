@@ -1,6 +1,6 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.openstreetmap.wayproperty;
 
-import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 
 /**
  * Associates an OSMSpecifier with some WayProperties. The WayProperties will be applied an OSM way

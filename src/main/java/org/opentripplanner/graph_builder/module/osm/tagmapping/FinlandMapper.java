@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
-import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
@@ -8,8 +8,8 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import java.util.function.BiFunction;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
