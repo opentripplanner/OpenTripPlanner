@@ -4,10 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
@@ -26,7 +24,6 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
-import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TranslatedString;
@@ -107,30 +104,18 @@ public class VehicleParkingsLayerTest {
         ]
       }
       """;
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      mapper.readTree(config);
-      var tiles = VectorTileConfig.mapVectorTilesParameters(
-        new NodeAdapter(mapper.readTree(config), "vectorTiles"),
-        "vectorTileLayers"
-      );
-      assertEquals(1, tiles.layers().size());
-      VehicleParkingsLayerBuilder builder = new VehicleParkingsLayerBuilder(
-        graph,
-        tiles.layers().get(0),
-        Locale.US
-      );
+    var nodeAdapter = newNodeAdapterForTest(config);
+    var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTileLayers");
+    assertEquals(1, tiles.layers().size());
+    var builder = new VehicleParkingsLayerBuilder(graph, tiles.layers().get(0), Locale.US);
 
-      List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
+    List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
 
-      assertEquals("[POINT (1 2)]", geometries.toString());
-      assertEquals(
+    assertEquals("[POINT (1 2)]", geometries.toString());
+    assertEquals(
         "VehicleParking{name: 'default name', coordinate: (2.0, 1.0)}",
-        geometries.get(0).getUserData().toString()
-      );
-    } catch (JacksonException exception) {
-      fail(exception.toString());
-    }
+      geometries.get(0).getUserData().toString()
+    );
   }
 
   @Test

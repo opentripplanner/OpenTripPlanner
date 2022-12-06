@@ -91,10 +91,7 @@ public class GraphBuilderModules {
       graph,
       issueStore,
       config.getTransitServicePeriod(),
-      config.fareServiceFactory,
-      config.discardMinTransferTimes,
-      config.blockBasedInterlining,
-      config.maxInterlineDistance
+      config.fareServiceFactory
     );
   }
 

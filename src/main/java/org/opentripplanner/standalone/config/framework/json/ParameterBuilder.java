@@ -44,6 +44,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class ParameterBuilder {
 
+  private static final Object UNDEFINED = new Object();
+
   /**
    * The node-info builder is used while parsing a configuration file to "build" information about
    * parameter "under construction". This meta information is used later, for example to generate
@@ -63,7 +65,7 @@ public class ParameterBuilder {
    * parameters, and the default value is just a fallback. In these cases we temporarily need to
    * keep the doc-default-value.
    */
-  private Object docDefaultValue = null;
+  private Object docDefaultValue = UNDEFINED;
 
   public ParameterBuilder(NodeAdapter target, String paramName) {
     this.target = target;
@@ -518,7 +520,7 @@ public class ParameterBuilder {
   }
 
   private String getDocDefaultValue(Object realDefaultValue) {
-    Object value = docDefaultValue == null ? realDefaultValue : docDefaultValue;
+    Object value = docDefaultValue == UNDEFINED ? realDefaultValue : docDefaultValue;
 
     if (value == null) {
       return null;
