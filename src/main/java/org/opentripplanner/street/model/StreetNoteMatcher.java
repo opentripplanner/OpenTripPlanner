@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.street.model;
 
 import java.io.Serializable;
 import org.opentripplanner.street.search.state.State;
@@ -9,6 +9,6 @@ import org.opentripplanner.street.search.state.State;
  *
  * @author laurent
  */
-public interface NoteMatcher extends Serializable {
+public interface StreetNoteMatcher extends Serializable {
   boolean matches(State state);
 }

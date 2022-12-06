@@ -2,8 +2,8 @@ package org.opentripplanner.updater.street_note;
 
 import java.util.Date;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.StreetNote;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 /**

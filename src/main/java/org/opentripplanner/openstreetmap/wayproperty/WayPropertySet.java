@@ -13,11 +13,11 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.model.NoteMatcher;
-import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
+import org.opentripplanner.street.model.StreetNoteAndMatcher;
+import org.opentripplanner.street.model.StreetNoteMatcher;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.slf4j.Logger;
@@ -355,7 +355,7 @@ public class WayPropertySet {
     addCreativeNamer(new BestMatchSpecifier(spec), namer);
   }
 
-  public void createNotes(String spec, String patternKey, NoteMatcher matcher) {
+  public void createNotes(String spec, String patternKey, StreetNoteMatcher matcher) {
     // TODO: notes aren't localized
     NoteProperties properties = new NoteProperties(patternKey, matcher);
     addNote(new BestMatchSpecifier(spec), properties);

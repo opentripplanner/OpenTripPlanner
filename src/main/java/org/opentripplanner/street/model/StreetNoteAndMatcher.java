@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.street.model;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -13,14 +13,14 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 public class StreetNoteAndMatcher implements Serializable {
 
   private final StreetNote note;
-  private final NoteMatcher matcher;
+  private final StreetNoteMatcher matcher;
 
-  public StreetNoteAndMatcher(StreetNote note, NoteMatcher matcher) {
+  public StreetNoteAndMatcher(StreetNote note, StreetNoteMatcher matcher) {
     this.matcher = matcher;
     this.note = note;
   }
 
-  public NoteMatcher matcher() {
+  public StreetNoteMatcher matcher() {
     return matcher;
   }
 

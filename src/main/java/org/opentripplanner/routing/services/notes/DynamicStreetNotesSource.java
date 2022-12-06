@@ -3,7 +3,7 @@ package org.opentripplanner.routing.services.notes;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import java.util.Set;
-import org.opentripplanner.model.StreetNoteAndMatcher;
+import org.opentripplanner.street.model.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
 
