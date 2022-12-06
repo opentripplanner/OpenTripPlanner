@@ -21,6 +21,7 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.index.StreetIndex;
@@ -36,8 +37,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.util.ElevationUtils;
-import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -366,23 +365,14 @@ public class Graph implements Serializable {
     this.envelope.expandToInclude(x, y);
   }
 
-  public void initEllipsoidToGeoidDifference() {
-    try {
-      WorldEnvelope env = getEnvelope();
-      double lat = (env.getLowerLeftLatitude() + env.getUpperRightLatitude()) / 2;
-      double lon = (env.getLowerLeftLongitude() + env.getUpperRightLongitude()) / 2;
-      this.ellipsoidToGeoidDifference = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
-      LOG.info(
-        "Computed ellipsoid/geoid offset at (" +
-        lat +
-        ", " +
-        lon +
-        ") as " +
-        this.ellipsoidToGeoidDifference
-      );
-    } catch (Exception e) {
-      LOG.error("Error computing ellipsoid/geoid difference");
-    }
+  public void initEllipsoidToGeoidDifference(double value, double lat, double lon) {
+    this.ellipsoidToGeoidDifference = value;
+    LOG.info(
+      "Computed ellipsoid/geoid offset at ({}, {}) as {}",
+      lat,
+      lon,
+      this.ellipsoidToGeoidDifference
+    );
   }
 
   public WorldEnvelope getEnvelope() {

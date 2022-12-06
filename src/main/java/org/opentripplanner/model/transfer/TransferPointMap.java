@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -19,22 +18,22 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 class TransferPointMap<E> {
 
-  private final Map<T2<Trip, Integer>, E> tripMap = new HashMap<>();
-  private final Map<T2<Route, StopLocation>, E> routeStopMap = new HashMap<>();
-  private final Map<T2<Route, Station>, E> routeStationMap = new HashMap<>();
+  private final Map<TripKey, E> tripMap = new HashMap<>();
+  private final Map<RouteStopKey, E> routeStopMap = new HashMap<>();
+  private final Map<RouteStationKey, E> routeStationMap = new HashMap<>();
   private final Map<StopLocation, E> stopMap = new HashMap<>();
   private final Map<Station, E> stationMap = new HashMap<>();
 
   void put(TransferPoint point, E e) {
     if (point.isTripTransferPoint()) {
       var tp = point.asTripTransferPoint();
-      tripMap.put(tripKey(tp.getTrip(), tp.getStopPositionInPattern()), e);
+      tripMap.put(new TripKey(tp.getTrip(), tp.getStopPositionInPattern()), e);
     } else if (point.isRouteStopTransferPoint()) {
       var rp = point.asRouteStopTransferPoint();
-      routeStopMap.put(routeStopKey(rp.getRoute(), rp.getStop()), e);
+      routeStopMap.put(new RouteStopKey(rp.getRoute(), rp.getStop()), e);
     } else if (point.isRouteStationTransferPoint()) {
       var rp = point.asRouteStationTransferPoint();
-      routeStationMap.put(routeStationKey(rp.getRoute(), rp.getStation()), e);
+      routeStationMap.put(new RouteStationKey(rp.getRoute(), rp.getStation()), e);
     } else if (point.isStopTransferPoint()) {
       stopMap.put(point.asStopTransferPoint().getStop(), e);
     } else if (point.isStationTransferPoint()) {
@@ -48,19 +47,19 @@ class TransferPointMap<E> {
     if (point.isTripTransferPoint()) {
       var tp = point.asTripTransferPoint();
       return tripMap.computeIfAbsent(
-        tripKey(tp.getTrip(), tp.getStopPositionInPattern()),
+        new TripKey(tp.getTrip(), tp.getStopPositionInPattern()),
         k -> creator.get()
       );
     } else if (point.isRouteStopTransferPoint()) {
       var rp = point.asRouteStopTransferPoint();
       return routeStopMap.computeIfAbsent(
-        routeStopKey(rp.getRoute(), rp.getStop()),
+        new RouteStopKey(rp.getRoute(), rp.getStop()),
         k -> creator.get()
       );
     } else if (point.isRouteStationTransferPoint()) {
       var rp = point.asRouteStationTransferPoint();
       return routeStationMap.computeIfAbsent(
-        routeStationKey(rp.getRoute(), rp.getStation()),
+        new RouteStationKey(rp.getRoute(), rp.getStation()),
         k -> creator.get()
       );
     } else if (point.isStopTransferPoint()) {
@@ -79,9 +78,9 @@ class TransferPointMap<E> {
   List<E> get(Trip trip, StopLocation stop, int stopPointInPattern) {
     return Stream
       .of(
-        tripMap.get(tripKey(trip, stopPointInPattern)),
-        routeStopMap.get(routeStopKey(trip.getRoute(), stop)),
-        routeStationMap.get(routeStationKey(trip.getRoute(), stop.getParentStation())),
+        tripMap.get(new TripKey(trip, stopPointInPattern)),
+        routeStopMap.get(new RouteStopKey(trip.getRoute(), stop)),
+        routeStationMap.get(new RouteStationKey(trip.getRoute(), stop.getParentStation())),
         stopMap.get(stop),
         stationMap.get(stop.getParentStation())
       )
@@ -89,15 +88,9 @@ class TransferPointMap<E> {
       .collect(Collectors.toList());
   }
 
-  private static T2<Trip, Integer> tripKey(Trip trip, int stopPositionInPattern) {
-    return new T2<>(trip, stopPositionInPattern);
-  }
+  private record TripKey(Trip trip, int stopPositionInPattern) {}
 
-  private static T2<Route, StopLocation> routeStopKey(Route route, StopLocation stop) {
-    return new T2<>(route, stop);
-  }
+  private record RouteStopKey(Route route, StopLocation stop) {}
 
-  private static T2<Route, Station> routeStationKey(Route route, Station station) {
-    return new T2<>(route, station);
-  }
+  private record RouteStationKey(Route route, Station station) {}
 }

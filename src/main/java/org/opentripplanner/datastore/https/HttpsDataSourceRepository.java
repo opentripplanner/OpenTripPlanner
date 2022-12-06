@@ -10,7 +10,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.base.DataSourceRepository;
-import org.opentripplanner.datastore.base.ZipStreamDataSourceDecorator;
+import org.opentripplanner.datastore.file.ZipStreamDataSourceDecorator;
 import org.opentripplanner.framework.io.HttpUtils;
 
 /**

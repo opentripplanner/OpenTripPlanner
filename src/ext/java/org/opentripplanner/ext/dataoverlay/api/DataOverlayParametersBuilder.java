@@ -6,7 +6,6 @@ import static org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters.reso
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.common.model.T2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +16,7 @@ public class DataOverlayParametersBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(DataOverlayParameters.class);
 
-  private final Map<T2<ParameterName, ParameterType>, Double> values = new HashMap<>();
+  private final Map<Parameter, Double> values = new HashMap<>();
 
   /**
    * Parse the input {@code params} and create a new {@link DataOverlayParameters} instance. All
@@ -50,10 +49,10 @@ public class DataOverlayParametersBuilder {
   }
 
   public DataOverlayParametersBuilder add(ParameterName name, ParameterType type, Double value) {
-    return add(new T2<>(name, type), value);
+    return add(new Parameter(name, type), value);
   }
 
-  private DataOverlayParametersBuilder add(T2<ParameterName, ParameterType> param, Double value) {
+  private DataOverlayParametersBuilder add(Parameter param, Double value) {
     if (param != null) {
       values.put(param, value);
     }

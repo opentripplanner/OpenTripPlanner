@@ -32,6 +32,7 @@ import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
@@ -51,7 +52,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

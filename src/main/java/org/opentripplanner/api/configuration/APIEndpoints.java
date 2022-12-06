@@ -1,17 +1,17 @@
 package org.opentripplanner.api.configuration;
 
-import static org.opentripplanner.util.OTPFeature.APIBikeRental;
-import static org.opentripplanner.util.OTPFeature.APIGraphInspectorTile;
-import static org.opentripplanner.util.OTPFeature.APIServerInfo;
-import static org.opentripplanner.util.OTPFeature.APIUpdaterStatus;
-import static org.opentripplanner.util.OTPFeature.ActuatorAPI;
-import static org.opentripplanner.util.OTPFeature.ReportApi;
-import static org.opentripplanner.util.OTPFeature.SandboxAPIGeocoder;
-import static org.opentripplanner.util.OTPFeature.SandboxAPILegacyGraphQLApi;
-import static org.opentripplanner.util.OTPFeature.SandboxAPIMapboxVectorTilesApi;
-import static org.opentripplanner.util.OTPFeature.SandboxAPIParkAndRideApi;
-import static org.opentripplanner.util.OTPFeature.SandboxAPITransmodelApi;
-import static org.opentripplanner.util.OTPFeature.SandboxAPITravelTime;
+import static org.opentripplanner.framework.application.OTPFeature.APIBikeRental;
+import static org.opentripplanner.framework.application.OTPFeature.APIGraphInspectorTile;
+import static org.opentripplanner.framework.application.OTPFeature.APIServerInfo;
+import static org.opentripplanner.framework.application.OTPFeature.APIUpdaterStatus;
+import static org.opentripplanner.framework.application.OTPFeature.ActuatorAPI;
+import static org.opentripplanner.framework.application.OTPFeature.ReportApi;
+import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIGeocoder;
+import static org.opentripplanner.framework.application.OTPFeature.SandboxAPILegacyGraphQLApi;
+import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIMapboxVectorTilesApi;
+import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIParkAndRideApi;
+import static org.opentripplanner.framework.application.OTPFeature.SandboxAPITransmodelApi;
+import static org.opentripplanner.framework.application.OTPFeature.SandboxAPITravelTime;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
+import org.opentripplanner.api.resource.GraphInspectorVectorTileResource;
 import org.opentripplanner.api.resource.PlannerResource;
 import org.opentripplanner.api.resource.Routers;
 import org.opentripplanner.api.resource.ServerInfo;
@@ -31,8 +32,8 @@ import org.opentripplanner.ext.reportapi.resource.ReportResource;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.ext.traveltime.TravelTimeResource;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.index.IndexAPI;
-import org.opentripplanner.util.OTPFeature;
 
 /**
  * Configure API resource endpoints.
@@ -52,6 +53,7 @@ public class APIEndpoints {
     addIfEnabled(APIBikeRental, BikeRental.class);
     addIfEnabled(APIServerInfo, ServerInfo.class);
     addIfEnabled(APIGraphInspectorTile, GraphInspectorTileResource.class);
+    addIfEnabled(APIGraphInspectorTile, GraphInspectorVectorTileResource.class);
     addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
 
     // Sandbox extension APIs

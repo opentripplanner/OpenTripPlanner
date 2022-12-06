@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -80,7 +79,6 @@ public class PruneNoThruIslandsTest {
         Set.of(),
         graph,
         DataImportIssueStore.NOOP,
-        new DefaultMapper(),
         false
       );
       osmModule.customNamer =

@@ -16,7 +16,6 @@ import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.logging.ProgressTracker;
@@ -28,14 +27,13 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
-import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -80,7 +78,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private final List<OpenStreetMapProvider> providers;
   private final Set<String> boardingAreaRefTags;
   private final DataImportIssueStore issueStore;
-  private final OsmTagMapper osmTagMapper;
   private final Graph graph;
 
   private final boolean areaVisibility;
@@ -116,14 +113,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Set<String> boardingAreaRefTags,
     Graph graph,
     DataImportIssueStore issueStore,
-    OsmTagMapper osmTagMapper,
     boolean areaVisibility
   ) {
     this.providers = List.copyOf(providers);
     this.boardingAreaRefTags = boardingAreaRefTags;
     this.graph = graph;
     this.issueStore = issueStore;
-    this.osmTagMapper = osmTagMapper;
     this.areaVisibility = areaVisibility;
   }
 
@@ -134,14 +129,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Graph graph,
     DataImportIssueStore issueStore
   ) {
-    this(
-      List.copyOf(providers),
-      boardingAreaRefTags,
-      graph,
-      issueStore,
-      config.osmDefaults.osmOsmTagMapper,
-      config.areaVisibility
-    );
+    this(List.copyOf(providers), boardingAreaRefTags, graph, issueStore, config.areaVisibility);
     this.customNamer = config.customNamer;
     this.platformEntriesLinking = config.platformEntriesLinking;
     this.staticBikeParkAndRide = config.staticBikeParkAndRide;
@@ -157,11 +145,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
       LOG.info("Gathering OSM from provider: {}", provider);
+      LOG.info(
+        "Using OSM way configuration from {}.",
+        provider.getOsmTagMapper().getClass().getSimpleName()
+      );
       provider.readOSM(osmdb);
     }
     osmdb.postLoad();
-
-    LOG.info("Using OSM way configuration from {}.", osmTagMapper.getClass().getSimpleName());
 
     LOG.info("Building street graph from OSM");
     handler.buildGraph();
@@ -287,10 +277,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     ) {
       OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
 
-      Set<T2<StreetNote, NoteMatcher>> notes = way
-        .getOsmProvider()
-        .getWayPropertySet()
-        .getNoteForWay(way);
+      Set<StreetNoteAndMatcher> notes = way.getOsmProvider().getWayPropertySet().getNoteForWay(way);
+
       boolean motorVehicleNoThrough = tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(
         way
       );
@@ -309,11 +297,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           bestWalkSafety = (float) walkSafety;
         }
         if (notes != null) {
-          for (T2<StreetNote, NoteMatcher> note : notes) graph.streetNotesService.addStaticNote(
-            street,
-            note.first,
-            note.second
-          );
+          for (var it : notes) {
+            graph.streetNotesService.addStaticNote(street, it.note(), it.matcher());
+          }
         }
         street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
         street.setBicycleNoThruTraffic(bicycleNoThrough);
@@ -332,11 +318,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
         backStreet.setWalkSafetyFactor((float) walkSafety);
         if (notes != null) {
-          for (T2<StreetNote, NoteMatcher> note : notes) graph.streetNotesService.addStaticNote(
-            backStreet,
-            note.first,
-            note.second
-          );
+          for (var it : notes) {
+            graph.streetNotesService.addStaticNote(backStreet, it.note(), it.matcher());
+          }
         }
         backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
         backStreet.setBicycleNoThruTraffic(bicycleNoThrough);

@@ -87,6 +87,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
 
         // add stops layer
         this.stopsLayer = new otp.layers.StopsLayer(this);
+        this.areaStopsLayer = new otp.layers.AreaStopsLayer(this);
     },
 
     routesLoaded : function() {

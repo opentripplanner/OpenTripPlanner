@@ -11,11 +11,11 @@ import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.GoogleStorageDSRepository;
+import org.opentripplanner.datastore.api.OtpBaseDirectory;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.FileDataSourceRepository;
 import org.opentripplanner.datastore.https.HttpsDataSourceRepository;
-import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
 
 /**
  * This is the global access point to create a data store and create datasource objects(tests). It

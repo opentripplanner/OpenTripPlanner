@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
@@ -26,6 +25,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -35,7 +35,7 @@ public class FlexRouter {
 
   private final Graph graph;
   private final TransitService transitService;
-  private final FlexParameters config;
+  private final FlexParameters parameters;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
   private final FlexIndex flexIndex;
@@ -57,9 +57,10 @@ public class FlexRouter {
   public FlexRouter(
     Graph graph,
     TransitService transitService,
-    FlexParameters config,
+    FlexConfig config,
     Instant searchInstant,
     boolean arriveBy,
+    double walkSpeed,
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     Collection<NearbyStop> streetAccesses,
@@ -67,7 +68,7 @@ public class FlexRouter {
   ) {
     this.graph = graph;
     this.transitService = transitService;
-    this.config = config;
+    this.parameters = new FlexParameters((config.maxTransferSeconds * walkSpeed));
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
@@ -168,14 +169,21 @@ public class FlexRouter {
     this.flexAccessTemplates =
       getClosestFlexTrips(streetAccesses, true)
         // For each date the router has data for
-        .flatMap(t2 ->
+        .flatMap(it ->
           Arrays
             .stream(dates)
             // Discard if service is not running on date
-            .filter(date -> date.isFlexTripRunning(t2.second, this.transitService))
+            .filter(date -> date.isFlexTripRunning(it.flexTrip(), this.transitService))
             // Create templates from trip, boarding at the nearbyStop
             .flatMap(date ->
-              t2.second.getFlexAccessTemplates(t2.first, date, accessFlexPathCalculator, config)
+              it
+                .flexTrip()
+                .getFlexAccessTemplates(
+                  it.accessEgress(),
+                  date,
+                  accessFlexPathCalculator,
+                  parameters
+                )
             )
         )
         .collect(Collectors.toList());
@@ -190,25 +198,32 @@ public class FlexRouter {
     this.flexEgressTemplates =
       getClosestFlexTrips(streetEgresses, false)
         // For each date the router has data for
-        .flatMap(t2 ->
+        .flatMap(it ->
           Arrays
             .stream(dates)
             // Discard if service is not running on date
-            .filter(date -> date.isFlexTripRunning(t2.second, this.transitService))
+            .filter(date -> date.isFlexTripRunning(it.flexTrip(), this.transitService))
             // Create templates from trip, alighting at the nearbyStop
             .flatMap(date ->
-              t2.second.getFlexEgressTemplates(t2.first, date, egressFlexPathCalculator, config)
+              it
+                .flexTrip()
+                .getFlexEgressTemplates(
+                  it.accessEgress(),
+                  date,
+                  egressFlexPathCalculator,
+                  parameters
+                )
             )
         )
         .collect(Collectors.toList());
   }
 
-  private Stream<T2<NearbyStop, FlexTrip<?, ?>>> getClosestFlexTrips(
+  private Stream<AccessEgressAndNearbyStop> getClosestFlexTrips(
     Collection<NearbyStop> nearbyStops,
     boolean pickup
   ) {
     // Find all trips reachable from the nearbyStops
-    Stream<T2<NearbyStop, FlexTrip<?, ?>>> flexTripsReachableFromNearbyStops = nearbyStops
+    Stream<AccessEgressAndNearbyStop> flexTripsReachableFromNearbyStops = nearbyStops
       .stream()
       .flatMap(accessEgress ->
         flexIndex
@@ -219,20 +234,24 @@ public class FlexRouter {
               ? flexTrip.isBoardingPossible(accessEgress)
               : flexTrip.isAlightingPossible(accessEgress)
           )
-          .map(flexTrip -> new T2<>(accessEgress, flexTrip))
+          .map(flexTrip -> new AccessEgressAndNearbyStop(accessEgress, flexTrip))
       );
 
     // Group all (NearbyStop, FlexTrip) tuples by flexTrip
-    Collection<List<T2<NearbyStop, FlexTrip<?, ?>>>> groupedReachableFlexTrips = flexTripsReachableFromNearbyStops
-      .collect(Collectors.groupingBy(t2 -> t2.second))
+    Collection<List<AccessEgressAndNearbyStop>> groupedReachableFlexTrips = flexTripsReachableFromNearbyStops
+      .collect(Collectors.groupingBy(AccessEgressAndNearbyStop::flexTrip))
       .values();
 
     // Get the tuple with least walking time from each group
     return groupedReachableFlexTrips
       .stream()
       .map(t2s ->
-        t2s.stream().min(Comparator.comparingLong(t2 -> t2.first.state.getElapsedTimeSeconds()))
+        t2s
+          .stream()
+          .min(Comparator.comparingLong(t2 -> t2.accessEgress().state.getElapsedTimeSeconds()))
       )
       .flatMap(Optional::stream);
   }
+
+  private record AccessEgressAndNearbyStop(NearbyStop accessEgress, FlexTrip<?, ?> flexTrip) {}
 }

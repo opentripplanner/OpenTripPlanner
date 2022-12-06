@@ -1,0 +1,125 @@
+{
+  "transitModelTimeZone": "America/Los_Angeles",
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Community_Transit-20221020T085912Z.gtfs.zip",
+      "feedId": "commtrans"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Everett_Transit-20221022T085914Z.gtfs.zip",
+      "feedId": "everett"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Homage_Senior_Services-20221013T085917Z.gtfs.zip",
+      "feedId": "homage"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Island_Transit-20221013T085915Z.gtfs.zip",
+      "feedId": "island-transit"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/King_County_Metro-20221022T085912Z.gtfs.zip",
+      "feedId": "kcm"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Kitsap_Transit-20221021T090015Z.gtfs.zip",
+      "feedId": "kitsap"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Muckleshoot_Indian_Tribe-20221012T214902Z.gtfs.zip",
+      "feedId": "muckleshoot"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Pierce_County_Ferries-20221012T215215Z.gtfs.zip",
+      "feedId": "pierce-ferries"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Pierce_County_Human_Services-20221021T085916Z.gtfs.zip",
+      "feedId": "pierce-human-services"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Pierce_County_Human_Services_Flex-20221012T215555Z.gtfs.zip",
+      "feedId": "pierce-flex"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Pierce_Transit-20221022T085914Z.gtfs.zip",
+      "feedId": "pierce-transit"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Puget_Sound_Educational_Service_District-20221012T215720Z.gtfs.zip",
+      "feedId": "pudget-sound-educational"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Seattle_Childrens_Hospital-20221019T085918Z.gtfs.zip",
+      "feedId": "childrens-hospital"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Seattle_Monorail-20221019T085918Z.gtfs.zip",
+      "feedId": "monorail"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Skagit_Transit-20221012T212605Z.gtfs.zip",
+      "feedId": "skagit"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Snoqualmie_Valley_Transportation-20221012T221032Z.gtfs.zip",
+      "feedId": "snoqualmie"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Snoqualmie_Valley_Transportation_Flex-20221012T221125Z.gtfs.zip",
+      "feedId": "snoqualmie-flex"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Solid_Ground-20221012T221409Z.gtfs.zip",
+      "feedId": "solid-ground"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Sound_Generations-20221012T221622Z.gtfs.zip",
+      "feedId": "sound-generations"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Sound_Transit-20221022T085914Z.gtfs.zip",
+      "feedId": "sound-transit"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/WA_State_Ferry-20221024T085913Z.gtfs.zip",
+      "feedId": "state-ferry"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/WSDOT_Public_Transportation-20221012T213935Z.gtfs.zip",
+      "feedId": "wsdot"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/washington-state/Whatcom_Transportation_Authority-20221012T213144Z.gtfs.zip",
+      "feedId": "whatcom"
+    }
+  ],
+  "osm": [
+    {
+      "source": "https://otp-performance.leonard.io/data/washington-state/nw-washington-state-2022-12-01.osm.pbf"
+    }
+  ]
+}
