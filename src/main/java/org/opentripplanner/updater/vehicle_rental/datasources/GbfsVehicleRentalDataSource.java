@@ -12,15 +12,16 @@ import org.entur.gbfs.v2_2.station_status.GBFSStation;
 import org.entur.gbfs.v2_2.station_status.GBFSStationStatus;
 import org.entur.gbfs.v2_2.system_information.GBFSSystemInformation;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
+import org.entur.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.UnsupportedGeometryException;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
-import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by demory on 2017-03-14.
@@ -30,9 +31,7 @@ import org.slf4j.LoggerFactory;
  * VehicleRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be
  * used.
  */
-class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
-
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleRentalDataSource.class);
+class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
 
   private final String url;
 
@@ -118,7 +117,7 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
           .map(stationInformationMapper::mapStationInformation)
           .filter(Objects::nonNull)
           .peek(stationStatusMapper::fillStationStatus)
-          .collect(Collectors.toList())
+          .toList()
       );
     }
 
@@ -137,7 +136,7 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
             .stream()
             .map(freeVehicleStatusMapper::mapFreeVehicleStatus)
             .filter(Objects::nonNull)
-            .collect(Collectors.toList())
+            .toList()
         );
       }
     }
@@ -161,5 +160,17 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
         allowKeepingRentedVehicleAtDestination
       )
       .toString();
+  }
+
+  @Override
+  public List<Geometry> getGeofencingZones() {
+    var zones = loader.getFeed(GBFSGeofencingZones.class);
+    return zones.getData().getGeofencingZones().getFeatures().stream().map(f -> {
+      try {
+        return GeometryUtils.convertGeoJsonToJtsGeometry(f.getGeometry());
+      } catch (UnsupportedGeometryException e) {
+        throw new RuntimeException(e);
+      }
+    }).toList();
   }
 }

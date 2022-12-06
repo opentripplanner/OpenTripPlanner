@@ -63,6 +63,7 @@ public class StreetEdge
   private static final int WALK_NOTHRUTRAFFIC = 8;
   private static final int CLASS_LINK = 9;
   private StreetEdgeCostExtension costExtension;
+  private StreetEdgeTraversalExtension traversalExtension;
   /** back, roundabout, stairs, ... */
   private short flags;
 
@@ -387,6 +388,10 @@ public class StreetEdge
   public State traverse(State s0) {
     final StateEditor editor;
 
+    if(traversalExtension != null && traversalExtension.isBanned(s0)) {
+      return null;
+    }
+
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
     if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
@@ -644,6 +649,9 @@ public class StreetEdge
 
   public void setCostExtension(StreetEdgeCostExtension costExtension) {
     this.costExtension = costExtension;
+  }
+  public void setTraversalExtension(StreetEdgeTraversalExtension ext) {
+    this.traversalExtension = ext;
   }
 
   /**

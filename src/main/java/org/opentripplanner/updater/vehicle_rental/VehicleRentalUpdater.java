@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
@@ -17,6 +18,8 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeTraversalExtension;
 import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
 import org.opentripplanner.street.model.edge.VehicleRentalEdge;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
@@ -24,11 +27,11 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.UpdaterConstructionException;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,17 +42,17 @@ import org.slf4j.LoggerFactory;
 public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
-  private final DataSource<VehicleRentalPlace> source;
+  private final VehicleRentalDatasource source;
   private WriteToGraphCallback saveResultOnGraph;
   Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
   Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
-  private VertexLinker linker;
+  private final VertexLinker linker;
 
-  private VehicleRentalService service;
+  private final VehicleRentalService service;
 
   public VehicleRentalUpdater(
     VehicleRentalUpdaterParameters parameters,
-    DataSource<VehicleRentalPlace> source,
+    VehicleRentalDatasource source,
     VertexLinker vertexLinker,
     VehicleRentalService vehicleRentalStationService
   ) throws IllegalArgumentException {
@@ -106,10 +109,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       return;
     }
     List<VehicleRentalPlace> stations = source.getUpdates();
+    var geofencingZones = source.getGeofencingZones();
 
     // Create graph writer runnable to apply these stations to the graph
     VehicleRentalGraphWriterRunnable graphWriterRunnable = new VehicleRentalGraphWriterRunnable(
-      stations
+      stations,
+      geofencingZones
     );
     saveResultOnGraph.execute(graphWriterRunnable);
   }
@@ -117,9 +122,14 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {
 
     private final List<VehicleRentalPlace> stations;
+    private final List<Geometry> geofencingZones;
 
-    public VehicleRentalGraphWriterRunnable(List<VehicleRentalPlace> stations) {
+    public VehicleRentalGraphWriterRunnable(
+      List<VehicleRentalPlace> stations,
+      List<Geometry> geofencingZones
+    ) {
       this.stations = stations;
+      this.geofencingZones = geofencingZones;
     }
 
     @Override
@@ -176,6 +186,16 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         verticesByStation.remove(station);
         tempEdgesByStation.get(station).disposeEdges();
         tempEdgesByStation.remove(station);
+      }
+      for (Geometry zone : geofencingZones) {
+        var candidates = graph.getStreetIndex().getEdgesForEnvelope(zone.getEnvelopeInternal());
+        candidates.forEach(e -> {
+          if (e instanceof StreetEdge streetEdge && e.getGeometry().intersects(zone)) {
+            streetEdge.setTraversalExtension(
+              new StreetEdgeTraversalExtension.BanRentalNetwork("tieroslo")
+            );
+          }
+        });
       }
     }
   }
