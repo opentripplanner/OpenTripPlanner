@@ -1,4 +1,4 @@
-package org.opentripplanner.openstreetmap.model;
+package org.opentripplanner.openstreetmap.spi;
 
 import java.time.ZoneId;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
