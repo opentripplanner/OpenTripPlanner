@@ -113,7 +113,7 @@ public class VehicleParkingsLayerTest {
 
     assertEquals("[POINT (1 2)]", geometries.toString());
     assertEquals(
-        "VehicleParking{name: 'default name', coordinate: (2.0, 1.0)}",
+      "VehicleParking{name: 'default name', coordinate: (2.0, 1.0)}",
       geometries.get(0).getUserData().toString()
     );
   }
