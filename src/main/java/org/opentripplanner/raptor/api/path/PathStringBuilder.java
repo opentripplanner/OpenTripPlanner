@@ -61,7 +61,9 @@ public class PathStringBuilder {
 
   public PathStringBuilder vehicleRental(String vehicleId, Duration duration) {
     return start()
-      .append("Vehicle rental %s".formatted(vehicleId))
+      .start()
+      .append(" ~ ")
+      .append("Vehicle rent %s".formatted(vehicleId))
       .duration((int) duration.toSeconds())
       .end();
   }
