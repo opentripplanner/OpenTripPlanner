@@ -6,12 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class VehicleParkingHelperTest {

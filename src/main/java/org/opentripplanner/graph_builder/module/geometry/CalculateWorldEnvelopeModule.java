@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

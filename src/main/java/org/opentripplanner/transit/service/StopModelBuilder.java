@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.service;
 
 import org.opentripplanner.framework.collection.CollectionsView;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.statistics.MedianCalcForDoubles;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupOfStations;

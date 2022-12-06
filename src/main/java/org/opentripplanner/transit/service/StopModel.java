@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.framework.collection.CollectionsView;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupOfStations;

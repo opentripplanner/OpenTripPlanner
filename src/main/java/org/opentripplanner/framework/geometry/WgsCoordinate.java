@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.basic;
+package org.opentripplanner.framework.geometry;
 
 import java.io.Serializable;
 import java.util.Collection;

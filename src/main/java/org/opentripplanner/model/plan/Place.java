@@ -1,5 +1,6 @@
 package org.opentripplanner.model.plan;
 
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -10,7 +11,6 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 

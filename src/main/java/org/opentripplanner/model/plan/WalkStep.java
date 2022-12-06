@@ -5,12 +5,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:

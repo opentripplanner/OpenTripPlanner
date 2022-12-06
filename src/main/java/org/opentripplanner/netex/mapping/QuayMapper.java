@@ -2,13 +2,13 @@ package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
