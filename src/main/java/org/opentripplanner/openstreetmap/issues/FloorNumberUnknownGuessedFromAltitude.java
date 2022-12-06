@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.issues;
+package org.opentripplanner.openstreetmap.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 
