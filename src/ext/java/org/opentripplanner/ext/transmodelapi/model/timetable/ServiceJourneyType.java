@@ -21,7 +21,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.TripTimesShortHelper;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -305,7 +305,7 @@ public class ServiceJourneyType {
               return null;
             }
 
-            return PolylineEncoder.encodeGeometry(geometry);
+            return EncodedPolyline.encode(geometry);
           })
           .build()
       )

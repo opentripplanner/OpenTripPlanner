@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.api.model.ApiAlert;
 import org.opentripplanner.api.model.ApiLeg;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -134,7 +134,7 @@ public class LegMapper {
     if (addIntermediateStops) {
       api.intermediateStops = placeMapper.mapStopArrivals(domain.getIntermediateStops());
     }
-    api.legGeometry = PolylineEncoder.encodeGeometry(domain.getLegGeometry());
+    api.legGeometry = EncodedPolyline.encode(domain.getLegGeometry());
     api.legElevation = mapElevation(domain.getElevationProfile());
     api.steps = walkStepMapper.mapWalkSteps(domain.getWalkSteps());
     api.alerts =
