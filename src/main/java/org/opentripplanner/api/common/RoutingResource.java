@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -25,6 +26,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.FilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -713,7 +716,7 @@ public abstract class RoutingResource {
         setIfNotNull(unpreferredAgencies, transit::setUnpreferredAgenciesFromString);
 
         var filter = new FilterRequest();
-        filter.getInclude().setTransportModes(modes.getRequestModes().transitModes);
+        filter.getInclude().setTransportModes(modes.getTransitModes().stream().map(MainAndSubMode::new).collect(Collectors.toList()));
 
         setIfNotNull(bannedAgencies, filter.getExclude()::setAgenciesFromString);
         setIfNotNull(whiteListedAgencies, filter.getInclude()::setAgenciesFromString);

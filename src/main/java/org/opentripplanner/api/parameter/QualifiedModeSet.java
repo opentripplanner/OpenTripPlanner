@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -37,15 +38,14 @@ public class QualifiedModeSet implements Serializable {
     this(s.split(","));
   }
 
-  public RequestModes getRequestModes() {
-    RequestModesBuilder mBuilder = RequestModes.of().clearTransitModes();
+  public List<TransitMode> getTransitModes() {
+    return qModes.stream()
+      .flatMap(qMode -> qMode.mode.getTransitModes().stream())
+      .collect(Collectors.toList());
+  }
 
-    // Set transit modes
-    for (QualifiedMode qMode : qModes) {
-      for (TransitMode mainMode : qMode.mode.getTransitModes()) {
-        mBuilder.withTransitMode(mainMode);
-      }
-    }
+  public RequestModes getRequestModes() {
+    RequestModesBuilder mBuilder = RequestModes.of();
 
     //  This is a best effort at mapping QualifiedModes to access/egress/direct StreetModes.
     //  It was unclear what exactly each combination of QualifiedModes should mean.

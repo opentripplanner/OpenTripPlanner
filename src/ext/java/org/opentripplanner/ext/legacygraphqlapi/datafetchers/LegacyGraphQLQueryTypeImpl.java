@@ -770,8 +770,8 @@ public class LegacyGraphQLQueryTypeImpl
         request.journey().egress().setMode(requestModes.egressMode);
         request.journey().direct().setMode(requestModes.directMode);
         request.journey().transfer().setMode(requestModes.transferMode);
+        include.setTransportModes(modes.getTransitModes().stream().map(MainAndSubMode::new).collect(Collectors.toList()));
 
-        include.setTransportModes(requestModes.transitModes);
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {

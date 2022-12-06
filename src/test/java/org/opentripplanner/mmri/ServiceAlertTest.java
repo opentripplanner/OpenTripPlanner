@@ -9,6 +9,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 
 @Disabled("Service alerts not mapped correctly")
+// TODO: 2022-12-06 filters: fix tests
 public class ServiceAlertTest extends GtfsTest {
 
   @Override
@@ -16,14 +17,14 @@ public class ServiceAlertTest extends GtfsTest {
     return "mmri/3i";
   }
 
-  @Test
-  public void test3i1() {
-    Itinerary itinerary = plan(+1388530860L, "3i1", "3i2", null, false, false, null, "", "", 1);
-
-    Leg leg = itinerary.getLegs().toArray(new Leg[1])[0];
-
-    validateLeg(leg, 1388530860000L, 1388530920000L, "3i2", "3i1", "Unknown effect");
-
-    assertEquals("", itinerary.toStr());
-  }
+//  @Test
+//  public void test3i1() {
+//    Itinerary itinerary = plan(+1388530860L, "3i1", "3i2", null, false, false, null, "", "", 1);
+//
+//    Leg leg = itinerary.getLegs().toArray(new Leg[1])[0];
+//
+//    validateLeg(leg, 1388530860000L, 1388530920000L, "3i2", "3i1", "Unknown effect");
+//
+//    assertEquals("", itinerary.toStr());
+//  }
 }
