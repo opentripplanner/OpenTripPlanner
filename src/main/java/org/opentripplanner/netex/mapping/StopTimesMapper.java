@@ -278,8 +278,6 @@ class StopTimesMapper {
       return null;
     }
 
-    List<String> vias = null;
-
     if (stopPoint != null) {
       if (isFalse(stopPoint.isForAlighting())) {
         stopTime.setDropOffType(NONE);
