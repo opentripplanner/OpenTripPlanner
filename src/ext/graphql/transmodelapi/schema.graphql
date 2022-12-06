@@ -169,9 +169,9 @@ type EstimatedCall {
   expectedArrivalTime: DateTime!
   "Expected time of departure from quay. Updated with real time information if available. Will be null if an actualDepartureTime exists"
   expectedDepartureTime: DateTime!
-  "Whether vehicle may be alighted at quay according to the planned data. If the cancellation flag is set, alighting is not possible, even if this field is set to true."
+  "Whether vehicle may be alighted at quay."
   forAlighting: Boolean!
-  "Whether vehicle may be boarded at quay according to the planned data. If the cancellation flag is set, boarding is not possible, even if this field is set to true."
+  "Whether vehicle may be boarded at quay."
   forBoarding: Boolean!
   notices: [Notice!]!
   occupancyStatus: OccupancyStatus!
