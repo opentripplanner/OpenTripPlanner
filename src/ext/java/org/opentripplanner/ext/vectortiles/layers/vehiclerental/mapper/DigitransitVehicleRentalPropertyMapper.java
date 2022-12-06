@@ -3,9 +3,9 @@ package org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import org.opentripplanner.ext.vectortiles.I18NStringMapper;
-import org.opentripplanner.ext.vectortiles.KeyValue;
-import org.opentripplanner.ext.vectortiles.PropertyMapper;
+import org.opentripplanner.api.mapping.I18NStringMapper;
+import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 
 public class DigitransitVehicleRentalPropertyMapper extends PropertyMapper<VehicleRentalPlace> {

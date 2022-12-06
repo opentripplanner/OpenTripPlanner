@@ -308,10 +308,7 @@ public class ConstantsForTests {
       graph,
       DataImportIssueStore.NOOP,
       ServiceDateInterval.unbounded(),
-      fareServiceFactory,
-      false,
-      true,
-      300
+      fareServiceFactory
     );
 
     module.buildGraph();

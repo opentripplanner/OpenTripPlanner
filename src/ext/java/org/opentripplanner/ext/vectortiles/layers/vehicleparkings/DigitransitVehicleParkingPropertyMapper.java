@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import org.opentripplanner.ext.vectortiles.I18NStringMapper;
-import org.opentripplanner.ext.vectortiles.KeyValue;
-import org.opentripplanner.ext.vectortiles.PropertyMapper;
+import org.opentripplanner.api.mapping.I18NStringMapper;
+import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
 public class DigitransitVehicleParkingPropertyMapper extends PropertyMapper<VehicleParking> {

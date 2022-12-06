@@ -26,11 +26,13 @@ import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParamete
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
+import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
 import org.opentripplanner.standalone.config.buildconfig.NetexConfig;
 import org.opentripplanner.standalone.config.buildconfig.OsmConfig;
 import org.opentripplanner.standalone.config.buildconfig.S3BucketConfig;
@@ -148,6 +150,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final double maxTransferDurationSeconds;
   public final Boolean extraEdgesStopPlatformLink;
   public final NetexFeedParameters netexDefaults;
+  public final GtfsFeedParameters gtfsDefaults;
 
   public final DemExtractParameters demDefaults;
   public final OsmExtractParameters osmDefaults;
@@ -164,7 +167,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final TransitFeeds transitFeeds;
   public boolean staticParkAndRide;
   public boolean staticBikeParkAndRide;
-  public int maxInterlineDistance;
   public double distanceBetweenElevationSamples;
   public double maxElevationPropagationMeters;
   public boolean readCachedElevations;
@@ -177,9 +179,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public LocalDate transitServiceStart;
 
   public LocalDate transitServiceEnd;
-  public boolean discardMinTransferTimes;
   public ZoneId transitModelTimeZone;
-  public boolean blockBasedInterlining;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
@@ -328,22 +328,6 @@ all of the elevation values in the street edges.
             """
         )
         .asInt(1000);
-    maxInterlineDistance =
-      root
-        .of("maxInterlineDistance")
-        .since(V1_5)
-        .summary(
-          "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle."
-        )
-        .asInt(200);
-    blockBasedInterlining =
-      root
-        .of("blockBasedInterlining")
-        .since(V2_2)
-        .summary(
-          "Whether to create stay-seated transfers in between two trips with the same block id."
-        )
-        .asBoolean(true);
     maxTransferDurationSeconds =
       root
         .of("maxTransferDurationSeconds")
@@ -554,18 +538,6 @@ recommended.
         )
         .description("[Detailed documentation](BoardingLocations.md)")
         .asStringSet(List.copyOf(Set.of("ref")));
-    discardMinTransferTimes =
-      root
-        .of("discardMinTransferTimes")
-        .since(V2_2)
-        .summary("Should minimum transfer times in GTFS files be discarded.")
-        .description(
-          """
-          This is useful eg. when the minimum transfer time is only set for ticketing purposes,
-          but we want to calculate the transfers always from OSM data.
-          """
-        )
-        .asBoolean(false);
 
     var localFileNamePatternsConfig = root
       .of("localFileNamePatterns")
@@ -682,7 +654,9 @@ Netex data is also often supplied in a ZIP file.
     demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
-    transitFeeds = TransitFeedConfig.mapTransitFeeds(root, "transitFeeds", netexDefaults);
+    gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
+    transitFeeds =
+      TransitFeedConfig.mapTransitFeeds(root, "transitFeeds", netexDefaults, gtfsDefaults);
 
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(root, "fares");
