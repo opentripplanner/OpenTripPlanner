@@ -3,27 +3,28 @@ package org.opentripplanner.routing.api.request.request.filter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
-import org.opentripplanner.transit.model.basic.SubMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class SelectRequest implements Cloneable, Serializable {
 
-  private List<MainAndSubMode> transportModes = new ArrayList<>();
+  private AllowTransitModeFilter transportModes;
   private List<FeedScopedId> agencies = new ArrayList<>();
   private RouteMatcher routes = RouteMatcher.emptyMatcher();
   // TODO: 2022-11-29 group of routes
   private List<FeedScopedId> trips = new ArrayList<>();
   private List<String> feeds = new ArrayList<>();
 
-  public List<MainAndSubMode> transportModes() {
+  public AllowTransitModeFilter transportModes() {
     return transportModes;
   }
 
   public void setTransportModes(List<MainAndSubMode> transportModes) {
-    this.transportModes = transportModes;
+    if (!transportModes.isEmpty()) {
+      this.transportModes = AllowTransitModeFilter.of(transportModes);
+    }
   }
 
   public void setAgencies(List<FeedScopedId> agencies) {
@@ -101,7 +102,8 @@ public class SelectRequest implements Cloneable, Serializable {
     try {
       var clone = (SelectRequest) super.clone();
 
-      clone.transportModes = List.copyOf(this.transportModes);
+      // TODO: 2022-12-06 filters: check if we need to copy that
+      clone.transportModes = this.transportModes;
       clone.agencies = List.copyOf(this.agencies);
       clone.routes = this.routes.clone();
       clone.trips = List.copyOf(this.trips);

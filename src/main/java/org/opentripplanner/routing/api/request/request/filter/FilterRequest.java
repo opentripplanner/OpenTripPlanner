@@ -62,8 +62,8 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
     var bannedFeeds = exclude.feeds();
 
     if (
-      allowedModes.isEmpty() &&
-      bannedModes.isEmpty() &&
+      allowedModes == null &&
+        bannedModes == null &&
       allowedAgencies.isEmpty() &&
       bannedAgencies.isEmpty() &&
       allowedRoutes.isEmpty() &&
@@ -76,8 +76,8 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
     }
 
     if (
-      !bannedModes.isEmpty() &&
-      AllowTransitModeFilter.of(bannedModes).allows(route.getMode(), route.getNetexSubmode())
+      bannedModes != null &&
+        bannedModes.allows(route.getMode(), route.getNetexSubmode())
     ) {
       return false;
     }
@@ -95,8 +95,8 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
     }
 
     if (
-      !allowedModes.isEmpty() &&
-      !AllowTransitModeFilter.of(allowedModes).allows(route.getMode(), route.getNetexSubmode())
+      allowedModes != null &&
+        allowedModes.allows(route.getMode(), route.getNetexSubmode())
     ) {
       return false;
     }
@@ -139,8 +139,8 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
     if (
       allowedTrips.isEmpty() &&
       bannedTrips.isEmpty() &&
-      allowedModes.isEmpty() &&
-      bannedModes.isEmpty()
+      allowedModes == null &&
+        bannedModes == null
     ) {
       // no trip-specific filters specified
       // all irrelevant trips were already filtered out by routePredicate
@@ -148,8 +148,8 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
     }
 
     if (
-      !bannedModes.isEmpty() &&
-      AllowTransitModeFilter.of(bannedModes).allows(trip.getMode(), trip.getNetexSubMode())
+      bannedModes != null &&
+      bannedModes.allows(trip.getMode(), trip.getNetexSubMode())
     ) {
       return false;
     }
@@ -171,8 +171,8 @@ public class FilterRequest implements Cloneable, Serializable, FilterPredicate {
     }
 
     if (
-      !allowedModes.isEmpty() &&
-      !AllowTransitModeFilter.of(allowedModes).allows(trip.getMode(), trip.getNetexSubMode())
+      allowedModes != null &&
+      allowedModes.allows(trip.getMode(), trip.getNetexSubMode())
     ) {
       return false;
     }
