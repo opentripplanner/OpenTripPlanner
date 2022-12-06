@@ -77,4 +77,19 @@ public class WgsCoordinateTest {
 
     assertThrows(IllegalArgumentException.class, () -> WgsCoordinate.mean(List.of()));
   }
+
+  @Test
+  public void validCoordinates() {
+    // Edge cases should NOT throw exceptions
+    new WgsCoordinate(90d, 1d);
+    new WgsCoordinate(-90d, 1d);
+    new WgsCoordinate(1d, 180d);
+    new WgsCoordinate(1d, -180d);
+
+    // Illegal values should
+    assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(91d, 1d));
+    assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(-91d, 1d));
+    assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(1d, 181d));
+    assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(1d, -181d));
+  }
 }

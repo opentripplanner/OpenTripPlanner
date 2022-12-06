@@ -15,10 +15,19 @@ import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
  */
 public final class WgsCoordinate implements Serializable {
 
+  private static final double LAT_MIN = -90;
+  private static final double LAT_MAX = 90;
+  private static final double LON_MIN = -180;
+  private static final double LON_MAX = 180;
+
   private final double latitude;
   private final double longitude;
 
   public WgsCoordinate(double latitude, double longitude) {
+    // Verify coordinates are in range
+    DoubleUtils.assertInRange(latitude, LAT_MIN, LAT_MAX, "latitude");
+    DoubleUtils.assertInRange(longitude, LON_MIN, LON_MAX, "longitude");
+
     // Normalize coordinates to precision around ~ 1 centimeters (7 decimals)
     this.latitude = DoubleUtils.roundTo7Decimals(latitude);
     this.longitude = DoubleUtils.roundTo7Decimals(longitude);
