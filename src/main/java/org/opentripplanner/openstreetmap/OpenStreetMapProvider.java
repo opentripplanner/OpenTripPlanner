@@ -62,7 +62,7 @@ public class OpenStreetMapProvider implements OSMProvider {
     boolean cacheDataInMem
   ) {
     this.source = osmExtractConfigConfiguredDataSource.dataSource();
-    this.zoneId = osmExtractConfigConfiguredDataSource.config().timeZone().orElse(null);
+    this.zoneId = osmExtractConfigConfiguredDataSource.config().timeZone();
     this.osmTagMapper = osmExtractConfigConfiguredDataSource.config().osmTagMapper().getInstance();
     this.wayPropertySet = new WayPropertySet();
     osmTagMapper.populateProperties(wayPropertySet);
