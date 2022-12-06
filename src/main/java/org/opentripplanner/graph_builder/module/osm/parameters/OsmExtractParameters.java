@@ -4,7 +4,7 @@ import java.net.URI;
 import java.time.ZoneId;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 
 /**
  * Configure an OpenStreetMap extract.

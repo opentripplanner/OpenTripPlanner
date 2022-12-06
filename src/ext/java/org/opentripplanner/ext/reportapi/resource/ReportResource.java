@@ -16,8 +16,8 @@ import org.opentripplanner.ext.reportapi.model.CachedValue;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder.GraphStats;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 

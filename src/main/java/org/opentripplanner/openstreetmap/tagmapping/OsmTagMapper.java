@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm.tagmapping;
+package org.opentripplanner.openstreetmap.tagmapping;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;

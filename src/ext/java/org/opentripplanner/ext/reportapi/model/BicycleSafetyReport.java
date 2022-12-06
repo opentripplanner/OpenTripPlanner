@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.reportapi.model;
 
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 public class BicycleSafetyReport {

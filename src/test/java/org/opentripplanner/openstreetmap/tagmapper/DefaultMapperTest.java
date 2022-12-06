@@ -1,12 +1,12 @@
-package org.opentripplanner.graph_builder.module.osm.tagmapper;
+package org.opentripplanner.openstreetmap.tagmapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.wayproperty.SpeedPicker;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;

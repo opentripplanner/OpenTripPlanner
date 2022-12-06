@@ -7,8 +7,8 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
 

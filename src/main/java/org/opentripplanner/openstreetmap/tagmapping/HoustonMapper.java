@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm.tagmapping;
+package org.opentripplanner.openstreetmap.tagmapping;
 
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
