@@ -19,10 +19,10 @@ public class WorldEnvelope implements Serializable {
   private final WgsCoordinate transitMedianCenter;
 
   private WorldEnvelope(
-    double lowerLeftLongitude,
     double lowerLeftLatitude,
-    double upperRightLongitude,
+    double lowerLeftLongitude,
     double upperRightLatitude,
+    double upperRightLongitude,
     WgsCoordinate transitMedianCenter
   ) {
     this.transitMedianCenter = transitMedianCenter;
@@ -159,9 +159,9 @@ public class WorldEnvelope implements Serializable {
 
     public WorldEnvelope build() {
       if (minLonWest == MIN_NOT_SET) {
-        return new WorldEnvelope(minLonEast, minLat, maxLonEast, maxLat, transitMedianCenter);
+        return new WorldEnvelope(minLat, minLonEast, maxLat, maxLonEast, transitMedianCenter);
       } else if (minLonEast == MIN_NOT_SET) {
-        return new WorldEnvelope(minLonWest, minLat, maxLonWest, maxLat, transitMedianCenter);
+        return new WorldEnvelope(minLat, minLonWest, maxLat, maxLonWest, transitMedianCenter);
       } else {
         double dist0 = minLonEast - minLonWest;
         double dist180 = 360d - maxLonEast + minLonWest;
@@ -169,9 +169,9 @@ public class WorldEnvelope implements Serializable {
         // A small gap between the east and west longitude at 0 degrees implies that the Envelope
         // should include the 0 degrees longitude(meridian), and be split at 180 degrees.
         if (dist0 < dist180) {
-          return new WorldEnvelope(maxLonWest, minLat, maxLonEast, maxLat, transitMedianCenter);
+          return new WorldEnvelope(minLat, maxLonWest, maxLat, maxLonEast, transitMedianCenter);
         } else {
-          return new WorldEnvelope(minLonEast, minLat, minLonWest, maxLat, transitMedianCenter);
+          return new WorldEnvelope(minLat, minLonEast, maxLat, minLonWest, transitMedianCenter);
         }
       }
     }
