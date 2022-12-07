@@ -109,7 +109,11 @@
       "ALLOWED": 75,
       "RECOMMENDED": 30,
       "PREFERRED": 0
-    }
+    },
+    "transferCacheRequests": [
+      { "modes": "WALK"                                                     },
+      { "modes": "WALK",    "wheelchairAccessibility": { "enabled": true  } }
+    ]
   },
   "vehicleRentalServiceDirectory": {
     "url": "https://entur.no/bikeRentalServiceDirectory",

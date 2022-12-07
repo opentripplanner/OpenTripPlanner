@@ -49,8 +49,10 @@ public class RouteRequestConfig {
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c) {
-    RouteRequest dft = new RouteRequest();
+    return mapRouteRequest(c, new RouteRequest());
+  }
 
+  public static RouteRequest mapRouteRequest(NodeAdapter c, RouteRequest dft) {
     if (c.isEmpty()) {
       return dft;
     }
