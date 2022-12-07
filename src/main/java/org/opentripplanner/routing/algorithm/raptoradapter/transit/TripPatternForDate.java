@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -132,11 +133,11 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     return startOfRunningPeriod;
   }
 
-  public List<LocalDate> getRunningPeriodDates() {
+  public Collection<LocalDate> getRunningPeriodDates() {
     // Add one day to ensure last day is included
     return startOfRunningPeriod
       .datesUntil(endOfRunningPeriod.plusDays(1))
-      .collect(Collectors.toList());
+      .collect(Collectors.toCollection(ArrayList::new));
   }
 
   public boolean hasFrequencies() {
