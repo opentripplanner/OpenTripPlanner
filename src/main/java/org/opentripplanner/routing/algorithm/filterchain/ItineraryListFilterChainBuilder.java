@@ -288,7 +288,7 @@ public class ItineraryListFilterChainBuilder {
       filters.add(new SameFirstOrLastTripFilter());
     }
 
-    if (minBikeParkingDistance > NOT_SET) {
+    if (minBikeParkingDistance > 0) {
       filters.add(
         new RemoveItinerariesWithShortStreetLeg(minBikeParkingDistance, TraverseMode.BICYCLE)
       );
