@@ -8,18 +8,14 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class FlexConfig {
 
-  private static final Duration MAX_TRANSFER_DURATION = Duration.ofMinutes(5);
-  private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
-
-  // this needs to be instantiated _after_ the defaults are initialized!
   public static final FlexConfig DEFAULT = new FlexConfig();
 
   private final Duration maxTransferDuration;
   private final Duration maxFlexTripDuration;
 
   private FlexConfig() {
-    maxTransferDuration = MAX_TRANSFER_DURATION;
-    maxFlexTripDuration = MAX_FLEX_TRIP_DURATION;
+    maxTransferDuration = Duration.ofMinutes(5);
+    maxFlexTripDuration = Duration.ofMinutes(45);
   }
 
   public FlexConfig(NodeAdapter root, String parameterName) {
@@ -47,7 +43,7 @@ public class FlexConfig {
             A lower value means that the routing is faster.
             """
         )
-        .asDuration(MAX_TRANSFER_DURATION);
+        .asDuration(DEFAULT.maxTransferDuration);
 
     maxFlexTripDuration =
       json
@@ -59,7 +55,7 @@ public class FlexConfig {
           "the access/egress duration to the boarding/alighting of the flex trip, as well as the " +
           "connection to the transit stop."
         )
-        .asDuration(MAX_FLEX_TRIP_DURATION);
+        .asDuration(DEFAULT.maxFlexTripDuration);
   }
 
   public Duration maxFlexTripDuration() {
