@@ -11,10 +11,27 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
  */
 public class WorldEnvelope implements Serializable {
 
+  private static final WorldEnvelope DEFAULT = new WorldEnvelope(
+    WgsCoordinate.GREENWICH.add(-1d, -1d),
+    WgsCoordinate.GREENWICH.add(1d, 1d),
+    WgsCoordinate.GREENWICH
+  );
+
   private final WgsCoordinate lowerLeft;
   private final WgsCoordinate upperRight;
   private final WgsCoordinate meanCenter;
   private final WgsCoordinate transitMedianCenter;
+
+  private WorldEnvelope(
+    WgsCoordinate lowerLeft,
+    WgsCoordinate upperRight,
+    WgsCoordinate transitMedianCenter
+  ) {
+    this.transitMedianCenter = transitMedianCenter;
+    this.lowerLeft = lowerLeft;
+    this.upperRight = upperRight;
+    this.meanCenter = calculateMeanCenter(lowerLeft, upperRight);
+  }
 
   WorldEnvelope(
     double lowerLeftLatitude,
@@ -23,14 +40,23 @@ public class WorldEnvelope implements Serializable {
     double upperRightLongitude,
     WgsCoordinate transitMedianCenter
   ) {
-    this.transitMedianCenter = transitMedianCenter;
-    this.lowerLeft = new WgsCoordinate(lowerLeftLatitude, lowerLeftLongitude);
-    this.upperRight = new WgsCoordinate(upperRightLatitude, upperRightLongitude);
-    this.meanCenter = calculateMeanCenter(lowerLeft, upperRight);
+    this(
+      new WgsCoordinate(lowerLeftLatitude, lowerLeftLongitude),
+      new WgsCoordinate(upperRightLatitude, upperRightLongitude),
+      transitMedianCenter
+    );
   }
 
   public static WorldEnvelopeBuilder of() {
     return new WorldEnvelopeBuilder();
+  }
+
+  /**
+   * Return a small square envelope around Greenwich to use as a default value. This allows
+   * us to always provide an envelope, even when there is no data.
+   */
+  public static WorldEnvelope defaultEnvelope() {
+    return DEFAULT;
   }
 
   public WgsCoordinate lowerLeft() {

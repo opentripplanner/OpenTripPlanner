@@ -247,15 +247,6 @@ public class GraphBuilderModules {
     );
   }
 
-  @Provides
-  @Singleton
-  static CalculateWorldEnvelopeModule provideCalculateWorldEnvelopeModule(
-    Graph graph,
-    TransitModel transitModel
-  ) {
-    return new CalculateWorldEnvelopeModule(graph, transitModel);
-  }
-
   /* private methods */
 
   private static ElevationGridCoverageFactory createNedElevationFactory(

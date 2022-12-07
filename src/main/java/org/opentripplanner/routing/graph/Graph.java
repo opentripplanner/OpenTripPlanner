@@ -28,7 +28,6 @@ import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
-import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -61,8 +60,6 @@ public class Graph implements Serializable {
 
   private transient StreetIndex streetIndex;
 
-  //Envelope of all OSM and transit vertices. Calculated during build time
-  private WorldEnvelope envelope = null;
   //ConvexHull of all the graph vertices. Generated at Graph build time.
   private Geometry convexHull = null;
 
@@ -317,17 +314,6 @@ public class Graph implements Serializable {
   public VertexLinker getLinkerSafe(StopModel stopModel) {
     indexIfNotIndexed(stopModel);
     return streetIndex.getVertexLinker();
-  }
-
-  public WorldEnvelope getEnvelope() {
-    return this.envelope;
-  }
-
-  /**
-   * Set envelope out of all OSM coordinates and/or transit stop locations
-   */
-  public void setEnvelope(WorldEnvelope envelope) {
-    this.envelope = envelope;
   }
 
   /**

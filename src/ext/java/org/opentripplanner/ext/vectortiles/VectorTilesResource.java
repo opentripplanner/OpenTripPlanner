@@ -83,7 +83,7 @@ public class VectorTilesResource {
     @Context HttpHeaders headers,
     @PathParam("layers") String requestedLayers
   ) {
-    var envelope = serverContext.graph().getEnvelope();
+    var envelope = serverContext.worldEnvelopeService().envelope();
     return new TileJson(
       uri,
       headers,

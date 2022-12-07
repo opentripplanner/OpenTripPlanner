@@ -30,7 +30,12 @@ public class ApiRouterInfo {
   public List<ApiTravelOption> travelOptions;
 
   /** TODO: Do not pass in the graph here, do this in a mapper instead. */
-  public ApiRouterInfo(String routerId, Graph graph, TransitService transitService) {
+  public ApiRouterInfo(
+    String routerId,
+    Graph graph,
+    TransitService transitService,
+    WorldEnvelope envelope
+  ) {
     VehicleRentalService vehicleRentalService = graph.getVehicleRentalService();
     VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
 
@@ -40,7 +45,7 @@ public class ApiRouterInfo {
     this.transitServiceStarts = transitService.getTransitServiceStarts().toEpochSecond();
     this.transitServiceEnds = transitService.getTransitServiceEnds().toEpochSecond();
     this.transitModes = ModeMapper.mapToApi(transitService.getTransitModes());
-    this.envelope = graph.getEnvelope();
+    this.envelope = envelope;
     this.hasBikeSharing = mapHasBikeSharing(vehicleRentalService);
     this.hasBikePark = mapHasBikePark(vehicleParkingService);
     this.hasCarPark = mapHasCarPark(vehicleParkingService);
@@ -48,7 +53,7 @@ public class ApiRouterInfo {
     this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
     this.travelOptions = ApiTravelOptionsMaker.makeOptions(graph, transitService);
 
-    var center = envelope.center();
+    var center = this.envelope.center();
     centerLongitude = center.longitude();
     centerLatitude = center.latitude();
   }

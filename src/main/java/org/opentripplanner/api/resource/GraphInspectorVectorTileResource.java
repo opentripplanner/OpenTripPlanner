@@ -89,7 +89,7 @@ public class GraphInspectorVectorTileResource {
       requestedLayers,
       ignoreRouterId,
       "inspector/vectortile",
-      serverContext.graph().getEnvelope(),
+      serverContext.worldEnvelopeService().envelope(),
       serverContext
         .transitService()
         .getFeedIds()

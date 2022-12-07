@@ -145,6 +145,7 @@ public class OTPMain {
       new SerializedGraphObject(
         app.graph(),
         app.transitModel(),
+        app.worldEnvelopeModel(),
         config.buildConfig(),
         config.routerConfig()
       )

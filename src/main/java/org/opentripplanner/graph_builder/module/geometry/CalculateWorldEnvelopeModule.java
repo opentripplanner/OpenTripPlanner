@@ -1,10 +1,12 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
 import java.util.Collection;
+import javax.inject.Inject;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
+import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
@@ -27,19 +29,25 @@ public class CalculateWorldEnvelopeModule implements GraphBuilderModule {
 
   private final Graph graph;
   private final TransitModel transitModel;
+  private final WorldEnvelopeModel worldEnvelopeModel;
 
-  public CalculateWorldEnvelopeModule(Graph graph, TransitModel transitModel) {
+  @Inject
+  public CalculateWorldEnvelopeModule(
+    Graph graph,
+    TransitModel transitModel,
+    WorldEnvelopeModel worldEnvelopeModel
+  ) {
     this.graph = graph;
     this.transitModel = transitModel;
+    this.worldEnvelopeModel = worldEnvelopeModel;
   }
 
-  @SuppressWarnings("Convert2MethodRef")
   @Override
   public void buildGraph() {
     var vertices = graph.getVertices();
     var stops = transitModel.getStopModel().listStopLocations();
     WorldEnvelope envelope = build(vertices, stops);
-    graph.setEnvelope(envelope);
+    worldEnvelopeModel.setEnvelope(envelope);
   }
 
   @Override
