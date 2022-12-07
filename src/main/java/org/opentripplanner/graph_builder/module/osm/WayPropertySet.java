@@ -59,6 +59,11 @@ public class WayPropertySet {
   private BiFunction<StreetTraversalPermission, Float, Double> defaultBicycleSafetyForPermission;
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
   private final WayProperties defaultProperties;
+
+  public List<MixinProperties> getMixins() {
+    return mixins;
+  }
+
   private final List<MixinProperties> mixins = new ArrayList<>();
 
   public WayPropertySet() {
