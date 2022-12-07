@@ -1,4 +1,4 @@
-package org.opentripplanner.openstreetmap.spi;
+package org.opentripplanner.openstreetmap.api;
 
 import java.time.ZoneId;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
