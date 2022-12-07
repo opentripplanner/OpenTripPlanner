@@ -10,8 +10,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 class CalculateWorldEnvelopeModuleTest {
 
-  public static final String FEED_ID = "F";
-
   private final List<V> vertexes = List.of(new V(10d, 12d), new V(11d, 13d), new V(14d, 15d));
 
   private final List<RegularStop> stops = List.of(
