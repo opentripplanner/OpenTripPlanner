@@ -69,13 +69,7 @@ public class TileJson implements Serializable {
         envelope.upperRight().latitude(),
       };
 
-    // TODO: Should we replace this with a fallback to the mean center
-    //       if median transit center do not exist?
-    if (envelope.transitMedianCenter().isPresent()) {
-      var c = envelope.transitMedianCenter().get();
-      center = new double[] { c.longitude(), c.latitude(), 9 };
-    } else {
-      center = null;
-    }
+    var c = envelope.center();
+    center = new double[] { c.longitude(), c.latitude(), 9 };
   }
 }

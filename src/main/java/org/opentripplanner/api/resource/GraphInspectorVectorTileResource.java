@@ -22,6 +22,7 @@ import org.opentripplanner.inspector.vector.AreaStopsLayerBuilder;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
+import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
@@ -83,20 +84,23 @@ public class GraphInspectorVectorTileResource {
     @Context HttpHeaders headers,
     @PathParam("layers") String requestedLayers
   ) {
+    var envelope = serverContext.worldEnvelopeService().envelope().orElseThrow();
+    List<FeedInfo> feedInfos = serverContext
+      .transitService()
+      .getFeedIds()
+      .stream()
+      .map(serverContext.transitService()::getFeedInfo)
+      .filter(Predicate.not(Objects::isNull))
+      .toList();
+
     return new TileJson(
       uri,
       headers,
       requestedLayers,
       ignoreRouterId,
       "inspector/vectortile",
-      serverContext.worldEnvelopeService().envelope(),
-      serverContext
-        .transitService()
-        .getFeedIds()
-        .stream()
-        .map(serverContext.transitService()::getFeedInfo)
-        .filter(Predicate.not(Objects::isNull))
-        .toList()
+      envelope,
+      feedInfos
     );
   }
 

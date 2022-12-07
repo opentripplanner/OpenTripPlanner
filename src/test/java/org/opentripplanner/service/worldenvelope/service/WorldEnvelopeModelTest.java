@@ -1,6 +1,7 @@
 package org.opentripplanner.service.worldenvelope.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
@@ -17,9 +18,9 @@ class WorldEnvelopeModelTest {
   void normalModelFlow() {
     var subject = new WorldEnvelopeModel();
 
-    assertEquals(WorldEnvelope.defaultEnvelope(), subject.envelope());
+    assertTrue(subject.envelope().isEmpty());
 
     subject.setEnvelope(envelope);
-    assertEquals(envelope, subject.envelope());
+    assertEquals(envelope, subject.envelope().get());
   }
 }

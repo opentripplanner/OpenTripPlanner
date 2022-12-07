@@ -10,6 +10,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.transit.service.TransitService;
 
+@SuppressWarnings("unused")
 public class ApiRouterInfo {
 
   /** Keep ref to domain object, but avoid exposing it */
@@ -23,8 +24,6 @@ public class ApiRouterInfo {
   public long transitServiceStarts;
   public long transitServiceEnds;
   public List<String> transitModes;
-  public double centerLatitude;
-  public double centerLongitude;
   public boolean hasParkRide;
   public boolean hasBikeSharing;
   public List<ApiTravelOption> travelOptions;
@@ -52,10 +51,6 @@ public class ApiRouterInfo {
     this.hasParkRide = this.hasCarPark;
     this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
     this.travelOptions = ApiTravelOptionsMaker.makeOptions(graph, transitService);
-
-    var center = this.envelope.center();
-    centerLongitude = center.longitude();
-    centerLatitude = center.latitude();
   }
 
   public boolean mapHasBikeSharing(VehicleRentalService service) {
@@ -102,5 +97,13 @@ public class ApiRouterInfo {
 
   public double getUpperRightLongitude() {
     return envelope.upperRight().longitude();
+  }
+
+  public double getCenterLatitude() {
+    return envelope.center().latitude();
+  }
+
+  public double getCenterLongitude() {
+    return envelope.center().longitude();
   }
 }

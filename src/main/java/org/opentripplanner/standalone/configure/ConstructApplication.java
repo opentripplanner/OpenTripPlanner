@@ -158,8 +158,7 @@ public class ConstructApplication {
 
   private void initEllipsoidToGeoidDifference() {
     try {
-      // TODO ENVELOPE: Use median center here if it exist?
-      var c = factory.worldEnvelopeModel().envelope().meanCenter();
+      var c = factory.worldEnvelopeModel().envelope().orElseThrow().center();
       double value = ElevationUtils.computeEllipsoidToGeoidDifference(c.latitude(), c.longitude());
       graph().initEllipsoidToGeoidDifference(value, c.latitude(), c.longitude());
     } catch (Exception e) {

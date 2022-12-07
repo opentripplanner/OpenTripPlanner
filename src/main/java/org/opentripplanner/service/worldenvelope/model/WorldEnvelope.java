@@ -11,12 +11,6 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
  */
 public class WorldEnvelope implements Serializable {
 
-  private static final WorldEnvelope DEFAULT = new WorldEnvelope(
-    WgsCoordinate.GREENWICH.add(-1d, -1d),
-    WgsCoordinate.GREENWICH.add(1d, 1d),
-    WgsCoordinate.GREENWICH
-  );
-
   private final WgsCoordinate lowerLeft;
   private final WgsCoordinate upperRight;
   private final WgsCoordinate meanCenter;
@@ -49,14 +43,6 @@ public class WorldEnvelope implements Serializable {
 
   public static WorldEnvelopeBuilder of() {
     return new WorldEnvelopeBuilder();
-  }
-
-  /**
-   * Return a small square envelope around Greenwich to use as a default value. This allows
-   * us to always provide an envelope, even when there is no data.
-   */
-  public static WorldEnvelope defaultEnvelope() {
-    return DEFAULT;
   }
 
   public WgsCoordinate lowerLeft() {

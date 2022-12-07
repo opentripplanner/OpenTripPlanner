@@ -1,6 +1,8 @@
 package org.opentripplanner.service.worldenvelope.service;
 
 import java.io.Serializable;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelopeService;
@@ -29,17 +31,17 @@ public class WorldEnvelopeModel implements Serializable, WorldEnvelopeService {
   /**
    * The volatile keyword is key to make this propagate to other threads.
    */
-  private volatile WorldEnvelope envelope = WorldEnvelope.defaultEnvelope();
+  private volatile WorldEnvelope envelope = null;
 
   @Inject
   public WorldEnvelopeModel() {}
 
   @Override
-  public WorldEnvelope envelope() {
-    return envelope;
+  public Optional<WorldEnvelope> envelope() {
+    return Optional.ofNullable(envelope);
   }
 
-  public void setEnvelope(WorldEnvelope envelope) {
+  public void setEnvelope(@Nonnull WorldEnvelope envelope) {
     this.envelope = envelope;
   }
 }

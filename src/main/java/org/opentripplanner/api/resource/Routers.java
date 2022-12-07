@@ -65,7 +65,7 @@ public class Routers {
         "default",
         serverContext.graph(),
         serverContext.transitService(),
-        serverContext.worldEnvelopeService().envelope()
+        serverContext.worldEnvelopeService().envelope().orElseThrow()
       );
     } catch (GraphNotFoundException e) {
       return null;
