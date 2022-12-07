@@ -26,7 +26,6 @@ public class FrameworkArchitectureTest {
   private static final Package IO = FRAMEWORK.subPackage("io");
   private static final Package LANG = FRAMEWORK.subPackage("lang");
   private static final Package LOGGING = FRAMEWORK.subPackage("logging");
-  private static final Package STATISTICS = FRAMEWORK.subPackage("statistics");
   private static final Package TEXT = FRAMEWORK.subPackage("text");
   private static final Package TIME = FRAMEWORK.subPackage("time");
   private static final Package TO_STRING = FRAMEWORK.subPackage("tostring");
@@ -44,7 +43,7 @@ public class FrameworkArchitectureTest {
   @Test
   void enforceGeometryPackageDependencies() {
     GEOMETRY
-      .dependsOn(GEO_JSON, GEO_TOOLS, GNU_TROVE, JTS_GEOM, OPEN_GIS, LANG, TO_STRING, STATISTICS)
+      .dependsOn(GEO_JSON, GEO_TOOLS, GNU_TROVE, JTS_GEOM, OPEN_GIS, LANG, TO_STRING)
       .verify();
   }
 
@@ -61,11 +60,6 @@ public class FrameworkArchitectureTest {
   @Test
   void enforceLoggingPackageDependencies() {
     LOGGING.dependsOn(TEXT, TIME).verify();
-  }
-
-  @Test
-  void enforceStatisticsPackageDependencies() {
-    STATISTICS.verify();
   }
 
   @Test

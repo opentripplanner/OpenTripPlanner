@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.statistics;
+package org.opentripplanner.service.worldenvelope.model;
 
 import java.util.Arrays;
 
