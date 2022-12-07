@@ -144,9 +144,13 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   public boolean vehicleRentalIsFinished() {
+    System.out.println(stateData.insideNoRentalDropOffArea);
     return (
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
-      stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING ||
+      (
+        stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING &&
+        !stateData.insideNoRentalDropOffArea
+      ) ||
       (
         getRequest().rental().allowArrivingInRentedVehicleAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&

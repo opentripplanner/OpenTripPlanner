@@ -204,6 +204,24 @@ public class StateEditor {
     child.stateData.enteredNoThroughTrafficArea = true;
   }
 
+  public void leaveNoRentalDropOffArea() {
+    if (!child.stateData.insideNoRentalDropOffArea) {
+      return;
+    }
+
+    cloneStateDataAsNeeded();
+    child.stateData.insideNoRentalDropOffArea = false;
+  }
+
+  public void enteredNoRentalDropOffArea() {
+    if (child.stateData.insideNoRentalDropOffArea) {
+      return;
+    }
+
+    cloneStateDataAsNeeded();
+    child.stateData.insideNoRentalDropOffArea = true;
+  }
+
   public void setBackMode(TraverseMode mode) {
     if (mode == child.stateData.backMode) return;
 

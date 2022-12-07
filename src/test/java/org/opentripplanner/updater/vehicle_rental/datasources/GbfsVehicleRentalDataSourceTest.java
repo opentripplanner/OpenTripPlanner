@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
@@ -62,6 +63,36 @@ class GbfsVehicleRentalDataSourceTest {
           vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed()
         )
     );
+  }
+
+  @Test
+  void geofencing() {
+    var dataSource = new GbfsVehicleRentalDataSource(
+      new GbfsVehicleRentalDataSourceParameters(
+        "file:src/test/resources/gbfs/tieroslo/gbfs.json",
+        "en",
+        false,
+        new HashMap<>(),
+        null
+      )
+    );
+
+    dataSource.setup();
+
+    assertTrue(dataSource.update());
+
+    var zones = dataSource.getGeofencingZones();
+
+    assertEquals(363, zones.size());
+
+    var frognerPark = zones
+      .stream()
+      .filter(z -> z.id().getId().equals("NP Frogner og vigelandsparken"))
+      .findFirst()
+      .get();
+
+    assertTrue(frognerPark.dropOffBanned());
+    assertFalse(frognerPark.passingThroughBanned());
   }
 
   @Test

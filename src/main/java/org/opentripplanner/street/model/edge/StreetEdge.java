@@ -388,7 +388,7 @@ public class StreetEdge
   public State traverse(State s0) {
     final StateEditor editor;
 
-    if(traversalExtension != null && traversalExtension.isBanned(s0)) {
+    if (traversalExtension != null && traversalExtension.traversalBanned(s0)) {
       return null;
     }
 
@@ -650,6 +650,7 @@ public class StreetEdge
   public void setCostExtension(StreetEdgeCostExtension costExtension) {
     this.costExtension = costExtension;
   }
+
   public void setTraversalExtension(StreetEdgeTraversalExtension ext) {
     this.traversalExtension = ext;
   }
@@ -992,10 +993,18 @@ public class StreetEdge
       }
     }
 
-    var s1 = createEditor(s0, this, traverseMode, walkingBike);
+    var editor = createEditor(s0, this, traverseMode, walkingBike);
 
-    if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, s1)) {
+    if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, editor)) {
       return null;
+    }
+
+    if (traversalExtension != null && traversalExtension.dropOffBanned(s0)) {
+      editor.enteredNoRentalDropOffArea();
+      LOG.info("Entering no drop off area at {}", traversalExtension.toString());
+    } else {
+      editor.leaveNoRentalDropOffArea();
+      LOG.info("Exiting no drop off area at {}", this.name);
     }
 
     final RoutingPreferences preferences = s0.getPreferences();
@@ -1078,7 +1087,7 @@ public class StreetEdge
       }
 
       if (!traverseMode.isDriving()) {
-        s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
+        editor.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
       }
 
       time += (int) Math.ceil(turnDuration);
@@ -1086,18 +1095,18 @@ public class StreetEdge
     }
 
     if (!traverseMode.isDriving()) {
-      s1.incrementWalkDistance(getDistanceWithElevation());
+      editor.incrementWalkDistance(getDistanceWithElevation());
     }
 
     if (costExtension != null) {
       weight += costExtension.calculateExtraCost(s0, length_mm, traverseMode);
     }
 
-    s1.incrementTimeInSeconds(time);
+    editor.incrementTimeInSeconds(time);
 
-    s1.incrementWeight(weight);
+    editor.incrementWeight(weight);
 
-    return s1;
+    return editor;
   }
 
   @Nonnull

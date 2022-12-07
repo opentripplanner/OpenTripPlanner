@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,12 +10,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
@@ -122,11 +124,11 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {
 
     private final List<VehicleRentalPlace> stations;
-    private final List<Geometry> geofencingZones;
+    private final List<GeofencingZone> geofencingZones;
 
     public VehicleRentalGraphWriterRunnable(
       List<VehicleRentalPlace> stations,
-      List<Geometry> geofencingZones
+      List<GeofencingZone> geofencingZones
     ) {
       this.stations = stations;
       this.geofencingZones = geofencingZones;
@@ -187,16 +189,43 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         tempEdgesByStation.get(station).disposeEdges();
         tempEdgesByStation.remove(station);
       }
-      for (Geometry zone : geofencingZones) {
-        var candidates = graph.getStreetIndex().getEdgesForEnvelope(zone.getEnvelopeInternal());
-        candidates.forEach(e -> {
-          if (e instanceof StreetEdge streetEdge && e.getGeometry().intersects(zone)) {
+
+      computeGeofencingZones(graph);
+    }
+
+    private void computeGeofencingZones(Graph graph) {
+      LOG.info("Computing geofencing zones");
+      var start = System.currentTimeMillis();
+
+      int bannedEdges = 0;
+      var restrictedZones = geofencingZones
+        .stream()
+        .filter(GeofencingZone::hasRestriction)
+        .toList();
+      for (GeofencingZone zone : restrictedZones) {
+        LOG.info("Adding restrictions for {}", zone.id());
+        var candidates = graph
+          .getStreetIndex()
+          .getEdgesForEnvelope(zone.geometry().getEnvelopeInternal());
+        for (var e : candidates) {
+          if (
+            e instanceof StreetEdge streetEdge &&
+            streetEdge.getGeometry().intersects(zone.geometry())
+          ) {
             streetEdge.setTraversalExtension(
-              new StreetEdgeTraversalExtension.BanRentalNetwork("tieroslo")
+              new StreetEdgeTraversalExtension.GeofencingZoneExtension(zone)
             );
+            bannedEdges++;
           }
-        });
+        }
       }
+      var end = System.currentTimeMillis();
+      var millis = Duration.ofMillis(end - start);
+      LOG.info(
+        "Geofencing zones computation took {}. Added extension to {} edges.",
+        TimeUtils.durationToStrCompact(millis),
+        bannedEdges
+      );
     }
   }
 }

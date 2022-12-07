@@ -12,12 +12,10 @@ import org.entur.gbfs.v2_2.station_status.GBFSStation;
 import org.entur.gbfs.v2_2.station_status.GBFSStationStatus;
 import org.entur.gbfs.v2_2.system_information.GBFSSystemInformation;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
-import org.entur.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
-import org.locationtech.jts.geom.Geometry;
+import org.entur.gbfs.v2_2.geofencing_zones.GBFSGeofencingZones;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.UnsupportedGeometryException;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
@@ -163,14 +161,10 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
   }
 
   @Override
-  public List<Geometry> getGeofencingZones() {
+  public List<GeofencingZone> getGeofencingZones() {
+    var mapper = new GbfsGeofencingZoneMapper("tieroslo");
     var zones = loader.getFeed(GBFSGeofencingZones.class);
-    return zones.getData().getGeofencingZones().getFeatures().stream().map(f -> {
-      try {
-        return GeometryUtils.convertGeoJsonToJtsGeometry(f.getGeometry());
-      } catch (UnsupportedGeometryException e) {
-        throw new RuntimeException(e);
-      }
-    }).toList();
+
+    return mapper.mapRentalVehicleType(zones);
   }
 }

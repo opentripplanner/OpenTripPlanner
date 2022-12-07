@@ -45,6 +45,8 @@ public class StateData implements Cloneable {
   /** This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
   protected boolean enteredNoThroughTrafficArea;
 
+  protected boolean insideNoRentalDropOffArea;
+
   /** Private constructor, use static methods to get a set of initial states. */
   private StateData(StreetMode requestMode) {
     if (requestMode.includesDriving()) {

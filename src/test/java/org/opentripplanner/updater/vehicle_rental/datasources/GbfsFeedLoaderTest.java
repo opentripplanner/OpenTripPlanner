@@ -129,7 +129,6 @@ class GbfsFeedLoaderTest {
     var zones = loader.getFeed(GBFSGeofencingZones.class);
     var features = zones.getData().getGeofencingZones().getFeatures();
     var f = features.get(0);
-    f.getGeometry().
     assertNotNull(f);
   }
 
