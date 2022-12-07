@@ -92,4 +92,15 @@ public class WgsCoordinateTest {
     assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(1d, 181d));
     assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(1d, -181d));
   }
+
+  @Test
+  public void add() {
+    assertEquals(new WgsCoordinate(12d, 5d), new WgsCoordinate(9d, 1d).add(3d, 4d));
+  }
+
+  @Test
+  public void testGreenwich() {
+    assertEquals(51.48d, WgsCoordinate.GREENWICH.latitude());
+    assertEquals(0d, WgsCoordinate.GREENWICH.longitude());
+  }
 }

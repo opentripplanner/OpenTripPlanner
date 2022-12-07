@@ -15,6 +15,7 @@ import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
  */
 public final class WgsCoordinate implements Serializable {
 
+  public static final WgsCoordinate GREENWICH = new WgsCoordinate(51.48, 0d);
   private static final double LAT_MIN = -90;
   private static final double LAT_MAX = 90;
   private static final double LON_MIN = -180;
@@ -119,6 +120,13 @@ public final class WgsCoordinate implements Serializable {
    */
   public boolean sameLocation(WgsCoordinate other) {
     return equals(other);
+  }
+
+  /**
+   * Add (deltaLat, deltaLon) to the current coordinates and return the new position.
+   */
+  public WgsCoordinate add(double deltaLat, double deltaLon) {
+    return new WgsCoordinate(latitude + deltaLat, longitude + deltaLon);
   }
 
   /**
