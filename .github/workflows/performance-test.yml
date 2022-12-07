@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - secondary_super_cache
 
 jobs:
   perf-test:
