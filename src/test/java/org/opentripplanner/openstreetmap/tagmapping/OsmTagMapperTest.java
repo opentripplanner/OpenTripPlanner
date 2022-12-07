@@ -1,4 +1,4 @@
-package org.opentripplanner.openstreetmap.tagmapper;
+package org.opentripplanner.openstreetmap.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -9,8 +9,6 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.openstreetmap.tagmapping.DefaultMapper;
-import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 public class OsmTagMapperTest {

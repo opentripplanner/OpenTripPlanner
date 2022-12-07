@@ -1,4 +1,4 @@
-package org.opentripplanner.openstreetmap.tagmapper;
+package org.opentripplanner.openstreetmap.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
@@ -8,7 +8,6 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.openstreetmap.tagmapping.HoustonMapper;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 class HoustonMapperTest {

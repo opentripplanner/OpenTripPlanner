@@ -77,8 +77,8 @@ public interface OsmTagMapper {
   }
 
   /**
-   * This is the list of {@link OsmTagMapper} sources. The enum provide a mapping between the
-   * enum name and the actual implementation.
+   * This is the list of {@link OsmTagMapper} sources. The enum provide a mapping between the enum
+   * name and the actual implementation.
    */
   enum Source {
     DEFAULT,
@@ -87,7 +87,8 @@ public interface OsmTagMapper {
     FINLAND,
     GERMANY,
     ATLANTA,
-    HOUSTON;
+    HOUSTON,
+    PORTLAND;
 
     public OsmTagMapper getInstance() {
       return switch (this) {
@@ -98,6 +99,7 @@ public interface OsmTagMapper {
         case GERMANY -> new GermanyMapper();
         case ATLANTA -> new AtlantaMapper();
         case HOUSTON -> new HoustonMapper();
+        case PORTLAND -> new PortlandMapper();
       };
     }
   }
