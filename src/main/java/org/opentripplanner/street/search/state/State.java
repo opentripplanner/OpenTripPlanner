@@ -373,6 +373,11 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return request.dataOverlayContext();
   }
 
+  @Override
+  public boolean isInsideNoRentalDropOffArea() {
+    return stateData.insideNoRentalDropOffArea;
+  }
+
   protected State clone() {
     State ret;
     try {

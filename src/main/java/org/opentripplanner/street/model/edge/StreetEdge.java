@@ -63,7 +63,7 @@ public class StreetEdge
   private static final int WALK_NOTHRUTRAFFIC = 8;
   private static final int CLASS_LINK = 9;
   private StreetEdgeCostExtension costExtension;
-  private StreetEdgeTraversalExtension traversalExtension;
+  protected StreetEdgeTraversalExtension traversalExtension;
   /** back, roundabout, stairs, ... */
   private short flags;
 
@@ -979,8 +979,12 @@ public class StreetEdge
    * return a StateEditor rather than a State so that we can make parking/mode switch modifications
    * for kiss-and-ride.
    */
-  private StateEditor doTraverse(State s0, TraverseMode traverseMode, boolean walkingBike) {
-    Edge backEdge = s0.getBackEdge();
+  private StateEditor doTraverse(
+    State currentState,
+    TraverseMode traverseMode,
+    boolean walkingBike
+  ) {
+    Edge backEdge = currentState.getBackEdge();
     if (backEdge != null) {
       // No illegal U-turns.
       // NOTE(flamholz): we check both directions because both edges get a chance to decide
@@ -993,21 +997,19 @@ public class StreetEdge
       }
     }
 
-    var editor = createEditor(s0, this, traverseMode, walkingBike);
+    var editor = createEditor(currentState, this, traverseMode, walkingBike);
 
-    if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, editor)) {
+    if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, currentState, editor)) {
       return null;
     }
 
-    if (traversalExtension != null && traversalExtension.dropOffBanned(s0)) {
+    if (traversalExtension != null && traversalExtension.dropOffBanned(currentState)) {
       editor.enteredNoRentalDropOffArea();
-      LOG.info("Entering no drop off area at {}", traversalExtension.toString());
-    } else {
+    } else if (currentState.isInsideNoRentalDropOffArea()) {
       editor.leaveNoRentalDropOffArea();
-      LOG.info("Exiting no drop off area at {}", this.name);
     }
 
-    final RoutingPreferences preferences = s0.getPreferences();
+    final RoutingPreferences preferences = currentState.getPreferences();
 
     // Automobiles have variable speeds depending on the edge type
     double speed = calculateSpeed(preferences, traverseMode, walkingBike);
@@ -1020,7 +1022,7 @@ public class StreetEdge
           traverseMode,
           speed,
           walkingBike,
-          s0.getRequest().wheelchair()
+          currentState.getRequest().wheelchair()
         );
         default -> otherTraversalCosts(preferences, traverseMode, walkingBike, speed);
       };
@@ -1030,19 +1032,23 @@ public class StreetEdge
 
     /* Compute turn cost. */
     if (backEdge instanceof StreetEdge backPSE) {
-      TraverseMode backMode = s0.getBackMode();
-      final boolean arriveBy = s0.getRequest().arriveBy();
+      TraverseMode backMode = currentState.getBackMode();
+      final boolean arriveBy = currentState.getRequest().arriveBy();
 
       // Apply turn restrictions
       if (
         arriveBy
-          ? !canTurnOnto(backPSE, s0, backMode)
-          : !backPSE.canTurnOnto(this, s0, traverseMode)
+          ? !canTurnOnto(backPSE, currentState, backMode)
+          : !backPSE.canTurnOnto(this, currentState, traverseMode)
       ) {
         return null;
       }
 
-      double backSpeed = backPSE.calculateSpeed(preferences, backMode, s0.isBackWalkingBike());
+      double backSpeed = backPSE.calculateSpeed(
+        preferences,
+        backMode,
+        currentState.isBackWalkingBike()
+      );
       final double turnDuration; // Units are seconds.
 
       /*
@@ -1058,7 +1064,7 @@ public class StreetEdge
        */
       if (arriveBy && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
         turnDuration =
-          s0
+          currentState
             .intersectionTraversalCalculator()
             .computeTraversalDuration(
               traversedVertex,
@@ -1070,7 +1076,7 @@ public class StreetEdge
             );
       } else if (!arriveBy && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
         turnDuration =
-          s0
+          currentState
             .intersectionTraversalCalculator()
             .computeTraversalDuration(
               traversedVertex,
@@ -1099,7 +1105,7 @@ public class StreetEdge
     }
 
     if (costExtension != null) {
-      weight += costExtension.calculateExtraCost(s0, length_mm, traverseMode);
+      weight += costExtension.calculateExtraCost(currentState, length_mm, traverseMode);
     }
 
     editor.incrementTimeInSeconds(time);

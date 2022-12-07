@@ -203,7 +203,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         .filter(GeofencingZone::hasRestriction)
         .toList();
       for (GeofencingZone zone : restrictedZones) {
-        LOG.info("Adding restrictions for {}", zone.id());
         var candidates = graph
           .getStreetIndex()
           .getEdgesForEnvelope(zone.geometry().getEnvelopeInternal());
