@@ -1,10 +1,11 @@
-package org.opentripplanner.framework.geometry;
+package org.opentripplanner.service.worldenvelope.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 
 class WorldEnvelopeTest {
 

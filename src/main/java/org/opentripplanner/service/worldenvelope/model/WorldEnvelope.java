@@ -1,9 +1,10 @@
-package org.opentripplanner.framework.geometry;
+package org.opentripplanner.service.worldenvelope.model;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.statistics.MedianCalcForDoubles;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
