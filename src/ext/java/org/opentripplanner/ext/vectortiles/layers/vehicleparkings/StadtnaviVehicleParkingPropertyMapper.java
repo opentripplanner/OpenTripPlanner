@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Locale;
 import org.json.simple.JSONObject;
 import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.TranslatedString;
 
 public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<VehicleParking> {
 

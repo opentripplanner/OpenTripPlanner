@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.vertex;
 
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 public class SimpleVertex extends StreetVertex {
 

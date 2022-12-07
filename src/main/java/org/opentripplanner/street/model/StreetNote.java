@@ -3,8 +3,8 @@ package org.opentripplanner.street.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 
 public class StreetNote implements Serializable {
 

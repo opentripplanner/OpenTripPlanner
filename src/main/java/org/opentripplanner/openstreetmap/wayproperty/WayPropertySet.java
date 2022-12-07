@@ -13,13 +13,13 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.street.model.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.StreetNoteMatcher;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.transit.model.basic.I18NString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

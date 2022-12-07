@@ -1,7 +1,7 @@
 package org.opentripplanner.openstreetmap.wayproperty;
 
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * A CreativeNamer makes up names for ways that don't have one in the OSM data set. It does this by
