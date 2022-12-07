@@ -35,7 +35,7 @@ public class FlexRouter {
 
   private final Graph graph;
   private final TransitService transitService;
-  private final FlexParameters parameters;
+  private final FlexConfig config;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
   private final FlexIndex flexIndex;
@@ -60,7 +60,6 @@ public class FlexRouter {
     FlexConfig config,
     Instant searchInstant,
     boolean arriveBy,
-    double walkSpeed,
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     Collection<NearbyStop> streetAccesses,
@@ -68,7 +67,7 @@ public class FlexRouter {
   ) {
     this.graph = graph;
     this.transitService = transitService;
-    this.parameters = new FlexParameters((config.maxTransferSeconds * walkSpeed));
+    this.config = config;
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
@@ -80,8 +79,10 @@ public class FlexRouter {
       );
 
     if (graph.hasStreets) {
-      this.accessFlexPathCalculator = new StreetFlexPathCalculator(false);
-      this.egressFlexPathCalculator = new StreetFlexPathCalculator(true);
+      this.accessFlexPathCalculator =
+        new StreetFlexPathCalculator(false, config.maxFlexTripDuration());
+      this.egressFlexPathCalculator =
+        new StreetFlexPathCalculator(true, config.maxFlexTripDuration());
     } else {
       // this is only really useful in tests. in real world scenarios you're unlikely to get useful
       // results if you don't have streets
@@ -178,12 +179,7 @@ public class FlexRouter {
             .flatMap(date ->
               it
                 .flexTrip()
-                .getFlexAccessTemplates(
-                  it.accessEgress(),
-                  date,
-                  accessFlexPathCalculator,
-                  parameters
-                )
+                .getFlexAccessTemplates(it.accessEgress(), date, accessFlexPathCalculator, config)
             )
         )
         .collect(Collectors.toList());
@@ -207,12 +203,7 @@ public class FlexRouter {
             .flatMap(date ->
               it
                 .flexTrip()
-                .getFlexEgressTemplates(
-                  it.accessEgress(),
-                  date,
-                  egressFlexPathCalculator,
-                  parameters
-                )
+                .getFlexEgressTemplates(it.accessEgress(), date, egressFlexPathCalculator, config)
             )
         )
         .collect(Collectors.toList());

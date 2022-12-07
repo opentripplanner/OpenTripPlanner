@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
@@ -14,6 +13,7 @@ import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -47,14 +47,14 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
     NearbyStop access,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    FlexParameters params
+    FlexConfig config
   );
 
   public abstract Stream<FlexEgressTemplate> getFlexEgressTemplates(
     NearbyStop egress,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    FlexParameters params
+    FlexConfig config
   );
 
   public abstract int earliestDepartureTime(

@@ -239,9 +239,10 @@ public class OpenStreetMapModuleTest {
 
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().forward()); // right (with traffic) comes
-    // from track
-    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().back()); // left comes from lane
+    // right (with traffic) comes from track
+    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().forward());
+    // left comes from lane
+    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().back());
 
     way = new OSMWay();
     way.addTag("highway", "footway");

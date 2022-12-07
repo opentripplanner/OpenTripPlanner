@@ -26,11 +26,12 @@ public class OsmExtractParametersBuilder {
 
   public OsmExtractParametersBuilder() {
     this.osmTagMapper = OsmExtractParameters.DEFAULT_OSM_TAG_MAPPER;
+    this.timeZone = OsmExtractParameters.DEFAULT_TIME_ZONE;
   }
 
   public OsmExtractParametersBuilder(OsmExtractParameters original) {
     this.osmTagMapper = original.osmTagMapper();
-    this.timeZone = original.timeZone().orElse(null);
+    this.timeZone = original.timeZone();
   }
 
   public OsmExtractParametersBuilder withSource(URI source) {
