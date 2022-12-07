@@ -587,6 +587,8 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
+      // we need to clone the default request as it is request-scoped and this method
+      // can be used by a batch query, causing several invocations to use the same instance
       RouteRequest request = context.getServerContext().defaultRouteRequest().clone();
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
