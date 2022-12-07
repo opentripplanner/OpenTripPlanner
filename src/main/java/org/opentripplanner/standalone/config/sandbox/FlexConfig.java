@@ -5,17 +5,14 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FlexConfig {
-
-  public static final FlexConfig DEFAULT = new FlexConfig();
 
   private static final Duration MAX_TRANSFER_DURATION = Duration.ofMinutes(5);
   private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
 
-  private static final Logger LOG = LoggerFactory.getLogger(FlexConfig.class);
+  // this needs to be instantiated _after_ the defaults are initialized!
+  public static final FlexConfig DEFAULT = new FlexConfig();
 
   private final Duration maxTransferDuration;
   private final Duration maxFlexTripDuration;
