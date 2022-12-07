@@ -48,8 +48,6 @@ public class WorldEnvelopeBuilder {
       expandToInclude(latProvider.apply(it), lonProvider.apply(it));
     }
 
-    // we need this check because there could be only AreaStops (which don't have vertices)
-    // in the graph
     var medianCalculator = new MedianCalcForDoubles(collection.size());
 
     collection.forEach(v -> medianCalculator.add(lonProvider.apply(v)));
