@@ -15,7 +15,7 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.street.model.StreetNote;
+import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;

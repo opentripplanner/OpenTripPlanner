@@ -6,11 +6,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.street.model.StreetNote;
-import org.opentripplanner.street.model.StreetNoteAndMatcher;
-import org.opentripplanner.street.model.StreetNoteMatcher;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.note.StreetNote;
+import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
+import org.opentripplanner.street.model.note.StreetNoteMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

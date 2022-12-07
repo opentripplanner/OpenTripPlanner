@@ -17,9 +17,9 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
-import org.opentripplanner.street.model.StreetNoteAndMatcher;
-import org.opentripplanner.street.model.StreetNoteMatcher;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
+import org.opentripplanner.street.model.note.StreetNoteMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,9 +5,9 @@ import java.util.regex.Pattern;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.street.model.StreetNote;
-import org.opentripplanner.street.model.StreetNoteAndMatcher;
-import org.opentripplanner.street.model.StreetNoteMatcher;
+import org.opentripplanner.street.model.note.StreetNote;
+import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
+import org.opentripplanner.street.model.note.StreetNoteMatcher;
 
 public class NoteProperties {
 

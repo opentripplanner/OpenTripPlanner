@@ -1,4 +1,4 @@
-package org.opentripplanner.street.model;
+package org.opentripplanner.street.model.note;
 
 import java.io.Serializable;
 import java.util.Date;

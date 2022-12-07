@@ -4,7 +4,7 @@ import java.util.Date;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.street.model.StreetNote;
+import org.opentripplanner.street.model.note.StreetNote;
 
 /**
  * Example implementation of a WFS based street note updater, which can be used to retrieve
