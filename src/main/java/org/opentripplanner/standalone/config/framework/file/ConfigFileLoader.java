@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.apache.commons.io.IOUtils;
-import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +29,6 @@ import org.slf4j.LoggerFactory;
 public class ConfigFileLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConfigFileLoader.class);
-
-  private static final String OTP_CONFIG_FILENAME = "otp-config.json";
-  private static final String BUILD_CONFIG_FILENAME = "build-config.json";
-  private static final String ROUTER_CONFIG_FILENAME = "router-config.json";
 
   /** When echoing config files to logs, values for these keys will be hidden. */
   private static final Set<String> REDACT_KEYS = Set.of("secretKey", "accessKey", "gsCredentials");
@@ -87,13 +83,9 @@ public class ConfigFileLoader {
       if (jsonFallback != null) {
         return stringToJsonNode(jsonFallback, filename);
       }
-      LOG.warn(
-        "Config '{}' not loaded, using defaults. Config directory not set.",
-        BUILD_CONFIG_FILENAME
-      );
+      LOG.warn("Config '{}' not loaded, using defaults. Config directory not set.", filename);
       return MissingNode.getInstance();
     }
-
     return loadJsonFile(new File(configDir, filename));
   }
 

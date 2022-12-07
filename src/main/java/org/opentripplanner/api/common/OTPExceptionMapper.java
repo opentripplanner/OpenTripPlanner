@@ -6,7 +6,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

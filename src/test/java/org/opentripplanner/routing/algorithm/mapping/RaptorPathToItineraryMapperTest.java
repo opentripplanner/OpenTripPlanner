@@ -4,10 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -32,7 +34,6 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.TestUtils;
 
 public class RaptorPathToItineraryMapperTest {
 
@@ -108,12 +109,15 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private RaptorPathToItineraryMapper<TestTripSchedule> getRaptorPathToItineraryMapper() {
-    Instant dateTime = TestUtils.dateInstant("Europe/Stockholm", 2022, 10, 10, 12, 0, 0);
+    Instant dateTime = LocalDateTime
+      .of(2022, Month.OCTOBER, 10, 12, 0, 0)
+      .atZone(ZoneIds.STOCKHOLM)
+      .toInstant();
     return new RaptorPathToItineraryMapper<TestTripSchedule>(
       new Graph(),
       new DefaultTransitService(new TransitModel()),
       null,
-      dateTime.atZone(ZoneId.of("CET")),
+      dateTime.atZone(ZoneIds.CET),
       new RouteRequest()
     );
   }

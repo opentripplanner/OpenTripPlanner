@@ -62,6 +62,7 @@ public class OsmConfig {
     OsmExtractParameters defaults,
     String documentationAddition
   ) {
+    var docDefaults = OsmExtractParameters.DEFAULT;
     return defaults
       .copyOf()
       .withOsmTagMapper(
@@ -71,6 +72,7 @@ public class OsmConfig {
           .summary(
             "The named set of mapping rules applied when parsing OSM tags." + documentationAddition
           )
+          .docDefaultValue(docDefaults.osmTagMapper())
           .asEnum(defaults.osmTagMapper())
       )
       .withTimeZone(
@@ -80,7 +82,8 @@ public class OsmConfig {
           .summary(
             "The timezone used to resolve opening hours in OSM data." + documentationAddition
           )
-          .asZoneId(defaults.timeZone().orElse(null))
+          .docDefaultValue(docDefaults.timeZone())
+          .asZoneId(defaults.timeZone())
       );
   }
 }

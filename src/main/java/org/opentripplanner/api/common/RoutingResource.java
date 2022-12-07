@@ -19,11 +19,11 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

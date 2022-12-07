@@ -1,5 +1,8 @@
 package org.opentripplanner.ext.transmodelapi.model.framework;
 
+import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
+import static org.opentripplanner.framework.application.OtpFileNames.OTP_CONFIG_FILENAME;
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import graphql.Scalars;
@@ -62,7 +65,7 @@ public class ServerInfoType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("otpConfigVersion")
-          .description("The 'configVersion' of the otp-config.json file.")
+          .description("The 'configVersion' of the " + OTP_CONFIG_FILENAME + " file.")
           .type(Scalars.GraphQLString)
           .dataFetcher(e -> projectInfo().otpConfigVersion)
           .build()
@@ -71,7 +74,7 @@ public class ServerInfoType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("buildConfigVersion")
-          .description("The 'configVersion' of the build-config.json file.")
+          .description("The 'configVersion' of the " + BUILD_CONFIG_FILENAME + " file.")
           .type(Scalars.GraphQLString)
           .dataFetcher(e -> projectInfo().buildConfigVersion)
           .build()
@@ -80,7 +83,7 @@ public class ServerInfoType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("routerConfigVersion")
-          .description("The 'configVersion' of the router-config.json file.")
+          .description("The 'configVersion' of the " + ROUTER_CONFIG_FILENAME + " file.")
           .type(Scalars.GraphQLString)
           .dataFetcher(e -> projectInfo().routerConfigVersion)
           .build()

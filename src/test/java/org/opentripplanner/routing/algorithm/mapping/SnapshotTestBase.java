@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -50,7 +51,6 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.util.TestUtils;
 
 /**
  * A base class for creating snapshots test of itinerary generation using the Portland graph.
@@ -104,15 +104,10 @@ public abstract class SnapshotTestBase {
 
     RouteRequest request = serverContext.defaultRouteRequest();
     request.setDateTime(
-      TestUtils.dateInstant(
-        serverContext.transitService().getTimeZone().getId(),
-        year,
-        month,
-        day,
-        hour,
-        minute,
-        second
-      )
+      LocalDateTime
+        .of(year, month, day, hour, minute, second)
+        .atZone(ZoneId.of(serverContext.transitService().getTimeZone().getId()))
+        .toInstant()
     );
 
     request.withPreferences(pref -> pref.withTransfer(tx -> tx.withMaxTransfers(6)));

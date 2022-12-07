@@ -2,11 +2,10 @@ package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
 
-import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -30,7 +29,7 @@ class OsmConfigTest {
 
     assertNull(subject.source());
     assertEquals(OsmTagMapper.Source.FINLAND, subject.osmTagMapper());
-    assertEquals(ZoneId.of("Europe/Helsinki"), subject.timeZone().get());
+    assertEquals(ZoneIds.HELSINKI, subject.timeZone());
   }
 
   @Test
@@ -44,7 +43,7 @@ class OsmConfigTest {
 
     assertNull(subject.source());
     assertEquals(OsmTagMapper.Source.DEFAULT, subject.osmTagMapper());
-    assertTrue(subject.timeZone().isEmpty());
+    assertNull(subject.timeZone());
   }
 
   @Test
@@ -77,7 +76,7 @@ class OsmConfigTest {
 
     assertEquals("https://foo.bar/osm.pbf", osmExtractParameters.source().toString());
     assertEquals(OsmTagMapper.Source.FINLAND, osmExtractParameters.osmTagMapper());
-    assertEquals(ZoneId.of("Europe/Helsinki"), osmExtractParameters.timeZone().get());
+    assertEquals(ZoneIds.HELSINKI, osmExtractParameters.timeZone());
   }
 
   @Test
@@ -122,7 +121,7 @@ class OsmConfigTest {
       atlantaOsmExtractParameters.source().toString()
     );
     assertEquals(OsmTagMapper.Source.ATLANTA, atlantaOsmExtractParameters.osmTagMapper());
-    assertEquals(ZoneId.of("US/Eastern"), atlantaOsmExtractParameters.timeZone().get());
+    assertEquals(ZoneIds.US_ESTERN, atlantaOsmExtractParameters.timeZone());
 
     var houstonOsmExtractParameters = subject.parameters.get(1);
     assertEquals(
@@ -130,7 +129,7 @@ class OsmConfigTest {
       houstonOsmExtractParameters.source().toString()
     );
     assertEquals(OsmTagMapper.Source.HOUSTON, houstonOsmExtractParameters.osmTagMapper());
-    assertEquals(ZoneId.of("US/Central"), houstonOsmExtractParameters.timeZone().get());
+    assertEquals(ZoneIds.US_CENTRAL, houstonOsmExtractParameters.timeZone());
   }
 
   @Test
@@ -164,6 +163,6 @@ class OsmConfigTest {
       atlantaOsmExtractParameters.source().toString()
     );
     assertEquals(OsmTagMapper.Source.ATLANTA, atlantaOsmExtractParameters.osmTagMapper());
-    assertEquals(ZoneId.of("US/Eastern"), atlantaOsmExtractParameters.timeZone().get());
+    assertEquals(ZoneIds.US_ESTERN, atlantaOsmExtractParameters.timeZone());
   }
 }

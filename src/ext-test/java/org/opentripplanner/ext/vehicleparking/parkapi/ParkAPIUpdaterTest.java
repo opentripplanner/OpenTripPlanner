@@ -9,7 +9,9 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
+import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class ParkAPIUpdaterTest {
@@ -17,7 +19,7 @@ public class ParkAPIUpdaterTest {
   @Test
   void parseCars() {
     var url = "file:src/ext-test/resources/vehicleparking/parkapi/parkapi-reutlingen.json";
-    var timeZone = ZoneId.of("Europe/Berlin");
+    var timeZone = ZoneIds.BERLIN;
     var parameters = new ParkAPIUpdaterParameters(
       "",
       url,
@@ -46,6 +48,7 @@ public class ParkAPIUpdaterTest {
       "OHCalendar{zoneId: Europe/Berlin, openingHours: [Mo-Su 0:00-23:59:59]}",
       first.getOpeningHours().toString()
     );
+    assertEquals("Mo-Su 0:00-23:59", OsmOpeningHoursSupport.osmFormat(first.getOpeningHours()));
     assertTrue(first.hasAnyCarPlaces());
     assertNull(first.getCapacity());
 

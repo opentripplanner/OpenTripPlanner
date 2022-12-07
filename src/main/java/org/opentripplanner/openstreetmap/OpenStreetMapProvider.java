@@ -9,6 +9,7 @@ import org.openstreetmap.osmosis.osmbinary.file.BlockInputStream;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
+import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
@@ -61,7 +62,7 @@ public class OpenStreetMapProvider implements OSMProvider {
     boolean cacheDataInMem
   ) {
     this.source = osmExtractConfigConfiguredDataSource.dataSource();
-    this.zoneId = osmExtractConfigConfiguredDataSource.config().timeZone().orElse(null);
+    this.zoneId = osmExtractConfigConfiguredDataSource.config().timeZone();
     this.osmTagMapper = osmExtractConfigConfiguredDataSource.config().osmTagMapper().getInstance();
     this.wayPropertySet = new WayPropertySet();
     osmTagMapper.populateProperties(wayPropertySet);
@@ -141,8 +142,10 @@ public class OpenStreetMapProvider implements OSMProvider {
       if (!hasWarnedAboutMissingTimeZone) {
         hasWarnedAboutMissingTimeZone = true;
         LOG.warn(
-          "Missing time zone for OSM source {} - time-restricted entities will not be created, please configure it in the build-config.json",
-          source.uri()
+          "Missing time zone for OSM source {} - time-restricted entities will " +
+          "not be created, please configure it in the {}",
+          source.uri(),
+          OtpFileNames.BUILD_CONFIG_FILENAME
         );
       }
     }

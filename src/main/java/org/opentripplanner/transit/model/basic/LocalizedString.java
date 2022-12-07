@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import org.opentripplanner.util.resources.ResourceBundleSingleton;
+import org.opentripplanner.framework.resources.ResourceBundleSingleton;
 
 /**
  * This is used to localize strings for which localization are known beforehand. Those are local

@@ -3,8 +3,8 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS Frequency into the OTP model. */
 class FrequencyMapper {

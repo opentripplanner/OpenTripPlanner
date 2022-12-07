@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
@@ -20,15 +21,18 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.lang.ObjectUtils;
+import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
+import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
 import org.opentripplanner.standalone.config.buildconfig.NetexConfig;
 import org.opentripplanner.standalone.config.buildconfig.OsmConfig;
 import org.opentripplanner.standalone.config.buildconfig.S3BucketConfig;
@@ -112,8 +116,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   /** See {@link S3BucketConfig}. */
   public final S3BucketConfig elevationBucket;
 
-  public final double elevationUnitMultiplier;
-
   /**
    * A specific fares service to use.
    */
@@ -148,7 +150,9 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final double maxTransferDurationSeconds;
   public final Boolean extraEdgesStopPlatformLink;
   public final NetexFeedParameters netexDefaults;
+  public final GtfsFeedParameters gtfsDefaults;
 
+  public final DemExtractParameters demDefaults;
   public final OsmExtractParameters osmDefaults;
 
   public final List<RouteRequest> transferRequests;
@@ -163,7 +167,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final TransitFeeds transitFeeds;
   public boolean staticParkAndRide;
   public boolean staticBikeParkAndRide;
-  public int maxInterlineDistance;
   public double distanceBetweenElevationSamples;
   public double maxElevationPropagationMeters;
   public boolean readCachedElevations;
@@ -176,9 +179,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public LocalDate transitServiceStart;
 
   public LocalDate transitServiceEnd;
-  public boolean discardMinTransferTimes;
   public ZoneId transitModelTimeZone;
-  public boolean blockBasedInterlining;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
@@ -224,7 +225,7 @@ public class BuildConfig implements OtpDataStoreConfig {
       root
         .of("configVersion")
         .since(V2_1)
-        .summary("Deployment version of the *build-config.json*.")
+        .summary("Deployment version of the *" + BUILD_CONFIG_FILENAME + "*.")
         .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
         .asString(null);
     dataImportReport =
@@ -245,19 +246,6 @@ public class BuildConfig implements OtpDataStoreConfig {
         )
         .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     elevationBucket = S3BucketConfig.fromConfig(root, "elevationBucket");
-    elevationUnitMultiplier =
-      root
-        .of("elevationUnitMultiplier")
-        .since(V2_0)
-        .summary("Specify a multiplier to convert elevation units from source to meters.")
-        .description(
-          """
-            Unit conversion multiplier for elevation values. No conversion needed if the elevation
-            values are defined in meters in the source data. If, for example, decimetres are used
-            in the source data, this should be set to 0.1.
-            """
-        )
-        .asDouble(1);
     embedRouterConfig =
       root
         .of("embedRouterConfig")
@@ -340,22 +328,6 @@ all of the elevation values in the street edges.
             """
         )
         .asInt(1000);
-    maxInterlineDistance =
-      root
-        .of("maxInterlineDistance")
-        .since(V1_5)
-        .summary(
-          "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle."
-        )
-        .asInt(200);
-    blockBasedInterlining =
-      root
-        .of("blockBasedInterlining")
-        .since(V2_2)
-        .summary(
-          "Whether to create stay-seated transfers in between two trips with the same block id."
-        )
-        .asBoolean(true);
     maxTransferDurationSeconds =
       root
         .of("maxTransferDurationSeconds")
@@ -566,18 +538,6 @@ recommended.
         )
         .description("[Detailed documentation](BoardingLocations.md)")
         .asStringSet(List.copyOf(Set.of("ref")));
-    discardMinTransferTimes =
-      root
-        .of("discardMinTransferTimes")
-        .since(V2_2)
-        .summary("Should minimum transfer times in GTFS files be discarded.")
-        .description(
-          """
-          This is useful eg. when the minimum transfer time is only set for ticketing purposes,
-          but we want to calculate the transfers always from OSM data.
-          """
-        )
-        .asBoolean(false);
 
     var localFileNamePatternsConfig = root
       .of("localFileNamePatterns")
@@ -691,10 +651,12 @@ Netex data is also often supplied in a ZIP file.
 
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);
-    dem = DemConfig.mapDemConfig(root, "dem");
-
+    demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
+    dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
-    transitFeeds = TransitFeedConfig.mapTransitFeeds(root, "transitFeeds", netexDefaults);
+    gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
+    transitFeeds =
+      TransitFeedConfig.mapTransitFeeds(root, "transitFeeds", netexDefaults, gtfsDefaults);
 
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(root, "fares");

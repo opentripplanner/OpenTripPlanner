@@ -52,7 +52,7 @@ public class DirectFlexRouter {
       FlexRouter flexRouter = new FlexRouter(
         serverContext.graph(),
         serverContext.transitService(),
-        serverContext.routerConfig().flexParameters(request.preferences()),
+        serverContext.flexConfig(),
         request.dateTime(),
         request.arriveBy(),
         additionalSearchDays.additionalSearchDaysInPast(),

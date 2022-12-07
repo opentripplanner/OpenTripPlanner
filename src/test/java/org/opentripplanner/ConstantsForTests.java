@@ -113,10 +113,12 @@ public class ConstantsForTests {
   }
 
   public static NetexBundle createMinimalNetexBundle() {
-    return NetexConfigure.netexBundleForTest(
-      createNetexBuilderParameters(),
-      new File(ConstantsForTests.NETEX_DIR, ConstantsForTests.NETEX_FILENAME)
-    );
+    var buildConfig = createNetexBuilderParameters();
+    var netexZipFile = new File(NETEX_DIR, NETEX_FILENAME);
+
+    var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
+    var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
+    return new NetexConfigure(buildConfig).netexBundle(configuredDataSource);
   }
 
   /**
@@ -306,10 +308,7 @@ public class ConstantsForTests {
       graph,
       DataImportIssueStore.NOOP,
       ServiceDateInterval.unbounded(),
-      fareServiceFactory,
-      false,
-      true,
-      300
+      fareServiceFactory
     );
 
     module.buildGraph();

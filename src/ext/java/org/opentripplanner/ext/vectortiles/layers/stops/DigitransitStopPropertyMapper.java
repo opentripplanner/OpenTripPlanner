@@ -8,9 +8,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.vectortiles.I18NStringMapper;
-import org.opentripplanner.ext.vectortiles.PropertyMapper;
+import org.opentripplanner.api.mapping.I18NStringMapper;
+import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
@@ -33,7 +33,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
   }
 
   @Override
-  protected Collection<T2<String, Object>> map(RegularStop stop) {
+  protected Collection<KeyValue> map(RegularStop stop) {
     Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop);
 
     String type = patternsForStop
@@ -59,17 +59,17 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
         .toList()
     );
     return List.of(
-      new T2<>("gtfsId", stop.getId().toString()),
-      new T2<>("name", i18NStringMapper.mapNonnullToApi(stop.getName())),
-      new T2<>("code", stop.getCode()),
-      new T2<>("platform", stop.getPlatformCode()),
-      new T2<>("desc", i18NStringMapper.mapToApi(stop.getDescription())),
-      new T2<>(
+      new KeyValue("gtfsId", stop.getId().toString()),
+      new KeyValue("name", i18NStringMapper.mapNonnullToApi(stop.getName())),
+      new KeyValue("code", stop.getCode()),
+      new KeyValue("platform", stop.getPlatformCode()),
+      new KeyValue("desc", i18NStringMapper.mapToApi(stop.getDescription())),
+      new KeyValue(
         "parentStation",
         stop.getParentStation() != null ? stop.getParentStation().getId() : "null"
       ),
-      new T2<>("type", type),
-      new T2<>("routes", routes)
+      new KeyValue("type", type),
+      new KeyValue("routes", routes)
     );
   }
 }

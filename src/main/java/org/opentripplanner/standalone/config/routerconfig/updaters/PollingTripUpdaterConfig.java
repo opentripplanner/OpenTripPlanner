@@ -3,10 +3,10 @@ package org.opentripplanner.standalone.config.routerconfig.updaters;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
-import org.opentripplanner.util.OtpAppException;
 
 public class PollingTripUpdaterConfig {
 

@@ -6,8 +6,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public final class TripTransferPoint implements TransferPoint, Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private final Trip trip;
   private final int stopPositionInPattern;
 

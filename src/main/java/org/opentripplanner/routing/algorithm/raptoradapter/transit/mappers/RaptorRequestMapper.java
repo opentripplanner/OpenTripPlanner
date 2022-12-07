@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
@@ -17,7 +18,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.Pe
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
 

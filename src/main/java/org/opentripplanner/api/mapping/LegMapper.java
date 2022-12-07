@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.api.model.ApiAlert;
 import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.util.PolylineEncoder;
 
 public class LegMapper {
 

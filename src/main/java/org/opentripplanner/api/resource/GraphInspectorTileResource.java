@@ -11,10 +11,11 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.geotools.geometry.Envelope2D;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
-import org.opentripplanner.inspector.MapTile;
-import org.opentripplanner.inspector.TileRenderer;
+import org.opentripplanner.inspector.raster.MapTile;
+import org.opentripplanner.inspector.raster.TileRenderer;
+import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
@@ -35,7 +36,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
  * given layer.
  *
  * @author laurent
- * @see org.opentripplanner.inspector.TileRendererManager
+ * @see TileRendererManager
  * @see TileRenderer
  */
 @Path("/routers/{ignoreRouterId}/inspector")
@@ -65,7 +66,7 @@ public class GraphInspectorTileResource {
     @PathParam("ext") String ext
   ) throws Exception {
     // Re-use analyst
-    Envelope2D env = WebMercatorTile.tile2Envelope(x, y, z);
+    Envelope env = WebMercatorTile.tile2Envelope(x, y, z);
     MapTile mapTile = new MapTile(env, 256, 256);
 
     OtpServerRequestContext serverContext = this.serverContext;
