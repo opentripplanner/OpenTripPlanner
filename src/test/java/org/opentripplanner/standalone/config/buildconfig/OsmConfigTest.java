@@ -7,7 +7,7 @@ import static org.opentripplanner.standalone.config.framework.JsonSupport.newNod
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
-import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 class OsmConfigTest {
@@ -28,7 +28,7 @@ class OsmConfigTest {
     var subject = OsmConfig.mapOsmDefaults(nodeAdapter, "osmDefaults");
 
     assertNull(subject.source());
-    assertEquals(OsmTagMapper.Source.FINLAND, subject.osmTagMapper());
+    assertEquals(OsmTagMapperSource.FINLAND, subject.osmTagMapper());
     assertEquals(ZoneIds.HELSINKI, subject.timeZone());
   }
 
@@ -42,7 +42,7 @@ class OsmConfigTest {
     var subject = OsmConfig.mapOsmDefaults(nodeAdapter, "osmDefaults");
 
     assertNull(subject.source());
-    assertEquals(OsmTagMapper.Source.DEFAULT, subject.osmTagMapper());
+    assertEquals(OsmTagMapperSource.DEFAULT, subject.osmTagMapper());
     assertNull(subject.timeZone());
   }
 
@@ -75,7 +75,7 @@ class OsmConfigTest {
     var osmExtractParameters = subject.parameters.get(0);
 
     assertEquals("https://foo.bar/osm.pbf", osmExtractParameters.source().toString());
-    assertEquals(OsmTagMapper.Source.FINLAND, osmExtractParameters.osmTagMapper());
+    assertEquals(OsmTagMapperSource.FINLAND, osmExtractParameters.osmTagMapper());
     assertEquals(ZoneIds.HELSINKI, osmExtractParameters.timeZone());
   }
 
@@ -120,7 +120,7 @@ class OsmConfigTest {
       "https://foo.bar/atlanta-osm.pbf",
       atlantaOsmExtractParameters.source().toString()
     );
-    assertEquals(OsmTagMapper.Source.ATLANTA, atlantaOsmExtractParameters.osmTagMapper());
+    assertEquals(OsmTagMapperSource.ATLANTA, atlantaOsmExtractParameters.osmTagMapper());
     assertEquals(ZoneIds.US_ESTERN, atlantaOsmExtractParameters.timeZone());
 
     var houstonOsmExtractParameters = subject.parameters.get(1);
@@ -128,7 +128,7 @@ class OsmConfigTest {
       "https://foo.bar/houston-osm.pbf",
       houstonOsmExtractParameters.source().toString()
     );
-    assertEquals(OsmTagMapper.Source.HOUSTON, houstonOsmExtractParameters.osmTagMapper());
+    assertEquals(OsmTagMapperSource.HOUSTON, houstonOsmExtractParameters.osmTagMapper());
     assertEquals(ZoneIds.US_CENTRAL, houstonOsmExtractParameters.timeZone());
   }
 
@@ -162,7 +162,7 @@ class OsmConfigTest {
       "https://foo.bar/atlanta-osm.pbf",
       atlantaOsmExtractParameters.source().toString()
     );
-    assertEquals(OsmTagMapper.Source.ATLANTA, atlantaOsmExtractParameters.osmTagMapper());
+    assertEquals(OsmTagMapperSource.ATLANTA, atlantaOsmExtractParameters.osmTagMapper());
     assertEquals(ZoneIds.US_ESTERN, atlantaOsmExtractParameters.timeZone());
   }
 }

@@ -15,6 +15,7 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.openstreetmap.api.OSMProvider;
 import org.opentripplanner.openstreetmap.spi.OSMDatabase;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,12 +42,12 @@ public class OpenStreetMapProvider implements OSMProvider {
 
   /** For tests */
   public OpenStreetMapProvider(File file, boolean cacheDataInMem) {
-    this(new FileDataSource(file, FileType.OSM), OsmTagMapper.Source.DEFAULT, null, cacheDataInMem);
+    this(new FileDataSource(file, FileType.OSM), OsmTagMapperSource.DEFAULT, null, cacheDataInMem);
   }
 
   public OpenStreetMapProvider(
     DataSource dataSource,
-    OsmTagMapper.Source tagMapperSource,
+    OsmTagMapperSource tagMapperSource,
     ZoneId zoneId,
     boolean cacheDataInMem
   ) {

@@ -10,10 +10,6 @@ import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
  * @author bdferris, novalis, seime
  */
 public interface OsmTagMapper {
-  static OsmTagMapper defaultMapper() {
-    return Source.DEFAULT.getInstance();
-  }
-
   void populateProperties(WayPropertySet wayPropertySet);
 
   default boolean doesTagValueDisallowThroughTraffic(String tagValue) {
@@ -73,34 +69,6 @@ public interface OsmTagMapper {
       return doesTagValueDisallowThroughTraffic(foot);
     } else {
       return isGeneralNoThroughTraffic(way);
-    }
-  }
-
-  /**
-   * This is the list of {@link OsmTagMapper} sources. The enum provide a mapping between the enum
-   * name and the actual implementation.
-   */
-  enum Source {
-    DEFAULT,
-    NORWAY,
-    UK,
-    FINLAND,
-    GERMANY,
-    ATLANTA,
-    HOUSTON,
-    PORTLAND;
-
-    public OsmTagMapper getInstance() {
-      return switch (this) {
-        case DEFAULT -> new DefaultMapper();
-        case NORWAY -> new NorwayMapper();
-        case UK -> new UKMapper();
-        case FINLAND -> new FinlandMapper();
-        case GERMANY -> new GermanyMapper();
-        case ATLANTA -> new AtlantaMapper();
-        case HOUSTON -> new HoustonMapper();
-        case PORTLAND -> new PortlandMapper();
-      };
     }
   }
 }
