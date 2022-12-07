@@ -32,6 +32,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add test for keeping Transmodel GraphQL schema in sync [#4658](https://github.com/opentripplanner/OpenTripPlanner/pull/4658)
 - Make maxFlexTripDuration configurable [#4642](https://github.com/opentripplanner/OpenTripPlanner/pull/4642)
 - Extract separate conditions for , ,  during OSM tag mapping, add Portland tag mapping [#4593](https://github.com/opentripplanner/OpenTripPlanner/pull/4593)
+- Better fallback in shape geometry processing [#4617](https://github.com/opentripplanner/OpenTripPlanner/pull/4617)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
