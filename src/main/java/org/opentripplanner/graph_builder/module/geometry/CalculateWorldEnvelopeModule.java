@@ -1,10 +1,12 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
+import java.util.Collection;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,18 @@ public class CalculateWorldEnvelopeModule implements GraphBuilderModule {
   public void buildGraph() {
     var vertices = graph.getVertices();
     var stops = transitModel.getStopModel().listStopLocations();
+    WorldEnvelope envelope = build(vertices, stops);
+    graph.setEnvelope(envelope);
+  }
 
+  @Override
+  public void checkInputs() {}
+
+  @SuppressWarnings("Convert2MethodRef")
+  static WorldEnvelope build(
+    Collection<? extends Vertex> vertices,
+    Collection<? extends StopLocation> stops
+  ) {
     var progressTracker = ProgressTracker.track(
       "CalculateWorldEnvelope",
       LOG_EVERY_N_COORDINATE,
@@ -59,11 +72,8 @@ public class CalculateWorldEnvelopeModule implements GraphBuilderModule {
     );
     progressTracker.steps(stops.size(), msg -> LOG.info(msg));
 
-    graph.setEnvelope(e.build());
-
     LOG.info(progressTracker.completeMessage());
-  }
 
-  @Override
-  public void checkInputs() {}
+    return e.build();
+  }
 }
