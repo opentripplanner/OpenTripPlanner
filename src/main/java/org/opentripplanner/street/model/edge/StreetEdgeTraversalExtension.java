@@ -16,6 +16,10 @@ public interface StreetEdgeTraversalExtension {
       this.zone = zone;
     }
 
+    public GeofencingZone zone() {
+      return zone;
+    }
+
     @Override
     public boolean traversalBanned(State state) {
       if (state.isRentingVehicle()) {

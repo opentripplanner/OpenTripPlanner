@@ -478,6 +478,10 @@ public class StreetEdge
       : getDistanceMeters();
   }
 
+  public StreetEdgeTraversalExtension getTraversalExtension() {
+    return traversalExtension;
+  }
+
   private void setGeometry(LineString geometry) {
     this.compactGeometry =
       CompactLineStringUtils.compactLineString(
