@@ -3,7 +3,6 @@ package org.opentripplanner.openstreetmap.wayproperty.specifier;
 import java.util.Arrays;
 import java.util.List;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.openstreetmap.tagmapping.HoustonMapper;
 
 /**
  * This specifier allows you to specify a very precise match. It will only result in a positive when
@@ -15,7 +14,7 @@ import org.opentripplanner.openstreetmap.tagmapping.HoustonMapper;
  * If you'd use a {@link BestMatchSpecifier} then the likelihood of the long spec matching unwanted
  * ways would be high.
  *
- * @see HoustonMapper
+ * @see org.opentripplanner.openstreetmap.tagmapping.HoustonMapper
  */
 public class ExactMatchSpecifier implements OsmSpecifier {
 

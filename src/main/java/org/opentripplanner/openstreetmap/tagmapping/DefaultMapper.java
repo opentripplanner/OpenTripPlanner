@@ -41,7 +41,7 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
  * @author bdferris, novalis
  * @see OsmTagMapper
  */
-public class DefaultMapper implements OsmTagMapper {
+class DefaultMapper implements OsmTagMapper {
 
   /* Populate properties on existing WayPropertySet */
   public void populateProperties(WayPropertySet props) {

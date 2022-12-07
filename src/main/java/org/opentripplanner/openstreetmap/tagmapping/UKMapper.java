@@ -21,7 +21,7 @@ import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
  * @see OsmTagMapper
  * @see DefaultMapper
  */
-public class UKMapper implements OsmTagMapper {
+class UKMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {

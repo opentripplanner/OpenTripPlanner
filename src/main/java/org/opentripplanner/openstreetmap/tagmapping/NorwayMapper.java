@@ -22,7 +22,7 @@ import org.opentripplanner.openstreetmap.wayproperty.specifier.LogicalOrSpecifie
  * @see OsmTagMapper
  * @see DefaultMapper
  */
-public class NorwayMapper implements OsmTagMapper {
+class NorwayMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {

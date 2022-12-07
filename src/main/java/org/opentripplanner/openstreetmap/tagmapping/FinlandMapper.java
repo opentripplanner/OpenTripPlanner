@@ -24,7 +24,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  * @see OsmTagMapper
  * @see DefaultMapper
  */
-public class FinlandMapper implements OsmTagMapper {
+class FinlandMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
