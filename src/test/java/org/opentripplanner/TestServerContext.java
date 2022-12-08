@@ -23,14 +23,19 @@ public class TestServerContext {
     transitModel.index();
     final RouterConfig routerConfig = RouterConfig.DEFAULT;
     DefaultServerRequestContext context = DefaultServerRequestContext.create(
-      routerConfig,
-      new RaptorConfig<>(routerConfig.raptorTuningParameters()),
+      routerConfig.transitTuningConfig(),
+      routerConfig.routingRequestDefaults(),
+      routerConfig.streetRoutingTimeout(),
+      new RaptorConfig<>(routerConfig.transitTuningConfig()),
       graph,
       new DefaultTransitService(transitModel),
       Metrics.globalRegistry,
-      null
+      routerConfig.vectorTileLayers(),
+      routerConfig.flexConfig(),
+      null,
+      routerConfig.requestLogFile()
     );
-    creatTransitLayerForRaptor(transitModel, routerConfig);
+    creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningConfig());
     return context;
   }
 }

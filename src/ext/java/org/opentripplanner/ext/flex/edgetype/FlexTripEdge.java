@@ -5,12 +5,12 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
-import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class FlexTripEdge extends Edge {

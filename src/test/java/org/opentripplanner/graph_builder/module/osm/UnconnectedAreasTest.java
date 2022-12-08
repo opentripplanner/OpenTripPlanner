@@ -14,7 +14,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
@@ -163,7 +162,6 @@ public class UnconnectedAreasTest {
       Set.of(),
       graph,
       issueStore,
-      new DefaultMapper(),
       true
     );
     loader.staticParkAndRide = true;

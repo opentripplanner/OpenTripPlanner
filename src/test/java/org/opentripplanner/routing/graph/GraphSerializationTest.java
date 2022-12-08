@@ -24,6 +24,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitModel;
+import org.slf4j.Logger;
 
 /**
  * Tests that saving a graph and reloading it (round trip through serialization and deserialization)

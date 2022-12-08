@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model.basic.TranslatedString;
+import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -63,7 +63,7 @@ public class StopsLayerTest {
     );
 
     Map<String, Object> map = new HashMap<>();
-    mapper.map(stop).forEach(o -> map.put(o.first, o.second));
+    mapper.map(stop).forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals("F:name", map.get("gtfsId"));
     assertEquals("name", map.get("name"));
@@ -83,7 +83,7 @@ public class StopsLayerTest {
     );
 
     Map<String, Object> map = new HashMap<>();
-    mapper.map(stop).forEach(o -> map.put(o.first, o.second));
+    mapper.map(stop).forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals("nameDE", map.get("name"));
     assertEquals("descDE", map.get("desc"));

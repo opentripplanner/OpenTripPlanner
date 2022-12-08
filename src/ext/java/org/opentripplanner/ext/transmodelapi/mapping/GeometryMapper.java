@@ -3,8 +3,8 @@ package org.opentripplanner.ext.transmodelapi.mapping;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.transmodelapi.model.util.EncodedPolylineBeanWithStops;
+import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.util.PolylineEncoder;
 
 public class GeometryMapper {
 

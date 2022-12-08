@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.osm.parameters;
 
 import java.net.URI;
 import java.time.ZoneId;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
 
 /**
  * Configure an OpenStreetMap extract.
@@ -17,19 +17,29 @@ public class OsmExtractParametersBuilder {
   /**
    * Custom OSM way properties for this extract.
    */
-  private OsmTagMapper osmTagMapper;
+  private OsmTagMapperSource osmTagMapper;
 
   /**
    * The timezone to use to resolve opening hours in this extract.
    */
   private ZoneId timeZone;
 
+  public OsmExtractParametersBuilder() {
+    this.osmTagMapper = OsmExtractParameters.DEFAULT_OSM_TAG_MAPPER;
+    this.timeZone = OsmExtractParameters.DEFAULT_TIME_ZONE;
+  }
+
+  public OsmExtractParametersBuilder(OsmExtractParameters original) {
+    this.osmTagMapper = original.osmTagMapper();
+    this.timeZone = original.timeZone();
+  }
+
   public OsmExtractParametersBuilder withSource(URI source) {
     this.source = source;
     return this;
   }
 
-  public OsmExtractParametersBuilder withOsmTagMapper(OsmTagMapper mapper) {
+  public OsmExtractParametersBuilder withOsmTagMapper(OsmTagMapperSource mapper) {
     this.osmTagMapper = mapper;
     return this;
   }
@@ -43,7 +53,7 @@ public class OsmExtractParametersBuilder {
     return source;
   }
 
-  public OsmTagMapper getOsmTagMapper() {
+  public OsmTagMapperSource getOsmTagMapper() {
     return osmTagMapper;
   }
 

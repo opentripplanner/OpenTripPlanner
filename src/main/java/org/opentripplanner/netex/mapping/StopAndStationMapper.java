@@ -13,15 +13,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.issues.StopPlaceWithoutQuays;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComparator;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -90,7 +89,7 @@ class StopAndStationMapper {
 
     Station station = mapStopPlaceAllVersionsToStation(selectedStopPlace);
     Collection<FareZone> fareZones = mapTariffZones(selectedStopPlace);
-    T2<TransitMode, String> transitMode = stopPlaceTypeMapper.map(selectedStopPlace);
+    var transitMode = stopPlaceTypeMapper.map(selectedStopPlace);
 
     // Loop through all versions of the StopPlace in order to collect all quays, even if they
     // were deleted in never versions of the StopPlace
@@ -162,7 +161,7 @@ class StopAndStationMapper {
     Quay quay,
     Station station,
     Collection<FareZone> fareZones,
-    T2<TransitMode, String> transitMode,
+    NetexMainAndSubMode transitMode,
     StopPlace stopPlace
   ) {
     // TODO OTP2 - This assumption is only valid because Norway have a

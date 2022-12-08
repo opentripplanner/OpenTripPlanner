@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
@@ -20,13 +20,18 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.framework.i18n.LocalizedString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
-import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.wayproperty.CreativeNamer;
+import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -35,8 +40,6 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.basic.LocalizedString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class OpenStreetMapModuleTest {
@@ -57,7 +60,6 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       gg,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       true
     );
 
@@ -125,7 +127,6 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       gg,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       true
     );
 
@@ -242,9 +243,10 @@ public class OpenStreetMapModuleTest {
 
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().forward()); // right (with traffic) comes
-    // from track
-    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().back()); // left comes from lane
+    // right (with traffic) comes from track
+    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().forward());
+    // left comes from lane
+    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().back());
 
     way = new OSMWay();
     way.addTag("highway", "footway");
@@ -302,7 +304,6 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       graph,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       false
     );
     module.staticParkAndRide = true;
@@ -341,7 +342,6 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       graph,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       !skipVisibility
     );
 

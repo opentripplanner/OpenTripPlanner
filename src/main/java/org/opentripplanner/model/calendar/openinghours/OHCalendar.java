@@ -75,4 +75,8 @@ public class OHCalendar implements Serializable {
       .addCol("openingHours", openingHours)
       .toString();
   }
+
+  public List<OpeningHours> openingHours() {
+    return openingHours;
+  }
 }

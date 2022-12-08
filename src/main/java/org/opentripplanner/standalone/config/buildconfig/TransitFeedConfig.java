@@ -1,23 +1,20 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import java.util.List;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParametersBuilder;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 public class TransitFeedConfig {
 
   public static TransitFeeds mapTransitFeeds(
     NodeAdapter root,
     String parameterName,
-    NetexFeedParameters netexDefaults
+    NetexFeedParameters netexDefaults,
+    GtfsFeedParameters gtfsDefaults
   ) {
     List<DataSourceConfig> list = root
       .of(parameterName)
@@ -30,11 +27,11 @@ public class TransitFeedConfig {
         You can specify data located outside the local filesystem (including cloud storage services)
         or at various different locations around the local filesystem.
         
-        When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds 
+        When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds
         section, auto-scanning in the base directory for this feed type will be disabled.
         """
       )
-      .asObjects(node -> TransitFeedConfig.mapTransitFeed(node, netexDefaults));
+      .asObjects(node -> TransitFeedConfig.mapTransitFeed(node, netexDefaults, gtfsDefaults));
 
     return new TransitFeeds(
       filterListOnSubType(list, GtfsFeedParameters.class),
@@ -44,7 +41,8 @@ public class TransitFeedConfig {
 
   private static DataSourceConfig mapTransitFeed(
     NodeAdapter feedNode,
-    NetexFeedParameters netexDefaults
+    NetexFeedParameters netexDefaults,
+    GtfsFeedParameters gtfsDefaults
   ) {
     var type = feedNode
       .of("type")
@@ -52,48 +50,9 @@ public class TransitFeedConfig {
       .summary("The feed input format.")
       .asEnum(TransitFeedType.class);
     return switch (type) {
-      case GTFS -> mapGtfsFeed(feedNode);
+      case GTFS -> GtfsConfig.mapGtfsFeed(feedNode, gtfsDefaults);
       case NETEX -> NetexConfig.mapNetexFeed(feedNode, netexDefaults);
     };
-  }
-
-  private static DataSourceConfig mapGtfsFeed(NodeAdapter node) {
-    return new GtfsFeedParametersBuilder()
-      .withFeedId(
-        node
-          .of("feedId")
-          .since(NA)
-          .summary(
-            "The unique ID for this feed. This overrides any feed ID defined within the feed itself."
-          )
-          .asString(null)
-      )
-      .withSource(
-        node.of("source").since(NA).summary("The unique URI pointing to the data file.").asUri()
-      )
-      .withRemoveRepeatedStops(
-        node
-          .of("removeRepeatedStops")
-          .since(V2_3)
-          .summary("Should consecutive identical stops be merged into one stop time entry")
-          .asBoolean(true)
-      )
-      .withStationTransferPreference(
-        node
-          .of("stationTransferPreference")
-          .since(V2_3)
-          .summary(
-            "Should there be some preference or aversion for transfers at stops that are part of a station."
-          )
-          .description(
-            """
-            This parameter sets the generic level of preference. What is the actual cost can be changed
-            with the `stopTransferCost` parameter in the router configuration.
-            """
-          )
-          .asEnum(StopTransferPriority.ALLOWED)
-      )
-      .build();
   }
 
   @SuppressWarnings("unchecked")

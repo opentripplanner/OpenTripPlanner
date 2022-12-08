@@ -3,17 +3,15 @@ package org.opentripplanner.routing.alertpatch;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.framework.i18n.I18NString;
 
 public class TransitAlert implements Serializable {
 
-  private static final long serialVersionUID = 8305126586053909836L;
   private final Set<EntitySelector> entities = new HashSet<>();
   private String id;
   public I18NString alertHeaderText;

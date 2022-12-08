@@ -17,14 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
-import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -60,23 +53,12 @@ public class TriangleInequalityTest {
         StandardCharsets.UTF_8
       )
     );
-    FileDataSource dataSource = new FileDataSource(file, FileType.OSM);
-    ConfiguredDataSource<OsmExtractParameters> source = new ConfiguredDataSource<>(
-      dataSource,
-      new OsmExtractParametersBuilder().withSource(dataSource.uri()).build()
-    );
-    OpenStreetMapProvider provider = new OpenStreetMapProvider(
-      source,
-      new OsmDefaultParameters(),
-      true
-    );
-
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
     OpenStreetMapModule osmModule = new OpenStreetMapModule(
       List.of(provider),
       Set.of(),
       graph,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       true
     );
     osmModule.buildGraph();

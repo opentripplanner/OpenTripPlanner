@@ -5,8 +5,8 @@ import static org.opentripplanner.gtfs.mapping.ServiceDateMapper.mapLocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS FeedInfo into the OTP model. */
 class FeedInfoMapper {

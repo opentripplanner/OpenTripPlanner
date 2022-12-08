@@ -10,13 +10,10 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.TravelOption;
-import org.opentripplanner.util.TravelOptionsMaker;
-import org.opentripplanner.util.WorldEnvelope;
 
 public class ApiRouterInfo {
 
-  private final WorldEnvelope envelope;
+  private final ApiWorldEnvelope envelope;
   public final boolean hasBikePark;
   public final boolean hasCarPark;
   public final boolean hasVehicleParking;
@@ -30,7 +27,7 @@ public class ApiRouterInfo {
   public double centerLongitude;
   public boolean hasParkRide;
   public boolean hasBikeSharing;
-  public List<TravelOption> travelOptions;
+  public List<ApiTravelOption> travelOptions;
 
   /** TODO: Do not pass in the graph here, do this in a mapper instead. */
   public ApiRouterInfo(String routerId, Graph graph, TransitService transitService) {
@@ -43,13 +40,20 @@ public class ApiRouterInfo {
     this.transitServiceStarts = transitService.getTransitServiceStarts().toEpochSecond();
     this.transitServiceEnds = transitService.getTransitServiceEnds().toEpochSecond();
     this.transitModes = ModeMapper.mapToApi(transitService.getTransitModes());
-    this.envelope = graph.getEnvelope();
+    var ev = graph.getEnvelope();
+    this.envelope =
+      new ApiWorldEnvelope(
+        ev.getLowerLeftLatitude(),
+        ev.getLowerLeftLongitude(),
+        ev.getUpperRightLatitude(),
+        ev.getUpperRightLongitude()
+      );
     this.hasBikeSharing = mapHasBikeSharing(vehicleRentalService);
     this.hasBikePark = mapHasBikePark(vehicleParkingService);
     this.hasCarPark = mapHasCarPark(vehicleParkingService);
     this.hasParkRide = this.hasCarPark;
     this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
-    this.travelOptions = TravelOptionsMaker.makeOptions(graph, transitService);
+    this.travelOptions = ApiTravelOptionsMaker.makeOptions(graph, transitService);
     transitService.getCenter().ifPresentOrElse(this::setCenter, this::calculateCenter);
   }
 

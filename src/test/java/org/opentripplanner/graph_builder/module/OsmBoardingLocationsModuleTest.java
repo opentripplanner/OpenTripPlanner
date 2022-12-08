@@ -11,9 +11,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -25,7 +25,6 @@ import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -94,7 +93,6 @@ class OsmBoardingLocationsModuleTest {
       Set.of("ref", "ref:IFOPT"),
       graph,
       DataImportIssueStore.NOOP,
-      new DefaultMapper(),
       areaVisibility
     );
 

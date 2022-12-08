@@ -141,20 +141,10 @@ snap stops to these roads, or by giving you poor routing results for walking and
 adjust which road types that are accessible by foot, car & bicycle as well as speed limits,
 suitability for biking and walking. It's possible to define "safety" values for cycling and walking which are used in routing.
 
-There are currently following OSM tag mapping defined;
-
-- `default` which is based on California/US mapping standard
-- `finland` which is adjusted to rules and speeds in Finland
-- `norway` which is adjusted to rules and speeds in Norway
-- `uk` which is adjusted to rules and speed in the UK
-- `germany` which is adjusted to rules and speed in Germany
-- `atlanta` which is adjusted to rules in Atlanta
-- `houston` which is adjusted to rules in Houston
-
 To add your own OSM tag mapping have a look
-at `org.opentripplanner.graph_builder.module.osm.NorwayWayPropertySet`
-and `org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySet`. If you choose to mainly
-rely on the default rules, make sure you add your own rules first before applying the default ones.
+at `org.opentripplanner.graph_builder.module.osm.tagmapping.NorwayTagMapper`
+and `org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper` as examples. 
+If you choose to mainly rely on the default rules, make sure you add your own rules first before applying the default ones.
 The mechanism is that for any two identical tags, OTP will use the first one.
 
 ```JSON

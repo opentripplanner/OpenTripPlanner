@@ -11,8 +11,6 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
  */
 public class DataOverlayConfig implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private final String fileName;
   private final String latitudeVariable;
   private final String longitudeVariable;

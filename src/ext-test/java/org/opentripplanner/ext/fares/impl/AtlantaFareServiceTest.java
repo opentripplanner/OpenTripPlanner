@@ -7,20 +7,20 @@ import static org.opentripplanner.ext.fares.impl.AtlantaFareService.MARTA_AGENCY
 import static org.opentripplanner.ext.fares.impl.AtlantaFareService.XPRESS_AGENCY_ID;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
-import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -30,7 +30,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 public class AtlantaFareServiceTest implements PlanTestConstants {
 
-  static final ZoneId NEW_YORK_TIMEZONE = ZoneId.of("America/New_York");
   public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
   public static final float DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE * 100;
   private static AtlantaFareService atlFareService;
@@ -216,7 +215,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     Agency agency = Agency
       .of(new FeedScopedId("A", agencyId))
       .withName(agencyId)
-      .withTimezone(NEW_YORK_TIMEZONE.getId())
+      .withTimezone(ZoneIds.NEW_YORK.getId())
       .build();
 
     // Set up stops

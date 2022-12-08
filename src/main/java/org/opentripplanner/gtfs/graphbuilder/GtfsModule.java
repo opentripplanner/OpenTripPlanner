@@ -32,6 +32,7 @@ import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
@@ -51,7 +52,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,9 +76,6 @@ public class GtfsModule implements GraphBuilderModule {
   private final ServiceDateInterval transitPeriodLimit;
   private final List<GtfsBundle> gtfsBundles;
   private final FareServiceFactory fareServiceFactory;
-  private final boolean discardMinTransferTimes;
-  private final boolean blockBasedInterlining;
-  private final int maxInterlineDistance;
 
   private final TransitModel transitModel;
   private final Graph graph;
@@ -91,10 +88,7 @@ public class GtfsModule implements GraphBuilderModule {
     Graph graph,
     DataImportIssueStore issueStore,
     ServiceDateInterval transitPeriodLimit,
-    FareServiceFactory fareServiceFactory,
-    boolean discardMinTransferTimes,
-    boolean blockBasedInterlining,
-    int maxInterlineDistance
+    FareServiceFactory fareServiceFactory
   ) {
     this.gtfsBundles = bundles;
     this.transitModel = transitModel;
@@ -102,9 +96,6 @@ public class GtfsModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.transitPeriodLimit = transitPeriodLimit;
     this.fareServiceFactory = fareServiceFactory;
-    this.discardMinTransferTimes = discardMinTransferTimes;
-    this.blockBasedInterlining = blockBasedInterlining;
-    this.maxInterlineDistance = maxInterlineDistance;
   }
 
   public GtfsModule(
@@ -119,10 +110,7 @@ public class GtfsModule implements GraphBuilderModule {
       graph,
       DataImportIssueStore.NOOP,
       transitPeriodLimit,
-      new DefaultFareServiceFactory(),
-      false,
-      true,
-      100
+      new DefaultFareServiceFactory()
     );
   }
 
@@ -138,7 +126,7 @@ public class GtfsModule implements GraphBuilderModule {
         GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
           gtfsBundle.getFeedId().getId(),
           issueStore,
-          discardMinTransferTimes,
+          gtfsBundle.discardMinTransferTimes(),
           gtfsDao,
           gtfsBundle.stationTransferPreference()
         );
@@ -187,11 +175,11 @@ public class GtfsModule implements GraphBuilderModule {
 
         addTransitModelToGraph(graph, transitModel, gtfsBundle, otpTransitService);
 
-        if (blockBasedInterlining) {
+        if (gtfsBundle.blockBasedInterlining()) {
           new InterlineProcessor(
             transitModel.getTransferService(),
             builder.getStaySeatedNotAllowed(),
-            maxInterlineDistance,
+            gtfsBundle.maxInterlineDistance(),
             issueStore
           )
             .run(otpTransitService.getTripPatterns());

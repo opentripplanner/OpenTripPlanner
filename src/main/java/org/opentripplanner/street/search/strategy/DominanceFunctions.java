@@ -23,8 +23,6 @@ import org.opentripplanner.street.search.state.State;
  */
 public abstract class DominanceFunctions implements Serializable, DominanceFunction<State> {
 
-  private static final long serialVersionUID = 1;
-
   /**
    * For bike rental, parking, and approaching turn-restricted intersections states are
    * incomparable: they exist on separate planes. The core state dominance logic is wrapped in this

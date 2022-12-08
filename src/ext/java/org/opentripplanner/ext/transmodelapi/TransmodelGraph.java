@@ -17,8 +17,8 @@ import java.util.concurrent.Executors;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
