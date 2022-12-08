@@ -14,8 +14,6 @@ import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.graph_builder.module.osm.MixinProperties;
-import org.opentripplanner.graph_builder.module.osm.MixinPropertiesBuilder;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;

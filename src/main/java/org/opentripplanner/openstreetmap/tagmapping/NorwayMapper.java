@@ -1,6 +1,6 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
-import static org.opentripplanner.graph_builder.module.osm.MixinPropertiesBuilder.ofBicycleSafety;
+import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE;

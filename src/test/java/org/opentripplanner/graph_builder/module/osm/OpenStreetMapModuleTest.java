@@ -27,6 +27,7 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.CreativeNamer;
+import org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;

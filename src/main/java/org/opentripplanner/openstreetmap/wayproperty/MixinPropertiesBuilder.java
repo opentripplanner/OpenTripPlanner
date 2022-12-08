@@ -1,6 +1,5 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.openstreetmap.wayproperty;
 
-import org.opentripplanner.openstreetmap.wayproperty.SafetyFeatures;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 
 /**
