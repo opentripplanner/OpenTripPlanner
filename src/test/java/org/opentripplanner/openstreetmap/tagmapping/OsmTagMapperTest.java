@@ -3,9 +3,9 @@ package org.opentripplanner.openstreetmap.tagmapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
-import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -63,7 +63,7 @@ public class OsmTagMapperTest {
 
     wps.setProperties("tag=imaginary", withModes(CAR).bicycleSafety(2));
 
-    wps.setMixinProperties("foo=bar", withModes(NONE).bicycleSafety(0.5));
+    wps.setMixinProperties("foo=bar", ofBicycleSafety(0.5));
     source.populateProperties(wps);
 
     var withoutFoo = new OSMWithTags();

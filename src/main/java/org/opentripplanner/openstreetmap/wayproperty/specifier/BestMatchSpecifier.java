@@ -1,6 +1,5 @@
 package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
-import java.util.List;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 

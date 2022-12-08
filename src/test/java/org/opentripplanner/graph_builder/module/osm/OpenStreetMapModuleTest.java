@@ -27,6 +27,7 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.CreativeNamer;
+import org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
@@ -223,8 +224,8 @@ public class OpenStreetMapModuleTest {
 
     // add a mixin
     BestMatchSpecifier gravel = new BestMatchSpecifier("surface=gravel");
-    WayProperties gravel_is_dangerous = new WayPropertiesBuilder(ALL).bicycleSafety(2).build();
-    wayPropertySet.addProperties(gravel, gravel_is_dangerous, true);
+    var gravel_is_dangerous = MixinPropertiesBuilder.ofBicycleSafety(2);
+    wayPropertySet.setMixinProperties(gravel, gravel_is_dangerous);
 
     dataForWay = wayPropertySet.getDataForWay(way);
     assertEquals(dataForWay.getBicycleSafetyFeatures().forward(), 1.5);

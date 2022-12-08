@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.basic;
+package org.opentripplanner.framework.geometry;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -15,10 +15,20 @@ import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
  */
 public final class WgsCoordinate implements Serializable {
 
+  public static final WgsCoordinate GREENWICH = new WgsCoordinate(51.48, 0d);
+  private static final double LAT_MIN = -90;
+  private static final double LAT_MAX = 90;
+  private static final double LON_MIN = -180;
+  private static final double LON_MAX = 180;
+
   private final double latitude;
   private final double longitude;
 
   public WgsCoordinate(double latitude, double longitude) {
+    // Verify coordinates are in range
+    DoubleUtils.assertInRange(latitude, LAT_MIN, LAT_MAX, "latitude");
+    DoubleUtils.assertInRange(longitude, LON_MIN, LON_MAX, "longitude");
+
     // Normalize coordinates to precision around ~ 1 centimeters (7 decimals)
     this.latitude = DoubleUtils.roundTo7Decimals(latitude);
     this.longitude = DoubleUtils.roundTo7Decimals(longitude);
@@ -110,6 +120,13 @@ public final class WgsCoordinate implements Serializable {
    */
   public boolean sameLocation(WgsCoordinate other) {
     return equals(other);
+  }
+
+  /**
+   * Add (deltaLat, deltaLon) to the current coordinates and return the new position.
+   */
+  public WgsCoordinate add(double deltaLat, double deltaLon) {
+    return new WgsCoordinate(latitude + deltaLat, longitude + deltaLon);
   }
 
   /**

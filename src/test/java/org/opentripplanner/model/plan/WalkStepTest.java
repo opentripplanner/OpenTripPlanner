@@ -3,8 +3,8 @@ package org.opentripplanner.model.plan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 public class WalkStepTest {
 

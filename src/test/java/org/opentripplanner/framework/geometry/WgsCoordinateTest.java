@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.basic;
+package org.opentripplanner.framework.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -76,5 +76,31 @@ public class WgsCoordinateTest {
     assertTrue(new WgsCoordinate(15.0, 0.0).sameLocation(m1));
 
     assertThrows(IllegalArgumentException.class, () -> WgsCoordinate.mean(List.of()));
+  }
+
+  @Test
+  public void validCoordinates() {
+    // Edge cases should NOT throw exceptions
+    new WgsCoordinate(90d, 1d);
+    new WgsCoordinate(-90d, 1d);
+    new WgsCoordinate(1d, 180d);
+    new WgsCoordinate(1d, -180d);
+
+    // Illegal values should
+    assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(91d, 1d));
+    assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(-91d, 1d));
+    assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(1d, 181d));
+    assertThrows(IllegalArgumentException.class, () -> new WgsCoordinate(1d, -181d));
+  }
+
+  @Test
+  public void add() {
+    assertEquals(new WgsCoordinate(12d, 5d), new WgsCoordinate(9d, 1d).add(3d, 4d));
+  }
+
+  @Test
+  public void testGreenwich() {
+    assertEquals(51.48d, WgsCoordinate.GREENWICH.latitude());
+    assertEquals(0d, WgsCoordinate.GREENWICH.longitude());
   }
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
+import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE;
@@ -623,7 +624,7 @@ class NorwayMapper implements OsmTagMapper {
     //relation properties are copied over to ways
     props.setMixinProperties(
       new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
-      withModes(ALL).bicycleSafety(0.7)
+      ofBicycleSafety(0.7)
     );
 
     props.setProperties(
@@ -639,8 +640,8 @@ class NorwayMapper implements OsmTagMapper {
     props.setProperties("highway=platform", withModes(PEDESTRIAN));
     props.setProperties("public_transport=platform", withModes(PEDESTRIAN));
 
-    props.setMixinProperties("smoothness=intermediate", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("smoothness=bad", withModes(ALL).bicycleSafety(2));
+    props.setMixinProperties("smoothness=intermediate", ofBicycleSafety(1.5));
+    props.setMixinProperties("smoothness=bad", ofBicycleSafety(2));
     props.setProperties("highway=*;smoothness=very_bad", withModes(PEDESTRIAN));
     props.setProperties("highway=*;smoothness=horrible", withModes(NONE));
     props.setProperties("highway=*;smoothness=very_horrible", withModes(NONE));
@@ -680,27 +681,27 @@ class NorwayMapper implements OsmTagMapper {
     props.setProperties("highway=path;sac_scale=difficult_alpine_hiking", withModes(NONE));
 
     // paved but unfavorable
-    props.setMixinProperties("surface=grass_paver", withModes(ALL).bicycleSafety(1.2));
-    props.setMixinProperties("surface=sett", withModes(ALL).bicycleSafety(1.2));
-    props.setMixinProperties("surface=cobblestone", withModes(ALL).bicycleSafety(1.2));
-    props.setMixinProperties("surface=unhewn_cobblestone", withModes(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("surface=grass_paver", ofBicycleSafety(1.2));
+    props.setMixinProperties("surface=sett", ofBicycleSafety(1.2));
+    props.setMixinProperties("surface=cobblestone", ofBicycleSafety(1.2));
+    props.setMixinProperties("surface=unhewn_cobblestone", ofBicycleSafety(1.5));
     // Can be slick if wet, but otherwise not unfavorable to bikes
-    props.setMixinProperties("surface=metal_grid", withModes(ALL).bicycleSafety(1.2));
-    props.setMixinProperties("surface=metal", withModes(ALL).bicycleSafety(1.2));
+    props.setMixinProperties("surface=metal_grid", ofBicycleSafety(1.2));
+    props.setMixinProperties("surface=metal", ofBicycleSafety(1.2));
 
     // unpaved
-    props.setMixinProperties("surface=unpaved", withModes(ALL).bicycleSafety(1.2));
-    props.setMixinProperties("surface=compacted", withModes(ALL).bicycleSafety(1.2));
-    props.setMixinProperties("surface=fine_gravel", withModes(ALL).bicycleSafety(1.3));
-    props.setMixinProperties("surface=pebblestone", withModes(ALL).bicycleSafety(1.3));
-    props.setMixinProperties("surface=gravel", withModes(ALL).bicycleSafety(1.3));
-    props.setMixinProperties("surface=woodchip", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=ground", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=dirt", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=earth", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=grass", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=mud", withModes(ALL).bicycleSafety(2));
-    props.setMixinProperties("surface=sand", withModes(ALL).bicycleSafety(2));
+    props.setMixinProperties("surface=unpaved", ofBicycleSafety(1.2));
+    props.setMixinProperties("surface=compacted", ofBicycleSafety(1.2));
+    props.setMixinProperties("surface=fine_gravel", ofBicycleSafety(1.3));
+    props.setMixinProperties("surface=pebblestone", ofBicycleSafety(1.3));
+    props.setMixinProperties("surface=gravel", ofBicycleSafety(1.3));
+    props.setMixinProperties("surface=woodchip", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=ground", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=dirt", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=earth", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=grass", ofBicycleSafety(1.5));
+    props.setMixinProperties("surface=mud", ofBicycleSafety(2));
+    props.setMixinProperties("surface=sand", ofBicycleSafety(2));
 
     /*
      * Automobile speeds in Norway. General speed limit is 80kph unless signs says otherwise

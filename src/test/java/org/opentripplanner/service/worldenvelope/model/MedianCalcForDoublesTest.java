@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.statistics;
+package org.opentripplanner.service.worldenvelope.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

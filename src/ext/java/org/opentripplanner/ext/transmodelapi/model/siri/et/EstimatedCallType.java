@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.model.siri.et;
 
 import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
-import static org.opentripplanner.model.PickDrop.NONE;
 
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;

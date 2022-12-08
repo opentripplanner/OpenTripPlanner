@@ -1,5 +1,6 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
+import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE_AND_CAR;
@@ -61,28 +62,28 @@ class GermanyMapper implements OsmTagMapper {
       withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.2)
     );
 
-    props.setMixinProperties("highway=tertiary", withModes(ALL).bicycleSafety(1.2));
-    props.setMixinProperties("maxspeed=70", withModes(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("maxspeed=80", withModes(ALL).bicycleSafety(2));
-    props.setMixinProperties("maxspeed=90", withModes(ALL).bicycleSafety(3));
-    props.setMixinProperties("maxspeed=100", withModes(ALL).bicycleSafety(5));
+    props.setMixinProperties("highway=tertiary", ofBicycleSafety(1.2));
+    props.setMixinProperties("maxspeed=70", ofBicycleSafety(1.5));
+    props.setMixinProperties("maxspeed=80", ofBicycleSafety(2));
+    props.setMixinProperties("maxspeed=90", ofBicycleSafety(3));
+    props.setMixinProperties("maxspeed=100", ofBicycleSafety(5));
 
     // tracktypes
 
     // solid
-    props.setMixinProperties("tracktype=grade1", withModes(ALL));
+    props.setMixinProperties("tracktype=grade1", ofBicycleSafety(1));
     // solid but unpaved
-    props.setMixinProperties("tracktype=grade2", withModes(ALL).bicycleSafety(1.1));
+    props.setMixinProperties("tracktype=grade2", ofBicycleSafety(1.1));
     // mostly solid.
-    props.setMixinProperties("tracktype=grade3", withModes(ALL).bicycleSafety(1.15));
+    props.setMixinProperties("tracktype=grade3", ofBicycleSafety(1.15));
     // mostly soft
-    props.setMixinProperties("tracktype=grade4", withModes(ALL).bicycleSafety(1.3));
+    props.setMixinProperties("tracktype=grade4", ofBicycleSafety(1.3));
     // soft
-    props.setMixinProperties("tracktype=grade5", withModes(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("tracktype=grade5", ofBicycleSafety(1.5));
 
     // lit=yes currently is tagged very rarely, so we just want to discount where lit=no explicitly
     // not lit decreases safety
-    props.setMixinProperties("lit=no", withModes(ALL).bicycleSafety(1.05));
+    props.setMixinProperties("lit=no", ofBicycleSafety(1.05));
 
     props.setProperties("highway=unclassified;cycleway=lane", withModes(ALL).bicycleSafety(0.87));
 
