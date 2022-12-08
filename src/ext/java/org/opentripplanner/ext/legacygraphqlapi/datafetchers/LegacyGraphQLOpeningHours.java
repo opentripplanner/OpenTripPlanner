@@ -2,7 +2,6 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.util.List;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
@@ -11,7 +10,8 @@ public record LegacyGraphQLOpeningHours(OHCalendar cal)
   implements LegacyGraphQLDataFetchers.LegacyGraphQLOpeningHours {
   @Override
   public DataFetcher<Iterable<Object>> dates() {
-    return env -> List.of();
+    //TODO: implement
+    return env -> null;
   }
 
   @Override
