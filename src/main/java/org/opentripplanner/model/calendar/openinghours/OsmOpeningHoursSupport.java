@@ -18,7 +18,7 @@ public class OsmOpeningHoursSupport {
       .openingHours()
       .stream()
       .map(OsmOpeningHoursSupport::osmFormat)
-      .collect(Collectors.joining(","));
+      .collect(Collectors.joining("; "));
   }
 
   /**
@@ -43,7 +43,7 @@ public class OsmOpeningHoursSupport {
 
   private static String toOsm(String description) {
     return switch (description.toLowerCase()) {
-      case "business days" -> "Mo-Fr";
+      case "business days" -> "Mo - Fr";
       case "monday" -> "Mo";
       case "tuesday" -> "Tu";
       case "wednesday" -> "We";
@@ -51,7 +51,7 @@ public class OsmOpeningHoursSupport {
       case "friday" -> "Fr";
       case "saturday" -> "Sa";
       case "sunday" -> "Su";
-      case "every day" -> "Mo-Su";
+      case "every day" -> "Mo - Su";
       default -> description;
     };
   }
