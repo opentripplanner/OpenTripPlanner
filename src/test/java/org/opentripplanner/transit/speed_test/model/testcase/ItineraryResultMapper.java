@@ -85,7 +85,8 @@ class ItineraryResultMapper {
       } else if (
         leg instanceof StreetLeg streetLeg && streetLeg.getFrom().vehicleRentalPlace != null
       ) {
-        buf.vehicleRental(streetLeg.getFrom().vehicleRentalPlace.getStationId(), leg.getDuration());
+        var name = streetLeg.getFrom().vehicleRentalPlace.getName().toString();
+        buf.stop(name).rental(leg.getDuration().toSeconds());
       } else if (leg instanceof TransitLeg transitLeg) {
         buf.transit(
           transitLeg.getMode().name() + " " + leg.getRoute().getShortName(),
