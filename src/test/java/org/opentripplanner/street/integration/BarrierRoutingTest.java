@@ -20,7 +20,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -193,6 +193,6 @@ public class BarrierRoutingTest {
     Geometry legGeometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
     temporaryVertices.close();
 
-    return PolylineEncoder.encodeGeometry(legGeometry).points();
+    return EncodedPolyline.encode(legGeometry).points();
   }
 }

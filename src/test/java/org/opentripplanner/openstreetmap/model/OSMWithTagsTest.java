@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -179,5 +181,49 @@ public class OSMWithTagsTest {
 
     assertEquals(Set.of(), osm.getMultiTagValues(Set.of()));
     assertEquals(Set.of(), osm.getMultiTagValues(Set.of("ref3")));
+  }
+
+  @Test
+  public void testGenerateI18NForPattern() {
+    OSMWithTags osmTags = new OSMWithTags();
+    osmTags.addTag("note", "Note EN");
+    osmTags.addTag("description:fr", "Description FR");
+    osmTags.addTag("wheelchair:description", "Wheelchair description EN");
+    osmTags.addTag("wheelchair:description:fr", "Wheelchair description FR");
+
+    assertNull(osmTags.generateI18NForPattern(null));
+    Map<String, String> expected = new HashMap<>();
+
+    expected.put(null, "");
+    assertEquals(expected, osmTags.generateI18NForPattern(""));
+
+    expected.clear();
+    expected.put(null, "Static text");
+    assertEquals(expected, osmTags.generateI18NForPattern("Static text"));
+
+    expected.clear();
+    expected.put(null, "Note: Note EN");
+    assertEquals(expected, osmTags.generateI18NForPattern("Note: {note}"));
+
+    expected.clear();
+    expected.put(null, "Desc: Description FR");
+    expected.put("fr", "Desc: Description FR");
+    assertEquals(expected, osmTags.generateI18NForPattern("Desc: {description}"));
+
+    expected.clear();
+    expected.put(null, "Note: Note EN, Wheelchair description EN");
+    expected.put("fr", "Note: Note EN, Wheelchair description FR");
+    assertEquals(
+      expected,
+      osmTags.generateI18NForPattern("Note: {note}, {wheelchair:description}")
+    );
+
+    expected.clear();
+    expected.put(null, "Note: Note EN, Wheelchair description EN, ");
+    expected.put("fr", "Note: Note EN, Wheelchair description FR, ");
+    assertEquals(
+      expected,
+      osmTags.generateI18NForPattern("Note: {note}, {wheelchair:description}, {foobar:description}")
+    );
   }
 }

@@ -22,7 +22,7 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -167,7 +167,7 @@ public class LegType {
           .name("pointsOnLink")
           .description("The leg's geometry.")
           .type(linkGeometryType)
-          .dataFetcher(env -> PolylineEncoder.encodeGeometry(leg(env).getLegGeometry()))
+          .dataFetcher(env -> EncodedPolyline.encode(leg(env).getLegGeometry()))
           .build()
       )
       .field(

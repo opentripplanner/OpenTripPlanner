@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.api.request.framework;
 
+import static java.lang.Math.abs;
+
 import org.opentripplanner.framework.lang.DoubleUtils;
 
 /**
@@ -41,13 +43,27 @@ public class Units {
    * Unit: Human cost per second of actual time (scalar)
    */
   public static double reluctance(double value) {
-    if (value < 0.0) {
-      throw new IllegalArgumentException("Negative reluctance not expected: " + value);
+    return reluctance(value, 0.0, Double.MAX_VALUE);
+  }
+
+  /**
+   * Reluctance of factor between {@param minValue} and {@param maxValue}.
+   * Number of decimals used are: 2 for absolute value less than 2.0, 1 for absolute value less than
+   * 10.0, and zero for absolute values above 10.0.
+   * <p>
+   * Unit: Human cost per second of actual time (scalar)
+   */
+  public static double reluctance(double value, double minValue, double maxValue) {
+    if (value < minValue) {
+      throw new IllegalArgumentException("Min limit(" + minValue + ") exceeded: " + value);
     }
-    if (value < 2.0) {
+    if (value > maxValue) {
+      throw new IllegalArgumentException("Max limit(" + maxValue + ") exceeded: " + value);
+    }
+    if (abs(value) < 2.0) {
       return DoubleUtils.roundTo2Decimals(value);
     }
-    if (value < 10.0) {
+    if (abs(value) < 10.0) {
       return DoubleUtils.roundTo1Decimal(value);
     }
     return DoubleUtils.roundToZeroDecimals(value);

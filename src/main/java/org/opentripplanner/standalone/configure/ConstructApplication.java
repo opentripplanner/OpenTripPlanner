@@ -6,7 +6,6 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -16,6 +15,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -62,6 +62,7 @@ public class ConstructApplication {
     CommandLineParameters cli,
     Graph graph,
     TransitModel transitModel,
+    WorldEnvelopeModel worldEnvelopeModel,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources
   ) {
@@ -81,6 +82,7 @@ public class ConstructApplication {
         .graph(graph)
         .transitModel(transitModel)
         .graphVisualizer(graphVisualizer)
+        .worldEnvelopeModel(worldEnvelopeModel)
         .build();
   }
 
@@ -106,6 +108,7 @@ public class ConstructApplication {
       graphBuilderDataSources,
       graph(),
       transitModel(),
+      factory.worldEnvelopeModel(),
       cli.doLoadStreetGraph(),
       cli.doSaveStreetGraph()
     );
@@ -155,11 +158,9 @@ public class ConstructApplication {
 
   private void initEllipsoidToGeoidDifference() {
     try {
-      WorldEnvelope env = graph().getEnvelope();
-      double lat = env.calcCenterLatitude();
-      double lon = env.calcCenterLongitude();
-      double value = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
-      graph().initEllipsoidToGeoidDifference(value, lat, lon);
+      var c = factory.worldEnvelopeModel().envelope().orElseThrow().center();
+      double value = ElevationUtils.computeEllipsoidToGeoidDifference(c.latitude(), c.longitude());
+      graph().initEllipsoidToGeoidDifference(value, c.latitude(), c.longitude());
     } catch (Exception e) {
       LOG.error("Error computing ellipsoid/geoid difference");
     }
@@ -194,6 +195,10 @@ public class ConstructApplication {
 
   public Graph graph() {
     return factory.graph();
+  }
+
+  public WorldEnvelopeModel worldEnvelopeModel() {
+    return factory.worldEnvelopeModel();
   }
 
   public OtpConfig otpConfig() {

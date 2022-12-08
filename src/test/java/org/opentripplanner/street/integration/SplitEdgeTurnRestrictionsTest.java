@@ -12,7 +12,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -182,6 +182,6 @@ public class SplitEdgeTurnRestrictionsTest {
         })
     );
     Geometry geometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
-    return PolylineEncoder.encodeGeometry(geometry).points();
+    return EncodedPolyline.encode(geometry).points();
   }
 }
