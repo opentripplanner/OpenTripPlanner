@@ -8,7 +8,7 @@ import java.util.Map;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.framework.collection.MapUtils;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.GroupStopBuilder;
 

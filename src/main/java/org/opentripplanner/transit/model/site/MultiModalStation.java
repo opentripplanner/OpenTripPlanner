@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.site;
 import java.util.Collection;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
