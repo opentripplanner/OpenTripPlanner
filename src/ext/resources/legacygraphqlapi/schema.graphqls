@@ -264,6 +264,11 @@ enum AlertSeverityLevelType {
 }
 
 type OpeningHours {
+    """
+    OSM-formatted string of the opening hours.
+
+    The spec is available at: https://wiki.openstreetmap.org/wiki/Key:opening_hours
+    """
     osm: String
     """
     Opening hours for the selected dates using the local time of the parking lot.
@@ -311,7 +316,7 @@ type BikePark implements Node & PlaceInterface {
     """
     tags: [String]
 
-
+    """Opening hours of the parking facility"""
     openingHours: OpeningHours
 }
 
@@ -401,6 +406,9 @@ type VehicleParking implements Node & PlaceInterface {
     The currently available spaces at this vehicle parking.
     """
     availability: VehicleParkingSpaces
+
+    """Opening hours of the parking facility"""
+    openingHours: OpeningHours
 }
 
 """
@@ -765,13 +773,7 @@ type CarPark implements Node & PlaceInterface {
     Each date can have multiple time spans.
     """
 
-
-    openingHours(
-        """
-        Opening hours will be returned for these dates. Dates should use YYYYMMDD format.
-        """
-        dates: [String!]!
-    ): [LocalTimeSpanDate]
+    openingHours: OpeningHours
 }
 
 """Cluster is a list of stops grouped by name and proximity"""

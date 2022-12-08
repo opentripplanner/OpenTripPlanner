@@ -49,8 +49,8 @@ public class LegacyGraphQLCarParkImpl implements LegacyGraphQLDataFetchers.Legac
 
   // TODO
   @Override
-  public DataFetcher<Iterable<Object>> openingHours() {
-    return environment -> null;
+  public DataFetcher<LegacyGraphQLOpeningHours> openingHours() {
+    return env -> new LegacyGraphQLOpeningHours(getSource(env).getOpeningHours());
   }
 
   @Override

@@ -217,7 +217,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> name();
 
-    public DataFetcher<Iterable<Object>> openingHours();
+    public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLOpeningHours> openingHours();
 
     public DataFetcher<Boolean> realtime();
 
@@ -943,6 +943,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> name();
 
     public DataFetcher<String> note();
+
+    public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLOpeningHours> openingHours();
 
     public DataFetcher<Boolean> realtime();
 

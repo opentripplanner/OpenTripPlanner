@@ -127,25 +127,6 @@ public class LegacyGraphQLTypes {
     }
   }
 
-  public static class LegacyGraphQLCarParkOpeningHoursArgs {
-
-    private Iterable<String> dates;
-
-    public LegacyGraphQLCarParkOpeningHoursArgs(Map<String, Object> args) {
-      if (args != null) {
-        this.dates = (Iterable<String>) args.get("dates");
-      }
-    }
-
-    public Iterable<String> getLegacyGraphQLDates() {
-      return this.dates;
-    }
-
-    public void setLegacyGraphQLDates(Iterable<String> dates) {
-      this.dates = dates;
-    }
-  }
-
   public static class LegacyGraphQLDepartureRowStoptimesArgs {
 
     private Integer numberOfDepartures;
