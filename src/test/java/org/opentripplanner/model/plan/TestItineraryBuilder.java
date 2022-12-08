@@ -14,7 +14,6 @@ import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
@@ -26,6 +25,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.graph.SimpleConcreteVertex;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -191,7 +191,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       null,
       new FlexServiceDate(LocalDate.now(), 0, new TIntHashSet()),
       new DirectFlexPathCalculator(),
-      new FlexParameters(100)
+      FlexConfig.DEFAULT
     );
 
     var edge = new FlexTripEdge(
