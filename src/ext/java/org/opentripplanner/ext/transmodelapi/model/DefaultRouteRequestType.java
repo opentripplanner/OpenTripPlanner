@@ -346,6 +346,17 @@ public class DefaultRouteRequestType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
+          .name("maxAdditionalTransfers")
+          .description(
+            "Maximum number of transfers allowed in addition to the result with least number of transfers"
+          )
+          .type(Scalars.GraphQLInt)
+          .dataFetcher(env -> preferences.transfer().maxAdditionalTransfers())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
           .name("reverseOptimizeOnTheFly")
           .deprecate("NOT IN USE IN OTP2.")
           .type(Scalars.GraphQLBoolean)

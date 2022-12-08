@@ -7,8 +7,8 @@ import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.framework.collection.MapUtils;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * Responsible for mapping GTFS StopTime into the OTP Transit model.

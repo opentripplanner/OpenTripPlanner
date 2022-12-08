@@ -8,15 +8,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.openstreetmap.OSMOpeningHoursParser;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GenericJsonDataSource;
@@ -100,8 +100,6 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
       .state(state)
       .coordinate(new WgsCoordinate(y, x))
       .openingHoursCalendar(parseOpeningHours(jsonNode.path("opening_hours"), vehicleParkId))
-      // TODO
-      // .feeHours(parseOpeningHours(jsonNode.path("fee_hours")))
       .detailsUrl(jsonNode.has("url") ? jsonNode.get("url").asText() : null)
       .imageUrl(jsonNode.has("image_url") ? jsonNode.get("image_url").asText() : null)
       .note(note)
