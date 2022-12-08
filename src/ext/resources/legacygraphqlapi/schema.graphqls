@@ -274,6 +274,8 @@ type OpeningHours {
     """
     Opening hours for the selected dates using the local time of the parking lot.
     Each date can have multiple time spans.
+
+    Note: This is not implemented yet and always returns null.
     """
     dates(
         """
