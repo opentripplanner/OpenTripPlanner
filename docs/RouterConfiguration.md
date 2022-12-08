@@ -432,7 +432,8 @@ Http headers.
     "itineraryFilters" : {
       "transitGeneralizedCostLimit" : "3600 + 2.5 x",
       "bikeRentalDistanceRatio" : 0.3,
-      "accessibilityScore" : true
+      "accessibilityScore" : true,
+      "minBikeParkingDistance" : 300
     },
     "carDecelerationSpeed" : 2.9,
     "carAccelerationSpeed" : 2.9,

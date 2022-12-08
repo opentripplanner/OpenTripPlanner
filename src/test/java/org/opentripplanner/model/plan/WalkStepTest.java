@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 
 public class WalkStepTest {
 

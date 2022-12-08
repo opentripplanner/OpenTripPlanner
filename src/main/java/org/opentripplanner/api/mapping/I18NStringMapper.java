@@ -3,7 +3,7 @@ package org.opentripplanner.api.mapping;
 import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.framework.i18n.I18NString;
 
 public class I18NStringMapper {
 

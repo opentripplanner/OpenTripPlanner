@@ -6,11 +6,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.model.NoteMatcher;
-import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.note.StreetNote;
+import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
+import org.opentripplanner.street.model.note.StreetNoteMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
     return maas;
   }
 
-  void addNote(Edge edge, StreetNote note, NoteMatcher matcher) {
+  void addNote(Edge edge, StreetNote note, StreetNoteMatcher matcher) {
     if (LOG.isDebugEnabled()) LOG.debug(
       "Adding note {} to {} with matcher {}",
       note,
@@ -80,7 +80,10 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
    * we use the default Object.equals() for matchers, as they are mostly already singleton
    * instances.
    */
-  private StreetNoteAndMatcher buildMatcherAndAlert(NoteMatcher noteMatcher, StreetNote note) {
+  private StreetNoteAndMatcher buildMatcherAndAlert(
+    StreetNoteMatcher noteMatcher,
+    StreetNote note
+  ) {
     var candidate = new StreetNoteAndMatcher(note, noteMatcher);
     var interned = uniqueMatchers.putIfAbsent(candidate, candidate);
     return interned == null ? candidate : interned;

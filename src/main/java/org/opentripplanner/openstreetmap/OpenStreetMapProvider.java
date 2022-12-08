@@ -12,13 +12,11 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
-import org.opentripplanner.openstreetmap.model.OSMProvider;
+import org.opentripplanner.openstreetmap.api.OSMProvider;
+import org.opentripplanner.openstreetmap.spi.OSMDatabase;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,26 +42,18 @@ public class OpenStreetMapProvider implements OSMProvider {
 
   /** For tests */
   public OpenStreetMapProvider(File file, boolean cacheDataInMem) {
-    this(new FileDataSource(file, FileType.OSM), cacheDataInMem);
-  }
-
-  public OpenStreetMapProvider(FileDataSource fileDataSource, boolean cacheDataInMem) {
-    this(
-      new ConfiguredDataSource<>(
-        fileDataSource,
-        new OsmExtractParametersBuilder().withSource(fileDataSource.uri()).build()
-      ),
-      cacheDataInMem
-    );
+    this(new FileDataSource(file, FileType.OSM), OsmTagMapperSource.DEFAULT, null, cacheDataInMem);
   }
 
   public OpenStreetMapProvider(
-    ConfiguredDataSource<OsmExtractParameters> osmExtractConfigConfiguredDataSource,
+    DataSource dataSource,
+    OsmTagMapperSource tagMapperSource,
+    ZoneId zoneId,
     boolean cacheDataInMem
   ) {
-    this.source = osmExtractConfigConfiguredDataSource.dataSource();
-    this.zoneId = osmExtractConfigConfiguredDataSource.config().timeZone();
-    this.osmTagMapper = osmExtractConfigConfiguredDataSource.config().osmTagMapper().getInstance();
+    this.source = dataSource;
+    this.zoneId = zoneId;
+    this.osmTagMapper = tagMapperSource.getInstance();
     this.wayPropertySet = new WayPropertySet();
     osmTagMapper.populateProperties(wayPropertySet);
     this.cacheDataInMem = cacheDataInMem;
