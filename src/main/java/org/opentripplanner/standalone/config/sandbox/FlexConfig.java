@@ -10,8 +10,6 @@ public class FlexConfig {
 
   public static final FlexConfig DEFAULT = new FlexConfig();
 
-
-  private static final Duration MAX_ACCESS_EGRESS_DURATION = Duration.ofMinutes(45);
   public static final String ACCESS_EGRESS_DESCRIPTION =
     """
     If you have multiple overlapping flex zones the high default value can lead to performance problems.
@@ -31,8 +29,8 @@ public class FlexConfig {
   private FlexConfig() {
     maxTransferDuration = Duration.ofMinutes(5);
     maxFlexTripDuration = Duration.ofMinutes(45);
-    maxAccessWalkDuration = MAX_ACCESS_EGRESS_DURATION;
-    maxEgressWalkDuration = MAX_ACCESS_EGRESS_DURATION;
+    maxAccessWalkDuration = Duration.ofMinutes(45);
+    maxEgressWalkDuration = Duration.ofMinutes(45);
   }
 
   public FlexConfig(NodeAdapter root, String parameterName) {
@@ -82,7 +80,7 @@ public class FlexConfig {
           "The maximum duration the passenger will be allowed to walk to reach a flex stop or zone."
         )
         .description(ACCESS_EGRESS_DESCRIPTION)
-        .asDuration(MAX_ACCESS_EGRESS_DURATION);
+        .asDuration(DEFAULT.maxAccessWalkDuration);
 
     maxEgressWalkDuration =
       json
@@ -92,7 +90,7 @@ public class FlexConfig {
           "The maximum duration the passenger will be allowed to walk after leaving the flex vehicle at the final destination."
         )
         .description(ACCESS_EGRESS_DESCRIPTION)
-        .asDuration(MAX_ACCESS_EGRESS_DURATION);
+        .asDuration(DEFAULT.maxEgressWalkDuration);
   }
 
   public Duration maxFlexTripDuration() {
