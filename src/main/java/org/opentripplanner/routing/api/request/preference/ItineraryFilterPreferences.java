@@ -28,6 +28,7 @@ public final class ItineraryFilterPreferences {
   private final boolean filterItinerariesWithSameFirstOrLastTrip;
   private final boolean accessibilityScore;
   private final boolean removeItinerariesWithSameRoutesAndStops;
+  private final double minBikeParkingDistance;
 
   private ItineraryFilterPreferences() {
     this.debug = false;
@@ -42,6 +43,7 @@ public final class ItineraryFilterPreferences {
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.accessibilityScore = false;
     this.removeItinerariesWithSameRoutesAndStops = false;
+    this.minBikeParkingDistance = 0;
   }
 
   private ItineraryFilterPreferences(Builder builder) {
@@ -59,6 +61,7 @@ public final class ItineraryFilterPreferences {
       builder.filterItinerariesWithSameFirstOrLastTrip;
     this.accessibilityScore = builder.accessibilityScore;
     this.removeItinerariesWithSameRoutesAndStops = builder.removeItinerariesWithSameRoutesAndStops;
+    this.minBikeParkingDistance = builder.minBikeParkingDistance;
   }
 
   public static Builder of() {
@@ -113,6 +116,10 @@ public final class ItineraryFilterPreferences {
     return accessibilityScore;
   }
 
+  public double minBikeParkingDistance() {
+    return minBikeParkingDistance;
+  }
+
   public static class Builder {
 
     private final ItineraryFilterPreferences original;
@@ -127,6 +134,7 @@ public final class ItineraryFilterPreferences {
     private boolean filterItinerariesWithSameFirstOrLastTrip;
     private boolean removeItinerariesWithSameRoutesAndStops;
     private boolean accessibilityScore;
+    public double minBikeParkingDistance;
 
     public ItineraryFilterPreferences original() {
       return original;
@@ -197,6 +205,11 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
+    public Builder withMinBikeParkingDistance(double distance) {
+      this.minBikeParkingDistance = distance;
+      return this;
+    }
+
     public Builder(ItineraryFilterPreferences original) {
       this.original = original;
       this.debug = original.debug;
@@ -213,6 +226,7 @@ public final class ItineraryFilterPreferences {
       this.removeItinerariesWithSameRoutesAndStops =
         original.removeItinerariesWithSameRoutesAndStops;
       this.accessibilityScore = original.accessibilityScore;
+      this.minBikeParkingDistance = original.minBikeParkingDistance;
     }
 
     public Builder apply(Consumer<Builder> body) {

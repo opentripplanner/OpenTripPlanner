@@ -12,12 +12,9 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FlexTripEdge extends Edge {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FlexTripEdge.class);
   private final FlexTrip trip;
   public StopLocation s1;
   public StopLocation s2;
