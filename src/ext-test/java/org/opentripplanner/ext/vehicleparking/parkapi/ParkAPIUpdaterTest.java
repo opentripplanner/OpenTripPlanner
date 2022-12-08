@@ -92,4 +92,44 @@ public class ParkAPIUpdaterTest {
     assertTrue(first.hasAnyCarPlaces());
     assertNull(first.getCapacity());
   }
+
+  @Test
+  void parseHerrenbergOpeningHours() {
+    var url = "file:src/ext-test/resources/vehicleparking/parkapi/herrenberg.json";
+    var parameters = new ParkAPIUpdaterParameters(
+      "",
+      url,
+      "park-api",
+      30,
+      null,
+      List.of(),
+      null,
+      ZoneIds.BERLIN
+    );
+    var openingHoursCalendarService = new OpeningHoursCalendarService(
+      new Deduplicator(),
+      LocalDate.of(2022, Month.JANUARY, 1),
+      LocalDate.of(2023, Month.JANUARY, 1)
+    );
+    var updater = new CarParkAPIUpdater(parameters, openingHoursCalendarService);
+
+    assertTrue(updater.update());
+
+    var openingHours = updater
+      .getUpdates()
+      .stream()
+      .filter(p -> p.getOpeningHours() != null)
+      .map(p -> OsmOpeningHoursSupport.osmFormat(p.getOpeningHours()))
+      .toList();
+
+    assertEquals(4, openingHours.size());
+
+    assertEquals("Mo-Su 8:00-17:00", openingHours.get(0));
+    assertEquals("Mo-Su 0:00-23:59", openingHours.get(1));
+    assertEquals(
+      "Tu 0:00-2:00,Sa 0:00-2:00,Mo 0:00-23:59,We 0:00-23:59,Th 0:00-23:59,Fr 0:00-23:59,Su 0:00-23:59,Tu 14:30-23:59,Sa 14:30-23:59",
+      openingHours.get(2)
+    );
+    assertEquals("Sa 7:30-18:00,Mo-Fr 7:30-22:00", openingHours.get(3));
+  }
 }

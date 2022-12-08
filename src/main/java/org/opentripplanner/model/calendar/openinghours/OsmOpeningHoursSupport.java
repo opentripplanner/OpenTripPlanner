@@ -51,6 +51,7 @@ public class OsmOpeningHoursSupport {
       case "friday" -> "Fr";
       case "saturday" -> "Sa";
       case "sunday" -> "Su";
+      case "every day" -> "Mo-Su";
       default -> description;
     };
   }
