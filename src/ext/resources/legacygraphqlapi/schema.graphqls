@@ -270,6 +270,7 @@ type OpeningHours {
     The spec is available at: https://wiki.openstreetmap.org/wiki/Key:opening_hours
     """
     osm: String
+
     """
     Opening hours for the selected dates using the local time of the parking lot.
     Each date can have multiple time spans.
@@ -772,7 +773,6 @@ type CarPark implements Node & PlaceInterface {
     Opening hours for the selected dates using the local time of the park.
     Each date can have multiple time spans.
     """
-
     openingHours: OpeningHours
 }
 
