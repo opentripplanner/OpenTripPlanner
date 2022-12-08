@@ -37,10 +37,10 @@ public class LegacyGraphQLBikeParkImpl implements LegacyGraphQLDataFetchers.Lega
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLOpeningHours> openingHours() {
+  public DataFetcher<LegacyGraphQLOpeningHoursImpl> openingHours() {
     return environment -> {
       var cal = getSource(environment).getOpeningHours();
-      return new LegacyGraphQLOpeningHours(cal);
+      return new LegacyGraphQLOpeningHoursImpl(cal);
     };
   }
 

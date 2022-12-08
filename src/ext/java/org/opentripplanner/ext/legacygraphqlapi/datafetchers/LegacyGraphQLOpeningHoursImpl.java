@@ -6,8 +6,15 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
 
-public record LegacyGraphQLOpeningHours(OHCalendar cal)
+public final class LegacyGraphQLOpeningHoursImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLOpeningHours {
+
+  private final OHCalendar cal;
+
+  public LegacyGraphQLOpeningHoursImpl(OHCalendar cal) {
+    this.cal = cal;
+  }
+
   @Override
   public DataFetcher<Iterable<Object>> dates() {
     //TODO: implement

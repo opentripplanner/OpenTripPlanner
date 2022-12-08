@@ -76,8 +76,9 @@ public class LegacyGraphQLVehicleParkingImpl
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLOpeningHours> openingHours() {
-    return environment -> new LegacyGraphQLOpeningHours(getSource(environment).getOpeningHours());
+  public DataFetcher<LegacyGraphQLOpeningHoursImpl> openingHours() {
+    return environment ->
+      new LegacyGraphQLOpeningHoursImpl(getSource(environment).getOpeningHours());
   }
 
   @Override
