@@ -13,6 +13,7 @@ import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNo
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
@@ -23,7 +24,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 @OnlyIfDocsExist
 public class BuildConfigurationDocTest {
 
-  private static final String CONFIG_JSON = "build-config.json";
+  private static final String CONFIG_JSON = OtpFileNames.BUILD_CONFIG_FILENAME;
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "BuildConfiguration.md");
   private static final File OUT_FILE = new File(DOCS_ROOT, "BuildConfiguration.md");
 

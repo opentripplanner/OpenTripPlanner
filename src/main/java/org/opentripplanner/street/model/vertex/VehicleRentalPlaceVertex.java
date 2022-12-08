@@ -12,8 +12,6 @@ import org.opentripplanner.street.model.edge.VehicleRentalEdge;
  */
 public class VehicleRentalPlaceVertex extends Vertex {
 
-  private static final long serialVersionUID = 2L;
-
   private VehicleRentalPlace station;
 
   public VehicleRentalPlaceVertex(Graph g, VehicleRentalPlace station) {

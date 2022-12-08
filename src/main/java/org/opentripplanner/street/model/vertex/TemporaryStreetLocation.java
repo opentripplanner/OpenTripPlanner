@@ -1,9 +1,9 @@
 package org.opentripplanner.street.model.vertex;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.TemporaryEdge;
-import org.opentripplanner.transit.model.basic.I18NString;
 
 public final class TemporaryStreetLocation extends StreetLocation implements TemporaryVertex {
 

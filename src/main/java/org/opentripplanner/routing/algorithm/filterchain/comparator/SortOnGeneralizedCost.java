@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.comparator;
 
+import org.opentripplanner.framework.collection.CompositeComparator;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.util.CompositeComparator;
 
 /**
  * This comparator sorts itineraries based on the generalized-cost. If the cost is the same then the

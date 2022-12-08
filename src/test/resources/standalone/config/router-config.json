@@ -10,6 +10,7 @@
     "walkReluctance": 4.0,
     "bikeReluctance": 5.0,
     "bikeWalkingReluctance": 10.0,
+    "bikeStairsReluctance": 150.0,
     "carReluctance": 10.0,
     "stairsReluctance": 1.65,
     "turnReluctance": 1.0,
@@ -44,7 +45,8 @@
     "itineraryFilters": {
       "transitGeneralizedCostLimit": "3600 + 2.5 x",
       "bikeRentalDistanceRatio": 0.3,
-      "accessibilityScore": true
+      "accessibilityScore": true,
+      "minBikeParkingDistance": 300
     },
     "carDecelerationSpeed": 2.9,
     "carAccelerationSpeed": 2.9,
@@ -72,7 +74,8 @@
     }
   },
   "flex": {
-    "maxTransferDurationSeconds": 240
+    "maxTransferDuration": "5m",
+    "maxFlexTripDuration": "45m"
   },
   "transit": {
     "maxNumberOfTransfers": 12,

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -16,10 +18,9 @@ import org.opentripplanner.graph_builder.issue.report.SummarizeDataImportIssues;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,7 @@ public class GraphBuilder implements Runnable {
     GraphBuilderDataSources dataSources,
     Graph graph,
     TransitModel transitModel,
+    WorldEnvelopeModel worldEnvelopeModel,
     boolean loadStreetGraph,
     boolean saveStreetGraph
   ) {
@@ -74,6 +76,7 @@ public class GraphBuilder implements Runnable {
       .config(config)
       .graph(graph)
       .transitModel(transitModel)
+      .worldEnvelopeModel(worldEnvelopeModel)
       .dataSources(dataSources)
       .timeZoneId(transitModel.getTimeZone())
       .build();
@@ -152,6 +155,8 @@ public class GraphBuilder implements Runnable {
     if (OTPFeature.DataOverlay.isOn()) {
       graphBuilder.addModuleOptional(factory.dataOverlayFactory());
     }
+
+    graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
 
     return graphBuilder;
   }

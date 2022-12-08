@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
@@ -60,7 +61,7 @@ public class RouterConfig implements Serializable {
       root
         .of("configVersion")
         .since(V2_1)
-        .summary("Deployment version of the *router-config.json*.")
+        .summary("Deployment version of the *" + ROUTER_CONFIG_FILENAME + "*.")
         .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
         .asString(null);
     this.requestLogFile =
@@ -110,10 +111,7 @@ number of transit vehicles used in that itinerary.
       RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
     this.updatersParameters = new UpdatersConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
-    this.flexConfig =
-      new FlexConfig(
-        root.of("flex").since(NA).summary("Configuration for flex routing.").asObject()
-      );
+    this.flexConfig = new FlexConfig(root, "flex");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllUnusedParameters(LOG::warn);
@@ -166,7 +164,7 @@ number of transit vehicles used in that itinerary.
     return updatersParameters;
   }
 
-  public VectorTilesResource.LayersParameters vectorTileLayers() {
+  public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
     return vectorTileLayers;
   }
 

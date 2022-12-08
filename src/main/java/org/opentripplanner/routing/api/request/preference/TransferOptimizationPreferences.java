@@ -4,10 +4,10 @@ import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.api.request.framework.Units;
-import org.opentripplanner.util.OTPFeature;
 
 /**
  * See {@link TransferOptimizationParameters} for documentation on this class.

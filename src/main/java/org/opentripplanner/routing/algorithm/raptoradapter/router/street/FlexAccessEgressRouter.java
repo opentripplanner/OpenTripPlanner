@@ -58,7 +58,6 @@ public class FlexAccessEgressRouter {
       config,
       request.dateTime(),
       request.arriveBy(),
-      request.preferences().walk().speed(),
       searchDays.additionalSearchDaysInPast(),
       searchDays.additionalSearchDaysInFuture(),
       accessStops,

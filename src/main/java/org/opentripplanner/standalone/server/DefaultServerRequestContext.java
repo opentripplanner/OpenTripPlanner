@@ -6,7 +6,7 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
-import org.opentripplanner.inspector.TileRendererManager;
+import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.RoutingService;
@@ -14,6 +14,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.worldenvelope.model.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
@@ -35,9 +36,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final RaptorConfig<TripSchedule> raptorConfig;
   private final Logger requestLogger;
   private final TileRendererManager tileRendererManager;
-  private final VectorTilesResource.LayersParameters vectorTileLayers;
+  private final VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers;
   private final FlexConfig flexConfig;
   private final TraverseVisitor traverseVisitor;
+  private final WorldEnvelopeService worldEnvelopeService;
 
   /**
    * Make sure all mutable components are copied/cloned before calling this constructor.
@@ -52,7 +54,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     RaptorConfig<TripSchedule> raptorConfig,
     Logger requestLogger,
     TileRendererManager tileRendererManager,
-    VectorTilesResource.LayersParameters vectorTileLayers,
+    VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
+    WorldEnvelopeService worldEnvelopeService,
     FlexConfig flexConfig,
     TraverseVisitor traverseVisitor
   ) {
@@ -68,6 +71,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.flexConfig = flexConfig;
     this.traverseVisitor = traverseVisitor;
     this.routeRequestDefaults = routeRequestDefaults;
+    this.worldEnvelopeService = worldEnvelopeService;
   }
 
   /**
@@ -81,7 +85,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     Graph graph,
     TransitService transitService,
     MeterRegistry meterRegistry,
-    VectorTilesResource.LayersParameters vectorTileLayers,
+    VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
+    WorldEnvelopeService worldEnvelopeService,
     FlexConfig flexConfig,
     @Nullable TraverseVisitor traverseVisitor,
     @Nullable String requestLogFile
@@ -97,6 +102,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       RequestLoggerFactory.createLogger(requestLogFile),
       new TileRendererManager(graph, routeRequestDefaults.preferences()),
       vectorTileLayers,
+      worldEnvelopeService,
       flexConfig,
       traverseVisitor
     );
@@ -140,6 +146,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
+  public WorldEnvelopeService worldEnvelopeService() {
+    return worldEnvelopeService;
+  }
+
+  @Override
   public TransitTuningParameters transitTuningParameters() {
     return transitRoutingConfig;
   }
@@ -180,7 +191,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public VectorTilesResource.LayersParameters vectorTileLayers() {
+  public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
     return vectorTileLayers;
   }
 }

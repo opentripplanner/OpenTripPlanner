@@ -35,14 +35,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.LocalDateUtils;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.OtpAppException;
 
 public class ParameterBuilder {
+
+  private static final Object UNDEFINED = new Object();
 
   /**
    * The node-info builder is used while parsing a configuration file to "build" information about
@@ -63,7 +65,7 @@ public class ParameterBuilder {
    * parameters, and the default value is just a fallback. In these cases we temporarily need to
    * keep the doc-default-value.
    */
-  private Object docDefaultValue = null;
+  private Object docDefaultValue = UNDEFINED;
 
   public ParameterBuilder(NodeAdapter target, String paramName) {
     this.target = target;
@@ -518,7 +520,7 @@ public class ParameterBuilder {
   }
 
   private String getDocDefaultValue(Object realDefaultValue) {
-    Object value = docDefaultValue == null ? realDefaultValue : docDefaultValue;
+    Object value = docDefaultValue == UNDEFINED ? realDefaultValue : docDefaultValue;
 
     if (value == null) {
       return null;

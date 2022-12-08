@@ -17,12 +17,14 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
+import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.model.edge.Edge;
@@ -31,7 +33,6 @@ import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,7 @@ public class SerializedGraphObject implements Serializable {
 
   public final Graph graph;
   public final TransitModel transitModel;
+  public final WorldEnvelopeModel worldEnvelopeModel;
   private final Collection<Edge> edges;
 
   /**
@@ -75,12 +77,14 @@ public class SerializedGraphObject implements Serializable {
   public SerializedGraphObject(
     Graph graph,
     TransitModel transitModel,
+    WorldEnvelopeModel worldEnvelopeModel,
     BuildConfig buildConfig,
     RouterConfig routerConfig
   ) {
     this.graph = graph;
     this.edges = graph.getEdges();
     this.transitModel = transitModel;
+    this.worldEnvelopeModel = worldEnvelopeModel;
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();

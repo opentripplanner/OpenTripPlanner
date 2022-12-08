@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.model.siri.et;
 
 import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
-import static org.opentripplanner.model.PickDrop.NONE;
 
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
@@ -221,13 +220,9 @@ public class EstimatedCallType {
           .newFieldDefinition()
           .name("forBoarding")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .description(
-            "Whether vehicle may be boarded at quay according to the planned data. " +
-            "If the cancellation flag is set, boarding is not possible, even if this field " +
-            "is set to true."
-          )
+          .description("Whether vehicle may be boarded at quay.")
           .dataFetcher(environment ->
-            ((TripTimeOnDate) environment.getSource()).getPickupType() != NONE
+            ((TripTimeOnDate) environment.getSource()).getPickupType().isRoutable()
           )
           .build()
       )
@@ -236,13 +231,9 @@ public class EstimatedCallType {
           .newFieldDefinition()
           .name("forAlighting")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .description(
-            "Whether vehicle may be alighted at quay according to the planned data. " +
-            "If the cancellation flag is set, alighting is not possible, even if this field " +
-            "is set to true."
-          )
+          .description("Whether vehicle may be alighted at quay.")
           .dataFetcher(environment ->
-            ((TripTimeOnDate) environment.getSource()).getDropoffType() != NONE
+            ((TripTimeOnDate) environment.getSource()).getDropoffType().isRoutable()
           )
           .build()
       )

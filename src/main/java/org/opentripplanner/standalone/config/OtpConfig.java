@@ -5,8 +5,9 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class OtpConfig {
       root
         .of("configVersion")
         .since(V2_1)
-        .summary("Deployment version of the *otp-config.json*.")
+        .summary("Deployment version of the *" + OtpFileNames.OTP_CONFIG_FILENAME + "*.")
         .description(CONFIG_VERSION_DESCRIPTION)
         .asString(null);
     this.otpFeatures =

@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.vertex;
 
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * A vertex coming from OpenStreetMap.
@@ -11,8 +11,6 @@ import org.opentripplanner.transit.model.basic.I18NString;
  * the transit network between (or eventually within) graphs.
  */
 public class OsmVertex extends IntersectionVertex {
-
-  private static final long serialVersionUID = 1L;
 
   /** The OSM node ID from whence this came */
   public final long nodeId;

@@ -2,8 +2,8 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.Serializable;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * A named area is a subset of an area with a certain set of properties (name, safety, etc). Its

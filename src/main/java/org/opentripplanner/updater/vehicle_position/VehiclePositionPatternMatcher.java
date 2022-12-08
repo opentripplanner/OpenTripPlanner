@@ -20,12 +20,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.common.model.T2;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -82,13 +81,18 @@ public class VehiclePositionPatternMatcher {
       .stream()
       .map(vehiclePosition -> toRealtimeVehiclePosition(feedId, vehiclePosition))
       .filter(Objects::nonNull)
-      .collect(Collectors.groupingBy(t -> t.first))
+      .collect(Collectors.groupingBy(PatternAndVehiclePosition::pattern))
       .entrySet()
       .stream()
       .collect(
         Collectors.toMap(
           Entry::getKey,
-          e -> e.getValue().stream().map(t -> t.second).collect(Collectors.toList())
+          e ->
+            e
+              .getValue()
+              .stream()
+              .map(PatternAndVehiclePosition::position)
+              .collect(Collectors.toList())
         )
       );
 
@@ -237,7 +241,7 @@ public class VehiclePositionPatternMatcher {
     }
   }
 
-  private T2<TripPattern, RealtimeVehiclePosition> toRealtimeVehiclePosition(
+  private PatternAndVehiclePosition toRealtimeVehiclePosition(
     String feedId,
     VehiclePosition vehiclePosition
   ) {
@@ -275,6 +279,8 @@ public class VehiclePositionPatternMatcher {
     // Add position to pattern
     var newPosition = mapVehiclePosition(vehiclePosition, pattern.getStops(), trip);
 
-    return new T2<>(pattern, newPosition);
+    return new PatternAndVehiclePosition(pattern, newPosition);
   }
+
+  record PatternAndVehiclePosition(TripPattern pattern, RealtimeVehiclePosition position) {}
 }

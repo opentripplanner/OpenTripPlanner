@@ -56,7 +56,14 @@ public class GraphBuilderModules {
   ) {
     List<OpenStreetMapProvider> providers = new ArrayList<>();
     for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
-      providers.add(new OpenStreetMapProvider(osmConfiguredDataSource, config.osmCacheDataInMem));
+      providers.add(
+        new OpenStreetMapProvider(
+          osmConfiguredDataSource.dataSource(),
+          osmConfiguredDataSource.config().osmTagMapper(),
+          osmConfiguredDataSource.config().timeZone(),
+          config.osmCacheDataInMem
+        )
+      );
     }
 
     return new OpenStreetMapModule(
@@ -91,10 +98,7 @@ public class GraphBuilderModules {
       graph,
       issueStore,
       config.getTransitServicePeriod(),
-      config.fareServiceFactory,
-      config.discardMinTransferTimes,
-      config.blockBasedInterlining,
-      config.maxInterlineDistance
+      config.fareServiceFactory
     );
   }
 

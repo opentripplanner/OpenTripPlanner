@@ -1,16 +1,14 @@
 package org.opentripplanner.street.model.vertex;
 
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.lang.BitSetUtils;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.util.BitSetUtils;
 
 /**
  * Represents an ordinary location in space, typically an intersection.
  */
 public class IntersectionVertex extends StreetVertex {
-
-  private static final long serialVersionUID = 1L;
 
   private static final int HIGHWAY_TRAFFIC_LIGHT_INDEX = 0;
 

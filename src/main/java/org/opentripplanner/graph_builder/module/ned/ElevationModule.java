@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
+import static org.opentripplanner.street.model.elevation.ElevationUtils.computeEllipsoidToGeoidDifference;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -25,6 +25,7 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.operation.TransformException;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.logging.ProgressTracker;
@@ -40,7 +41,6 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetElevationExtension;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -247,7 +247,7 @@ public class ElevationModule implements GraphBuilderModule {
       HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
       for (StreetEdge streetEdge : edgesWithCalculatedElevations) {
         newCachedElevations.put(
-          PolylineEncoder.encodeGeometry(streetEdge.getGeometry()).points(),
+          EncodedPolyline.encode(streetEdge.getGeometry()).points(),
           streetEdge.getElevationProfile()
         );
       }
@@ -383,7 +383,7 @@ public class ElevationModule implements GraphBuilderModule {
     Geometry edgeGeometry = ee.getGeometry();
     if (cachedElevations != null) {
       PackedCoordinateSequence coordinateSequence = cachedElevations.get(
-        PolylineEncoder.encodeGeometry(edgeGeometry).points()
+        EncodedPolyline.encode(edgeGeometry).points()
       );
       if (coordinateSequence != null) {
         // found a cached value! Set the elevation profile with the pre-calculated data.

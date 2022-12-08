@@ -23,7 +23,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.common.RepeatingTimePeriod;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -42,15 +42,15 @@ import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMTag;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.street.model.RepeatingTimePeriod;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OSMDatabase {
+public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDatabase {
 
   private static final Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
@@ -209,6 +209,7 @@ public class OSMDatabase {
     return waysNodeIds.contains(nodeId);
   }
 
+  @Override
   public void addNode(OSMNode node) {
     if (node.isBikeParking()) {
       bikeParkingNodes.put(node.getId(), node);
@@ -232,6 +233,7 @@ public class OSMDatabase {
     nodesById.put(node.getId(), node);
   }
 
+  @Override
   public void addWay(OSMWay way) {
     /* only add ways once */
     long wayId = way.getId();
@@ -286,6 +288,7 @@ public class OSMDatabase {
     waysById.put(wayId, way);
   }
 
+  @Override
   public void addRelation(OSMRelation relation) {
     if (relationsById.containsKey(relation.getId())) {
       return;
@@ -329,16 +332,12 @@ public class OSMDatabase {
     relationsById.put(relation.getId(), relation);
   }
 
-  /**
-   * Called after the first phase, when all relations are loaded.
-   */
+  @Override
   public void doneFirstPhaseRelations() {
     // nothing to do here
   }
 
-  /**
-   * Called after the second phase, when all ways are loaded.
-   */
+  @Override
   public void doneSecondPhaseWays() {
     // This copies relevant tags to the ways (highway=*) where it doesn't exist, so that
     // the way purging keeps the needed way around.
@@ -354,10 +353,7 @@ public class OSMDatabase {
     markNodesForKeeping(areaWaysById.valueCollection(), areaNodeIds);
   }
 
-  /**
-   * Called after the third and final phase, when all nodes are loaded. After all relations, ways,
-   * and nodes are loaded, handle areas.
-   */
+  @Override
   public void doneThirdPhaseNodes() {
     processMultipolygonRelations();
     processSingleWayAreas();

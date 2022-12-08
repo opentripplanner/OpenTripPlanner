@@ -6,8 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,9 +18,12 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
@@ -41,10 +45,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.TestUtils;
-import org.opentripplanner.util.model.EncodedPolyline;
 
 /**
  * This tests that the feed for the Cobb County Flex service is processed correctly. This service
@@ -96,7 +96,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
 
-    var accesses = trip.getFlexAccessTemplates(nearbyStop, flexDate, calculator, params).toList();
+    var accesses = trip
+      .getFlexAccessTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
+      .toList();
 
     assertEquals(3, accesses.size());
 
@@ -109,7 +111,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   void calculateEgressTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
-    var egresses = trip.getFlexEgressTemplates(nearbyStop, flexDate, calculator, params).toList();
+    var egresses = trip
+      .getFlexEgressTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
+      .toList();
 
     assertEquals(3, egresses.size());
 
@@ -132,7 +136,6 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       FlexConfig.DEFAULT,
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
       false,
-      1.0,
       1,
       1,
       List.of(from),
@@ -185,7 +188,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     assertEquals(1, intermediateStops.size());
     assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
 
-    EncodedPolyline legGeometry = PolylineEncoder.encodeGeometry(leg.getLegGeometry());
+    EncodedPolyline legGeometry = EncodedPolyline.encode(leg.getLegGeometry());
     assertThatPolylinesAreEqual(
       legGeometry.points(),
       "kfsmEjojcOa@eBRKfBfHR|ALjBBhVArMG|OCrEGx@OhAKj@a@tAe@hA]l@MPgAnAgw@nr@cDxCm@t@c@t@c@x@_@~@]pAyAdIoAhG}@lE{AzHWhAtt@t~Aj@tAb@~AXdBHn@FlBC`CKnA_@nC{CjOa@dCOlAEz@E|BRtUCbCQ~CWjD??qBvXBl@kBvWOzAc@dDOx@sHv]aIG?q@@c@ZaB\\mA"
@@ -235,12 +238,15 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     OtpServerRequestContext serverContext
   ) {
     RouteRequest request = new RouteRequest();
-    Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);
+    Instant dateTime = LocalDateTime
+      .of(2021, Month.DECEMBER, 16, 12, 0)
+      .atZone(ZoneIds.NEW_YORK)
+      .toInstant();
     request.setDateTime(dateTime);
     request.setFrom(from);
     request.setTo(to);
 
-    var time = dateTime.atZone(ZoneId.of("America/New_York"));
+    var time = dateTime.atZone(ZoneIds.NEW_YORK);
     var additionalSearchDays = AdditionalSearchDays.defaults(time);
 
     var result = TransitRouter.route(

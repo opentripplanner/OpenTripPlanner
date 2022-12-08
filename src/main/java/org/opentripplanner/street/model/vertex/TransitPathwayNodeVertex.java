@@ -12,8 +12,6 @@ public class TransitPathwayNodeVertex extends StationElementVertex {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitPathwayNodeVertex.class);
 
-  private static final long serialVersionUID = 1L;
-
   private final boolean wheelchairEntrance;
 
   private final PathwayNode node;
@@ -31,8 +29,6 @@ public class TransitPathwayNodeVertex extends StationElementVertex {
     );
     this.node = node;
     this.wheelchairEntrance = node.getWheelchairAccessibility() != Accessibility.NOT_POSSIBLE;
-    //Adds this vertex into graph envelope so that we don't need to loop over all vertices
-    graph.expandToInclude(node.getCoordinate().longitude(), node.getCoordinate().latitude());
   }
 
   public boolean isWheelchairEntrance() {

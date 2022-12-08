@@ -72,4 +72,16 @@ public class OpeningHours implements Comparable<OpeningHours>, Serializable {
       days.get(day) && this.startTime <= secondsSinceMidnight && secondsSinceMidnight <= endTime
     );
   }
+
+  public String periodDescription() {
+    return periodDescription;
+  }
+
+  public long startTime() {
+    return startTime;
+  }
+
+  public long endTime() {
+    return endTime;
+  }
 }

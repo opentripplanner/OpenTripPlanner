@@ -1,0 +1,3 @@
+agency_id,agency_name,agency_url,agency_timezone
+45131,Matka Mäkelä Oy,http://matkamakela.fi,Europe/Helsinki
+6743,Koivuranta Oy,http://www.koivuranta.fi,Europe/Helsinki

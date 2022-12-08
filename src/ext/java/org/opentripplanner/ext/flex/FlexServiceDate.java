@@ -23,7 +23,11 @@ public class FlexServiceDate {
   /** Which services are running on the date. */
   public final TIntSet servicesRunning;
 
-  FlexServiceDate(LocalDate serviceDate, int secondsFromStartOfTime, TIntSet servicesRunning) {
+  public FlexServiceDate(
+    LocalDate serviceDate,
+    int secondsFromStartOfTime,
+    TIntSet servicesRunning
+  ) {
     this.serviceDate = serviceDate;
     this.secondsFromStartOfTime = secondsFromStartOfTime;
     this.servicesRunning = servicesRunning;

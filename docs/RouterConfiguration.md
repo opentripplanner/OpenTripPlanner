@@ -36,8 +36,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                   | *Optional* |               |  2.1  |
 | [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
 | [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |   na  |
-| flex                                                                                      |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |   na  |
-|    [maxTransferDurationSeconds](#flex_maxTransferDurationSeconds)                         |       `integer`       | How long should you be allowed to walk from a flex vehicle to a transit one.                      | *Optional* | `300`         |  2.1  |
+| [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |  2.1  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
 | [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                   | *Optional* |               |   na  |
@@ -143,15 +142,6 @@ search-window.
 
 The search aborts after this duration and any paths found are returned to the client.
 
-
-<h3 id="flex_maxTransferDurationSeconds">maxTransferDurationSeconds</h3>
-
-**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `300`   
-**Path:** /flex 
-
-How long should you be allowed to walk from a flex vehicle to a transit one.
-
-How long should a passenger be allowed to walk after getting out of a flex vehicle and transferring to a flex or transit one. This was mainly introduced to improve performance which is also the reason for not using the existing value with the same name: fixed schedule transfers are computed during the graph build but flex ones are calculated at request time and are more sensitive to slowdown. A lower value means that the routing is faster.
 
 <h3 id="transit">transit</h3>
 
@@ -408,6 +398,7 @@ Http headers.
     "walkReluctance" : 4.0,
     "bikeReluctance" : 5.0,
     "bikeWalkingReluctance" : 10.0,
+    "bikeStairsReluctance" : 150.0,
     "carReluctance" : 10.0,
     "stairsReluctance" : 1.65,
     "turnReluctance" : 1.0,
@@ -441,7 +432,8 @@ Http headers.
     "itineraryFilters" : {
       "transitGeneralizedCostLimit" : "3600 + 2.5 x",
       "bikeRentalDistanceRatio" : 0.3,
-      "accessibilityScore" : true
+      "accessibilityScore" : true,
+      "minBikeParkingDistance" : 300
     },
     "carDecelerationSpeed" : 2.9,
     "carAccelerationSpeed" : 2.9,
@@ -468,7 +460,8 @@ Http headers.
     }
   },
   "flex" : {
-    "maxTransferDurationSeconds" : 240
+    "maxTransferDuration" : "5m",
+    "maxFlexTripDuration" : "45m"
   },
   "transit" : {
     "maxNumberOfTransfers" : 12,

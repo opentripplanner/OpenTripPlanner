@@ -5,6 +5,7 @@ import javax.ws.rs.core.Application;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -14,6 +15,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -22,9 +24,9 @@ import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPWebApplication;
+import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
-import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +62,7 @@ public class ConstructApplication {
     CommandLineParameters cli,
     Graph graph,
     TransitModel transitModel,
+    WorldEnvelopeModel worldEnvelopeModel,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources
   ) {
@@ -79,6 +82,7 @@ public class ConstructApplication {
         .graph(graph)
         .transitModel(transitModel)
         .graphVisualizer(graphVisualizer)
+        .worldEnvelopeModel(worldEnvelopeModel)
         .build();
   }
 
@@ -104,6 +108,7 @@ public class ConstructApplication {
       graphBuilderDataSources,
       graph(),
       transitModel(),
+      factory.worldEnvelopeModel(),
       cli.doLoadStreetGraph(),
       cli.doSaveStreetGraph()
     );
@@ -135,7 +140,7 @@ public class ConstructApplication {
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(graph(), transitModel(), routerConfig().updaterConfig());
 
-    graph().initEllipsoidToGeoidDifference();
+    initEllipsoidToGeoidDifference();
 
     if (OTPFeature.SandboxAPITransmodelApi.isOn()) {
       TransmodelAPI.setUp(
@@ -148,6 +153,16 @@ public class ConstructApplication {
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Creating debug client geocoder lucene index");
       LuceneIndex.forServer(createServerContext());
+    }
+  }
+
+  private void initEllipsoidToGeoidDifference() {
+    try {
+      var c = factory.worldEnvelopeModel().envelope().orElseThrow().center();
+      double value = ElevationUtils.computeEllipsoidToGeoidDifference(c.latitude(), c.longitude());
+      graph().initEllipsoidToGeoidDifference(value, c.latitude(), c.longitude());
+    } catch (Exception e) {
+      LOG.error("Error computing ellipsoid/geoid difference");
     }
   }
 
@@ -180,6 +195,10 @@ public class ConstructApplication {
 
   public Graph graph() {
     return factory.graph();
+  }
+
+  public WorldEnvelopeModel worldEnvelopeModel() {
+    return factory.worldEnvelopeModel();
   }
 
   public OtpConfig otpConfig() {

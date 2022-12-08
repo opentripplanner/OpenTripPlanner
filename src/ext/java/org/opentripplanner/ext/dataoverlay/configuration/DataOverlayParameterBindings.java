@@ -8,8 +8,6 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 public class DataOverlayParameterBindings implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private final List<ParameterBinding> parameters;
 
   DataOverlayParameterBindings(List<ParameterBinding> parameters) {

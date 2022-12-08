@@ -2,7 +2,9 @@ package org.opentripplanner.framework.lang;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.framework.lang.DoubleUtils.assertInRange;
 
 import org.junit.jupiter.api.Test;
 
@@ -51,6 +53,16 @@ class DoubleUtilsTest {
     assertEquals(DoubleUtils.roundTo1Decimal(Double.NaN), Double.NaN);
     assertEquals(DoubleUtils.roundTo2Decimals(Double.NEGATIVE_INFINITY), Double.NEGATIVE_INFINITY);
     assertEquals(DoubleUtils.roundTo3Decimals(Double.POSITIVE_INFINITY), Double.POSITIVE_INFINITY);
+  }
+
+  @Test
+  void testAssertInRange() {
+    assertInRange(7.0, 0d, 10d, "test");
+    assertInRange(0.0, 0d, 10d, "test");
+    assertInRange(10.0, 0d, 10d, "test");
+
+    assertThrows(IllegalArgumentException.class, () -> assertInRange(10.1, 0d, 10d, "test"), "");
+    assertThrows(IllegalArgumentException.class, () -> assertInRange(-0.1, 0d, 10d, "test"), "");
   }
 
   @Test

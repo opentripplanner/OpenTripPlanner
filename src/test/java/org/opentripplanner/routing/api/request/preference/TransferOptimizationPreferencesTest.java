@@ -8,7 +8,7 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 import static org.opentripplanner.routing.api.request.preference.TransferOptimizationPreferences.DEFAULT;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.framework.application.OTPFeature;
 
 class TransferOptimizationPreferencesTest {
 

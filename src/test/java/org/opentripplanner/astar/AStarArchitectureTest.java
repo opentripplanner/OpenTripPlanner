@@ -1,8 +1,8 @@
 package org.opentripplanner.astar;
 
+import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK_UTILS;
 import static org.opentripplanner.OtpArchitectureModules.GOOGLE_COLLECTIONS;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
-import static org.opentripplanner.OtpArchitectureModules.UTILS;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.arch.Package;
@@ -19,7 +19,7 @@ public class AStarArchitectureTest {
 
   @Test
   void enforcePackageDependencies() {
-    ASTAR.dependsOn(UTILS, ASTAR_MODEL, ASTAR_SPI).verify();
+    ASTAR.dependsOn(FRAMEWORK_UTILS, ASTAR_MODEL, ASTAR_SPI).verify();
   }
 
   @Test

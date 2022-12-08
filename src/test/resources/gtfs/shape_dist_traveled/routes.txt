@@ -1,0 +1,2 @@
+agency_id,route_id,route_short_name,route_long_name,route_type,route_color,route_text_color,bikes_allowed
+6743,412,Koivuranta,Laukaa-Jyväskylä Kos,3,00662b,FFFFFF,2

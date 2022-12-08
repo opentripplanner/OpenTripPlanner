@@ -1,9 +1,9 @@
 package org.opentripplanner.street.model.edge;
 
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
-import org.opentripplanner.transit.model.basic.I18NString;
 
 public class AreaEdge extends StreetEdge {
 

@@ -30,6 +30,12 @@ public class GtfsBundle {
 
   private StopTransferPriority stationTransferPreference;
 
+  private boolean discardMinTransferTimes;
+
+  private boolean blockBasedInterlining;
+
+  private int maxInterlineDistance;
+
   /** Used by unit tests */
   public GtfsBundle(File gtfsFile) {
     this(DataStoreModule.compositeSource(gtfsFile, FileType.GTFS));
@@ -46,12 +52,14 @@ public class GtfsBundle {
 
   public GtfsBundle(ConfiguredDataSource<GtfsFeedParameters> configuredDataSource) {
     this.dataSource = (CompositeDataSource) configuredDataSource.dataSource();
-    if (configuredDataSource.config().feedId().isPresent()) {
-      this.feedId =
-        new GtfsFeedId.Builder().id(configuredDataSource.config().feedId().get()).build();
+    if (configuredDataSource.config().feedId() != null) {
+      this.feedId = new GtfsFeedId.Builder().id(configuredDataSource.config().feedId()).build();
     }
     this.removeRepeatedStops = configuredDataSource.config().removeRepeatedStops();
     this.stationTransferPreference = configuredDataSource.config().stationTransferPreference();
+    this.discardMinTransferTimes = configuredDataSource.config().discardMinTransferTimes();
+    this.blockBasedInterlining = configuredDataSource.config().blockBasedInterlining();
+    this.maxInterlineDistance = configuredDataSource.config().maxInterlineDistance();
   }
 
   public CsvInputSource getCsvInputSource() {
@@ -136,5 +144,17 @@ public class GtfsBundle {
 
   public StopTransferPriority stationTransferPreference() {
     return stationTransferPreference;
+  }
+
+  public boolean discardMinTransferTimes() {
+    return discardMinTransferTimes;
+  }
+
+  public boolean blockBasedInterlining() {
+    return blockBasedInterlining;
+  }
+
+  public int maxInterlineDistance() {
+    return maxInterlineDistance;
   }
 }

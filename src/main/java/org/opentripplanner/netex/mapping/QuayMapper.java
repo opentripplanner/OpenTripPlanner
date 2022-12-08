@@ -2,14 +2,13 @@ package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
 import javax.annotation.Nullable;
-import org.opentripplanner.common.model.T2;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -35,7 +34,7 @@ class QuayMapper {
     Quay quay,
     Station parentStation,
     Collection<FareZone> fareZones,
-    T2<TransitMode, String> transitMode,
+    NetexMainAndSubMode transitMode,
     Accessibility wheelchair
   ) {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
@@ -55,8 +54,8 @@ class QuayMapper {
       )
       .withCoordinate(WgsCoordinateMapper.mapToDomain(quay.getCentroid()))
       .withWheelchairAccessibility(wheelchair)
-      .withVehicleType(transitMode.first)
-      .withNetexVehicleSubmode(transitMode.second);
+      .withVehicleType(transitMode.mainMode())
+      .withNetexVehicleSubmode(transitMode.subMode());
 
     builder.fareZones().addAll(fareZones);
 
