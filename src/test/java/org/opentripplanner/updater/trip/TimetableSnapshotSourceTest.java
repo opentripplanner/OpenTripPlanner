@@ -19,6 +19,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelations
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.GtfsRealtimeExtensions.OtpStopTimePropertiesExtension.DropOffPickupType;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.PickDrop;

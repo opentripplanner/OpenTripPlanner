@@ -17,6 +17,7 @@ import com.google.common.base.Preconditions;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import de.mfdz.MfdzRealtimeExtensions;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -30,7 +31,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opentripplanner.GtfsRealtimeExtensions;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.DoubleUtils;
@@ -663,7 +663,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .withTimezone("Europe/Paris")
       .build();
     Route route;
-    if (tripDescriptor.hasExtension(GtfsRealtimeExtensions.tripDescriptor)) {
+    if (tripDescriptor.hasExtension(MfdzRealtimeExtensions.tripDescriptor)) {
       FeedScopedId id = tripDescriptor.hasRouteId()
         ? new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
         : tripId;

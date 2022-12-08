@@ -2,10 +2,10 @@ syntax = "proto2";
 
 import "gtfs-realtime.proto";
 
-option java_package = "org.opentripplanner";
+option java_package = "de.mfdz";
 package transit_realtime;
 
-message OtpTripDescriptorExtension {
+message TripDescriptorExtension {
   optional string route_url = 1;
   optional string agency_id = 2;
   optional string route_long_name = 3;
@@ -13,10 +13,10 @@ message OtpTripDescriptorExtension {
 }
 
 extend TripDescriptor {
-  optional OtpTripDescriptorExtension trip_descriptor = 9000;
+  optional TripDescriptorExtension trip_descriptor = 9000;
 }
 
-message OtpStopTimePropertiesExtension {
+message StopTimePropertiesExtension {
   enum DropOffPickupType {
     // Regularly scheduled pickup/dropoff.
     REGULAR = 0;
@@ -36,5 +36,5 @@ message OtpStopTimePropertiesExtension {
 }
 
 extend TripUpdate.StopTimeUpdate.StopTimeProperties {
-  optional OtpStopTimePropertiesExtension stop_time_properties = 9000;
+  optional StopTimePropertiesExtension stop_time_properties = 9000;
 }

@@ -2,10 +2,10 @@ package org.opentripplanner.updater.trip;
 
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import de.mfdz.MfdzRealtimeExtensions;
+import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import org.opentripplanner.GtfsRealtimeExtensions;
-import org.opentripplanner.GtfsRealtimeExtensions.OtpStopTimePropertiesExtension.DropOffPickupType;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 
 public class TripUpdateBuilder {
@@ -75,12 +75,12 @@ public class TripUpdateBuilder {
 
     if (pickDrop != null) {
       var stopTimePropsBuilder = stopTimeUpdateBuilder.getStopTimePropertiesBuilder();
-      var b = GtfsRealtimeExtensions.OtpStopTimePropertiesExtension.newBuilder();
+      var b = MfdzRealtimeExtensions.StopTimePropertiesExtension.newBuilder();
       b.setDropoffType(pickDrop);
       b.setPickupType(pickDrop);
 
       var ext = b.build();
-      stopTimePropsBuilder.setExtension(GtfsRealtimeExtensions.stopTimeProperties, ext);
+      stopTimePropsBuilder.setExtension(MfdzRealtimeExtensions.stopTimeProperties, ext);
     }
 
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
@@ -108,14 +108,14 @@ public class TripUpdateBuilder {
    * Set route name, agency id, url and type (mode) via a custom extension.
    */
   public TripUpdateBuilder addTripExtension() {
-    var b = GtfsRealtimeExtensions.OtpTripDescriptorExtension.newBuilder();
+    var b = MfdzRealtimeExtensions.TripDescriptorExtension.newBuilder();
     b.setRouteType(2);
     b.setRouteUrl(ROUTE_URL);
     b.setAgencyId("agency");
     b.setRouteLongName(ROUTE_NAME);
 
     var ext = b.build();
-    tripDescriptorBuilder.setExtension(GtfsRealtimeExtensions.tripDescriptor, ext);
+    tripDescriptorBuilder.setExtension(MfdzRealtimeExtensions.tripDescriptor, ext);
 
     return this;
   }

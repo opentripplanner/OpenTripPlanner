@@ -3,8 +3,8 @@ package org.opentripplanner.updater.trip;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.mfdz.MfdzRealtimeExtensions;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.GtfsRealtimeExtensions;
 
 class GtfsRealtimeHttpTripUpdateSourceTest {
 
@@ -34,9 +34,9 @@ class GtfsRealtimeHttpTripUpdateSourceTest {
         .getStopTimeUpdateList()
         .get(0)
         .getStopTimeProperties()
-        .hasExtension(GtfsRealtimeExtensions.stopTimeProperties)
+        .hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
     );
 
-    assertTrue(first.getTrip().hasExtension(GtfsRealtimeExtensions.tripDescriptor));
+    assertTrue(first.getTrip().hasExtension(MfdzRealtimeExtensions.tripDescriptor));
   }
 }

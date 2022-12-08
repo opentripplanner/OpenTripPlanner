@@ -1,10 +1,10 @@
 package org.opentripplanner.updater.trip;
 
 import com.google.transit.realtime.GtfsRealtime;
+import de.mfdz.MfdzRealtimeExtensions;
+import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.GtfsRealtimeExtensions;
-import org.opentripplanner.GtfsRealtimeExtensions.OtpStopTimePropertiesExtension;
 import org.opentripplanner.model.PickDrop;
 
 final class AddedStopTime {
@@ -33,8 +33,8 @@ final class AddedStopTime {
   static AddedStopTime ofStopTimeProperties(
     GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties props
   ) {
-    if (props.hasExtension(GtfsRealtimeExtensions.stopTimeProperties)) {
-      var ext = props.getExtension(GtfsRealtimeExtensions.stopTimeProperties);
+    if (props.hasExtension(MfdzRealtimeExtensions.stopTimeProperties)) {
+      var ext = props.getExtension(MfdzRealtimeExtensions.stopTimeProperties);
       var pickup = ext.getPickupType();
       var dropOff = ext.getDropoffType();
       return new AddedStopTime(toPickDrop(pickup), toPickDrop(dropOff));
@@ -43,7 +43,7 @@ final class AddedStopTime {
     }
   }
 
-  private static PickDrop toPickDrop(OtpStopTimePropertiesExtension.DropOffPickupType gtfs) {
+  private static PickDrop toPickDrop(StopTimePropertiesExtension.DropOffPickupType gtfs) {
     return switch (gtfs) {
       case REGULAR -> PickDrop.SCHEDULED;
       case NONE -> PickDrop.NONE;

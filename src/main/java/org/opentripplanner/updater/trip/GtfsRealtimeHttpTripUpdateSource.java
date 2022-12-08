@@ -5,12 +5,12 @@ import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import de.mfdz.MfdzRealtimeExtensions;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.GtfsRealtimeExtensions;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
   public GtfsRealtimeHttpTripUpdateSource(Parameters config) {
     this.feedId = config.getFeedId();
     this.url = config.getUrl();
-    GtfsRealtimeExtensions.registerAllExtensions(registry);
+    MfdzRealtimeExtensions.registerAllExtensions(registry);
   }
 
   @Override
