@@ -45,7 +45,9 @@ public class FrameworkArchitectureTest {
 
   @Test
   void enforceGeometryPackageDependencies() {
-    GEOMETRY.dependsOn(GEO_JSON, GEO_TOOLS, GNU_TROVE, JTS_GEOM, OPEN_GIS).verify();
+    GEOMETRY
+      .dependsOn(GEO_JSON, GEO_TOOLS, GNU_TROVE, JTS_GEOM, OPEN_GIS, LANG, TO_STRING)
+      .verify();
   }
 
   @Test
@@ -71,11 +73,6 @@ public class FrameworkArchitectureTest {
   @Test
   void enforceResourcesPackageDependencies() {
     RESOURCES.verify();
-  }
-
-  @Test
-  void enforceStatisticsPackageDependencies() {
-    STATISTICS.verify();
   }
 
   @Test

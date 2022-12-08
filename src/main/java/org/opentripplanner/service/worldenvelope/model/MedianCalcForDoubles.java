@@ -1,11 +1,12 @@
-package org.opentripplanner.framework.statistics;
+package org.opentripplanner.service.worldenvelope.model;
 
 import java.util.Arrays;
 
 /**
- * Calculate the median for a large set of doubles
+ * Calculate the median for a large set of doubles. This class is package local; It is only used
+ * by the builder.
  */
-public class MedianCalcForDoubles {
+class MedianCalcForDoubles {
 
   private final double[] array;
   private int index = 0;

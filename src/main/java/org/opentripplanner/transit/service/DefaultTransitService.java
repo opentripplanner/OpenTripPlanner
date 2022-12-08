@@ -9,10 +9,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -29,7 +27,6 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
@@ -538,11 +535,6 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public GraphUpdaterStatus getUpdaterStatus() {
     return transitModel.getUpdaterManager();
-  }
-
-  @Override
-  public Optional<Coordinate> getCenter() {
-    return transitModel.getStopModel().stopLocationCenter().map(WgsCoordinate::asJtsCoordinate);
   }
 
   @Override

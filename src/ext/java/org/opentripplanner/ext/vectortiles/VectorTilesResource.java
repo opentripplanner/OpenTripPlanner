@@ -83,21 +83,23 @@ public class VectorTilesResource {
     @Context HttpHeaders headers,
     @PathParam("layers") String requestedLayers
   ) {
+    var envelope = serverContext.worldEnvelopeService().envelope().orElseThrow();
+    var feedInfos = serverContext
+      .transitService()
+      .getFeedIds()
+      .stream()
+      .map(serverContext.transitService()::getFeedInfo)
+      .filter(Predicate.not(Objects::isNull))
+      .toList();
+
     return new TileJson(
       uri,
       headers,
       requestedLayers,
       ignoreRouterId,
       "vectorTiles",
-      serverContext.graph().getEnvelope(),
-      serverContext
-        .transitService()
-        .getFeedIds()
-        .stream()
-        .map(serverContext.transitService()::getFeedInfo)
-        .filter(Predicate.not(Objects::isNull))
-        .toList(),
-      serverContext.transitService().getCenter().orElse(null)
+      envelope,
+      feedInfos
     );
   }
 
