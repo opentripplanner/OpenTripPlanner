@@ -130,6 +130,6 @@ public class ParkAPIUpdaterTest {
       "Tu 0:00-2:00; Sa 0:00-2:00; Mo 0:00-23:59; We 0:00-23:59; Th 0:00-23:59; Fr 0:00-23:59; Su 0:00-23:59; Tu 14:30-23:59; Sa 14:30-23:59",
       openingHours.get(2)
     );
-    assertEquals("Sa 7:30-18:00,Mo-Fr 7:30-22:00", openingHours.get(3));
+    assertEquals("Sa 7:30-18:00; Mo-Fr 7:30-22:00", openingHours.get(3));
   }
 }
