@@ -1,6 +1,6 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
-import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofWalkSafety;
+import static org.opentripplanner.graph_builder.module.osm.MixinPropertiesBuilder.ofWalkSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.ExactMatchSpecifier.exact;
 
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;

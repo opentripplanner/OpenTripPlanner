@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
 
 class MixinPropertiesBuilderTest {
 

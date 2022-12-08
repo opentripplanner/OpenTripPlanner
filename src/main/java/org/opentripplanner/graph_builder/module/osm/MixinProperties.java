@@ -1,6 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.SafetyFeatures;
+import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 
 /**
  * Mixins are like {@link WayProperties} but they only contain walk and bicycle safety features (not

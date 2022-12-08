@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.SafetyFeatures;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 
 /**
  * Builder for {@link MixinProperties}. If you don't set the safety features they will have a default
@@ -11,16 +12,16 @@ public class MixinPropertiesBuilder {
   private SafetyFeatures bicycleSafety = new SafetyFeatures(1d, 1d);
   private SafetyFeatures walkSafety = new SafetyFeatures(1d, 1d);
 
-  public static MixinPropertiesBuilder ofWalkSafety(Number safety) {
-    return new MixinPropertiesBuilder().walkSafety(safety.doubleValue());
+  public static MixinPropertiesBuilder ofWalkSafety(double safety) {
+    return new MixinPropertiesBuilder().walkSafety(safety);
   }
 
-  public static MixinPropertiesBuilder ofBicycleSafety(Number safety) {
-    return new MixinPropertiesBuilder().bicycleSafety(safety.doubleValue(), safety.doubleValue());
+  public static MixinPropertiesBuilder ofBicycleSafety(double safety) {
+    return new MixinPropertiesBuilder().bicycleSafety(safety, safety);
   }
 
-  public static MixinPropertiesBuilder ofBicycleSafety(Number forward, Number back) {
-    return new MixinPropertiesBuilder().bicycleSafety(forward.doubleValue(), back.doubleValue());
+  public static MixinPropertiesBuilder ofBicycleSafety(double forward, double back) {
+    return new MixinPropertiesBuilder().bicycleSafety(forward, back);
   }
 
   /**
