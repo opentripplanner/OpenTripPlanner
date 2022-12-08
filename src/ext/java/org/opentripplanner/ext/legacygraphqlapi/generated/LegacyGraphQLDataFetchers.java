@@ -10,7 +10,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
-import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLOpeningHoursImpl;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -124,7 +123,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> name();
 
-    public DataFetcher<LegacyGraphQLOpeningHoursImpl> openingHours();
+    public DataFetcher<org.opentripplanner.model.calendar.openinghours.OHCalendar> openingHours();
 
     public DataFetcher<Boolean> realtime();
 
@@ -218,7 +217,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> name();
 
-    public DataFetcher<LegacyGraphQLOpeningHoursImpl> openingHours();
+    public DataFetcher<org.opentripplanner.model.calendar.openinghours.OHCalendar> openingHours();
 
     public DataFetcher<Boolean> realtime();
 
@@ -945,7 +944,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> note();
 
-    public DataFetcher<LegacyGraphQLOpeningHoursImpl> openingHours();
+    public DataFetcher<org.opentripplanner.model.calendar.openinghours.OHCalendar> openingHours();
 
     public DataFetcher<Boolean> realtime();
 
