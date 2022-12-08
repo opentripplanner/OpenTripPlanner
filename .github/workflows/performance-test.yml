@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - scooter-rent-speed-test
 
 jobs:
   perf-test:
