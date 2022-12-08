@@ -79,7 +79,9 @@ public class SpeedTest {
     this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
 
     UpdaterConfigurator.configure(model.graph(), transitModel, config.updatersConfig);
-    transitModel.getUpdaterManager().startUpdaters();
+    if (transitModel.getUpdaterManager() != null) {
+      transitModel.getUpdaterManager().startUpdaters();
+    }
 
     this.serverContext =
       DefaultServerRequestContext.create(
@@ -114,7 +116,9 @@ public class SpeedTest {
       // and run it
       speedTest.runTest();
 
-      speedTest.transitModel.getUpdaterManager().stop();
+      if (speedTest.transitModel.getUpdaterManager() != null) {
+        speedTest.transitModel.getUpdaterManager().stop();
+      }
     } catch (OtpAppException ae) {
       System.err.println(ae.getMessage());
       System.exit(1);
