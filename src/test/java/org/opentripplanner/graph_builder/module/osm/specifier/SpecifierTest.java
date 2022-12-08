@@ -6,15 +6,11 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public class SpecifierTest {
 
-  protected void assertScore(
-    int expectedScore,
-    OsmSpecifier pedestrianUndergroundTunnelSpec,
-    OSMWithTags tunnel
-  ) {
-    var result = pedestrianUndergroundTunnelSpec.matchScores(tunnel);
+  protected void assertScore(int expectedScore, OsmSpecifier spec, OSMWithTags tunnel) {
+    var result = spec.matchScores(tunnel);
     assertEquals(expectedScore, result.left());
     assertEquals(expectedScore, result.right());
-    var score = pedestrianUndergroundTunnelSpec.matchScore(tunnel);
+    var score = spec.matchScore(tunnel);
     assertEquals(expectedScore, score);
   }
 }

@@ -10,8 +10,6 @@ public class FlexConfig {
 
   public static final FlexConfig DEFAULT = new FlexConfig();
 
-  private static final Duration MAX_TRANSFER_DURATION = Duration.ofMinutes(5);
-  private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
 
   private static final Duration MAX_ACCESS_EGRESS_DURATION = Duration.ofMinutes(45);
   public static final String ACCESS_EGRESS_DESCRIPTION =
@@ -31,8 +29,8 @@ public class FlexConfig {
   private final Duration maxEgressWalkDuration;
 
   private FlexConfig() {
-    maxTransferDuration = MAX_TRANSFER_DURATION;
-    maxFlexTripDuration = MAX_FLEX_TRIP_DURATION;
+    maxTransferDuration = Duration.ofMinutes(5);
+    maxFlexTripDuration = Duration.ofMinutes(45);
     maxAccessWalkDuration = MAX_ACCESS_EGRESS_DURATION;
     maxEgressWalkDuration = MAX_ACCESS_EGRESS_DURATION;
   }
@@ -62,7 +60,7 @@ public class FlexConfig {
             A lower value means that the routing is faster.
             """
         )
-        .asDuration(MAX_TRANSFER_DURATION);
+        .asDuration(DEFAULT.maxTransferDuration);
 
     maxFlexTripDuration =
       json
@@ -74,7 +72,7 @@ public class FlexConfig {
           "the access/egress duration to the boarding/alighting of the flex trip, as well as the " +
           "connection to the transit stop."
         )
-        .asDuration(MAX_FLEX_TRIP_DURATION);
+        .asDuration(DEFAULT.maxFlexTripDuration);
 
     maxAccessWalkDuration =
       json
