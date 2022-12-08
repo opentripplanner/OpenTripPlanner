@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder.NOT_SET;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -130,16 +128,6 @@ public class RoutingWorker {
     boolean removeWalkAllTheWayResultsFromDirectFlex =
       request.journey().direct().mode() == StreetMode.FLEXIBLE;
 
-    var modes = request.journey().modes();
-    boolean hasBikePark = List
-      .of(modes.accessMode, modes.egressMode)
-      .contains(StreetMode.BIKE_TO_PARK);
-
-    double minBikeParkingDistance = NOT_SET;
-    if (hasBikePark) {
-      minBikeParkingDistance = request.preferences().itineraryFilter().minBikeParkingDistance();
-    }
-
     ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
       request.itinerariesSortOrder(),
       request.preferences().itineraryFilter(),
@@ -152,7 +140,7 @@ public class RoutingWorker {
       request.wheelchair(),
       request.preferences().wheelchair().maxSlope(),
       serverContext.graph().getFareService(),
-      minBikeParkingDistance,
+      minBikeParkingDistance(request),
       serverContext.transitService().getTransitAlertService(),
       serverContext.transitService()::getMultiModalStationForStation
     );
@@ -189,6 +177,19 @@ public class RoutingWorker {
       debugTimingAggregator,
       serverContext.transitService()
     );
+  }
+
+  private static double minBikeParkingDistance(RouteRequest request) {
+    var modes = request.journey().modes();
+    boolean hasBikePark = List
+      .of(modes.accessMode, modes.egressMode)
+      .contains(StreetMode.BIKE_TO_PARK);
+
+    double minBikeParkingDistance = 0;
+    if (hasBikePark) {
+      minBikeParkingDistance = request.preferences().itineraryFilter().minBikeParkingDistance();
+    }
+    return minBikeParkingDistance;
   }
 
   private static AdditionalSearchDays createAdditionalSearchDays(
