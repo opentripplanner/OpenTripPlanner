@@ -45,7 +45,7 @@ import org.opentripplanner.transit.model.site.Station;
  */
 public class ItineraryListFilterChainBuilder {
 
-  public static final int NOT_SET = -1;
+  private static final int NOT_SET = -1;
 
   private final SortOrder sortOrder;
   private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();

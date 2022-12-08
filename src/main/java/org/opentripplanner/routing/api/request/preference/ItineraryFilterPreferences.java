@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.api.request.preference;
 
-import static org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder.NOT_SET;
-
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
@@ -45,7 +43,7 @@ public final class ItineraryFilterPreferences {
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.accessibilityScore = false;
     this.removeItinerariesWithSameRoutesAndStops = false;
-    this.minBikeParkingDistance = NOT_SET;
+    this.minBikeParkingDistance = 0;
   }
 
   private ItineraryFilterPreferences(Builder builder) {
