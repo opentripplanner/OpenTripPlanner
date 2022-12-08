@@ -1,15 +1,15 @@
 package org.opentripplanner.ext.reportapi.model;
 
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 public class BicycleSafetyReport {
 
   public static void main(String[] args) {
-    System.out.println(makeCsv(OsmTagMapper.Source.NORWAY));
+    System.out.println(makeCsv(OsmTagMapperSource.NORWAY));
   }
 
-  public static String makeCsv(OsmTagMapper.Source source) {
+  public static String makeCsv(OsmTagMapperSource source) {
     var wayPropertySet = new WayPropertySet();
 
     source.getInstance().populateProperties(wayPropertySet);

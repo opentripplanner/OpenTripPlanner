@@ -2,9 +2,9 @@ package org.opentripplanner.routing.vehicle_parking;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 

@@ -6,21 +6,21 @@ import java.util.Map;
 import java.util.Objects;
 import org.openstreetmap.osmosis.osmbinary.BinaryParser;
 import org.openstreetmap.osmosis.osmbinary.Osmformat;
-import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
+import org.opentripplanner.openstreetmap.api.OSMProvider;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMNodeRef;
-import org.opentripplanner.openstreetmap.model.OSMProvider;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMTag;
 import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.openstreetmap.spi.OSMDatabase;
 
 /**
  * Parser for the OpenStreetMap PBF Format.
  *
  * @since 0.4
  */
-public class OpenStreetMapParser extends BinaryParser {
+class OpenStreetMapParser extends BinaryParser {
 
   private final OSMDatabase osmdb;
   private final Map<String, String> stringTable = new HashMap<>();

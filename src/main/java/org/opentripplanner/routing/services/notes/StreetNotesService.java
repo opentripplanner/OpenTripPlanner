@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.model.NoteMatcher;
-import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.note.StreetNote;
+import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
+import org.opentripplanner.street.model.note.StreetNoteMatcher;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
@@ -39,28 +39,28 @@ public class StreetNotesService implements Serializable {
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(StreetNotesService.class);
 
-  public static final NoteMatcher WHEELCHAIR_MATCHER = new NoteMatcher() {
+  public static final StreetNoteMatcher WHEELCHAIR_MATCHER = new StreetNoteMatcher() {
     @Override
     public boolean matches(State state) {
       return state.getRequest().wheelchair();
     }
   };
 
-  public static final NoteMatcher DRIVING_MATCHER = new NoteMatcher() {
+  public static final StreetNoteMatcher DRIVING_MATCHER = new StreetNoteMatcher() {
     @Override
     public boolean matches(State state) {
       return state.getBackMode().isDriving();
     }
   };
 
-  public static final NoteMatcher BICYCLE_MATCHER = new NoteMatcher() {
+  public static final StreetNoteMatcher BICYCLE_MATCHER = new StreetNoteMatcher() {
     @Override
     public boolean matches(State state) {
       return state.getBackMode() == TraverseMode.BICYCLE;
     }
   };
 
-  public static final NoteMatcher ALWAYS_MATCHER = new NoteMatcher() {
+  public static final StreetNoteMatcher ALWAYS_MATCHER = new StreetNoteMatcher() {
     @Override
     public boolean matches(State state) {
       return true;
@@ -112,7 +112,7 @@ public class StreetNotesService implements Serializable {
     return notes;
   }
 
-  public void addStaticNote(Edge edge, StreetNote note, NoteMatcher matcher) {
+  public void addStaticNote(Edge edge, StreetNote note, StreetNoteMatcher matcher) {
     staticNotesSource.addNote(edge, note, matcher);
   }
 
