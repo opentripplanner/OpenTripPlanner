@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
@@ -33,8 +32,8 @@ public class PathStringBuilderTest {
   @Test
   public void walkThenRent() {
     assertEquals(
-      "Walk 17s ~ Vehicle rent oslo:1 10m",
-      subject.walk(17).vehicleRental("oslo:1", Duration.ofMinutes(10)).toString()
+      "Walk 17s ~ oslo:1 Rental  2m",
+      subject.walk(17).sep().stop("oslo:1").space().rental(120).toString()
     );
   }
 
