@@ -262,6 +262,10 @@ public class ParkingProcessor {
       entity
     );
 
+    if (entrances.isEmpty()) {
+      entrances = createArtificialEntrances(group, creativeName, entity, isCarParkAndRide);
+    }
+
     var vehicleParking = createVehicleParkingObjectFromOsmEntity(
       isCarParkAndRide,
       envelope.centre(),
@@ -273,6 +277,31 @@ public class ParkingProcessor {
     VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
 
     return vehicleParking;
+  }
+
+  private List<VehicleParking.VehicleParkingEntranceCreator> createArtificialEntrances(
+    AreaGroup area,
+    I18NString vehicleParkingName,
+    OSMWithTags entity,
+    boolean isCarPark
+  ) {
+    var centroid = area.outermostRings.get(0).jtsPolygon.getCentroid();
+
+    return List.of(builder ->
+      builder
+        .entranceId(
+          new FeedScopedId(
+            VEHICLE_PARKING_OSM_FEED_ID,
+            String.format("%s/%d/centroid", entity.getClass().getSimpleName(), entity.getId())
+          )
+        )
+        .name(vehicleParkingName)
+        .coordinate(new WgsCoordinate(centroid))
+        // setting the vertex to null signals the rest of the build process that this needs to be linked to the street network
+        .vertex(null)
+        .walkAccessible(true)
+        .carAccessible(isCarPark)
+    );
   }
 
   private VehicleParking createVehicleParkingObjectFromOsmEntity(
