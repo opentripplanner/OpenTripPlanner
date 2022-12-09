@@ -94,7 +94,7 @@ public class IntersectionVertex extends StreetVertex {
     return flags == 0;
   }
 
-  private short initFlags(boolean highwayTrafficLight, boolean crossingTrafficLight) {
+  private static short initFlags(boolean highwayTrafficLight, boolean crossingTrafficLight) {
     short flags = 0;
     flags = BitSetUtils.set(flags, HIGHWAY_TRAFFIC_LIGHT_INDEX, highwayTrafficLight);
     flags = BitSetUtils.set(flags, CROSSING_TRAFFIC_LIGHT_INDEX, crossingTrafficLight);
