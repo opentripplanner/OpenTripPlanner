@@ -5,24 +5,32 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FlexConfig {
 
   public static final FlexConfig DEFAULT = new FlexConfig();
 
-  private static final Duration MAX_TRANSFER_DURATION = Duration.ofMinutes(5);
-  private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
-
-  private static final Logger LOG = LoggerFactory.getLogger(FlexConfig.class);
+  public static final String ACCESS_EGRESS_DESCRIPTION =
+    """
+    If you have multiple overlapping flex zones the high default value can lead to performance problems.
+    A lower value means faster routing.
+    
+    Depending on your service this might be what you want to do anyway: many flex services are used
+    by passengers with mobility problems so offering a long walk might be problematic. In other words,
+    if you can walk 45 minutes to a flex stop/zone you're unlikely to be the target audience for those
+    services.
+    """;
 
   private final Duration maxTransferDuration;
   private final Duration maxFlexTripDuration;
+  private final Duration maxAccessWalkDuration;
+  private final Duration maxEgressWalkDuration;
 
   private FlexConfig() {
-    maxTransferDuration = MAX_TRANSFER_DURATION;
-    maxFlexTripDuration = MAX_FLEX_TRIP_DURATION;
+    maxTransferDuration = Duration.ofMinutes(5);
+    maxFlexTripDuration = Duration.ofMinutes(45);
+    maxAccessWalkDuration = Duration.ofMinutes(45);
+    maxEgressWalkDuration = Duration.ofMinutes(45);
   }
 
   public FlexConfig(NodeAdapter root, String parameterName) {
@@ -50,7 +58,7 @@ public class FlexConfig {
             A lower value means that the routing is faster.
             """
         )
-        .asDuration(MAX_TRANSFER_DURATION);
+        .asDuration(DEFAULT.maxTransferDuration);
 
     maxFlexTripDuration =
       json
@@ -62,7 +70,27 @@ public class FlexConfig {
           "the access/egress duration to the boarding/alighting of the flex trip, as well as the " +
           "connection to the transit stop."
         )
-        .asDuration(MAX_FLEX_TRIP_DURATION);
+        .asDuration(DEFAULT.maxFlexTripDuration);
+
+    maxAccessWalkDuration =
+      json
+        .of("maxAccessWalkDuration")
+        .since(V2_3)
+        .summary(
+          "The maximum duration the passenger will be allowed to walk to reach a flex stop or zone."
+        )
+        .description(ACCESS_EGRESS_DESCRIPTION)
+        .asDuration(DEFAULT.maxAccessWalkDuration);
+
+    maxEgressWalkDuration =
+      json
+        .of("maxEgressWalkDuration")
+        .since(V2_3)
+        .summary(
+          "The maximum duration the passenger will be allowed to walk after leaving the flex vehicle at the final destination."
+        )
+        .description(ACCESS_EGRESS_DESCRIPTION)
+        .asDuration(DEFAULT.maxEgressWalkDuration);
   }
 
   public Duration maxFlexTripDuration() {
@@ -71,5 +99,13 @@ public class FlexConfig {
 
   public Duration maxTransferDuration() {
     return maxTransferDuration;
+  }
+
+  public Duration maxAccessWalkDuration() {
+    return maxAccessWalkDuration;
+  }
+
+  public Duration maxEgressWalkDuration() {
+    return maxEgressWalkDuration;
   }
 }
