@@ -1055,10 +1055,14 @@ type TimetabledPassingTime {
   "Scheduled time of departure from quay"
   departure: TimeAndDayOffset
   destinationDisplay: DestinationDisplay
+  "Earliest possible departure time for a service journey with a service window."
+  earliestDepartureTime: TimeAndDayOffset
   "Whether vehicle may be alighted at quay."
   forAlighting: Boolean
   "Whether vehicle may be boarded at quay."
   forBoarding: Boolean
+  "Latest possible (planned) arrival time for a service journey with a service window."
+  latestArrivalTime: TimeAndDayOffset
   notices: [Notice!]!
   quay: Quay
   "Whether vehicle will only stop on request."
