@@ -39,6 +39,9 @@ public class RaptorArchitectureTest {
   private static final Package RR_STANDARD = RANGE_RAPTOR.subPackage("standard");
   private static final Package RR_STD_CONFIGURE = RR_STANDARD.subPackage("configure");
   private static final Package RR_CONTEXT = RANGE_RAPTOR.subPackage("context");
+  private static final Package EXT_SORLANDSBANAN_HACK = Package.of(
+    "org.opentripplanner.ext.sorlandsbanen"
+  );
 
   /**
    * Packages used by standard-range-raptor and multi-criteria-range-raptor.
@@ -200,7 +203,8 @@ public class RaptorArchitectureTest {
         RAPTOR_UTIL,
         CONFIGURE,
         RR_INTERNAL_API,
-        RR_TRANSIT
+        RR_TRANSIT,
+        EXT_SORLANDSBANAN_HACK
       )
       .verify();
   }
