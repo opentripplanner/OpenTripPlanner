@@ -491,6 +491,15 @@ public class StreetEdge
     }
   }
 
+  /**
+   * This method is not thread-safe.
+   */
+  public void removeTraversalExtension(String network) {
+    if (traversalExtensions != null) {
+      traversalExtensions= Arrays.stream(traversalExtensions).filter(e -> !e.network().equals(network)).toArray(StreetEdgeRentalExtension[]::new);
+    }
+  }
+
   private void setGeometry(LineString geometry) {
     this.compactGeometry =
       CompactLineStringUtils.compactLineString(

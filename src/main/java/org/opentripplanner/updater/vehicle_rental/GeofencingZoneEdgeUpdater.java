@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.vehicle_rental;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,19 +8,15 @@ import java.util.Set;
 import java.util.function.Function;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.BusinessAreaBorder;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.GeofencingZoneExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class GeofencingZoneEdgeUpdater {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GeofencingZoneEdgeUpdater.class);
   private final Function<Envelope, Collection<Edge>> getEdgesForEnvelope;
 
   public GeofencingZoneEdgeUpdater(Function<Envelope, Collection<Edge>> getEdgesForEnvelope) {
@@ -29,8 +24,6 @@ class GeofencingZoneEdgeUpdater {
   }
 
   Set<StreetEdge> applyGeofencingZones(List<GeofencingZone> geofencingZones) {
-    LOG.info("Computing geofencing zones");
-    var start = System.currentTimeMillis();
 
     var restrictedZones = geofencingZones.stream().filter(GeofencingZone::hasRestriction).toList();
 
@@ -51,16 +44,9 @@ class GeofencingZoneEdgeUpdater {
       zone -> new BusinessAreaBorder(zone.id().getFeedId())
     );
 
-    var end = System.currentTimeMillis();
-    var millis = Duration.ofMillis(end - start);
     var updatedEdges = new HashSet<>(businessAreaBorders);
     updatedEdges.addAll(restrictedEdges);
 
-    LOG.info(
-      "Geofencing zones computation took {}. Added extension to {} edges.",
-      TimeUtils.durationToStrCompact(millis),
-      updatedEdges.size()
-    );
     return updatedEdges;
   }
 

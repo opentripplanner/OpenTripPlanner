@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
@@ -18,6 +20,7 @@ import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
 import org.opentripplanner.street.model.edge.VehicleRentalEdge;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
@@ -44,6 +47,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   private WriteToGraphCallback saveResultOnGraph;
 
   private List<GeofencingZone> latestAppliedGeofencingZones = List.of();
+  private Set<StreetEdge> updatedEdges = Set.of();
   Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
   Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
   private final VertexLinker linker;
@@ -195,12 +199,27 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         tempEdgesByStation.remove(station);
       }
 
-      // this check relies on the generated equals for the record which also recursively checkes that
+      // this check relies on the generated equals for the record which also recursively checks that
       // the JTS geometries are equal
-      if (!geofencingZones.equals(latestAppliedGeofencingZones)) {
+      if (!geofencingZones.isEmpty() && !geofencingZones.equals(latestAppliedGeofencingZones)) {
+
+        LOG.info("Computing geofencing zones");
+        var start = System.currentTimeMillis();
+
+        var network = geofencingZones.get(0).id().getFeedId();
+        updatedEdges.forEach(e -> e.removeTraversalExtension(network));
+
         var updater = new GeofencingZoneEdgeUpdater(graph.getStreetIndex()::getEdgesForEnvelope);
-        updater.applyGeofencingZones(geofencingZones);
+        updatedEdges = updater.applyGeofencingZones(geofencingZones);
         latestAppliedGeofencingZones = geofencingZones;
+
+        var end = System.currentTimeMillis();
+        var millis = Duration.ofMillis(end - start);
+        LOG.info(
+          "Geofencing zones computation took {}. Added extension to {} edges.",
+          TimeUtils.durationToStrCompact(millis),
+          updatedEdges.size()
+        );
       }
 
       isPrimed = true;
