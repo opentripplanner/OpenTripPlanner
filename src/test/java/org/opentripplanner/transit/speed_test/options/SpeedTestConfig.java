@@ -12,6 +12,7 @@ import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,7 @@ public class SpeedTestConfig {
   public final UpdatersConfig updatersConfig;
 
   public final RouteRequest request;
+  public final FlexConfig flexConfig;
 
   public SpeedTestConfig(JsonNode node) {
     this(new NodeAdapter(node, FILE_NAME));
@@ -48,6 +50,7 @@ public class SpeedTestConfig {
     graph = adapter.of("graph").asUri(null);
     feedId = adapter.of("feedId").asString();
     transitRoutingParams = new TransitRoutingConfig("tuningParameters", adapter);
+    flexConfig = new FlexConfig(adapter, "flex");
     request = mapRouteRequest(adapter.of("routingDefaults").asObject());
     updatersConfig = new UpdatersConfig(adapter);
     adapter.logAllUnusedParameters(LOG::warn);
