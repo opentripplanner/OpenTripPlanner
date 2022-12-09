@@ -18,7 +18,6 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
@@ -74,12 +73,11 @@ public class FlexIntegrationTest {
   }
 
   @Test
-  @Disabled
   void shouldReturnARouteTransferringFromBusToFlex() {
-    var from = new GenericLocation(33.84329482265106, -84.583740234375);
-    var to = new GenericLocation(33.86701256815635, -84.61787939071655);
+    var from = new GenericLocation(33.7552, -84.4631);
+    var to = new GenericLocation(33.8694, -84.6233);
 
-    var itin = getItinerary(from, to, 2);
+    var itin = getItinerary(from, to, 3);
 
     assertEquals(4, itin.getLegs().size());
 
