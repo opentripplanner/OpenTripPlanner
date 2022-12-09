@@ -144,7 +144,6 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   public boolean vehicleRentalIsFinished() {
-    System.out.println(stateData.insideNoRentalDropOffArea);
     return (
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
       (

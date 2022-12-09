@@ -50,6 +50,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   private final VehicleRentalService service;
 
+  private boolean isPrimed = false;
+
   public VehicleRentalUpdater(
     VehicleRentalUpdaterParameters parameters,
     VehicleRentalDatasource source,
@@ -89,6 +91,11 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   @Override
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
+  }
+
+  @Override
+  public boolean isPrimed() {
+    return isPrimed;
   }
 
   @Override
@@ -195,6 +202,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         updater.applyGeofencingZones(geofencingZones);
         latestAppliedGeofencingZones = geofencingZones;
       }
+
+      isPrimed = true;
     }
   }
 }
