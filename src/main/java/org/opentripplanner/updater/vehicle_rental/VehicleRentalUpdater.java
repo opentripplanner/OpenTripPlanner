@@ -21,7 +21,7 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetEdgeTraversalExtension;
+import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
 import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
 import org.opentripplanner.street.model.edge.VehicleRentalEdge;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
@@ -46,6 +46,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
   private final VehicleRentalDatasource source;
   private WriteToGraphCallback saveResultOnGraph;
+
+  private List<GeofencingZone> latestAppliedGeofencingZones = List.of();
   Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
   Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
   private final VertexLinker linker;
@@ -190,14 +192,19 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         tempEdgesByStation.remove(station);
       }
 
-      computeGeofencingZones(graph);
+      // this check relies on the generated equals for the record which also recursively checkes that
+      // the JTS geometries are equal
+      if (!geofencingZones.equals(latestAppliedGeofencingZones)) {
+        computeGeofencingZones(graph);
+        latestAppliedGeofencingZones = geofencingZones;
+      }
     }
 
     private void computeGeofencingZones(Graph graph) {
       LOG.info("Computing geofencing zones");
       var start = System.currentTimeMillis();
 
-      int bannedEdges = 0;
+      int edgesTouched = 0;
       var restrictedZones = geofencingZones
         .stream()
         .filter(GeofencingZone::hasRestriction)
@@ -211,10 +218,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             e instanceof StreetEdge streetEdge &&
             streetEdge.getGeometry().intersects(zone.geometry())
           ) {
-            streetEdge.setTraversalExtension(
-              new StreetEdgeTraversalExtension.GeofencingZoneExtension(zone)
+            streetEdge.addRentalExtension(
+              new StreetEdgeRentalExtension.GeofencingZoneExtension(zone)
             );
-            bannedEdges++;
+            edgesTouched++;
           }
         }
       }
@@ -223,7 +230,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       LOG.info(
         "Geofencing zones computation took {}. Added extension to {} edges.",
         TimeUtils.durationToStrCompact(millis),
-        bannedEdges
+        edgesTouched
       );
     }
   }

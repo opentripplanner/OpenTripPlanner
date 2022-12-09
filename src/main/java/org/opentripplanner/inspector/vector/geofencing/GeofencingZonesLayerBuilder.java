@@ -39,12 +39,10 @@ public class GeofencingZonesLayerBuilder extends LayerBuilder<StreetEdge> {
       .stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
-      .filter(se -> se.getTraversalExtension() != null)
+      .filter(se -> !se.getTraversalExtensions().isEmpty())
       .map(edge -> {
         Geometry geometry = edge.getGeometry().copy();
-
         geometry.setUserData(edge);
-
         return geometry;
       })
       .toList();

@@ -31,7 +31,7 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
   ) {
     super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
     this.parentEdge = parentEdge;
-    this.traversalExtension = parentEdge.traversalExtension;
+    this.traversalExtensions = parentEdge.traversalExtensions;
     this.geometry = super.getGeometry();
   }
 
@@ -49,7 +49,7 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
     boolean back
   ) {
     super(v1, v2, geometry, name, parentEdge.getPermission(), back);
-    this.traversalExtension = parentEdge.traversalExtension;
+    this.traversalExtensions = parentEdge.traversalExtensions;
     this.parentEdge = parentEdge;
     this.geometry = super.getGeometry();
   }

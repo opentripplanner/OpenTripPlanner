@@ -3,12 +3,14 @@ package org.opentripplanner.street.model.edge;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.street.search.state.State;
 
-public interface StreetEdgeTraversalExtension {
+public interface StreetEdgeRentalExtension {
   boolean traversalBanned(State state);
 
   boolean dropOffBanned(State state);
 
-  class GeofencingZoneExtension implements StreetEdgeTraversalExtension {
+  String network();
+
+  class GeofencingZoneExtension implements StreetEdgeRentalExtension {
 
     private final GeofencingZone zone;
 
@@ -41,6 +43,11 @@ public interface StreetEdgeTraversalExtension {
       } else {
         return false;
       }
+    }
+
+    @Override
+    public String network() {
+      return zone.id().getFeedId();
     }
 
     @Override

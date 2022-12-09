@@ -7,7 +7,7 @@ import org.opentripplanner.inspector.vector.AreaStopsLayerBuilder;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetEdgeTraversalExtension;
+import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
 
 /**
  * A {@link PropertyMapper} for the {@link AreaStopsLayerBuilder} for the OTP debug client.
@@ -26,14 +26,15 @@ public class GeofencingZonesPropertyMapper extends PropertyMapper<StreetEdge> {
 
   @Override
   protected Collection<KeyValue> map(StreetEdge input) {
-    if(input.getTraversalExtension() instanceof StreetEdgeTraversalExtension.GeofencingZoneExtension ext) {
-
-    return List.of(
-      new KeyValue("id", ext.zone().id()),
-      new KeyValue("dropOffBanned", ext.zone().dropOffBanned()),
-      new KeyValue("passingThroughBanned", ext.zone().passingThroughBanned())
-    );
-    }else {
+    if (
+      input.getTraversalExtensions() instanceof StreetEdgeRentalExtension.GeofencingZoneExtension ext
+    ) {
+      return List.of(
+        new KeyValue("id", ext.zone().id()),
+        new KeyValue("dropOffBanned", ext.zone().dropOffBanned()),
+        new KeyValue("passingThroughBanned", ext.zone().passingThroughBanned())
+      );
+    } else {
       return List.of();
     }
   }

@@ -2,6 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -63,7 +64,7 @@ public class StreetEdge
   private static final int WALK_NOTHRUTRAFFIC = 8;
   private static final int CLASS_LINK = 9;
   private StreetEdgeCostExtension costExtension;
-  protected StreetEdgeTraversalExtension traversalExtension;
+  protected StreetEdgeRentalExtension[] traversalExtensions;
   /** back, roundabout, stairs, ... */
   private short flags;
 
@@ -388,8 +389,12 @@ public class StreetEdge
   public State traverse(State s0) {
     final StateEditor editor;
 
-    if (traversalExtension != null && traversalExtension.traversalBanned(s0)) {
-      return null;
+    if (traversalExtensions != null) {
+      for (var ext : traversalExtensions) {
+        if (ext.traversalBanned(s0)) {
+          return null;
+        }
+      }
     }
 
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
@@ -478,8 +483,12 @@ public class StreetEdge
       : getDistanceMeters();
   }
 
-  public StreetEdgeTraversalExtension getTraversalExtension() {
-    return traversalExtension;
+  public List<StreetEdgeRentalExtension> getTraversalExtensions() {
+    if (traversalExtensions == null) {
+      return List.of();
+    } else {
+      return Arrays.asList(traversalExtensions);
+    }
   }
 
   private void setGeometry(LineString geometry) {
@@ -655,8 +664,17 @@ public class StreetEdge
     this.costExtension = costExtension;
   }
 
-  public void setTraversalExtension(StreetEdgeTraversalExtension ext) {
-    this.traversalExtension = ext;
+  /**
+   * This method is not threasafe!
+   */
+  public void addRentalExtension(StreetEdgeRentalExtension ext) {
+    if (traversalExtensions == null) {
+      this.traversalExtensions = new StreetEdgeRentalExtension[] { ext };
+    } else {
+      var list = new ArrayList<>(Arrays.asList(traversalExtensions));
+      list.add(ext);
+      this.traversalExtensions = list.toArray(new StreetEdgeRentalExtension[0]);
+    }
   }
 
   /**
@@ -1007,7 +1025,7 @@ public class StreetEdge
       return null;
     }
 
-    if (traversalExtension != null && traversalExtension.dropOffBanned(currentState)) {
+    if (isDropOffBanned(currentState)) {
       editor.enteredNoRentalDropOffArea();
     } else if (currentState.isInsideNoRentalDropOffArea()) {
       editor.leaveNoRentalDropOffArea();
@@ -1117,6 +1135,18 @@ public class StreetEdge
     editor.incrementWeight(weight);
 
     return editor;
+  }
+
+  private boolean isDropOffBanned(State currentState) {
+    if (traversalExtensions == null) {
+      return false;
+    }
+    for (var ext : traversalExtensions) {
+      if (ext.dropOffBanned(currentState)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Nonnull

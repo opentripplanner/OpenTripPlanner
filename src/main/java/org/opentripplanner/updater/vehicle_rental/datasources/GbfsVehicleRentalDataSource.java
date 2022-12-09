@@ -7,12 +7,12 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.entur.gbfs.v2_2.free_bike_status.GBFSFreeBikeStatus;
+import org.entur.gbfs.v2_2.geofencing_zones.GBFSGeofencingZones;
 import org.entur.gbfs.v2_2.station_information.GBFSStationInformation;
 import org.entur.gbfs.v2_2.station_status.GBFSStation;
 import org.entur.gbfs.v2_2.station_status.GBFSStationStatus;
 import org.entur.gbfs.v2_2.system_information.GBFSSystemInformation;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
-import org.entur.gbfs.v2_2.geofencing_zones.GBFSGeofencingZones;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
@@ -43,6 +43,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
   private final boolean allowKeepingRentedVehicleAtDestination;
 
   private GbfsFeedLoader loader;
+  private List<GeofencingZone> geofencingZones;
 
   public GbfsVehicleRentalDataSource(GbfsVehicleRentalDataSourceParameters parameters) {
     url = parameters.url();
@@ -139,6 +140,11 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
       }
     }
 
+    var zones = loader.getFeed(GBFSGeofencingZones.class);
+
+    var mapper = new GbfsGeofencingZoneMapper(system.systemId);
+    this.geofencingZones = mapper.mapRentalVehicleType(zones);
+
     return stations;
   }
 
@@ -162,9 +168,6 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
 
   @Override
   public List<GeofencingZone> getGeofencingZones() {
-    var mapper = new GbfsGeofencingZoneMapper("tieroslo");
-    var zones = loader.getFeed(GBFSGeofencingZones.class);
-
-    return mapper.mapRentalVehicleType(zones);
+    return this.geofencingZones;
   }
 }
