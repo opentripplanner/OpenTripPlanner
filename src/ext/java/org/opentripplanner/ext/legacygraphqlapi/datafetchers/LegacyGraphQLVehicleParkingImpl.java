@@ -5,6 +5,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
@@ -73,6 +74,11 @@ public class LegacyGraphQLVehicleParkingImpl
   public DataFetcher<String> note() {
     return environment ->
       LegacyGraphQLUtils.getTranslation(getSource(environment).getNote(), environment);
+  }
+
+  @Override
+  public DataFetcher<OHCalendar> openingHours() {
+    return environment -> getSource(environment).getOpeningHours();
   }
 
   @Override

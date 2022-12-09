@@ -15,6 +15,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.Leg
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
@@ -123,7 +124,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> name();
 
-    public DataFetcher<Iterable<Object>> openingHours();
+    public DataFetcher<OHCalendar> openingHours();
 
     public DataFetcher<Boolean> realtime();
 
@@ -217,7 +218,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> name();
 
-    public DataFetcher<Iterable<Object>> openingHours();
+    public DataFetcher<OHCalendar> openingHours();
 
     public DataFetcher<Boolean> realtime();
 
@@ -404,6 +405,12 @@ public class LegacyGraphQLDataFetchers {
     public default DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id() {
       return null;
     }
+  }
+
+  public interface LegacyGraphQLOpeningHours {
+    public DataFetcher<Iterable<Object>> dates();
+
+    public DataFetcher<String> osm();
   }
 
   /** Information about pagination in a connection. */
@@ -937,6 +944,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> name();
 
     public DataFetcher<String> note();
+
+    public DataFetcher<OHCalendar> openingHours();
 
     public DataFetcher<Boolean> realtime();
 
