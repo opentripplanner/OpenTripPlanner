@@ -1093,13 +1093,31 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLStep {
+    public DataFetcher<Object> absoluteDirection();
+
+    public DataFetcher<Iterable<TransitAlert>> alerts();
+
+    public DataFetcher<Boolean> area();
+
+    public DataFetcher<Boolean> bogusName();
+
     public DataFetcher<Double> distance();
 
     public DataFetcher<Iterable<org.opentripplanner.model.plan.ElevationProfile.Step>> elevationProfile();
 
+    public DataFetcher<String> exit();
+
     public DataFetcher<Double> lat();
 
     public DataFetcher<Double> lon();
+
+    public DataFetcher<Object> relativeDirection();
+
+    public DataFetcher<Boolean> stayOn();
+
+    public DataFetcher<String> streetName();
+
+    public DataFetcher<Boolean> walkingBike();
   }
 
   public interface LegacyGraphQLStopAtDistance {
