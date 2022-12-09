@@ -24,7 +24,6 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
@@ -189,7 +188,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     assertEquals(1, intermediateStops.size());
     assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
 
-    EncodedPolyline legGeometry = PolylineEncoder.encodeGeometry(leg.getLegGeometry());
+    EncodedPolyline legGeometry = EncodedPolyline.encode(leg.getLegGeometry());
     assertThatPolylinesAreEqual(
       legGeometry.points(),
       "kfsmEjojcOa@eBRKfBfHR|ALjBBhVArMG|OCrEGx@OhAKj@a@tAe@hA]l@MPgAnAgw@nr@cDxCm@t@c@t@c@x@_@~@]pAyAdIoAhG}@lE{AzHWhAtt@t~Aj@tAb@~AXdBHn@FlBC`CKnA_@nC{CjOa@dCOlAEz@E|BRtUCbCQ~CWjD??qBvXBl@kBvWOzAc@dDOx@sHv]aIG?q@@c@ZaB\\mA"

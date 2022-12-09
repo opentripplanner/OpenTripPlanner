@@ -34,6 +34,7 @@ public class RouteRequestToFilterChainMapper {
     boolean wheelchairAccessible,
     double wheelchairMaxSlope,
     FareService fareService,
+    double minBikeParkingDistance,
     TransitAlertService transitAlertService,
     Function<Station, MultiModalStation> getMultiModalStation
   ) {
@@ -73,6 +74,7 @@ public class RouteRequestToFilterChainMapper {
         wheelchairMaxSlope
       )
       .withFares(fareService)
+      .withMinBikeParkingDistance(minBikeParkingDistance)
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
         params.removeItinerariesWithSameRoutesAndStops()
       )

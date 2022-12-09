@@ -14,14 +14,12 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.index.StreetIndex;
@@ -62,8 +60,6 @@ public class Graph implements Serializable {
 
   private transient StreetIndex streetIndex;
 
-  //Envelope of all OSM and transit vertices. Calculated during build time
-  private WorldEnvelope envelope = null;
   //ConvexHull of all the graph vertices. Generated at Graph build time.
   private Geometry convexHull = null;
 
@@ -321,20 +317,6 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Calculates envelope out of all OSM coordinates
-   * <p>
-   * Transit stops are added to the envelope as they are added to the graph
-   */
-  public void calculateEnvelope() {
-    this.envelope = new WorldEnvelope();
-
-    for (Vertex v : this.getVertices()) {
-      Coordinate c = v.getCoordinate();
-      this.envelope.expandToInclude(c);
-    }
-  }
-
-  /**
    * Calculates convexHull of all the vertices during build time
    */
   public void calculateConvexHull() {
@@ -348,23 +330,6 @@ public class Graph implements Serializable {
     return convexHull;
   }
 
-  /**
-   * Expands envelope to include given point
-   * <p>
-   * If envelope is empty it creates it (This can happen with a graph without OSM data) Used when
-   * adding stops to OSM envelope
-   *
-   * @param x the value to lower the minimum x to or to raise the maximum x to
-   * @param y the value to lower the minimum y to or to raise the maximum y to
-   */
-  public void expandToInclude(double x, double y) {
-    //Envelope can be empty if graph building is run without OSM data
-    if (this.envelope == null) {
-      calculateEnvelope();
-    }
-    this.envelope.expandToInclude(x, y);
-  }
-
   public void initEllipsoidToGeoidDifference(double value, double lat, double lon) {
     this.ellipsoidToGeoidDifference = value;
     LOG.info(
@@ -373,10 +338,6 @@ public class Graph implements Serializable {
       lon,
       this.ellipsoidToGeoidDifference
     );
-  }
-
-  public WorldEnvelope getEnvelope() {
-    return this.envelope;
   }
 
   public double getDistanceBetweenElevationSamples() {

@@ -20,6 +20,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
+import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -168,6 +169,7 @@ public class GraphSerializationTest {
     SerializedGraphObject serializedObj = new SerializedGraphObject(
       originalGraph,
       originalTransitModel,
+      new WorldEnvelopeModel(),
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT
     );

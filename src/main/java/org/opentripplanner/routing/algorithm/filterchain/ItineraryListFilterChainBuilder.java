@@ -19,6 +19,7 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimi
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OtherThanSameLegsMaxGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
@@ -35,6 +36,7 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRou
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 
@@ -66,6 +68,7 @@ public class ItineraryListFilterChainBuilder {
   private TransitAlertService transitAlertService;
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
+  private double minBikeParkingDistance;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -86,8 +89,8 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * Remove itineraries from the tail or head of the list in the final filtering. The {@link
-   * #maxNumberOfItineraries} is used together with this parameter to reduce the number of
+   * Remove itineraries from the tail or head of the list in the final filtering. The
+   * {@link #maxNumberOfItineraries} is used together with this parameter to reduce the number of
    * itineraries down to the requested size.
    * <p>
    * The default is to crop the tail. But, we need to crop the head to be able to paginate in the
@@ -260,6 +263,11 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withMinBikeParkingDistance(double distance) {
+    this.minBikeParkingDistance = distance;
+    return this;
+  }
+
   public ItineraryListFilterChainBuilder withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
     boolean remove
   ) {
@@ -278,6 +286,12 @@ public class ItineraryListFilterChainBuilder {
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
       filters.add(new SameFirstOrLastTripFilter());
+    }
+
+    if (minBikeParkingDistance > 0) {
+      filters.add(
+        new RemoveItinerariesWithShortStreetLeg(minBikeParkingDistance, TraverseMode.BICYCLE)
+      );
     }
 
     if (accessibilityScore) {
@@ -372,10 +386,20 @@ public class ItineraryListFilterChainBuilder {
     return new ItineraryListFilterChain(filters, debug);
   }
 
+  public ItineraryListFilterChainBuilder withTransitAlerts(
+    TransitAlertService transitAlertService,
+    Function<Station, MultiModalStation> getMultiModalStation
+  ) {
+    this.transitAlertService = transitAlertService;
+    this.getMultiModalStation = getMultiModalStation;
+
+    return this;
+  }
+
   /**
    * If enabled, this adds the filter to remove itineraries which have the same stops and routes.
-   * These are sometimes called "time-shifted duplicates" but since those terms have so many meanings
-   * we chose to use a long, but descriptive name instead.
+   * These are sometimes called "time-shifted duplicates" but since those terms have so many
+   * meanings we chose to use a long, but descriptive name instead.
    */
   private List<ItineraryListFilter> buildGroupBySameRoutesAndStopsFilter() {
     if (removeItinerariesWithSameRoutesAndStops) {
@@ -391,16 +415,6 @@ public class ItineraryListFilterChainBuilder {
     } else {
       return List.of();
     }
-  }
-
-  public ItineraryListFilterChainBuilder withTransitAlerts(
-    TransitAlertService transitAlertService,
-    Function<Station, MultiModalStation> getMultiModalStation
-  ) {
-    this.transitAlertService = transitAlertService;
-    this.getMultiModalStation = getMultiModalStation;
-
-    return this;
   }
 
   /**
