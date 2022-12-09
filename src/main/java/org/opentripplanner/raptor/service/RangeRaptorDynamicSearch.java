@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.sorlandsbanen.EnturHackSorlandsBanen;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -134,7 +136,13 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
     // Create worker
     if (request.profile().is(MULTI_CRITERIA)) {
-      raptorWorker = config.createMcWorker(transitData, request, getDestinationHeuristics());
+      // HACK SØRLANDSBANEN
+      if (OTPFeature.HackSorlandsbanen.isOn() && EnturHackSorlandsBanen.match(request)) {
+        raptorWorker =
+          EnturHackSorlandsBanen.worker(config, transitData, request, getDestinationHeuristics());
+      } else {
+        raptorWorker = config.createMcWorker(transitData, request, getDestinationHeuristics());
+      }
     } else {
       raptorWorker = config.createStdWorker(transitData, request);
     }

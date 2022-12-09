@@ -6,12 +6,12 @@ import java.util.Arrays;
  * This class keep a facto for each index and the minimum factor for fast retrieval during Raptor
  * search.
  */
-final class IndexBasedFactorStrategy implements FactorStrategy {
+public final class IndexBasedFactorStrategy implements FactorStrategy {
 
   private final int[] factors;
   private final int minFactor;
 
-  private IndexBasedFactorStrategy(int[] factors) {
+  public IndexBasedFactorStrategy(int[] factors) {
     this.factors = factors;
     this.minFactor = findMinimumFactor(factors);
   }
