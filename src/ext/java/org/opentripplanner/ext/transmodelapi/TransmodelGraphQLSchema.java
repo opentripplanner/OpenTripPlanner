@@ -278,6 +278,7 @@ public class TransmodelGraphQLSchema {
     GraphQLNamedOutputType ptSituationElementType = PtSituationElementType.create(
       authorityType,
       quayType,
+      stopPlaceType,
       lineType,
       ServiceJourneyType.REF,
       multilingualStringType,
