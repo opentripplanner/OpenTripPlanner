@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.vehicle_rental;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
@@ -20,8 +18,6 @@ import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
-import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
 import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
 import org.opentripplanner.street.model.edge.VehicleRentalEdge;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
@@ -195,43 +191,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       // this check relies on the generated equals for the record which also recursively checkes that
       // the JTS geometries are equal
       if (!geofencingZones.equals(latestAppliedGeofencingZones)) {
-        computeGeofencingZones(graph);
+        var updater = new GeofencingZoneEdgeUpdater(graph.getStreetIndex()::getEdgesForEnvelope);
+        updater.applyGeofencingZones(geofencingZones);
         latestAppliedGeofencingZones = geofencingZones;
       }
-    }
-
-    private void computeGeofencingZones(Graph graph) {
-      LOG.info("Computing geofencing zones");
-      var start = System.currentTimeMillis();
-
-      int edgesTouched = 0;
-      var restrictedZones = geofencingZones
-        .stream()
-        .filter(GeofencingZone::hasRestriction)
-        .toList();
-      for (GeofencingZone zone : restrictedZones) {
-        var candidates = graph
-          .getStreetIndex()
-          .getEdgesForEnvelope(zone.geometry().getEnvelopeInternal());
-        for (var e : candidates) {
-          if (
-            e instanceof StreetEdge streetEdge &&
-            streetEdge.getGeometry().intersects(zone.geometry())
-          ) {
-            streetEdge.addRentalExtension(
-              new StreetEdgeRentalExtension.GeofencingZoneExtension(zone)
-            );
-            edgesTouched++;
-          }
-        }
-      }
-      var end = System.currentTimeMillis();
-      var millis = Duration.ofMillis(end - start);
-      LOG.info(
-        "Geofencing zones computation took {}. Added extension to {} edges.",
-        TimeUtils.durationToStrCompact(millis),
-        edgesTouched
-      );
     }
   }
 }

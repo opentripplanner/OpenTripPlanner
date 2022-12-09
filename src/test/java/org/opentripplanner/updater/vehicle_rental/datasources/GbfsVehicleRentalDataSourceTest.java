@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
@@ -81,6 +82,8 @@ class GbfsVehicleRentalDataSourceTest {
 
     assertTrue(dataSource.update());
 
+    dataSource.getUpdates();
+
     var zones = dataSource.getGeofencingZones();
 
     assertEquals(363, zones.size());
@@ -93,6 +96,12 @@ class GbfsVehicleRentalDataSourceTest {
 
     assertTrue(frognerPark.dropOffBanned());
     assertFalse(frognerPark.passingThroughBanned());
+
+    var businessAreas = zones.stream().filter(GeofencingZone::isBusinessArea).toList();
+
+    assertEquals(12, businessAreas.size());
+
+    assertEquals("tieroslo:OSLO Summer 2021", businessAreas.get(0).id().toString());
   }
 
   @Test

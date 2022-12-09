@@ -6,6 +6,10 @@
     "en": {
       "feeds": [
         {
+          "name": "system_information",
+          "url": "file:src/test/resources/gbfs/tieroslo/system_information.json"
+        },
+        {
           "name": "geofencing_zones",
           "url": "file:src/test/resources/gbfs/tieroslo/geofencing_zones.json"
         }
