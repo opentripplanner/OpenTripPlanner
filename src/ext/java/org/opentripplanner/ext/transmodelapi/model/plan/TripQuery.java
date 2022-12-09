@@ -554,6 +554,14 @@ public class TripQuery {
           )
           .build()
       )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name("extraSearchCoachReluctance")
+          .description("FOR TESTING ONLY")
+          .type(Scalars.GraphQLFloat)
+          .build()
+      )
       .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))
       .build();
   }
