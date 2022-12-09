@@ -13,7 +13,8 @@ message TripDescriptorExtension {
 }
 
 extend TripDescriptor {
-  optional TripDescriptorExtension trip_descriptor = 9000;
+  // https://groups.google.com/d/msgid/gtfs-realtime/255580b2-1fce-4605-a854-3e18f24fcab7n%40googlegroups.com
+  optional TripDescriptorExtension trip_descriptor = 1010;
 }
 
 message StopTimePropertiesExtension {
@@ -36,5 +37,6 @@ message StopTimePropertiesExtension {
 }
 
 extend TripUpdate.StopTimeUpdate.StopTimeProperties {
-  optional StopTimePropertiesExtension stop_time_properties = 9000;
+  // https://groups.google.com/d/msgid/gtfs-realtime/255580b2-1fce-4605-a854-3e18f24fcab7n%40googlegroups.com
+  optional StopTimePropertiesExtension stop_time_properties = 1010;
 }
