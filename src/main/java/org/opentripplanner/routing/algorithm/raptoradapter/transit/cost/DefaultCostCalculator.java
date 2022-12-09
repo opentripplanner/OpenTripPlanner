@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -211,4 +212,19 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
     // fallback to regular transfer
     return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStop, boardTime);
   }
+
+  /*--  HACK SØRLANDSBANEN  ::  BEGIN  --*/
+
+  public DefaultCostCalculator(
+    DefaultCostCalculator<T> original,
+    Function<FactorStrategy, FactorStrategy> modeReluctanceMapper
+  ) {
+    this.boardCostOnly = original.boardCostOnly;
+    this.boardAndTransferCost = original.boardAndTransferCost;
+    this.waitFactor = original.waitFactor;
+    this.transferCostOnly = original.transferCostOnly;
+    this.transitFactors = modeReluctanceMapper.apply(original.transitFactors);
+    this.stopTransferCost = original.stopTransferCost;
+  }
+  /*--  HACK SØRLANDSBANEN  ::  END  --*/
 }

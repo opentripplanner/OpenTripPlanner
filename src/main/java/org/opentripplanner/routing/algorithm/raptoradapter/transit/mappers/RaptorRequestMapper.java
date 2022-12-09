@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.ext.sorlandsbanen.EnturHackSorlandsBanen;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
@@ -17,6 +18,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -31,6 +33,8 @@ public class RaptorRequestMapper {
   private final boolean isMultiThreadedEnbled;
   private final MeterRegistry meterRegistry;
 
+  private final TransitLayer transitLayer;
+
   private RaptorRequestMapper(
     RouteRequest request,
     boolean isMultiThreaded,
@@ -38,13 +42,15 @@ public class RaptorRequestMapper {
     Collection<? extends RaptorAccessEgress> egressPaths,
     Duration searchWindowAccessSlack,
     long transitSearchTimeZeroEpocSecond,
-    MeterRegistry meterRegistry
+    MeterRegistry meterRegistry,
+    TransitLayer transitLayer
   ) {
     this.request = request;
     this.isMultiThreadedEnbled = isMultiThreaded;
     this.accessPaths = accessPaths;
     this.egressPaths = egressPaths;
     this.searchWindowAccessSlack = searchWindowAccessSlack;
+    this.transitLayer = transitLayer;
     this.transitSearchTimeZeroEpocSecond = transitSearchTimeZeroEpocSecond;
     this.meterRegistry = meterRegistry;
   }
@@ -56,7 +62,8 @@ public class RaptorRequestMapper {
     Collection<? extends RaptorAccessEgress> accessPaths,
     Collection<? extends RaptorAccessEgress> egressPaths,
     Duration searchWindowAccessSlack,
-    MeterRegistry meterRegistry
+    MeterRegistry meterRegistry,
+    TransitLayer transitLayer
   ) {
     return new RaptorRequestMapper(
       request,
@@ -65,7 +72,8 @@ public class RaptorRequestMapper {
       egressPaths,
       searchWindowAccessSlack,
       transitSearchTimeZero.toEpochSecond(),
-      meterRegistry
+      meterRegistry,
+      transitLayer
     )
       .doMap();
   }
@@ -171,7 +179,7 @@ public class RaptorRequestMapper {
       )
     );
 
-    return builder.build();
+    return EnturHackSorlandsBanen.enableHack(builder.build(), request, transitLayer);
   }
 
   private List<PassThroughPoint> mapPassThroughPoints() {

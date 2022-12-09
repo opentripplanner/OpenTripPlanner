@@ -6,7 +6,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
  * <p>
  * The class and methods are {@code final} to help the JIT compiler optimize the use of this class.
  */
-interface FactorStrategy {
+public interface FactorStrategy {
   /**
    * Return the factor for the given index.
    */
