@@ -29,6 +29,9 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
   private final DebugRequest debug;
   private final RaptorTimers performanceTimers;
 
+  // HACK SØRLANDSBANEN
+  public double extraSearchCoachReluctance = 0.0;
+
   private RaptorRequest() {
     searchParams = SearchParams.defaults();
     profile = RaptorProfile.MULTI_CRITERIA;
@@ -49,6 +52,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     this.multiCriteria = builder.multiCriteria();
     this.performanceTimers = builder.performanceTimers();
     this.debug = builder.debug().build();
+    this.extraSearchCoachReluctance = builder.extraSearchCoachReluctance;
     verify();
   }
 

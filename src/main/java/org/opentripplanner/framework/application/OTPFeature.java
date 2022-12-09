@@ -29,6 +29,7 @@ public enum OTPFeature {
   ),
   DebugClient(true, false, "Enable the debug web client located at the root of the web server."),
   FloatingBike(true, false, "Enable floating bike routing."),
+  HackSorlandsbanen(false, true, "Includ Sørlandsbanen"),
   GtfsGraphQlApi(true, false, "Enable GTFS GraphQL API."),
   GtfsGraphQlApiRentalStationFuzzyMatching(
     false,
