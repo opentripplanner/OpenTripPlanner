@@ -128,7 +128,8 @@ public class TransitRouter {
       accessEgresses.getAccesses(),
       accessEgresses.getEgresses(),
       accessEgresses.calculateMaxAccessTimePenalty(),
-      serverContext.meterRegistry()
+      serverContext.meterRegistry(),
+      transitLayer
     );
 
     // Route transit
