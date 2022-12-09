@@ -246,13 +246,11 @@ public class ParkingProcessor {
       if (!walkAccessibleOut || !carAccessibleIn || !walkAccessibleIn || !carAccessibleOut) {
         // This will prevent the P+R to be useful.
         issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-        return null;
       }
     } else {
       if (!walkAccessibleOut || !walkAccessibleIn) {
         // This will prevent the P+R to be useful.
         issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-        return null;
       }
     }
 
@@ -287,6 +285,10 @@ public class ParkingProcessor {
   ) {
     var centroid = area.outermostRings.get(0).jtsPolygon.getCentroid();
 
+    LOG.debug(
+      "Creating an artificial entrance for {} as it's not linked to the street network",
+      entity.getOpenStreetMapLink()
+    );
     return List.of(builder ->
       builder
         .entranceId(
