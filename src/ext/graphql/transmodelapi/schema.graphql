@@ -1009,6 +1009,8 @@ type StopPlace implements PlaceInterface {
     "If true only quays with at least one visiting line are included."
     filterByInUse: Boolean = false
   ): [Quay] @timingData
+  "Get all situations active for the stop place. Situations affecting individual quays are not returned, and should be fetched directly from the quay."
+  situations: [PtSituationElement!]!
   tariffZones: [TariffZone]!
   timeZone: String
   "The transport modes of quays under this stop place."

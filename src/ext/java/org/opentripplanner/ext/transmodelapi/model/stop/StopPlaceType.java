@@ -58,6 +58,7 @@ public class StopPlaceType {
     GraphQLOutputType quayType,
     GraphQLOutputType tariffZoneType,
     GraphQLOutputType estimatedCallType,
+    GraphQLOutputType ptSituationElementType,
     GqlUtil gqlUtil
   ) {
     return GraphQLObjectType
@@ -391,6 +392,22 @@ public class StopPlaceType {
               .limit(numberOfDepartures)
               .collect(Collectors.toList());
           })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("situations")
+          .description(
+            "Get all situations active for the stop place. Situations affecting individual quays are not returned, and should be fetched directly from the quay."
+          )
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
+          .dataFetcher(env ->
+            GqlUtil
+              .getTransitService(env)
+              .getTransitAlertService()
+              .getStopAlerts(((MonoOrMultiModalStation) env.getSource()).getId())
+          )
           .build()
       )
       .build();
