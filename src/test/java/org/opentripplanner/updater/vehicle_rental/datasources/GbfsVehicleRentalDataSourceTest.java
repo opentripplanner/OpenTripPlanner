@@ -24,7 +24,8 @@ class GbfsVehicleRentalDataSourceTest {
         "nb",
         false,
         new HashMap<>(),
-        null
+        null,
+        false
       )
     );
 
@@ -74,7 +75,8 @@ class GbfsVehicleRentalDataSourceTest {
         "en",
         false,
         new HashMap<>(),
-        null
+        null,
+        true
       )
     );
 
@@ -113,7 +115,8 @@ class GbfsVehicleRentalDataSourceTest {
         "en",
         false,
         new HashMap<>(),
-        network
+        network,
+        false
       )
     );
 

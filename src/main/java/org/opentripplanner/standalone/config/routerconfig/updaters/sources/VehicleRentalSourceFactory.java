@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters.sources;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import java.util.Map;
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
@@ -38,7 +39,8 @@ public class VehicleRentalSourceFactory {
         language(),
         allowKeepingRentedVehicleAtDestination(),
         headers(),
-        network()
+        network(),
+        geofencingZones()
       );
       case SMOOVE -> new SmooveBikeRentalDataSourceParameters(
         url(),
@@ -100,6 +102,14 @@ public class VehicleRentalSourceFactory {
       .of("allowOverloading")
       .since(NA)
       .summary("Allow leaving vehicles at a station even though there are no free slots.")
+      .asBoolean(false);
+  }
+
+  private boolean geofencingZones() {
+    return c
+      .of("geofencingZones")
+      .since(V2_3)
+      .summary("Compute rental restrictions based on GBFS 2.2 geofencing zones.")
       .asBoolean(false);
   }
 }

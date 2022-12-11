@@ -31,26 +31,13 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicle
  */
 class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
 
-  private final String url;
-
-  private final String language;
-
-  private final Map<String, String> httpHeaders;
-
-  private final String network;
-
-  /** Is it possible to arrive at the destination with a rented bicycle, without dropping it off */
-  private final boolean allowKeepingRentedVehicleAtDestination;
+  private final GbfsVehicleRentalDataSourceParameters params;
 
   private GbfsFeedLoader loader;
-  private List<GeofencingZone> geofencingZones;
+  private List<GeofencingZone> geofencingZones = List.of();
 
   public GbfsVehicleRentalDataSource(GbfsVehicleRentalDataSourceParameters parameters) {
-    url = parameters.url();
-    language = parameters.language();
-    httpHeaders = parameters.httpHeaders();
-    allowKeepingRentedVehicleAtDestination = parameters.allowKeepingRentedVehicleAtDestination();
-    network = parameters.network();
+    this.params = parameters;
   }
 
   @Override
@@ -68,7 +55,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
     GbfsSystemInformationMapper systemInformationMapper = new GbfsSystemInformationMapper();
     VehicleRentalSystem system = systemInformationMapper.mapSystemInformation(
       systemInformation.getData(),
-      network
+      params.network()
     );
 
     // Get vehicle types
@@ -104,7 +91,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
       GbfsStationInformationMapper stationInformationMapper = new GbfsStationInformationMapper(
         system,
         vehicleTypes,
-        allowKeepingRentedVehicleAtDestination
+        params.allowKeepingRentedVehicleAtDestination()
       );
 
       // Iterate over all known stations, and if we have any status information add it to those station objects.
@@ -140,28 +127,29 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
       }
     }
 
-    var zones = loader.getFeed(GBFSGeofencingZones.class);
+    if (params.geofencingZones()) {
+      var zones = loader.getFeed(GBFSGeofencingZones.class);
 
-    var mapper = new GbfsGeofencingZoneMapper(system.systemId);
-    this.geofencingZones = mapper.mapRentalVehicleType(zones);
-
+      var mapper = new GbfsGeofencingZoneMapper(system.systemId);
+      this.geofencingZones = mapper.mapRentalVehicleType(zones);
+    }
     return stations;
   }
 
   @Override
   public void setup() {
-    loader = new GbfsFeedLoader(url, httpHeaders, language);
+    loader = new GbfsFeedLoader(params.url(), params.httpHeaders(), params.language());
   }
 
   @Override
   public String toString() {
     return ToStringBuilder
       .of(GbfsVehicleRentalDataSource.class)
-      .addStr("url", url)
-      .addStr("language", language)
+      .addStr("url", params.url())
+      .addStr("language", params.language())
       .addBoolIfTrue(
         "allowKeepingRentedVehicleAtDestination",
-        allowKeepingRentedVehicleAtDestination
+        params.allowKeepingRentedVehicleAtDestination()
       )
       .toString();
   }
