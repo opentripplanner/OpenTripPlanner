@@ -29,7 +29,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ElevatorProcessor {
+class ElevatorProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ElevatorProcessor.class);
   private final DataImportIssueStore issueStore;
