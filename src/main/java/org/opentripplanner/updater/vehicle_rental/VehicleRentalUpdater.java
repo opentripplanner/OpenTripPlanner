@@ -202,14 +202,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       // this check relies on the generated equals for the record which also recursively checks that
       // the JTS geometries are equal
       if (!geofencingZones.isEmpty() && !geofencingZones.equals(latestAppliedGeofencingZones)) {
-
         LOG.info("Computing geofencing zones");
         var start = System.currentTimeMillis();
 
         var network = geofencingZones.get(0).id().getFeedId();
         updatedEdges.forEach(e -> e.removeTraversalExtension(network));
 
-        var updater = new GeofencingZoneEdgeUpdater(graph.getStreetIndex()::getEdgesForEnvelope);
+        var updater = new GeofencingEdgeUpdater(graph.getStreetIndex()::getEdgesForEnvelope);
         updatedEdges = updater.applyGeofencingZones(geofencingZones);
         latestAppliedGeofencingZones = geofencingZones;
 

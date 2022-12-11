@@ -1,5 +1,8 @@
 package org.opentripplanner.framework.geometry;
 
+import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -17,6 +20,7 @@ import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequenceFactory;
 import org.locationtech.jts.linearref.LengthLocationMap;
@@ -184,6 +188,34 @@ public class GeometryUtils {
   }
 
   /**
+   * Splits a line string into a number of partition with the same number of coordinates.
+   * <p>
+   * The last coordinate of partition n will also be the first coordinate of partition n+1 so all
+   * partitions together will represent the original line string without gaps.
+   *
+   * @param segmentSize How many coordinates should be in each partition.
+   */
+  public static List<LineString> partitionLineString(LineString input, int segmentSize) {
+    var partitions = Lists.partition(Arrays.asList(input.getCoordinates()), segmentSize);
+    var ret = new ArrayList<LineString>();
+    for (int i = 0; i < partitions.size() - 1; i++) {
+      var partition = new ArrayList<>(partitions.get(i));
+      // also add the first coordinate from the next partition
+      partition.add(partitions.get(i + 1).get(0));
+
+      var ls = gf.createLineString(partition.toArray(new Coordinate[0]));
+      ret.add(ls);
+    }
+    var lastPartition = partitions.get(partitions.size() - 1);
+    if (lastPartition.size() > 1) {
+      var lastLinestring = gf.createLineString(lastPartition.toArray(new Coordinate[0]));
+      ret.add(lastLinestring);
+    }
+
+    return List.copyOf(ret);
+  }
+
+  /**
    * Returns the chunk of the given geometry between the two given coordinates.
    * <p>
    * Assumes that "second" is after "first" along the input geometry.
@@ -282,6 +314,17 @@ public class GeometryUtils {
     }
 
     throw new UnsupportedGeometryException(geoJsonGeom.getClass().toString());
+  }
+
+  /**
+   * Extract individual line string from a mult-line string.
+   */
+  public static List<LineString> getLineStrings(MultiLineString mls) {
+    var ret= new ArrayList<LineString>();
+    for(var i=0; i< mls.getNumGeometries();i++){
+      ret.add((LineString) mls.getGeometryN(i));
+    }
+    return List.copyOf(ret);
   }
 
   private static Coordinate[] convertPath(List<LngLatAlt> path) {

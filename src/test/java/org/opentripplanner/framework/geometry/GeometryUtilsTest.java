@@ -242,4 +242,28 @@ public class GeometryUtilsTest {
 
     assertEquals(4, line.getCoordinates().length);
   }
+
+  @Test
+  void partitionLineString() {
+    Coordinate[] coordinates = List
+      .of(
+        new Coordinate(0, 0),
+        new Coordinate(1, 1),
+        new Coordinate(2, 2),
+        new Coordinate(3, 3),
+        new Coordinate(4, 4),
+        new Coordinate(5, 5),
+        new Coordinate(6, 6)
+      )
+      .toArray(new Coordinate[0]);
+
+    LineString line = GeometryUtils.makeLineString(coordinates);
+
+    var partitions = GeometryUtils.partitionLineString(line, 3);
+
+    assertEquals(
+      "[LINESTRING (0 0, 1 1, 2 2, 3 3), LINESTRING (3 3, 4 4, 5 5, 6 6)]",
+      partitions.toString()
+    );
+  }
 }
