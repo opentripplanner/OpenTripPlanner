@@ -612,8 +612,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             endEndpoint,
             way,
             i,
-            osmStartNode.getId(),
-            osmEndNode.getId(),
             permissions,
             geometry
           );
@@ -882,8 +880,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       IntersectionVertex endEndpoint,
       OSMWay way,
       int index,
-      long startNode,
-      long endNode,
       StreetTraversalPermission permissions,
       LineString geometry
     ) {
