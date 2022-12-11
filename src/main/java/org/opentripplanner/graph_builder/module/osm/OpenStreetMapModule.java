@@ -78,10 +78,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    */
   public CustomNamer customNamer;
   /**
-   * Ignore wheelchair accessibility information.
-   */
-  public boolean ignoreWheelchairAccessibility = false;
-  /**
    * Whether we should create car P+R stations from OSM data. The default value is true. In normal
    * operation it is set by the JSON graph build configuration, but it is also initialized to "true"
    * here to provide the default behavior in tests.
@@ -253,7 +249,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       }
 
       applySafetyFactors(graph);
-    } // END buildGraph()
+    }
 
     // TODO Set this to private once WalkableAreaBuilder is gone
     protected void applyWayProperties(
@@ -971,10 +967,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       street.setStairs(steps);
 
       /* TODO: This should probably generalized somehow? */
-      if (
-        !ignoreWheelchairAccessibility &&
-        (way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair")))
-      ) {
+      if ((way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair")))) {
         street.setWheelchairAccessible(false);
       }
 
