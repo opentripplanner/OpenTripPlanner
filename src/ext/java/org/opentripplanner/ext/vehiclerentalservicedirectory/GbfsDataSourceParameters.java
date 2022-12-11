@@ -1,16 +1,20 @@
 package org.opentripplanner.ext.vehiclerentalservicedirectory;
 
 import java.util.Map;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import javax.annotation.Nonnull;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
-public class GbfsDataSourceParameters extends GbfsVehicleRentalDataSourceParameters {
-
-  public GbfsDataSourceParameters(
-    String url,
-    String language,
-    Map<String, String> httpHeaders,
-    String network
-  ) {
-    super(url, language, false, httpHeaders, network);
+public record GbfsDataSourceParameters(
+  String url,
+  String language,
+  Map<String, String> httpHeaders,
+  String network
+)
+  implements VehicleRentalDataSourceParameters {
+  @Nonnull
+  @Override
+  public VehicleRentalSourceType sourceType() {
+    return VehicleRentalSourceType.GBFS;
   }
 }
