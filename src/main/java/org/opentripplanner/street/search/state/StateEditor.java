@@ -213,7 +213,7 @@ public class StateEditor {
     child.stateData.insideNoRentalDropOffArea = false;
   }
 
-  public void enteredNoRentalDropOffArea() {
+  public void enterNoRentalDropOffArea() {
     if (child.stateData.insideNoRentalDropOffArea) {
       return;
     }

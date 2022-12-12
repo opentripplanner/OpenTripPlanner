@@ -1039,7 +1039,7 @@ public class StreetEdge
     }
 
     if (isDropOffBanned(currentState)) {
-      editor.enteredNoRentalDropOffArea();
+      editor.enterNoRentalDropOffArea();
     } else if (currentState.isInsideNoRentalDropOffArea()) {
       editor.leaveNoRentalDropOffArea();
     }

@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
+import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
 
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,11 +16,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -37,17 +36,14 @@ public class StreetEdgeTest {
   private static final double DELTA = 0.00001;
   private static final double SPEED = 6.0;
 
-  private Graph graph;
   private IntersectionVertex v0, v1, v2;
   private StreetSearchRequest proto;
 
   @BeforeEach
   public void before() {
-    graph = new Graph();
-
-    v0 = vertex("maple_0th", 0.0, 0.0); // label, X, Y
-    v1 = vertex("maple_1st", 2.0, 2.0);
-    v2 = vertex("maple_2nd", 1.0, 2.0);
+    v0 = intersectionVertex("maple_0th", 0.0, 0.0); // label, X, Y
+    v1 = intersectionVertex("maple_1st", 2.0, 2.0);
+    v2 = intersectionVertex("maple_2nd", 1.0, 2.0);
 
     this.proto =
       StreetSearchRequest
@@ -65,18 +61,18 @@ public class StreetEdgeTest {
   @Test
   public void testInAndOutAngles() {
     // An edge heading straight West
-    StreetEdge e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
+    StreetEdge e1 = streetEdge(v1, v2, 1.0, StreetTraversalPermission.ALL);
 
     // Edge has same first and last angle.
     assertEquals(90, e1.getInAngle());
     assertEquals(90, e1.getOutAngle());
 
     // 2 new ones
-    StreetVertex u = vertex("test1", 2.0, 1.0);
-    StreetVertex v = vertex("test2", 2.0, 2.0);
+    StreetVertex u = intersectionVertex("test1", 2.0, 1.0);
+    StreetVertex v = intersectionVertex("test2", 2.0, 2.0);
 
     // Second edge, heading straight North
-    StreetEdge e2 = edge(u, v, 1.0, StreetTraversalPermission.ALL);
+    StreetEdge e2 = streetEdge(u, v, 1.0, StreetTraversalPermission.ALL);
 
     // 180 degrees could be expressed as 180 or -180. Our implementation happens to use -180.
     assertEquals(180, Math.abs(e2.getInAngle()));
@@ -85,7 +81,7 @@ public class StreetEdgeTest {
 
   @Test
   public void testTraverseAsPedestrian() {
-    StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+    StreetEdge e1 = streetEdge(v1, v2, 100.0, StreetTraversalPermission.ALL);
     e1.setCarSpeed(10.0f);
 
     StreetSearchRequest options = StreetSearchRequest
@@ -105,7 +101,7 @@ public class StreetEdgeTest {
 
   @Test
   public void testTraverseAsCar() {
-    StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+    StreetEdge e1 = streetEdge(v1, v2, 100.0, StreetTraversalPermission.ALL);
     e1.setCarSpeed(10.0f);
 
     State s0 = new State(v1, StreetSearchRequest.copyOf(proto).withMode(StreetMode.CAR).build());
@@ -120,7 +116,7 @@ public class StreetEdgeTest {
 
   @Test
   public void testModeSetCanTraverse() {
-    StreetEdge e = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
+    StreetEdge e = streetEdge(v1, v2, 1.0, StreetTraversalPermission.ALL);
 
     TraverseModeSet modes = TraverseModeSet.allModes();
     assertTrue(e.canTraverse(modes));
@@ -128,7 +124,7 @@ public class StreetEdgeTest {
     modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK);
     assertTrue(e.canTraverse(modes));
 
-    e = edge(v1, v2, 1.0, StreetTraversalPermission.CAR);
+    e = streetEdge(v1, v2, 1.0, StreetTraversalPermission.CAR);
     assertFalse(e.canTraverse(modes));
 
     modes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK);
@@ -145,8 +141,8 @@ public class StreetEdgeTest {
   @Test
   public void testTraverseModeSwitchBike() {
     var vWithTrafficLight = new IntersectionVertex(graph, "maple_1st", 2.0, 2.0, false, true);
-    StreetEdge e0 = edge(v0, vWithTrafficLight, 50.0, StreetTraversalPermission.PEDESTRIAN);
-    StreetEdge e1 = edge(
+    StreetEdge e0 = streetEdge(v0, vWithTrafficLight, 50.0, StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge e1 = streetEdge(
       vWithTrafficLight,
       v2,
       18.4,
@@ -182,13 +178,13 @@ public class StreetEdgeTest {
   @Test
   public void testTraverseModeSwitchWalk() {
     var vWithTrafficLight = new IntersectionVertex(graph, "maple_1st", 2.0, 2.0, false, true);
-    StreetEdge e0 = edge(
+    StreetEdge e0 = streetEdge(
       v0,
       vWithTrafficLight,
       50.0,
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
     );
-    StreetEdge e1 = edge(vWithTrafficLight, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge e1 = streetEdge(vWithTrafficLight, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
 
     StreetSearchRequestBuilder forward = StreetSearchRequest.copyOf(proto);
 
@@ -212,9 +208,9 @@ public class StreetEdgeTest {
    */
   @Test
   public void testBikeSwitch() {
-    StreetEdge e0 = edge(v0, v1, 0.0, StreetTraversalPermission.PEDESTRIAN);
-    StreetEdge e1 = edge(v1, v2, 0.0, StreetTraversalPermission.BICYCLE);
-    StreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    StreetEdge e0 = streetEdge(v0, v1, 0.0, StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge e1 = streetEdge(v1, v2, 0.0, StreetTraversalPermission.BICYCLE);
+    StreetEdge e2 = streetEdge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
     StreetSearchRequestBuilder noPenalty = StreetSearchRequest.copyOf(proto);
     noPenalty.withPreferences(p -> p.withBike(it -> it.withSwitchTime(0).withSwitchCost(0)));
@@ -265,8 +261,8 @@ public class StreetEdgeTest {
 
   @Test
   public void testTurnRestriction() {
-    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
-    StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
+    StreetEdge e0 = streetEdge(v0, v1, 50.0, StreetTraversalPermission.ALL);
+    StreetEdge e1 = streetEdge(v1, v2, 18.4, StreetTraversalPermission.ALL);
     StreetSearchRequestBuilder streetSearchRequestBuilder = StreetSearchRequest.copyOf(proto);
     streetSearchRequestBuilder.withArriveBy(true);
     StreetSearchRequest request = streetSearchRequestBuilder.withMode(StreetMode.WALK).build();
@@ -284,60 +280,14 @@ public class StreetEdgeTest {
       2,
       0
     );
-    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL, elevationProfile);
+    var edge = streetEdge(v0, v1, 50.0, StreetTraversalPermission.ALL);
+    StreetElevationExtension.addToEdge(edge, elevationProfile, false);
+    StreetEdge e0 = edge;
 
     assertArrayEquals(
       elevationProfile.toCoordinateArray(),
       e0.getElevationProfile().toCoordinateArray()
     );
-  }
-
-  /****
-   * Private Methods
-   ****/
-
-  private IntersectionVertex vertex(String label, double x, double y) {
-    return new IntersectionVertex(graph, label, x, y);
-  }
-
-  /**
-   * Create an edge. If twoWay, create two edges (back and forth).
-   */
-  private StreetEdge edge(
-    StreetVertex vA,
-    StreetVertex vB,
-    double length,
-    StreetTraversalPermission perm
-  ) {
-    String labelA = vA.getLabel();
-    String labelB = vB.getLabel();
-    String name = String.format("%s_%s", labelA, labelB);
-    Coordinate[] coords = new Coordinate[2];
-    coords[0] = vA.getCoordinate();
-    coords[1] = vB.getCoordinate();
-    LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
-
-    return new StreetEdge(vA, vB, geom, name, length, perm, false);
-  }
-
-  private StreetEdge edge(
-    StreetVertex vA,
-    StreetVertex vB,
-    double length,
-    StreetTraversalPermission perm,
-    PackedCoordinateSequence elevationProfile
-  ) {
-    String labelA = vA.getLabel();
-    String labelB = vB.getLabel();
-    String name = String.format("%s_%s", labelA, labelB);
-    Coordinate[] coords = new Coordinate[2];
-    coords[0] = vA.getCoordinate();
-    coords[1] = vB.getCoordinate();
-    LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
-
-    var edge = new StreetEdge(vA, vB, geom, name, length, perm, false);
-    StreetElevationExtension.addToEdge(edge, elevationProfile, false);
-    return edge;
   }
 
   @Test
