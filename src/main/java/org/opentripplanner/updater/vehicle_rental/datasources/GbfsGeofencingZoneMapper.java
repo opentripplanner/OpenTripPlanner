@@ -1,8 +1,11 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
+import com.google.common.hash.Hashing;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import org.entur.gbfs.v2_2.geofencing_zones.GBFSGeofencingZones;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.UnsupportedGeometryException;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
@@ -28,11 +31,19 @@ public class GbfsGeofencingZoneMapper {
       .stream()
       .map(f -> {
         try {
-          var name = f.getProperties().getName();
+          var g = GeometryUtils.convertGeoJsonToJtsGeometry(f.getGeometry());
+          var name = Objects.requireNonNullElseGet(
+            f.getProperties().getName(),
+            () -> fallbackId(g)
+          );
           var dropOffBanned = !f.getProperties().getRules().get(0).getRideAllowed();
           var passThroughBanned = !f.getProperties().getRules().get(0).getRideThroughAllowed();
-          var g = GeometryUtils.convertGeoJsonToJtsGeometry(f.getGeometry());
-          return new GeofencingZone(new FeedScopedId(systemId, name), g, dropOffBanned, passThroughBanned);
+          return new GeofencingZone(
+            new FeedScopedId(systemId, name),
+            g,
+            dropOffBanned,
+            passThroughBanned
+          );
         } catch (UnsupportedGeometryException e) {
           LOG.error("Could not convert geofencing zone", e);
           return null;
@@ -40,5 +51,15 @@ public class GbfsGeofencingZoneMapper {
       })
       .filter(Objects::nonNull)
       .toList();
+  }
+
+  /**
+   * Some zones don't have a name, so we use the hash of the geometry as a fallback.
+   */
+  private static String fallbackId(Geometry geom) {
+    return Hashing
+      .murmur3_32_fixed()
+      .hashBytes(geom.toString().getBytes(StandardCharsets.UTF_8))
+      .toString();
   }
 }

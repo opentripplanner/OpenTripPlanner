@@ -19,6 +19,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.BusinessAreaBorder;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.GeofencingZoneExtension;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GeofencingEdgeUpdater {
 
@@ -46,14 +47,26 @@ class GeofencingEdgeUpdater {
     var generalBusinessAreas = geofencingZones
       .stream()
       .filter(GeofencingZone::isBusinessArea)
-      .toList();
+      .map(GeofencingZone::geometry)
+      .toArray(Geometry[]::new);
 
+    var unionOfBusinessAreas = GeometryUtils
+      .getGeometryFactory()
+      .createGeometryCollection(generalBusinessAreas)
+      .union();
+
+    var businessAreaZone = new GeofencingZone(
+      new FeedScopedId("1", "general-business-area"),
+      unionOfBusinessAreas,
+      false,
+      false
+    );
     // if the geofencing zones don't have any restrictions then they describe a general business
-    // are which you can traverse freely but are not allowed to leave
+    // area which you can traverse freely but are not allowed to leave
     // here we just take the boundary of the geometry since we want to add a "no pass through"
     // restriction to any edge intersecting it
     var businessAreaBorders = addExtensionToIntersectingStreetEdges(
-      generalBusinessAreas,
+      List.of(businessAreaZone),
       zone -> zone.geometry().getBoundary(),
       zone -> new BusinessAreaBorder(zone.id().getFeedId())
     );
