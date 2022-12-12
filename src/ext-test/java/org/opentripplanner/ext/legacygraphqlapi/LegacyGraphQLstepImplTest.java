@@ -24,7 +24,7 @@ class LegacyGraphQLstepImplTest {
     note.url = TEST_STREET_NOTE_URL;
     Date startDate = new Date();
     note.effectiveStartDate = startDate;
-    // Internal constructor for alert TimePeriod is limited to seconds.
+    // Truncate instant to seconds because {@link TimePeriod::new} takes seconds, not milliseconds.
     Instant startInstant = startDate.toInstant().truncatedTo(ChronoUnit.SECONDS);
     Instant endInstant = startInstant.plusSeconds(3600);
     note.effectiveEndDate = Date.from(endInstant);
