@@ -678,7 +678,7 @@ public class StreetEdge
   }
 
   /**
-   * This method is not threasafe!
+   * This method is not thread-safe!
    */
   public void addRentalExtension(StreetEdgeRentalExtension ext) {
     if (traversalExtensions == null) {
