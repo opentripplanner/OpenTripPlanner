@@ -21,11 +21,11 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
+import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -87,7 +87,8 @@ public class SpeedTest {
         new DefaultTransitService(transitModel),
         timer.getRegistry(),
         List::of,
-        FlexConfig.DEFAULT,
+        new WorldEnvelopeModel(),
+        config.flexConfig,
         null,
         null
       );

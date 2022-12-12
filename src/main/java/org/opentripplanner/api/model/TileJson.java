@@ -3,13 +3,11 @@ package org.opentripplanner.api.model;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
-import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.geometry.WorldEnvelope;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 
 /**
  * Container for <a href="https://github.com/mapbox/tilejson-spec">TileJSON</a> response
@@ -42,9 +40,8 @@ public class TileJson implements Serializable {
     String layers,
     String ignoreRouterId,
     String path,
-    WorldEnvelope graphEnvelope,
-    Collection<FeedInfo> feedInfos,
-    @Nullable Coordinate transitServiceCenter
+    WorldEnvelope envelope,
+    Collection<FeedInfo> feedInfos
   ) {
     attribution =
       feedInfos
@@ -66,16 +63,13 @@ public class TileJson implements Serializable {
 
     bounds =
       new double[] {
-        graphEnvelope.getLowerLeftLongitude(),
-        graphEnvelope.getLowerLeftLatitude(),
-        graphEnvelope.getUpperRightLongitude(),
-        graphEnvelope.getUpperRightLatitude(),
+        envelope.lowerLeft().longitude(),
+        envelope.lowerLeft().latitude(),
+        envelope.upperRight().longitude(),
+        envelope.upperRight().latitude(),
       };
 
-    if (transitServiceCenter == null) {
-      center = null;
-    } else {
-      center = new double[] { transitServiceCenter.x, transitServiceCenter.y, 9 };
-    }
+    var c = envelope.center();
+    center = new double[] { c.longitude(), c.latitude(), 9 };
   }
 }

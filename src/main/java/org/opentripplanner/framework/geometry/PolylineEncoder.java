@@ -12,9 +12,9 @@ import org.locationtech.jts.geom.Polygon;
  *
  * {@see EncodedPolyline}
  */
-public class PolylineEncoder {
+class PolylineEncoder {
 
-  public static EncodedPolyline encodeGeometry(Geometry geometry) {
+  static EncodedPolyline encodeGeometry(Geometry geometry) {
     if (geometry instanceof LineString string) {
       return encodeCoordinates(string.getCoordinates());
     } else if (geometry instanceof MultiLineString mls) {

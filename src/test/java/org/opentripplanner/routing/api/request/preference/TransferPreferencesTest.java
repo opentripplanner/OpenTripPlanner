@@ -12,6 +12,7 @@ class TransferPreferencesTest {
   private static final int SLACK = 150;
   private static final double WAIT_RELUCTANCE = 0.95;
   private static final int MAX_TRANSFERS = 17;
+  private static final int MAX_ADDITIONAL_TRANSFERS = 7;
   private static final TransferOptimizationPreferences OPTIMIZATION = TransferOptimizationPreferences
     .of()
     .withBackTravelWaitTimeFactor(2.5)
@@ -23,6 +24,7 @@ class TransferPreferencesTest {
     .withSlack(SLACK)
     .withWaitReluctance(WAIT_RELUCTANCE)
     .withMaxTransfers(MAX_TRANSFERS)
+    .withMaxAdditionalTransfers(MAX_ADDITIONAL_TRANSFERS)
     .withOptimization(OPTIMIZATION)
     .withNonpreferredCost(NONPREFERRED_COST)
     .build();
@@ -45,6 +47,11 @@ class TransferPreferencesTest {
   @Test
   void maxTransfers() {
     assertEquals(MAX_TRANSFERS, subject.maxTransfers());
+  }
+
+  @Test
+  void maxAdditionalTransfers() {
+    assertEquals(MAX_ADDITIONAL_TRANSFERS, subject.maxAdditionalTransfers());
   }
 
   @Test
@@ -78,6 +85,7 @@ class TransferPreferencesTest {
       "slack: 150, " +
       "waitReluctance: 0.95, " +
       "maxTransfers: 17, " +
+      "maxAdditionalTransfers: 7, " +
       "optimization: TransferOptimizationPreferences{backTravelWaitTimeFactor: 2.5}, " +
       "nonpreferredCost: 30,000" +
       "}",

@@ -1,8 +1,6 @@
 package org.opentripplanner.generate.doc.framework;
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Replace a text in a file wrapped using HTML comments
@@ -11,7 +9,6 @@ public class TemplateUtil {
 
   private static final String PARAMETERS_TABLE = "PARAMETERS-TABLE";
   private static final String PARAMETERS_DETAILS = "PARAMETERS-DETAILS";
-
   private static final String EXAMPLE = "JSON-EXAMPLE";
   private static final String COMMENT_OPEN = "<!-- ";
   private static final String COMMENT_CLOSE = " -->";

@@ -12,7 +12,7 @@
   "dependencies": {
     "@graphql-codegen/add": "3.1.1",
     "@graphql-codegen/cli": "2.5.0",
-    "@graphql-codegen/java": "3.2.4",
+    "@graphql-codegen/java": "3.3.6",
     "@graphql-codegen/java-resolvers": "2.2.3",
     "graphql": "16.3.0"
   }
