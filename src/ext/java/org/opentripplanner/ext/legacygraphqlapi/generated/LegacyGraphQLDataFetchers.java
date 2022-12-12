@@ -11,6 +11,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
@@ -1093,7 +1094,7 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLStep {
-    public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection> absoluteDirection();
+    public DataFetcher<LegacyGraphQLRelativeDirection> absoluteDirection();
 
     public DataFetcher<Iterable<TransitAlert>> alerts();
 
@@ -1111,7 +1112,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Double> lon();
 
-    public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLRelativeDirection> relativeDirection();
+    public DataFetcher<LegacyGraphQLRelativeDirection> relativeDirection();
 
     public DataFetcher<Boolean> stayOn();
 
