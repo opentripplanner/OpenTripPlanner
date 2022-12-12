@@ -1,15 +1,10 @@
 package org.opentripplanner.smoketest;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.smoketest.util.GraphQLClient;
-import org.opentripplanner.smoketest.util.SmokeTestRequest;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 
 /**
  * This smoke test expects an OTP installation running at localhost:8080

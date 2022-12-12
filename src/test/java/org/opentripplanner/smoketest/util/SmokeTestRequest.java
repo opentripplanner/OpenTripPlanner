@@ -3,8 +3,8 @@ package org.opentripplanner.smoketest.util;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.smoketest.SmokeTest;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 public record SmokeTestRequest(WgsCoordinate from, WgsCoordinate to, Collection<String> modes) {
   public Map<String, String> toMap() {

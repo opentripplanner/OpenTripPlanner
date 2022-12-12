@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.smoketest.util.RestClient;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 /**
  * This smoke test expects an OTP installation running at localhost:8080

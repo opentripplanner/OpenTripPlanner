@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.smoketest.util.GraphQLClient;
 import org.opentripplanner.smoketest.util.RestClient;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 /**
  * This is both a utility class and a category to select or deselect smoke tests during test
