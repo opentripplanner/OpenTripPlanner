@@ -496,7 +496,11 @@ public class StreetEdge
    */
   public void removeTraversalExtension(String network) {
     if (traversalExtensions != null) {
-      traversalExtensions= Arrays.stream(traversalExtensions).filter(e -> !e.network().equals(network)).toArray(StreetEdgeRentalExtension[]::new);
+      traversalExtensions =
+        Arrays
+          .stream(traversalExtensions)
+          .filter(e -> !e.network().equals(network))
+          .toArray(StreetEdgeRentalExtension[]::new);
     }
   }
 

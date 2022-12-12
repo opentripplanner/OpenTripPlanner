@@ -19,7 +19,6 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.BusinessAreaBorder;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.GeofencingZoneExtension;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GeofencingEdgeUpdater {
 
@@ -40,39 +39,40 @@ class GeofencingEdgeUpdater {
     // or "no drop-off" are added
     var restrictedEdges = addExtensionToIntersectingStreetEdges(
       restrictedZones,
-      GeofencingZone::geometry,
       GeofencingZoneExtension::new
     );
+
+    var updatedEdges = new HashSet<>(restrictedEdges);
 
     var generalBusinessAreas = geofencingZones
       .stream()
       .filter(GeofencingZone::isBusinessArea)
-      .map(GeofencingZone::geometry)
-      .toArray(Geometry[]::new);
+      .toList();
 
-    var unionOfBusinessAreas = GeometryUtils
-      .getGeometryFactory()
-      .createGeometryCollection(generalBusinessAreas)
-      .union();
+    if (!generalBusinessAreas.isEmpty()) {
+      // if the geofencing zones don't have any restrictions then they describe a general business
+      // area which you can traverse freely but are not allowed to leave
+      // here we just take the boundary of the geometry since we want to add a "no pass through"
+      // restriction to any edge intersecting it
 
-    var businessAreaZone = new GeofencingZone(
-      new FeedScopedId("1", "general-business-area"),
-      unionOfBusinessAreas,
-      false,
-      false
-    );
-    // if the geofencing zones don't have any restrictions then they describe a general business
-    // area which you can traverse freely but are not allowed to leave
-    // here we just take the boundary of the geometry since we want to add a "no pass through"
-    // restriction to any edge intersecting it
-    var businessAreaBorders = addExtensionToIntersectingStreetEdges(
-      List.of(businessAreaZone),
-      zone -> zone.geometry().getBoundary(),
-      zone -> new BusinessAreaBorder(zone.id().getFeedId())
-    );
+      var network = generalBusinessAreas.get(0).id().getFeedId();
+      var polygons = generalBusinessAreas
+        .stream()
+        .map(GeofencingZone::geometry)
+        .toArray(Geometry[]::new);
 
-    var updatedEdges = new HashSet<>(businessAreaBorders);
-    updatedEdges.addAll(restrictedEdges);
+      var unionOfBusinessAreas = GeometryUtils
+        .getGeometryFactory()
+        .createGeometryCollection(polygons)
+        .union();
+
+      var updated = applyExtension(
+        unionOfBusinessAreas.getBoundary(),
+        new BusinessAreaBorder(network)
+      );
+
+      updatedEdges.addAll(updated);
+    }
 
     return updatedEdges;
   }
@@ -87,25 +87,29 @@ class GeofencingEdgeUpdater {
 
   private Collection<StreetEdge> addExtensionToIntersectingStreetEdges(
     List<GeofencingZone> zones,
-    Function<GeofencingZone, Geometry> extractGeometry,
     Function<GeofencingZone, StreetEdgeRentalExtension> createExtension
   ) {
     var edgesUpdated = new ArrayList<StreetEdge>();
     for (GeofencingZone zone : zones) {
-      var geom = extractGeometry.apply(zone);
-      Set<Edge> candidates;
+      var geom = zone.geometry();
+      var ext = createExtension.apply(zone);
+      edgesUpdated.addAll(applyExtension(geom, ext));
+    }
+    return edgesUpdated;
+  }
 
-      if (geom instanceof MultiLineString mls) {
-        candidates = getEdgesAlongLineStrings(mls);
-      } else {
-        candidates = Set.copyOf(getEdgesForEnvelope.apply(geom.getEnvelopeInternal()));
-      }
-      for (var e : candidates) {
-        if (e instanceof StreetEdge streetEdge && streetEdge.getGeometry().intersects(geom)) {
-          var ext = createExtension.apply(zone);
-          streetEdge.addRentalExtension(ext);
-          edgesUpdated.add(streetEdge);
-        }
+  private Collection<StreetEdge> applyExtension(Geometry geom, StreetEdgeRentalExtension ext) {
+    var edgesUpdated = new ArrayList<StreetEdge>();
+    Set<Edge> candidates;
+    if (geom instanceof MultiLineString mls) {
+      candidates = getEdgesAlongLineStrings(mls);
+    } else {
+      candidates = Set.copyOf(getEdgesForEnvelope.apply(geom.getEnvelopeInternal()));
+    }
+    for (var e : candidates) {
+      if (e instanceof StreetEdge streetEdge && streetEdge.getGeometry().intersects(geom)) {
+        streetEdge.addRentalExtension(ext);
+        edgesUpdated.add(streetEdge);
       }
     }
     return edgesUpdated;

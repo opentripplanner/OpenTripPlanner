@@ -320,8 +320,8 @@ public class GeometryUtils {
    * Extract individual line string from a mult-line string.
    */
   public static List<LineString> getLineStrings(MultiLineString mls) {
-    var ret= new ArrayList<LineString>();
-    for(var i=0; i< mls.getNumGeometries();i++){
+    var ret = new ArrayList<LineString>();
+    for (var i = 0; i < mls.getNumGeometries(); i++) {
       ret.add((LineString) mls.getGeometryN(i));
     }
     return List.copyOf(ret);
