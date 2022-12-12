@@ -29,7 +29,17 @@ otp.layers.GeofencingZonesLayer = otp.Class({
     this.stopsLookup = {};
 
     this.layer = VectorTileLayer(this.url, {
-      style: { stroke: true, color: "blue" },
+      style: (feature) => {
+        if(feature.properties.type === "business-area-border") {
+          return { stroke: true, color: "#f65173" };
+        }
+        else if(feature.properties.type === "traversal-banned") {
+          return { stroke: true, color: "#62081a" };
+        }
+        else if(feature.properties.type === "drop-off-banned") {
+          return { stroke: true, color: "#ecc029" };
+        }
+      },
     });
 
     this.module.webapp.map.layer_control.addOverlay(this.layer, "Geofencing Zones");

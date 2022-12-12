@@ -19,7 +19,7 @@ public class GeofencingZonesLayerBuilder extends LayerBuilder<StreetEdge> {
 
   private static final Map<MapperType, MapperFactory> mappers = Map.of(
     MapperType.DebugClient,
-    GeofencingZonesPropertyMapper::create
+    transitService -> new GeofencingZonesPropertyMapper()
   );
   private final StreetIndex streetIndex;
 
