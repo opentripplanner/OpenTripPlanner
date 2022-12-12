@@ -15,8 +15,8 @@ import org.opentripplanner.street.model.note.StreetNote;
 public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStep {
 
   @Override
-  public DataFetcher<Object> absoluteDirection() {
-    return environment -> getSource(environment).getAbsoluteDirection();
+  public DataFetcher<String> absoluteDirection() {
+    return environment -> getSource(environment).getAbsoluteDirection().toString();
   }
 
   @Override
@@ -65,8 +65,8 @@ public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Object> relativeDirection() {
-    return environment -> getSource(environment).getRelativeDirection();
+  public DataFetcher<String> relativeDirection() {
+    return environment -> getSource(environment).getRelativeDirection().toString();
   }
 
   @Override
