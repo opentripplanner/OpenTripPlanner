@@ -78,3 +78,7 @@ routers in [RoutingWorker](src/main/java/org/opentripplanner/routing/algorithm/R
 in order to sort and reduce the number of returned itineraries. It can also be used to decorate the
 returned itineraries, especially if it requires more complex calculations, which would be unfeasible
 to do during the routing process.
+
+### [Service](src/main/java/org/opentripplanner/service/package.md)
+The service package contains small services usually specific to one or a few use-cases. In contrast 
+to a domain model they may use one or many domain models and other services. 
