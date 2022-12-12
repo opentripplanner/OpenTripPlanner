@@ -21,10 +21,12 @@ public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
-    return environment -> getSource(environment).getStreetNotes()
-      .stream()
-      .map(LegacyGraphQLstepImpl::mapStreetNoteToAlert)
-      .toList();
+    return environment ->
+      getSource(environment)
+        .getStreetNotes()
+        .stream()
+        .map(LegacyGraphQLstepImpl::mapStreetNoteToAlert)
+        .toList();
   }
 
   @Override
@@ -94,10 +96,14 @@ public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGr
     alert.alertHeaderText = note.note;
     alert.alertDescriptionText = note.descriptionText;
     alert.alertUrl = new NonLocalizedString(note.url);
-    alert.setTimePeriods(List.of(new TimePeriod(
-      note.effectiveStartDate.getTime() / 1000,
-      note.effectiveEndDate.getTime() / 1000
-    )));
+    alert.setTimePeriods(
+      List.of(
+        new TimePeriod(
+          note.effectiveStartDate.getTime() / 1000,
+          note.effectiveEndDate.getTime() / 1000
+        )
+      )
+    );
     return alert;
   }
 }
