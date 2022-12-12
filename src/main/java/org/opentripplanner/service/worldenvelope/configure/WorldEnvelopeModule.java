@@ -2,8 +2,8 @@ package org.opentripplanner.service.worldenvelope.configure;
 
 import dagger.Binds;
 import dagger.Module;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.service.worldenvelope.internal.WorldEnvelopeRepository;
-import org.opentripplanner.service.worldenvelope.model.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 
 @Module

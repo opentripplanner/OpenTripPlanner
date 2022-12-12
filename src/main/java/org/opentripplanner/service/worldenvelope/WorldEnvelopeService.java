@@ -1,6 +1,7 @@
-package org.opentripplanner.service.worldenvelope.model;
+package org.opentripplanner.service.worldenvelope;
 
 import java.util.Optional;
+import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 
 /**
  * This service provide information about the geographical bounding-box and center coordinates

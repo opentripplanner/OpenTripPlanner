@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
-import org.opentripplanner.service.worldenvelope.model.WorldEnvelopeService;
 
 /**
  * Provide a container for the envelope. This is used set and pass the immutable envelope into the
