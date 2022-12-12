@@ -1,4 +1,4 @@
-package org.opentripplanner.service.worldenvelope.service;
+package org.opentripplanner.service.worldenvelope.internal;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -26,7 +26,7 @@ import org.opentripplanner.service.worldenvelope.model.WorldEnvelopeService;
  * <p>
  * THIS CLASS IS THREAD-SAFE.
  */
-public class WorldEnvelopeModel implements Serializable, WorldEnvelopeService {
+public class WorldEnvelopeRepository implements Serializable, WorldEnvelopeService {
 
   /**
    * The volatile keyword is key to make this propagate to other threads.
@@ -34,7 +34,7 @@ public class WorldEnvelopeModel implements Serializable, WorldEnvelopeService {
   private volatile WorldEnvelope envelope = null;
 
   @Inject
-  public WorldEnvelopeModel() {}
+  public WorldEnvelopeRepository() {}
 
   @Override
   public Optional<WorldEnvelope> envelope() {

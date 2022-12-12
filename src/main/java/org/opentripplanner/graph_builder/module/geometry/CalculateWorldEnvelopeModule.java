@@ -5,8 +5,8 @@ import javax.inject.Inject;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.worldenvelope.internal.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
-import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
@@ -29,17 +29,17 @@ public class CalculateWorldEnvelopeModule implements GraphBuilderModule {
 
   private final Graph graph;
   private final TransitModel transitModel;
-  private final WorldEnvelopeModel worldEnvelopeModel;
+  private final WorldEnvelopeRepository worldEnvelopeRepository;
 
   @Inject
   public CalculateWorldEnvelopeModule(
     Graph graph,
     TransitModel transitModel,
-    WorldEnvelopeModel worldEnvelopeModel
+    WorldEnvelopeRepository worldEnvelopeRepository
   ) {
     this.graph = graph;
     this.transitModel = transitModel;
-    this.worldEnvelopeModel = worldEnvelopeModel;
+    this.worldEnvelopeRepository = worldEnvelopeRepository;
   }
 
   @Override
@@ -47,7 +47,7 @@ public class CalculateWorldEnvelopeModule implements GraphBuilderModule {
     var vertices = graph.getVertices();
     var stops = transitModel.getStopModel().listStopLocations();
     WorldEnvelope envelope = build(vertices, stops);
-    worldEnvelopeModel.setEnvelope(envelope);
+    worldEnvelopeRepository.setEnvelope(envelope);
   }
 
   @Override

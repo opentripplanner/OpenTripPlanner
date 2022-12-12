@@ -24,7 +24,7 @@ import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
-import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
+import org.opentripplanner.service.worldenvelope.internal.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.model.edge.Edge;
@@ -53,7 +53,7 @@ public class SerializedGraphObject implements Serializable {
 
   public final Graph graph;
   public final TransitModel transitModel;
-  public final WorldEnvelopeModel worldEnvelopeModel;
+  public final WorldEnvelopeRepository worldEnvelopeRepository;
   private final Collection<Edge> edges;
 
   /**
@@ -77,14 +77,14 @@ public class SerializedGraphObject implements Serializable {
   public SerializedGraphObject(
     Graph graph,
     TransitModel transitModel,
-    WorldEnvelopeModel worldEnvelopeModel,
+    WorldEnvelopeRepository worldEnvelopeRepository,
     BuildConfig buildConfig,
     RouterConfig routerConfig
   ) {
     this.graph = graph;
     this.edges = graph.getEdges();
     this.transitModel = transitModel;
-    this.worldEnvelopeModel = worldEnvelopeModel;
+    this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();

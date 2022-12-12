@@ -15,7 +15,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
+import org.opentripplanner.service.worldenvelope.internal.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -62,7 +62,7 @@ public class ConstructApplication {
     CommandLineParameters cli,
     Graph graph,
     TransitModel transitModel,
-    WorldEnvelopeModel worldEnvelopeModel,
+    WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources
   ) {
@@ -82,7 +82,7 @@ public class ConstructApplication {
         .graph(graph)
         .transitModel(transitModel)
         .graphVisualizer(graphVisualizer)
-        .worldEnvelopeModel(worldEnvelopeModel)
+        .worldEnvelopeModel(worldEnvelopeRepository)
         .build();
   }
 
@@ -197,7 +197,7 @@ public class ConstructApplication {
     return factory.graph();
   }
 
-  public WorldEnvelopeModel worldEnvelopeModel() {
+  public WorldEnvelopeRepository worldEnvelopeModel() {
     return factory.worldEnvelopeModel();
   }
 
