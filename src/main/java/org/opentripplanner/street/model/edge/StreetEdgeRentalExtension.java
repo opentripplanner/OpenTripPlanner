@@ -26,7 +26,7 @@ public sealed interface StreetEdgeRentalExtension {
     public boolean traversalBanned(State state) {
       if (state.isRentingVehicle()) {
         return (
-          state.getVehicleRentalNetwork().equals(zone.id().getFeedId()) &&
+          zone.id().getFeedId().equals(state.getVehicleRentalNetwork()) &&
           zone.passingThroughBanned()
         );
       } else {
@@ -38,7 +38,7 @@ public sealed interface StreetEdgeRentalExtension {
     public boolean dropOffBanned(State state) {
       if (state.isRentingVehicle()) {
         return (
-          state.getVehicleRentalNetwork().equals(zone.id().getFeedId()) && zone.dropOffBanned()
+          zone.id().getFeedId().equals(state.getVehicleRentalNetwork()) && zone.dropOffBanned()
         );
       } else {
         return false;
@@ -66,7 +66,7 @@ public sealed interface StreetEdgeRentalExtension {
 
     @Override
     public boolean traversalBanned(State state) {
-      return state.isRentingVehicle() && state.getVehicleRentalNetwork().equals(network);
+      return state.isRentingVehicle() && network.equals(state.getVehicleRentalNetwork());
     }
 
     @Override
