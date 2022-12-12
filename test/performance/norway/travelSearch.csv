@@ -44,3 +44,45 @@ testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon
 105,"P+R into Oslo, Hønefoss",10:00,,3h,Hønefoss,,60.1688416,10.2612305,Oslo,,59.9299041,10.74874,p-and-r,CAR_PARK|TRANSIT|WALK
 106,"P+R into Oslo, Moss",10:00,,3h,Moss,,59.4318080,10.6649780,Oslo,,59.9299041,10.74874,p-and-r,CAR_PARK|TRANSIT|WALK
 107,"P+R Drammen to Ålesund",10:00,,3h,Drammen,,59.7176376,10.2612305,Ålesund,,62.4869530,6.1303710,p-and-r,CAR_PARK|TRANSIT|WALK
+201,Jordal to Lille Tøyen,10:00,,,Jordal,,59.90947,10.78350,Lille Tøyen,,59.9204,10.7866,scooter-rent,WALK|SCOOTER_RENT
+202,Jordal to Briskeby,10:00,,,Jordal,,59.90947,10.78350,Briskeby,,59.9211,10.7167,scooter-rent,WALK|SCOOTER_RENT
+203,Jordal to Kvadraturen,10:00,,,Jordal,,59.90947,10.78350,Kvadraturen,,59.9109,10.7423,scooter-rent,WALK|SCOOTER_RENT
+204,Jordal to Bergskogen,10:00,,,Jordal,,59.90947,10.78350,Bergskogen,,59.94770,10.74223,scooter-rent,WALK|SCOOTER_RENT
+205,Jordal to Refstad,10:00,,,Jordal,,59.90947,10.78350,Refstad,,59.9388,10.8012,scooter-rent,WALK|SCOOTER_RENT
+206,Jordal to Eiksmarka,10:00,,,Jordal,,59.90947,10.78350,Eiksmarka,,59.9463,10.6263,scooter-rent,WALK|SCOOTER_RENT
+207,Lille Tøyen to Jordal,10:00,,,Lille Tøyen,,59.9204,10.7866,Jordal,,59.90947,10.78350,scooter-rent,WALK|SCOOTER_RENT
+208,Lille Tøyen to Briskeby,10:00,,,Lille Tøyen,,59.9204,10.7866,Briskeby,,59.9211,10.7167,scooter-rent,WALK|SCOOTER_RENT
+209,Lille Tøyen to Kvadraturen,10:00,,,Lille Tøyen,,59.9204,10.7866,Kvadraturen,,59.9109,10.7423,scooter-rent,WALK|SCOOTER_RENT
+210,Lille Tøyen to Bergskogen,10:00,,,Lille Tøyen,,59.9204,10.7866,Bergskogen,,59.94770,10.74223,scooter-rent,WALK|SCOOTER_RENT
+211,Lille Tøyen to Refstad,10:00,,,Lille Tøyen,,59.9204,10.7866,Refstad,,59.9388,10.8012,scooter-rent,WALK|SCOOTER_RENT
+212,Lille Tøyen to Eiksmarka,10:00,,,Lille Tøyen,,59.9204,10.7866,Eiksmarka,,59.9463,10.6263,scooter-rent,WALK|SCOOTER_RENT
+213,Briskeby to Jordal,10:00,,,Briskeby,,59.9211,10.7167,Jordal,,59.90947,10.78350,scooter-rent,WALK|SCOOTER_RENT
+214,Briskeby to Lille Tøyen,10:00,,,Briskeby,,59.9211,10.7167,Lille Tøyen,,59.9204,10.7866,scooter-rent,WALK|SCOOTER_RENT
+215,Briskeby to Kvadraturen,10:00,,,Briskeby,,59.9211,10.7167,Kvadraturen,,59.9109,10.7423,scooter-rent,WALK|SCOOTER_RENT
+216,Briskeby to Bergskogen,10:00,,,Briskeby,,59.9211,10.7167,Bergskogen,,59.94770,10.74223,scooter-rent,WALK|SCOOTER_RENT
+217,Briskeby to Refstad,10:00,,,Briskeby,,59.9211,10.7167,Refstad,,59.9388,10.8012,scooter-rent,WALK|SCOOTER_RENT
+218,Briskeby to Eiksmarka,10:00,,,Briskeby,,59.9211,10.7167,Eiksmarka,,59.9463,10.6263,scooter-rent,WALK|SCOOTER_RENT
+219,Kvadraturen to Jordal,10:00,,,Kvadraturen,,59.9109,10.7423,Jordal,,59.90947,10.78350,scooter-rent,WALK|SCOOTER_RENT
+220,Kvadraturen to Lille Tøyen,10:00,,,Kvadraturen,,59.9109,10.7423,Lille Tøyen,,59.9204,10.7866,scooter-rent,WALK|SCOOTER_RENT
+221,Kvadraturen to Briskeby,10:00,,,Kvadraturen,,59.9109,10.7423,Briskeby,,59.9211,10.7167,scooter-rent,WALK|SCOOTER_RENT
+222,Kvadraturen to Bergskogen,10:00,,,Kvadraturen,,59.9109,10.7423,Bergskogen,,59.94770,10.74223,scooter-rent,WALK|SCOOTER_RENT
+223,Kvadraturen to Refstad,10:00,,,Kvadraturen,,59.9109,10.7423,Refstad,,59.9388,10.8012,scooter-rent,WALK|SCOOTER_RENT
+224,Kvadraturen to Eiksmarka,10:00,,,Kvadraturen,,59.9109,10.7423,Eiksmarka,,59.9463,10.6263,scooter-rent,WALK|SCOOTER_RENT
+225,Bergskogen to Jordal,10:00,,,Bergskogen,,59.94770,10.74223,Jordal,,59.90947,10.78350,scooter-rent,WALK|SCOOTER_RENT
+226,Bergskogen to Lille Tøyen,10:00,,,Bergskogen,,59.94770,10.74223,Lille Tøyen,,59.9204,10.7866,scooter-rent,WALK|SCOOTER_RENT
+227,Bergskogen to Briskeby,10:00,,,Bergskogen,,59.94770,10.74223,Briskeby,,59.9211,10.7167,scooter-rent,WALK|SCOOTER_RENT
+228,Bergskogen to Kvadraturen,10:00,,,Bergskogen,,59.94770,10.74223,Kvadraturen,,59.9109,10.7423,scooter-rent,WALK|SCOOTER_RENT
+229,Bergskogen to Refstad,10:00,,,Bergskogen,,59.94770,10.74223,Refstad,,59.9388,10.8012,scooter-rent,WALK|SCOOTER_RENT
+230,Bergskogen to Eiksmarka,10:00,,,Bergskogen,,59.94770,10.74223,Eiksmarka,,59.9463,10.6263,scooter-rent,WALK|SCOOTER_RENT
+231,Refstad to Jordal,10:00,,,Refstad,,59.9388,10.8012,Jordal,,59.90947,10.78350,scooter-rent,WALK|SCOOTER_RENT
+232,Refstad to Lille Tøyen,10:00,,,Refstad,,59.9388,10.8012,Lille Tøyen,,59.9204,10.7866,scooter-rent,WALK|SCOOTER_RENT
+233,Refstad to Briskeby,10:00,,,Refstad,,59.9388,10.8012,Briskeby,,59.9211,10.7167,scooter-rent,WALK|SCOOTER_RENT
+234,Refstad to Kvadraturen,10:00,,,Refstad,,59.9388,10.8012,Kvadraturen,,59.9109,10.7423,scooter-rent,WALK|SCOOTER_RENT
+235,Refstad to Bergskogen,10:00,,,Refstad,,59.9388,10.8012,Bergskogen,,59.94770,10.74223,scooter-rent,WALK|SCOOTER_RENT
+236,Refstad to Eiksmarka,10:00,,,Refstad,,59.9388,10.8012,Eiksmarka,,59.9463,10.6263,scooter-rent,WALK|SCOOTER_RENT
+237,Eiksmarka to Jordal,10:00,,,Eiksmarka,,59.9463,10.6263,Jordal,,59.90947,10.78350,scooter-rent,WALK|SCOOTER_RENT
+238,Eiksmarka to Lille Tøyen,10:00,,,Eiksmarka,,59.9463,10.6263,Lille Tøyen,,59.9204,10.7866,scooter-rent,WALK|SCOOTER_RENT
+239,Eiksmarka to Briskeby,10:00,,,Eiksmarka,,59.9463,10.6263,Briskeby,,59.9211,10.7167,scooter-rent,WALK|SCOOTER_RENT
+240,Eiksmarka to Kvadraturen,10:00,,,Eiksmarka,,59.9463,10.6263,Kvadraturen,,59.9109,10.7423,scooter-rent,WALK|SCOOTER_RENT
+241,Eiksmarka to Bergskogen,10:00,,,Eiksmarka,,59.9463,10.6263,Bergskogen,,59.94770,10.74223,scooter-rent,WALK|SCOOTER_RENT
+242,Eiksmarka to Refstad,10:00,,,Eiksmarka,,59.9463,10.6263,Refstad,,59.9388,10.8012,scooter-rent,WALK|SCOOTER_RENT
