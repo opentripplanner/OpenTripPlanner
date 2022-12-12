@@ -255,6 +255,7 @@ can be configured as a json. Any header key, value can be inserted.
 | type = "VEHICLE_RENTAL"                                                               |      `enum`     | The type of the updater.                                                        | *Required* |               |   na  |
 | [allowKeepingRentedBicycleAtDestination](#u_1_allowKeepingRentedBicycleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental. | *Optional* | `false`       |   na  |
 | frequencySec                                                                          |    `integer`    | How often the data should be updated in seconds.                                | *Optional* | `60`          |   na  |
+| [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                 | *Optional* | `false`       |  2.3  |
 | language                                                                              |     `string`    | TODO                                                                            | *Optional* |               |   na  |
 | [network](#u_1_network)                                                               |     `string`    | The name of the network to override the one derived from the source data.       | *Optional* |               |   na  |
 | [sourceType](#u_1_sourceType)                                                         |      `enum`     | What source of vehicle rental updater to use.                                   | *Required* |               |   na  |
@@ -272,6 +273,19 @@ can be configured as a json. Any header key, value can be inserted.
 If a vehicle should be allowed to be kept at the end of a station-based rental.
 
 This behaviour is useful in towns that have only a single rental station. Without it you would need see any results as you would have to always bring it back to the station.
+
+<h4 id="u_1_geofencingZones">geofencingZones</h4>
+
+**Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /updaters/[1] 
+
+Compute rental restrictions based on GBFS 2.2 geofencing zones.
+
+This feature is somewhat experimental and therefore turned off by default for the following reasons:
+
+- It delays start up of OTP. How long is dependent on the complexity of the zones. For example in Oslo it takes 6 seconds to compute while Portland takes 25 seconds.
+- It's easy for a malformed or unintended geofencing zone to make routing impossible. If you encounter such a case, please file a bug.
+
 
 <h4 id="u_1_network">network</h4>
 
