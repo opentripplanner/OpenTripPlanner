@@ -1093,7 +1093,7 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLStep {
-    public DataFetcher<String> absoluteDirection();
+    public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection> absoluteDirection();
 
     public DataFetcher<Iterable<TransitAlert>> alerts();
 
@@ -1111,7 +1111,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Double> lon();
 
-    public DataFetcher<String> relativeDirection();
+    public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLRelativeDirection> relativeDirection();
 
     public DataFetcher<Boolean> stayOn();
 

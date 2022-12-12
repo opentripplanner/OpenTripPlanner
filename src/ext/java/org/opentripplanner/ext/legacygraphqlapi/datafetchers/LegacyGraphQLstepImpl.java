@@ -2,11 +2,16 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 import org.opentripplanner.api.mapping.StreetNoteMaperMapper;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.ElevationProfile.Step;
+import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -14,9 +19,36 @@ import org.opentripplanner.street.model.note.StreetNote;
 
 public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStep {
 
+  private static final EnumMap<AbsoluteDirection, LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection> absoluteDirectionMap = new EnumMap<>(
+    AbsoluteDirection.class
+  );
+
+  private static final EnumMap<RelativeDirection, LegacyGraphQLTypes.LegacyGraphQLRelativeDirection> relativeDirectionMap = new EnumMap<>(
+    RelativeDirection.class
+  );
+
+  static {
+    Arrays
+      .stream(AbsoluteDirection.values())
+      .forEach(d ->
+        absoluteDirectionMap.put(
+          d,
+          LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection.valueOf(d.toString())
+        )
+      );
+    Arrays
+      .stream(RelativeDirection.values())
+      .forEach(d ->
+        relativeDirectionMap.put(
+          d,
+          LegacyGraphQLTypes.LegacyGraphQLRelativeDirection.valueOf(d.toString())
+        )
+      );
+  }
+
   @Override
-  public DataFetcher<String> absoluteDirection() {
-    return environment -> getSource(environment).getAbsoluteDirection().toString();
+  public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection> absoluteDirection() {
+    return environment -> absoluteDirectionMap.get(getSource(environment).getAbsoluteDirection());
   }
 
   @Override
@@ -65,8 +97,8 @@ public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<String> relativeDirection() {
-    return environment -> getSource(environment).getRelativeDirection().toString();
+  public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLRelativeDirection> relativeDirection() {
+    return environment -> relativeDirectionMap.get(getSource(environment).getRelativeDirection());
   }
 
   @Override
