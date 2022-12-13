@@ -10,7 +10,9 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
@@ -1102,13 +1104,31 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLStep {
+    public DataFetcher<LegacyGraphQLAbsoluteDirection> absoluteDirection();
+
+    public DataFetcher<Iterable<TransitAlert>> alerts();
+
+    public DataFetcher<Boolean> area();
+
+    public DataFetcher<Boolean> bogusName();
+
     public DataFetcher<Double> distance();
 
     public DataFetcher<Iterable<org.opentripplanner.model.plan.ElevationProfile.Step>> elevationProfile();
 
+    public DataFetcher<String> exit();
+
     public DataFetcher<Double> lat();
 
     public DataFetcher<Double> lon();
+
+    public DataFetcher<LegacyGraphQLRelativeDirection> relativeDirection();
+
+    public DataFetcher<Boolean> stayOn();
+
+    public DataFetcher<String> streetName();
+
+    public DataFetcher<Boolean> walkingBike();
   }
 
   public interface LegacyGraphQLStopAtDistance {
