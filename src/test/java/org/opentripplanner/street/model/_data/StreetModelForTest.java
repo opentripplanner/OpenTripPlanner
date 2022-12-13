@@ -15,6 +15,7 @@ public class StreetModelForTest {
     var label = "%s_%s".formatted(lat, lon);
     return new IntersectionVertex(null, label, lat, lon, label);
   }
+
   public static IntersectionVertex intersectionVertex(String label, double lat, double lon) {
     return new IntersectionVertex(null, label, lat, lon, label);
   }
