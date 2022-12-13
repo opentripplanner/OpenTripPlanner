@@ -32,7 +32,7 @@ public class VilkkuBikeRentalDataSource extends GenericXmlDataSource<VehicleRent
    * @param config   Vilkku data source configuration parameters.
    */
   public VilkkuBikeRentalDataSource(VilkkuBikeRentalDataSourceParameters config) {
-    super(config.getUrl(), stationXpath);
+    super(config.url(), stationXpath);
     network = config.network();
   }
 
