@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 
-class WorldEnvelopeRepositoryTest {
+class WorldEnvelopeServiceTest {
 
   private final WorldEnvelope envelope = WorldEnvelope
     .of()
@@ -16,11 +16,13 @@ class WorldEnvelopeRepositoryTest {
 
   @Test
   void normalModelFlow() {
-    var subject = new DefaultWorldEnvelopeRepository();
+    var repository = new DefaultWorldEnvelopeRepository();
+    var subject = new DefaultWorldEnvelopeService(repository);
 
-    assertTrue(subject.retrieveEnvelope().isEmpty());
+    assertTrue(subject.envelope().isEmpty());
 
-    subject.saveEnvelope(envelope);
-    assertEquals(envelope, subject.retrieveEnvelope().get());
+    repository.saveEnvelope(envelope);
+
+    assertEquals(envelope, subject.envelope().get());
   }
 }

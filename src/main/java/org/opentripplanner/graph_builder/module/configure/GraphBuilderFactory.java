@@ -26,7 +26,7 @@ import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.worldenvelope.internal.WorldEnvelopeRepository;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -65,7 +65,7 @@ public interface GraphBuilderFactory {
     Builder transitModel(TransitModel transitModel);
 
     @BindsInstance
-    Builder worldEnvelopeModel(WorldEnvelopeRepository worldEnvelopeRepository);
+    Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
 
     @BindsInstance
     Builder dataSources(GraphBuilderDataSources graphBuilderDataSources);

@@ -4,7 +4,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
-import org.opentripplanner.service.worldenvelope.internal.WorldEnvelopeRepository;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -55,7 +55,7 @@ public class LoadApplication {
     return createAppConstruction(
       factory.emptyGraph(),
       factory.emptyTransitModel(),
-      factory.emptyWorldWorldEnvelopeModel()
+      factory.emptyWorldEnvelopeRepository()
     );
   }
 

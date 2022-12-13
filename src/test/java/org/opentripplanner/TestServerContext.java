@@ -5,7 +5,9 @@ import static org.opentripplanner.standalone.configure.ConstructApplication.crea
 import io.micrometer.core.instrument.Metrics;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.worldenvelope.internal.WorldEnvelopeRepository;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
+import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
+import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
@@ -32,12 +34,17 @@ public class TestServerContext {
       new DefaultTransitService(transitModel),
       Metrics.globalRegistry,
       routerConfig.vectorTileLayers(),
-      new WorldEnvelopeRepository(),
+      createWorldEnvelopeService(),
       routerConfig.flexConfig(),
       null,
       routerConfig.requestLogFile()
     );
     creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningConfig());
     return context;
+  }
+
+  /** Static factory method to create a service for test purposes. */
+  public static WorldEnvelopeService createWorldEnvelopeService() {
+    return new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository());
   }
 }

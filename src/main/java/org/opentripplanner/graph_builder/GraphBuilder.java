@@ -18,7 +18,7 @@ import org.opentripplanner.graph_builder.issue.report.SummarizeDataImportIssues;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.worldenvelope.internal.WorldEnvelopeRepository;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
@@ -76,7 +76,7 @@ public class GraphBuilder implements Runnable {
       .config(config)
       .graph(graph)
       .transitModel(transitModel)
-      .worldEnvelopeModel(worldEnvelopeRepository)
+      .worldEnvelopeRepository(worldEnvelopeRepository)
       .dataSources(dataSources)
       .timeZoneId(transitModel.getTimeZone())
       .build();

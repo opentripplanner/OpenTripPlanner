@@ -24,7 +24,7 @@ import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
-import org.opentripplanner.service.worldenvelope.internal.WorldEnvelopeRepository;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.model.edge.Edge;

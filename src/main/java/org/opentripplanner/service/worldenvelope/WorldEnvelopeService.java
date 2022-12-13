@@ -5,8 +5,7 @@ import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 
 /**
  * This service provide information about the geographical bounding-box and center coordinates
- * for OTP. The information is computed once, based on static data and returned in the
- * {@link WorldEnvelope}.
+ * for OTP. The information is computed once, based on static data and in the {@link WorldEnvelope}.
  */
 public interface WorldEnvelopeService {
   /**
