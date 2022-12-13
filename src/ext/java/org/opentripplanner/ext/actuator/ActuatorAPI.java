@@ -86,6 +86,7 @@ public class ActuatorAPI {
    * Returns micrometer metrics in a prometheus structured format.
    */
   @GET
+  @Produces
   @Path("/prometheus")
   public Response prometheus(@Context PrometheusMeterRegistry prometheusRegistry) {
     return Response
