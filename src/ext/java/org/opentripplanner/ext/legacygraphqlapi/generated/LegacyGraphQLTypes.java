@@ -8,6 +8,18 @@ import java.util.stream.Collectors;
 
 public class LegacyGraphQLTypes {
 
+  /** The cardinal (compass) direction taken when engaging a walking/driving step. */
+  public enum LegacyGraphQLAbsoluteDirection {
+    EAST,
+    NORTH,
+    NORTHEAST,
+    NORTHWEST,
+    SOUTH,
+    SOUTHEAST,
+    SOUTHWEST,
+    WEST,
+  }
+
   public static class LegacyGraphQLAgencyAlertsArgs {
 
     private Iterable<LegacyGraphQLAgencyAlertType> types;
@@ -2538,6 +2550,23 @@ public class LegacyGraphQLTypes {
     MODIFIED,
     SCHEDULED,
     UPDATED,
+  }
+
+  /** Actions to take relative to the current position when engaging a walking/driving step. */
+  public enum LegacyGraphQLRelativeDirection {
+    CIRCLE_CLOCKWISE,
+    CIRCLE_COUNTERCLOCKWISE,
+    CONTINUE,
+    DEPART,
+    ELEVATOR,
+    HARD_LEFT,
+    HARD_RIGHT,
+    LEFT,
+    RIGHT,
+    SLIGHTLY_LEFT,
+    SLIGHTLY_RIGHT,
+    UTURN_LEFT,
+    UTURN_RIGHT,
   }
 
   public static class LegacyGraphQLRouteAlertsArgs {
