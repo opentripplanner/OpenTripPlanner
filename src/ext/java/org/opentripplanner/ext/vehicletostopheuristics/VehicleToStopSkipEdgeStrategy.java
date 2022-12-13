@@ -9,14 +9,13 @@ import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.filter.FilterPredicate;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.state.State;
@@ -52,14 +51,14 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Ed
   );
   private final Function<RegularStop, Set<Route>> getRoutesForStop;
   private final int maxScore;
-  private final List<FilterPredicate> filters;
+  private final List<TransitFilter> filters;
   private double sumOfScores;
 
   private final Set<FeedScopedId> stopsCounted = new HashSet<>();
 
   public VehicleToStopSkipEdgeStrategy(
     Function<RegularStop, Set<Route>> getRoutesForStop,
-    Collection<FilterPredicate> filters
+    Collection<TransitFilter> filters
   ) {
     this.filters = new ArrayList<>(filters);
     this.maxScore = 300;
@@ -79,7 +78,7 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Ed
         var score = getRoutesForStop
           .apply(stop)
           .stream()
-          .filter(route -> filters.stream().anyMatch(f -> f.routePredicate(route)))
+          .filter(route -> filters.stream().anyMatch(f -> f.matchRoute(route)))
           .map(Route::getMode)
           .mapToInt(VehicleToStopSkipEdgeStrategy::score)
           .sum();

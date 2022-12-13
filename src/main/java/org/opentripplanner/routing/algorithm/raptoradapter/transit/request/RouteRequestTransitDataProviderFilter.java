@@ -9,7 +9,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternFo
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.api.request.request.filter.FilterPredicate;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -29,9 +29,13 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
 
   private final boolean includePlannedCancellations;
 
-  private final List<FilterPredicate> filters;
+  private final List<TransitFilter> filters;
+
+  private final List<FeedScopedId> bannedTrips;
 
   private final Set<FeedScopedId> bannedRoutes;
+
+  private final boolean hasSubModeFilters;
 
   public RouteRequestTransitDataProviderFilter(
     RouteRequest request,
@@ -42,6 +46,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       request.wheelchair(),
       request.preferences().wheelchair(),
       request.preferences().transit().includePlannedCancellations(),
+      request.journey().transit().bannedTrips(),
       request.journey().transit().filters(),
       transitService
     );
@@ -52,7 +57,8 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     boolean wheelchairEnabled,
     WheelchairPreferences wheelchairPreferences,
     boolean includePlannedCancellations,
-    List<FilterPredicate> filters,
+    List<FeedScopedId> bannedTrips,
+    List<TransitFilter> filters,
     TransitService transitService
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
@@ -60,7 +66,9 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     this.wheelchairPreferences = wheelchairPreferences;
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes(filters, transitService.getAllRoutes());
+    this.bannedTrips = bannedTrips;
     this.filters = filters;
+    this.hasSubModeFilters = filters.stream().anyMatch(TransitFilter::isSubModePredicate);
   }
 
   public static BikeAccess bikeAccessForTrip(Trip trip) {
@@ -102,8 +110,22 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       }
     }
 
+    if (bannedTrips.contains(trip.getId())) {
+      return false;
+    }
+
+    // TODO: 2022-12-13 filters: this is expensive
+    //  we only have to do it if we have submodes in the filters
+    //  in the future we will make sure that we have separate routing trip pattern for each submode
+    //  then we do not have to do that
     // trip has to match with at least one predicate in order to be included in search
-    return filters.stream().anyMatch(f -> f.tripTimesPredicate(tripTimes));
+    if (hasSubModeFilters) {
+      // we only have to this if we have submode specific filter
+      //  since that's the only thing that is trip specific
+      return filters.stream().anyMatch(f -> f.matchTripTimes(tripTimes));
+    }
+
+    return true;
   }
 
   @Override
@@ -122,13 +144,13 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
   }
 
   public static Set<FeedScopedId> bannedRoutes(
-    List<FilterPredicate> filters,
+    List<TransitFilter> filters,
     Collection<Route> routes
   ) {
     Set<FeedScopedId> ret = new HashSet<>();
     for (Route route : routes) {
       // Route have to match with at least predicate in order to be included in search
-      if (filters.stream().noneMatch(f -> f.routePredicate(route))) {
+      if (filters.stream().noneMatch(f -> f.matchRoute(route))) {
         ret.add(route.getId());
       }
     }

@@ -48,8 +48,9 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
-import org.opentripplanner.routing.api.request.request.filter.AllowAllFilter;
-import org.opentripplanner.routing.api.request.request.filter.FilterRequest;
+import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareType;
@@ -744,15 +745,29 @@ public class LegacyGraphQLQueryTypeImpl
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
 
       if (!hasArgument(environment, "banned") && !hasArgument(environment, "transportModes")) {
-        request.journey().transit().setFilters(List.of(new AllowAllFilter()));
+        request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
       } else {
-        var filterRequest = new FilterRequest();
-        var include = filterRequest.getInclude();
-        var exclude = filterRequest.getExclude();
+        var filterRequest = new TransitFilterRequest();
+        var select = filterRequest.select();
+        var not = filterRequest.not();
 
-        callWith.argument("banned.routes", exclude::setRoutesFromString);
-        callWith.argument("banned.agencies", exclude::setAgenciesFromString);
-        callWith.argument("banned.trips", exclude::setTripsFromString);
+        if (hasArgument(environment, "banned.routes")) {
+          var selectRequest = new SelectRequest();
+          callWith.argument("banned.routes", selectRequest::setRoutesFromString);
+          if (!selectRequest.routes().isEmpty()) {
+            not.add(selectRequest);
+          }
+        }
+
+        if (hasArgument(environment, "banned.agencies")) {
+          var selectRequest = new SelectRequest();
+          callWith.argument("banned.agencies", selectRequest::setAgenciesFromString);
+          if (!selectRequest.agencies().isEmpty()) {
+            not.add(selectRequest);
+          }
+        }
+
+        callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
 
         if (hasArgument(environment, "transportModes")) {
           QualifiedModeSet modes = new QualifiedModeSet("WALK");
@@ -778,9 +793,27 @@ public class LegacyGraphQLQueryTypeImpl
           request.journey().egress().setMode(requestModes.egressMode);
           request.journey().direct().setMode(requestModes.directMode);
           request.journey().transfer().setMode(requestModes.transferMode);
-          include.setTransportModes(
-            modes.getTransitModes().stream().map(MainAndSubMode::new).collect(Collectors.toList())
-          );
+
+          var tModes = modes
+            .getTransitModes()
+            .stream()
+            .map(MainAndSubMode::new)
+            .collect(Collectors.toList());
+          if (select.isEmpty()) {
+            var selectRequest = new SelectRequest();
+            if (!tModes.isEmpty()) {
+              selectRequest.setTransportModes(tModes);
+            } else {
+              selectRequest.setTransportModes(MainAndSubMode.all());
+            }
+            select.add(selectRequest);
+          } else {
+            if (!tModes.isEmpty()) {
+              select.forEach(s -> s.setTransportModes(tModes));
+            } else {
+              select.forEach(s -> s.setTransportModes(MainAndSubMode.all()));
+            }
+          }
         }
 
         request.journey().transit().setFilters(List.of(filterRequest));

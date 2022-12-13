@@ -4,14 +4,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.routing.api.request.DebugRaptor;
-import org.opentripplanner.routing.api.request.request.filter.FilterPredicate;
-import org.opentripplanner.routing.api.request.request.filter.FilterRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 // TODO VIA: Javadoc
 public class TransitRequest implements Cloneable, Serializable {
 
-  private List<FilterPredicate> filters = new ArrayList<>();
+  private List<FeedScopedId> bannedTrips = new ArrayList<>();
+
+  private List<TransitFilter> filters = new ArrayList<>();
 
   @Deprecated
   private List<FeedScopedId> preferredAgencies = List.of();
@@ -27,11 +28,25 @@ public class TransitRequest implements Cloneable, Serializable {
   private List<FeedScopedId> unpreferredRoutes = List.of();
   private DebugRaptor raptorDebugging = new DebugRaptor();
 
-  public List<FilterPredicate> filters() {
+  public void setBannedTripsFromString(String ids) {
+    if (!ids.isEmpty()) {
+      this.bannedTrips = FeedScopedId.parseListOfIds(ids);
+    }
+  }
+
+  public void setBannedTrips(List<FeedScopedId> bannedTrips) {
+    this.bannedTrips = bannedTrips;
+  }
+
+  public List<FeedScopedId> bannedTrips() {
+    return bannedTrips;
+  }
+
+  public List<TransitFilter> filters() {
     return filters;
   }
 
-  public void setFilters(List<FilterPredicate> filters) {
+  public void setFilters(List<TransitFilter> filters) {
     this.filters = filters;
   }
 
@@ -131,7 +146,7 @@ public class TransitRequest implements Cloneable, Serializable {
       clone.unpreferredRoutes = List.copyOf(this.unpreferredRoutes);
       clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
 
-      var cloneFilters = new ArrayList<FilterPredicate>();
+      var cloneFilters = new ArrayList<TransitFilter>();
       for (var filterRequest : this.filters) {
         cloneFilters.add(filterRequest.clone());
       }

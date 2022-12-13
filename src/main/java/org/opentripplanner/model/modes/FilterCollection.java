@@ -24,10 +24,10 @@ public class FilterCollection implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean allows(TransitMode transitMode, SubMode netexSubMode) {
+  public boolean match(TransitMode transitMode, SubMode netexSubMode) {
     // Performance is important here, do not use streams
     for (AllowTransitModeFilter it : filters) {
-      if (it.allows(transitMode, netexSubMode)) {
+      if (it.match(transitMode, netexSubMode)) {
         return true;
       }
     }

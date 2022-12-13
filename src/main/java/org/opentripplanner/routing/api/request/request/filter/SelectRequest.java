@@ -7,6 +7,8 @@ import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class SelectRequest implements Cloneable, Serializable {
 
@@ -14,8 +16,51 @@ public class SelectRequest implements Cloneable, Serializable {
   private List<FeedScopedId> agencies = new ArrayList<>();
   private RouteMatcher routes = RouteMatcher.emptyMatcher();
   // TODO: 2022-11-29 group of routes
-  private List<FeedScopedId> trips = new ArrayList<>();
   private List<String> feeds = new ArrayList<>();
+
+  public boolean matches(Route route) {
+    if (
+      this.transportModes != null &&
+      !this.transportModes.match(route.getMode(), route.getNetexSubmode())
+    ) {
+      return false;
+    }
+
+    if (!agencies.isEmpty() && !agencies.contains(route.getAgency().getId())) {
+      return false;
+    }
+
+    if (!routes.isEmpty() && !routes.matches(route)) {
+      return false;
+    }
+
+    if (!feeds.isEmpty() && !feeds.contains(route.getId().getFeedId())) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public boolean matches(TripTimes tripTimes) {
+    var trip = tripTimes.getTrip();
+
+    if (
+      this.transportModes != null &&
+      !this.transportModes.match(trip.getMode(), trip.getNetexSubMode())
+    ) {
+      return false;
+    }
+
+    if (!agencies.isEmpty() && !agencies.contains(trip.getRoute().getAgency().getId())) {
+      return false;
+    }
+
+    if (!feeds.isEmpty() && !feeds.contains(trip.getId().getFeedId())) {
+      return false;
+    }
+
+    return true;
+  }
 
   public AllowTransitModeFilter transportModes() {
     return transportModes;
@@ -57,20 +102,6 @@ public class SelectRequest implements Cloneable, Serializable {
     return this.routes;
   }
 
-  public void setTripsFromString(String ids) {
-    if (!ids.isEmpty()) {
-      this.trips = FeedScopedId.parseListOfIds(ids);
-    }
-  }
-
-  public void setTrips(List<FeedScopedId> trips) {
-    this.trips = trips;
-  }
-
-  public List<FeedScopedId> trips() {
-    return trips;
-  }
-
   public List<String> feeds() {
     return feeds;
   }
@@ -89,8 +120,6 @@ public class SelectRequest implements Cloneable, Serializable {
       agencies +
       ", routes=" +
       routes +
-      ", trips=" +
-      trips +
       ", feeds=" +
       feeds +
       '}'
@@ -106,7 +135,6 @@ public class SelectRequest implements Cloneable, Serializable {
       clone.transportModes = this.transportModes;
       clone.agencies = List.copyOf(this.agencies);
       clone.routes = this.routes.clone();
-      clone.trips = List.copyOf(this.trips);
       clone.feeds = List.copyOf(this.feeds);
 
       return clone;

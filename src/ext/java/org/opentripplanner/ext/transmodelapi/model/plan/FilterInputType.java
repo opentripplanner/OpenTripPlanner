@@ -2,6 +2,7 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
+import graphql.schema.GraphQLList;
 
 public class FilterInputType {
 
@@ -16,23 +17,23 @@ public class FilterInputType {
     .field(
       GraphQLInputObjectField
         .newInputObjectField()
-        .name("include")
+        .name("select")
         .description(
           "Combination of allow-lists for which lines/trips should be included. In order to be accepted " +
           "trip/line has to match with all allow-lists. An empty list means allow all."
         )
-        .type(SelectInputType.INPUT_TYPE)
+        .type(new GraphQLList(SelectInputType.INPUT_TYPE))
         .build()
     )
     .field(
       GraphQLInputObjectField
         .newInputObjectField()
-        .name("exclude")
+        .name("not")
         .description(
           "Combination of exclude-lists for which lines/trips should be excluded. In order to be accepted " +
           "trip/lines cannot match with any exclude-list."
         )
-        .type(SelectInputType.INPUT_TYPE)
+        .type(new GraphQLList(SelectInputType.INPUT_TYPE))
         .build()
     )
     .build();

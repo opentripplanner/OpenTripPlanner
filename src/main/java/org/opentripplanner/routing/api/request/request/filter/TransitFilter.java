@@ -3,16 +3,20 @@ package org.opentripplanner.routing.api.request.request.filter;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
-public interface FilterPredicate {
+public interface TransitFilter {
   /**
    * Return false is route banned, otherwise return true
    */
-  boolean routePredicate(Route route);
+  boolean matchRoute(Route route);
 
   /**
    * Return false is tripTimes are banned, otherwise return true
    */
-  boolean tripTimesPredicate(TripTimes trip);
+  boolean matchTripTimes(TripTimes trip);
 
-  FilterPredicate clone();
+  default boolean isSubModePredicate() {
+    return false;
+  }
+
+  TransitFilter clone();
 }

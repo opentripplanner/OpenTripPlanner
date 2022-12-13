@@ -6,7 +6,6 @@ import static org.opentripplanner.api.common.RequestToPreferencesMapper.setIfNot
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -23,11 +22,11 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.filter.FilterRequest;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -711,27 +710,74 @@ public abstract class RoutingResource {
 
       {
         var transit = journey.transit();
+        var filter = new TransitFilterRequest();
         // Filter Agencies
         setIfNotNull(preferredAgencies, transit::setPreferredAgenciesFromString);
         setIfNotNull(unpreferredAgencies, transit::setUnpreferredAgenciesFromString);
 
-        var filter = new FilterRequest();
-        filter
-          .getInclude()
-          .setTransportModes(
-            modes.getTransitModes().stream().map(MainAndSubMode::new).collect(Collectors.toList())
-          );
+        setIfNotNull(
+          bannedAgencies,
+          s -> {
+            var selectRequest = new SelectRequest();
+            selectRequest.setAgenciesFromString(s);
+            filter.not().add(selectRequest);
+          }
+        );
 
-        setIfNotNull(bannedAgencies, filter.getExclude()::setAgenciesFromString);
-        setIfNotNull(whiteListedAgencies, filter.getInclude()::setAgenciesFromString);
+        setIfNotNull(
+          whiteListedAgencies,
+          s -> {
+            var selectRequest = new SelectRequest();
+            selectRequest.setAgenciesFromString(s);
+            filter.select().add(selectRequest);
+          }
+        );
 
         // Filter Routes
         setIfNotNull(preferredRoutes, transit::setPreferredRoutesFromString);
         setIfNotNull(unpreferredRoutes, transit::setUnpreferredRoutesFromString);
-        setIfNotNull(bannedRoutes, filter.getExclude()::setRoutesFromString);
-        setIfNotNull(whiteListedRoutes, filter.getInclude()::setRoutesFromString);
+
+        setIfNotNull(
+          bannedRoutes,
+          s -> {
+            var selectRequest = new SelectRequest();
+            selectRequest.setRoutesFromString(s);
+            filter.not().add(selectRequest);
+          }
+        );
+
+        setIfNotNull(
+          whiteListedRoutes,
+          s -> {
+            var selectRequest = new SelectRequest();
+            selectRequest.setRoutesFromString(s);
+            filter.select().add(selectRequest);
+          }
+        );
+
         // Filter Trips
-        setIfNotNull(bannedTrips, filter.getExclude()::setTripsFromString);
+        setIfNotNull(bannedTrips, journey.transit()::setBannedTripsFromString);
+
+        var tModes = modes
+          .getTransitModes()
+          .stream()
+          .map(MainAndSubMode::new)
+          .collect(Collectors.toList());
+        if (filter.select().isEmpty()) {
+          var selectRequest = new SelectRequest();
+          if (!tModes.isEmpty()) {
+            selectRequest.setTransportModes(tModes);
+          } else {
+            selectRequest.setTransportModes(MainAndSubMode.all());
+          }
+        } else {
+          if (!tModes.isEmpty()) {
+            filter.select().forEach(s -> s.setTransportModes(tModes));
+          } else {
+            filter.select().forEach(s -> s.setTransportModes(MainAndSubMode.all()));
+          }
+        }
+
         transit.filters().add(filter);
       }
       {

@@ -2,9 +2,12 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import static org.opentripplanner.ext.transmodelapi.support.GqlUtil.newIdListInputField;
 
+import graphql.Scalars;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
+import java.util.List;
 
 public class SelectInputType {
 
@@ -25,10 +28,15 @@ public class SelectInputType {
       )
     )
     .field(
-      newIdListInputField(
-        "feeds",
-        "Set of ids for feeds that should be should be included in/excluded from search"
-      )
+      GraphQLInputObjectField
+        .newInputObjectField()
+        .name("feeds")
+        .description(
+          "Set of ids for feeds that should be should be included in/excluded from search"
+        )
+        .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
+        .defaultValue(List.of())
+        .build()
     )
     .field(
       newIdListInputField(
