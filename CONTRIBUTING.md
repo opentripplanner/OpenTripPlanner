@@ -7,10 +7,10 @@ the contribution process and expectations.
 ## Primary Channels of Communication
 
 If you have any questions about problems you are encountering with code, deployment, documentation,
-or development coordination, please don't hesitate to post to the OpenTripPlanner discussion groups.
-These are Google Groups which can be accessed as web forums or as traditional email mailing lists:
+or development coordination, please don't hesitate to post to the [OpenTripPlanner Gitter chat](https://gitter.im/opentripplanner/OpenTripPlanner)
+or the mailing list. This is the Google Group which can be accessed as web forums or as traditional 
+email mailing lists:
 
-- https://groups.google.com/g/opentripplanner-dev (opentripplanner-dev@googlegroups.com)
 - https://groups.google.com/g/opentripplanner-users (opentripplanner-users@googlegroups.com)
 
 Any message posted there will be seen by most of the contributors, some of whom work on OTP full
