@@ -65,6 +65,7 @@ public class DemConfig {
     DemExtractParameters defaults,
     String documentationAddition
   ) {
+    var docDefaults = DemExtractParameters.DEFAULT;
     return defaults
       .copyOf()
       .withElevationUnitMultiplier(
@@ -82,6 +83,7 @@ public class DemConfig {
             in the source data, this should be set to 0.1.
             """
           )
+          .docDefaultValue(docDefaults.elevationUnitMultiplier())
           .asDouble(defaults.elevationUnitMultiplier())
       );
   }

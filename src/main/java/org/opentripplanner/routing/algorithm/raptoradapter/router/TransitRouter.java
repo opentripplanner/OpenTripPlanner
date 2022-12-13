@@ -218,7 +218,8 @@ public class TransitRouter {
       serverContext.transitService(),
       streetRequest,
       serverContext.dataOverlayContext(accessRequest),
-      isEgress
+      isEgress,
+      accessRequest.preferences().street().maxAccessEgressDuration().valueOf(streetRequest.mode())
     );
 
     var results = new ArrayList<>(accessEgressMapper.mapNearbyStops(nearbyStops, isEgress));

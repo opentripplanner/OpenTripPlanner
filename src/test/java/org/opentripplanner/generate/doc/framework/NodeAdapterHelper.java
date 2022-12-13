@@ -10,6 +10,7 @@ public class NodeAdapterHelper {
     new AnchorAbbreviation("to.", "transferOptimization."),
     new AnchorAbbreviation("if.", "itineraryFilters."),
     new AnchorAbbreviation("nd.", "netexDefaults."),
+    new AnchorAbbreviation("gd.", "gtfsDefaults."),
     new AnchorAbbreviation("tf.", "transitFeeds."),
     new AnchorAbbreviation("od.", "osmDefaults."),
     new AnchorAbbreviation("lfp.", "localFileNamePatterns."),

@@ -1,15 +1,15 @@
 package org.opentripplanner.ext.reportapi.model;
 
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 public class BicycleSafetyReport {
 
   public static void main(String[] args) {
-    System.out.println(makeCsv(OsmTagMapper.Source.NORWAY));
+    System.out.println(makeCsv(OsmTagMapperSource.NORWAY));
   }
 
-  public static String makeCsv(OsmTagMapper.Source source) {
+  public static String makeCsv(OsmTagMapperSource source) {
     var wayPropertySet = new WayPropertySet();
 
     source.getInstance().populateProperties(wayPropertySet);
@@ -28,10 +28,25 @@ public class BicycleSafetyReport {
       .getWayProperties()
       .forEach(p -> {
         buf.addText(p.specifier().toString());
-        buf.addBoolean(p.safetyMixin());
+        buf.addBoolean(false);
         buf.addText(p.properties().getPermission().toString());
 
         var safetyProps = p.properties().getBicycleSafetyFeatures();
+        if (safetyProps != null) {
+          buf.addNumber(safetyProps.forward());
+          buf.addNumber(safetyProps.back());
+        }
+        buf.newLine();
+      });
+
+    wayPropertySet
+      .getMixins()
+      .forEach(p -> {
+        buf.addText(p.specifier().toString());
+        buf.addBoolean(true);
+        buf.addText("");
+
+        var safetyProps = p.bicycleSafety();
         buf.addNumber(safetyProps.forward());
         buf.addNumber(safetyProps.back());
         buf.newLine();

@@ -25,8 +25,8 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.operation.TransformException;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -247,7 +247,7 @@ public class ElevationModule implements GraphBuilderModule {
       HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
       for (StreetEdge streetEdge : edgesWithCalculatedElevations) {
         newCachedElevations.put(
-          PolylineEncoder.encodeGeometry(streetEdge.getGeometry()).points(),
+          EncodedPolyline.encode(streetEdge.getGeometry()).points(),
           streetEdge.getElevationProfile()
         );
       }
@@ -383,7 +383,7 @@ public class ElevationModule implements GraphBuilderModule {
     Geometry edgeGeometry = ee.getGeometry();
     if (cachedElevations != null) {
       PackedCoordinateSequence coordinateSequence = cachedElevations.get(
-        PolylineEncoder.encodeGeometry(edgeGeometry).points()
+        EncodedPolyline.encode(edgeGeometry).points()
       );
       if (coordinateSequence != null) {
         // found a cached value! Set the elevation profile with the pre-calculated data.

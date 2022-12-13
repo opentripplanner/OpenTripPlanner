@@ -8,6 +8,7 @@ import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.worldenvelope.model.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
@@ -23,6 +24,7 @@ public class ConstructApplicationModule {
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
     TransitService transitService,
+    WorldEnvelopeService worldEnvelopeService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor
   ) {
     return DefaultServerRequestContext.create(
@@ -34,6 +36,7 @@ public class ConstructApplicationModule {
       transitService,
       Metrics.globalRegistry,
       routerConfig.vectorTileLayers(),
+      worldEnvelopeService,
       routerConfig.flexConfig(),
       traverseVisitor,
       routerConfig.requestLogFile()

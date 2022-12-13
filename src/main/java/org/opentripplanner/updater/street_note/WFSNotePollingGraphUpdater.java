@@ -18,14 +18,14 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.NoteMatcher;
-import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.notes.DynamicStreetNotesSource;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.note.StreetNote;
+import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
+import org.opentripplanner.street.model.note.StreetNoteMatcher;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -57,7 +57,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
   );
 
   /** Set the matcher type for the notes */
-  private static final NoteMatcher NOTE_MATCHER = StreetNotesService.ALWAYS_MATCHER;
+  private static final StreetNoteMatcher NOTE_MATCHER = StreetNotesService.ALWAYS_MATCHER;
 
   private final DynamicStreetNotesSource notesSource = new DynamicStreetNotesSource();
   private final FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
@@ -157,7 +157,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
    * Methods for writing into notesForEdge
    * TODO: Should these be extracted into somewhere?
    */
-  private void addNote(Edge edge, StreetNote note, NoteMatcher matcher) {
+  private void addNote(Edge edge, StreetNote note, StreetNoteMatcher matcher) {
     if (LOG.isDebugEnabled()) LOG.debug(
       "Adding note {} to {} with matcher {}",
       note,
@@ -172,7 +172,10 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
    * Note: we use the default Object.equals() for matchers, as they are mostly already singleton
    * instances.
    */
-  private StreetNoteAndMatcher buildMatcherAndStreetNote(NoteMatcher noteMatcher, StreetNote note) {
+  private StreetNoteAndMatcher buildMatcherAndStreetNote(
+    StreetNoteMatcher noteMatcher,
+    StreetNote note
+  ) {
     var candidate = new StreetNoteAndMatcher(note, noteMatcher);
     var interned = uniqueMatchers.putIfAbsent(candidate, candidate);
     return interned == null ? candidate : interned;

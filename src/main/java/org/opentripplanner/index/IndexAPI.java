@@ -51,7 +51,6 @@ import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.api.model.ApiTripTimeShort;
 import org.opentripplanner.api.support.SemanticHash;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -456,7 +455,7 @@ public class IndexAPI {
   @Path("/trips/{tripId}/geometry")
   public EncodedPolyline getGeometryForTrip(@PathParam("tripId") String tripId) {
     var pattern = tripPatternForTripId(tripId);
-    return PolylineEncoder.encodeGeometry(pattern.getGeometry());
+    return EncodedPolyline.encode(pattern.getGeometry());
   }
 
   /**
@@ -510,7 +509,7 @@ public class IndexAPI {
   @Path("/patterns/{patternId}/geometry")
   public EncodedPolyline getGeometryForPattern(@PathParam("patternId") String patternId) {
     var line = tripPattern(patternId).getGeometry();
-    return PolylineEncoder.encodeGeometry(line);
+    return EncodedPolyline.encode(line);
   }
 
   /**

@@ -9,7 +9,6 @@
   "staticParkAndRide": true,
   "staticBikeParkAndRide": true,
   "maxDataImportIssuesPerFile": 1000,
-  "maxInterlineDistance": 200,
   "islandWithoutStopsMaxSize": 5,
   "islandWithStopsMaxSize": 5,
   "banDiscouragedWalking": false,

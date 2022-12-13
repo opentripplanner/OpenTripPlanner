@@ -18,6 +18,7 @@ import org.opentripplanner.graph_builder.issue.report.SummarizeDataImportIssues;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
@@ -58,6 +59,7 @@ public class GraphBuilder implements Runnable {
     GraphBuilderDataSources dataSources,
     Graph graph,
     TransitModel transitModel,
+    WorldEnvelopeModel worldEnvelopeModel,
     boolean loadStreetGraph,
     boolean saveStreetGraph
   ) {
@@ -74,6 +76,7 @@ public class GraphBuilder implements Runnable {
       .config(config)
       .graph(graph)
       .transitModel(transitModel)
+      .worldEnvelopeModel(worldEnvelopeModel)
       .dataSources(dataSources)
       .timeZoneId(transitModel.getTimeZone())
       .build();
@@ -152,6 +155,8 @@ public class GraphBuilder implements Runnable {
     if (OTPFeature.DataOverlay.isOn()) {
       graphBuilder.addModuleOptional(factory.dataOverlayFactory());
     }
+
+    graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
 
     return graphBuilder;
   }

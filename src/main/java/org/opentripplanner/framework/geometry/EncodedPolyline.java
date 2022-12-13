@@ -1,6 +1,7 @@
 package org.opentripplanner.framework.geometry;
 
 import java.io.Serializable;
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * A list of coordinates encoded as a string.
@@ -9,4 +10,8 @@ import java.io.Serializable;
  * polyline algorithm format</a>
  */
 
-public record EncodedPolyline(String points, int length) implements Serializable {}
+public record EncodedPolyline(String points, int length) implements Serializable {
+  public static EncodedPolyline encode(Geometry geometry) {
+    return PolylineEncoder.encodeGeometry(geometry);
+  }
+}

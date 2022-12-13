@@ -27,7 +27,7 @@
   },
   "flex": {
     // for performance allow a maximum of 4 minutes of walking from a flex vehicle to a transit stop
-    "maxTransferDurationSeconds": 240
+    "maxTransferDuration": "4m"
   },
   "updaters": []
 }

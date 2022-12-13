@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiAlert;
-import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.street.model.note.StreetNote;
 
 public class StreetNoteMaperMapper {
 

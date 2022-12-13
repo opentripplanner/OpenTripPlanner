@@ -10,8 +10,27 @@ public class GtfsFeedParametersBuilder {
 
   private URI source;
   private String feedId;
-  private boolean removeRepeatedStops = true;
+  private boolean removeRepeatedStops;
   private StopTransferPriority stationTransferPreference;
+  private boolean discardMinTransferTimes;
+  private boolean blockBasedInterlining;
+  private int maxInterlineDistance;
+
+  public GtfsFeedParametersBuilder() {
+    this.removeRepeatedStops = GtfsFeedParameters.DEFAULT_REMOVE_REPEATED_STOPS;
+    this.stationTransferPreference = GtfsFeedParameters.DEFAULT_STATION_TRANSFER_PREFERENCE;
+    this.discardMinTransferTimes = GtfsFeedParameters.DEFAULT_DISCARD_MIN_TRANSFER_TIMES;
+    this.blockBasedInterlining = GtfsFeedParameters.DEFAULT_BLOCK_BASED_INTERLINING;
+    this.maxInterlineDistance = GtfsFeedParameters.DEFAULT_MAX_INTERLINE_DISTANCE;
+  }
+
+  public GtfsFeedParametersBuilder(GtfsFeedParameters original) {
+    this.removeRepeatedStops = original.removeRepeatedStops();
+    this.stationTransferPreference = original.stationTransferPreference();
+    this.discardMinTransferTimes = original.discardMinTransferTimes();
+    this.blockBasedInterlining = original.blockBasedInterlining();
+    this.maxInterlineDistance = original.maxInterlineDistance();
+  }
 
   public GtfsFeedParametersBuilder withFeedId(String feedId) {
     this.feedId = feedId;
@@ -49,6 +68,33 @@ public class GtfsFeedParametersBuilder {
 
   boolean removeRepeatedStops() {
     return removeRepeatedStops;
+  }
+
+  public GtfsFeedParametersBuilder withDiscardMinTransferTimes(boolean value) {
+    this.discardMinTransferTimes = value;
+    return this;
+  }
+
+  boolean discardMinTransferTimes() {
+    return discardMinTransferTimes;
+  }
+
+  public GtfsFeedParametersBuilder withBlockBasedInterlining(boolean value) {
+    this.blockBasedInterlining = value;
+    return this;
+  }
+
+  boolean blockBasedInterlining() {
+    return blockBasedInterlining;
+  }
+
+  public GtfsFeedParametersBuilder withMaxInterlineDistance(int value) {
+    this.maxInterlineDistance = value;
+    return this;
+  }
+
+  int maxInterlineDistance() {
+    return maxInterlineDistance;
   }
 
   public GtfsFeedParameters build() {

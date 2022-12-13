@@ -267,7 +267,8 @@ public class TravelTimeResource {
       transitService,
       routingRequest.journey().access(),
       null,
-      false
+      false,
+      traveltimeRequest.maxAccessDuration
     );
     return new AccessEgressMapper().mapNearbyStops(accessStops, false);
   }

@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.algorithm.MultiTargetTerminationStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -25,7 +26,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 public class AStarTest {
 
