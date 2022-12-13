@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
@@ -32,11 +33,12 @@ public class AccessEgressRouter {
     TransitService transitService,
     StreetRequest streetRequest,
     DataOverlayContext dataOverlayContext,
-    boolean fromTarget
+    boolean fromTarget,
+    Duration durationLimit
   ) {
     NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
       transitService,
-      request.preferences().street().maxAccessEgressDuration().valueOf(streetRequest.mode()),
+      durationLimit,
       dataOverlayContext,
       true
     );

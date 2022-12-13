@@ -1,0 +1,3 @@
+route_id,trip_id,service_id,trip_headsign,direction_id,shape_id,wheelchair_accessible,bikes_allowed
+412,shape_dist_ahead,SEUTU M-P talvi,JYVÄSKYLÄ MATKAKESKUS,1,286,2,2
+412,shape_dist_ok,SEUTU S Talvi,LAUKAA,1,120,2,2

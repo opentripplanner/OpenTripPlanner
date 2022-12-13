@@ -21,11 +21,11 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
+import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -36,6 +36,7 @@ import org.opentripplanner.transit.speed_test.model.testcase.TestCaseInput;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.updater.configure.UpdaterConfigurator;
 
 /**
  * Test response times for a large batch of origin/destination points. Also demonstrates how to run
@@ -77,6 +78,11 @@ public class SpeedTest {
     // Read Test-case definitions and expected results from file
     this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
 
+    UpdaterConfigurator.configure(model.graph(), transitModel, config.updatersConfig);
+    if (transitModel.getUpdaterManager() != null) {
+      transitModel.getUpdaterManager().startUpdaters();
+    }
+
     this.serverContext =
       DefaultServerRequestContext.create(
         config.transitRoutingParams,
@@ -87,7 +93,8 @@ public class SpeedTest {
         new DefaultTransitService(transitModel),
         timer.getRegistry(),
         List::of,
-        FlexConfig.DEFAULT,
+        new WorldEnvelopeModel(),
+        config.flexConfig,
         null,
         null
       );
@@ -109,6 +116,10 @@ public class SpeedTest {
 
       // and run it
       speedTest.runTest();
+
+      if (speedTest.transitModel.getUpdaterManager() != null) {
+        speedTest.transitModel.getUpdaterManager().stop();
+      }
     } catch (OtpAppException ae) {
       System.err.println(ae.getMessage());
       System.exit(1);

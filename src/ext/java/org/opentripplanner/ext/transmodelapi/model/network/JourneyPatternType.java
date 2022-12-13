@@ -17,7 +17,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.mapping.GeometryMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
@@ -120,7 +120,7 @@ public class JourneyPatternType {
             if (geometry == null) {
               return null;
             } else {
-              return PolylineEncoder.encodeGeometry(geometry);
+              return EncodedPolyline.encode(geometry);
             }
           })
           .build()

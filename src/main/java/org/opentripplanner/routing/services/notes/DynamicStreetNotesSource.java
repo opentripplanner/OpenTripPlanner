@@ -3,9 +3,9 @@ package org.opentripplanner.routing.services.notes;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import java.util.Set;
-import org.opentripplanner.model.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 
 /**
  * A notes source of dynamic notes, Usually created and modified by a single GraphUpdater.

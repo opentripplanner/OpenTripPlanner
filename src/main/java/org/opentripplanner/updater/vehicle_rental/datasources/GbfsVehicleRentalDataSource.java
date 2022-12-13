@@ -48,9 +48,9 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
   private GbfsFeedLoader loader;
 
   public GbfsVehicleRentalDataSource(GbfsVehicleRentalDataSourceParameters parameters) {
-    url = parameters.getUrl();
+    url = parameters.url();
     language = parameters.language();
-    httpHeaders = parameters.getHttpHeaders();
+    httpHeaders = parameters.httpHeaders();
     allowKeepingRentedVehicleAtDestination = parameters.allowKeepingRentedVehicleAtDestination();
     network = parameters.network();
   }

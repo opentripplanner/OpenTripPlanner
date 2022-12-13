@@ -11,17 +11,13 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.Trip;
 
 public class LineType {
 
@@ -175,30 +171,15 @@ public class LineType {
           .newFieldDefinition()
           .name("serviceJourneys")
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
-          .dataFetcher(environment -> {
-            List<Trip> result = GqlUtil
+          .dataFetcher(environment ->
+            GqlUtil
               .getTransitService(environment)
               .getPatternsForRoute(environment.getSource())
               .stream()
               .flatMap(TripPattern::scheduledTripsAsStream)
               .distinct()
-              .collect(Collectors.toList());
-
-            if (OTPFeature.FlexRouting.isOn()) {
-              // Workaround since flex trips are not part of patterns yet
-              result.addAll(
-                GqlUtil
-                  .getTransitService(environment)
-                  .getFlexIndex()
-                  .getAllFlexTrips()
-                  .stream()
-                  .map(FlexTrip::getTrip)
-                  .filter(t -> t.getRoute().equals((Route) environment.getSource()))
-                  .collect(Collectors.toList())
-              );
-            }
-            return result;
-          })
+              .collect(Collectors.toList())
+          )
           .build()
       )
       .field(

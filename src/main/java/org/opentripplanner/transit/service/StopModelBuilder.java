@@ -1,8 +1,5 @@
 package org.opentripplanner.transit.service;
 
-import org.opentripplanner.framework.collection.CollectionsView;
-import org.opentripplanner.framework.statistics.MedianCalcForDoubles;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupOfStations;
@@ -92,41 +89,6 @@ public class StopModelBuilder {
     areaStopById.addAll(other.listAreaStops());
     groupStopById.addAll(other.listGroupStops());
     return this;
-  }
-
-  /**
-   * Calculates Transit center from median of coordinates of all transitStops if graph has transit.
-   * If it doesn't it isn't calculated. (mean value of min, max latitude and longitudes are used)
-   * <p>
-   * Transit center is saved in center variable
-   * <p>
-   * This speeds up calculation, but problem is that median needs to have all of
-   * latitudes/longitudes in memory, this can become problematic in large installations. It works
-   * without a problem on New York State.
-   */
-  WgsCoordinate calculateTransitCenter() {
-    var stops = new CollectionsView<>(
-      regularStopById.values(),
-      areaStopById.values(),
-      groupStopById.values()
-    );
-
-    if (stops.isEmpty()) {
-      return null;
-    }
-
-    // we need this check because there could be only AreaStops (which don't have vertices)
-    // in the graph
-    var medianCalculator = new MedianCalcForDoubles(stops.size());
-
-    stops.forEach(v -> medianCalculator.add(v.getLon()));
-    double lon = medianCalculator.median();
-
-    medianCalculator.reset();
-    stops.forEach(v -> medianCalculator.add(v.getLat()));
-    double lat = medianCalculator.median();
-
-    return new WgsCoordinate(lat, lon);
   }
 
   public StopModel build() {

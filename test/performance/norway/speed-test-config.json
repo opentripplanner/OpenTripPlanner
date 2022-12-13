@@ -56,5 +56,14 @@
     "transitReluctanceForMode": {
       "RAIL": 1.0
     }
-  }
+  },
+  "updaters": [
+    {
+      "type" : "vehicle-rental",
+      "sourceType" : "gbfs",
+      "frequencySec" : -1,
+      "url" : "https://otp-performance.leonard.io/data/norway/tieroslo/gbfs.json"
+    }
+  ]
+
 }

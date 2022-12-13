@@ -13,6 +13,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
+import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
@@ -82,6 +83,10 @@ public class HslParkUpdaterTest {
       "}",
       first.getOpeningHours().toString()
     );
+    assertEquals(
+      "Mo-Fr 0:00-23:59; Sa 0:00-23:59; Su 0:00-23:59",
+      OsmOpeningHoursSupport.osmFormat(first.getOpeningHours())
+    );
 
     var firstVehicleParkingGroup = first.getVehicleParkingGroup();
     assertEquals("hslpark:321", firstVehicleParkingGroup.id().toString());
@@ -104,6 +109,7 @@ public class HslParkUpdaterTest {
     assertNull(second.getCapacity().getBicycleSpaces());
     assertFalse(second.hasRealTimeData());
     assertNull(second.getAvailability());
+
     assertEquals(
       "OHCalendar{" +
       "zoneId: Europe/Helsinki, " +

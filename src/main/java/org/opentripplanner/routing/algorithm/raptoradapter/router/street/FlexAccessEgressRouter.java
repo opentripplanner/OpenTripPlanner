@@ -37,7 +37,8 @@ public class FlexAccessEgressRouter {
         transitService,
         new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
-        false
+        false,
+        serverContext.flexConfig().maxAccessWalkDuration()
       )
       : List.of();
 
@@ -48,7 +49,8 @@ public class FlexAccessEgressRouter {
         transitService,
         new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
-        true
+        true,
+        serverContext.flexConfig().maxEgressWalkDuration()
       )
       : List.of();
 
@@ -58,7 +60,6 @@ public class FlexAccessEgressRouter {
       config,
       request.dateTime(),
       request.arriveBy(),
-      request.preferences().walk().speed(),
       searchDays.additionalSearchDaysInPast(),
       searchDays.additionalSearchDaysInFuture(),
       accessStops,

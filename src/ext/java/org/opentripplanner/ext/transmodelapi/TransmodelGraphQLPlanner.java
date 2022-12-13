@@ -432,6 +432,7 @@ public class TransmodelGraphQLPlanner {
 
       callWith.argument("waitReluctance", transfer::withWaitReluctance);
       callWith.argument("maximumTransfers", transfer::withMaxTransfers);
+      callWith.argument("maximumAdditionalTransfers", transfer::withMaxAdditionalTransfers);
     });
     preferences.withTransit(tr -> {
       callWith.argument(
@@ -454,6 +455,11 @@ public class TransmodelGraphQLPlanner {
       });
       callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
       callWith.argument("includePlannedCancellations", tr::setIncludePlannedCancellations);
+      callWith.argument(
+        "relaxTransitSearchGeneralizedCostAtDestination",
+        (Double value) ->
+          tr.withRaptor(it -> it.withRelaxTransitSearchGeneralizedCostAtDestination(value))
+      );
     });
     preferences.withItineraryFilter(itineraryFilter -> {
       callWith.argument("debugItineraryFilter", itineraryFilter::withDebug);

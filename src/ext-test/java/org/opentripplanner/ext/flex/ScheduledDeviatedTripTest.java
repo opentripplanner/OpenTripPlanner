@@ -24,7 +24,6 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
@@ -97,7 +96,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
 
-    var accesses = trip.getFlexAccessTemplates(nearbyStop, flexDate, calculator, params).toList();
+    var accesses = trip
+      .getFlexAccessTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
+      .toList();
 
     assertEquals(3, accesses.size());
 
@@ -110,7 +111,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   void calculateEgressTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
-    var egresses = trip.getFlexEgressTemplates(nearbyStop, flexDate, calculator, params).toList();
+    var egresses = trip
+      .getFlexEgressTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
+      .toList();
 
     assertEquals(3, egresses.size());
 
@@ -133,7 +136,6 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       FlexConfig.DEFAULT,
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
       false,
-      1.0,
       1,
       1,
       List.of(from),
@@ -186,7 +188,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     assertEquals(1, intermediateStops.size());
     assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
 
-    EncodedPolyline legGeometry = PolylineEncoder.encodeGeometry(leg.getLegGeometry());
+    EncodedPolyline legGeometry = EncodedPolyline.encode(leg.getLegGeometry());
     assertThatPolylinesAreEqual(
       legGeometry.points(),
       "kfsmEjojcOa@eBRKfBfHR|ALjBBhVArMG|OCrEGx@OhAKj@a@tAe@hA]l@MPgAnAgw@nr@cDxCm@t@c@t@c@x@_@~@]pAyAdIoAhG}@lE{AzHWhAtt@t~Aj@tAb@~AXdBHn@FlBC`CKnA_@nC{CjOa@dCOlAEz@E|BRtUCbCQ~CWjD??qBvXBl@kBvWOzAc@dDOx@sHv]aIG?q@@c@ZaB\\mA"

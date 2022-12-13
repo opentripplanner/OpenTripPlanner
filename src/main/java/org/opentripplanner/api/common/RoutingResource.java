@@ -21,6 +21,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
@@ -475,19 +476,24 @@ public abstract class RoutingResource {
    * <p>
    * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
    *
-   * @deprecated TODO OTP2 Regression. A maxTransfers should be set in the router config, not
-   * here. Instead the client should be able to pass in a parameter for
-   * the max number of additional/extra transfers relative to the best
-   * trip (with the fewest possible transfers) within constraint of the
-   * other search parameters.
-   * This might be to complicated to explain to the customer, so we
-   * might stick to the old limit, but that have side-effects that you
-   * might not find any trips on a day where a critical part of the
-   * trip is not available, because of some real-time disruption.
+   * @deprecated Use {@link #maxAdditionalTransfers} instead to pass in the max number of
+   * additional/extra transfers relative to the best trip (with the fewest possible transfers)
+   * within constraint of the other search parameters. This might be too complicated to explain to
+   * the customer, so you might stick to the old limit, but that has side-effects where you might
+   * not find any trips on a day when a critical part of the trip is not available, because of some
+   * real-time disruption.
    */
   @Deprecated
   @QueryParam("maxTransfers")
   protected Integer maxTransfers;
+
+  /**
+   * The maximum number of additional transfers in addition to the result with the least number of transfers.
+   * <p>
+   * Consider using the {@link #transferPenalty} instead of this parameter.
+   */
+  @QueryParam("maxAdditionalTransfers")
+  protected Integer maxAdditionalTransfers;
 
   /**
    * If true, goal direction is turned off and a full path tree is built (specify only once)
@@ -619,11 +625,38 @@ public abstract class RoutingResource {
   @QueryParam("debugItineraryFilter")
   protected Boolean debugItineraryFilter;
 
+  @QueryParam("groupSimilarityKeepOne")
+  Double groupSimilarityKeepOne;
+
+  @QueryParam("groupSimilarityKeepThree")
+  Double groupSimilarityKeepThree;
+
+  @QueryParam("groupedOtherThanSameLegsMaxCostMultiplier")
+  Double groupedOtherThanSameLegsMaxCostMultiplier;
+
+  @QueryParam("transitGeneralizedCostLimitFunction")
+  String transitGeneralizedCostLimitFunction;
+
+  @QueryParam("transitGeneralizedCostLimitIntervalRelaxFactor")
+  Double transitGeneralizedCostLimitIntervalRelaxFactor;
+
+  @QueryParam("nonTransitGeneralizedCostLimitFunction")
+  String nonTransitGeneralizedCostLimitFunction;
+
   @QueryParam("geoidElevation")
   protected Boolean geoidElevation;
 
   @QueryParam("useVehicleParkingAvailabilityInformation")
   protected Boolean useVehicleParkingAvailabilityInformation;
+
+  /**
+   * Whether non-optimal transit paths at the destination should be returned.
+   * If the value is less than 0.0 a normal '<' comparison is performed.
+   * Values greater than 2.0 are not supported, due to performance reasons.
+   * {@link SearchParams#relaxCostAtDestination()}
+   */
+  @QueryParam("relaxTransitSearchGeneralizedCostAtDestination")
+  protected Double relaxTransitSearchGeneralizedCostAtDestination;
 
   @QueryParam("debugRaptorStops")
   private String debugRaptorStops;

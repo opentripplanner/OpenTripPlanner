@@ -30,6 +30,14 @@ public class PathStringBuilderTest {
   }
 
   @Test
+  public void walkThenRent() {
+    assertEquals(
+      "Walk 17s ~ oslo:1 Rental  2m",
+      subject.walk(17).sep().stop("oslo:1").space().rental(120).toString()
+    );
+  }
+
+  @Test
   public void walkWithDurationPadded() {
     assertEquals("Walk   17s", new PathStringBuilder(STOP_NAME_RESOLVER, true).walk(17).toString());
   }

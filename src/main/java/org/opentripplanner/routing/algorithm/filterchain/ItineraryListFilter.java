@@ -26,7 +26,7 @@ public interface ItineraryListFilter {
    * <p>
    * This can be achieved using streams. Example:
    * <pre>
-   * return itineraries.stream().peek(...).collect(Collectors.toList());
+   * return itineraries.stream().peek(...).toList();
    * </pre>
    */
   List<Itinerary> filter(List<Itinerary> itineraries);

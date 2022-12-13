@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -334,6 +335,10 @@ public class Itinerary {
    */
   public List<Leg> getLegs() {
     return legs;
+  }
+
+  public Stream<StreetLeg> getStreetLegs() {
+    return legs.stream().filter(StreetLeg.class::isInstance).map(StreetLeg.class::cast);
   }
 
   /**

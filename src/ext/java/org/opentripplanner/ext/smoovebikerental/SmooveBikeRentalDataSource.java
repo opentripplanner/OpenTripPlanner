@@ -2,10 +2,10 @@ package org.opentripplanner.ext.smoovebikerental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GenericJsonDataSource;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonDataSource<VehicleRen
   private final RentalVehicleType vehicleType;
 
   public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
-    super(config.getUrl(), "result", config.getHttpHeaders());
+    super(config.url(), "result", config.httpHeaders());
     networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
     vehicleType = RentalVehicleType.getDefaultType(networkName);
     allowOverloading = config.isAllowOverloading();
