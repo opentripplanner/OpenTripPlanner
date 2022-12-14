@@ -37,6 +37,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix batch queries in legacy graphql API [#4663](https://github.com/opentripplanner/OpenTripPlanner/pull/4663)
 - Add filter for minimum bike parking distance [#4626](https://github.com/opentripplanner/OpenTripPlanner/pull/4626)
 - Add limits for flex access/egress walking [#4655](https://github.com/opentripplanner/OpenTripPlanner/pull/4655)
+- Make Prometheus endpoint take Accept header into account [#4674](https://github.com/opentripplanner/OpenTripPlanner/pull/4674)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
