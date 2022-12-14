@@ -14,6 +14,7 @@ public class TripUpdateBuilder {
   public static final String ROUTE_NAME = "A route that was added dynamically";
   private static final StopTimeUpdate.ScheduleRelationship DEFAULT_SCHEDULE_RELATIONSHIP =
     StopTimeUpdate.ScheduleRelationship.SCHEDULED;
+  public static final int NO_VALUE = -1;
   private final GtfsRealtime.TripDescriptor.Builder tripDescriptorBuilder;
   private final GtfsRealtime.TripUpdate.Builder tripUpdateBuilder;
   private final long midnightSecondsSinceEpoch;
@@ -36,29 +37,62 @@ public class TripUpdateBuilder {
   }
 
   public TripUpdateBuilder addStopTime(String stopName, int minutes) {
-    return addStopTime(stopName, minutes, -1, -1, DEFAULT_SCHEDULE_RELATIONSHIP, null);
+    return addStopTime(
+      stopName,
+      minutes,
+      NO_VALUE,
+      NO_VALUE,
+      NO_VALUE,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null
+    );
   }
 
   public TripUpdateBuilder addStopTime(String stopName, int minutes, DropOffPickupType pickDrop) {
-    return addStopTime(stopName, minutes, -1, -1, DEFAULT_SCHEDULE_RELATIONSHIP, pickDrop);
+    return addStopTime(
+      stopName,
+      minutes,
+      NO_VALUE,
+      NO_VALUE,
+      NO_VALUE,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      pickDrop
+    );
   }
 
   public TripUpdateBuilder addDelayedStopTime(int stopSequence, int delay) {
-    return addStopTime(null, -1, stopSequence, delay, DEFAULT_SCHEDULE_RELATIONSHIP, null);
+    return addStopTime(null, -1, stopSequence, delay, delay, DEFAULT_SCHEDULE_RELATIONSHIP, null);
+  }
+
+  public TripUpdateBuilder addDelayedStopTime(
+    int stopSequence,
+    int arrivalDelay,
+    int departureDelay
+  ) {
+    return addStopTime(
+      null,
+      -1,
+      stopSequence,
+      arrivalDelay,
+      departureDelay,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null
+    );
   }
 
   public TripUpdateBuilder addStopTime(
     int stopSequence,
     StopTimeUpdate.ScheduleRelationship scheduleRelationship
   ) {
-    return addStopTime(null, -1, stopSequence, -1, scheduleRelationship, null);
+    return addStopTime(null, -1, stopSequence, NO_VALUE, NO_VALUE, scheduleRelationship, null);
   }
 
   private TripUpdateBuilder addStopTime(
     String stopId,
     int minutes,
     int stopSequence,
-    int delay,
+    int arrivalDelay,
+    int departureDelay,
     StopTimeUpdate.ScheduleRelationship scheduleRelationShip,
     DropOffPickupType pickDrop
   ) {
@@ -91,9 +125,11 @@ public class TripUpdateBuilder {
       departureBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (minutes * 60));
     }
 
-    if (delay > -1) {
-      arrivalBuilder.setDelay(delay);
-      departureBuilder.setDelay(delay);
+    if (arrivalDelay > -1) {
+      arrivalBuilder.setDelay(arrivalDelay);
+    }
+    if (departureDelay > -1) {
+      departureBuilder.setDelay(departureDelay);
     }
 
     return this;

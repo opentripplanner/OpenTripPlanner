@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
+import static com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -319,7 +320,7 @@ public class TimetableSnapshotSourceTest {
 
       { // Stop D
         final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
-        stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
+        stopTimeUpdateBuilder.setScheduleRelationship(SKIPPED);
         stopTimeUpdateBuilder.setStopId("D");
         stopTimeUpdateBuilder.setStopSequence(40);
 
@@ -469,73 +470,17 @@ public class TimetableSnapshotSourceTest {
       LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
       String scheduledTripId = "1.1";
 
-      TripUpdate tripUpdate;
-      {
-        final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+      var builder = new TripUpdateBuilder(
+        scheduledTripId,
+        serviceDate,
+        SCHEDULED,
+        transitModel.getTimeZone()
+      )
+        .addDelayedStopTime(1, 0)
+        .addDelayedStopTime(2, 60, 80)
+        .addDelayedStopTime(3, 90, 90);
 
-        tripDescriptorBuilder.setTripId(scheduledTripId);
-        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
-        tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
-
-        final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
-
-        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-
-        { // First stop
-          final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(
-            0
-          );
-          stopTimeUpdateBuilder.setScheduleRelationship(
-            StopTimeUpdate.ScheduleRelationship.SCHEDULED
-          );
-          stopTimeUpdateBuilder.setStopSequence(1);
-
-          { // Departure
-            final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-            departureBuilder.setDelay(0);
-          }
-        }
-
-        { // Second stop
-          final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(
-            1
-          );
-          stopTimeUpdateBuilder.setScheduleRelationship(
-            StopTimeUpdate.ScheduleRelationship.SCHEDULED
-          );
-          stopTimeUpdateBuilder.setStopSequence(2);
-
-          { // Arrival
-            final StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-            arrivalBuilder.setDelay(60);
-          }
-          { // Departure
-            final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-            departureBuilder.setDelay(80);
-          }
-        }
-
-        { // Last stop
-          final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(
-            2
-          );
-          stopTimeUpdateBuilder.setScheduleRelationship(
-            StopTimeUpdate.ScheduleRelationship.SCHEDULED
-          );
-          stopTimeUpdateBuilder.setStopSequence(3);
-
-          { // Arrival
-            final StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-            arrivalBuilder.setDelay(90);
-          }
-          { // Departure
-            final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-            departureBuilder.setDelay(90);
-          }
-        }
-
-        tripUpdate = tripUpdateBuilder.build();
-      }
+      var tripUpdate = builder.build();
 
       var updater = new TimetableSnapshotSource(
         TimetableSnapshotSourceParameters.DEFAULT,
@@ -614,9 +559,9 @@ public class TimetableSnapshotSourceTest {
         SCHEDULED,
         transitModel.getTimeZone()
       )
-        .addStopTime(1, StopTimeUpdate.ScheduleRelationship.NO_DATA)
-        .addStopTime(2, StopTimeUpdate.ScheduleRelationship.SKIPPED)
-        .addStopTime(3, StopTimeUpdate.ScheduleRelationship.NO_DATA);
+        .addStopTime(1, NO_DATA)
+        .addStopTime(2, SKIPPED)
+        .addStopTime(3, NO_DATA);
 
       var tripUpdate = builder.build();
 
@@ -765,9 +710,7 @@ public class TimetableSnapshotSourceTest {
           final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(
             1
           );
-          stopTimeUpdateBuilder.setScheduleRelationship(
-            StopTimeUpdate.ScheduleRelationship.SKIPPED
-          );
+          stopTimeUpdateBuilder.setScheduleRelationship(SKIPPED);
           stopTimeUpdateBuilder.setStopSequence(2);
         }
 
