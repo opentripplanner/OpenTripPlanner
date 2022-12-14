@@ -5,7 +5,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -166,7 +165,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
   public final TransitFeeds transitFeeds;
-  public final Set<String> alwaysGenerateTransfersFeeds;
   public boolean staticParkAndRide;
   public boolean staticBikeParkAndRide;
   public double distanceBetweenElevationSamples;
@@ -650,22 +648,6 @@ Netex data is also often supplied in a ZIP file.
       """
         )
         .asUri(null);
-    alwaysGenerateTransfersFeeds =
-      root
-        .of("alwaysGenerateTransfersFeeds")
-        .since(V2_3)
-        .summary(
-          "Always generate transfers to stops in this feed even when they don't have a trip pattern using them."
-        )
-        .description(
-          """
-      By default OTP doesn't generate a transfer to a stop that doesn't have a trip pattern using it.
-      However, there are feeds that have stops that exist just so that realtime updaters can create
-      trips to them on the fly.
-      In such a case you _do_ want to generate the transfers anyway.
-      """
-        )
-        .asStringSet(Set.of());
 
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);

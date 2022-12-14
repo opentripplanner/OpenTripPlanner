@@ -47,7 +47,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 class DirectTransferGeneratorTest extends GraphRoutingTest {
 
   private static final Duration MAX_TRANSFER_DURATION = Duration.ofSeconds(3600);
-  private TransitStopVertex S0, S11, S12, S13, S21, S22, S23, STOP_WITHOUT_PATTERNS;
+  private TransitStopVertex S0, S11, S12, S13, S21, S22, S23;
   private StreetVertex V0, V11, V12, V13, V21, V22, V23;
 
   @Test
@@ -103,44 +103,6 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       tr(S22, 751, S12),
       tr(S23, 2347, S12),
       tr(S23, 2224, S22)
-    );
-  }
-
-  @Test
-  public void directTransfersWithPatternsIgnoringSomeFeeds() {
-    var otpModel = model(false);
-    var graph = otpModel.graph();
-    graph.hasStreets = false;
-    var transitModel = otpModel.transitModel();
-    var req = new RouteRequest();
-    req.journey().transfer().setMode(StreetMode.WALK);
-    var transferRequests = List.of(req);
-
-    new DirectTransferGenerator(
-      graph,
-      transitModel,
-      DataImportIssueStore.NOOP,
-      MAX_TRANSFER_DURATION,
-      transferRequests,
-      Set.of(S0.getStop().getId().getFeedId())
-    )
-      .buildGraph();
-
-    assertEquals(38, transitModel.getAllPathTransfers().size());
-
-    var transfers = transitModel
-      .getAllPathTransfers()
-      .stream()
-      .filter(t -> t.to.getId().equals(S0.getStop().getId()))
-      .toList();
-
-    assertEquals(4, transfers.size());
-    assertTransfers(
-      transfers,
-      tr(S22, 2880, S0),
-      tr(S21, 935, S0),
-      tr(S11, 556, S0),
-      tr(S12, 2780, S0)
     );
   }
 
