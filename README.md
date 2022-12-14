@@ -1,5 +1,7 @@
 ## Overview
 
+[![Join the chat at https://gitter.im/opentripplanner/OpenTripPLanner](https://badges.gitter.im/opentripplanner/OpenTripPlanner.svg)](https://gitter.im/opentripplanner/OpenTripPlanner)
+
 OpenTripPlanner (OTP) is an open source multi-modal trip planner, focusing on travel by scheduled
 public transportation in combination with bicycling, walking, and mobility services including bike
 share and ride hailing. Its server component runs on any platform with a Java virtual machine (
