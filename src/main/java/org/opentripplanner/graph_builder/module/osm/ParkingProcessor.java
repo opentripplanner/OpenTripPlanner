@@ -12,8 +12,6 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedStringFormat;
@@ -291,12 +289,6 @@ public class ParkingProcessor {
     OSMWithTags entity,
     boolean isCarPark
   ) {
-    var geoms = group.areas.stream().map(a -> a.jtsMultiPolygon).toArray(Geometry[]::new);
-    var centroid = GeometryUtils
-      .getGeometryFactory()
-      .createGeometryCollection(geoms)
-      .getInteriorPoint();
-
     LOG.debug(
       "Creating an artificial entrance for {} as it's not linked to the street network",
       entity.getOpenStreetMapLink()
@@ -310,7 +302,7 @@ public class ParkingProcessor {
           )
         )
         .name(vehicleParkingName)
-        .coordinate(new WgsCoordinate(centroid))
+        .coordinate(new WgsCoordinate(group.union.getInteriorPoint()))
         // setting the vertex to null signals the rest of the build process that this needs to be linked to the street network
         .vertex(null)
         .walkAccessible(true)
