@@ -71,18 +71,18 @@ class AreaGroup {
     );
     this.union = allPolygons.union();
 
-    if (this.union instanceof GeometryCollection) {
-      GeometryCollection mp = (GeometryCollection) this.union;
+    if (this.union instanceof GeometryCollection coll) {
+      GeometryCollection mp = coll;
       for (int i = 0; i < mp.getNumGeometries(); ++i) {
-        Geometry poly = mp.getGeometryN(i);
-        if (!(poly instanceof Polygon)) {
-          LOG.warn("Unexpected non-polygon when merging areas: {}", poly);
-          continue;
+        Geometry geom = mp.getGeometryN(i);
+        if (geom instanceof Polygon polygon) {
+          outermostRings.add(toRing(polygon, nodeMap));
+        } else {
+          LOG.warn("Unexpected non-polygon when merging areas: {}", geom);
         }
-        outermostRings.add(toRing((Polygon) poly, nodeMap));
       }
-    } else if (this.union instanceof Polygon) {
-      outermostRings.add(toRing((Polygon) this.union, nodeMap));
+    } else if (this.union instanceof Polygon polygon) {
+      outermostRings.add(toRing(polygon, nodeMap));
     } else {
       LOG.warn("Unexpected non-polygon when merging areas: {}", this.union);
     }
