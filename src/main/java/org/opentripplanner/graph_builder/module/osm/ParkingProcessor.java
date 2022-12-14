@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedStringFormat;
@@ -284,12 +286,16 @@ public class ParkingProcessor {
    * it would not be usable by the routing algorithm as it's unreachable.
    */
   private List<VehicleParking.VehicleParkingEntranceCreator> createArtificialEntrances(
-    AreaGroup area,
+    AreaGroup group,
     I18NString vehicleParkingName,
     OSMWithTags entity,
     boolean isCarPark
   ) {
-    var centroid = area.jtsMultiPolygon.getInteriorPoint();
+    var geoms = group.areas.stream().map(a -> a.jtsMultiPolygon).toArray(Geometry[]::new);
+    var centroid = GeometryUtils
+      .getGeometryFactory()
+      .createGeometryCollection(geoms)
+      .getInteriorPoint();
 
     LOG.debug(
       "Creating an artificial entrance for {} as it's not linked to the street network",
