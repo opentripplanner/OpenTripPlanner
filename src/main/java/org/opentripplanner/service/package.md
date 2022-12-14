@@ -10,8 +10,8 @@ The typical package structure of the `<name>` service:
 o.o.service.<name>
     configure                   -- Dependency Injection configuration
       <Name>Module
-    grapbuilder                 -- If this module have its own graph-builder module
-      <Name>GrpahBuilderModule
+    grapbuilder                 -- If this module has its own graph-builder module
+      <Name>GraphBuilderModule
     internal                    -- Internal implementaion 
       Default<Name>Service
       Default<Name>Repository
@@ -21,7 +21,7 @@ o.o.service.<name>
     <Name>Repository            -- Optional interface for updating the model (in memory)
 ```
 
- - The `grapbuilder` are just an example in case this service have its own 
+ - The `grapbuilder` is just an example in case this service have its own 
    graph-builder module.
  - The `internal` package can be split into sub-packages, if needed. 
  - The aggregate root `<Name>Service` is defined in the root package.
@@ -30,7 +30,7 @@ o.o.service.<name>
  - Both the `Default<Name>Repository` and `Default<Name>Service` should be 
    thread safe.
  - The `Default<Name>Repository` should be serialized in the `graph.obj` file and hence
-   need to be `Serializable`.
+   needs to be `Serializable`.
 
 The `worldenvelope` service is used to illustrate the above example; Hence the `worldenvelope`
-have a `WorldEnvelopeRepositroy` even if it is strictly not required in that case.
+has a `WorldEnvelopeRepository` even if it is not required.
