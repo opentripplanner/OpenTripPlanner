@@ -19,7 +19,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelations
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import de.mfdz.MfdzRealtimeExtensions;
+import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -250,8 +250,6 @@ public class TimetableSnapshotSourceTest {
         assertNull(snapshot);
       });
   }
-
-
 
   @Test
   public void testHandleModifiedTrip() {
@@ -957,9 +955,9 @@ public class TimetableSnapshotSourceTest {
       builder.addTripExtension();
 
       builder
-        .addStopTime("A", 30, MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.PHONE_AGENCY)
-        .addStopTime("C", 40, MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.COORDINATE_WITH_DRIVER)
-        .addStopTime("E", 55, MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.NONE);
+        .addStopTime("A", 30, DropOffPickupType.PHONE_AGENCY)
+        .addStopTime("C", 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
+        .addStopTime("E", 55, DropOffPickupType.NONE);
 
       var tripUpdate = builder.build();
 

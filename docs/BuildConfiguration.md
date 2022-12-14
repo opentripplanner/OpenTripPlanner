@@ -51,7 +51,6 @@ Sections follow that describe particular settings in more depth.
 | [transitServiceEnd](#transitServiceEnd)                                  |  `duration` | Limit the import of transit services to the given end date.                                                                                                    | *Optional* | `"P3Y"`                           |  2.0  |
 | [transitServiceStart](#transitServiceStart)                              |  `duration` | Limit the import of transit services to the given START date.                                                                                                  | *Optional* | `"-P1Y"`                          |  2.0  |
 | [writeCachedElevations](#writeCachedElevations)                          |  `boolean`  | Reusing elevation data from previous builds                                                                                                                    | *Optional* | `false`                           |  2.0  |
-| [alwaysGenerateTransfersFeeds](#alwaysGenerateTransfersFeeds)            |  `string[]` | Always generate transfers to stops in this feed even when they don't have a trip pattern using them.                                                           | *Optional* |                                   |  2.3  |
 | [boardingLocationTags](#boardingLocationTags)                            |  `string[]` | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                                                     | *Optional* |                                   |  2.2  |
 | [dataOverlay](sandbox/DataOverlay.md)                                    |   `object`  | Config for the DataOverlay Sandbox module                                                                                                                      | *Optional* |                                   |  2.2  |
 | [dem](#dem)                                                              |  `object[]` | Specify parameters for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.2  |
@@ -688,19 +687,6 @@ data is changed, or different configuration values for `elevationUnitMultiplier`
 should be recalculated. Over time, various edits to OpenStreetMap will cause this cached data to
 become stale and not include new OSM ways. Therefore, periodic update of this cached data is
 recommended.
-
-
-<h3 id="alwaysGenerateTransfersFeeds">alwaysGenerateTransfersFeeds</h3>
-
-**Since version:** `2.3` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
-**Path:** / 
-
-Always generate transfers to stops in this feed even when they don't have a trip pattern using them.
-
-By default OTP doesn't generate a transfer to a stop that doesn't have a trip pattern using it.
-However, there are feeds that have stops that exist just so that realtime updaters can create
-trips to them on the fly.
-In such a case you _do_ want to generate the transfers anyway.
 
 
 <h3 id="boardingLocationTags">boardingLocationTags</h3>
