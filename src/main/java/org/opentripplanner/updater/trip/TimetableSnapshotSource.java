@@ -663,6 +663,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .withTimezone(transitService.getTimeZone().toString())
       .build();
     Route route;
+
     if (tripDescriptor.hasExtension(MfdzRealtimeExtensions.tripDescriptor)) {
       FeedScopedId id = tripDescriptor.hasRouteId()
         ? new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
@@ -670,27 +671,27 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
       var builder = Route.of(id);
 
-      var ext = AddedRoute.ofTripDescriptor(tripDescriptor);
+      var addedRouteExtension = AddedRoute.ofTripDescriptor(tripDescriptor);
 
       var agency = transitService
         .getAgencies()
         .stream()
         .filter(a -> a.getId().getFeedId().equals(tripId.getFeedId()))
-        .filter(ext::matchesAgencyId)
+        .filter(addedRouteExtension::matchesAgencyId)
         .findFirst()
         .orElse(fallbackAgency);
 
       builder.withAgency(agency);
 
-      builder.withGtfsType(ext.routeType());
-      var mode = TransitModeMapper.mapMode(ext.routeType());
+      builder.withGtfsType(addedRouteExtension.routeType());
+      var mode = TransitModeMapper.mapMode(addedRouteExtension.routeType());
       builder.withMode(mode);
 
       // Create route name
-      var name = Objects.requireNonNullElse(ext.routeLongName(), tripId.toString());
+      var name = Objects.requireNonNullElse(addedRouteExtension.routeLongName(), tripId.toString());
       builder.withLongName(new NonLocalizedString(name));
       builder.withShortName(name);
-      builder.withUrl(ext.routeUrl());
+      builder.withUrl(addedRouteExtension.routeUrl());
       builder.withAgency(fallbackAgency);
 
       route = builder.build();
@@ -869,7 +870,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     }
     final List<StopLocation> stops1 = pattern.getStops();
     LOG.trace(
-      "New pattern with mode {} on {} from {} to {}",
+      "Trip pattern added with mode {} on {} from {} to {}",
       trip.getRoute().getMode(),
       serviceDate,
       stops1.get(1).getName(),
