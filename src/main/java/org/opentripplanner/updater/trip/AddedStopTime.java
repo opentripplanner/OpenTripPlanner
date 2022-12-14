@@ -2,9 +2,9 @@ package org.opentripplanner.updater.trip;
 
 import com.google.transit.realtime.GtfsRealtime;
 import de.mfdz.MfdzRealtimeExtensions;
-import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.model.PickDrop;
 
 final class AddedStopTime {
@@ -37,18 +37,11 @@ final class AddedStopTime {
       var ext = props.getExtension(MfdzRealtimeExtensions.stopTimeProperties);
       var pickup = ext.getPickupType();
       var dropOff = ext.getDropoffType();
-      return new AddedStopTime(toPickDrop(pickup), toPickDrop(dropOff));
+      var dropOffType = PickDropMapper.map(dropOff.getNumber());
+      var pickupType = PickDropMapper.map(pickup.getNumber());
+      return new AddedStopTime(pickupType, dropOffType);
     } else {
       return new AddedStopTime(null, null);
     }
-  }
-
-  private static PickDrop toPickDrop(StopTimePropertiesExtension.DropOffPickupType gtfs) {
-    return switch (gtfs) {
-      case REGULAR -> PickDrop.SCHEDULED;
-      case NONE -> PickDrop.NONE;
-      case PHONE_AGENCY -> PickDrop.CALL_AGENCY;
-      case COORDINATE_WITH_DRIVER -> PickDrop.COORDINATE_WITH_DRIVER;
-    };
   }
 }

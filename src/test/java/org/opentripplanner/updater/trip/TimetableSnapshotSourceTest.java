@@ -19,12 +19,13 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelations
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
+import de.mfdz.MfdzRealtimeExtensions;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -250,125 +251,7 @@ public class TimetableSnapshotSourceTest {
       });
   }
 
-  @Test
-  public void addedTrip() {
-    // Get service date of today because old dates will be purged after applying updates
-    final LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
 
-    final String tripId = "added_trip";
-    var builder = new TripUpdateBuilder(tripId, serviceDate, ADDED, transitModel.getTimeZone());
-
-    builder.addStopTime("A", 30).addStopTime("C", 40).addStopTime("E", 55);
-
-    var tripUpdate = builder.build();
-
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel
-    );
-
-    // WHEN
-    updater.applyTripUpdates(
-      TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
-      fullDataset,
-      List.of(tripUpdate),
-      feedId
-    );
-
-    // THEN
-    assertAddedTrip(serviceDate, tripId, updater);
-  }
-
-  private TripPattern assertAddedTrip(
-    LocalDate serviceDate,
-    String tripId,
-    TimetableSnapshotSource updater
-  ) {
-    // Find new pattern in graph starting from stop A
-    var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
-    // Get trip pattern of last (most recently added) outgoing edge
-    var snapshot = updater.getTimetableSnapshot();
-    var patternsAtA = snapshot.getPatternsForStop(stopA);
-
-    assertNotNull(patternsAtA, "Added trip pattern should be found");
-    assertEquals(1, patternsAtA.size());
-    var tripPattern = patternsAtA.stream().findFirst().get();
-
-    final Timetable forToday = snapshot.resolve(tripPattern, serviceDate);
-    final Timetable schedule = snapshot.resolve(tripPattern, null);
-
-    assertNotSame(forToday, schedule);
-
-    final int forTodayAddedTripIndex = forToday.getTripIndex(tripId);
-    assertTrue(
-      forTodayAddedTripIndex > -1,
-      "Added trip should be found in time table for service date"
-    );
-    assertEquals(
-      RealTimeState.ADDED,
-      forToday.getTripTimes(forTodayAddedTripIndex).getRealTimeState()
-    );
-
-    final int scheduleTripIndex = schedule.getTripIndex(tripId);
-    assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
-    return tripPattern;
-  }
-
-  @Test
-  public void addedTripWithNewRoute() {
-    // GIVEN
-
-    // Get service date of today because old dates will be purged after applying updates
-    final LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
-
-    final String addedTripId = "added_trip";
-
-    final var builder = new TripUpdateBuilder(
-      addedTripId,
-      serviceDate,
-      ADDED,
-      transitModel.getTimeZone()
-    );
-    // add extension to set route name, url, mode
-    builder.addTripExtension();
-
-    builder
-      .addStopTime("A", 30, DropOffPickupType.PHONE_AGENCY)
-      .addStopTime("C", 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-      .addStopTime("E", 55, DropOffPickupType.NONE);
-
-    var tripUpdate = builder.build();
-
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel
-    );
-
-    // WHEN
-    updater.applyTripUpdates(
-      TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
-      fullDataset,
-      List.of(tripUpdate),
-      feedId
-    );
-
-    // THEN
-    var pattern = assertAddedTrip(serviceDate, addedTripId, updater);
-
-    var route = pattern.getRoute();
-    assertEquals(TripUpdateBuilder.ROUTE_URL, route.getUrl());
-    assertEquals(TripUpdateBuilder.ROUTE_NAME, route.getName());
-    assertEquals(TransitMode.RAIL, route.getMode());
-
-    var stopPattern = pattern.getStopPattern();
-    assertEquals(PickDrop.CALL_AGENCY, stopPattern.getPickup(0));
-    assertEquals(PickDrop.CALL_AGENCY, stopPattern.getDropoff(0));
-
-    assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getPickup(1));
-    assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getDropoff(1));
-  }
 
   @Test
   public void testHandleModifiedTrip() {
@@ -984,6 +867,130 @@ public class TimetableSnapshotSourceTest {
       assertFalse(newTripTimes.isCancelledStop(0));
       assertTrue(newTripTimes.isCancelledStop(1));
       assertFalse(newTripTimes.isNoDataStop(2));
+    }
+  }
+
+  @Nested
+  class AddedTests {
+
+    @Test
+    public void addedTrip() {
+      // Get service date of today because old dates will be purged after applying updates
+      final LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
+
+      final String tripId = "added_trip";
+      var builder = new TripUpdateBuilder(tripId, serviceDate, ADDED, transitModel.getTimeZone());
+
+      builder.addStopTime("A", 30).addStopTime("C", 40).addStopTime("E", 55);
+
+      var tripUpdate = builder.build();
+
+      var updater = new TimetableSnapshotSource(
+        TimetableSnapshotSourceParameters.DEFAULT,
+        transitModel
+      );
+
+      // WHEN
+      updater.applyTripUpdates(
+        TRIP_MATCHER_NOOP,
+        REQUIRED_NO_DATA,
+        fullDataset,
+        List.of(tripUpdate),
+        feedId
+      );
+
+      // THEN
+      assertAddedTrip(serviceDate, tripId, updater);
+    }
+
+    private TripPattern assertAddedTrip(
+      LocalDate serviceDate,
+      String tripId,
+      TimetableSnapshotSource updater
+    ) {
+      // Find new pattern in graph starting from stop A
+      var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
+      // Get trip pattern of last (most recently added) outgoing edge
+      var snapshot = updater.getTimetableSnapshot();
+      var patternsAtA = snapshot.getPatternsForStop(stopA);
+
+      assertNotNull(patternsAtA, "Added trip pattern should be found");
+      assertEquals(1, patternsAtA.size());
+      var tripPattern = patternsAtA.stream().findFirst().get();
+
+      final Timetable forToday = snapshot.resolve(tripPattern, serviceDate);
+      final Timetable schedule = snapshot.resolve(tripPattern, null);
+
+      assertNotSame(forToday, schedule);
+
+      final int forTodayAddedTripIndex = forToday.getTripIndex(tripId);
+      assertTrue(
+        forTodayAddedTripIndex > -1,
+        "Added trip should be found in time table for service date"
+      );
+      assertEquals(
+        RealTimeState.ADDED,
+        forToday.getTripTimes(forTodayAddedTripIndex).getRealTimeState()
+      );
+
+      final int scheduleTripIndex = schedule.getTripIndex(tripId);
+      assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
+      return tripPattern;
+    }
+
+    @Test
+    public void addedTripWithNewRoute() {
+      // GIVEN
+
+      // Get service date of today because old dates will be purged after applying updates
+      final LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
+
+      final String addedTripId = "added_trip";
+
+      final var builder = new TripUpdateBuilder(
+        addedTripId,
+        serviceDate,
+        ADDED,
+        transitModel.getTimeZone()
+      );
+      // add extension to set route name, url, mode
+      builder.addTripExtension();
+
+      builder
+        .addStopTime("A", 30, MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.PHONE_AGENCY)
+        .addStopTime("C", 40, MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.COORDINATE_WITH_DRIVER)
+        .addStopTime("E", 55, MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.NONE);
+
+      var tripUpdate = builder.build();
+
+      var updater = new TimetableSnapshotSource(
+        TimetableSnapshotSourceParameters.DEFAULT,
+        transitModel
+      );
+
+      // WHEN
+      updater.applyTripUpdates(
+        TRIP_MATCHER_NOOP,
+        REQUIRED_NO_DATA,
+        fullDataset,
+        List.of(tripUpdate),
+        feedId
+      );
+
+      // THEN
+      var pattern = assertAddedTrip(serviceDate, addedTripId, updater);
+
+      var route = pattern.getRoute();
+      assertEquals(TripUpdateBuilder.ROUTE_URL, route.getUrl());
+      assertEquals(TripUpdateBuilder.ROUTE_NAME, route.getName());
+      assertEquals(TransitMode.RAIL, route.getMode());
+
+      var stopPattern = pattern.getStopPattern();
+      assertEquals(PickDrop.CALL_AGENCY, stopPattern.getPickup(0));
+      assertEquals(PickDrop.CALL_AGENCY, stopPattern.getDropoff(0));
+
+      assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getPickup(1));
+      assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getDropoff(1));
     }
   }
 
