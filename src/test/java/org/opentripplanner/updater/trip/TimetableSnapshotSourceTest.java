@@ -871,6 +871,8 @@ public class TimetableSnapshotSourceTest {
   @Nested
   class AddedTests {
 
+    final String addedTripId = "added_trip";
+
     @Test
     public void addedTrip() {
       // Get service date of today because old dates will be purged after applying updates
@@ -989,6 +991,59 @@ public class TimetableSnapshotSourceTest {
 
       assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getPickup(1));
       assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getDropoff(1));
+    }
+
+    @Test
+    public void repeatedlyAddedTripWithNewRoute() {
+      // GIVEN
+      final LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
+
+      final var builder = new TripUpdateBuilder(
+        addedTripId,
+        serviceDate,
+        ADDED,
+        transitModel.getTimeZone()
+      );
+      // add extension to set route name, url, mode
+      builder.addTripExtension();
+
+      builder
+        .addStopTime("A", 30, DropOffPickupType.PHONE_AGENCY)
+        .addStopTime("C", 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
+        .addStopTime("E", 55, DropOffPickupType.NONE);
+
+      var tripUpdate = builder.build();
+
+      var updater = new TimetableSnapshotSource(
+        TimetableSnapshotSourceParameters.DEFAULT,
+        transitModel
+      );
+
+      // WHEN
+      updater.applyTripUpdates(
+        TRIP_MATCHER_NOOP,
+        REQUIRED_NO_DATA,
+        fullDataset,
+        List.of(tripUpdate),
+        feedId
+      );
+      var pattern = assertAddedTrip(serviceDate, addedTripId, updater);
+      var firstRoute = pattern.getRoute();
+
+      // apply the update a second time to check that no new route instance is created but the old one is reused
+      updater.applyTripUpdates(
+        TRIP_MATCHER_NOOP,
+        REQUIRED_NO_DATA,
+        fullDataset,
+        List.of(tripUpdate),
+        feedId
+      );
+      var secondPattern = assertAddedTrip(serviceDate, addedTripId, updater);
+      var secondRoute = pattern.getRoute();
+
+      // THEN
+
+      assertSame(firstRoute, secondRoute);
     }
   }
 

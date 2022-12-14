@@ -116,6 +116,7 @@ public class TripUpdateBuilder {
 
     var ext = b.build();
     tripDescriptorBuilder.setExtension(MfdzRealtimeExtensions.tripDescriptor, ext);
+    tripDescriptorBuilder.setRouteId("dynamically-added-trip");
 
     return this;
   }
