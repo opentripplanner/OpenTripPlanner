@@ -289,7 +289,7 @@ public class ParkingProcessor {
     OSMWithTags entity,
     boolean isCarPark
   ) {
-    var centroid = area.outermostRings.get(0).jtsPolygon.getCentroid();
+    var centroid = area.jtsMultiPolygon.getInteriorPoint();
 
     LOG.debug(
       "Creating an artificial entrance for {} as it's not linked to the street network",
