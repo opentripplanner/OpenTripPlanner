@@ -4,6 +4,7 @@ import static org.apache.http.HttpHeaders.ACCEPT;
 
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.prometheus.client.exporter.common.TextFormat;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -95,7 +96,7 @@ public class ActuatorAPI {
   @Produces({ TextFormat.CONTENT_TYPE_004, TextFormat.CONTENT_TYPE_OPENMETRICS_100 })
   public Response prometheus(
     @Context final PrometheusMeterRegistry prometheusRegistry,
-    @HeaderParam(ACCEPT) final String acceptHeader
+    @HeaderParam(ACCEPT) @DefaultValue("*/*") final String acceptHeader
   ) {
     final var contentType = acceptHeader.contains("application/openmetrics-text")
       ? TextFormat.CONTENT_TYPE_OPENMETRICS_100
