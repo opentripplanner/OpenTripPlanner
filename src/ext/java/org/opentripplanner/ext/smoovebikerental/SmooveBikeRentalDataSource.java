@@ -28,7 +28,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonDataSource<VehicleRen
   private final RentalVehicleType vehicleType;
 
   public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
-    super(config.getUrl(), "result", config.getHttpHeaders());
+    super(config.url(), "result", config.httpHeaders());
     networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
     vehicleType = RentalVehicleType.getDefaultType(networkName);
     allowOverloading = config.isAllowOverloading();
