@@ -3,12 +3,12 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 import static org.opentripplanner.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
 import java.util.function.IntConsumer;
-import org.opentripplanner.raptor.rangeraptor.TimeBasedRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
@@ -24,7 +24,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
-  extends TimeBasedRoutingStrategy<T> {
+  extends TimeBasedRoutingSupport<T> {
 
   private final McRangeRaptorWorkerState<T> state;
   private final CostCalculator<T> costCalculator;

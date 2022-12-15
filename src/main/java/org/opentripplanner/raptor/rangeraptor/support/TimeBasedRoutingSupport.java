@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor;
+package org.opentripplanner.raptor.rangeraptor.support;
 
 import java.util.function.IntConsumer;
 import javax.annotation.Nonnull;
@@ -20,7 +20,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripS
  * This class contains code which is shared by all time-dependent routing strategies. It also
  * defines abstract methods, which the individual strategies must implement.
  */
-public abstract class TimeBasedRoutingStrategy<T extends RaptorTripSchedule>
+public abstract class TimeBasedRoutingSupport<T extends RaptorTripSchedule>
   implements RoutingStrategy<T> {
 
   protected final SlackProvider slackProvider;
@@ -31,7 +31,7 @@ public abstract class TimeBasedRoutingStrategy<T extends RaptorTripSchedule>
   private RaptorTimeTable<T> timeTable;
   private RaptorTripScheduleSearch<T> tripSearch;
 
-  protected TimeBasedRoutingStrategy(
+  protected TimeBasedRoutingSupport(
     SlackProvider slackProvider,
     TransitCalculator<T> calculator,
     RoundProvider roundProvider,

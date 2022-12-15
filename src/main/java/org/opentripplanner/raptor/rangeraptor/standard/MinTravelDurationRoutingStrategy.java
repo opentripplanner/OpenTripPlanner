@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
 import java.util.function.IntConsumer;
-import org.opentripplanner.raptor.rangeraptor.TimeBasedRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
+import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
@@ -25,7 +25,7 @@ import org.opentripplanner.raptor.spi.TransitArrival;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule>
-  extends TimeBasedRoutingStrategy<T> {
+  extends TimeBasedRoutingSupport<T> {
 
   private static final int NOT_SET = -1;
 
