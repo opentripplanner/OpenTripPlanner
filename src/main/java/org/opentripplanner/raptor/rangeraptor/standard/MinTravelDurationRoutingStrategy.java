@@ -92,7 +92,13 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   @Override
   public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
     int prevArrivalTime = prevArrivalTime(stopIndex);
-    routingSupport.boardWithRegularTransfer(prevArrivalTime, stopIndex, stopPos, boardSlack);
+    routingSupport.boardWithRegularTransfer(
+      prevArrivalTime,
+      stopIndex,
+      stopPos,
+      boardSlack,
+      onTripIndex
+    );
   }
 
   @Override
@@ -128,11 +134,6 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     // Calculate the time-shift, the time-shift will be a positive duration in a
     // forward-search, and a negative value in case of a reverse-search.
     onTripTimeShift = boarding.getTime() - onTripBoardTime;
-  }
-
-  @Override
-  public int onTripIndex() {
-    return onTripIndex;
   }
 
   @Override

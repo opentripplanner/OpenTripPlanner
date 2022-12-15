@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.support;
 
+import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
+
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -54,16 +56,30 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     this.tripSearch = createTripSearch(timeTable);
   }
 
+  /**
+   * Same as {@link #boardWithRegularTransfer(int, int, int, int, int)}, but with
+   * {@code onTripIndex} unbounded.
+   */
   public void boardWithRegularTransfer(
     int prevArrivalTime,
     int stopIndex,
     int stopPos,
     int boardSlack
   ) {
+    boardWithRegularTransfer(prevArrivalTime, stopIndex, stopPos, boardSlack, UNBOUNDED_TRIP_INDEX);
+  }
+
+  public void boardWithRegularTransfer(
+    int prevArrivalTime,
+    int stopIndex,
+    int stopPos,
+    int boardSlack,
+    int onTripIndex
+  ) {
     int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
     // check if we can back up to an earlier trip due to this stop
     // being reached earlier
-    var result = tripSearch.search(earliestBoardTime, stopPos, callback.onTripIndex());
+    var result = tripSearch.search(earliestBoardTime, stopPos, onTripIndex);
     if (result != null) {
       callback.board(stopIndex, earliestBoardTime, result);
     } else {
