@@ -34,11 +34,19 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   /**
    * Board the given trip(event) at the given stop index.
    */
-  void board(
+  void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack);
+
+  /**
+   * Board the given trip(event) at the given stop index using constraint transfers
+   * if it exists.
+   *
+   * @return {@code true} if the boarding was processed by the constrained transfers,
+   *         return {@code false} to fall back to boarding with regular transfers.
+   */
+  boolean boardWithConstrainedTransfer(
     int stopIndex,
     int stopPos,
     int boardSlack,
-    boolean hasConstrainedTransfer,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   );
 }
