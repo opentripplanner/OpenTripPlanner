@@ -6,9 +6,9 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 public class ParkAndRideUnlinked implements DataImportIssue {
 
   public static final String FMT =
-    "Park and ride '%s' (%s) not linked to any streets; it will not be usable.";
+    "Park and ride '%s' (%s) not linked to any streets in OSM; entrance might not be placed correctly.";
   public static final String HTMLFMT =
-    "Park and ride <a href='%s'>'%s' (%s)</a> not linked to any streets; it will not be usable.";
+    "Park and ride <a href='%s'>'%s' (%s)</a> not linked to any streets in OSM; entrance might not be placed correctly.";
 
   final String name;
   final OSMWithTags entity;
