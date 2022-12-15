@@ -92,13 +92,13 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   @Override
   public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
     int prevArrivalTime = prevArrivalTime(stopIndex);
-    routingSupport.boardWithRegularTransfer(
-      prevArrivalTime,
-      stopIndex,
-      stopPos,
-      boardSlack,
-      onTripIndex
-    );
+    int earliestBoardTime = routingSupport.earliestBoardTime(prevArrivalTime, boardSlack);
+    var result = routingSupport.searchForBoardingAfter(stopPos, onTripIndex, earliestBoardTime);
+    if (result != null) {
+      board(stopIndex, earliestBoardTime, result);
+    } else {
+      boardSameTrip(earliestBoardTime, stopPos, stopIndex);
+    }
   }
 
   @Override
@@ -132,8 +132,15 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     onTripTimeShift = boarding.getTime() - onTripBoardTime;
   }
 
-  @Override
-  public void boardSameTrip(int earliestBoardTime, int stopPos, int stopIndex) {
+  /**
+   * This method allow the strategy to replace the existing boarding (if it exists) with a better
+   * option. It is left to the implementation to check that a boarding already exist.
+   *
+   * @param earliestBoardTime - the earliest possible time a boarding can take place
+   * @param stopPos           - the pattern stop position
+   * @param stopIndex         - the global stop index
+   */
+  private void boardSameTrip(int earliestBoardTime, int stopPos, int stopIndex) {
     // If not boarded, return
     if (onTripIndex == UNBOUNDED_TRIP_INDEX) {
       return;
