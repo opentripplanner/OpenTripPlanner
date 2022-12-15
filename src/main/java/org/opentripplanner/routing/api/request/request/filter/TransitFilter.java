@@ -17,6 +17,4 @@ public interface TransitFilter {
   default boolean isSubModePredicate() {
     return false;
   }
-
-  TransitFilter clone();
 }

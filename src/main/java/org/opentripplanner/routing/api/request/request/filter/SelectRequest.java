@@ -2,6 +2,7 @@ package org.opentripplanner.routing.api.request.request.filter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.core.RouteMatcher;
@@ -10,13 +11,89 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
-public class SelectRequest implements Cloneable, Serializable {
+public class SelectRequest implements Serializable {
 
-  private AllowTransitModeFilter transportModes;
-  private List<FeedScopedId> agencies = new ArrayList<>();
-  private RouteMatcher routes = RouteMatcher.emptyMatcher();
+  public static class Builder {
+
+    private List<MainAndSubMode> transportModes = new ArrayList<>();
+    private List<FeedScopedId> agencies = new ArrayList<>();
+    private RouteMatcher routes = RouteMatcher.emptyMatcher();
+    // TODO: 2022-11-29 group of routes
+    private List<String> feeds = new ArrayList<>();
+
+    public Builder withTransportModes(List<MainAndSubMode> transportModes) {
+      this.transportModes = transportModes;
+
+      return this;
+    }
+
+    public Builder addTransportMode(MainAndSubMode transportMode) {
+      this.transportModes.add(transportMode);
+
+      return this;
+    }
+
+    public Builder withAgenciesFromString(String s) {
+      if (!s.isEmpty()) {
+        this.agencies = FeedScopedId.parseListOfIds(s);
+      }
+
+      return this;
+    }
+
+    public Builder withAgencies(List<FeedScopedId> agencies) {
+      this.agencies = agencies;
+
+      return this;
+    }
+
+    public Builder withRoutesFromString(String s) {
+      if (!s.isEmpty()) {
+        this.routes = RouteMatcher.parse(s);
+      } else {
+        this.routes = RouteMatcher.emptyMatcher();
+      }
+
+      return this;
+    }
+
+    public Builder withRoutes(RouteMatcher routes) {
+      this.routes = routes;
+
+      return this;
+    }
+
+    public Builder withFeeds(List<String> feeds) {
+      this.feeds = feeds;
+
+      return this;
+    }
+
+    public SelectRequest build() {
+      return new SelectRequest(this);
+    }
+  }
+
+  public static Builder of() {
+    return new Builder();
+  }
+
+  public SelectRequest(Builder builder) {
+    if (!builder.transportModes.isEmpty()) {
+      this.transportModes = AllowTransitModeFilter.of(builder.transportModes);
+    } else {
+      this.transportModes = null;
+    }
+    this.agencies = Collections.unmodifiableList(builder.agencies);
+    this.routes = builder.routes;
+    this.feeds = Collections.unmodifiableList(builder.feeds);
+  }
+
+  private final AllowTransitModeFilter transportModes;
+  private final List<FeedScopedId> agencies;
+  private final RouteMatcher routes;
   // TODO: 2022-11-29 group of routes
-  private List<String> feeds = new ArrayList<>();
+  private final List<String> feeds;
 
   public boolean matches(Route route) {
     if (
@@ -66,36 +143,8 @@ public class SelectRequest implements Cloneable, Serializable {
     return transportModes;
   }
 
-  public void setTransportModes(List<MainAndSubMode> transportModes) {
-    if (!transportModes.isEmpty()) {
-      this.transportModes = AllowTransitModeFilter.of(transportModes);
-    }
-  }
-
-  public void setAgencies(List<FeedScopedId> agencies) {
-    this.agencies = agencies;
-  }
-
-  public void setAgenciesFromString(String s) {
-    if (!s.isEmpty()) {
-      this.agencies = FeedScopedId.parseListOfIds(s);
-    }
-  }
-
   public List<FeedScopedId> agencies() {
     return agencies;
-  }
-
-  public void setRoutesFromString(String s) {
-    if (!s.isEmpty()) {
-      this.routes = RouteMatcher.parse(s);
-    } else {
-      this.routes = RouteMatcher.emptyMatcher();
-    }
-  }
-
-  public void setRoutes(RouteMatcher routes) {
-    this.routes = routes;
   }
 
   public RouteMatcher routes() {
@@ -104,10 +153,6 @@ public class SelectRequest implements Cloneable, Serializable {
 
   public List<String> feeds() {
     return feeds;
-  }
-
-  public void setFeeds(List<String> feeds) {
-    this.feeds = feeds;
   }
 
   @Override
@@ -124,23 +169,5 @@ public class SelectRequest implements Cloneable, Serializable {
       feeds +
       '}'
     );
-  }
-
-  @Override
-  protected SelectRequest clone() throws CloneNotSupportedException {
-    try {
-      var clone = (SelectRequest) super.clone();
-
-      // TODO: 2022-12-06 filters: check if we need to copy that
-      clone.transportModes = this.transportModes;
-      clone.agencies = List.copyOf(this.agencies);
-      clone.routes = this.routes.clone();
-      clone.feeds = List.copyOf(this.feeds);
-
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
-    }
   }
 }

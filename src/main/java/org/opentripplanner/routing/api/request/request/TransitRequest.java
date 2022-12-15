@@ -145,12 +145,8 @@ public class TransitRequest implements Cloneable, Serializable {
       clone.preferredRoutes = List.copyOf(this.preferredRoutes);
       clone.unpreferredRoutes = List.copyOf(this.unpreferredRoutes);
       clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
-
-      var cloneFilters = new ArrayList<TransitFilter>();
-      for (var filterRequest : this.filters) {
-        cloneFilters.add(filterRequest.clone());
-      }
-      clone.setFilters(cloneFilters);
+      // filters are immutable
+      clone.setFilters(this.filters);
 
       return clone;
     } catch (CloneNotSupportedException e) {

@@ -30,15 +30,13 @@ public class TestBanning {
   public void testSetBannedOnRequest() {
     Collection<Route> routes = getTestRoutes();
 
-    var filterRequest = new TransitFilterRequest();
-
-    var routeSelect = new SelectRequest();
-    routeSelect.setRoutes(RouteMatcher.parse("F__RUT:Route:1"));
-    filterRequest.not().add(routeSelect);
-
-    var agencySelect = new SelectRequest();
-    agencySelect.setAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
-    filterRequest.not().add(agencySelect);
+    var filterRequest = TransitFilterRequest
+      .of()
+      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__RUT:Route:1")).build())
+      .addNot(
+        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2"))).build()
+      )
+      .build();
 
     Collection<FeedScopedId> bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
       List.of(filterRequest),
@@ -54,15 +52,13 @@ public class TestBanning {
   public void testSetWhiteListedOnRequest() {
     Collection<Route> routes = getTestRoutes();
 
-    var filterRequest = new TransitFilterRequest();
-
-    var routeSelect = new SelectRequest();
-    routeSelect.setRoutes(RouteMatcher.parse("F__RUT:Route:1"));
-    filterRequest.select().add(routeSelect);
-
-    var agencySelect = new SelectRequest();
-    agencySelect.setAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
-    filterRequest.select().add(agencySelect);
+    var filterRequest = TransitFilterRequest
+      .of()
+      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__RUT:Route:1")).build())
+      .addSelect(
+        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2"))).build()
+      )
+      .build();
 
     Collection<FeedScopedId> bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
       List.of(filterRequest),

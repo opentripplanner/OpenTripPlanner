@@ -213,28 +213,16 @@ public class TransmodelGraphQLPlanner {
     DataFetcherDecorator callWith,
     RouteRequest request
   ) {
-    var filter = new TransitFilterRequest();
-    var select = filter.select();
-    var not = filter.not();
-
     if (
       !GqlUtil.hasArgument(environment, "modes.transportModes") &&
       GqlUtil.hasArgument(environment, "whiteListed") &&
       GqlUtil.hasArgument(environment, "banned")
     ) {
       request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
+      return;
     }
 
-    var whiteListedAgencies = new ArrayList<FeedScopedId>();
-    callWith.argument(
-      "whiteListed.authorities",
-      (Collection<String> authorities) -> whiteListedAgencies.addAll(mapIDsToDomain(authorities))
-    );
-    if (!whiteListedAgencies.isEmpty()) {
-      var selectRequest = new SelectRequest();
-      selectRequest.setAgencies(whiteListedAgencies);
-      select.add(selectRequest);
-    }
+    var filterRequestBuilder = TransitFilterRequest.of();
 
     var bannedAgencies = new ArrayList<FeedScopedId>();
     callWith.argument(
@@ -242,20 +230,7 @@ public class TransmodelGraphQLPlanner {
       (Collection<String> authorities) -> bannedAgencies.addAll(mapIDsToDomain(authorities))
     );
     if (!bannedAgencies.isEmpty()) {
-      var selectRequest = new SelectRequest();
-      selectRequest.setAgencies(bannedAgencies);
-      not.add(selectRequest);
-    }
-
-    var whiteListedLines = new ArrayList<FeedScopedId>();
-    callWith.argument(
-      "whiteListed.lines",
-      (List<String> lines) -> whiteListedLines.addAll(mapIDsToDomain(lines))
-    );
-    if (!whiteListedLines.isEmpty()) {
-      var selectRequest = new SelectRequest();
-      selectRequest.setRoutes(RouteMatcher.idMatcher(whiteListedLines));
-      select.add(selectRequest);
+      filterRequestBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
     }
 
     var bannedLines = new ArrayList<FeedScopedId>();
@@ -264,18 +239,38 @@ public class TransmodelGraphQLPlanner {
       (List<String> lines) -> bannedLines.addAll(mapIDsToDomain(lines))
     );
     if (!bannedLines.isEmpty()) {
-      var selectRequest = new SelectRequest();
-      selectRequest.setRoutes(RouteMatcher.idMatcher(bannedLines));
-      not.add(selectRequest);
+      filterRequestBuilder.addSelect(
+        SelectRequest.of().withRoutes(RouteMatcher.idMatcher(bannedLines)).build()
+      );
     }
 
+    var selectors = new ArrayList<SelectRequest.Builder>();
+
+    var whiteListedAgencies = new ArrayList<FeedScopedId>();
+    callWith.argument(
+      "whiteListed.authorities",
+      (Collection<String> authorities) -> whiteListedAgencies.addAll(mapIDsToDomain(authorities))
+    );
+    if (!whiteListedAgencies.isEmpty()) {
+      selectors.add(SelectRequest.of().withAgencies(whiteListedAgencies));
+    }
+
+    var whiteListedLines = new ArrayList<FeedScopedId>();
+    callWith.argument(
+      "whiteListed.lines",
+      (List<String> lines) -> whiteListedLines.addAll(mapIDsToDomain(lines))
+    );
+    if (!whiteListedLines.isEmpty()) {
+      selectors.add(SelectRequest.of().withRoutes(RouteMatcher.idMatcher(whiteListedLines)));
+    }
+
+    // Create modes filter for the request
+    List<MainAndSubMode> tModes = new ArrayList<>();
     if (GqlUtil.hasArgument(environment, "modes")) {
       ElementWrapper<List<LinkedHashMap<String, ?>>> transportModes = new ElementWrapper<>();
       callWith.argument("modes.transportModes", transportModes::set);
 
       if (transportModes.get() != null) {
-        var tModes = new ArrayList<MainAndSubMode>();
-
         for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
           if (modeWithSubmodes.containsKey("transportMode")) {
             var mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
@@ -292,26 +287,24 @@ public class TransmodelGraphQLPlanner {
             }
           }
         }
-
-        if (select.isEmpty()) {
-          var selectRequest = new SelectRequest();
-          if (!tModes.isEmpty()) {
-            selectRequest.setTransportModes(tModes);
-          } else {
-            selectRequest.setTransportModes(MainAndSubMode.all());
-          }
-          select.add(selectRequest);
-        } else {
-          if (!tModes.isEmpty()) {
-            select.forEach(s -> s.setTransportModes(tModes));
-          } else {
-            select.forEach(s -> s.setTransportModes(MainAndSubMode.all()));
-          }
-        }
+      } else {
+        tModes = MainAndSubMode.all();
       }
+    } else {
+      tModes = MainAndSubMode.all();
     }
 
-    request.journey().transit().setFilters(List.of(filter));
+    // Add modes filter to all existing selectors
+    // If no selectors specified, create new one
+    if (!selectors.isEmpty()) {
+      for (var selector : selectors) {
+        filterRequestBuilder.addSelect(selector.withTransportModes(tModes).build());
+      }
+    } else {
+      filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
+    }
+
+    request.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
   }
 
   @SuppressWarnings("unchecked")
@@ -327,21 +320,21 @@ public class TransmodelGraphQLPlanner {
       var filterRequests = new ArrayList<TransitFilter>();
 
       for (var filterInput : filtersInput.get()) {
-        var filterRequest = new TransitFilterRequest();
+        var filterRequestBuilder = TransitFilterRequest.of();
 
         if (filterInput.containsKey("select")) {
           for (var selectInput : (List<LinkedHashMap<String, List<?>>>) filterInput.get("select")) {
-            filterRequest.select().add(mapSelectRequest(selectInput));
+            filterRequestBuilder.addSelect(mapSelectRequest(selectInput));
           }
         }
 
         if (filterInput.containsKey("not")) {
           for (var selectInput : (List<LinkedHashMap<String, List<?>>>) filterInput.get("not")) {
-            filterRequest.not().add(mapSelectRequest(selectInput));
+            filterRequestBuilder.addSelect(mapSelectRequest(selectInput));
           }
         }
 
-        filterRequests.add(filterRequest);
+        filterRequests.add(filterRequestBuilder.build());
       }
 
       request.journey().transit().setFilters(filterRequests);
@@ -352,21 +345,21 @@ public class TransmodelGraphQLPlanner {
 
   @SuppressWarnings("unchecked")
   private SelectRequest mapSelectRequest(LinkedHashMap<String, List<?>> input) {
-    var selectRequest = new SelectRequest();
+    var selectRequestBuilder = SelectRequest.of();
 
     if (input.containsKey("lines")) {
       var lines = (List<String>) input.get("lines");
-      selectRequest.setRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)));
+      selectRequestBuilder.withRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)));
     }
 
     if (input.containsKey("authorities")) {
       var authorities = (List<String>) input.get("authorities");
-      selectRequest.setAgencies(mapIDsToDomain(authorities));
+      selectRequestBuilder.withAgencies(mapIDsToDomain(authorities));
     }
 
     if (input.containsKey("feeds")) {
       var feeds = (List<String>) input.get("feeds");
-      selectRequest.setFeeds(feeds);
+      selectRequestBuilder.withFeeds(feeds);
     }
 
     if (input.containsKey("transportModes")) {
@@ -387,10 +380,10 @@ public class TransmodelGraphQLPlanner {
           tModes.add(new MainAndSubMode(mainMode));
         }
       }
-      selectRequest.setTransportModes(tModes);
+      selectRequestBuilder.withTransportModes(tModes);
     }
 
-    return selectRequest;
+    return selectRequestBuilder.build();
   }
 
   private void mapPreferences(

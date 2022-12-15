@@ -6,6 +6,7 @@ import static org.opentripplanner.api.common.RequestToPreferencesMapper.setIfNot
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -743,75 +744,63 @@ public abstract class RoutingResource {
 
       {
         var transit = journey.transit();
-        var filter = new TransitFilterRequest();
+        var filterBuilder = TransitFilterRequest.of();
         // Filter Agencies
         setIfNotNull(preferredAgencies, transit::setPreferredAgenciesFromString);
         setIfNotNull(unpreferredAgencies, transit::setUnpreferredAgenciesFromString);
-
-        setIfNotNull(
-          bannedAgencies,
-          s -> {
-            var selectRequest = new SelectRequest();
-            selectRequest.setAgenciesFromString(s);
-            filter.not().add(selectRequest);
-          }
-        );
-
-        setIfNotNull(
-          whiteListedAgencies,
-          s -> {
-            var selectRequest = new SelectRequest();
-            selectRequest.setAgenciesFromString(s);
-            filter.select().add(selectRequest);
-          }
-        );
 
         // Filter Routes
         setIfNotNull(preferredRoutes, transit::setPreferredRoutesFromString);
         setIfNotNull(unpreferredRoutes, transit::setUnpreferredRoutesFromString);
 
+        // Filter Trips
+        setIfNotNull(bannedTrips, journey.transit()::setBannedTripsFromString);
+
+        // Excluded entities
+        setIfNotNull(
+          bannedAgencies,
+          s -> filterBuilder.addNot(SelectRequest.of().withAgenciesFromString(s).build())
+        );
+
         setIfNotNull(
           bannedRoutes,
-          s -> {
-            var selectRequest = new SelectRequest();
-            selectRequest.setRoutesFromString(s);
-            filter.not().add(selectRequest);
-          }
+          s -> filterBuilder.addNot(SelectRequest.of().withRoutesFromString(s).build())
+        );
+
+        // Included entities
+        var selectors = new ArrayList<SelectRequest.Builder>();
+
+        setIfNotNull(
+          whiteListedAgencies,
+          s -> selectors.add(SelectRequest.of().withAgenciesFromString(s))
         );
 
         setIfNotNull(
           whiteListedRoutes,
-          s -> {
-            var selectRequest = new SelectRequest();
-            selectRequest.setRoutesFromString(s);
-            filter.select().add(selectRequest);
-          }
+          s -> selectors.add(SelectRequest.of().withRoutesFromString(s))
         );
 
-        // Filter Trips
-        setIfNotNull(bannedTrips, journey.transit()::setBannedTripsFromString);
-
+        // Create modes
         var tModes = modes
           .getTransitModes()
           .stream()
           .map(MainAndSubMode::new)
           .collect(Collectors.toList());
-        if (filter.select().isEmpty()) {
-          var selectRequest = new SelectRequest();
-          if (!tModes.isEmpty()) {
-            selectRequest.setTransportModes(tModes);
-          } else {
-            selectRequest.setTransportModes(MainAndSubMode.all());
-          }
-        } else {
-          if (!tModes.isEmpty()) {
-            filter.select().forEach(s -> s.setTransportModes(tModes));
-          } else {
-            filter.select().forEach(s -> s.setTransportModes(MainAndSubMode.all()));
-          }
+        if (tModes.isEmpty()) {
+          tModes = MainAndSubMode.all();
         }
 
-        transit.filters().add(filter);
+        // Add modes filter to all existing selectors
+        // If no selectors specified, create new one
+        if (!selectors.isEmpty()) {
+          for (var selector : selectors) {
+            filterBuilder.addSelect(selector.withTransportModes(tModes).build());
+          }
+        } else {
+          filterBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
+        }
+
+        transit.filters().add(filterBuilder.build());
       }
       {
         var debugRaptor = journey.transit().raptorDebugging();

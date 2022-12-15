@@ -749,24 +749,26 @@ public class LegacyGraphQLQueryTypeImpl
       if (!hasArgument(environment, "banned") && !hasArgument(environment, "transportModes")) {
         request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
       } else {
-        var filterRequest = new TransitFilterRequest();
-        var select = filterRequest.select();
-        var not = filterRequest.not();
+        var filterRequestBuilder = TransitFilterRequest.of();
 
         if (hasArgument(environment, "banned.routes")) {
-          var selectRequest = new SelectRequest();
-          callWith.argument("banned.routes", selectRequest::setRoutesFromString);
-          if (!selectRequest.routes().isEmpty()) {
-            not.add(selectRequest);
-          }
+          callWith.argument(
+            "banned.routes",
+            s ->
+              filterRequestBuilder.addNot(
+                SelectRequest.of().withRoutesFromString((String) s).build()
+              )
+          );
         }
 
         if (hasArgument(environment, "banned.agencies")) {
-          var selectRequest = new SelectRequest();
-          callWith.argument("banned.agencies", selectRequest::setAgenciesFromString);
-          if (!selectRequest.agencies().isEmpty()) {
-            not.add(selectRequest);
-          }
+          callWith.argument(
+            "banned.agencies",
+            s ->
+              filterRequestBuilder.addNot(
+                SelectRequest.of().withAgenciesFromString((String) s).build()
+              )
+          );
         }
 
         callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
@@ -801,24 +803,14 @@ public class LegacyGraphQLQueryTypeImpl
             .stream()
             .map(MainAndSubMode::new)
             .collect(Collectors.toList());
-          if (select.isEmpty()) {
-            var selectRequest = new SelectRequest();
-            if (!tModes.isEmpty()) {
-              selectRequest.setTransportModes(tModes);
-            } else {
-              selectRequest.setTransportModes(MainAndSubMode.all());
-            }
-            select.add(selectRequest);
-          } else {
-            if (!tModes.isEmpty()) {
-              select.forEach(s -> s.setTransportModes(tModes));
-            } else {
-              select.forEach(s -> s.setTransportModes(MainAndSubMode.all()));
-            }
+          if (tModes.isEmpty()) {
+            tModes = MainAndSubMode.all();
           }
+
+          filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
         }
 
-        request.journey().transit().setFilters(List.of(filterRequest));
+        request.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {

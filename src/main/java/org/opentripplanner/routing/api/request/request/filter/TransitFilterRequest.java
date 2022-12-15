@@ -2,69 +2,59 @@ package org.opentripplanner.routing.api.request.request.filter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
-public class TransitFilterRequest implements Cloneable, Serializable, TransitFilter {
+public class TransitFilterRequest implements Serializable, TransitFilter {
 
-  private List<SelectRequest> select = new ArrayList<>();
-  private List<SelectRequest> not = new ArrayList<>();
+  public static class Builder {
+
+    private List<SelectRequest> select = new ArrayList<>();
+    private List<SelectRequest> not = new ArrayList<>();
+
+    public Builder addSelect(SelectRequest selectRequest) {
+      this.select.add(selectRequest);
+
+      return this;
+    }
+
+    public Builder addNot(SelectRequest selectRequest) {
+      this.not.add(selectRequest);
+
+      return this;
+    }
+
+    public TransitFilterRequest build() {
+      return new TransitFilterRequest(this);
+    }
+  }
+
+  public TransitFilterRequest(Builder builder) {
+    this.select = Collections.unmodifiableList(builder.select);
+    this.not = Collections.unmodifiableList(builder.not);
+  }
+
+  private final List<SelectRequest> select;
+  private final List<SelectRequest> not;
 
   public List<SelectRequest> select() {
     return select;
-  }
-
-  public void setSelect(List<SelectRequest> select) {
-    this.select = select;
   }
 
   public List<SelectRequest> not() {
     return not;
   }
 
-  public void setNot(List<SelectRequest> not) {
-    this.not = not;
+  public static Builder of() {
+    return new Builder();
   }
 
   @Override
   public String toString() {
+    // TODO: 2022-12-15 filters: create proper toString
     return "TransitFilterRequest{" + "select=" + select + ", not=" + not + '}';
-  }
-
-  @Override
-  public TransitFilterRequest clone() {
-    try {
-      var clone = (TransitFilterRequest) super.clone();
-
-      clone.select =
-        this.select.stream()
-          .map(f -> {
-            try {
-              return f.clone();
-            } catch (CloneNotSupportedException e) {
-              throw new RuntimeException(e);
-            }
-          })
-          .collect(Collectors.toList());
-
-      clone.not =
-        this.not.stream()
-          .map(f -> {
-            try {
-              return f.clone();
-            } catch (CloneNotSupportedException e) {
-              throw new RuntimeException(e);
-            }
-          })
-          .collect(Collectors.toList());
-
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
-    }
   }
 
   @Override

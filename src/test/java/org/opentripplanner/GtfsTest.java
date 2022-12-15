@@ -107,26 +107,29 @@ public abstract class GtfsTest {
       .withEgressMode(WALK);
     routingRequest.journey().setModes(requestModesBuilder.build());
 
-    var filterRequest = new TransitFilterRequest();
+    var filterRequestBuilder = TransitFilterRequest.of();
     if (preferredMode != null) {
-      var selectRequest = new SelectRequest();
-      selectRequest.setTransportModes(List.of(new MainAndSubMode(preferredMode, null)));
-      filterRequest.setSelect(List.of(selectRequest));
+      filterRequestBuilder.addSelect(
+        SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
+      );
     } else {
-      var selectRequest = new SelectRequest();
-      selectRequest.setTransportModes(MainAndSubMode.all());
-      filterRequest.setSelect(List.of(selectRequest));
+      filterRequestBuilder.addSelect(
+        SelectRequest.of().withTransportModes(MainAndSubMode.all()).build()
+      );
     }
 
     if (excludedRoute != null && !excludedRoute.isEmpty()) {
-      var selectRequest = new SelectRequest();
-      selectRequest.setRoutes(
-        RouteMatcher.idMatcher(List.of(new FeedScopedId(feedId.getId(), excludedRoute)))
+      filterRequestBuilder.addNot(
+        SelectRequest
+          .of()
+          .withRoutes(
+            RouteMatcher.idMatcher(List.of(new FeedScopedId(feedId.getId(), excludedRoute)))
+          )
+          .build()
       );
-      filterRequest.setNot(List.of(selectRequest));
     }
 
-    routingRequest.journey().transit().setFilters(List.of(filterRequest));
+    routingRequest.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
 
     // Init preferences
     routingRequest.withPreferences(preferences -> {
