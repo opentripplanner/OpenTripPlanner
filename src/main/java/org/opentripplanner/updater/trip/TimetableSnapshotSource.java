@@ -838,7 +838,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (stopTimeUpdate.hasStopSequence()) {
         stopTime.setStopSequence(stopTimeUpdate.getStopSequence());
       }
-      var added = AddedStopTime.ofStopTimeProperties(stopTimeUpdate.getStopTimeProperties());
+      var added = AddedStopTime.ofStopTime(stopTimeUpdate);
       stopTime.setPickupType(added.pickup());
       stopTime.setDropOffType(added.dropOff());
       // Add stop time to list

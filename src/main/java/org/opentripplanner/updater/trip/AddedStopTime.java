@@ -7,6 +7,10 @@ import javax.annotation.Nullable;
 import org.opentripplanner.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.model.PickDrop;
 
+/**
+ * This class purely exists to encapsulate the logic for extracting conversion of the GTFS-RT
+ * updates into a separate place.
+ */
 final class AddedStopTime {
 
   @Nullable
@@ -30,18 +34,28 @@ final class AddedStopTime {
     return Objects.requireNonNullElse(dropOff, DEFAULT_PICK_DROP);
   }
 
-  static AddedStopTime ofStopTimeProperties(
-    GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties props
-  ) {
-    if (props.hasExtension(MfdzRealtimeExtensions.stopTimeProperties)) {
-      var ext = props.getExtension(MfdzRealtimeExtensions.stopTimeProperties);
+  static AddedStopTime ofStopTime(GtfsRealtime.TripUpdate.StopTimeUpdate props) {
+    if (props.getStopTimeProperties().hasExtension(MfdzRealtimeExtensions.stopTimeProperties)) {
+      var ext = props
+        .getStopTimeProperties()
+        .getExtension(MfdzRealtimeExtensions.stopTimeProperties);
       var pickup = ext.getPickupType();
       var dropOff = ext.getDropoffType();
       var dropOffType = PickDropMapper.map(dropOff.getNumber());
       var pickupType = PickDropMapper.map(pickup.getNumber());
       return new AddedStopTime(pickupType, dropOffType);
     } else {
-      return new AddedStopTime(null, null);
+      var pickDrop = toPickDrop(props.getScheduleRelationship());
+      return new AddedStopTime(pickDrop, pickDrop);
     }
+  }
+
+  private static PickDrop toPickDrop(
+    GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship
+  ) {
+    return switch (scheduleRelationship) {
+      case SCHEDULED, NO_DATA -> PickDrop.SCHEDULED;
+      case SKIPPED, UNSCHEDULED -> PickDrop.NONE;
+    };
   }
 }
