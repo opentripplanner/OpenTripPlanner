@@ -94,6 +94,9 @@ public class ViaRoutingWorkerTest {
       result.plan().get(s1i2).contains(s2i3),
       "Second itinerary should be combined with s2i3"
     );
+
+    // Assert that the connection creation logic works and returns the same combinations as above
+    assertEquals(List.of(List.of(List.of(0, 1), List.of(2))), result.createConnections());
   }
 
   /**
