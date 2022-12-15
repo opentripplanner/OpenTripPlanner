@@ -21,12 +21,12 @@ o.o.service.<name>
     <Name>Repository            -- Optional interface for updating the model (in memory)
 ```
 
- - The `grapbuilder` is just an example in case this service have its own 
+ - The `grapbuilder` is just an example, in case this service has its own 
    graph-builder module.
  - The `internal` package can be split into sub-packages, if needed. 
  - The aggregate root `<Name>Service` is defined in the root package.
  - The `<Name>Repository` interface is only needed if the repository 
-   is used outside the module by an updater or other service.
+   is used outside the module by an updater or another service.
  - Both the `Default<Name>Repository` and `Default<Name>Service` should be 
    thread safe.
  - The `Default<Name>Repository` should be serialized in the `graph.obj` file and hence
