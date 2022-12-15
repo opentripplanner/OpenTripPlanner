@@ -57,7 +57,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
@@ -98,7 +97,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private final TripPatternCache tripPatternCache = new TripPatternCache();
 
   private final ZoneId timeZone;
-  private final TransitService transitService;
+  private final DefaultTransitService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
 
   /**
@@ -732,6 +731,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       builder.withAgency(fallbackAgency);
 
       route = builder.build();
+
+      transitService.addRoutes(route);
     } else if (routeExists(tripId.getFeedId(), tripDescriptor)) {
       // Try to find route
       route =
@@ -751,7 +752,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       I18NString longName = NonLocalizedString.ofNullable(tripDescriptor.getTripId());
       builder.withLongName(longName);
       route = builder.build();
+      transitService.addRoutes(route);
     }
+
     return route;
   }
 

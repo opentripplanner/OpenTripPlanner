@@ -937,6 +937,9 @@ public class TimetableSnapshotSourceTest {
       assertEquals(TripUpdateBuilder.ROUTE_NAME, route.getName());
       assertEquals(TransitMode.RAIL, route.getMode());
 
+      var fromTransitModel = transitModel.getTransitModelIndex().getRouteForId(route.getId());
+      assertEquals(fromTransitModel, route);
+
       var stopPattern = pattern.getStopPattern();
       assertEquals(PickDrop.CALL_AGENCY, stopPattern.getPickup(0));
       assertEquals(PickDrop.CALL_AGENCY, stopPattern.getDropoff(0));
@@ -991,11 +994,12 @@ public class TimetableSnapshotSourceTest {
         feedId
       );
       var secondPattern = assertAddedTrip(serviceDate, addedTripId, updater);
-      var secondRoute = pattern.getRoute();
+      var secondRoute = secondPattern.getRoute();
 
       // THEN
 
       assertSame(firstRoute, secondRoute);
+      assertNotNull(transitModel.getTransitModelIndex().getRouteForId(firstRoute.getId()));
     }
   }
 
