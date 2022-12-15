@@ -7,7 +7,7 @@ import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeSe
 
 /**
  * The service is used during application serve phase, not loading, so we need to provide
- * a module for the service without the repository, witch is injected from the loading phase.
+ * a module for the service without the repository, which is injected from the loading phase.
  */
 @Module
 public interface WorldEnvelopeServiceModule {
