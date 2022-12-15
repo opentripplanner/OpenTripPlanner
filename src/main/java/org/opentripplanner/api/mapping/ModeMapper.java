@@ -63,6 +63,8 @@ public class ModeMapper {
       case TRAM -> "TRAM";
       case TROLLEYBUS -> "TROLLEYBUS";
       case MONORAIL -> "MONORAIL";
+      case CARPOOL -> "CARPOOL";
+      case TAXI -> "TAXI";
     };
   }
 }

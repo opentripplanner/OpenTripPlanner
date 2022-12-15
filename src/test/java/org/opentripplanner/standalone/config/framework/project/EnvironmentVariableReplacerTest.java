@@ -7,11 +7,11 @@ import static org.opentripplanner.standalone.config.framework.project.Environmen
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.projectinfo.MavenProjectVersion;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.model.projectinfo.VersionControlInfo;
 import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
-import org.opentripplanner.util.OtpAppException;
 
 public class EnvironmentVariableReplacerTest {
 

@@ -60,8 +60,6 @@ public class NycFareServiceImpl implements FareService {
 
   private static final Logger LOG = LoggerFactory.getLogger(NycFareServiceImpl.class);
 
-  private static final long serialVersionUID = 1L;
-
   private static final float ORDINARY_FARE = 2.75f;
 
   private static final float EXPRESS_FARE = 6.50f;

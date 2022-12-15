@@ -1,5 +1,6 @@
 package org.opentripplanner.generate.doc;
 
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
@@ -26,7 +27,7 @@ public class UpdaterConfigDocTest {
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "UpdaterConfig.md");
   private static final File OUT_FILE = new File(DOCS_ROOT, "UpdaterConfig.md");
 
-  private static final String ROUTER_CONFIG_FILENAME = "standalone/config/router-config.json";
+  private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final Set<String> SKIP_UPDATERS = Set.of(
     "siri-azure-sx-updater",
     "vehicle-parking"
@@ -63,8 +64,8 @@ public class UpdaterConfigDocTest {
   }
 
   private NodeAdapter readBuildConfig() {
-    var json = jsonNodeFromResource(ROUTER_CONFIG_FILENAME);
-    var conf = new RouterConfig(json, ROUTER_CONFIG_FILENAME, false);
+    var json = jsonNodeFromResource(ROUTER_CONFIG_PATH);
+    var conf = new RouterConfig(json, ROUTER_CONFIG_PATH, false);
     return conf.asNodeAdapter().child("updaters");
   }
 
@@ -94,7 +95,7 @@ public class UpdaterConfigDocTest {
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
     buf.addExample(
-      "router-config.json",
+      ROUTER_CONFIG_FILENAME,
       """
       "updaters": [
         %s

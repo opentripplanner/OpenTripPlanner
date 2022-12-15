@@ -173,16 +173,16 @@ public class SearchParams {
   }
 
   /**
-   * This accept none optimal trips if they are close enough - if and only if they represent an
-   * optimal path for their given iteration. I other words this slack only relax the pareto
+   * Whether to accept non-optimal trips if they are close enough - if and only if they represent an
+   * optimal path for their given iteration. In other words this slack only relaxes the pareto
    * comparison at the destination.
    * <p/>
-   * Let {@code c} be the existing minimum pareto optimal cost to to beat. Then a trip with cost
+   * Let {@code c} be the existing minimum pareto optimal cost to beat. Then a trip with cost
    * {@code c'} is accepted if the following is true:
    * <pre>
    * c' < Math.round(c * relaxCostAtDestination)
    * </pre>
-   * If the values is less then 0.0 a normal '<' comparison is performed.
+   * If the value is less than 0.0 a normal '<' comparison is performed.
    * <p/>
    * TODO - When setting this above 1.0, we get some unwanted results. We should have a filter to remove those
    * TODO - results. See issue https://github.com/entur/r5/issues/28

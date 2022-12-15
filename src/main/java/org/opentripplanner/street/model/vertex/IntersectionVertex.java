@@ -1,15 +1,13 @@
 package org.opentripplanner.street.model.vertex;
 
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 /**
  * Represents an ordinary location in space, typically an intersection.
  */
 public class IntersectionVertex extends StreetVertex {
-
-  private static final long serialVersionUID = 1L;
 
   /**
    * Does this intersection have a traffic light?

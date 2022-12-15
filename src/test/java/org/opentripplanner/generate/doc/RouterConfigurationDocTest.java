@@ -1,5 +1,6 @@
 package org.opentripplanner.generate.doc;
 
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
@@ -23,17 +24,16 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 @OnlyIfDocsExist
 public class RouterConfigurationDocTest {
 
-  private static final String CONFIG_JSON = "router-config.json";
-
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "RouterConfiguration.md");
   private static final File OUT_FILE = new File(DOCS_ROOT, "RouterConfiguration.md");
 
-  private static final String CONFIG_PATH = "standalone/config/" + CONFIG_JSON;
+  private static final String CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final SkipNodes SKIP_NODES = SkipNodes
     .of()
-    .add("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
+    .add("flex", "sandbox/Flex.md")
     .add("routingDefaults", "RouteRequest.md")
     .add("updaters", "UpdaterConfig.md")
+    .add("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
     .build();
 
   /**
@@ -54,7 +54,7 @@ public class RouterConfigurationDocTest {
 
     doc = replaceParametersTable(doc, getParameterSummaryTable(node));
     doc = replaceParametersDetails(doc, getParameterDetailsTable(node));
-    doc = replaceJsonExample(doc, node, CONFIG_JSON);
+    doc = replaceJsonExample(doc, node, ROUTER_CONFIG_FILENAME);
 
     writeFile(OUT_FILE, doc);
 

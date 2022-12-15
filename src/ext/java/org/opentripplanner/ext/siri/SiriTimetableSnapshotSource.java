@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -29,7 +28,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
@@ -541,7 +539,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     FeedScopedId routeId = new FeedScopedId(feedId, lineRef);
     Route route = transitModel.getTransitModelIndex().getRouteForId(routeId);
 
-    T2<TransitMode, String> transitMode = AddedTripHelper.getTransitMode(
+    Mode transitMode = AddedTripHelper.getTransitMode(
       estimatedVehicleJourney.getVehicleModes(),
       replacedRoute
     );
@@ -782,7 +780,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     StopLocation stop,
     String destinationDisplay
   ) {
-    T2<Integer, Integer> arrivalAndDepartureTime = getArrivalAndDepartureTime(
+    TimeForStop arrivalAndDepartureTime = getArrivalAndDepartureTime(
       numStops,
       departureDate,
       stopSequence,
@@ -794,8 +792,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       trip,
       stopSequence,
       stop,
-      arrivalAndDepartureTime.first,
-      arrivalAndDepartureTime.second,
+      arrivalAndDepartureTime.arrivalTime(),
+      arrivalAndDepartureTime.departureTime(),
       destinationDisplay
     );
   }
@@ -831,7 +829,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return stopSequence;
   }
 
-  private T2<Integer, Integer> getArrivalAndDepartureTime(
+  private TimeForStop getArrivalAndDepartureTime(
     int numStops,
     ZonedDateTime departureDate,
     int i,

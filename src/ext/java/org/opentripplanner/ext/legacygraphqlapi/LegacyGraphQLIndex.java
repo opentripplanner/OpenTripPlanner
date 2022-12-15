@@ -46,6 +46,7 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLGeomet
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLItineraryImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLLegImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLNodeTypeResolver;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLOpeningHoursImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLPatternImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLPlaceImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLPlaceInterfaceTypeResolver;
@@ -79,8 +80,8 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLplaceA
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLserviceTimeRangeImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstepImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstopAtDistanceImpl;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,6 +159,7 @@ class LegacyGraphQLIndex {
         .type(IntrospectionTypeWiring.build(LegacyGraphQLStopGeometriesImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLVehiclePositionImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLStopRelationshipImpl.class))
+        .type(IntrospectionTypeWiring.build(LegacyGraphQLOpeningHoursImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

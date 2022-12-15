@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
@@ -19,7 +20,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OTPFeature;
 
 public abstract class FlexTest {
 
@@ -38,7 +38,6 @@ public abstract class FlexTest {
     secondsSinceMidnight,
     new TIntHashSet()
   );
-  static final FlexParameters params = new FlexParameters(300);
 
   static TestOtpModel buildFlexGraph(String fileName) {
     File file = null;

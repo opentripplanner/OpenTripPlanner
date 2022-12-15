@@ -9,10 +9,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.ext.vectortiles.LayerBuilder;
-import org.opentripplanner.ext.vectortiles.PropertyMapper;
+import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.inspector.vector.LayerBuilder;
+import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -26,12 +27,13 @@ public class StationsLayerBuilder extends LayerBuilder<Station> {
 
   public StationsLayerBuilder(
     TransitService transitService,
-    VectorTilesResource.LayerParameters layerParameters,
+    LayerParameters<VectorTilesResource.LayerType> layerParameters,
     Locale locale
   ) {
     super(
+      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitService, locale),
       layerParameters.name(),
-      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitService, locale)
+      layerParameters.expansionFactor()
     );
     this.transitModel = transitService;
   }

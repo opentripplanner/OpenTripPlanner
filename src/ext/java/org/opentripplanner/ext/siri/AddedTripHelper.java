@@ -5,10 +5,9 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DAT
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.common.model.T2;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -51,11 +50,11 @@ public class AddedTripHelper {
     Operator operator,
     Route replacedRoute,
     FeedScopedId routeId,
-    T2<TransitMode, String> transitMode
+    Mode transitMode
   ) {
     var routeBuilder = Route.of(routeId);
-    routeBuilder.withMode(transitMode.first);
-    routeBuilder.withNetexSubmode(transitMode.second);
+    routeBuilder.withMode(transitMode.mode());
+    routeBuilder.withNetexSubmode(transitMode.submode());
     routeBuilder.withOperator(operator);
 
     // TODO - SIRI: Is there a better way to find authority/Agency?
@@ -87,7 +86,7 @@ public class AddedTripHelper {
     FeedScopedId tripId,
     Route route,
     Operator operator,
-    T2<TransitMode, String> transitMode,
+    Mode transitMode,
     List<NaturalLanguageStringStructure> destinationNames,
     FeedScopedId calServiceId
   ) {
@@ -99,8 +98,8 @@ public class AddedTripHelper {
     tripBuilder.withRoute(route);
 
     // Explicitly set TransitMode on Trip - in case it differs from Route
-    tripBuilder.withMode(transitMode.first);
-    tripBuilder.withNetexSubmode(transitMode.second);
+    tripBuilder.withMode(transitMode.mode());
+    tripBuilder.withNetexSubmode(transitMode.submode());
 
     tripBuilder.withServiceId(calServiceId);
 
@@ -134,7 +133,7 @@ public class AddedTripHelper {
    * @param numStops the total number of stops in the journey
    * @return a tuple with the aimedArrivalTime as first and the aimedDepartureTime as second.
    */
-  public static T2<Integer, Integer> getTimeForStop(
+  public static TimeForStop getTimeForStop(
     int aimedArrivalTime,
     int aimedDepartureTime,
     int stopIndex,
@@ -144,11 +143,11 @@ public class AddedTripHelper {
     boolean isLastStop = stopIndex == (numStops - 1);
 
     if (isFirstStop) {
-      return new T2<>(aimedDepartureTime, aimedDepartureTime);
+      return new TimeForStop(aimedDepartureTime, aimedDepartureTime);
     } else if (isLastStop) {
-      return new T2<>(aimedArrivalTime, aimedArrivalTime);
+      return new TimeForStop(aimedArrivalTime, aimedArrivalTime);
     } else {
-      return new T2<>(aimedArrivalTime, aimedDepartureTime);
+      return new TimeForStop(aimedArrivalTime, aimedDepartureTime);
     }
   }
 
@@ -186,7 +185,7 @@ public class AddedTripHelper {
   /**
    * Resolves TransitMode from SIRI VehicleMode
    */
-  public static T2<TransitMode, String> getTransitMode(
+  public static Mode getTransitMode(
     List<VehicleModesEnumeration> vehicleModes,
     Route replacedRoute
   ) {
@@ -194,7 +193,7 @@ public class AddedTripHelper {
 
     String transitSubMode = resolveTransitSubMode(transitMode, replacedRoute);
 
-    return new T2<>(transitMode, transitSubMode);
+    return new Mode(transitMode, transitSubMode);
   }
 
   /**

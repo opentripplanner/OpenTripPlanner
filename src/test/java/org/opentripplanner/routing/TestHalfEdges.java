@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,12 +18,13 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -34,6 +37,7 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -46,12 +50,10 @@ import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.TestUtils;
 
 public class TestHalfEdges {
 
@@ -225,7 +227,10 @@ public class TestHalfEdges {
 
     assertEquals(2, edges.size());
 
-    long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
+    long startTime = LocalDateTime
+      .of(2009, Month.DECEMBER, 1, 12, 34, 25)
+      .atZone(ZoneIds.NEW_YORK)
+      .toEpochSecond();
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree<State, Edge, Vertex> spt1 = StreetSearchBuilder
       .of()
@@ -427,7 +432,10 @@ public class TestHalfEdges {
 
     assertEquals(3, edges.size());
 
-    long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
+    long startTime = LocalDateTime
+      .of(2009, Month.DECEMBER, 1, 12, 34, 25)
+      .atZone(ZoneIds.NEW_YORK)
+      .toEpochSecond();
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()
@@ -480,7 +488,10 @@ public class TestHalfEdges {
     Collection<Edge> edges = end.getIncoming();
     assertEquals(1, edges.size());
 
-    long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
+    long startTime = LocalDateTime
+      .of(2009, Month.DECEMBER, 1, 12, 34, 25)
+      .atZone(ZoneIds.NEW_YORK)
+      .toEpochSecond();
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()

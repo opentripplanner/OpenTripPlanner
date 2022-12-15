@@ -9,8 +9,6 @@ import org.opentripplanner.model.Frequency;
  */
 public class FrequencyEntry implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   public final int startTime; // sec after midnight
   public final int endTime; // sec after midnight
   public final int headway; // sec

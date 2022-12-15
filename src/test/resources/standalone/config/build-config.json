@@ -10,6 +10,7 @@
   },
 
   "osmDefaults": {
+    "timeZone": "Europe/Rome",
     "osmTagMapping": "default"
   },
   "osm": [{
@@ -17,6 +18,9 @@
     "timeZone" : "Europe/Oslo",
     "osmTagMapping" : "norway"
   }],
+  "demDefaults": {
+    "elevationUnitMultiplier" : 1.0
+  },
   "dem": [{
     "source" : "gs://my-bucket/otp-work-dir/norway.dem.tiff",
     "elevationUnitMultiplier" : 2.5
@@ -28,6 +32,13 @@
     "groupFilePattern" : "(\\w{3})_.*\\.xml",
     "ignoreFilePattern" : "(temp|tmp)",
     "ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
+  },
+  "gtfsDefaults" : {
+    "stationTransferPreference" : "recommended",
+    "removeRepeatedStops" : true,
+    "discardMinTransferTimes": false,
+    "blockBasedInterlining": true,
+    "maxInterlineDistance": 200
   },
   "transitFeeds" : [
     {

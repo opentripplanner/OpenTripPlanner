@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -81,6 +82,11 @@ class ItineraryResultMapper {
 
       if (leg.isWalkingLeg()) {
         buf.walk((int) leg.getDuration().toSeconds());
+      } else if (
+        leg instanceof StreetLeg streetLeg && streetLeg.getFrom().vehicleRentalPlace != null
+      ) {
+        var name = streetLeg.getFrom().vehicleRentalPlace.getName().toString();
+        buf.sep().stop(name).space().rental((int) leg.getDuration().toSeconds());
       } else if (leg instanceof TransitLeg transitLeg) {
         buf.transit(
           transitLeg.getMode().name() + " " + leg.getRoute().getShortName(),

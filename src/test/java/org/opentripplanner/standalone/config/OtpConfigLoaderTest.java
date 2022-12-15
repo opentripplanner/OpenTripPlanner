@@ -1,10 +1,11 @@
 package org.opentripplanner.standalone.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
@@ -20,9 +21,6 @@ import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 
 public class OtpConfigLoaderTest {
 
-  private static final String OTP_CONFIG_FILENAME = "otp-config.json";
-  private static final String BUILD_CONFIG_FILENAME = "build-config.json";
-  private static final String ROUTER_CONFIG_FILENAME = "router-config.json";
   private static final String UTF_8 = "UTF-8";
   private File tempDir;
 
@@ -35,14 +33,6 @@ public class OtpConfigLoaderTest {
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void tearDown() {
     tempDir.delete();
-  }
-
-  @Test
-  public void isConfigFile() {
-    assertTrue(OtpConfigLoader.isConfigFile(OTP_CONFIG_FILENAME));
-    assertTrue(OtpConfigLoader.isConfigFile(BUILD_CONFIG_FILENAME));
-    assertTrue(OtpConfigLoader.isConfigFile(ROUTER_CONFIG_FILENAME));
-    assertFalse(OtpConfigLoader.isConfigFile("not-config.json"));
   }
 
   @Test

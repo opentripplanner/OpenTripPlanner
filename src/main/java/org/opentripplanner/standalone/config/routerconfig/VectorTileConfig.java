@@ -1,26 +1,30 @@
 package org.opentripplanner.standalone.config.routerconfig;
 
-import static org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters.CACHE_MAX_SECONDS;
-import static org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters.EXPANSION_FACTOR;
-import static org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters.MAX_ZOOM;
-import static org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters.MIN_ZOOM;
+import static org.opentripplanner.inspector.vector.LayerParameters.CACHE_MAX_SECONDS;
+import static org.opentripplanner.inspector.vector.LayerParameters.EXPANSION_FACTOR;
+import static org.opentripplanner.inspector.vector.LayerParameters.MAX_ZOOM;
+import static org.opentripplanner.inspector.vector.LayerParameters.MIN_ZOOM;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
+import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-public class VectorTileConfig implements VectorTilesResource.LayersParameters {
+public class VectorTileConfig
+  implements VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> {
 
-  List<VectorTilesResource.LayerParameters> layers;
+  List<LayerParameters<VectorTilesResource.LayerType>> layers;
 
-  public VectorTileConfig(Collection<? extends VectorTilesResource.LayerParameters> layers) {
+  public VectorTileConfig(
+    Collection<? extends LayerParameters<VectorTilesResource.LayerType>> layers
+  ) {
     this.layers = List.copyOf(layers);
   }
 
   @Override
-  public List<VectorTilesResource.LayerParameters> layers() {
+  public List<LayerParameters<VectorTilesResource.LayerType>> layers() {
     return layers;
   }
 
@@ -94,5 +98,5 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
     int cacheMaxSeconds,
     double expansionFactor
   )
-    implements VectorTilesResource.LayerParameters {}
+    implements LayerParameters<VectorTilesResource.LayerType> {}
 }

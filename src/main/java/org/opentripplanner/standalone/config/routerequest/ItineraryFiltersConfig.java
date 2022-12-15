@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.routerequest;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
@@ -231,6 +232,18 @@ removed from list.
             "This can be used by frontend developers to implement a simple traffic light UI."
           )
           .asBoolean(dft.useAccessibilityScore())
+      )
+      .withMinBikeParkingDistance(
+        c
+          .of("minBikeParkingDistance")
+          .since(V2_3)
+          .summary(
+            "Filter out bike park+ride results that have fewer meters of cycling than this value."
+          )
+          .description(
+            "Useful if you want to exclude those routes which have only a few meters of cycling before parking the bike and taking public transport."
+          )
+          .asDouble(dft.minBikeParkingDistance())
       )
       .build();
   }

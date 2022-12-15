@@ -7,8 +7,6 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 public final class RouteStopTransferPoint implements TransferPoint, Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private final Route route;
   private final StopLocation stop;
 

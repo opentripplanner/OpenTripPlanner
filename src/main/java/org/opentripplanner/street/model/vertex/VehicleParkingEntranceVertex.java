@@ -14,8 +14,6 @@ import org.opentripplanner.street.model.edge.VehicleParkingEdge;
  */
 public class VehicleParkingEntranceVertex extends Vertex {
 
-  private static final long serialVersionUID = 1L;
-
   private final VehicleParkingEntrance parkingEntrance;
 
   public VehicleParkingEntranceVertex(Graph g, VehicleParkingEntrance parkingEntrance) {

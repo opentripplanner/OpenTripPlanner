@@ -12,6 +12,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
@@ -38,7 +39,6 @@ import org.opentripplanner.street.model.edge.VehicleRentalEdge;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
@@ -71,6 +71,8 @@ public class ConstantsForTests {
 
   public static final String FARE_COMPONENT_GTFS =
     "src/test/resources/gtfs/farecomponents.gtfs.zip";
+
+  public static final String SHAPE_DIST_GTFS = "src/test/resources/gtfs/shape_dist_traveled/";
 
   private static final String NETEX_DIR = "src/test/resources/netex";
 
@@ -113,10 +115,12 @@ public class ConstantsForTests {
   }
 
   public static NetexBundle createMinimalNetexBundle() {
-    return NetexConfigure.netexBundleForTest(
-      createNetexBuilderParameters(),
-      new File(ConstantsForTests.NETEX_DIR, ConstantsForTests.NETEX_FILENAME)
-    );
+    var buildConfig = createNetexBuilderParameters();
+    var netexZipFile = new File(NETEX_DIR, NETEX_FILENAME);
+
+    var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
+    var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
+    return new NetexConfigure(buildConfig).netexBundle(configuredDataSource);
   }
 
   /**
@@ -306,10 +310,7 @@ public class ConstantsForTests {
       graph,
       DataImportIssueStore.NOOP,
       ServiceDateInterval.unbounded(),
-      fareServiceFactory,
-      false,
-      true,
-      300
+      fareServiceFactory
     );
 
     module.buildGraph();

@@ -25,6 +25,7 @@ config:
     Polyline: String
     GeoJson: org.locationtech.jts.geom.Geometry
   mappers:
+    AbsoluteDirection: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection#LegacyGraphQLAbsoluteDirection
     Agency: org.opentripplanner.transit.model.organization.Agency#Agency
     RouteType: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel#LegacyGraphQLRouteTypeModel
     Alert: org.opentripplanner.routing.alertpatch.TransitAlert#TransitAlert
@@ -64,6 +65,7 @@ config:
     placeAtDistanceEdge: graphql.relay.Edge#Edge<PlaceAtDistance>
     Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     RealtimeState: String
+    RelativeDirection: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection#LegacyGraphQLRelativeDirection
     Route: org.opentripplanner.transit.model.network.Route#Route
     RoutingError: org.opentripplanner.routing.api.response.RoutingError#RoutingError
     RoutingErrorCode: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode#LegacyGraphQLRoutingErrorCode
@@ -92,3 +94,4 @@ config:
     FormFactor: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor
     PropulsionType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType
     RentalVehicleType: org.opentripplanner.routing.vehicle_rental.RentalVehicleType#RentalVehicleType
+    OpeningHours: org.opentripplanner.model.calendar.openinghours.OHCalendar#OHCalendar

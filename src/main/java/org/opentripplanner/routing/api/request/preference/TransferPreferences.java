@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.api.request.framework.Units;
 
@@ -26,6 +25,7 @@ public final class TransferPreferences implements Serializable {
   private final int slack;
   private final double waitReluctance;
   private final int maxTransfers;
+  private final int maxAdditionalTransfers;
   private final TransferOptimizationParameters optimization;
   private final int nonpreferredCost;
 
@@ -34,6 +34,7 @@ public final class TransferPreferences implements Serializable {
     this.slack = 120;
     this.waitReluctance = 1.0;
     this.maxTransfers = 12;
+    this.maxAdditionalTransfers = 5;
     this.optimization = TransferOptimizationPreferences.DEFAULT;
     this.nonpreferredCost = 180;
   }
@@ -43,6 +44,8 @@ public final class TransferPreferences implements Serializable {
     this.slack = Units.duration(builder.slack);
     this.waitReluctance = Units.reluctance(builder.waitReluctance);
     this.maxTransfers = Units.count(builder.maxTransfers, MAX_NUMBER_OF_TRANSFERS);
+    this.maxAdditionalTransfers =
+      Units.count(builder.maxAdditionalTransfers, MAX_NUMBER_OF_TRANSFERS);
     this.optimization = requireNonNull(builder.optimization);
     this.nonpreferredCost = Units.cost(builder.nonpreferredCost);
   }
@@ -106,18 +109,27 @@ public final class TransferPreferences implements Serializable {
   }
 
   /**
-   * Ideally maxTransfers should be set in the router config, not here. Instead the client should be
-   * able to pass in a parameter for the max number of additional/extra transfers relative to the
-   * best trip (with the fewest possible transfers) within constraint of the other search
-   * parameters(TODO OTP2 Expose {@link SearchParams#numberOfAdditionalTransfers()}
-   * in APIs). This might be to complicated to explain to the customer, so we might stick to the old
-   * limit, but that have side-effects that you might not find any trips on a day where a critical
-   * part of the trip is not available, because of some real-time disruption.
+   * Ideally maxTransfers should be set in the router config, not from the client. Instead, the
+   * client should use {@link #maxAdditionalTransfers)} instead to pass in the max number of
+   * additional/extra transfers relative to the best trip (with the fewest possible transfers)
+   * within constraint of the other search parameters. This might be too complicated to explain to
+   * the customer, so you might stick to the old limit, but that has side-effects where you might
+   * not find any trips on a day when a critical part of the trip is not available, because of some
+   * real-time disruption.
    * <p>
    * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
    */
   public Integer maxTransfers() {
     return maxTransfers;
+  }
+
+  /**
+   * The maximum number of transfers allowed in addition to the least number of transfers of any
+   * result found in the search. This can be used both to improve the performance of the search, and
+   * limiting the number of transfers should be done by increasing the {@link #cost} instead.
+   */
+  public Integer maxAdditionalTransfers() {
+    return maxAdditionalTransfers;
   }
 
   /** Configure the transfer optimization */
@@ -146,6 +158,7 @@ public final class TransferPreferences implements Serializable {
       slack == that.slack &&
       doubleEquals(that.waitReluctance, waitReluctance) &&
       maxTransfers == that.maxTransfers &&
+      maxAdditionalTransfers == that.maxAdditionalTransfers &&
       optimization.equals(that.optimization) &&
       nonpreferredCost == that.nonpreferredCost
     );
@@ -153,7 +166,15 @@ public final class TransferPreferences implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(cost, slack, waitReluctance, maxTransfers, optimization, nonpreferredCost);
+    return Objects.hash(
+      cost,
+      slack,
+      waitReluctance,
+      maxTransfers,
+      maxAdditionalTransfers,
+      optimization,
+      nonpreferredCost
+    );
   }
 
   @Override
@@ -164,6 +185,7 @@ public final class TransferPreferences implements Serializable {
       .addNum("slack", slack, DEFAULT.slack)
       .addNum("waitReluctance", waitReluctance, DEFAULT.waitReluctance)
       .addNum("maxTransfers", maxTransfers, DEFAULT.maxTransfers)
+      .addNum("maxAdditionalTransfers", maxAdditionalTransfers, DEFAULT.maxAdditionalTransfers)
       .addObj("optimization", optimization, DEFAULT.optimization)
       .addNum("nonpreferredCost", nonpreferredCost, DEFAULT.nonpreferredCost)
       .toString();
@@ -172,19 +194,21 @@ public final class TransferPreferences implements Serializable {
   public static class Builder {
 
     private final TransferPreferences original;
-    private int cost = 0;
-    private int slack = 120;
-    private int nonpreferredCost = 180;
-    private double waitReluctance = 1.0;
+    private int cost;
+    private int slack;
+    private int nonpreferredCost;
+    private double waitReluctance;
 
-    private TransferOptimizationParameters optimization = TransferOptimizationPreferences.DEFAULT;
-    private Integer maxTransfers = 12;
+    private TransferOptimizationParameters optimization;
+    private Integer maxTransfers;
+    private Integer maxAdditionalTransfers;
 
     public Builder(TransferPreferences original) {
       this.original = original;
       this.cost = original.cost;
       this.slack = original.slack;
       this.maxTransfers = original.maxTransfers;
+      this.maxAdditionalTransfers = original.maxAdditionalTransfers;
       this.waitReluctance = original.waitReluctance;
       this.optimization = original.optimization;
       this.nonpreferredCost = original.nonpreferredCost;
@@ -221,6 +245,11 @@ public final class TransferPreferences implements Serializable {
 
     public Builder withMaxTransfers(Integer maxTransfers) {
       this.maxTransfers = maxTransfers;
+      return this;
+    }
+
+    public Builder withMaxAdditionalTransfers(Integer maxAdditionalTransfers) {
+      this.maxAdditionalTransfers = maxAdditionalTransfers;
       return this;
     }
 

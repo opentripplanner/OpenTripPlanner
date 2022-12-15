@@ -4,12 +4,12 @@ import java.util.Map;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.netex.mapping.support.MainAndSubMode;
+import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -108,7 +108,7 @@ class TripMapper {
     builder.withOperator(findOperator(serviceJourney));
 
     if (serviceJourney.getTransportMode() != null) {
-      MainAndSubMode transitMode = null;
+      NetexMainAndSubMode transitMode = null;
       try {
         transitMode =
           transportModeMapper.map(
