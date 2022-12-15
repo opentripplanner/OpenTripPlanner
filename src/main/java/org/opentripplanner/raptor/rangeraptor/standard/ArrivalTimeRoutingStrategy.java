@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
+import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
+
 import java.util.function.IntConsumer;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
@@ -59,7 +61,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
 
   @Override
   public void prepareForTransitWith() {
-    this.onTripIndex = NOT_SET;
+    this.onTripIndex = UNBOUNDED_TRIP_INDEX;
     this.onTripBoardTime = NOT_SET;
     this.onTripBoardStop = NOT_SET;
     this.onTrip = null;
@@ -67,7 +69,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
 
   @Override
   public void alight(final int stopIndex, final int stopPos, final int alightSlack) {
-    if (onTripIndex != NOT_SET) {
+    if (onTripIndex != UNBOUNDED_TRIP_INDEX) {
       final int stopArrivalTime = calculator.stopArrivalTime(onTrip, stopPos, alightSlack);
       state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStop, onTripBoardTime, onTrip);
     }

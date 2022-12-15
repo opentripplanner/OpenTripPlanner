@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
+import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
+
 import java.util.function.IntConsumer;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
@@ -55,7 +57,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
 
   @Override
   public void prepareForTransitWith() {
-    this.onTripIndex = NOT_SET;
+    this.onTripIndex = UNBOUNDED_TRIP_INDEX;
     this.onTripBoardTime = NOT_SET;
     this.onTripBoardStop = NOT_SET;
     this.onTrip = null;
@@ -65,7 +67,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   @Override
   public void alight(int stopIndex, int stopPos, int alightSlack) {
     // attempt to alight if we're on board
-    if (onTripIndex != NOT_SET) {
+    if (onTripIndex != UNBOUNDED_TRIP_INDEX) {
       // Trip alightTime + alight-slack(forward-search) or board-slack(reverse-search)
       final int stopArrivalTime0 = calculator.stopArrivalTime(onTrip, stopPos, alightSlack);
 
@@ -111,7 +113,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   @Override
   public void boardSameTrip(int earliestBoardTime, int stopPos, int stopIndex) {
     // If not boarded, return
-    if (onTripIndex == NOT_SET) {
+    if (onTripIndex == UNBOUNDED_TRIP_INDEX) {
       return;
     }
 

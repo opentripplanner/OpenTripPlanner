@@ -11,11 +11,11 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
- * The contract the state must implement for the {@link RangeRaptorWorker} to do its job. This allow
- * us to mix workers and states to implement different versions of the algorithm like Standard,
- * Standard-reversed and multi-criteria and use this with different states keeping only the
- * information needed by the use-case. Some example use-cases are calculating heuristics, debugging
- * and returning result paths.
+ * The contract the state must implement for the {@link RangeRaptorWorker} to do its job. This
+ * allows us to mix workers and states to implement different versions of the algorithm like
+ * Standard, Standard-reversed and multi-criteria and use this with different states keeping only
+ * the information needed by the use-case. Some example use-cases are calculating heuristics,
+ * debugging and returning result paths.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

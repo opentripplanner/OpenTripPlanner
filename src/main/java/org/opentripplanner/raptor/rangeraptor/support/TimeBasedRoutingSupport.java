@@ -122,10 +122,10 @@ public abstract class TimeBasedRoutingSupport<T extends RaptorTripSchedule>
    * subsequent search faster since it must board an earlier trip, and the trip search can start at
    * the given onTripIndex. if not the current trip is used.
    * <p>
-   * Return -1 to if the tripIndex is unknown.
+   * Return {@link RaptorTripScheduleSearch#UNBOUNDED_TRIP_INDEX} to if the tripIndex is unknown.
    */
   protected int onTripIndex() {
-    return -1;
+    return RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
   }
 
   /**
