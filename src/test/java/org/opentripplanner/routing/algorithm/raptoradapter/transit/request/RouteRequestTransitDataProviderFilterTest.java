@@ -548,12 +548,12 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   private List<TransitFilter> filterForModes(Collection<MainAndSubMode> modes) {
-    var filterRequest = new TransitFilterRequest();
-    var selectRequest = new SelectRequest();
-    selectRequest.setTransportModes(List.copyOf(modes));
-    filterRequest.setSelect(List.of(selectRequest));
-
-    return List.of(filterRequest);
+    return List.of(
+      TransitFilterRequest
+        .of()
+        .addSelect(SelectRequest.of().withTransportModes(List.copyOf(modes)).build())
+        .build()
+    );
   }
 
   private TripTimes createTestTripTimes(
