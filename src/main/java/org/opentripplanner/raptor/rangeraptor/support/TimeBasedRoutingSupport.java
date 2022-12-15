@@ -1,9 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.support;
 
-import java.util.function.IntConsumer;
 import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
@@ -11,7 +9,6 @@ import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.spi.TransitArrival;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleBoardSearch;
@@ -20,18 +17,18 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripS
  * This class contains code which is shared by all time-dependent routing strategies. It also
  * defines abstract methods, which the individual strategies must implement.
  */
-public abstract class TimeBasedRoutingSupport<T extends RaptorTripSchedule>
-  implements RoutingStrategy<T> {
+public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
 
-  protected final SlackProvider slackProvider;
-  protected final TransitCalculator<T> calculator;
+  private final SlackProvider slackProvider;
+  private final TransitCalculator<T> calculator;
   private final RoundProvider roundProvider;
   private boolean inFirstIteration = true;
   private boolean hasTimeDependentAccess = false;
   private RaptorTimeTable<T> timeTable;
   private RaptorTripScheduleSearch<T> tripSearch;
+  private TimeBasedRoutingSupportCallback<T> callback;
 
-  protected TimeBasedRoutingSupport(
+  public TimeBasedRoutingSupport(
     SlackProvider slackProvider,
     TransitCalculator<T> calculator,
     RoundProvider roundProvider,
@@ -44,22 +41,20 @@ public abstract class TimeBasedRoutingSupport<T extends RaptorTripSchedule>
     subscriptions.onIterationComplete(() -> inFirstIteration = false);
   }
 
-  @Override
-  public final void prepareForTransitWith(RaptorTimeTable<T> timeTable) {
-    this.timeTable = timeTable;
-    this.tripSearch = createTripSearch(timeTable);
-    prepareForTransitWith();
+  /**
+   * The callback can not be part of the constructor, hence final,
+   * because that make a circular dependency when initiating the
+   * callback.
+   */
+  public void withCallback(TimeBasedRoutingSupportCallback<T> callback) {
+    this.callback = callback;
   }
 
-  protected abstract void prepareForTransitWith();
+  public void prepareForTransitWith(RaptorTimeTable<T> timeTable) {
+    this.timeTable = timeTable;
+    this.tripSearch = createTripSearch(timeTable);
+  }
 
-  /**
-   * Get the current boarding previous transit arrival. This is used to look up any guaranteed
-   * transfers.
-   */
-  protected abstract TransitArrival<T> previousTransit(int boardStopIndex);
-
-  @Override
   public final void board(
     int stopIndex,
     int stopPos,
@@ -68,7 +63,7 @@ public abstract class TimeBasedRoutingSupport<T extends RaptorTripSchedule>
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
     // MC Raptor have many, while RR have one boarding
-    forEachBoarding(
+    callback.forEachBoarding(
       stopIndex,
       (int prevArrivalTime) -> {
         boolean boardedUsingConstrainedTransfer =
@@ -84,11 +79,30 @@ public abstract class TimeBasedRoutingSupport<T extends RaptorTripSchedule>
   }
 
   /**
-   * Board trip for each stopArrival (Std have only one "best" arrival, while Mc may have many).
+   * Get the time-dependent departure time for an access/egress and mark if we have time-dependent
+   * accesses or egresses
    */
-  protected abstract void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer);
+  public int getTimeDependentDepartureTime(RaptorAccessEgress it, int iterationDepartureTime) {
+    // Earliest possible departure time from the origin, or latest possible arrival
+    // time at the destination if searching backwards.
+    int timeDependentDepartureTime = calculator.departureTime(it, iterationDepartureTime);
 
-  protected final void boardWithRegularTransfer(
+    // This access is not available after the iteration departure time
+    if (timeDependentDepartureTime == -1) {
+      return -1;
+    }
+
+    // If the time differs from the iterationDepartureTime, then the access has time
+    // restrictions. If the difference between _any_ access between iterations is not a
+    // uniform iterationStep, then the exactTripSearch optimisation may not be used.
+    if (timeDependentDepartureTime != iterationDepartureTime) {
+      hasTimeDependentAccess = true;
+    }
+
+    return timeDependentDepartureTime;
+  }
+
+  private void boardWithRegularTransfer(
     RaptorTripScheduleSearch<T> tripSearch,
     int stopIndex,
     int stopPos,
@@ -98,53 +112,19 @@ public abstract class TimeBasedRoutingSupport<T extends RaptorTripSchedule>
     int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
     // check if we can back up to an earlier trip due to this stop
     // being reached earlier
-    var result = tripSearch.search(earliestBoardTime, stopPos, onTripIndex());
+    var result = tripSearch.search(earliestBoardTime, stopPos, callback.onTripIndex());
     if (result != null) {
-      board(stopIndex, earliestBoardTime, result);
+      callback.board(stopIndex, earliestBoardTime, result);
     } else {
-      boardSameTrip(earliestBoardTime, stopPos, stopIndex);
+      callback.boardSameTrip(earliestBoardTime, stopPos, stopIndex);
     }
-  }
-
-  /**
-   * Board the given trip(event) at the given stop index.
-   *
-   * @param earliestBoardTime used to calculate wait-time (if needed)
-   */
-  protected abstract void board(
-    final int stopIndex,
-    final int earliestBoardTime,
-    RaptorTripScheduleBoardOrAlightEvent<T> boarding
-  );
-
-  /**
-   * The trip search will use this index to search relative to an existing boarding. This make a
-   * subsequent search faster since it must board an earlier trip, and the trip search can start at
-   * the given onTripIndex. if not the current trip is used.
-   * <p>
-   * Return {@link RaptorTripScheduleSearch#UNBOUNDED_TRIP_INDEX} to if the tripIndex is unknown.
-   */
-  protected int onTripIndex() {
-    return RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
-  }
-
-  /**
-   * This method allow the strategy to replace the existing boarding (if it exists) with a better
-   * option. It is left to the implementation to check that a boarding already exist.
-   *
-   * @param earliestBoardTime - the earliest possible time a boarding can take place
-   * @param stopPos           - the pattern stop position
-   * @param stopIndex         - the global stop index
-   */
-  protected void boardSameTrip(int earliestBoardTime, int stopPos, int stopIndex) {
-    // Do nothing. For standard and multi-criteria Raptor we do not need to do anything.
   }
 
   /**
    * @return {@code true} if a constrained transfer exist to prevent the normal trip search from
    * execution.
    */
-  protected final boolean boardWithConstrainedTransfer(
+  private boolean boardWithConstrainedTransfer(
     @Nonnull RaptorConstrainedTripScheduleBoardingSearch<T> txSearch,
     RaptorTimeTable<T> targetTimetable,
     int targetStopIndex,
@@ -152,7 +132,7 @@ public abstract class TimeBasedRoutingSupport<T extends RaptorTripSchedule>
     int boardSlack
   ) {
     // Get the previous transit stop arrival (transfer source)
-    TransitArrival<T> sourceStopArrival = previousTransit(targetStopIndex);
+    TransitArrival<T> sourceStopArrival = callback.previousTransit(targetStopIndex);
     if (sourceStopArrival == null) {
       return false;
     }
@@ -187,36 +167,9 @@ public abstract class TimeBasedRoutingSupport<T extends RaptorTripSchedule>
       return true;
     }
 
-    board(targetStopIndex, result.getEarliestBoardTimeForConstrainedTransfer(), result);
+    callback.board(targetStopIndex, result.getEarliestBoardTimeForConstrainedTransfer(), result);
 
     return true;
-  }
-
-  /**
-   * Get the time-dependent departure time for an access/egress and mark if we have time-dependent
-   * accesses or egresses
-   */
-  protected final int getTimeDependentDepartureTime(
-    RaptorAccessEgress it,
-    int iterationDepartureTime
-  ) {
-    // Earliest possible departure time from the origin, or latest possible arrival
-    // time at the destination if searching backwards.
-    int timeDependentDepartureTime = calculator.departureTime(it, iterationDepartureTime);
-
-    // This access is not available after the iteration departure time
-    if (timeDependentDepartureTime == -1) {
-      return -1;
-    }
-
-    // If the time differs from the iterationDepartureTime, then the access has time
-    // restrictions. If the difference between _any_ access between iterations is not a
-    // uniform iterationStep, then the exactTripSearch optimisation may not be used.
-    if (timeDependentDepartureTime != iterationDepartureTime) {
-      hasTimeDependentAccess = true;
-    }
-
-    return timeDependentDepartureTime;
   }
 
   /**
