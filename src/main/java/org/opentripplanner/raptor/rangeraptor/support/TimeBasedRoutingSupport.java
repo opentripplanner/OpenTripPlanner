@@ -10,6 +10,7 @@ import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.spi.TransitArrival;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleBoardSearch;
@@ -77,14 +78,22 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     int onTripIndex
   ) {
     int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
-    // check if we can back up to an earlier trip due to this stop
-    // being reached earlier
-    var result = tripSearch.search(earliestBoardTime, stopPos, onTripIndex);
+    var result = searchForBoardingAfter(prevArrivalTime, stopPos, boardSlack, onTripIndex);
     if (result != null) {
+      // check if we can back up to an earlier trip due to this stop
+      // being reached earlier
       callback.board(stopIndex, earliestBoardTime, result);
-    } else {
-      callback.boardSameTrip(earliestBoardTime, stopPos, stopIndex);
     }
+  }
+
+  public RaptorTripScheduleBoardOrAlightEvent<T> searchForBoardingAfter(
+    int prevArrivalTime,
+    int stopPos,
+    int boardSlack,
+    int onTripIndex
+  ) {
+    int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
+    return tripSearch.search(earliestBoardTime, stopPos, onTripIndex);
   }
 
   /**
@@ -171,10 +180,18 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     return timeDependentDepartureTime;
   }
 
+  public RaptorTripScheduleBoardOrAlightEvent<T> searchForBoardingAfter(
+    int stopPos,
+    int onTripIndex,
+    int earliestBoardTime
+  ) {
+    return tripSearch.search(earliestBoardTime, stopPos, onTripIndex);
+  }
+
   /**
    * Add board-slack(forward-search) or alight-slack(reverse-search)
    */
-  private int earliestBoardTime(int prevArrivalTime, int boardSlack) {
+  public int earliestBoardTime(int prevArrivalTime, int boardSlack) {
     return calculator.plusDuration(prevArrivalTime, boardSlack);
   }
 
