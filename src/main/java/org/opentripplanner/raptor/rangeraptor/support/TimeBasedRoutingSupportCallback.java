@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.rangeraptor.support;
 
-import java.util.function.IntConsumer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
@@ -12,11 +11,6 @@ public interface TimeBasedRoutingSupportCallback<T extends RaptorTripSchedule> {
    * transfers.
    */
   TransitArrival<T> previousTransit(int boardStopIndex);
-
-  /**
-   * Board trip for each stopArrival (Std have only one "best" arrival, while Mc may have many).
-   */
-  void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer);
 
   /**
    * Board the given trip(event) at the given stop index.

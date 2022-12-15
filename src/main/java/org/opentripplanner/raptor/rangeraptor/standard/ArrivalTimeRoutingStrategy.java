@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.rangeraptor.standard;
 
 import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
 
-import java.util.function.IntConsumer;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
@@ -97,15 +96,18 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
     boolean hasConstrainedTransfer,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
-    routingSupport.board(stopIndex, stopPos, boardSlack, hasConstrainedTransfer, txSearch);
+    int prevArrivalTime = state.bestTimePreviousRound(stopIndex);
+    routingSupport.board(
+      prevArrivalTime,
+      stopIndex,
+      stopPos,
+      boardSlack,
+      hasConstrainedTransfer,
+      txSearch
+    );
   }
 
   /* TimeBasedRoutingSupportCallback */
-
-  @Override
-  public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
-    prevStopArrivalTimeConsumer.accept(state.bestTimePreviousRound(stopIndex));
-  }
 
   @Override
   public TransitArrival<T> previousTransit(int boardStopIndex) {

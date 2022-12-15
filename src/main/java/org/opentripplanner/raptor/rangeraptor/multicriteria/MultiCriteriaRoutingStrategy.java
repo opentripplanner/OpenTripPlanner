@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
-import java.util.function.IntConsumer;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -99,18 +98,21 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     boolean hasConstrainedTransfer,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
-    routingSupport.board(stopIndex, stopPos, boardSlack, hasConstrainedTransfer, txSearch);
+    for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
+      this.prevArrival = prevArrival;
+      int prevArrivalTime = prevArrival.arrivalTime();
+      routingSupport.board(
+        prevArrivalTime,
+        stopIndex,
+        stopPos,
+        boardSlack,
+        hasConstrainedTransfer,
+        txSearch
+      );
+    }
   }
 
   /* TimeBasedRoutingSupportCallback */
-
-  @Override
-  public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
-    for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
-      this.prevArrival = prevArrival;
-      prevStopArrivalTimeConsumer.accept(prevArrival.arrivalTime());
-    }
-  }
 
   @Override
   public TransitArrival<T> previousTransit(int boardStopIndex) {

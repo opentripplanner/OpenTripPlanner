@@ -55,27 +55,22 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     this.tripSearch = createTripSearch(timeTable);
   }
 
-  public final void board(
+  public void board(
+    int prevArrivalTime,
     int stopIndex,
     int stopPos,
     int boardSlack,
     boolean hasConstrainedTransfer,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
-    // MC Raptor have many, while RR have one boarding
-    callback.forEachBoarding(
-      stopIndex,
-      (int prevArrivalTime) -> {
-        boolean boardedUsingConstrainedTransfer =
-          hasConstrainedTransfer &&
-          boardWithConstrainedTransfer(txSearch, timeTable, stopIndex, prevArrivalTime, boardSlack);
+    boolean boardedUsingConstrainedTransfer =
+      hasConstrainedTransfer &&
+      boardWithConstrainedTransfer(txSearch, timeTable, stopIndex, prevArrivalTime, boardSlack);
 
-        // Find the best trip and board [no guaranteed transfer exist]
-        if (!boardedUsingConstrainedTransfer) {
-          boardWithRegularTransfer(tripSearch, stopIndex, stopPos, prevArrivalTime, boardSlack);
-        }
-      }
-    );
+    // Find the best trip and board [no guaranteed transfer exist]
+    if (!boardedUsingConstrainedTransfer) {
+      boardWithRegularTransfer(tripSearch, stopIndex, stopPos, prevArrivalTime, boardSlack);
+    }
   }
 
   /**
