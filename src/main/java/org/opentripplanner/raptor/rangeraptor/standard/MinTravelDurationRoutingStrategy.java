@@ -89,24 +89,23 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     }
   }
 
-  /**
-   * Board the given trip(event) at the given stop index.
-   */
   @Override
-  public void board(
+  public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
+    int prevArrivalTime = prevArrivalTime(stopIndex);
+    routingSupport.boardWithRegularTransfer(prevArrivalTime, stopIndex, stopPos, boardSlack);
+  }
+
+  @Override
+  public boolean boardWithConstrainedTransfer(
     int stopIndex,
     int stopPos,
     int boardSlack,
-    boolean hasConstrainedTransfer,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
-    int prevArrivalTime = state.bestTimePreviousRound(stopIndex);
-    routingSupport.board(
-      prevArrivalTime,
+    return routingSupport.boardWithConstrainedTransfer(
+      prevArrivalTime(stopIndex),
       stopIndex,
-      stopPos,
       boardSlack,
-      hasConstrainedTransfer,
       txSearch
     );
   }
@@ -161,5 +160,9 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     onTripBoardTime = earliestBoardTime;
     onTripBoardStop = stopIndex;
     onTripTimeShift = tripTimeShift;
+  }
+
+  private int prevArrivalTime(int stopIndex) {
+    return state.bestTimePreviousRound(stopIndex);
   }
 }

@@ -87,29 +87,38 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     }
   }
 
-  /**
-   * Board the given trip(event) at the given stop index.
-   */
   @Override
-  public void board(
+  public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
+    for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
+      this.prevArrival = prevArrival;
+      int prevArrivalTime = prevArrival.arrivalTime();
+      routingSupport.boardWithRegularTransfer(prevArrivalTime, stopIndex, stopPos, boardSlack);
+    }
+  }
+
+  @Override
+  public boolean boardWithConstrainedTransfer(
     int stopIndex,
     int stopPos,
     int boardSlack,
-    boolean hasConstrainedTransfer,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
     for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
       this.prevArrival = prevArrival;
-      int prevArrivalTime = prevArrival.arrivalTime();
-      routingSupport.board(
-        prevArrivalTime,
+      boolean boardingOk = routingSupport.boardWithConstrainedTransfer(
+        prevArrival.arrivalTime(),
         stopIndex,
-        stopPos,
         boardSlack,
-        hasConstrainedTransfer,
         txSearch
       );
+      // We can not relay on the default fallback to regular transfers, we need to do it
+      // here since we can not return false.
+      if (!boardingOk) {
+        boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
+      }
     }
+    // The boarding is processed, we do not want to enter regular boarding
+    return true;
   }
 
   /* TimeBasedRoutingSupportCallback */

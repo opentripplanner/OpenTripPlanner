@@ -230,10 +230,20 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             // Don't attempt to board if this stop was not reached in the last round.
             // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
             if (state.isStopReachedInPreviousRound(stopIndex)) {
-              boolean hasConstrainedTransfer =
-                enableTransferConstraints && txSearch.transferExist(stopPos);
-
-              transitWorker.board(stopIndex, stopPos, boardSlack, hasConstrainedTransfer, txSearch);
+              // has constrained transfers
+              boolean boardUsingRegularTransfer = true;
+              if (enableTransferConstraints && txSearch.transferExist(stopPos)) {
+                boardUsingRegularTransfer =
+                  !transitWorker.boardWithConstrainedTransfer(
+                    stopIndex,
+                    stopPos,
+                    boardSlack,
+                    txSearch
+                  );
+              }
+              if (boardUsingRegularTransfer) {
+                transitWorker.boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
+              }
             }
           }
         }

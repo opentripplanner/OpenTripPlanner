@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.rangeraptor.support;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -55,22 +54,68 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     this.tripSearch = createTripSearch(timeTable);
   }
 
-  public void board(
+  public void boardWithRegularTransfer(
     int prevArrivalTime,
     int stopIndex,
     int stopPos,
+    int boardSlack
+  ) {
+    int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
+    // check if we can back up to an earlier trip due to this stop
+    // being reached earlier
+    var result = tripSearch.search(earliestBoardTime, stopPos, callback.onTripIndex());
+    if (result != null) {
+      callback.board(stopIndex, earliestBoardTime, result);
+    } else {
+      callback.boardSameTrip(earliestBoardTime, stopPos, stopIndex);
+    }
+  }
+
+  public boolean boardWithConstrainedTransfer(
+    int prevArrivalTime,
+    int stopIndex,
     int boardSlack,
-    boolean hasConstrainedTransfer,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
-    boolean boardedUsingConstrainedTransfer =
-      hasConstrainedTransfer &&
-      boardWithConstrainedTransfer(txSearch, timeTable, stopIndex, prevArrivalTime, boardSlack);
-
-    // Find the best trip and board [no guaranteed transfer exist]
-    if (!boardedUsingConstrainedTransfer) {
-      boardWithRegularTransfer(tripSearch, stopIndex, stopPos, prevArrivalTime, boardSlack);
+    // Get the previous transit stop arrival (transfer source)
+    TransitArrival<T> sourceStopArrival = callback.previousTransit(stopIndex);
+    if (sourceStopArrival == null) {
+      return false;
     }
+
+    int prevTransitStopArrivalTime = sourceStopArrival.arrivalTime();
+
+    int prevTransitArrivalTime = calculator.minusDuration(
+      prevTransitStopArrivalTime,
+      slackProvider.alightSlack(sourceStopArrival.trip().pattern().slackIndex())
+    );
+
+    int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
+
+    var result = txSearch.find(
+      timeTable,
+      slackProvider.transferSlack(),
+      sourceStopArrival.trip(),
+      sourceStopArrival.stop(),
+      prevTransitArrivalTime,
+      earliestBoardTime
+    );
+
+    if (result == null) {
+      return false;
+    }
+
+    var constraint = result.getTransferConstraint();
+
+    if (constraint.isNotAllowed()) {
+      // We are blocking a normal trip search here by returning
+      // true without boarding the trip
+      return true;
+    }
+
+    callback.board(stopIndex, result.getEarliestBoardTimeForConstrainedTransfer(), result);
+
+    return true;
   }
 
   /**
@@ -95,76 +140,6 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     }
 
     return timeDependentDepartureTime;
-  }
-
-  private void boardWithRegularTransfer(
-    RaptorTripScheduleSearch<T> tripSearch,
-    int stopIndex,
-    int stopPos,
-    int prevArrivalTime,
-    int boardSlack
-  ) {
-    int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
-    // check if we can back up to an earlier trip due to this stop
-    // being reached earlier
-    var result = tripSearch.search(earliestBoardTime, stopPos, callback.onTripIndex());
-    if (result != null) {
-      callback.board(stopIndex, earliestBoardTime, result);
-    } else {
-      callback.boardSameTrip(earliestBoardTime, stopPos, stopIndex);
-    }
-  }
-
-  /**
-   * @return {@code true} if a constrained transfer exist to prevent the normal trip search from
-   * execution.
-   */
-  private boolean boardWithConstrainedTransfer(
-    @Nonnull RaptorConstrainedTripScheduleBoardingSearch<T> txSearch,
-    RaptorTimeTable<T> targetTimetable,
-    int targetStopIndex,
-    int prevArrivalTime,
-    int boardSlack
-  ) {
-    // Get the previous transit stop arrival (transfer source)
-    TransitArrival<T> sourceStopArrival = callback.previousTransit(targetStopIndex);
-    if (sourceStopArrival == null) {
-      return false;
-    }
-
-    int prevTransitStopArrivalTime = sourceStopArrival.arrivalTime();
-
-    int prevTransitArrivalTime = calculator.minusDuration(
-      prevTransitStopArrivalTime,
-      slackProvider.alightSlack(sourceStopArrival.trip().pattern().slackIndex())
-    );
-
-    int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
-
-    var result = txSearch.find(
-      targetTimetable,
-      slackProvider.transferSlack(),
-      sourceStopArrival.trip(),
-      sourceStopArrival.stop(),
-      prevTransitArrivalTime,
-      earliestBoardTime
-    );
-
-    if (result == null) {
-      return false;
-    }
-
-    var constraint = result.getTransferConstraint();
-
-    if (constraint.isNotAllowed()) {
-      // We are blocking a normal trip search here by returning
-      // true without boarding the trip
-      return true;
-    }
-
-    callback.board(targetStopIndex, result.getEarliestBoardTimeForConstrainedTransfer(), result);
-
-    return true;
   }
 
   /**
