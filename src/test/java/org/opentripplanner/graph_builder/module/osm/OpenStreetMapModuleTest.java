@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
@@ -39,6 +40,7 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -294,6 +296,30 @@ public class OpenStreetMapModuleTest {
 
   @Test
   void addParkingLotsToService() {
+    Graph graph = buildParkingLots();
+
+    var service = graph.getVehicleParkingService();
+    assertEquals(11, service.getVehicleParkings().count());
+    assertEquals(6, service.getBikeParks().count());
+    assertEquals(5, service.getCarParks().count());
+  }
+
+  @Test
+  void createArtificalEntrancesToUnlikedParkingLots() {
+    Graph graph = buildParkingLots();
+
+    graph
+      .getVerticesOfType(VehicleParkingEntranceVertex.class)
+      .stream()
+      .filter(v -> v.getLabel().contains("centroid"))
+      .forEach(v -> {
+        assertFalse(v.getOutgoing().isEmpty());
+        assertFalse(v.getIncoming().isEmpty());
+      });
+  }
+
+  @Nonnull
+  private Graph buildParkingLots() {
     var graph = new Graph();
     var providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
@@ -310,11 +336,7 @@ public class OpenStreetMapModuleTest {
     module.staticParkAndRide = true;
     module.staticBikeParkAndRide = true;
     module.buildGraph();
-
-    var service = graph.getVehicleParkingService();
-    assertEquals(8, service.getVehicleParkings().count());
-    assertEquals(4, service.getBikeParks().count());
-    assertEquals(4, service.getCarParks().count());
+    return graph;
   }
 
   /**
