@@ -14,7 +14,11 @@ public class ViaLocationInputType {
       .newInputObject()
       .name("ViaLocation")
       .description(
-        "Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known."
+        "Input format for specifying a location through either a place reference (id), " +
+        "coordinates or both. If both place and coordinates are provided the place ref will be " +
+        "used if found, coordinates will only be used if place is not known. The location also " +
+        "contain information about the minimum and maximum time the user is willing to stay at " +
+        "the via location."
       )
       .field(
         GraphQLInputObjectField
