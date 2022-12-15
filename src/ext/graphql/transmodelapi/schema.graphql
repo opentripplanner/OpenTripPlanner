@@ -1752,9 +1752,9 @@ input TriangleFactors {
 "List of filters that should be applied on the search. A trip or line has to match with with at least one filter in order to be included in search. Not specifying any filters means that everything should be included. If a search include this parameter, \"whiteListed\", \"banned\" & \"modes.transportModes\" filters will be ignored."
 input TripFilterInput {
   "Combination of exclude-lists for which lines/trips should be excluded. In order to be accepted trip/lines cannot match with any exclude-list."
-  exclude: TripFilterSelectInput
+  not: [TripFilterSelectInput]
   "Combination of allow-lists for which lines/trips should be included. In order to be accepted trip/line has to match with all allow-lists. An empty list means allow all."
-  include: TripFilterSelectInput
+  select: [TripFilterSelectInput]
 }
 
 "A list of selectors for filter allow-list / exclude-list"
@@ -1762,7 +1762,7 @@ input TripFilterSelectInput {
   "Set of ids for authorities that should be included in/excluded from search"
   authorities: [ID] = []
   "Set of ids for feeds that should be should be included in/excluded from search"
-  feeds: [ID] = []
+  feeds: [String!] = []
   "Set of ids for lines that should be included in/excluded from search"
   lines: [ID] = []
   "Set of ids for service journeys that should be included in/excluded from search"
