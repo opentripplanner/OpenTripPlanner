@@ -381,14 +381,14 @@ public class StopPlaceType {
                   transitModes,
                   environment
                 )
-              )
-              .sorted(TripTimeOnDate.compareByDeparture())
-              .distinct();
+              );
 
             return limitPerLineAndDestinationDisplay(
               tripTimeOnDateStream,
               departuresPerLineAndDestinationDisplay
             )
+              .sorted(TripTimeOnDate.compareByDeparture())
+              .distinct()
               .limit(numberOfDepartures)
               .collect(Collectors.toList());
           })
