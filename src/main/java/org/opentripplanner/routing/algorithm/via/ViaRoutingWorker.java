@@ -40,7 +40,11 @@ public class ViaRoutingWorker {
 
   public ViaRoutingResponse route() {
     //Loop over Via, for each cycle change from/to and JourneyRequest.
-    var result = viaRequest.viaLegs().stream().map(v -> getRoutingResponse(viaRequest, v)).toList();
+    var result = viaRequest
+      .viaSegment()
+      .stream()
+      .map(v -> getRoutingResponse(viaRequest, v))
+      .toList();
 
     return combineRoutingResponse(result);
   }
@@ -49,7 +53,10 @@ public class ViaRoutingWorker {
    * Set to point and search trips. Return result with itineraries and prepare request for next
    * search.
    */
-  private RoutingResponse getRoutingResponse(RouteViaRequest request, RouteViaRequest.ViaLeg v) {
+  private RoutingResponse getRoutingResponse(
+    RouteViaRequest request,
+    RouteViaRequest.ViaSegment v
+  ) {
     // If viaLocation is null then we are at last search
     if (v.viaLocation() != null) {
       this.request.setTo(v.viaLocation().point());
@@ -98,7 +105,7 @@ public class ViaRoutingWorker {
         var filteredTransits = filterTransits(
           itinerary,
           routingResponses.get(i + 1).getTripPlan().itineraries,
-          this.viaRequest.viaLegs().get(i).viaLocation()
+          this.viaRequest.viaSegment().get(i).viaLocation()
         );
 
         if (!filteredTransits.isEmpty()) {

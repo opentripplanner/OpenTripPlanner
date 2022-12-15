@@ -17,8 +17,8 @@ import org.opentripplanner.routing.api.request.request.JourneyRequest;
  */
 public class RouteViaRequest implements Serializable {
 
-  private final List<ViaLeg> viaLegs;
   private final GenericLocation from;
+  private final List<ViaSegment> viaSegments;
   private final GenericLocation to;
   private final Instant dateTime;
   private final Duration searchWindow;
@@ -38,8 +38,8 @@ public class RouteViaRequest implements Serializable {
       throw new IllegalArgumentException("There must be one more JourneyRequest than ViaLocation");
     }
 
-    this.viaLegs = new ArrayList<>();
     this.from = null;
+    this.viaSegments = new ArrayList<>();
     this.to = null;
     this.dateTime = Instant.now();
     this.searchWindow = null;
@@ -48,16 +48,16 @@ public class RouteViaRequest implements Serializable {
     this.locale = null;
     this.numItineraries = null;
 
-    // Last ViaLeg has no ViaLocation
+    // Last ViaSegment has no ViaLocation
     for (int i = 0; i < viaJourneys.size(); i++) {
       var viaLocation = i < viaJourneys.size() - 1 ? viaLocations.get(i) : null;
-      viaLegs.add(new ViaLeg(viaJourneys.get(i), viaLocation));
+      viaSegments.add(new ViaSegment(viaJourneys.get(i), viaLocation));
     }
   }
 
   private RouteViaRequest(Builder builder) {
-    this.viaLegs = Objects.requireNonNull(builder.viaLegs);
     this.from = Objects.requireNonNull(builder.from);
+    this.viaSegments = Objects.requireNonNull(builder.viaSegments);
     this.to = Objects.requireNonNull(builder.to);
     this.dateTime = Objects.requireNonNull(builder.dateTime);
     this.searchWindow = Objects.requireNonNull(builder.searchWindow);
@@ -91,12 +91,12 @@ public class RouteViaRequest implements Serializable {
     return request;
   }
 
-  public List<ViaLeg> viaLegs() {
-    return viaLegs;
-  }
-
   public GenericLocation from() {
     return from;
+  }
+
+  public List<ViaSegment> viaSegment() {
+    return viaSegments;
   }
 
   public GenericLocation to() {
@@ -134,7 +134,7 @@ public class RouteViaRequest implements Serializable {
     }
 
     return (
-      viaLegs.equals(other.viaLegs) &&
+      viaSegments.equals(other.viaSegments) &&
       from.equals(other.from) &&
       to.equals(other.to) &&
       dateTime.equals(other.dateTime) &&
@@ -149,7 +149,7 @@ public class RouteViaRequest implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hash(
-      viaLegs,
+      viaSegments,
       from,
       to,
       dateTime,
@@ -163,7 +163,7 @@ public class RouteViaRequest implements Serializable {
 
   public static class Builder {
 
-    private final List<ViaLeg> viaLegs;
+    private final List<ViaSegment> viaSegments;
     private GenericLocation from;
     private GenericLocation to;
     private Instant dateTime;
@@ -180,7 +180,7 @@ public class RouteViaRequest implements Serializable {
       this.searchWindow = original.searchWindow;
       this.wheelchair = original.wheelchair;
       this.preferences = original.preferences;
-      this.viaLegs = original.viaLegs;
+      this.viaSegments = original.viaSegments;
       this.numItineraries = original.numItineraries;
     }
 
@@ -229,5 +229,9 @@ public class RouteViaRequest implements Serializable {
     }
   }
 
-  public record ViaLeg(JourneyRequest journeyRequest, ViaLocation viaLocation) {}
+  /**
+   * ViaSegments contains the {@link JourneyRequest} to the next {@link ViaLocation}. The last
+   * segment has null viaLocation, as `to` is the destination of that segment.
+   */
+  public record ViaSegment(JourneyRequest journeyRequest, ViaLocation viaLocation) {}
 }
