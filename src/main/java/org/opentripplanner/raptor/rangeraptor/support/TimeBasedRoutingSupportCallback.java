@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.rangeraptor.support;
 
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.spi.TransitArrival;
 
 public interface TimeBasedRoutingSupportCallback<T extends RaptorTripSchedule> {
@@ -22,17 +21,6 @@ public interface TimeBasedRoutingSupportCallback<T extends RaptorTripSchedule> {
     final int earliestBoardTime,
     RaptorTripScheduleBoardOrAlightEvent<T> boarding
   );
-
-  /**
-   * The trip search will use this index to search relative to an existing boarding. This make a
-   * subsequent search faster since it must board an earlier trip, and the trip search can start at
-   * the given onTripIndex. if not the current trip is used.
-   * <p>
-   * Return {@link RaptorTripScheduleSearch#UNBOUNDED_TRIP_INDEX} to if the tripIndex is unknown.
-   */
-  default int onTripIndex() {
-    return RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
-  }
 
   /**
    * This method allow the strategy to replace the existing boarding (if it exists) with a better

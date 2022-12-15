@@ -91,7 +91,13 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   @Override
   public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
     int prevArrivalTime = prevArrivalTime(stopIndex);
-    routingSupport.boardWithRegularTransfer(prevArrivalTime, stopIndex, stopPos, boardSlack);
+    routingSupport.boardWithRegularTransfer(
+      prevArrivalTime,
+      stopIndex,
+      stopPos,
+      boardSlack,
+      onTripIndex
+    );
   }
 
   @Override
@@ -126,11 +132,6 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
     onTrip = boarding.getTrip();
     onTripBoardTime = boarding.getTime();
     onTripBoardStop = stopIndex;
-  }
-
-  @Override
-  public int onTripIndex() {
-    return onTripIndex;
   }
 
   private int prevArrivalTime(int stopIndex) {
