@@ -119,11 +119,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   /* TimeBasedRoutingSupportCallback */
 
   @Override
-  public void board(
-    int stopIndex,
-    final int earliestBoardTime,
-    RaptorTripScheduleBoardOrAlightEvent<T> boarding
-  ) {
+  public void board(int stopIndex, RaptorTripScheduleBoardOrAlightEvent<T> boarding) {
     onTripIndex = boarding.getTripIndex();
     onTrip = boarding.getTrip();
     onTripBoardTime = boarding.getTime();

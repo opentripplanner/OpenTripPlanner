@@ -95,7 +95,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     int earliestBoardTime = routingSupport.earliestBoardTime(prevArrivalTime, boardSlack);
     var result = routingSupport.searchForBoardingAfter(stopPos, onTripIndex, earliestBoardTime);
     if (result != null) {
-      board(stopIndex, earliestBoardTime, result);
+      board(stopIndex, result);
     } else {
       boardSameTrip(earliestBoardTime, stopPos, stopIndex);
     }
@@ -118,14 +118,10 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   }
 
   @Override
-  public void board(
-    final int stopIndex,
-    final int earliestBoardTime,
-    final RaptorTripScheduleBoardOrAlightEvent<T> boarding
-  ) {
+  public void board(final int stopIndex, final RaptorTripScheduleBoardOrAlightEvent<T> boarding) {
     onTripIndex = boarding.getTripIndex();
     onTrip = boarding.getTrip();
-    onTripBoardTime = earliestBoardTime;
+    onTripBoardTime = boarding.getEarliestBoardTime();
     onTripBoardStop = stopIndex;
     // Calculate the time-shift, the time-shift will be a positive duration in a
     // forward-search, and a negative value in case of a reverse-search.

@@ -56,7 +56,7 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   }
 
   @Override
-  public int getEarliestBoardTimeForConstrainedTransfer() {
+  public int getEarliestBoardTime() {
     return earliestBoardTime;
   }
 

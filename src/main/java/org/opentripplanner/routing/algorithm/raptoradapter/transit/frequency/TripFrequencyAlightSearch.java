@@ -51,6 +51,7 @@ public final class TripFrequencyAlightSearch<T extends DefaultTripSchedule>
             patternForDates,
             tripTimes,
             stopPositionInPattern,
+            earliestBoardTime,
             arrivalTime + headway,
             headway,
             offset,

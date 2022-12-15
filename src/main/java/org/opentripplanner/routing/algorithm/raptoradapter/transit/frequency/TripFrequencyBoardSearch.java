@@ -50,6 +50,7 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule>
             patternForDates,
             tripTimes,
             stopPositionInPattern,
+            earliestBoardTime,
             departureTime - headway,
             headway,
             offset,

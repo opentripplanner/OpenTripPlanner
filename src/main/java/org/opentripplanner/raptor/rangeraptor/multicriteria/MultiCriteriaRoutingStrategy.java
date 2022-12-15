@@ -124,11 +124,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   /* TimeBasedRoutingSupportCallback */
 
   @Override
-  public void board(
-    final int stopIndex,
-    final int earliestBoardTime,
-    final RaptorTripScheduleBoardOrAlightEvent<T> boarding
-  ) {
+  public void board(final int stopIndex, final RaptorTripScheduleBoardOrAlightEvent<T> boarding) {
     final T trip = boarding.getTrip();
     final int boardTime = boarding.getTime();
 
