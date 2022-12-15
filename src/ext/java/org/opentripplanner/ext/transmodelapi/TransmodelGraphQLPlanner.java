@@ -118,12 +118,7 @@ public class TransmodelGraphQLPlanner {
       response = new ViaPlanResponse(viaJourneys, connectionLists, res.routingErrors());
     } catch (Exception e) {
       LOG.error("System error: " + e.getMessage(), e);
-      response =
-        new ViaPlanResponse(
-          List.of(),
-          List.of(),
-          List.of(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null))
-        );
+      response = ViaPlanResponse.failed(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
     }
     Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
     return DataFetcherResult
