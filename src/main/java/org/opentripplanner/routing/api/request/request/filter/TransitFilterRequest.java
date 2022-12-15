@@ -30,7 +30,7 @@ public class TransitFilterRequest implements Cloneable, Serializable, TransitFil
 
   @Override
   public String toString() {
-    return "FilterRequest{" + "include=" + select + ", exclude=" + not + '}';
+    return "TransitFilterRequest{" + "select=" + select + ", not=" + not + '}';
   }
 
   @Override

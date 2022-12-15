@@ -28,6 +28,8 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.graph.Graph;
@@ -44,7 +46,6 @@ import org.opentripplanner.updater.alert.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
-// TODO: 2022-12-06 fix tests
 public abstract class GtfsTest {
 
   public Graph graph;
@@ -58,97 +59,103 @@ public abstract class GtfsTest {
 
   public abstract String getFeedName();
 
-  //  public Itinerary plan(
-  //    long dateTime,
-  //    String fromVertex,
-  //    String toVertex,
-  //    String onTripId,
-  //    boolean wheelchairAccessible,
-  //    boolean preferLeastTransfers,
-  //    TransitMode preferredMode,
-  //    String excludedRoute,
-  //    String excludedStop,
-  //    int legCount
-  //  ) {
-  //    // Preconditions
-  //    if (excludedStop != null && !excludedStop.isEmpty()) {
-  //      throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
-  //    }
-  //
-  //    // Init request
-  //    RouteRequest routingRequest = new RouteRequest();
-  //
-  //    routingRequest.setNumItineraries(1);
-  //
-  //    routingRequest.setArriveBy(dateTime < 0);
-  //    routingRequest.setDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
-  //    if (fromVertex != null && !fromVertex.isEmpty()) {
-  //      routingRequest.setFrom(
-  //        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + fromVertex)
-  //      );
-  //    }
-  //    if (toVertex != null && !toVertex.isEmpty()) {
-  //      routingRequest.setTo(
-  //        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + toVertex)
-  //      );
-  //    }
-  //    if (onTripId != null && !onTripId.isEmpty()) {
-  //      // TODO VIA - set different on-board request
-  //      //routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
-  //    }
-  //    routingRequest.setWheelchair(wheelchairAccessible);
-  //
-  //    RequestModesBuilder requestModesBuilder = RequestModes
-  //      .of()
-  //      .withDirectMode(NOT_SET)
-  //      .withAccessMode(WALK)
-  //      .withTransferMode(WALK)
-  //      .withEgressMode(WALK);
-  //    if (preferredMode != null) {
-  //      requestModesBuilder.withTransitMode(preferredMode);
-  //    } else {
-  //      requestModesBuilder.withTransitModes(MainAndSubMode.all());
-  //    }
-  //    routingRequest.journey().setModes(requestModesBuilder.build());
-  //    if (excludedRoute != null && !excludedRoute.isEmpty()) {
-  //      routingRequest
-  //        .journey()
-  //        .transit()
-  //        // TODO: 2022-11-29 filters: fix
-  ////        .setBannedRoutes(
-  ////          RouteMatcher.idMatcher(List.of(new FeedScopedId(feedId.getId(), excludedRoute)))
-  ////        )
-  //      ;
-  //    }
-  //
-  //    // Init preferences
-  //    routingRequest.withPreferences(preferences -> {
-  //      preferences.withTransfer(tx -> {
-  //        tx.withSlack(0);
-  //        tx.withWaitReluctance(1);
-  //        tx.withCost(preferLeastTransfers ? 300 : 0);
-  //      });
-  //
-  //      // The walk board cost is set low because it interferes with test 2c1.
-  //      // As long as boarding has a very low cost, waiting should not be "better" than riding
-  //      // since this makes interlining _worse_ than alighting and re-boarding the same line.
-  //      // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
-  //      preferences.withWalk(w -> w.withBoardCost(30));
-  //      preferences.withTransit(tr -> tr.setOtherThanPreferredRoutesPenalty(0));
-  //    });
-  //
-  //    // Route
-  //    RoutingResponse res = serverContext.routingService().route(routingRequest);
-  //
-  //    // Assert itineraries
-  //    List<Itinerary> itineraries = res.getTripPlan().itineraries;
-  //    // Stored in instance field for use in individual tests
-  //    Itinerary itinerary = itineraries.get(0);
-  //
-  //    assertEquals(legCount, itinerary.getLegs().size());
-  //
-  //    return itinerary;
-  //  }
+  public Itinerary plan(
+    long dateTime,
+    String fromVertex,
+    String toVertex,
+    String onTripId,
+    boolean wheelchairAccessible,
+    boolean preferLeastTransfers,
+    TransitMode preferredMode,
+    String excludedRoute,
+    String excludedStop,
+    int legCount
+  ) {
+    // Preconditions
+    if (excludedStop != null && !excludedStop.isEmpty()) {
+      throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
+    }
+
+    // Init request
+    RouteRequest routingRequest = new RouteRequest();
+
+    routingRequest.setNumItineraries(1);
+
+    routingRequest.setArriveBy(dateTime < 0);
+    routingRequest.setDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
+    if (fromVertex != null && !fromVertex.isEmpty()) {
+      routingRequest.setFrom(
+        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + fromVertex)
+      );
+    }
+    if (toVertex != null && !toVertex.isEmpty()) {
+      routingRequest.setTo(
+        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + toVertex)
+      );
+    }
+    if (onTripId != null && !onTripId.isEmpty()) {
+      // TODO VIA - set different on-board request
+      //routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
+    }
+    routingRequest.setWheelchair(wheelchairAccessible);
+
+    RequestModesBuilder requestModesBuilder = RequestModes
+      .of()
+      .withDirectMode(NOT_SET)
+      .withAccessMode(WALK)
+      .withTransferMode(WALK)
+      .withEgressMode(WALK);
+    routingRequest.journey().setModes(requestModesBuilder.build());
+
+    var filterRequest = new TransitFilterRequest();
+    if (preferredMode != null) {
+      var selectRequest = new SelectRequest();
+      selectRequest.setTransportModes(List.of(new MainAndSubMode(preferredMode, null)));
+      filterRequest.setSelect(List.of(selectRequest));
+    } else {
+      var selectRequest = new SelectRequest();
+      selectRequest.setTransportModes(MainAndSubMode.all());
+      filterRequest.setSelect(List.of(selectRequest));
+    }
+
+    if (excludedRoute != null && !excludedRoute.isEmpty()) {
+      var selectRequest = new SelectRequest();
+      selectRequest.setRoutes(
+        RouteMatcher.idMatcher(List.of(new FeedScopedId(feedId.getId(), excludedRoute)))
+      );
+      filterRequest.setNot(List.of(selectRequest));
+    }
+
+    routingRequest.journey().transit().setFilters(List.of(filterRequest));
+
+    // Init preferences
+    routingRequest.withPreferences(preferences -> {
+      preferences.withTransfer(tx -> {
+        tx.withSlack(0);
+        tx.withWaitReluctance(1);
+        tx.withCost(preferLeastTransfers ? 300 : 0);
+      });
+
+      // The walk board cost is set low because it interferes with test 2c1.
+      // As long as boarding has a very low cost, waiting should not be "better" than riding
+      // since this makes interlining _worse_ than alighting and re-boarding the same line.
+      // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
+      preferences.withWalk(w -> w.withBoardCost(30));
+      preferences.withTransit(tr -> tr.setOtherThanPreferredRoutesPenalty(0));
+    });
+
+    // Route
+    RoutingResponse res = serverContext.routingService().route(routingRequest);
+
+    // Assert itineraries
+    List<Itinerary> itineraries = res.getTripPlan().itineraries;
+    // Stored in instance field for use in individual tests
+    Itinerary itinerary = itineraries.get(0);
+
+    assertEquals(legCount, itinerary.getLegs().size());
+
+    return itinerary;
+  }
 
   public void validateLeg(
     Leg leg,

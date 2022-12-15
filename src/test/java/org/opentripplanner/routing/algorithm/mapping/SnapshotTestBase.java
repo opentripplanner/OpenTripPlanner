@@ -272,7 +272,7 @@ public abstract class SnapshotTestBase {
       .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
-    // TODO: 2022-11-29 filters: fix
+    // TODO: 2022-11-29 filters: fix. This is problematic. How should be solve it?
     //    var transitModes = mapModes(request.journey().transit().modes());
     List<ApiRequestMode> transitModes = List.of();
 

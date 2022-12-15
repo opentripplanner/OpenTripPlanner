@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
+import org.opentripplanner.routing.api.request.request.filter.ExcludeAllTransitFilter;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 
 @ExtendWith(SnapshotExtension.class)
@@ -67,8 +69,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.journey().direct().setMode(StreetMode.WALK);
-    // TODO: 2022-11-29 filters: fix
-    //    request.journey().transit().setModes(List.of());
+    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
+
     request.setFrom(p0);
     request.setTo(p2);
 
@@ -83,8 +85,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     request.journey().egress().setMode(StreetMode.WALK);
     request.journey().direct().setMode(StreetMode.WALK);
     request.journey().transfer().setMode(StreetMode.WALK);
-    // TODO: 2022-11-29 filters: fix
-    //    request.journey().transit().setModes(List.of());
+    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
+
     request.setFrom(ps);
     request.setTo(p2);
 
@@ -99,8 +101,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     request.journey().egress().setMode(StreetMode.WALK);
     request.journey().direct().setMode(StreetMode.WALK);
     request.journey().transfer().setMode(StreetMode.WALK);
-    // TODO: 2022-11-29 filters: fix
-    //    request.journey().transit().setModes(List.of());
+    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
+
     request.setFrom(ptc);
     request.setTo(p3);
 
@@ -116,8 +118,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     request.journey().egress().setMode(StreetMode.WALK);
     request.journey().direct().setMode(StreetMode.WALK);
     request.journey().transfer().setMode(StreetMode.WALK);
-    // TODO: 2022-11-29 filters: fix
-    //    request.journey().transit().setModes(MainAndSubMode.all());
+    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
+
     request.setFrom(p1);
     request.setTo(p2);
 
@@ -132,8 +134,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     request.journey().egress().setMode(StreetMode.WALK);
     request.journey().direct().setMode(StreetMode.WALK);
     request.journey().transfer().setMode(StreetMode.WALK);
-    // TODO: 2022-11-29 filters: fix
-    //    request.journey().transit().setModes(MainAndSubMode.all());
+    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
 
     request.setFrom(ps);
     request.setTo(p3);
@@ -150,8 +151,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     request.journey().egress().setMode(StreetMode.WALK);
     request.journey().direct().setMode(StreetMode.WALK);
     request.journey().transfer().setMode(StreetMode.WALK);
-    // TODO: 2022-11-29 filters: fix
-    //    request.journey().transit().setModes(MainAndSubMode.all());
+    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
+
     request.setFrom(ptc);
     request.setTo(p3);
 

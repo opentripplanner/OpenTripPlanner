@@ -13,6 +13,7 @@ import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.filter.ExcludeAllTransitFilter;
 
 @ExtendWith(SnapshotExtension.class)
 @ResourceLock(Resources.LOCALE)
@@ -67,8 +68,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_TO_PARK);
-    // TODO: 2022-11-29 filters: fix
-    //    request.journey().transit().setModes(List.of());
+    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
     request.setFrom(p1);
     request.setTo(p2);
 
@@ -83,8 +83,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_PICKUP);
-    // TODO: 2022-11-29 filters: fix
-    //    request.journey().transit().setModes(List.of());
+    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
     request.setFrom(p3);
     request.setTo(p4);
 
@@ -99,8 +98,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_PICKUP);
-    // TODO: 2022-11-29 filters: fix
-    //    request.journey().transit().setModes(List.of());
+    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
     request.setFrom(p3);
     request.setTo(p4);
     request.setArriveBy(true);
@@ -116,8 +114,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_PICKUP);
-    // TODO: 2022-11-29 filters: fix
-    //    request.journey().transit().setModes(List.of());
+    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
     request.setFrom(p1);
     request.setTo(p2);
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));

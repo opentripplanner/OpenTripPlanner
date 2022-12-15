@@ -47,28 +47,35 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       request.preferences().wheelchair(),
       request.preferences().transit().includePlannedCancellations(),
       request.journey().transit().bannedTrips(),
-      request.journey().transit().filters(),
-      transitService
+      bannedRoutes(request.journey().transit().filters(), transitService.getAllRoutes()),
+      request.journey().transit().filters()
     );
   }
 
+  // This constructor is used only for testing
   public RouteRequestTransitDataProviderFilter(
     boolean requireBikesAllowed,
     boolean wheelchairEnabled,
     WheelchairPreferences wheelchairPreferences,
     boolean includePlannedCancellations,
+    // TODO: 2022-12-14 this should be a set
     List<FeedScopedId> bannedTrips,
-    List<TransitFilter> filters,
-    TransitService transitService
+    Set<FeedScopedId> bannedRoutes,
+    List<TransitFilter> filters
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
     this.wheelchairEnabled = wheelchairEnabled;
     this.wheelchairPreferences = wheelchairPreferences;
     this.includePlannedCancellations = includePlannedCancellations;
-    this.bannedRoutes = bannedRoutes(filters, transitService.getAllRoutes());
+    this.bannedRoutes = Set.copyOf(bannedRoutes);
     this.bannedTrips = bannedTrips;
     this.filters = filters;
     this.hasSubModeFilters = filters.stream().anyMatch(TransitFilter::isSubModePredicate);
+  }
+
+  @Override
+  public boolean hasSubModeFilters() {
+    return hasSubModeFilters;
   }
 
   public static BikeAccess bikeAccessForTrip(Trip trip) {
@@ -85,7 +92,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
   }
 
   @Override
-  public boolean tripTimesPredicate(TripTimes tripTimes) {
+  public boolean tripTimesPredicate(TripTimes tripTimes, boolean withFilters) {
     final Trip trip = tripTimes.getTrip();
 
     if (requireBikesAllowed) {
@@ -119,7 +126,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     //  in the future we will make sure that we have separate routing trip pattern for each submode
     //  then we do not have to do that
     // trip has to match with at least one predicate in order to be included in search
-    if (hasSubModeFilters) {
+    if (withFilters) {
       // we only have to this if we have submode specific filter
       //  since that's the only thing that is trip specific
       return filters.stream().anyMatch(f -> f.matchTripTimes(tripTimes));
