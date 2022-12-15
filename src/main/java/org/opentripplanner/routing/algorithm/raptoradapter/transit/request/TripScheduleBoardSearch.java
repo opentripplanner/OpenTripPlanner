@@ -63,6 +63,11 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
   }
 
   @Override
+  public int getEarliestBoardTime() {
+    return earliestBoardTime;
+  }
+
+  @Override
   public int getStopPositionInPattern() {
     return stopPositionInPattern;
   }

@@ -82,7 +82,7 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     if (result != null) {
       // check if we can back up to an earlier trip due to this stop
       // being reached earlier
-      callback.board(stopIndex, earliestBoardTime, result);
+      callback.board(stopIndex, result);
     }
   }
 
@@ -151,7 +151,7 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
       return true;
     }
 
-    callback.board(stopIndex, result.getEarliestBoardTimeForConstrainedTransfer(), result);
+    callback.board(stopIndex, result);
 
     return true;
   }

@@ -33,6 +33,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   protected final TripPatternForDates raptorTripPattern;
   protected final TripTimes tripTimes;
   protected final int stopPositionInPattern;
+  protected final int earliestDepartureTime;
   protected final int departureTime;
   protected final int offset;
   protected final int headway;
@@ -43,6 +44,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
     TripPatternForDates raptorTripPattern,
     TripTimes tripTimes,
     int stopPositionInPattern,
+    int earliestDepartureTime,
     int departureTime,
     int offset,
     int headway,
@@ -51,6 +53,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
     this.raptorTripPattern = raptorTripPattern;
     this.tripTimes = tripTimes;
     this.stopPositionInPattern = stopPositionInPattern;
+    this.earliestDepartureTime = earliestDepartureTime;
     this.departureTime = departureTime;
     this.offset = offset;
     this.headway = headway;
@@ -78,6 +81,11 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   @Override
   public int getTime() {
     return departureTime + offset;
+  }
+
+  @Override
+  public int getEarliestBoardTime() {
+    return earliestDepartureTime;
   }
 
   @Override
