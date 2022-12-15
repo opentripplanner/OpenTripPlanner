@@ -24,6 +24,10 @@ public class RaptorArchitectureTest {
   private static final Package RANGE_RAPTOR = RAPTOR.subPackage("rangeraptor");
   private static final Package RR_INTERNAL_API = RANGE_RAPTOR.subPackage("internalapi");
   private static final Package RR_TRANSIT = RANGE_RAPTOR.subPackage("transit");
+  private static final Package RR_SUPPORT = RANGE_RAPTOR.subPackage("support");
+  private static final Package RR_PATH = RANGE_RAPTOR.subPackage("path");
+  private static final Package RR_DEBUG = RANGE_RAPTOR.subPackage("debug");
+  private static final Package RR_LIFECYCLE = RANGE_RAPTOR.subPackage("lifecycle");
   private static final Package RR_MULTI_CRITERIA = RANGE_RAPTOR.subPackage("multicriteria");
   private static final Package RR_MC_CONFIGURE = RR_MULTI_CRITERIA.subPackage("configure");
   private static final Package RR_STANDARD = RANGE_RAPTOR.subPackage("standard");
@@ -52,8 +56,6 @@ public class RaptorArchitectureTest {
 
   @Test
   void enforcePackageDependenciesInRaptorImplementation() {
-    var rr = RANGE_RAPTOR;
-
     var internalApi = RR_INTERNAL_API.dependsOn(RAPTOR_API, RAPTOR_SPI).verify();
 
     // RangeRaptor common allowed dependencies
@@ -66,16 +68,20 @@ public class RaptorArchitectureTest {
       internalApi
     );
 
-    var debug = rr.subPackage("debug").dependsOn(common).verify();
-    var lifecycle = rr.subPackage("lifecycle").dependsOn(common).verify();
-    RR_TRANSIT.dependsOn(common, debug, lifecycle).verify();
-    RR_CONTEXT.subPackage("context").dependsOn(common, RR_TRANSIT);
-    var path = rr.subPackage("path").dependsOn(common, debug, RR_TRANSIT).verify();
-    var pathConfigure = path.subPackage("configure").dependsOn(common, RR_CONTEXT, path);
-    RANGE_RAPTOR.dependsOn(common, internalApi, lifecycle, RR_TRANSIT).verify();
+    RR_DEBUG.dependsOn(common).verify();
+    RR_LIFECYCLE.dependsOn(common).verify();
+    RR_TRANSIT.dependsOn(common, RR_DEBUG, RR_LIFECYCLE).verify();
+    RR_CONTEXT.dependsOn(common, RR_DEBUG, RR_LIFECYCLE, RR_TRANSIT).verify();
+    RR_PATH.dependsOn(common, RR_DEBUG, RR_TRANSIT).verify();
+
+    var pathConfigure = RR_PATH
+      .subPackage("configure")
+      .dependsOn(common, RR_CONTEXT, RR_PATH)
+      .verify();
+    RANGE_RAPTOR.dependsOn(common, internalApi, RR_LIFECYCLE, RR_TRANSIT).verify();
 
     // Common packages
-    var rrCommon = Module.of(common, debug, lifecycle, RR_TRANSIT, path);
+    var rrCommon = Module.of(common, RR_DEBUG, RR_LIFECYCLE, RR_TRANSIT, RR_SUPPORT, RR_PATH);
 
     // Standard Range Raptor Implementation
     var stdInternalApi = RR_STANDARD
