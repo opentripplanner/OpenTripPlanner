@@ -21,7 +21,7 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
 
   /**
    * Find the best trip matching the given {@code timeLimit}. This is the same as calling {@link
-   * #search(int, int, int)} with {@code tripIndexLimit: -1}.
+   * #search(int, int, int)} with {@code tripIndexLimit: UNBOUNDED_TRIP_INDEX}.
    *
    * @see #search(int, int, int)
    */
@@ -46,10 +46,10 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
    * @param earliestBoardTime     The time of arrival(departure for reverse search) at the given
    *                              stop.
    * @param stopPositionInPattern The stop to board
-   * @param tripIndexLimit        Upper bound for trip index to search. Inclusive. Use {@code -1}
-   *                              for an unbounded search. This is an optimization which allow us to
-   *                              search faster, and it exclude results which is less favorable than
-   *                              trips already processed.
+   * @param tripIndexLimit        Upper bound for trip index to search. Inclusive. Use
+   *                              {@code UNBOUNDED_TRIP_INDEX} for an unbounded search. This is an
+   *                              optimization which allow us to search faster, and it excludes
+   *                              results which is less favorable than trips already processed.
    */
   @Nullable
   @Flyweight
