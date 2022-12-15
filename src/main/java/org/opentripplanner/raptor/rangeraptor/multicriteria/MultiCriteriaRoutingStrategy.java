@@ -5,13 +5,17 @@ import static org.opentripplanner.raptor.rangeraptor.multicriteria.PatternRide.p
 import java.util.function.IntConsumer;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupport;
+import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupportCallback;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.TransitArrival;
@@ -24,11 +28,13 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
-  extends TimeBasedRoutingSupport<T> {
+  implements RoutingStrategy<T>, TimeBasedRoutingSupportCallback<T> {
 
   private final McRangeRaptorWorkerState<T> state;
-  private final CostCalculator<T> costCalculator;
+  private final TimeBasedRoutingSupport<T> routingSupport;
   private final ParetoSet<PatternRide<T>> patternRides;
+  private final CostCalculator<T> costCalculator;
+  private final SlackProvider slackProvider;
 
   private AbstractStopArrival<T> prevArrival;
 
@@ -41,9 +47,12 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     DebugHandlerFactory<T> debugHandlerFactory,
     WorkerLifeCycle lifecycle
   ) {
-    super(slackProvider, calculator, roundProvider, lifecycle);
     this.state = state;
+    this.routingSupport =
+      new TimeBasedRoutingSupport<>(slackProvider, calculator, roundProvider, lifecycle);
+    this.routingSupport.withCallback(this);
     this.costCalculator = costCalculator;
+    this.slackProvider = slackProvider;
     this.patternRides =
       new ParetoSet<>(
         paretoComparatorRelativeCost(),
@@ -53,7 +62,10 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
   @Override
   public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
-    int departureTime = getTimeDependentDepartureTime(accessPath, iterationDepartureTime);
+    int departureTime = routingSupport.getTimeDependentDepartureTime(
+      accessPath,
+      iterationDepartureTime
+    );
 
     // This access is not available after the iteration departure time
     if (departureTime == -1) {
@@ -64,7 +76,8 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void prepareForTransitWith() {
+  public void prepareForTransitWith(RaptorTimeTable<T> timeTable) {
+    routingSupport.prepareForTransitWith(timeTable);
     this.patternRides.clear();
   }
 
@@ -74,6 +87,22 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
       state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
     }
   }
+
+  /**
+   * Board the given trip(event) at the given stop index.
+   */
+  @Override
+  public void board(
+    int stopIndex,
+    int stopPos,
+    int boardSlack,
+    boolean hasConstrainedTransfer,
+    RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
+  ) {
+    routingSupport.board(stopIndex, stopPos, boardSlack, hasConstrainedTransfer, txSearch);
+  }
+
+  /* TimeBasedRoutingSupportCallback */
 
   @Override
   public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
