@@ -2,15 +2,8 @@ package org.opentripplanner.raptor.rangeraptor.support;
 
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.raptor.spi.TransitArrival;
 
 public interface TimeBasedRoutingSupportCallback<T extends RaptorTripSchedule> {
-  /**
-   * Get the current boarding previous transit arrival. This is used to look up any guaranteed
-   * transfers.
-   */
-  TransitArrival<T> previousTransit(int boardStopIndex);
-
   /**
    * Board the given trip(event) at the given stop index.
    *

@@ -91,8 +91,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
     for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
       this.prevArrival = prevArrival;
-      int prevArrivalTime = prevArrival.arrivalTime();
-      routingSupport.boardWithRegularTransfer(prevArrivalTime, stopIndex, stopPos, boardSlack);
+      routingSupport.boardWithRegularTransfer(prevArrivalTime(), stopIndex, stopPos, boardSlack);
     }
   }
 
@@ -106,7 +105,8 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
       this.prevArrival = prevArrival;
       boolean boardingOk = routingSupport.boardWithConstrainedTransfer(
-        prevArrival.arrivalTime(),
+        previousTransitArrival(stopIndex),
+        prevArrivalTime(),
         stopIndex,
         boardSlack,
         txSearch
@@ -124,11 +124,6 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   /* TimeBasedRoutingSupportCallback */
 
   @Override
-  public TransitArrival<T> previousTransit(int boardStopIndex) {
-    return prevArrival.mostRecentTransitArrival();
-  }
-
-  @Override
   public void board(
     final int stopIndex,
     final int earliestBoardTime,
@@ -144,7 +139,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
       prevArrival = prevArrival.timeShiftNewArrivalTime(latestArrivalTime);
     }
 
-    final int boardCost = calculateCostAtBoardTime(prevArrival, boarding);
+    final int boardCost = calculateCostAtBoardTime(boarding);
 
     final int relativeBoardCost = boardCost + calculateOnTripRelativeCost(boardTime, trip);
 
@@ -166,18 +161,15 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
    * journey all the way until a trip is boarded. Any slack at the end of the last leg is not part
    * of this, because that is already accounted for. If the previous leg is an access leg, then it
    * is already time-shifted, which is important for this calculation to be correct.
-   *
-   * @param prevArrival The stop-arrival where the trip was boarded.
+   * <p>
+   * Note! This depends on the {@code prevArrival} being set.
    */
-  private int calculateCostAtBoardTime(
-    final AbstractStopArrival<T> prevArrival,
-    final RaptorTripScheduleBoardOrAlightEvent<T> boardEvent
-  ) {
+  private int calculateCostAtBoardTime(final RaptorTripScheduleBoardOrAlightEvent<T> boardEvent) {
     return (
       prevArrival.cost() +
       costCalculator.boardingCost(
         prevArrival.isFirstRound(),
-        prevArrival.arrivalTime(),
+        prevArrivalTime(),
         boardEvent.getBoardStopIndex(),
         boardEvent.getTime(),
         boardEvent.getTrip(),
@@ -195,5 +187,13 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
    */
   private int calculateOnTripRelativeCost(int boardTime, T tripSchedule) {
     return costCalculator.onTripRelativeRidingCost(boardTime, tripSchedule);
+  }
+
+  private TransitArrival<T> previousTransitArrival(int boardStopIndex) {
+    return prevArrival.mostRecentTransitArrival();
+  }
+
+  private int prevArrivalTime() {
+    return prevArrival.arrivalTime();
   }
 }

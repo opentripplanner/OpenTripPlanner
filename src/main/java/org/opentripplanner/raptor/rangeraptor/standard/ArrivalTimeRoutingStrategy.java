@@ -108,6 +108,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
     return routingSupport.boardWithConstrainedTransfer(
+      previousTransitArrival(stopIndex),
       prevArrivalTime(stopIndex),
       stopIndex,
       boardSlack,
@@ -116,11 +117,6 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   /* TimeBasedRoutingSupportCallback */
-
-  @Override
-  public TransitArrival<T> previousTransit(int boardStopIndex) {
-    return state.previousTransit(boardStopIndex);
-  }
 
   @Override
   public void board(
@@ -136,5 +132,9 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
 
   private int prevArrivalTime(int stopIndex) {
     return state.bestTimePreviousRound(stopIndex);
+  }
+
+  private TransitArrival<T> previousTransitArrival(int boardStopIndex) {
+    return state.previousTransit(boardStopIndex);
   }
 }

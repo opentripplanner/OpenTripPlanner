@@ -87,23 +87,36 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     }
   }
 
+  /**
+   *
+   * @param prevTransitStopArrival the current boarding previous transit arrival. This is used to
+   *                               look up any guaranteed transfers.
+   * @param prevArrivalTime        the arrival time for the board stop ({@code stopIndex}), this
+   *                               may not be same as the {@code prevTransitStopArrival}, since
+   *                               there might be a "walking" transfer to reach stop.
+   * @param stopIndex              The {@code stop index} for the boarding stop.
+   * @param boardSlack             The minimum number of seconds to apply to the arrival time
+   *                               before boarding a trip. Stay-seated and guaranteed transfers
+   *                               may override this.
+   * @param txSearch               The constrained transfer search to use.
+   */
   public boolean boardWithConstrainedTransfer(
+    TransitArrival<T> prevTransitStopArrival,
     int prevArrivalTime,
     int stopIndex,
     int boardSlack,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
     // Get the previous transit stop arrival (transfer source)
-    TransitArrival<T> sourceStopArrival = callback.previousTransit(stopIndex);
-    if (sourceStopArrival == null) {
+    if (prevTransitStopArrival == null) {
       return false;
     }
 
-    int prevTransitStopArrivalTime = sourceStopArrival.arrivalTime();
+    int prevTransitStopArrivalTime = prevTransitStopArrival.arrivalTime();
 
     int prevTransitArrivalTime = calculator.minusDuration(
       prevTransitStopArrivalTime,
-      slackProvider.alightSlack(sourceStopArrival.trip().pattern().slackIndex())
+      slackProvider.alightSlack(prevTransitStopArrival.trip().pattern().slackIndex())
     );
 
     int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
@@ -111,8 +124,8 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     var result = txSearch.find(
       timeTable,
       slackProvider.transferSlack(),
-      sourceStopArrival.trip(),
-      sourceStopArrival.stop(),
+      prevTransitStopArrival.trip(),
+      prevTransitStopArrival.stop(),
       prevTransitArrivalTime,
       earliestBoardTime
     );
