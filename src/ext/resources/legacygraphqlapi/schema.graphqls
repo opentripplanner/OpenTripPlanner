@@ -1,3 +1,9 @@
+"""
+Use an asynchronous data fetcher on a separate thread for this field.
+This is only worth it when the execution is long running, i.e. several hundreds of milliseconds, so this doesn't happen by default.
+"""
+directive @async on FIELD_DEFINITION
+
 schema {
     query: QueryType
 }
@@ -2705,7 +2711,7 @@ type QueryType {
         If the value is set to be 0, safety is ignored. Default is 1.0.
         """
         walkSafetyFactor: Float
-    ): Plan
+    ): Plan @async
 }
 
 enum RealtimeState {

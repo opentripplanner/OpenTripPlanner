@@ -1,6 +1,10 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
+import graphql.language.ObjectTypeDefinition;
+import graphql.language.TypeDefinition;
+import graphql.schema.AsyncDataFetcher;
 import graphql.schema.DataFetcher;
+import graphql.schema.idl.TypeDefinitionRegistry;
 import graphql.schema.idl.TypeRuntimeWiring;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,8 +22,27 @@ class IntrospectionTypeWiring {
         Arrays.asList(method.getReturnType().getInterfaces()).contains(DataFetcher.class)
       );
 
-  static <T> TypeRuntimeWiring build(Class<T> clazz) throws Exception {
+  private final TypeDefinitionRegistry typeRegistry;
+
+  public IntrospectionTypeWiring(TypeDefinitionRegistry typeRegistry) {
+    this.typeRegistry = typeRegistry;
+  }
+
+  <T> TypeRuntimeWiring build(Class<T> clazz) throws Exception {
     T instance = clazz.getConstructor().newInstance();
+
+    String typeName = clazz
+      .getSimpleName()
+      .replaceFirst("LegacyGraphQL", "")
+      .replaceAll("Impl$", "");
+
+    TypeDefinition type = typeRegistry
+      .getType(typeName)
+      .orElseThrow(() -> new IllegalArgumentException("Type not found in schema"));
+
+    if (!(type instanceof ObjectTypeDefinition objectType)) {
+      throw new IllegalArgumentException("Type is not object type");
+    }
 
     return TypeRuntimeWiring
       .newTypeWiring(
@@ -34,23 +57,39 @@ class IntrospectionTypeWiring {
             Collectors.toMap(
               Method::getName,
               method -> {
+                String fieldName = method.getName();
                 try {
                   DataFetcher dataFetcher = (DataFetcher) method.invoke(instance);
                   if (dataFetcher == null) {
                     throw new RuntimeException(
                       String.format(
                         "Data fetcher %s for type %s is null",
-                        method.getName(),
+                        fieldName,
                         clazz.getSimpleName()
                       )
                     );
                   }
+                  if (
+                    objectType
+                      .getFieldDefinitions()
+                      .stream()
+                      .filter(fieldDefinition -> fieldDefinition.getName().equals(fieldName))
+                      .anyMatch(fieldDefinition ->
+                        fieldDefinition
+                          .getDirectives()
+                          .stream()
+                          .anyMatch(directive -> directive.getName().equals("async"))
+                      )
+                  ) {
+                    return AsyncDataFetcher.async(dataFetcher);
+                  }
+
                   return dataFetcher;
                 } catch (IllegalAccessException | InvocationTargetException error) {
                   throw new RuntimeException(
                     String.format(
                       "Data fetcher %s for type %s threw error",
-                      method.getName(),
+                      fieldName,
                       clazz.getSimpleName()
                     ),
                     error
