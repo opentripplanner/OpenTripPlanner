@@ -7,8 +7,9 @@ import javax.inject.Singleton;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.worldenvelope.configure.WorldEnvelopeModule;
-import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
+import org.opentripplanner.service.worldenvelope.configure.WorldEnvelopeServiceModule;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.ConfigModule;
@@ -26,8 +27,8 @@ import org.opentripplanner.visualizer.GraphVisualizer;
   modules = {
     ConfigModule.class,
     TransitModule.class,
+    WorldEnvelopeServiceModule.class,
     ConstructApplicationModule.class,
-    WorldEnvelopeModule.class,
   }
 )
 public interface ConstructApplicationFactory {
@@ -35,7 +36,8 @@ public interface ConstructApplicationFactory {
   RaptorConfig<TripSchedule> raptorConfig();
   Graph graph();
   TransitModel transitModel();
-  WorldEnvelopeModel worldEnvelopeModel();
+  WorldEnvelopeRepository worldEnvelopeRepository();
+  WorldEnvelopeService worldEnvelopeService();
 
   @Nullable
   GraphVisualizer graphVisualizer();
@@ -60,7 +62,7 @@ public interface ConstructApplicationFactory {
     Builder graphVisualizer(@Nullable GraphVisualizer graphVisualizer);
 
     @BindsInstance
-    Builder worldEnvelopeModel(WorldEnvelopeModel worldEnvelopeModel);
+    Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
 
     ConstructApplicationFactory build();
   }

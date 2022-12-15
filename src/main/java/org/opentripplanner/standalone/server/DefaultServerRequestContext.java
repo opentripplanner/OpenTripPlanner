@@ -14,7 +14,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.worldenvelope.model.WorldEnvelopeService;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
