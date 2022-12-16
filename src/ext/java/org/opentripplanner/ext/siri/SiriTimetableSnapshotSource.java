@@ -342,17 +342,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           } else {
             // Updated trip
             var result = handleModifiedTrip(transitModel, fuzzyTripMatcher, feedId, journey);
-            result.ifSuccess(ignored -> {
-              if (journey.isMonitored() != null && !journey.isMonitored()) {
-                results.add(
-                  Result.success(
-                    new UpdateSuccess(List.of(UpdateSuccess.WarningType.NOT_MONITORED))
-                  )
-                );
-              } else {
-                results.add(Result.success(UpdateSuccess.noWarnings()));
-              }
-            });
+            // need to put it in a new instance so the type is correct
+            result.ifSuccess(ignored -> results.add(Result.success(result.successValue())));
             result.ifFailure(failures -> {
               List<Result<UpdateSuccess, UpdateError>> f = failures
                 .stream()
@@ -853,7 +844,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return null;
   }
 
-  private Result<?, List<UpdateError>> handleModifiedTrip(
+  private Result<UpdateSuccess, List<UpdateError>> handleModifiedTrip(
     TransitModel transitModel,
     SiriFuzzyTripMatcher fuzzyTripMatcher,
     String feedId,
@@ -866,7 +857,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         estimatedVehicleJourney.isCancellation() != null &&
         !estimatedVehicleJourney.isCancellation()
       ) {
-        return Result.success();
+        return Result.success(UpdateSuccess.ofWarnings());
       }
     }
 
@@ -888,8 +879,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
+    final Result<UpdateSuccess, List<UpdateError>> successNoWarnings = Result.success(
+      UpdateSuccess.noWarnings()
+    );
     if (serviceDate == null) {
-      return Result.success();
+      return successNoWarnings;
     }
 
     Set<TripTimes> times = new HashSet<>();
@@ -1045,7 +1039,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     if (errors.isEmpty()) {
-      return Result.success();
+      return successNoWarnings;
     } else {
       return Result.failure(errors);
     }
