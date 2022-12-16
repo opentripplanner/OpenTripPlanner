@@ -157,6 +157,11 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   @Override
+  public int earliestDepartureTime(int stopIndex) {
+    return stopTimes[stopIndex].flexWindowStart;
+  }
+
+  @Override
   public int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime) {
     UnscheduledStopTime fromStopTime = stopTimes[fromStopIndex];
     UnscheduledStopTime toStopTime = stopTimes[toStopIndex];
@@ -168,6 +173,11 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     }
 
     return Math.min(arrivalTime, toStopTime.flexWindowEnd);
+  }
+
+  @Override
+  public int latestArrivalTime(int stopIndex) {
+    return stopTimes[stopIndex].flexWindowEnd;
   }
 
   @Override

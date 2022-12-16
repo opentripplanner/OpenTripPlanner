@@ -25,20 +25,56 @@ the [GTFS-Flex v2.1 draft](https://github.com/MobilityData/gtfs-flex/blob/master
 {
     "flex": {
       "maxTransferDuration" : "5m",
-      "maxFlexTripDuration" : "45m"
+      "maxFlexTripDuration" : "45m",
+      "maxAccessWalkDuration" : "15m",
+      "maxEgressWalkDuration" : "15m"
     }
 
 }
 ```
 ### Overview
 
-| Config Parameter                                 |    Type    | Summary                                                                                                                       |  Req./Opt. | Default Value | Since |
-|--------------------------------------------------|:----------:|-------------------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| [maxFlexTripDuration](#flex_maxFlexTripDuration) | `duration` | How long can a non-scheduled flex trip at maximum be.                                                                         | *Optional* | `"PT45M"`     |  2.3  |
-| [maxTransferDuration](#flex_maxTransferDuration) | `duration` | How long should a passenger be allowed to walk after getting out of a flex vehicle and transferring to a flex or transit one. | *Optional* | `"PT5M"`      |  2.3  |
+| Config Parameter                                     |    Type    | Summary                                                                                                                       |  Req./Opt. | Default Value | Since |
+|------------------------------------------------------|:----------:|-------------------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| [maxAccessWalkDuration](#flex_maxAccessWalkDuration) | `duration` | The maximum duration the passenger will be allowed to walk to reach a flex stop or zone.                                      | *Optional* | `"PT45M"`     |  2.3  |
+| [maxEgressWalkDuration](#flex_maxEgressWalkDuration) | `duration` | The maximum duration the passenger will be allowed to walk after leaving the flex vehicle at the final destination.           | *Optional* | `"PT45M"`     |  2.3  |
+| [maxFlexTripDuration](#flex_maxFlexTripDuration)     | `duration` | How long can a non-scheduled flex trip at maximum be.                                                                         | *Optional* | `"PT45M"`     |  2.3  |
+| [maxTransferDuration](#flex_maxTransferDuration)     | `duration` | How long should a passenger be allowed to walk after getting out of a flex vehicle and transferring to a flex or transit one. | *Optional* | `"PT5M"`      |  2.3  |
 
 
 ### Details
+
+<h4 id="flex_maxAccessWalkDuration">maxAccessWalkDuration</h4>
+
+**Since version:** `2.3` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT45M"`   
+**Path:** /flex 
+
+The maximum duration the passenger will be allowed to walk to reach a flex stop or zone.
+
+If you have multiple overlapping flex zones the high default value can lead to performance problems.
+A lower value means faster routing.
+
+Depending on your service this might be what you want to do anyway: many flex services are used
+by passengers with mobility problems so offering a long walk might be problematic. In other words,
+if you can walk 45 minutes to a flex stop/zone you're unlikely to be the target audience for those
+services.
+
+
+<h4 id="flex_maxEgressWalkDuration">maxEgressWalkDuration</h4>
+
+**Since version:** `2.3` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT45M"`   
+**Path:** /flex 
+
+The maximum duration the passenger will be allowed to walk after leaving the flex vehicle at the final destination.
+
+If you have multiple overlapping flex zones the high default value can lead to performance problems.
+A lower value means faster routing.
+
+Depending on your service this might be what you want to do anyway: many flex services are used
+by passengers with mobility problems so offering a long walk might be problematic. In other words,
+if you can walk 45 minutes to a flex stop/zone you're unlikely to be the target audience for those
+services.
+
 
 <h4 id="flex_maxFlexTripDuration">maxFlexTripDuration</h4>
 

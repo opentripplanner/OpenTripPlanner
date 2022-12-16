@@ -84,7 +84,7 @@ public class HslParkUpdaterTest {
       first.getOpeningHours().toString()
     );
     assertEquals(
-      "Mo-Fr 0:00-23:59,Sa 0:00-23:59,Su 0:00-23:59",
+      "Mo-Fr 0:00-23:59; Sa 0:00-23:59; Su 0:00-23:59",
       OsmOpeningHoursSupport.osmFormat(first.getOpeningHours())
     );
 

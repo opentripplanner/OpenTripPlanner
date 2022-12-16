@@ -22,7 +22,7 @@ jobs:
             jfr-delay: "35s"
 
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
-            iterations: 4
+            iterations: 1
             jfr-delay: "50s"
 
           - location: skanetrafiken
@@ -32,7 +32,7 @@ jobs:
           - location: switzerland
             iterations: 4
             jfr-delay: "50s"
-          
+
           - location: washington-state
             iterations: 1
             jfr-delay: "20s"

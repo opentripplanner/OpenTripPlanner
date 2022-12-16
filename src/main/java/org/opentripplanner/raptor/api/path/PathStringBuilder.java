@@ -58,6 +58,10 @@ public class PathStringBuilder {
     return start().append("Walk").duration(duration).end();
   }
 
+  public PathStringBuilder rental(int duration) {
+    return start().append("Rental").space().duration(duration).end();
+  }
+
   public PathStringBuilder flex(int duration, int nRides) {
     // The 'tx' is short for eXtra Transfers added by the flex access/egress.
     return start().append("Flex").duration(duration).space().append(nRides).append("x").end();

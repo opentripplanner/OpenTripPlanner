@@ -74,10 +74,6 @@ public abstract class FlexAccessEgressTemplate {
     return accessEgress.stop;
   }
 
-  public FlexTrip getFlexTrip() {
-    return trip;
-  }
-
   /**
    * This method is very much the hot code path in the flex access/egress search so any optimization
    * here will lead to noticeable speedups.

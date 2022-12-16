@@ -114,7 +114,7 @@ public class OTPMain {
     // processing input data to fail early
     loadApp.validateConfigAndDataSources();
 
-    ConstructApplication app = null;
+    ConstructApplication app;
 
     /* Load graph from disk if one is not present from build. */
     if (cli.doLoadGraph() || cli.doLoadStreetGraph()) {
@@ -145,7 +145,7 @@ public class OTPMain {
       new SerializedGraphObject(
         app.graph(),
         app.transitModel(),
-        app.worldEnvelopeModel(),
+        app.worldEnvelopeRepository(),
         config.buildConfig(),
         config.routerConfig()
       )

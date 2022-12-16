@@ -18,7 +18,7 @@ public class OsmOpeningHoursSupport {
       .openingHours()
       .stream()
       .map(OsmOpeningHoursSupport::osmFormat)
-      .collect(Collectors.joining(","));
+      .collect(Collectors.joining("; "));
   }
 
   /**
@@ -51,6 +51,7 @@ public class OsmOpeningHoursSupport {
       case "friday" -> "Fr";
       case "saturday" -> "Sa";
       case "sunday" -> "Su";
+      case "every day" -> "Mo-Su";
       default -> description;
     };
   }
