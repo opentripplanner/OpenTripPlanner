@@ -34,6 +34,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.gtfs.TripPatternCache;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -87,12 +88,13 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private final ReentrantLock bufferLock = new ReentrantLock(true);
 
+  private static final String DEFAULT_PATTERN_ID_SUFFIX = "rt";
   /**
    * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
    * messages.
    */
 
-  private final TripPatternCache tripPatternCache = new TripPatternCache();
+  private final TripPatternCache tripPatternCache = new TripPatternCache(DEFAULT_PATTERN_ID_SUFFIX);
 
   private final ZoneId timeZone;
   private final TransitService transitService;
@@ -137,8 +139,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Constructor is package local to allow unit-tests to provide their own clock, not using
-   * system time.
+   * Constructor is package local to allow unit-tests to provide their own clock, not using system
+   * time.
    */
   TimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
@@ -192,10 +194,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * feed when matching IDs.
    *
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
-   *                                     if these stops are given the NO_DATA flag.
-   * @param fullDataset true if the list with updates represent all updates that are active right
-   *                    now, i.e. all previous updates should be disregarded
-   * @param updates     GTFS-RT TripUpdate's that should be applied atomically
+   *                                      if these stops are given the NO_DATA flag.
+   * @param fullDataset                   true if the list with updates represent all updates that
+   *                                      are active right now, i.e. all previous updates should be
+   *                                      disregarded
+   * @param updates                       GTFS-RT TripUpdate's that should be applied atomically
    */
   public UpdateResult applyTripUpdates(
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
@@ -441,11 +444,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
       final Trip trip = getTripForTripId(tripId);
       // Get cached trip pattern or create one if it doesn't exist yet
-      final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
-        newStopPattern,
-        trip,
-        pattern
-      );
+      final TripPattern newPattern = getOrCreateTripPattern(newStopPattern, trip, pattern);
 
       cancelScheduledTrip(tripId, serviceDate);
       return buffer.update(newPattern, updatedTripTimes, serviceDate);
@@ -779,12 +778,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     final TripPattern originalTripPattern = transitService.getPatternForTrip(trip);
     // Get cached trip pattern or create one if it doesn't exist yet
-    final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
-      stopPattern,
-      trip,
-      originalTripPattern
-    );
-
+    final TripPattern pattern = getOrCreateTripPattern(stopPattern, trip, originalTripPattern);
     // Create new trip times
     final TripTimes newTripTimes = new TripTimes(trip, stopTimes, deduplicator);
 
@@ -816,6 +810,33 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Add new trip times to the buffer
     return buffer.update(pattern, newTripTimes, serviceDate);
+  }
+
+  private TripPattern getOrCreateTripPattern(
+    StopPattern stopPattern,
+    Trip trip,
+    TripPattern originalTripPattern
+  ) {
+    TripPattern pattern = tripPatternCache.getTripPattern(stopPattern, trip);
+
+    if (pattern == null) {
+      // Generate unique code for trip pattern
+      var id = tripPatternCache.generateUniqueIdForTripPattern(trip);
+
+      pattern =
+        TripPattern
+          .of(id)
+          .withRoute(trip.getRoute())
+          .withMode(trip.getMode())
+          .withStopPattern(stopPattern)
+          .withCreatedByRealtimeUpdater(true)
+          .withOriginalTripPattern(originalTripPattern)
+          .build();
+
+      // Add pattern to cache
+      tripPatternCache.add(stopPattern, pattern);
+    }
+    return pattern;
   }
 
   /**
