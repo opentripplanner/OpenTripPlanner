@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.framework;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.annotation.Nonnull;
 
 /**
@@ -23,6 +24,14 @@ public abstract sealed class Result<T, E> {
 
   public static <E> Result<Void, E> success() {
     return new Success<>(null);
+  }
+
+  public <NewType> Result<NewType, E> mapSuccess(Function<T, NewType> mapper) {
+    if (isSuccess()) {
+      return Result.success(mapper.apply(successValue()));
+    } else {
+      return Result.failure(failureValue());
+    }
   }
 
   /**

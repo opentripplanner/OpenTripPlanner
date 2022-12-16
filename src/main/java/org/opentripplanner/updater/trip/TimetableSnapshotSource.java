@@ -42,6 +42,7 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.UpdateError;
+import org.opentripplanner.model.UpdateSuccess;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -215,7 +216,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     bufferLock.lock();
 
     Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship = new HashMap<>();
-    List<Result<?, UpdateError>> results = new ArrayList<>();
+    List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
     try {
       if (fullDataset) {
@@ -272,14 +273,15 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           tripDescriptor
         );
 
-        Result<?, UpdateError> result =
+        Result<UpdateSuccess, UpdateError> result =
           switch (tripScheduleRelationship) {
             case SCHEDULED -> handleScheduledTrip(
               tripUpdate,
               tripId,
               serviceDate,
               backwardsDelayPropagationType
-            );
+            )
+              .mapSuccess(ignored -> UpdateSuccess.noWarnings());
             case ADDED -> validateAndHandleAddedTrip(
               tripUpdate,
               tripDescriptor,
@@ -464,7 +466,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param tripDescriptor GTFS-RT TripDescriptor
    * @return empty Result if successful or one containing an error
    */
-  private Result<?, UpdateError> validateAndHandleAddedTrip(
+  private Result<UpdateSuccess, UpdateError> validateAndHandleAddedTrip(
     final TripUpdate tripUpdate,
     final TripDescriptor tripDescriptor,
     final FeedScopedId tripId,
@@ -497,6 +499,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     final List<StopTimeUpdate> stopTimeUpdates = removeUnknownStops(tripUpdate, tripId);
 
+    var warnings = new ArrayList<UpdateSuccess.WarningType>(0);
+
+    if (stopTimeUpdates.size() < tripUpdate.getStopTimeUpdateCount()) {
+      warnings.add(UpdateSuccess.WarningType.UNKNOWN_STOPS_REMOVED_FROM_ADDED_TRIP);
+    }
+
     // check if after filtering the stops we still have at least 2
     if (stopTimeUpdates.size() < 2) {
       debug(tripId, "ADDED trip has fewer than two known stops, skipping.");
@@ -512,7 +520,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     //
     // Handle added trip
     //
-    return handleAddedTrip(tripUpdate, stopTimeUpdates, tripDescriptor, stops, tripId, serviceDate);
+    return handleAddedTrip(tripUpdate, stopTimeUpdates, tripDescriptor, stops, tripId, serviceDate)
+      .mapSuccess(s -> s.addWarnings(warnings));
   }
 
   /**
@@ -634,7 +643,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param serviceDate    service date for added trip
    * @return empty Result if successful or one containing an error
    */
-  private Result<?, UpdateError> handleAddedTrip(
+  private Result<UpdateSuccess, UpdateError> handleAddedTrip(
     final TripUpdate tripUpdate,
     final List<StopTimeUpdate> stopTimeUpdates,
     final TripDescriptor tripDescriptor,
@@ -777,7 +786,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param realTimeState real-time state of new trip
    * @return empty Result if successful or one containing an error
    */
-  private Result<?, UpdateError> addTripToGraphAndBuffer(
+  private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(
     final Trip trip,
     final TripUpdate tripUpdate,
     final List<StopTimeUpdate> stopTimeUpdates,
@@ -970,7 +979,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param tripDescriptor GTFS-RT TripDescriptor
    * @return empty Result if successful or one containing an error
    */
-  private Result<?, UpdateError> validateAndHandleModifiedTrip(
+  private Result<UpdateSuccess, UpdateError> validateAndHandleModifiedTrip(
     final TripUpdate tripUpdate,
     final TripDescriptor tripDescriptor,
     final FeedScopedId tripId,
@@ -1038,7 +1047,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param serviceDate service date for modified trip
    * @return empty Result if successful or one containing an error
    */
-  private Result<?, UpdateError> handleModifiedTrip(
+  private Result<UpdateSuccess, UpdateError> handleModifiedTrip(
     final Trip trip,
     final TripUpdate tripUpdate,
     final List<StopLocation> stops,
@@ -1070,7 +1079,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     );
   }
 
-  private Result<?, UpdateError> handleCanceledTrip(
+  private Result<UpdateSuccess, UpdateError> handleCanceledTrip(
     FeedScopedId tripId,
     final LocalDate serviceDate
   ) {
@@ -1084,7 +1093,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       debug(tripId, "No pattern found for tripId. Skipping cancellation.");
       return UpdateError.result(tripId, NO_TRIP_FOR_CANCELLATION_FOUND);
     }
-    return Result.success();
+    return Result.success(UpdateSuccess.noWarnings());
   }
 
   private boolean purgeExpiredData() {
