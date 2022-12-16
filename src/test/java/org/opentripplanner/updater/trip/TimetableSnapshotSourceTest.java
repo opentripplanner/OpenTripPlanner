@@ -167,57 +167,6 @@ public class TimetableSnapshotSourceTest {
     assertEquals(RealTimeState.CANCELED, tripTimes.getRealTimeState());
   }
 
-  @Test
-  public void delayedTrip() {
-    final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
-    final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
-    final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
-    final TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
-    final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
-    final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
-
-    var tripUpdateBuilder = new TripUpdateBuilder(
-      tripId.getId(),
-      LocalDate.now(),
-      ScheduleRelationship.SCHEDULED,
-      transitModel.getTimeZone()
-    );
-
-    int stopSequence = 2;
-    int delay = 1;
-    tripUpdateBuilder.addDelayedStopTime(stopSequence, delay);
-
-    final TripUpdate tripUpdate = tripUpdateBuilder.build();
-
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel
-    );
-
-    updater.applyTripUpdates(
-      TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
-      fullDataset,
-      List.of(tripUpdate),
-      feedId
-    );
-
-    final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-    final Timetable forToday = snapshot.resolve(pattern, serviceDate);
-    final Timetable schedule = snapshot.resolve(pattern, null);
-    assertNotSame(forToday, schedule);
-    assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
-    assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
-    assertEquals(1, forToday.getTripTimes(tripIndex).getArrivalDelay(1));
-    assertEquals(1, forToday.getTripTimes(tripIndex).getDepartureDelay(1));
-
-    assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex).getRealTimeState());
-    assertEquals(RealTimeState.UPDATED, forToday.getTripTimes(tripIndex).getRealTimeState());
-
-    assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex2).getRealTimeState());
-    assertEquals(RealTimeState.SCHEDULED, forToday.getTripTimes(tripIndex2).getRealTimeState());
-  }
-
   /**
    * This test just asserts that invalid trip ids don't throw an exception and are ignored instead
    */
@@ -465,6 +414,57 @@ public class TimetableSnapshotSourceTest {
   class Scheduled {
 
     @Test
+    public void delayed() {
+      final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
+      final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
+      final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
+      final TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
+      final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
+      final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
+
+      var tripUpdateBuilder = new TripUpdateBuilder(
+        tripId.getId(),
+        LocalDate.now(),
+        ScheduleRelationship.SCHEDULED,
+        transitModel.getTimeZone()
+      );
+
+      int stopSequence = 2;
+      int delay = 1;
+      tripUpdateBuilder.addDelayedStopTime(stopSequence, delay);
+
+      final TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+      var updater = new TimetableSnapshotSource(
+        TimetableSnapshotSourceParameters.DEFAULT,
+        transitModel
+      );
+
+      updater.applyTripUpdates(
+        TRIP_MATCHER_NOOP,
+        REQUIRED_NO_DATA,
+        fullDataset,
+        List.of(tripUpdate),
+        feedId
+      );
+
+      final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+      final Timetable forToday = snapshot.resolve(pattern, serviceDate);
+      final Timetable schedule = snapshot.resolve(pattern, null);
+      assertNotSame(forToday, schedule);
+      assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
+      assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
+      assertEquals(1, forToday.getTripTimes(tripIndex).getArrivalDelay(1));
+      assertEquals(1, forToday.getTripTimes(tripIndex).getDepartureDelay(1));
+
+      assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex).getRealTimeState());
+      assertEquals(RealTimeState.UPDATED, forToday.getTripTimes(tripIndex).getRealTimeState());
+
+      assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex2).getRealTimeState());
+      assertEquals(RealTimeState.SCHEDULED, forToday.getTripTimes(tripIndex2).getRealTimeState());
+    }
+
+    @Test
     public void scheduled() {
       // GIVEN
 
@@ -674,69 +674,24 @@ public class TimetableSnapshotSourceTest {
     }
 
     @Test
-    public void testHandleScheduledTripWithSkippedAndScheduled() {
+    public void scheduledTripWithSkippedAndScheduled() {
       // GIVEN
 
       // Get service date of today because old dates will be purged after applying updates
       LocalDate serviceDate = LocalDate.now();
       String scheduledTripId = "1.1";
 
-      TripUpdate tripUpdate;
-      {
-        final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+      var builder = new TripUpdateBuilder(
+        scheduledTripId,
+        serviceDate,
+        SCHEDULED,
+        transitModel.getTimeZone()
+      )
+        .addDelayedStopTime(1, 0)
+        .addStopTime(2, SKIPPED)
+        .addDelayedStopTime(3, 90);
 
-        tripDescriptorBuilder.setTripId(scheduledTripId);
-        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
-        tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
-
-        final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
-
-        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-
-        { // First stop
-          final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(
-            0
-          );
-          stopTimeUpdateBuilder.setScheduleRelationship(
-            StopTimeUpdate.ScheduleRelationship.SCHEDULED
-          );
-          stopTimeUpdateBuilder.setStopSequence(1);
-
-          { // Departure
-            final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-            departureBuilder.setDelay(0);
-          }
-        }
-
-        { // Second stop
-          final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(
-            1
-          );
-          stopTimeUpdateBuilder.setScheduleRelationship(SKIPPED);
-          stopTimeUpdateBuilder.setStopSequence(2);
-        }
-
-        { // Last stop
-          final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(
-            2
-          );
-          stopTimeUpdateBuilder.setScheduleRelationship(
-            StopTimeUpdate.ScheduleRelationship.SCHEDULED
-          );
-          stopTimeUpdateBuilder.setStopSequence(3);
-
-          { // Arrival
-            final StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-            arrivalBuilder.setDelay(90);
-          }
-          { // Departure
-            final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-            departureBuilder.setDelay(90);
-          }
-        }
-
-        tripUpdate = tripUpdateBuilder.build();
-      }
+      var tripUpdate = builder.build();
 
       var updater = new TimetableSnapshotSource(
         TimetableSnapshotSourceParameters.DEFAULT,
