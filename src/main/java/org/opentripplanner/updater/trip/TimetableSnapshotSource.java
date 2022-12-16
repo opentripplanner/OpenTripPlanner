@@ -281,8 +281,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               tripId,
               serviceDate,
               backwardsDelayPropagationType
-            )
-              .mapSuccess(ignored -> UpdateSuccess.noWarnings());
+            );
             case ADDED -> validateAndHandleAddedTrip(
               tripUpdate,
               tripDescriptor,
@@ -404,7 +403,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return tripScheduleRelationship;
   }
 
-  private Result<?, UpdateError> handleScheduledTrip(
+  private Result<UpdateSuccess, UpdateError> handleScheduledTrip(
     TripUpdate tripUpdate,
     FeedScopedId tripId,
     LocalDate serviceDate,
@@ -432,7 +431,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate, backwardsDelayPropagationType);
 
     if (result.isFailure()) {
-      return result;
+      // needs to be put into a new Result so the success type is correct
+      return Result.failure(result.failureValue());
     }
 
     var tripTimesPatch = result.successValue();
