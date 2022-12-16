@@ -1169,7 +1169,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
       // Add additional replaced service journeys if present.
       Optional
-        .of(estimatedVehicleJourney.getAdditionalVehicleJourneyReves())
+        .ofNullable(estimatedVehicleJourney.getAdditionalVehicleJourneyReves())
         .ifPresent(additionalVehicleJourneyReves -> {
           additionalVehicleJourneyReves.forEach(vehicleJourneyRef -> {
             var id = new FeedScopedId(feedId, vehicleJourneyRef.getDatedVehicleJourneyRef());
