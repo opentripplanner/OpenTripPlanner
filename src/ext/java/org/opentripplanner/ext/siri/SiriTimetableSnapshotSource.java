@@ -11,6 +11,7 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DAT
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
+import static org.opentripplanner.model.UpdateSuccess.WarningType.NOT_MONITORED;
 
 import com.google.common.base.Preconditions;
 import java.time.LocalDate;
@@ -857,7 +858,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         estimatedVehicleJourney.isCancellation() != null &&
         !estimatedVehicleJourney.isCancellation()
       ) {
-        return Result.success(UpdateSuccess.ofWarnings());
+        return Result.success(UpdateSuccess.ofWarnings(NOT_MONITORED));
       }
     }
 
