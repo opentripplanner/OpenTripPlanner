@@ -11,9 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.opentripplanner.common.model.T2;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -32,7 +31,7 @@ public class AddedTripHelperTest {
   private Operator operator;
   private Trip trip;
   private FeedScopedId routeId;
-  private T2<TransitMode, String> transitMode;
+  private Mode transitMode;
   private NaturalLanguageStringStructure publishedNames;
 
   @BeforeEach
@@ -56,7 +55,7 @@ public class AddedTripHelperTest {
         .build();
 
     routeId = new FeedScopedId("FEED_ID", "ROUTE_ID");
-    transitMode = new T2<>(TransitMode.RAIL, "replacementRailService");
+    transitMode = new Mode(TransitMode.RAIL, "replacementRailService");
     publishedNames = new NaturalLanguageStringStructure();
     publishedNames.setLang("en");
     publishedNames.setValue("Hogwarts Express");
@@ -88,7 +87,7 @@ public class AddedTripHelperTest {
   public void testGetTrip() {
     var route = getRouteWithAgency(agency, operator);
     var destinationName = new NaturalLanguageStringStructure();
-    var transitMode = new T2<>(TransitMode.RAIL, "replacementRailService");
+    var transitMode = new Mode(TransitMode.RAIL, "replacementRailService");
     var serviceId = new FeedScopedId("FEED ID", "CS ID");
 
     var actualTrip = AddedTripHelper.getTrip(
@@ -110,12 +109,12 @@ public class AddedTripHelperTest {
       );
       assertEquals(route, actualTrip.successValue().getRoute(), "route is should be mapped");
       assertEquals(
-        transitMode.first,
+        transitMode.mode(),
         actualTrip.successValue().getMode(),
         "transitMode is should be mapped"
       );
       assertEquals(
-        SubMode.of(transitMode.second),
+        SubMode.of(transitMode.submode()),
         actualTrip.successValue().getNetexSubMode(),
         "submode is should be mapped"
       );
@@ -255,8 +254,8 @@ public class AddedTripHelperTest {
     //Assert
     var expectedMode = TransitMode.valueOf(internalMode);
     assertNotNull(mode, "TransitMode response should never be null");
-    assertEquals(expectedMode, mode.first, "Mode not mapped to correct internal mode");
-    assertEquals(subMode, mode.second, "Mode not mapped to correct sub mode");
+    assertEquals(expectedMode, mode.mode(), "Mode not mapped to correct internal mode");
+    assertEquals(subMode, mode.submode(), "Mode not mapped to correct sub mode");
   }
 
   @ParameterizedTest
@@ -277,14 +276,14 @@ public class AddedTripHelperTest {
 
     if (expectedEqual) {
       assertEquals(
-        arrivalAndDepartureTime.first,
-        arrivalAndDepartureTime.second,
+        arrivalAndDepartureTime.arrivalTime(),
+        arrivalAndDepartureTime.departureTime(),
         "Arrival and departure time are expected to be equal"
       );
     } else {
       assertNotEquals(
-        arrivalAndDepartureTime.first,
-        arrivalAndDepartureTime.second,
+        arrivalAndDepartureTime.arrivalTime(),
+        arrivalAndDepartureTime.departureTime(),
         "Arrival and departure time are expected to differ"
       );
     }
