@@ -14,6 +14,7 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ALREADY
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Multimaps;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
@@ -354,6 +355,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           failuresByRelationship
         );
       }
+
+      var warnings = Multimaps.index(updateResult.warnings(), w -> w);
+      warnings
+        .keySet()
+        .forEach(key -> {
+          var count = warnings.get(key).size();
+          LOG.info("[feedId: {}] {} warnings of type {}", feedId, count, key);
+        });
     }
     return updateResult;
   }
