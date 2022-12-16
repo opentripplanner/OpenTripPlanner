@@ -15,6 +15,8 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ALREADY
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
@@ -88,13 +90,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private final ReentrantLock bufferLock = new ReentrantLock(true);
 
-  private static final String DEFAULT_PATTERN_ID_SUFFIX = "rt";
+  private static final String DEFAULT_RT_PATTERN_ID_SUFFIX = "rt";
   /**
    * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
    * messages.
    */
-
-  private final TripPatternCache tripPatternCache = new TripPatternCache(DEFAULT_PATTERN_ID_SUFFIX);
+  private final TripPatternCache tripPatternCache;
 
   private final ZoneId timeZone;
   private final TransitService transitService;
@@ -155,6 +156,13 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     this.maxSnapshotFrequencyMs = parameters.maxSnapshotFrequencyMs();
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.localDateNow = localDateNow;
+
+    // Load existing patterns into the cache, prevent creating unnecessary new patterns
+    Multimap<StopPattern, TripPattern> patterns = LinkedListMultimap.create();
+    for (TripPattern pattern : transitModel.getAllTripPatterns()) {
+      patterns.put(pattern.getStopPattern(), pattern);
+    }
+    this.tripPatternCache = new TripPatternCache(DEFAULT_RT_PATTERN_ID_SUFFIX, patterns);
 
     // Inject this into the transit model
     transitModel.initTimetableSnapshotProvider(this);
