@@ -1168,14 +1168,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       });
 
       // Add additional replaced service journeys if present.
-      Optional.of(estimatedVehicleJourney.getAdditionalVehicleJourneyReves()).ifPresent(additionalVehicleJourneyReves -> {
+      Optional
+        .of(estimatedVehicleJourney.getAdditionalVehicleJourneyReves())
+        .ifPresent(additionalVehicleJourneyReves -> {
           additionalVehicleJourneyReves.forEach(vehicleJourneyRef -> {
             var id = new FeedScopedId(feedId, vehicleJourneyRef.getDatedVehicleJourneyRef());
             var replacedTrip = buffer.getRealtimeAddedTripOnServiceDate().get(id);
             listOfReplacedVehicleJourneys.add(replacedTrip);
           });
-        }
-      );
+        });
 
       buffer.addLastAddedTripOnServiceDate(
         TripOnServiceDate
