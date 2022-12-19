@@ -4,7 +4,10 @@ import java.io.Serializable;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
-public class AllowAllTransitFilter implements Cloneable, Serializable, TransitFilter {
+/**
+ * This filter will include everything.
+ */
+public class AllowAllTransitFilter implements Serializable, TransitFilter {
 
   private static final AllowAllTransitFilter INSTANCE = new AllowAllTransitFilter();
 
@@ -22,14 +25,5 @@ public class AllowAllTransitFilter implements Cloneable, Serializable, TransitFi
   @Override
   public boolean matchTripTimes(TripTimes trip) {
     return true;
-  }
-
-  @Override
-  public AllowAllTransitFilter clone() {
-    try {
-      return (AllowAllTransitFilter) super.clone();
-    } catch (CloneNotSupportedException e) {
-      throw new RuntimeException(e);
-    }
   }
 }
