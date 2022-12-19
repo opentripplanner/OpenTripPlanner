@@ -6,7 +6,6 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
@@ -113,23 +112,6 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
       prevTransitArrivalTime,
       earliestBoardTime
     );
-  }
-
-  /**
-   * Get the time-dependent departure time for an access/egress and mark if we have time-dependent
-   * accesses or egresses
-   */
-  public int getTimeDependentDepartureTime(RaptorAccessEgress it, int iterationDepartureTime) {
-    // Earliest possible departure time from the origin, or latest possible arrival
-    // time at the destination if searching backwards.
-    int timeDependentDepartureTime = calculator.departureTime(it, iterationDepartureTime);
-
-    // This access is not available after the iteration departure time
-    if (timeDependentDepartureTime == -1) {
-      return -1;
-    }
-
-    return timeDependentDepartureTime;
   }
 
   /**

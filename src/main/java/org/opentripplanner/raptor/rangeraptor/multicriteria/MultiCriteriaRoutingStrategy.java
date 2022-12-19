@@ -7,6 +7,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupport;
+import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
@@ -27,18 +28,21 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   private final McRangeRaptorWorkerState<T> state;
   private final TimeBasedRoutingSupport<T> routingSupport;
   private final ParetoSet<PatternRide<T>> patternRides;
+  private final TransitCalculator<T> calculator;
   private final CostCalculator<T> costCalculator;
   private final SlackProvider slackProvider;
 
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
     TimeBasedRoutingSupport<T> routingSupport,
+    TransitCalculator<T> calculator,
     CostCalculator<T> costCalculator,
     SlackProvider slackProvider,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     this.state = state;
     this.routingSupport = routingSupport;
+    this.calculator = calculator;
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;
     this.patternRides =
@@ -50,10 +54,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
   @Override
   public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
-    int departureTime = routingSupport.getTimeDependentDepartureTime(
-      accessPath,
-      iterationDepartureTime
-    );
+    int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
 
     // This access is not available after the iteration departure time
     if (departureTime == -1) {
