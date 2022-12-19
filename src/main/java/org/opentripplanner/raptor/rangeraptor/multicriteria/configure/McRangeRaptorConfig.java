@@ -47,7 +47,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private RoutingStrategy<T> createTransitWorkerStrategy(McRangeRaptorWorkerState<T> state) {
     return new MultiCriteriaRoutingStrategy<>(
       state,
-      context.createTimeBasedRoutingSupport(),
+      context.createTimeBasedBoardingSupport(),
       context.calculator(),
       context.costCalculator(),
       context.slackProvider(),
