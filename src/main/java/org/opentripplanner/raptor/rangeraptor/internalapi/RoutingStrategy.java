@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorker;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
@@ -47,6 +47,6 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     int stopIndex,
     int stopPos,
     int boardSlack,
-    RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
+    RaptorConstrainedBoardingSearch<T> txSearch
   );
 }

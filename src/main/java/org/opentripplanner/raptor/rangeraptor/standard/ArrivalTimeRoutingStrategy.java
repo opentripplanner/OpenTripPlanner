@@ -7,7 +7,7 @@ import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.TransitArrival;
@@ -96,7 +96,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
     int stopIndex,
     int stopPos,
     int boardSlack,
-    RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
+    RaptorConstrainedBoardingSearch<T> txSearch
   ) {
     boardingSupport
       .boardWithConstrainedTransfer(
