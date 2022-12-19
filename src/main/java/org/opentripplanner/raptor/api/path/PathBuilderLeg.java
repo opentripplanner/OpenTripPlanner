@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.api.path;
 
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
@@ -469,6 +470,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       newToTime -= next.asTransferLeg().transfer.durationInSeconds();
     }
     newToTime = accessPath.latestArrivalTime(newToTime);
+
+    if (newToTime == SearchParams.TIME_NOT_SET) {
+      throw new IllegalStateException("Can not time-shift accessPath: " + accessPath);
+    }
 
     setTime(newToTime - accessPath.durationInSeconds(), newToTime);
   }
