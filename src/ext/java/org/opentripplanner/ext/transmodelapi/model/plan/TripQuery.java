@@ -234,8 +234,12 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("filters")
-          // TODO: 2022-12-19 filters: documentation
-          .description("TODO")
+          .description(
+            "A list of filters for which trips should be included. " +
+            "A trip will be included if it matches with at least one filter. " +
+            "An empty list of filters means that all trips should be included. " +
+            "If a search include this parameter, \"whiteListed\", \"banned\" & \"modes.transportModes\" filters will be ignored."
+          )
           .type(new GraphQLList(FilterInputType.INPUT_TYPE))
           .build()
       )

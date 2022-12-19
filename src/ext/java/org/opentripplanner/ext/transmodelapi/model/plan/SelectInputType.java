@@ -14,7 +14,11 @@ public class SelectInputType {
   static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
     .newInputObject()
     .name("TripFilterSelectInput")
-    .description("A list of selectors for filter allow-list / exclude-list")
+    .description(
+      "A list of selectors for filter allow-list / exclude-list. " +
+      "An empty list means that everything is allowed." +
+      " A trip/line will match with selectors if it matches with all non-empty lists."
+    )
     .field(
       newIdListInputField(
         "lines",
@@ -26,17 +30,6 @@ public class SelectInputType {
         "authorities",
         "Set of ids for authorities that should be included in/excluded from search"
       )
-    )
-    .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
-        .name("feeds")
-        .description(
-          "Set of ids for feeds that should be should be included in/excluded from search"
-        )
-        .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
-        .defaultValue(List.of())
-        .build()
     )
     .field(
       newIdListInputField(

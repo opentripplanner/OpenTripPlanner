@@ -9,9 +9,13 @@ public class FilterInputType {
   static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
     .newInputObject()
     .name("TripFilterInput")
-    // TODO: 2022-12-19 Correct documentation. Give some examples
+    // TODO: 2022-12-19 filters: Correct documentation. Give some examples
     .description(
-      "List of filters that should be applied on the search. A trip or line has to match with " +
+      "a collection of allow/exclude-lists that defines which trips or lines should be included during search" +
+      "" +
+      "" +
+      "" +
+      ". A trip or line has to match with " +
       "with at least one filter in order to be included in search. Not specifying any filters means that everything should be included. " +
       "If a search include this parameter, \"whiteListed\", \"banned\" & \"modes.transportModes\" filters will be ignored."
     )
@@ -20,8 +24,9 @@ public class FilterInputType {
         .newInputObjectField()
         .name("select")
         .description(
-          "Combination of allow-lists for which lines/trips should be included. In order to be accepted " +
-          "trip/line has to match with all allow-lists. An empty list means allow all."
+          "A list of selectors for what lines/trips should be allowed during search." +
+          " I order to be accepted a trip/line has to match with at least one selector." +
+          "An empty list means that everything should be allowed. "
         )
         .type(new GraphQLList(SelectInputType.INPUT_TYPE))
         .build()
@@ -31,8 +36,8 @@ public class FilterInputType {
         .newInputObjectField()
         .name("not")
         .description(
-          "Combination of exclude-lists for which lines/trips should be excluded. In order to be accepted " +
-          "trip/lines cannot match with any exclude-list."
+          "A list of selectors for what lines/trips should be excluded during the search. " +
+          "If line/trip matches with at least one selector it will be excluded."
         )
         .type(new GraphQLList(SelectInputType.INPUT_TYPE))
         .build()
