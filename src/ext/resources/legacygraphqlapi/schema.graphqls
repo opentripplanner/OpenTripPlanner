@@ -1,6 +1,10 @@
 """
 Use an asynchronous data fetcher on a separate thread for this field.
-This is only worth it when the execution is long running, i.e. several hundreds of milliseconds, so this doesn't happen by default.
+
+This is useful when adding several queries in the same HTTP request, for example by using a batch: Those
+fields annotated with this directive run in parallel.
+
+This is only worth it when the execution is long running, i.e. more than ~50 milliseconds, so this doesn't happen by default.
 """
 directive @async on FIELD_DEFINITION
 
@@ -2032,7 +2036,7 @@ type QueryType {
         after: String
         first: Int
         last: Int
-    ): placeAtDistanceConnection
+    ): placeAtDistanceConnection @async
 
     """
     Get a single departure row based on its ID (ID format is `FeedId:StopId:PatternId`)
