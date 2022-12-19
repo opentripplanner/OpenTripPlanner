@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.logging.ThrottleLogger;
 import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.DebugHandler;
@@ -167,8 +168,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
       transitCalculator
     );
 
-    // TODO OTP2 - Use a constant not -1
-    if (departureTime == -1) {
+    if (departureTime == SearchParams.TIME_NOT_SET) {
       return null;
     }
 
