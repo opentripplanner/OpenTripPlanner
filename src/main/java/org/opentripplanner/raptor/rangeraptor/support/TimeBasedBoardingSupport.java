@@ -18,7 +18,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripS
  * This class contains code which is shared by all time-dependent routing strategies. It also
  * defines abstract methods, which the individual strategies must implement.
  */
-public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
+public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
 
   private final SlackProvider slackProvider;
   private final TransitCalculator<T> calculator;
@@ -28,7 +28,7 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
   private RaptorTimeTable<T> timeTable;
   private RaptorTripScheduleSearch<T> tripSearch;
 
-  public TimeBasedRoutingSupport(
+  public TimeBasedBoardingSupport(
     boolean hasTimeDependentAccess,
     SlackProvider slackProvider,
     TransitCalculator<T> calculator,
@@ -49,7 +49,7 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Same as {@link #boardWithRegularTransfer(int, int, int, int, int)}, but with
+   * Same as {@link #boardWithRegularTransfer(int, int, int, int)}, but with
    * {@code onTripIndex} unbounded.
    */
   public RaptorTripScheduleBoardOrAlightEvent<T> boardWithRegularTransfer(

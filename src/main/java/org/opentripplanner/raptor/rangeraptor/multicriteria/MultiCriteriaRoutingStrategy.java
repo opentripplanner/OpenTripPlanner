@@ -6,7 +6,7 @@ import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
-import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupport;
+import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
@@ -26,7 +26,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   implements RoutingStrategy<T> {
 
   private final McRangeRaptorWorkerState<T> state;
-  private final TimeBasedRoutingSupport<T> routingSupport;
+  private final TimeBasedBoardingSupport<T> boardingSupport;
   private final ParetoSet<PatternRide<T>> patternRides;
   private final TransitCalculator<T> calculator;
   private final CostCalculator<T> costCalculator;
@@ -34,14 +34,14 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
-    TimeBasedRoutingSupport<T> routingSupport,
+    TimeBasedBoardingSupport<T> boardingSupport,
     TransitCalculator<T> calculator,
     CostCalculator<T> costCalculator,
     SlackProvider slackProvider,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     this.state = state;
-    this.routingSupport = routingSupport;
+    this.boardingSupport = boardingSupport;
     this.calculator = calculator;
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;
@@ -66,7 +66,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
   @Override
   public void prepareForTransitWith(RaptorTimeTable<T> timeTable) {
-    routingSupport.prepareForTransitWith(timeTable);
+    boardingSupport.prepareForTransitWith(timeTable);
     this.patternRides.clear();
   }
 
@@ -132,7 +132,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     int stopPos,
     int boardSlack
   ) {
-    var result = routingSupport.boardWithRegularTransfer(
+    var result = boardingSupport.boardWithRegularTransfer(
       prevArrival.arrivalTime(),
       stopPos,
       boardSlack
@@ -151,7 +151,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   ) {
     var previousTransitArrival = prevArrival.mostRecentTransitArrival();
 
-    var boarding = routingSupport.boardWithConstrainedTransfer(
+    var boarding = boardingSupport.boardWithConstrainedTransfer(
       previousTransitArrival,
       prevArrival.arrivalTime(),
       boardSlack,
