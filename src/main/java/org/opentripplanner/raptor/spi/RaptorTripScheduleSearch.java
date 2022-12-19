@@ -24,10 +24,7 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
    * @see #search(int, int, int)
    */
   @Flyweight
-  default RaptorTripScheduleBoardOrAlightEvent<T> search(
-    int earliestBoardTime,
-    int stopPositionInPattern
-  ) {
+  default RaptorBoardOrAlightEvent<T> search(int earliestBoardTime, int stopPositionInPattern) {
     return search(earliestBoardTime, stopPositionInPattern, UNBOUNDED_TRIP_INDEX);
   }
 
@@ -49,7 +46,7 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
    *                              results which is less favorable than trips already processed.
    */
   @Flyweight
-  RaptorTripScheduleBoardOrAlightEvent<T> search(
+  RaptorBoardOrAlightEvent<T> search(
     int earliestBoardTime,
     int stopPositionInPattern,
     int tripIndexLimit

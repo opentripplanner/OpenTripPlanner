@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 
 public class TestConstrainedBoardingSearch
   implements RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> {
@@ -34,7 +34,7 @@ public class TestConstrainedBoardingSearch
 
   @Nullable
   @Override
-  public RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> find(
+  public RaptorBoardOrAlightEvent<TestTripSchedule> find(
     RaptorTimeTable<TestTripSchedule> targetTimetable,
     int transferSlack,
     TestTripSchedule sourceTrip,
@@ -53,7 +53,7 @@ public class TestConstrainedBoardingSearch
         }
       }
     }
-    return RaptorTripScheduleBoardOrAlightEvent.empty(earliestBoardTime);
+    return RaptorBoardOrAlightEvent.empty(earliestBoardTime);
   }
 
   /**

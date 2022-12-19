@@ -5,13 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 
 class TripAssert {
 
   private final RaptorTripScheduleSearch<TestTripSchedule> subject;
-  private RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> result;
+  private RaptorBoardOrAlightEvent<TestTripSchedule> result;
   private int stopPosition;
 
   TripAssert(RaptorTripScheduleSearch<TestTripSchedule> subject) {

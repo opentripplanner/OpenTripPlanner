@@ -6,10 +6,10 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.TransitArrival;
 
 /**
@@ -98,19 +98,20 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
     int boardSlack,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
-    boardingSupport.boardWithConstrainedTransfer(
-      previousTransitArrival(stopIndex),
-      prevArrivalTime(stopIndex),
-      boardSlack,
-      txSearch
-    )
+    boardingSupport
+      .boardWithConstrainedTransfer(
+        previousTransitArrival(stopIndex),
+        prevArrivalTime(stopIndex),
+        boardSlack,
+        txSearch
+      )
       .boardWithFallback(
         boarding -> board(stopIndex, boarding),
         emptyBoarding -> boardWithRegularTransfer(stopIndex, stopPos, boardSlack)
       );
   }
 
-  private void board(int stopIndex, RaptorTripScheduleBoardOrAlightEvent<T> boarding) {
+  private void board(int stopIndex, RaptorBoardOrAlightEvent<T> boarding) {
     onTripIndex = boarding.getTripIndex();
     onTrip = boarding.getTrip();
     onTripBoardTime = boarding.getTime();

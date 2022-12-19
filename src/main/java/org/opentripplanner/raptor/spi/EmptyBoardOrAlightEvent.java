@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
 record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTime)
-  implements RaptorTripScheduleBoardOrAlightEvent<T> {
+  implements RaptorBoardOrAlightEvent<T> {
   @Override
   public int getTripIndex() {
     return NOT_FOUND;
@@ -43,8 +43,8 @@ record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTi
 
   @Override
   public void boardWithFallback(
-    Consumer<RaptorTripScheduleBoardOrAlightEvent<T>> boardCallback,
-    Consumer<RaptorTripScheduleBoardOrAlightEvent<T>> fallback
+    Consumer<RaptorBoardOrAlightEvent<T>> boardCallback,
+    Consumer<RaptorBoardOrAlightEvent<T>> fallback
   ) {
     fallback.accept(this);
   }

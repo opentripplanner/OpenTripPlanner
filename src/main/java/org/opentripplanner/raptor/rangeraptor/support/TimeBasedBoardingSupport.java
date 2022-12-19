@@ -6,10 +6,10 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.spi.TransitArrival;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleBoardSearch;
@@ -52,7 +52,7 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
    * Same as {@link #boardWithRegularTransfer(int, int, int, int)}, but with
    * {@code onTripIndex} unbounded.
    */
-  public RaptorTripScheduleBoardOrAlightEvent<T> boardWithRegularTransfer(
+  public RaptorBoardOrAlightEvent<T> boardWithRegularTransfer(
     int prevArrivalTime,
     int stopPos,
     int boardSlack
@@ -60,7 +60,7 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
     return boardWithRegularTransfer(prevArrivalTime, stopPos, boardSlack, UNBOUNDED_TRIP_INDEX);
   }
 
-  public RaptorTripScheduleBoardOrAlightEvent<T> boardWithRegularTransfer(
+  public RaptorBoardOrAlightEvent<T> boardWithRegularTransfer(
     int prevArrivalTime,
     int stopPos,
     int boardSlack,
@@ -82,7 +82,7 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
    *                               may override this.
    * @param txSearch               The constrained transfer search to use.
    */
-  public RaptorTripScheduleBoardOrAlightEvent<T> boardWithConstrainedTransfer(
+  public RaptorBoardOrAlightEvent<T> boardWithConstrainedTransfer(
     TransitArrival<T> prevTransitStopArrival,
     int prevArrivalTime,
     int boardSlack,
@@ -90,9 +90,7 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
   ) {
     // Get the previous transit stop arrival (transfer source)
     if (prevTransitStopArrival == null) {
-      return RaptorTripScheduleBoardOrAlightEvent.empty(
-        earliestBoardTime(prevArrivalTime, boardSlack)
-      );
+      return RaptorBoardOrAlightEvent.empty(earliestBoardTime(prevArrivalTime, boardSlack));
     }
 
     int prevTransitStopArrivalTime = prevTransitStopArrival.arrivalTime();

@@ -4,9 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -36,7 +36,7 @@ public final class ConstrainedBoardingSearch
     }
 
     @Override
-    public RaptorTripScheduleBoardOrAlightEvent<TripSchedule> find(
+    public RaptorBoardOrAlightEvent<TripSchedule> find(
       RaptorTimeTable<TripSchedule> targetTimetable,
       int transferSlack,
       TripSchedule sourceTrip,
@@ -44,7 +44,7 @@ public final class ConstrainedBoardingSearch
       int prevTransitArrivalTime,
       int earliestBoardTime
     ) {
-      return RaptorTripScheduleBoardOrAlightEvent.empty(earliestBoardTime);
+      return RaptorBoardOrAlightEvent.empty(earliestBoardTime);
     }
   };
 
@@ -81,7 +81,7 @@ public final class ConstrainedBoardingSearch
   }
 
   @Override
-  public RaptorTripScheduleBoardOrAlightEvent<TripSchedule> find(
+  public RaptorBoardOrAlightEvent<TripSchedule> find(
     RaptorTimeTable<TripSchedule> timetable,
     int transferSlack,
     TripSchedule sourceTripSchedule,
@@ -92,7 +92,7 @@ public final class ConstrainedBoardingSearch
     var transfers = findMatchingTransfers(sourceTripSchedule, sourceStopIndex);
 
     if (!transfers.iterator().hasNext()) {
-      return RaptorTripScheduleBoardOrAlightEvent.empty(earliestBoardTime);
+      return RaptorBoardOrAlightEvent.empty(earliestBoardTime);
     }
 
     boolean found = findTimetableTripInfo(
@@ -105,7 +105,7 @@ public final class ConstrainedBoardingSearch
     );
 
     if (!found) {
-      return RaptorTripScheduleBoardOrAlightEvent.empty(earliestBoardTime);
+      return RaptorBoardOrAlightEvent.empty(earliestBoardTime);
     }
 
     var trip = timetable.getTripSchedule(onTripIndex);
