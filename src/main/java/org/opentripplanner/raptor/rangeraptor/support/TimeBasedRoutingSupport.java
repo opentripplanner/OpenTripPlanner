@@ -24,17 +24,19 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
   private final SlackProvider slackProvider;
   private final TransitCalculator<T> calculator;
   private final RoundProvider roundProvider;
+  private final boolean hasTimeDependentAccess;
   private boolean inFirstIteration = true;
-  private boolean hasTimeDependentAccess = false;
   private RaptorTimeTable<T> timeTable;
   private RaptorTripScheduleSearch<T> tripSearch;
 
   public TimeBasedRoutingSupport(
+    boolean hasTimeDependentAccess,
     SlackProvider slackProvider,
     TransitCalculator<T> calculator,
     RoundProvider roundProvider,
     WorkerLifeCycle subscriptions
   ) {
+    this.hasTimeDependentAccess = hasTimeDependentAccess;
     this.slackProvider = slackProvider;
     this.calculator = calculator;
     this.roundProvider = roundProvider;
@@ -60,15 +62,6 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
   }
 
   public RaptorTripScheduleBoardOrAlightEvent<T> boardWithRegularTransfer(
-    int prevArrivalTime,
-    int stopPos,
-    int boardSlack,
-    int onTripIndex
-  ) {
-    return searchForBoardingAfter(prevArrivalTime, stopPos, boardSlack, onTripIndex);
-  }
-
-  public RaptorTripScheduleBoardOrAlightEvent<T> searchForBoardingAfter(
     int prevArrivalTime,
     int stopPos,
     int boardSlack,
@@ -134,13 +127,6 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     // This access is not available after the iteration departure time
     if (timeDependentDepartureTime == -1) {
       return -1;
-    }
-
-    // If the time differs from the iterationDepartureTime, then the access has time
-    // restrictions. If the difference between _any_ access between iterations is not a
-    // uniform iterationStep, then the exactTripSearch optimisation may not be used.
-    if (timeDependentDepartureTime != iterationDepartureTime) {
-      hasTimeDependentAccess = true;
     }
 
     return timeDependentDepartureTime;

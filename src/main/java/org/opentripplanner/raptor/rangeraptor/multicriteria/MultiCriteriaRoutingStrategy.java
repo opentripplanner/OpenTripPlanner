@@ -3,13 +3,10 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 import static org.opentripplanner.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
-import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupport;
-import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
@@ -35,16 +32,13 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
-    SlackProvider slackProvider,
+    TimeBasedRoutingSupport<T> routingSupport,
     CostCalculator<T> costCalculator,
-    TransitCalculator<T> calculator,
-    RoundProvider roundProvider,
-    DebugHandlerFactory<T> debugHandlerFactory,
-    WorkerLifeCycle lifecycle
+    SlackProvider slackProvider,
+    DebugHandlerFactory<T> debugHandlerFactory
   ) {
     this.state = state;
-    this.routingSupport =
-      new TimeBasedRoutingSupport<>(slackProvider, calculator, roundProvider, lifecycle);
+    this.routingSupport = routingSupport;
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;
     this.patternRides =

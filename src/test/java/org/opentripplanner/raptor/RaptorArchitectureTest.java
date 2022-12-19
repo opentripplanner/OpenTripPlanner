@@ -61,7 +61,7 @@ public class RaptorArchitectureTest {
     RR_DEBUG.dependsOn(common).verify();
     RR_LIFECYCLE.dependsOn(common).verify();
     RR_TRANSIT.dependsOn(common, RR_DEBUG, RR_LIFECYCLE).verify();
-    RR_CONTEXT.dependsOn(common, RR_DEBUG, RR_LIFECYCLE, RR_TRANSIT).verify();
+    RR_CONTEXT.dependsOn(common, RR_DEBUG, RR_LIFECYCLE, RR_SUPPORT, RR_TRANSIT).verify();
     RR_PATH.dependsOn(common, RR_DEBUG, RR_TRANSIT).verify();
 
     var pathConfigure = RR_PATH

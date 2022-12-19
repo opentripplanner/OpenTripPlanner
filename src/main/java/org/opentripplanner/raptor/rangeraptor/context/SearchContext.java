@@ -18,6 +18,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
+import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.ForwardTransitCalculator;
@@ -193,6 +194,16 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
   public RaptorStopNameResolver stopNameResolver() {
     return transit.stopNameResolver();
+  }
+
+  public TimeBasedRoutingSupport<T> createTimeBasedRoutingSupport() {
+    return new TimeBasedRoutingSupport<>(
+      accessPaths().hasTimeDependentAccess(),
+      slackProvider(),
+      calculator(),
+      roundProvider(),
+      lifeCycle()
+    );
   }
 
   /**

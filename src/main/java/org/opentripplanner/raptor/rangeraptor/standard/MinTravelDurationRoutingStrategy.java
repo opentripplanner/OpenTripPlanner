@@ -2,10 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.standard;
 
 import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
 
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
-import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
-import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
@@ -45,14 +42,11 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
 
   public MinTravelDurationRoutingStrategy(
     StdWorkerState<T> state,
-    SlackProvider slackProvider,
-    TransitCalculator<T> calculator,
-    RoundProvider roundProvider,
-    WorkerLifeCycle lifecycle
+    TimeBasedRoutingSupport<T> routingSupport,
+    TransitCalculator<T> calculator
   ) {
     this.state = state;
-    this.routingSupport =
-      new TimeBasedRoutingSupport<>(slackProvider, calculator, roundProvider, lifecycle);
+    this.routingSupport = routingSupport;
     this.calculator = calculator;
   }
 
