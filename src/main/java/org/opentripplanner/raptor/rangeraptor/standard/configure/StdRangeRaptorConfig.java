@@ -96,19 +96,15 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
       case BEST_TIME:
         return new ArrivalTimeRoutingStrategy<>(
           state,
-          ctx.calculator(),
-          ctx.slackProvider(),
-          ctx.roundProvider(),
-          ctx.lifeCycle()
+          ctx.createTimeBasedRoutingSupport(),
+          ctx.calculator()
         );
       case MIN_TRAVEL_DURATION:
       case MIN_TRAVEL_DURATION_BEST_TIME:
         return new MinTravelDurationRoutingStrategy<>(
           state,
-          ctx.slackProvider(),
-          ctx.calculator(),
-          ctx.roundProvider(),
-          ctx.lifeCycle()
+          ctx.createTimeBasedRoutingSupport(),
+          ctx.calculator()
         );
     }
     throw new IllegalArgumentException(ctx.profile().toString());

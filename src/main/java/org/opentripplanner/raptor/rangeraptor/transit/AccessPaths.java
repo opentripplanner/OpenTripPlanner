@@ -66,4 +66,21 @@ public class AccessPaths {
       groupByRound(paths, RaptorAccessEgress::hasRides)
     );
   }
+
+  /** Raptor uses this information to optimize boarding of the first trip */
+  public boolean hasTimeDependentAccess() {
+    return (
+      hasTimeDependentAccess(arrivedOnBoardByNumOfRides) ||
+      hasTimeDependentAccess(arrivedOnStreetByNumOfRides)
+    );
+  }
+
+  private static boolean hasTimeDependentAccess(TIntObjectMap<List<RaptorAccessEgress>> map) {
+    for (List<RaptorAccessEgress> list : map.valueCollection()) {
+      if (list.stream().anyMatch(RaptorAccessEgress::hasOpeningHours)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
