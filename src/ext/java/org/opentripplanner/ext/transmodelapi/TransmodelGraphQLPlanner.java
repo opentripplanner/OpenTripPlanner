@@ -330,7 +330,7 @@ public class TransmodelGraphQLPlanner {
 
         if (filterInput.containsKey("not")) {
           for (var selectInput : (List<LinkedHashMap<String, List<?>>>) filterInput.get("not")) {
-            filterRequestBuilder.addSelect(mapSelectRequest(selectInput));
+            filterRequestBuilder.addNot(mapSelectRequest(selectInput));
           }
         }
 
