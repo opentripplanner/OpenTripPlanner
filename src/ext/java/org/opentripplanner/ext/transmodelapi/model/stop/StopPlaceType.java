@@ -58,6 +58,7 @@ public class StopPlaceType {
     GraphQLOutputType quayType,
     GraphQLOutputType tariffZoneType,
     GraphQLOutputType estimatedCallType,
+    GraphQLOutputType ptSituationElementType,
     GqlUtil gqlUtil
   ) {
     return GraphQLObjectType
@@ -180,7 +181,7 @@ public class StopPlaceType {
               .map(StopLocation::getNetexVehicleSubmode)
               .filter(it -> it != SubMode.UNKNOWN)
               .map(TransmodelTransportSubmode::fromValue)
-              .collect(Collectors.toList())
+              .collect(Collectors.toSet())
           )
           .build()
       )
@@ -380,17 +381,33 @@ public class StopPlaceType {
                   transitModes,
                   environment
                 )
-              )
-              .sorted(TripTimeOnDate.compareByDeparture())
-              .distinct();
+              );
 
             return limitPerLineAndDestinationDisplay(
               tripTimeOnDateStream,
               departuresPerLineAndDestinationDisplay
             )
+              .sorted(TripTimeOnDate.compareByDeparture())
+              .distinct()
               .limit(numberOfDepartures)
               .collect(Collectors.toList());
           })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("situations")
+          .description(
+            "Get all situations active for the stop place. Situations affecting individual quays are not returned, and should be fetched directly from the quay."
+          )
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
+          .dataFetcher(env ->
+            GqlUtil
+              .getTransitService(env)
+              .getTransitAlertService()
+              .getStopAlerts(((MonoOrMultiModalStation) env.getSource()).getId())
+          )
           .build()
       )
       .build();

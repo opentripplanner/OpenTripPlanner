@@ -162,7 +162,7 @@ type EstimatedCall {
   "Whether stop is cancelled. This means that either the ServiceJourney has a planned cancellation, the ServiceJourney has been cancelled by realtime data, or this particular StopPoint has been cancelled. This also means that both boarding and alighting has been cancelled."
   cancellation: Boolean!
   "The date the estimated call is valid for."
-  date: Date
+  date: Date!
   datedServiceJourney: DatedServiceJourney
   destinationDisplay: DestinationDisplay
   "Expected time of arrival at quay. Updated with real time information if available. Will be null if an actualArrivalTime exists"
@@ -177,13 +177,13 @@ type EstimatedCall {
   occupancyStatus: OccupancyStatus!
   "Whether the updated estimates are expected to be inaccurate."
   predictionInaccurate: Boolean!
-  quay: Quay
+  quay: Quay!
   "Whether this call has been updated with real time information."
   realtime: Boolean!
   realtimeState: RealtimeState!
   "Whether vehicle will only stop on request."
   requestStop: Boolean!
-  serviceJourney: ServiceJourney
+  serviceJourney: ServiceJourney!
   "Get all relevant situations for this EstimatedCall."
   situations: [PtSituationElement!]! @timingData
   stopPositionInPattern: Int!
@@ -464,7 +464,7 @@ type PtSituationElement {
   lines: [Line]!
   "Priority of this situation "
   priority: Int
-  quays: [Quay]!
+  quays: [Quay!]!
   "Authority that reported this situation"
   reportAuthority: Authority @deprecated
   "ReportType of this situation"
@@ -474,6 +474,7 @@ type PtSituationElement {
   severity: Severity
   "Operator's internal id for this situation"
   situationNumber: String
+  stopPlaces: [StopPlace!]!
   "Summary of situation in all different translations available"
   summary: [MultilingualString!]!
   "Period this situation is in effect"
@@ -1010,6 +1011,8 @@ type StopPlace implements PlaceInterface {
     "If true only quays with at least one visiting line are included."
     filterByInUse: Boolean = false
   ): [Quay] @timingData
+  "Get all situations active for the stop place. Situations affecting individual quays are not returned, and should be fetched directly from the quay."
+  situations: [PtSituationElement!]!
   tariffZones: [TariffZone]!
   timeZone: String
   "The transport modes of quays under this stop place."
@@ -1057,17 +1060,21 @@ type TimetabledPassingTime {
   "Scheduled time of departure from quay"
   departure: TimeAndDayOffset
   destinationDisplay: DestinationDisplay
+  "Earliest possible departure time for a service journey with a service window."
+  earliestDepartureTime: TimeAndDayOffset
   "Whether vehicle may be alighted at quay."
-  forAlighting: Boolean
+  forAlighting: Boolean!
   "Whether vehicle may be boarded at quay."
-  forBoarding: Boolean
+  forBoarding: Boolean!
+  "Latest possible (planned) arrival time for a service journey with a service window."
+  latestArrivalTime: TimeAndDayOffset
   notices: [Notice!]!
-  quay: Quay
+  quay: Quay!
   "Whether vehicle will only stop on request."
-  requestStop: Boolean
-  serviceJourney: ServiceJourney
+  requestStop: Boolean!
+  serviceJourney: ServiceJourney!
   "Whether this is a timing point or not. Boarding and alighting is not allowed at timing points."
-  timingPoint: Boolean
+  timingPoint: Boolean!
 }
 
 "Used to specify board and alight slack for a given modes."

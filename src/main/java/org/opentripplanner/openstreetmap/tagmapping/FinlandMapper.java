@@ -84,7 +84,68 @@ class FinlandMapper implements OsmTagMapper {
 
     // No biking on designated footways/sidewalks
     props.setProperties("highway=footway", withModes(PEDESTRIAN));
-    props.setProperties("footway=sidewalk;highway=footway", withModes(PEDESTRIAN).walkSafety(1.0));
+    props.setProperties("footway=sidewalk;highway=footway", withModes(PEDESTRIAN));
+
+    // Walking on segregated ways is safer than when cycling and walking happens on the same lane
+    props.setProperties(
+      "highway=cycleway;segregated=yes",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.1).bicycleSafety(0.6)
+    );
+
+    // Tunnels and bridges are safer than crossing a street
+    props.setProperties("highway=footway;bridge=yes", withModes(PEDESTRIAN).walkSafety(1.0));
+    props.setProperties("highway=footway;tunnel=yes", withModes(PEDESTRIAN).walkSafety(1.0));
+    props.setProperties(
+      "highway=cycleway;bridge=yes",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.0).bicycleSafety(0.6)
+    );
+    props.setProperties(
+      "highway=cycleway;tunnel=yes",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.0).bicycleSafety(0.6)
+    );
+
+    // Crossing is less safe for pedestrians, especially without traffic lights
+    props.setProperties(
+      "highway=footway;footway=crossing;crossing=traffic_signals",
+      withModes(PEDESTRIAN).walkSafety(1.1)
+    );
+    props.setProperties("highway=footway;footway=crossing", withModes(PEDESTRIAN).walkSafety(1.3));
+
+    // If cycleway is segregated, walking is as safe on crossing as in footway crossings
+    props.setProperties(
+      "highway=cycleway;cycleway=crossing;segregated=yes;crossing=traffic_signals",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.1).bicycleSafety(0.8)
+    );
+    props.setProperties(
+      "highway=cycleway;footway=crossing;segregated=yes;crossing=traffic_signals",
+      withModes(PEDESTRIAN).walkSafety(1.1).bicycleSafety(0.8)
+    );
+    props.setProperties(
+      "highway=cycleway;cycleway=crossing;segregated=yes",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.3).bicycleSafety(1.2)
+    );
+    props.setProperties(
+      "highway=cycleway;footway=crossing;segregated=yes",
+      withModes(PEDESTRIAN).walkSafety(1.3).bicycleSafety(1.2)
+    );
+
+    // If cycleway is not segregated, walking is less safe on crossing than it is footway crossings
+    props.setProperties(
+      "highway=cycleway;cycleway=crossing;crossing=traffic_signals",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.15).bicycleSafety(0.8)
+    );
+    props.setProperties(
+      "highway=cycleway;footway=crossing;crossing=traffic_signals",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.15).bicycleSafety(0.8)
+    );
+    props.setProperties(
+      "highway=cycleway;cycleway=crossing",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.35).bicycleSafety(1.2)
+    );
+    props.setProperties(
+      "highway=cycleway;footway=crossing",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.35).bicycleSafety(1.2)
+    );
 
     // Prefer designated cycleways
     props.setProperties(

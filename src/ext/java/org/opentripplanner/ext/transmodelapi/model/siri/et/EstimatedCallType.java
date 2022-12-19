@@ -14,7 +14,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
@@ -53,7 +52,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("quay")
-          .type(quayType)
+          .type(new GraphQLNonNull(quayType))
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStop())
           .build()
       )
@@ -269,22 +268,16 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("date")
-          .type(gqlUtil.dateScalar)
+          .type(new GraphQLNonNull(gqlUtil.dateScalar))
           .description("The date the estimated call is valid for.")
-          .dataFetcher(environment ->
-            Optional
-              .of(environment.getSource())
-              .map(TripTimeOnDate.class::cast)
-              .map(TripTimeOnDate::getServiceDay)
-              .orElse(null)
-          )
+          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getServiceDay())
           .build()
       )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourney")
-          .type(serviceJourneyType)
+          .type(new GraphQLNonNull(serviceJourneyType))
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getTrip())
           .build()
       )

@@ -31,6 +31,54 @@ public class FinlandMapperTest {
     OSMWithTags sidewalk = new OSMWithTags();
     sidewalk.addTag("footway", "sidewalk");
     sidewalk.addTag("highway", "footway");
+    OSMWithTags segregatedCycleway = new OSMWithTags();
+    segregatedCycleway.addTag("segregated", "yes");
+    segregatedCycleway.addTag("highway", "cycleway");
+    OSMWithTags tunnel = new OSMWithTags();
+    tunnel.addTag("tunnel", "yes");
+    tunnel.addTag("highway", "footway");
+    OSMWithTags bridge = new OSMWithTags();
+    bridge.addTag("bridge", "yes");
+    bridge.addTag("highway", "footway");
+    OSMWithTags footwayCrossing = new OSMWithTags();
+    footwayCrossing.addTag("footway", "crossing");
+    footwayCrossing.addTag("highway", "footway");
+    OSMWithTags footwayCrossingWithTrafficLights = new OSMWithTags();
+    footwayCrossingWithTrafficLights.addTag("footway", "crossing");
+    footwayCrossingWithTrafficLights.addTag("highway", "footway");
+    footwayCrossingWithTrafficLights.addTag("crossing", "traffic_signals");
+    OSMWithTags cyclewayCrossing = new OSMWithTags();
+    cyclewayCrossing.addTag("cycleway", "crossing");
+    cyclewayCrossing.addTag("highway", "cycleway");
+    OSMWithTags cyclewayFootwayCrossing = new OSMWithTags();
+    cyclewayFootwayCrossing.addTag("footway", "crossing");
+    cyclewayFootwayCrossing.addTag("highway", "cycleway");
+    OSMWithTags cyclewayCrossingWithTrafficLights = new OSMWithTags();
+    cyclewayCrossingWithTrafficLights.addTag("cycleway", "crossing");
+    cyclewayCrossingWithTrafficLights.addTag("highway", "cycleway");
+    cyclewayCrossingWithTrafficLights.addTag("crossing", "traffic_signals");
+    OSMWithTags cyclewayFootwayCrossingWithTrafficLights = new OSMWithTags();
+    cyclewayFootwayCrossingWithTrafficLights.addTag("footway", "crossing");
+    cyclewayFootwayCrossingWithTrafficLights.addTag("highway", "cycleway");
+    cyclewayFootwayCrossingWithTrafficLights.addTag("crossing", "traffic_signals");
+    OSMWithTags cyclewaySegregatedCrossing = new OSMWithTags();
+    cyclewaySegregatedCrossing.addTag("cycleway", "crossing");
+    cyclewaySegregatedCrossing.addTag("segregated", "yes");
+    cyclewaySegregatedCrossing.addTag("highway", "cycleway");
+    OSMWithTags cyclewaySegregatedFootwayCrossing = new OSMWithTags();
+    cyclewaySegregatedFootwayCrossing.addTag("footway", "crossing");
+    cyclewaySegregatedFootwayCrossing.addTag("segregated", "yes");
+    cyclewaySegregatedFootwayCrossing.addTag("highway", "cycleway");
+    OSMWithTags cyclewaySegregatedCrossingWithTrafficLights = new OSMWithTags();
+    cyclewaySegregatedCrossingWithTrafficLights.addTag("cycleway", "crossing");
+    cyclewaySegregatedCrossingWithTrafficLights.addTag("segregated", "yes");
+    cyclewaySegregatedCrossingWithTrafficLights.addTag("highway", "cycleway");
+    cyclewaySegregatedCrossingWithTrafficLights.addTag("crossing", "traffic_signals");
+    OSMWithTags cyclewaySegregatedFootwayCrossingWithTrafficLights = new OSMWithTags();
+    cyclewaySegregatedFootwayCrossingWithTrafficLights.addTag("footway", "crossing");
+    cyclewaySegregatedFootwayCrossingWithTrafficLights.addTag("segregated", "yes");
+    cyclewaySegregatedFootwayCrossingWithTrafficLights.addTag("highway", "cycleway");
+    cyclewaySegregatedFootwayCrossingWithTrafficLights.addTag("crossing", "traffic_signals");
     assertEquals(2.06, wps.getDataForWay(primaryWay).getBicycleSafetyFeatures().forward(), epsilon);
     // way with high speed limit, has higher walk safety factor
     assertEquals(1.8, wps.getDataForWay(primaryWay).getWalkSafetyFeatures().forward(), epsilon);
@@ -42,7 +90,70 @@ public class FinlandMapperTest {
       epsilon
     );
     assertEquals(1.1, wps.getDataForWay(footway).getWalkSafetyFeatures().forward(), epsilon);
-    assertEquals(1.0, wps.getDataForWay(sidewalk).getWalkSafetyFeatures().forward(), epsilon);
+    assertEquals(1.1, wps.getDataForWay(sidewalk).getWalkSafetyFeatures().forward(), epsilon);
+    assertEquals(
+      1.1,
+      wps.getDataForWay(segregatedCycleway).getWalkSafetyFeatures().forward(),
+      epsilon
+    );
+    assertEquals(1.0, wps.getDataForWay(tunnel).getWalkSafetyFeatures().forward(), epsilon);
+    assertEquals(1.0, wps.getDataForWay(bridge).getWalkSafetyFeatures().forward(), epsilon);
+    assertEquals(
+      1.3,
+      wps.getDataForWay(footwayCrossing).getWalkSafetyFeatures().forward(),
+      epsilon
+    );
+    assertEquals(
+      1.1,
+      wps.getDataForWay(footwayCrossingWithTrafficLights).getWalkSafetyFeatures().forward(),
+      epsilon
+    );
+    assertEquals(
+      1.35,
+      wps.getDataForWay(cyclewayCrossing).getWalkSafetyFeatures().forward(),
+      epsilon
+    );
+    assertEquals(
+      1.35,
+      wps.getDataForWay(cyclewayFootwayCrossing).getWalkSafetyFeatures().forward(),
+      epsilon
+    );
+    assertEquals(
+      1.15,
+      wps.getDataForWay(cyclewayCrossingWithTrafficLights).getWalkSafetyFeatures().forward(),
+      epsilon
+    );
+    assertEquals(
+      1.15,
+      wps.getDataForWay(cyclewayFootwayCrossingWithTrafficLights).getWalkSafetyFeatures().forward(),
+      epsilon
+    );
+    assertEquals(
+      1.3,
+      wps.getDataForWay(cyclewaySegregatedCrossing).getWalkSafetyFeatures().forward(),
+      epsilon
+    );
+    assertEquals(
+      1.3,
+      wps.getDataForWay(cyclewaySegregatedFootwayCrossing).getWalkSafetyFeatures().forward(),
+      epsilon
+    );
+    assertEquals(
+      1.1,
+      wps
+        .getDataForWay(cyclewaySegregatedCrossingWithTrafficLights)
+        .getWalkSafetyFeatures()
+        .forward(),
+      epsilon
+    );
+    assertEquals(
+      1.1,
+      wps
+        .getDataForWay(cyclewaySegregatedFootwayCrossingWithTrafficLights)
+        .getWalkSafetyFeatures()
+        .forward(),
+      epsilon
+    );
   }
 
   @Test

@@ -11,9 +11,13 @@ import org.opentripplanner.routing.graph.Graph;
 public class SplitterVertex extends IntersectionVertex {
 
   public SplitterVertex(Graph g, String label, double x, double y, I18NString name) {
-    super(g, label, x, y, name);
+    super(g, label, x, y, name, false, false);
+  }
+
+  @Override
+  public boolean inferredFreeFlowing() {
     // splitter vertices don't represent something that exists in the world, so traversing them is
     // always free.
-    this.freeFlowing = true;
+    return true;
   }
 }
