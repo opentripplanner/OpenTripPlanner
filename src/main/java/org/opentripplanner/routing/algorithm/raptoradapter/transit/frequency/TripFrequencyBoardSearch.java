@@ -59,6 +59,6 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule>
         }
       }
     }
-    return null;
+    return RaptorTripScheduleBoardOrAlightEvent.empty(earliestBoardTime);
   }
 }

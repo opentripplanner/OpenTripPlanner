@@ -1,7 +1,5 @@
 package org.opentripplanner.raptor.spi;
 
-import javax.annotation.Nullable;
-
 /**
  * The purpose of the TripScheduleSearch is to search for a trip schedule for a given pattern.
  * The search need to be optimized for speed, this is one of the most frequently called
@@ -25,7 +23,6 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
    *
    * @see #search(int, int, int)
    */
-  @Nullable
   @Flyweight
   default RaptorTripScheduleBoardOrAlightEvent<T> search(
     int earliestBoardTime,
@@ -36,7 +33,7 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
 
   /**
    * Find the best trip matching the given {@code timeLimit} and {@code tripIndexLimit}. This method
-   * returns {@code null} if no trip is found.
+   * returns an empty event if no trip is found.
    * <p>
    * Note! The implementation may use a "fly-weight" pattern to implement this, which mean no
    * objects are created for the result, but the result object will instead be reused for the next
@@ -51,7 +48,6 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
    *                              optimization which allow us to search faster, and it excludes
    *                              results which is less favorable than trips already processed.
    */
-  @Nullable
   @Flyweight
   RaptorTripScheduleBoardOrAlightEvent<T> search(
     int earliestBoardTime,

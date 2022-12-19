@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator.testDummyCalculator;
 
 import org.junit.jupiter.api.Test;
@@ -48,13 +48,13 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
     assertNotNull(subject.search(earliestDepartureTime, STOP_POS_0));
 
     earliestDepartureTime = TRIP_TIME + 1;
-    assertNull(subject.search(earliestDepartureTime, STOP_POS_0));
+    assertTrue(subject.search(earliestDepartureTime, STOP_POS_0).empty());
 
     earliestDepartureTime = TRIP_TIME - ITERATION_STEP;
-    assertNull(subject.search(earliestDepartureTime, STOP_POS_0));
+    assertTrue(subject.search(earliestDepartureTime, STOP_POS_0).empty());
 
     earliestDepartureTime = TRIP_TIME;
-    assertNull(subject.search(earliestDepartureTime, STOP_POS_0, 0));
+    assertTrue(subject.search(earliestDepartureTime, STOP_POS_0, 0).empty());
   }
 
   @Test
@@ -69,10 +69,10 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
     assertNotNull(subject.search(limit, STOP_POS_0));
 
     limit = TRIP_TIME - 1;
-    assertNull(subject.search(limit, STOP_POS_0));
+    assertTrue(subject.search(limit, STOP_POS_0).empty());
 
     limit = TRIP_TIME + ITERATION_STEP;
-    assertNull(subject.search(limit, STOP_POS_0));
+    assertTrue(subject.search(limit, STOP_POS_0).empty());
   }
 
   @Test

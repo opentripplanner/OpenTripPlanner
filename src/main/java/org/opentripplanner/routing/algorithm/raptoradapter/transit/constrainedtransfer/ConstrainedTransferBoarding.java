@@ -21,7 +21,7 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   public ConstrainedTransferBoarding(
     @Nonnull RaptorTransferConstraint constraint,
     int tripIndex,
-    @Nonnull T trip,
+    T trip,
     int stopPositionInPattern,
     int time,
     int earliestBoardTime
@@ -64,5 +64,10 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   @Nonnull
   public RaptorTransferConstraint getTransferConstraint() {
     return constraint;
+  }
+
+  @Override
+  public boolean empty() {
+    return false;
   }
 }

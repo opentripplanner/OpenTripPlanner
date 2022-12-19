@@ -9,7 +9,6 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupport;
-import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupportCallback;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
@@ -17,7 +16,6 @@ import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearc
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.raptor.spi.TransitArrival;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
 /**
@@ -27,15 +25,13 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
-  implements RoutingStrategy<T>, TimeBasedRoutingSupportCallback<T> {
+  implements RoutingStrategy<T> {
 
   private final McRangeRaptorWorkerState<T> state;
   private final TimeBasedRoutingSupport<T> routingSupport;
   private final ParetoSet<PatternRide<T>> patternRides;
   private final CostCalculator<T> costCalculator;
   private final SlackProvider slackProvider;
-
-  private AbstractStopArrival<T> prevArrival;
 
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
@@ -49,7 +45,6 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     this.state = state;
     this.routingSupport =
       new TimeBasedRoutingSupport<>(slackProvider, calculator, roundProvider, lifecycle);
-    this.routingSupport.withCallback(this);
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;
     this.patternRides =
@@ -90,57 +85,41 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   @Override
   public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
     for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
-      this.prevArrival = prevArrival;
-      routingSupport.boardWithRegularTransfer(prevArrivalTime(), stopIndex, stopPos, boardSlack);
+      boardWithRegularTransfer(prevArrival, stopIndex, stopPos, boardSlack);
     }
   }
 
   @Override
-  public boolean boardWithConstrainedTransfer(
+  public void boardWithConstrainedTransfer(
     int stopIndex,
     int stopPos,
     int boardSlack,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
     for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
-      this.prevArrival = prevArrival;
-      boolean boardingOk = routingSupport.boardWithConstrainedTransfer(
-        previousTransitArrival(stopIndex),
-        prevArrivalTime(),
-        stopIndex,
-        boardSlack,
-        txSearch
-      );
-      // We can not relay on the default fallback to regular transfers, we need to do it
-      // here since we can not return false.
-      if (!boardingOk) {
-        boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
-      }
+      boardWithConstrainedTransfer(prevArrival, stopIndex, stopPos, boardSlack, txSearch);
     }
-    // The boarding is processed, we do not want to enter regular boarding
-    return true;
   }
 
-  /* TimeBasedRoutingSupportCallback */
-
-  @Override
-  public void board(final int stopIndex, final RaptorTripScheduleBoardOrAlightEvent<T> boarding) {
+  private void board(
+    AbstractStopArrival<T> prevArrival,
+    final int stopIndex,
+    final RaptorTripScheduleBoardOrAlightEvent<T> boarding
+  ) {
     final T trip = boarding.getTrip();
     final int boardTime = boarding.getTime();
 
     if (prevArrival.arrivedByAccess()) {
-      // TODO: What if access is FLEX with rides, should not FLEX transfersSlack be taken
-      //       into account as well?
       int latestArrivalTime = boardTime - slackProvider.boardSlack(trip.pattern().slackIndex());
       prevArrival = prevArrival.timeShiftNewArrivalTime(latestArrivalTime);
     }
 
-    final int boardCost = calculateCostAtBoardTime(boarding);
+    final int boardCost = calculateCostAtBoardTime(prevArrival, boarding);
 
     final int relativeBoardCost = boardCost + calculateOnTripRelativeCost(boardTime, trip);
 
     patternRides.add(
-      new PatternRide<T>(
+      new PatternRide<>(
         prevArrival,
         stopIndex,
         boarding.getStopPositionInPattern(),
@@ -152,6 +131,44 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     );
   }
 
+  private void boardWithRegularTransfer(
+    AbstractStopArrival<T> prevArrival,
+    int stopIndex,
+    int stopPos,
+    int boardSlack
+  ) {
+    var result = routingSupport.boardWithRegularTransfer(
+      prevArrival.arrivalTime(),
+      stopPos,
+      boardSlack
+    );
+    if (!result.empty()) {
+      board(prevArrival, stopIndex, result);
+    }
+  }
+
+  private void boardWithConstrainedTransfer(
+    AbstractStopArrival<T> prevArrival,
+    int stopIndex,
+    int stopPos,
+    int boardSlack,
+    RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
+  ) {
+    var previousTransitArrival = prevArrival.mostRecentTransitArrival();
+
+    var boarding = routingSupport.boardWithConstrainedTransfer(
+      previousTransitArrival,
+      prevArrival.arrivalTime(),
+      boardSlack,
+      txSearch
+    );
+    if (boarding.empty()) {
+      boardWithRegularTransfer(prevArrival, stopIndex, stopPos, boardSlack);
+    } else if (!boarding.getTransferConstraint().isNotAllowed()) {
+      board(prevArrival, stopIndex, boarding);
+    }
+  }
+
   /**
    * Calculate a cost for riding a trip. It should include the cost from the beginning of the
    * journey all the way until a trip is boarded. Any slack at the end of the last leg is not part
@@ -160,12 +177,15 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
    * <p>
    * Note! This depends on the {@code prevArrival} being set.
    */
-  private int calculateCostAtBoardTime(final RaptorTripScheduleBoardOrAlightEvent<T> boardEvent) {
+  private int calculateCostAtBoardTime(
+    AbstractStopArrival<T> prevArrival,
+    final RaptorTripScheduleBoardOrAlightEvent<T> boardEvent
+  ) {
     return (
       prevArrival.cost() +
       costCalculator.boardingCost(
         prevArrival.isFirstRound(),
-        prevArrivalTime(),
+        prevArrival.arrivalTime(),
         boardEvent.getBoardStopIndex(),
         boardEvent.getTime(),
         boardEvent.getTrip(),
@@ -183,13 +203,5 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
    */
   private int calculateOnTripRelativeCost(int boardTime, T tripSchedule) {
     return costCalculator.onTripRelativeRidingCost(boardTime, tripSchedule);
-  }
-
-  private TransitArrival<T> previousTransitArrival(int boardStopIndex) {
-    return prevArrival.mostRecentTransitArrival();
-  }
-
-  private int prevArrivalTime() {
-    return prevArrival.arrivalTime();
   }
 }

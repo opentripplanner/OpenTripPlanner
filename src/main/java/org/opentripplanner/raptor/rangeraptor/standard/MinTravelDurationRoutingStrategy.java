@@ -7,7 +7,6 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupport;
-import org.opentripplanner.raptor.rangeraptor.support.TimeBasedRoutingSupportCallback;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
@@ -30,7 +29,7 @@ import org.opentripplanner.raptor.spi.TransitArrival;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule>
-  implements RoutingStrategy<T>, TimeBasedRoutingSupportCallback<T> {
+  implements RoutingStrategy<T> {
 
   private static final int NOT_SET = -1;
 
@@ -54,7 +53,6 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     this.state = state;
     this.routingSupport =
       new TimeBasedRoutingSupport<>(slackProvider, calculator, roundProvider, lifecycle);
-    this.routingSupport.withCallback(this);
     this.calculator = calculator;
   }
 
@@ -91,33 +89,40 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
 
   @Override
   public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
-    int prevArrivalTime = prevArrivalTime(stopIndex);
-    int earliestBoardTime = routingSupport.earliestBoardTime(prevArrivalTime, boardSlack);
-    var result = routingSupport.searchForBoardingAfter(stopPos, onTripIndex, earliestBoardTime);
-    if (result != null) {
-      board(stopIndex, result);
+    var boarding = routingSupport.boardWithRegularTransfer(
+      prevArrivalTime(stopIndex),
+      stopPos,
+      boardSlack,
+      onTripIndex
+    );
+    if (boarding.empty()) {
+      boardSameTrip(boarding.getEarliestBoardTime(), stopPos, stopIndex);
     } else {
-      boardSameTrip(earliestBoardTime, stopPos, stopIndex);
+      board(stopIndex, boarding);
     }
   }
 
   @Override
-  public boolean boardWithConstrainedTransfer(
-    int stopIndex,
-    int stopPos,
-    int boardSlack,
+  public void boardWithConstrainedTransfer(
+    final int stopIndex,
+    final int stopPos,
+    final int boardSlack,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
-    return routingSupport.boardWithConstrainedTransfer(
+    var boarding = routingSupport.boardWithConstrainedTransfer(
       previousTransitArrival(stopIndex),
       prevArrivalTime(stopIndex),
-      stopIndex,
       boardSlack,
       txSearch
     );
+
+    if (boarding.empty()) {
+      boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
+    } else if (!boarding.getTransferConstraint().isNotAllowed()) {
+      board(stopIndex, boarding);
+    }
   }
 
-  @Override
   public void board(final int stopIndex, final RaptorTripScheduleBoardOrAlightEvent<T> boarding) {
     onTripIndex = boarding.getTripIndex();
     onTrip = boarding.getTrip();
