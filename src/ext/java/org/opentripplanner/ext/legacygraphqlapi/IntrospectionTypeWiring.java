@@ -38,10 +38,12 @@ class IntrospectionTypeWiring {
 
     TypeDefinition type = typeRegistry
       .getType(typeName)
-      .orElseThrow(() -> new IllegalArgumentException("Type not found in schema"));
+      .orElseThrow(() ->
+        new IllegalArgumentException("Type %s not found in schema".formatted(typeName))
+      );
 
     if (!(type instanceof ObjectTypeDefinition objectType)) {
-      throw new IllegalArgumentException("Type is not object type");
+      throw new IllegalArgumentException("Type %s is not object type".formatted(type.getName()));
     }
 
     return TypeRuntimeWiring
