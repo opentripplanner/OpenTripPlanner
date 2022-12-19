@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STATION_B;
@@ -453,7 +452,7 @@ public class ConstrainedBoardingSearchTest {
       assertEquals(targetStopPos, boarding.getStopPositionInPattern());
       assertEquals(expectedTripIndex, boarding.getTripIndex());
     } else {
-      assertNull(boarding);
+      assertTrue(boarding.empty());
     }
   }
 

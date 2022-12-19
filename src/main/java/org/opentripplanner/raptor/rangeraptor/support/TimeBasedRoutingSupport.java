@@ -28,7 +28,6 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
   private boolean hasTimeDependentAccess = false;
   private RaptorTimeTable<T> timeTable;
   private RaptorTripScheduleSearch<T> tripSearch;
-  private TimeBasedRoutingSupportCallback<T> callback;
 
   public TimeBasedRoutingSupport(
     SlackProvider slackProvider,
@@ -43,15 +42,6 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     subscriptions.onIterationComplete(() -> inFirstIteration = false);
   }
 
-  /**
-   * The callback can not be part of the constructor, hence final,
-   * because that make a circular dependency when initiating the
-   * callback.
-   */
-  public void withCallback(TimeBasedRoutingSupportCallback<T> callback) {
-    this.callback = callback;
-  }
-
   public void prepareForTransitWith(RaptorTimeTable<T> timeTable) {
     this.timeTable = timeTable;
     this.tripSearch = createTripSearch(timeTable);
@@ -61,29 +51,21 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
    * Same as {@link #boardWithRegularTransfer(int, int, int, int, int)}, but with
    * {@code onTripIndex} unbounded.
    */
-  public void boardWithRegularTransfer(
+  public RaptorTripScheduleBoardOrAlightEvent<T> boardWithRegularTransfer(
     int prevArrivalTime,
-    int stopIndex,
     int stopPos,
     int boardSlack
   ) {
-    boardWithRegularTransfer(prevArrivalTime, stopIndex, stopPos, boardSlack, UNBOUNDED_TRIP_INDEX);
+    return boardWithRegularTransfer(prevArrivalTime, stopPos, boardSlack, UNBOUNDED_TRIP_INDEX);
   }
 
-  public void boardWithRegularTransfer(
+  public RaptorTripScheduleBoardOrAlightEvent<T> boardWithRegularTransfer(
     int prevArrivalTime,
-    int stopIndex,
     int stopPos,
     int boardSlack,
     int onTripIndex
   ) {
-    int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
-    var result = searchForBoardingAfter(prevArrivalTime, stopPos, boardSlack, onTripIndex);
-    if (result != null) {
-      // check if we can back up to an earlier trip due to this stop
-      // being reached earlier
-      callback.board(stopIndex, result);
-    }
+    return searchForBoardingAfter(prevArrivalTime, stopPos, boardSlack, onTripIndex);
   }
 
   public RaptorTripScheduleBoardOrAlightEvent<T> searchForBoardingAfter(
@@ -103,22 +85,22 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
    * @param prevArrivalTime        the arrival time for the board stop ({@code stopIndex}), this
    *                               may not be same as the {@code prevTransitStopArrival}, since
    *                               there might be a "walking" transfer to reach stop.
-   * @param stopIndex              The {@code stop index} for the boarding stop.
    * @param boardSlack             The minimum number of seconds to apply to the arrival time
    *                               before boarding a trip. Stay-seated and guaranteed transfers
    *                               may override this.
    * @param txSearch               The constrained transfer search to use.
    */
-  public boolean boardWithConstrainedTransfer(
+  public RaptorTripScheduleBoardOrAlightEvent<T> boardWithConstrainedTransfer(
     TransitArrival<T> prevTransitStopArrival,
     int prevArrivalTime,
-    int stopIndex,
     int boardSlack,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
     // Get the previous transit stop arrival (transfer source)
     if (prevTransitStopArrival == null) {
-      return false;
+      return RaptorTripScheduleBoardOrAlightEvent.empty(
+        earliestBoardTime(prevArrivalTime, boardSlack)
+      );
     }
 
     int prevTransitStopArrivalTime = prevTransitStopArrival.arrivalTime();
@@ -130,7 +112,7 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
 
     int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
 
-    var result = txSearch.find(
+    return txSearch.find(
       timeTable,
       slackProvider.transferSlack(),
       prevTransitStopArrival.trip(),
@@ -138,22 +120,6 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
       prevTransitArrivalTime,
       earliestBoardTime
     );
-
-    if (result == null) {
-      return false;
-    }
-
-    var constraint = result.getTransferConstraint();
-
-    if (constraint.isNotAllowed()) {
-      // We are blocking a normal trip search here by returning
-      // true without boarding the trip
-      return true;
-    }
-
-    callback.board(stopIndex, result);
-
-    return true;
   }
 
   /**
@@ -180,18 +146,10 @@ public final class TimeBasedRoutingSupport<T extends RaptorTripSchedule> {
     return timeDependentDepartureTime;
   }
 
-  public RaptorTripScheduleBoardOrAlightEvent<T> searchForBoardingAfter(
-    int stopPos,
-    int onTripIndex,
-    int earliestBoardTime
-  ) {
-    return tripSearch.search(earliestBoardTime, stopPos, onTripIndex);
-  }
-
   /**
    * Add board-slack(forward-search) or alight-slack(reverse-search)
    */
-  public int earliestBoardTime(int prevArrivalTime, int boardSlack) {
+  private int earliestBoardTime(int prevArrivalTime, int boardSlack) {
     return calculator.plusDuration(prevArrivalTime, boardSlack);
   }
 

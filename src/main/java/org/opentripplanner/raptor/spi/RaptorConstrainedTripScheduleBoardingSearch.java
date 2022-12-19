@@ -1,7 +1,5 @@
 package org.opentripplanner.raptor.spi;
 
-import javax.annotation.Nullable;
-
 /**
  * This interface enable the transit layer to override the normal trip search in Raptor. Each {@link
  * RaptorRoute} may provide an instance of this interface so Raptor can ask for a bord-/alight-
@@ -25,9 +23,8 @@ public interface RaptorConstrainedTripScheduleBoardingSearch<T extends RaptorTri
    * source stop and trip with the given source arrival board-/alight time (exclude slack).
    * <p>
    *
-   * @return {@code null} if no target trip is found
+   * @return An "empty" event if no target trip is found
    */
-  @Nullable
   RaptorTripScheduleBoardOrAlightEvent<T> find(
     RaptorTimeTable<T> targetTimetable,
     int transferSlack,

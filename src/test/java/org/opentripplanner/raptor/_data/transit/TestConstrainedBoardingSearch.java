@@ -53,7 +53,7 @@ public class TestConstrainedBoardingSearch
         }
       }
     }
-    return null;
+    return RaptorTripScheduleBoardOrAlightEvent.empty(earliestBoardTime);
   }
 
   /**

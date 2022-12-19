@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
@@ -36,7 +35,6 @@ public final class ConstrainedBoardingSearch
       return false;
     }
 
-    @Nullable
     @Override
     public RaptorTripScheduleBoardOrAlightEvent<TripSchedule> find(
       RaptorTimeTable<TripSchedule> targetTimetable,
@@ -46,7 +44,7 @@ public final class ConstrainedBoardingSearch
       int prevTransitArrivalTime,
       int earliestBoardTime
     ) {
-      return null;
+      return RaptorTripScheduleBoardOrAlightEvent.empty(earliestBoardTime);
     }
   };
 
@@ -82,7 +80,6 @@ public final class ConstrainedBoardingSearch
     return currentTransfers != null;
   }
 
-  @Nullable
   @Override
   public RaptorTripScheduleBoardOrAlightEvent<TripSchedule> find(
     RaptorTimeTable<TripSchedule> timetable,
@@ -95,7 +92,7 @@ public final class ConstrainedBoardingSearch
     var transfers = findMatchingTransfers(sourceTripSchedule, sourceStopIndex);
 
     if (!transfers.iterator().hasNext()) {
-      return null;
+      return RaptorTripScheduleBoardOrAlightEvent.empty(earliestBoardTime);
     }
 
     boolean found = findTimetableTripInfo(
@@ -108,7 +105,7 @@ public final class ConstrainedBoardingSearch
     );
 
     if (!found) {
-      return null;
+      return RaptorTripScheduleBoardOrAlightEvent.empty(earliestBoardTime);
     }
 
     var trip = timetable.getTripSchedule(onTripIndex);

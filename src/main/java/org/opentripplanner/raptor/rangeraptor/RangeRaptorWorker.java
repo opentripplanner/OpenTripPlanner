@@ -28,7 +28,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,”
  * January 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
  * <p>
- * This version do support the following features:
+ * This version support the following features:
  * <ul>
  *     <li>Raptor (R)
  *     <li>Range Raptor (RR)
@@ -231,17 +231,14 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
             if (state.isStopReachedInPreviousRound(stopIndex)) {
               // has constrained transfers
-              boolean boardUsingRegularTransfer = true;
               if (enableTransferConstraints && txSearch.transferExist(stopPos)) {
-                boardUsingRegularTransfer =
-                  !transitWorker.boardWithConstrainedTransfer(
-                    stopIndex,
-                    stopPos,
-                    boardSlack,
-                    txSearch
-                  );
-              }
-              if (boardUsingRegularTransfer) {
+                transitWorker.boardWithConstrainedTransfer(
+                  stopIndex,
+                  stopPos,
+                  boardSlack,
+                  txSearch
+                );
+              } else {
                 transitWorker.boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
               }
             }

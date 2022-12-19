@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.function.IntUnaryOperator;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
@@ -74,8 +75,14 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
   }
 
   @Override
+  @Nonnull
   public RaptorTransferConstraint getTransferConstraint() {
     return RaptorTransferConstraint.REGULAR_TRANSFER;
+  }
+
+  @Override
+  public boolean empty() {
+    return candidateTripIndex == NOT_FOUND;
   }
 
   /* TripScheduleSearch implementation */
@@ -137,7 +144,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
     var result = findBoardingSearchForwardInTime(indexBestGuess);
 
     // If a valid result is found and we can return
-    if (result != null) {
+    if (!result.empty()) {
       return this;
     }
 
@@ -168,10 +175,9 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
         break;
       }
     }
-    if (candidateTripIndex == NOT_FOUND) {
-      return null;
+    if (candidateTripIndex != NOT_FOUND) {
+      candidateTrip = timetable.getTripSchedule(candidateTripIndex);
     }
-    candidateTrip = timetable.getTripSchedule(candidateTripIndex);
     return this;
   }
 
@@ -181,7 +187,6 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
    *
    * @param tripIndexUpperBound The trip index upper bound, where search end (exclusive).
    */
-  @Nullable
   private RaptorTripScheduleBoardOrAlightEvent<T> findBoardingSearchBackwardsInTime(
     final int tripIndexUpperBound
   ) {
@@ -192,7 +197,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
         return this;
       }
     }
-    return null;
+    return this;
   }
 
   /**

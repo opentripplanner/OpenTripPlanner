@@ -43,7 +43,7 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
    * @return {@code true} if the boarding was processed by the constrained transfers,
    *         return {@code false} to fall back to boarding with regular transfers.
    */
-  boolean boardWithConstrainedTransfer(
+  void boardWithConstrainedTransfer(
     int stopIndex,
     int stopPos,
     int boardSlack,

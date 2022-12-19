@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
@@ -43,11 +43,11 @@ class TripAssert {
   }
 
   void assertNoTripFound() {
-    assertNull(result, "No trip expected, but trip found with index: " + result);
+    assertTrue(result.empty(), "No trip expected, but trip found with index: " + result);
   }
 
   TripAssert assertTripFound() {
-    assertNotNull(result, "Trip expected, but trip found");
+    assertFalse(result.empty(), "Trip expected, but trip found");
     return this;
   }
 

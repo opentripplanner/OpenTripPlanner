@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
  */
 public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedule> {
   /** Used to indicate that no trip is found. */
-  static final int NOT_FOUND = -1;
+  int NOT_FOUND = -1;
 
   /**
    * The trip timetable index for the trip  found.
@@ -66,4 +66,23 @@ public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedu
    */
   @Nonnull
   RaptorTransferConstraint getTransferConstraint();
+
+  /**
+   * This method return true if no result is found, but the algorithm may continue
+   * to search using another way of boarding. The result is NOT empty if it is forbidden.
+   */
+  boolean empty();
+
+  /**
+   * Create an empty event with the given {@code earliestBoardTime}.
+   * <p>
+   * Sometimes we need to override the search result and force an empty result. This
+   * factory method is used to avoid creating new instances, and instead the search
+   * can be cleared (if implementing the fly-weight pattern).
+   */
+  static <S extends RaptorTripSchedule> RaptorTripScheduleBoardOrAlightEvent<S> empty(
+    final int earliestBoardTime
+  ) {
+    return new EmptyBoardOrAlightEvent<>(earliestBoardTime);
+  }
 }

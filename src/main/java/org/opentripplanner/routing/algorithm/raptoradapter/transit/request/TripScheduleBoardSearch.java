@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.function.IntUnaryOperator;
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
@@ -73,8 +73,14 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
   }
 
   @Override
+  @Nonnull
   public RaptorTransferConstraint getTransferConstraint() {
     return RaptorTransferConstraint.REGULAR_TRANSFER;
+  }
+
+  @Override
+  public boolean empty() {
+    return candidateTripIndex == NOT_FOUND;
   }
 
   /* TripScheduleSearch implementation */
@@ -137,7 +143,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
     var result = findBoardingBySteppingBackwardsInTime(indexBestGuess);
 
     // If a valid result is found and we can return
-    if (result != null) {
+    if (!result.empty()) {
       return this;
     }
 
@@ -157,7 +163,6 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
    *
    * @param tripIndexUpperBound The trip index upper bound, where search start (exclusive).
    */
-  @Nullable
   private RaptorTripScheduleBoardOrAlightEvent<T> findBoardingBySteppingBackwardsInTime(
     int tripIndexUpperBound
   ) {
@@ -171,10 +176,9 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
         break;
       }
     }
-    if (candidateTripIndex == NOT_FOUND) {
-      return null;
+    if (candidateTripIndex != NOT_FOUND) {
+      candidateTrip = timetable.getTripSchedule(candidateTripIndex);
     }
-    candidateTrip = timetable.getTripSchedule(candidateTripIndex);
     return this;
   }
 
@@ -184,7 +188,6 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
    *
    * @param tripIndexLowerBound The trip index lower bound, where search start (inclusive).
    */
-  @Nullable
   private RaptorTripScheduleBoardOrAlightEvent<T> findBoardingBySteppingForwardInTime(
     final int tripIndexLowerBound
   ) {
@@ -195,7 +198,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
         return this;
       }
     }
-    return null;
+    return this;
   }
 
   /**
