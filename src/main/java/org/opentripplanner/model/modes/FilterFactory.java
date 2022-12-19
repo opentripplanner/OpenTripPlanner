@@ -38,13 +38,7 @@ class FilterFactory {
    * </ul>
    */
   static AllowTransitModeFilter create(Collection<MainAndSubMode> allowedModes) {
-    System.out.println("list: ");
-    System.out.println(allowedModes);
-
     var filters = allowedModes.stream().map(FilterFactory::of).toList();
-
-    System.out.println("filters: ");
-    System.out.println(filters);
 
     if (filters.isEmpty()) {
       throw new IllegalArgumentException("Can not match an empty set of modes!");
@@ -58,11 +52,6 @@ class FilterFactory {
       .stream()
       .collect(Collectors.groupingBy(Object::getClass));
 
-    System.out.println("after grouping:");
-    for (var e : map.entrySet()) {
-      System.out.println(e.getKey() + ": " + e.getValue());
-    }
-
     if (map.containsKey(AllowAllModesFilter.class)) {
       return ALLOWED_ALL_TRANSIT_MODES;
     }
@@ -75,7 +64,6 @@ class FilterFactory {
     if (mainModeFilters.size() == TransitMode.values().length) {
       return ALLOWED_ALL_TRANSIT_MODES;
     } else if (mainModeFilters.size() == 1) {
-      System.out.println("add main mode filters");
       result.addAll(mainModeFilters);
     } else if (mainModeFilters.size() > 1) {
       result.add(new AllowMainModesFilter(mainModeFilters));
@@ -84,11 +72,6 @@ class FilterFactory {
 
     var subModeFiltersByMainMode = stream(map, AllowMainAndSubModeFilter.class)
       .collect(Collectors.groupingBy(AllowMainAndSubModeFilter::mainMode));
-
-    System.out.println("submode grouping:");
-    for (var e : subModeFiltersByMainMode.entrySet()) {
-      System.out.println(e.getKey() + ": " + e.getValue());
-    }
 
     var mainModes = mainModeFilters.isEmpty()
       ? EnumSet.noneOf(TransitMode.class)
@@ -109,9 +92,6 @@ class FilterFactory {
       }
       // esle ignore empty
     }
-
-    System.out.println("result: ");
-    System.out.println(result.stream().distinct().toList());
 
     if (result.size() == 1) {
       return result.get(0);
