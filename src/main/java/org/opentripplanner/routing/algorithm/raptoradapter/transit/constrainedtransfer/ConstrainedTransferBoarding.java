@@ -2,15 +2,15 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 
 /**
  * A boarding event passed to Raptor to perform a boarding.
  */
 public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
-  implements RaptorTripScheduleBoardOrAlightEvent<T> {
+  implements RaptorBoardOrAlightEvent<T> {
 
   private final RaptorTransferConstraint constraint;
   private final int tripIndex;
@@ -74,13 +74,12 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
 
   @Override
   public void boardWithFallback(
-    Consumer<RaptorTripScheduleBoardOrAlightEvent<T>> boardCallback,
-    Consumer<RaptorTripScheduleBoardOrAlightEvent<T>> fallback
+    Consumer<RaptorBoardOrAlightEvent<T>> boardCallback,
+    Consumer<RaptorBoardOrAlightEvent<T>> fallback
   ) {
-    if(empty()) {
+    if (empty()) {
       fallback.accept(this);
-    }
-    else if(!constraint.isNotAllowed()) {
+    } else if (!constraint.isNotAllowed()) {
       boardCallback.accept(this);
     }
   }

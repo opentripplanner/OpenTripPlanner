@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 
 /**
@@ -36,12 +36,12 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule>
   }
 
   @Override
-  public RaptorTripScheduleBoardOrAlightEvent<T> search(
+  public RaptorBoardOrAlightEvent<T> search(
     int timeLimit,
     int stopPositionInPattern,
     int tripIndexLimit
   ) {
-    RaptorTripScheduleBoardOrAlightEvent<T> result = delegate.search(
+    RaptorBoardOrAlightEvent<T> result = delegate.search(
       timeLimit,
       stopPositionInPattern,
       tripIndexLimit
@@ -51,7 +51,7 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule>
     }
     return isWithinSlack(timeLimit, result.getTime())
       ? result
-      : RaptorTripScheduleBoardOrAlightEvent.empty(result.getEarliestBoardTime());
+      : RaptorBoardOrAlightEvent.empty(result.getEarliestBoardTime());
   }
 
   @Override

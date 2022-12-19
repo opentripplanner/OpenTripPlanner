@@ -6,10 +6,10 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.TransitArrival;
 
 /**
@@ -83,15 +83,12 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
 
   @Override
   public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
-    boardingSupport.boardWithRegularTransfer(
-      prevArrivalTime(stopIndex),
-      stopPos,
-      boardSlack,
-      onTripIndex
-    ).boardWithFallback(
-      boarding -> board(stopIndex, boarding),
-      emptyBoarding -> boardSameTrip(emptyBoarding.getEarliestBoardTime(), stopPos, stopIndex)
-    );
+    boardingSupport
+      .boardWithRegularTransfer(prevArrivalTime(stopIndex), stopPos, boardSlack, onTripIndex)
+      .boardWithFallback(
+        boarding -> board(stopIndex, boarding),
+        emptyBoarding -> boardSameTrip(emptyBoarding.getEarliestBoardTime(), stopPos, stopIndex)
+      );
   }
 
   @Override
@@ -101,18 +98,20 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     final int boardSlack,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
-    boardingSupport.boardWithConstrainedTransfer(
-      previousTransitArrival(stopIndex),
-      prevArrivalTime(stopIndex),
-      boardSlack,
-      txSearch
-    ).boardWithFallback(
+    boardingSupport
+      .boardWithConstrainedTransfer(
+        previousTransitArrival(stopIndex),
+        prevArrivalTime(stopIndex),
+        boardSlack,
+        txSearch
+      )
+      .boardWithFallback(
         boarding -> board(stopIndex, boarding),
         emptyBoarding -> boardWithRegularTransfer(stopIndex, stopPos, boardSlack)
       );
   }
 
-  public void board(final int stopIndex, final RaptorTripScheduleBoardOrAlightEvent<T> boarding) {
+  public void board(final int stopIndex, final RaptorBoardOrAlightEvent<T> boarding) {
     onTripIndex = boarding.getTripIndex();
     onTrip = boarding.getTrip();
     onTripBoardTime = boarding.getEarliestBoardTime();

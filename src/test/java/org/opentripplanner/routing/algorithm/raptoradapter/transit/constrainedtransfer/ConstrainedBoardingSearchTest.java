@@ -23,7 +23,7 @@ import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TripTransferPoint;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestRouteData;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -443,7 +443,7 @@ public class ConstrainedBoardingSearchTest {
     int targetStopPos,
     int expectedTripIndex,
     TransferConstraint expectedConstraint,
-    RaptorTripScheduleBoardOrAlightEvent<TripSchedule> boarding
+    RaptorBoardOrAlightEvent<TripSchedule> boarding
   ) {
     if (expectedConstraint != null) {
       assertNotNull(boarding);

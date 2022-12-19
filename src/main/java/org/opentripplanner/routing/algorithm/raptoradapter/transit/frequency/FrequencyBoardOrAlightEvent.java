@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
 import java.time.LocalDate;
 import javax.annotation.Nonnull;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorTripPattern;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
@@ -29,7 +29,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * internal OTP transit model.
  */
 abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
-  implements RaptorTripScheduleBoardOrAlightEvent<T>, TripSchedule {
+  implements RaptorBoardOrAlightEvent<T>, TripSchedule {
 
   protected final TripPatternForDates raptorTripPattern;
   protected final TripTimes tripTimes;

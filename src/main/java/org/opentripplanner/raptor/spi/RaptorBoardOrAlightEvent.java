@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedule> {
+public interface RaptorBoardOrAlightEvent<T extends RaptorTripSchedule> {
   /** Used to indicate that no trip is found. */
   int NOT_FOUND = -1;
 
@@ -75,13 +75,12 @@ public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedu
   boolean empty();
 
   default void boardWithFallback(
-    Consumer<RaptorTripScheduleBoardOrAlightEvent<T>> boardCallback,
-    Consumer<RaptorTripScheduleBoardOrAlightEvent<T>> fallback
+    Consumer<RaptorBoardOrAlightEvent<T>> boardCallback,
+    Consumer<RaptorBoardOrAlightEvent<T>> fallback
   ) {
-    if(empty()) {
+    if (empty()) {
       fallback.accept(this);
-    }
-    else {
+    } else {
       boardCallback.accept(this);
     }
   }
@@ -93,7 +92,7 @@ public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedu
    * factory method is used to avoid creating new instances, and instead the search
    * can be cleared (if implementing the fly-weight pattern).
    */
-  static <S extends RaptorTripSchedule> RaptorTripScheduleBoardOrAlightEvent<S> empty(
+  static <S extends RaptorTripSchedule> RaptorBoardOrAlightEvent<S> empty(
     final int earliestBoardTime
   ) {
     return new EmptyBoardOrAlightEvent<>(earliestBoardTime);

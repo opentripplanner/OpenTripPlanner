@@ -25,7 +25,7 @@ public interface RaptorConstrainedTripScheduleBoardingSearch<T extends RaptorTri
    *
    * @return An "empty" event if no target trip is found
    */
-  RaptorTripScheduleBoardOrAlightEvent<T> find(
+  RaptorBoardOrAlightEvent<T> find(
     RaptorTimeTable<T> targetTimetable,
     int transferSlack,
     T sourceTrip,
