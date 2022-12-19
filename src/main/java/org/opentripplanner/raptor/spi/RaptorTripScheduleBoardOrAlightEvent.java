@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
+import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
 /**
@@ -72,6 +73,18 @@ public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedu
    * to search using another way of boarding. The result is NOT empty if it is forbidden.
    */
   boolean empty();
+
+  default void boardWithFallback(
+    Consumer<RaptorTripScheduleBoardOrAlightEvent<T>> boardCallback,
+    Consumer<RaptorTripScheduleBoardOrAlightEvent<T>> fallback
+  ) {
+    if(empty()) {
+      fallback.accept(this);
+    }
+    else {
+      boardCallback.accept(this);
+    }
+  }
 
   /**
    * Create an empty event with the given {@code earliestBoardTime}.

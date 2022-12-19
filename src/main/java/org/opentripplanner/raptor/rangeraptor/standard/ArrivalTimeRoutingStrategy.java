@@ -86,7 +86,6 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
       boardSlack,
       onTripIndex
     );
-
     if (!boarding.empty()) {
       board(stopIndex, boarding);
     }
@@ -99,17 +98,16 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
     int boardSlack,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
-    var boarding = boardingSupport.boardWithConstrainedTransfer(
+    boardingSupport.boardWithConstrainedTransfer(
       previousTransitArrival(stopIndex),
       prevArrivalTime(stopIndex),
       boardSlack,
       txSearch
-    );
-    if (boarding.empty()) {
-      boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
-    } else if (!boarding.getTransferConstraint().isNotAllowed()) {
-      board(stopIndex, boarding);
-    }
+    )
+      .boardWithFallback(
+        boarding -> board(stopIndex, boarding),
+        emptyBoarding -> boardWithRegularTransfer(stopIndex, stopPos, boardSlack)
+      );
   }
 
   private void board(int stopIndex, RaptorTripScheduleBoardOrAlightEvent<T> boarding) {

@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
+import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
@@ -69,5 +70,18 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   @Override
   public boolean empty() {
     return false;
+  }
+
+  @Override
+  public void boardWithFallback(
+    Consumer<RaptorTripScheduleBoardOrAlightEvent<T>> boardCallback,
+    Consumer<RaptorTripScheduleBoardOrAlightEvent<T>> fallback
+  ) {
+    if(empty()) {
+      fallback.accept(this);
+    }
+    else if(!constraint.isNotAllowed()) {
+      boardCallback.accept(this);
+    }
   }
 }

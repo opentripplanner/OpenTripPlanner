@@ -149,19 +149,17 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     int boardSlack,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
-    var previousTransitArrival = prevArrival.mostRecentTransitArrival();
-
-    var boarding = boardingSupport.boardWithConstrainedTransfer(
-      previousTransitArrival,
-      prevArrival.arrivalTime(),
-      boardSlack,
-      txSearch
-    );
-    if (boarding.empty()) {
-      boardWithRegularTransfer(prevArrival, stopIndex, stopPos, boardSlack);
-    } else if (!boarding.getTransferConstraint().isNotAllowed()) {
-      board(prevArrival, stopIndex, boarding);
-    }
+    boardingSupport
+      .boardWithConstrainedTransfer(
+        prevArrival.mostRecentTransitArrival(),
+        prevArrival.arrivalTime(),
+        boardSlack,
+        txSearch
+      )
+      .boardWithFallback(
+        boarding -> board(prevArrival, stopIndex, boarding),
+        emptyBoarding -> boardWithRegularTransfer(prevArrival, stopIndex, stopPos, boardSlack)
+      );
   }
 
   /**

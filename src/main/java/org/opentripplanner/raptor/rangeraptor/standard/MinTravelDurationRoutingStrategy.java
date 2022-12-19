@@ -83,17 +83,15 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
 
   @Override
   public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
-    var boarding = boardingSupport.boardWithRegularTransfer(
+    boardingSupport.boardWithRegularTransfer(
       prevArrivalTime(stopIndex),
       stopPos,
       boardSlack,
       onTripIndex
+    ).boardWithFallback(
+      boarding -> board(stopIndex, boarding),
+      emptyBoarding -> boardSameTrip(emptyBoarding.getEarliestBoardTime(), stopPos, stopIndex)
     );
-    if (boarding.empty()) {
-      boardSameTrip(boarding.getEarliestBoardTime(), stopPos, stopIndex);
-    } else {
-      board(stopIndex, boarding);
-    }
   }
 
   @Override
@@ -103,18 +101,15 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     final int boardSlack,
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
   ) {
-    var boarding = boardingSupport.boardWithConstrainedTransfer(
+    boardingSupport.boardWithConstrainedTransfer(
       previousTransitArrival(stopIndex),
       prevArrivalTime(stopIndex),
       boardSlack,
       txSearch
-    );
-
-    if (boarding.empty()) {
-      boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
-    } else if (!boarding.getTransferConstraint().isNotAllowed()) {
-      board(stopIndex, boarding);
-    }
+    ).boardWithFallback(
+        boarding -> board(stopIndex, boarding),
+        emptyBoarding -> boardWithRegularTransfer(stopIndex, stopPos, boardSlack)
+      );
   }
 
   public void board(final int stopIndex, final RaptorTripScheduleBoardOrAlightEvent<T> boarding) {
