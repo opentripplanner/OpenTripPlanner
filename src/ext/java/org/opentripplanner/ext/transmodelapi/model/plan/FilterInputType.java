@@ -9,15 +9,8 @@ public class FilterInputType {
   static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
     .newInputObject()
     .name("TripFilterInput")
-    // TODO: 2022-12-19 filters: Correct documentation. Give some examples
     .description(
-      "a collection of allow/exclude-lists that defines which trips or lines should be included during search" +
-      "" +
-      "" +
-      "" +
-      ". A trip or line has to match with " +
-      "with at least one filter in order to be included in search. Not specifying any filters means that everything should be included. " +
-      "If a search include this parameter, \"whiteListed\", \"banned\" & \"modes.transportModes\" filters will be ignored."
+      "A collection of selectors for what lines/trips should be included in / excluded from search"
     )
     .field(
       GraphQLInputObjectField
