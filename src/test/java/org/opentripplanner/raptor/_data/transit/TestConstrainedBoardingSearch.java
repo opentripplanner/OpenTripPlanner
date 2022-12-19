@@ -11,11 +11,11 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 
 public class TestConstrainedBoardingSearch
-  implements RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> {
+  implements RaptorConstrainedBoardingSearch<TestTripSchedule> {
 
   /** Index of guaranteed transfers by fromStopPos */
   private final TIntObjectMap<List<TestConstrainedTransfer>> transfersByFromStopPos = new TIntObjectHashMap<>();

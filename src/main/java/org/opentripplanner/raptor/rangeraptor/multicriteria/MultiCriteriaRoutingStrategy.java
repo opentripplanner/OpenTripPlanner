@@ -11,7 +11,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
@@ -89,7 +89,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     int stopIndex,
     int stopPos,
     int boardSlack,
-    RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
+    RaptorConstrainedBoardingSearch<T> txSearch
   ) {
     for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
       boardWithConstrainedTransfer(prevArrival, stopIndex, stopPos, boardSlack, txSearch);
@@ -147,7 +147,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     int stopIndex,
     int stopPos,
     int boardSlack,
-    RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
+    RaptorConstrainedBoardingSearch<T> txSearch
   ) {
     boardingSupport
       .boardWithConstrainedTransfer(

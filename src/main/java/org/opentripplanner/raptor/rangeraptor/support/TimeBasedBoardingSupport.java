@@ -7,7 +7,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
@@ -86,7 +86,7 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
     TransitArrival<T> prevTransitStopArrival,
     int prevArrivalTime,
     int boardSlack,
-    RaptorConstrainedTripScheduleBoardingSearch<T> txSearch
+    RaptorConstrainedBoardingSearch<T> txSearch
   ) {
     // Get the previous transit stop arrival (transfer source)
     if (prevTransitStopArrival == null) {

@@ -11,7 +11,7 @@ package org.opentripplanner.raptor.spi;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface RaptorConstrainedTripScheduleBoardingSearch<T extends RaptorTripSchedule> {
+public interface RaptorConstrainedBoardingSearch<T extends RaptorTripSchedule> {
   /**
    * Check if the current pattern have any guaranteed transfers for the given stop position in
    * pattern. If not, then Raptor will fall back to a regular trip search.

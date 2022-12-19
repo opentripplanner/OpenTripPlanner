@@ -6,7 +6,7 @@ import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
@@ -101,7 +101,7 @@ public final class ReverseTransitCalculator<T extends RaptorTripSchedule>
   }
 
   @Override
-  public RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(
+  public RaptorConstrainedBoardingSearch<T> transferConstraintsSearch(
     RaptorTransitDataProvider<T> transitData,
     int routeIndex
   ) {
