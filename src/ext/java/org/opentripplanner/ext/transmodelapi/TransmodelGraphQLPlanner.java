@@ -357,11 +357,6 @@ public class TransmodelGraphQLPlanner {
       selectRequestBuilder.withAgencies(mapIDsToDomain(authorities));
     }
 
-    if (input.containsKey("feeds")) {
-      var feeds = (List<String>) input.get("feeds");
-      selectRequestBuilder.withFeeds(feeds);
-    }
-
     if (input.containsKey("transportModes")) {
       var tModes = new ArrayList<MainAndSubMode>();
 

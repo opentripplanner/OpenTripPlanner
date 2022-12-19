@@ -52,12 +52,6 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
   }
 
   @Override
-  public String toString() {
-    // TODO: 2022-12-15 filters: create proper toString
-    return "TransitFilterRequest{" + "select=" + select + ", not=" + not + '}';
-  }
-
-  @Override
   public boolean isSubModePredicate() {
     for (var selectRequest : select) {
       if (selectRequest.transportModes() != null && selectRequest.transportModes().isSubMode()) {

@@ -24,8 +24,6 @@ import org.opentripplanner.transit.model.organization.Agency;
  */
 public class TestBanning {
 
-  // TODO: 2022-11-29 filters: add test for new functionality
-
   @Test
   public void testSetBannedOnRequest() {
     Collection<Route> routes = getTestRoutes();

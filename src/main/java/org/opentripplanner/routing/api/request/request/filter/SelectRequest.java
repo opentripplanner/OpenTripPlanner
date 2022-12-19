@@ -18,8 +18,7 @@ public class SelectRequest implements Serializable {
     private List<MainAndSubMode> transportModes = new ArrayList<>();
     private List<FeedScopedId> agencies = new ArrayList<>();
     private RouteMatcher routes = RouteMatcher.emptyMatcher();
-    // TODO: 2022-11-29 group of routes
-    private List<String> feeds = new ArrayList<>();
+    // TODO: 2022-11-29 filters: group of routes
 
     public Builder withTransportModes(List<MainAndSubMode> transportModes) {
       this.transportModes = transportModes;
@@ -63,12 +62,6 @@ public class SelectRequest implements Serializable {
       return this;
     }
 
-    public Builder withFeeds(List<String> feeds) {
-      this.feeds = feeds;
-
-      return this;
-    }
-
     public SelectRequest build() {
       return new SelectRequest(this);
     }
@@ -86,14 +79,12 @@ public class SelectRequest implements Serializable {
     }
     this.agencies = Collections.unmodifiableList(builder.agencies);
     this.routes = builder.routes;
-    this.feeds = Collections.unmodifiableList(builder.feeds);
   }
 
   private final AllowTransitModeFilter transportModes;
   private final List<FeedScopedId> agencies;
   private final RouteMatcher routes;
   // TODO: 2022-11-29 group of routes
-  private final List<String> feeds;
 
   public boolean matches(Route route) {
     if (
@@ -108,10 +99,6 @@ public class SelectRequest implements Serializable {
     }
 
     if (!routes.isEmpty() && !routes.matches(route)) {
-      return false;
-    }
-
-    if (!feeds.isEmpty() && !feeds.contains(route.getId().getFeedId())) {
       return false;
     }
 
@@ -132,10 +119,6 @@ public class SelectRequest implements Serializable {
       return false;
     }
 
-    if (!feeds.isEmpty() && !feeds.contains(trip.getId().getFeedId())) {
-      return false;
-    }
-
     return true;
   }
 
@@ -149,25 +132,5 @@ public class SelectRequest implements Serializable {
 
   public RouteMatcher routes() {
     return this.routes;
-  }
-
-  public List<String> feeds() {
-    return feeds;
-  }
-
-  @Override
-  public String toString() {
-    return (
-      "SelectRequest{" +
-      "transportModes=" +
-      transportModes +
-      ", agencies=" +
-      agencies +
-      ", routes=" +
-      routes +
-      ", feeds=" +
-      feeds +
-      '}'
-    );
   }
 }

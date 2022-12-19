@@ -56,9 +56,6 @@ public class SelectInputType {
         .type(new GraphQLList(ModeAndSubModeInputType.INPUT_TYPE))
         .build()
     )
-    // TODO: 2022-11-29 filters: planned cancellations?
-    // TODO: 2022-11-29 filters: bikes ?
-    // TODO: 2022-11-29 filters: wheelchair?
     // TODO: 2022-11-29 filters: groups of lines
     .build();
 }

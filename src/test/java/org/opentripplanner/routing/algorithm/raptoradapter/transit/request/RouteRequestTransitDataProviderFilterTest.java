@@ -42,9 +42,6 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class RouteRequestTransitDataProviderFilterTest {
 
-  // TODO: 2022-12-14 filters: none of those tests actually verifies filtering on routes
-  //  we need to fix that
-
   private static final Route ROUTE = TransitModelForTest.route("1").build();
 
   private static final FeedScopedId TRIP_ID = TransitModelForTest.id("T1");

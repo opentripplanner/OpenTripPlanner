@@ -124,7 +124,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     // TODO: 2022-12-13 filters: this is expensive
     //  we only have to do it if we have submodes in the filters
     //  in the future we will make sure that we have separate routing trip pattern for each submode
-    //  then we do not have to do that
+    //  then we do not have to do that at all and it should increase performance a lot
     // trip has to match with at least one predicate in order to be included in search
     if (withFilters) {
       // we only have to this if we have submode specific filter
