@@ -9,6 +9,7 @@ public class FilterInputType {
   static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
     .newInputObject()
     .name("TripFilterInput")
+    // TODO: 2022-12-19 Correct documentation. Give some examples
     .description(
       "List of filters that should be applied on the search. A trip or line has to match with " +
       "with at least one filter in order to be included in search. Not specifying any filters means that everything should be included. " +

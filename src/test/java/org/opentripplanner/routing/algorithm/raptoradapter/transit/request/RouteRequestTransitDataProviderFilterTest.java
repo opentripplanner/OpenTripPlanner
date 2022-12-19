@@ -86,7 +86,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       true,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(),
+      Set.of(),
       Set.of(),
       List.of(AllowAllTransitFilter.of())
     );
@@ -110,7 +110,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(),
+      Set.of(),
       Set.of(),
       filterForMode(TransitMode.BUS)
     );
@@ -129,7 +129,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(),
+      Set.of(),
       Set.of(ROUTE.getId()),
       filterForMode(TransitMode.BUS)
     );
@@ -156,7 +156,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(TRIP_ID),
+      Set.of(TRIP_ID),
       Set.of(),
       filterForMode(TransitMode.BUS)
     );
@@ -209,7 +209,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(),
+      Set.of(),
       Set.of(),
       filterForMode(TransitMode.BUS)
     );
@@ -236,7 +236,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       true,
       WheelchairPreferences.DEFAULT,
       false,
-      List.of(),
+      Set.of(),
       Set.of(),
       List.of(AllowAllTransitFilter.of())
     );
@@ -263,7 +263,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       true,
       WheelchairPreferences.DEFAULT,
       false,
-      List.of(),
+      Set.of(),
       Set.of(),
       List.of(AllowAllTransitFilter.of())
     );
@@ -290,7 +290,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       true,
       WheelchairPreferences.DEFAULT,
       false,
-      List.of(),
+      Set.of(),
       Set.of(),
       filterForMode(TransitMode.BUS)
     );
@@ -317,7 +317,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       true,
       WheelchairPreferences.DEFAULT,
       false,
-      List.of(),
+      Set.of(),
       Set.of(),
       filterForMode(TransitMode.BUS)
     );
@@ -356,7 +356,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       WheelchairPreferences.DEFAULT,
       true,
-      List.of(),
+      Set.of(),
       Set.of(),
       filterForMode(TransitMode.BUS)
     );
@@ -377,7 +377,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(),
+      Set.of(),
       Set.of(),
       List.of(AllowAllTransitFilter.of())
     );
@@ -491,7 +491,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       true,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(),
+      Set.of(),
       Set.of(),
       filterForMode(TransitMode.BUS)
     );
@@ -514,7 +514,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      List.of(),
+      Set.of(),
       Set.of(),
       filterForModes(allowedModes)
     );

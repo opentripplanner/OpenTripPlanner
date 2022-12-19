@@ -200,7 +200,7 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   public String toString(String sep) {
-    // TODO: 2022-12-05 transit modes are no longer include within RequestModes. Fix it
+    // TODO: 2022-12-05 filters: transit modes are no longer included within RequestModes. Fix it
     return from + sep + to + sep + dateTime + sep + arriveBy + sep + journey.modes();
   }
 

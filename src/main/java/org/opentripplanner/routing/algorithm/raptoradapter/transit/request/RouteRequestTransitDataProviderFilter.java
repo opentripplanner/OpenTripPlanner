@@ -31,7 +31,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
 
   private final List<TransitFilter> filters;
 
-  private final List<FeedScopedId> bannedTrips;
+  private final Set<FeedScopedId> bannedTrips;
 
   private final Set<FeedScopedId> bannedRoutes;
 
@@ -46,7 +46,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       request.wheelchair(),
       request.preferences().wheelchair(),
       request.preferences().transit().includePlannedCancellations(),
-      request.journey().transit().bannedTrips(),
+      Set.copyOf(request.journey().transit().bannedTrips()),
       bannedRoutes(request.journey().transit().filters(), transitService.getAllRoutes()),
       request.journey().transit().filters()
     );
@@ -58,8 +58,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     boolean wheelchairEnabled,
     WheelchairPreferences wheelchairPreferences,
     boolean includePlannedCancellations,
-    // TODO: 2022-12-14 this should be a set
-    List<FeedScopedId> bannedTrips,
+    Set<FeedScopedId> bannedTrips,
     Set<FeedScopedId> bannedRoutes,
     List<TransitFilter> filters
   ) {

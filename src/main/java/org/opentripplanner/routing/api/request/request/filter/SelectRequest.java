@@ -86,7 +86,7 @@ public class SelectRequest implements Serializable {
   private final List<FeedScopedId> agencies;
   private final RouteMatcher routes;
 
-  // TODO: 2022-11-29 group of routes
+  // TODO: 2022-11-29 filters: group of routes
 
   public boolean matches(Route route) {
     if (

@@ -234,6 +234,7 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("filters")
+          // TODO: 2022-12-19 filters: documentation
           .description("TODO")
           .type(new GraphQLList(FilterInputType.INPUT_TYPE))
           .build()
