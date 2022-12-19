@@ -50,10 +50,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
 
   @Override
   public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
-    int departureTime = routingSupport.getTimeDependentDepartureTime(
-      accessPath,
-      iterationDepartureTime
-    );
+    int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
 
     // This access is not available after the iteration departure time
     if (departureTime == -1) {
