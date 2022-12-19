@@ -1,0 +1,59 @@
+{
+  "streetRoutingTimeout": "7s",
+  "routingDefaults": {
+    "maxJourneyDuration": "6h",
+    "boardSlack": "0s",
+    "alightSlack": "0s",
+    "transferSlack": 180,
+    "waitReluctance": 0.9,
+    "walkReluctance": 1.75,
+    "stairsReluctance": 1.65,
+    "numItineraries": 3,
+    "geoidElevation": true
+  },
+  "transit": {
+    "maxNumberOfTransfers" : 4
+  },
+  "updaters": [
+    {
+      "type": "real-time-alerts",
+      "frequencySec": 60,
+      "earlyStartSec": 864000,
+      "url": "http://trimet.org/transweb/ws/V1/FeedSpecAlerts/includeFuture/true/suppressSystemWideAlerts/true/",
+      "feedId": "TriMet"
+    },
+    {
+      "type": "stop-time-updater",
+      "frequencySec": 30,
+      "url": "https://trimet.org/transweb/ws/V1/TripUpdate",
+      "feedId": "TriMet"
+    },
+    {
+      "type": "bike-rental",
+      "frequencySec": 92,
+      "sourceType": "gbfs",
+      "url": "https://gbfs.biketownpdx.com/gbfs"
+    },
+    {
+      "type": "vehicle-rental",
+      "frequencySec": 90,
+      "network": "BIRD",
+      "sourceType": "gbfs",
+      "url": "https://mds.bird.co/gbfs/v2/public/portland"
+    },
+    {
+      "type": "vehicle-rental",
+      "frequencySec": 91,
+      "network": "LIME",
+      "sourceType": "gbfs",
+      "url": "https://data.lime.bike/api/partners/v2/gbfs/portland"
+    },
+    {
+      "type": "vehicle-rental",
+      "frequencySec": 93,
+      "network": "SPIN",
+      "sourceType": "gbfs",
+      "url": "https://gbfs.spin.pm/api/gbfs/v2/portland"
+    }
+  ]
+}
