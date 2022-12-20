@@ -140,7 +140,7 @@ public class StreetEdgeTest {
    */
   @Test
   public void testTraverseModeSwitchBike() {
-    var vWithTrafficLight = new IntersectionVertex(graph, "maple_1st", 2.0, 2.0, false, true);
+    var vWithTrafficLight = new IntersectionVertex(null, "maple_1st", 2.0, 2.0, false, true);
     StreetEdge e0 = streetEdge(v0, vWithTrafficLight, 50.0, StreetTraversalPermission.PEDESTRIAN);
     StreetEdge e1 = streetEdge(
       vWithTrafficLight,
@@ -177,7 +177,7 @@ public class StreetEdgeTest {
    */
   @Test
   public void testTraverseModeSwitchWalk() {
-    var vWithTrafficLight = new IntersectionVertex(graph, "maple_1st", 2.0, 2.0, false, true);
+    var vWithTrafficLight = new IntersectionVertex(null, "maple_1st", 2.0, 2.0, false, true);
     StreetEdge e0 = streetEdge(
       v0,
       vWithTrafficLight,
