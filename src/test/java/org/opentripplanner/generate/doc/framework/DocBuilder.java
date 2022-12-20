@@ -2,7 +2,12 @@ package org.opentripplanner.generate.doc.framework;
 
 import static org.opentripplanner.framework.text.MarkdownFormatter.NEW_LINE;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.text.MarkdownFormatter;
@@ -14,6 +19,8 @@ import org.opentripplanner.standalone.config.framework.json.EnumMapper;
 @SuppressWarnings("UnusedReturnValue")
 public class DocBuilder {
 
+  public static final ObjectMapper objectMapper = new ObjectMapper();
+  public static final DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
   private final StringBuilder buffer = new StringBuilder();
 
   /**
@@ -116,17 +123,24 @@ public class DocBuilder {
   }
 
   public void addExample(String comment, JsonNode body) {
-    buffer.append(
-      """
+    String json = prettyPrintJson(body);
+
+    buffer.append("""
       ```JSON
       // %s
       %s
       ```
-      """.formatted(
-          comment,
-          body.toPrettyString()
-        )
-    );
+      """.formatted(comment, json));
+  }
+
+  private static String prettyPrintJson(JsonNode body) {
+    try {
+      objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+      prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
+      return objectMapper.writer(prettyPrinter).writeValueAsString(body);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
