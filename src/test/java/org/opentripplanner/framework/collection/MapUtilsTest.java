@@ -29,9 +29,13 @@ public class MapUtilsTest {
     var combined = MapUtils.combine(Map.of("key", "value"), Map.of("key2", "value"));
     assertEquals(Map.of("key", "value", "key2", "value"), combined);
   }
+
   @Test
   public void combineMultiple() {
-    var combined = MapUtils.combine(Map.of("key", "value", "key3", "another"), Map.of("key2", "value"));
+    var combined = MapUtils.combine(
+      Map.of("key", "value", "key3", "another"),
+      Map.of("key2", "value")
+    );
     assertEquals(Map.of("key", "value", "key2", "value", "key3", "another"), combined);
   }
 

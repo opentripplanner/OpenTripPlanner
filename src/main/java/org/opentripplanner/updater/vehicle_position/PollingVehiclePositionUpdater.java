@@ -45,7 +45,8 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     TransitModel transitModel
   ) {
     super(params);
-    this.vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(params.url());
+    this.vehiclePositionSource =
+      new GtfsRealtimeHttpVehiclePositionSource(params.url(), params.headers());
     var index = transitModel.getTransitModelIndex();
     this.vehiclePositionPatternMatcher =
       new VehiclePositionPatternMatcher(

@@ -48,15 +48,15 @@ Alerts are text messages attached to GTFS objects, informing riders of disruptio
 <!-- real-time-alerts BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter          |       Type      | Summary                                                     |  Req./Opt. | Default Value | Since |
-|---------------------------|:---------------:|-------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "REAL_TIME_ALERTS" |      `enum`     | The type of the updater.                                    | *Required* |               |   na  |
-| earlyStartSec             |    `integer`    | TODO                                                        | *Optional* | `0`           |  1.5  |
-| feedId                    |     `string`    | The id of the feed to apply the alerts to.                  | *Optional* |               |  1.5  |
-| frequencySec              |    `integer`    | How often the URL should be fetched.                        | *Optional* | `60`          |  1.5  |
-| fuzzyTripMatching         |    `boolean`    | Whether to match trips fuzzily.                             | *Optional* | `false`       |  1.5  |
-| url                       |     `string`    | URL to fetch the GTFS-RT feed from.                         | *Required* |               |  1.5  |
-| [headers](#u_0_headers)   | `map of string` | Extra headers to add to the HTTP request fetching the data. | *Optional* |               |  2.3  |
+| Config Parameter          |       Type      | Summary                                                                      |  Req./Opt. | Default Value | Since |
+|---------------------------|:---------------:|------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "REAL_TIME_ALERTS" |      `enum`     | The type of the updater.                                                     | *Required* |               |   na  |
+| earlyStartSec             |    `integer`    | How long before the posted start of an event it should be displayed to users | *Optional* | `0`           |  1.5  |
+| feedId                    |     `string`    | The id of the feed to apply the alerts to.                                   | *Optional* |               |  1.5  |
+| frequencySec              |    `integer`    | How often the URL should be fetched.                                         | *Optional* | `60`          |  1.5  |
+| fuzzyTripMatching         |    `boolean`    | Whether to match trips fuzzily.                                              | *Optional* | `false`       |  1.5  |
+| url                       |     `string`    | URL to fetch the GTFS-RT feed from.                                          | *Required* |               |  1.5  |
+| [headers](#u_0_headers)   | `map of string` | Extra headers to add to the HTTP request fetching the data.                  | *Optional* |               |  2.3  |
 
 
 #### Details

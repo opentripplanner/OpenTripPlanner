@@ -17,7 +17,11 @@ public class GtfsRealtimeAlertsUpdaterConfig {
         .summary("The id of the feed to apply the alerts to.")
         .asString(null),
       c.of("url").since(V1_5).summary("URL to fetch the GTFS-RT feed from.").asString(),
-      c.of("earlyStartSec").since(V1_5).summary("TODO").asInt(0),
+      c
+        .of("earlyStartSec")
+        .since(V1_5)
+        .summary("How long before the posted start of an event it should be displayed to users")
+        .asInt(0),
       c
         .of("fuzzyTripMatching")
         .since(V1_5)

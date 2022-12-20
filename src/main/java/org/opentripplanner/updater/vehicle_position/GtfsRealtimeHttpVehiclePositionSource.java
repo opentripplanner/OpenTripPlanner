@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -25,20 +26,23 @@ public class GtfsRealtimeHttpVehiclePositionSource implements VehiclePositionSou
    */
   private final URI url;
 
-  private final Map<String, String> defaultHeaders = Map.of(
+  private final Map<String, String> DEFAULT_HEADERS = Map.of(
     "Accept",
     "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
   );
 
-  public GtfsRealtimeHttpVehiclePositionSource(URI url) {
+  private final Map<String, String> headers;
+
+  public GtfsRealtimeHttpVehiclePositionSource(URI url, Map<String, String> headers) {
     this.url = url;
+    this.headers = MapUtils.combine(DEFAULT_HEADERS, headers);
   }
 
   /**
    * Parses raw GTFS-RT data into vehicle positions
    */
   public List<VehiclePosition> getPositions() {
-    try (InputStream is = HttpUtils.openInputStream(url.toString(), defaultHeaders)) {
+    try (InputStream is = HttpUtils.openInputStream(url.toString(), headers)) {
       if (is == null) {
         LOG.warn("Failed to get data from url {}", url);
         return List.of();
