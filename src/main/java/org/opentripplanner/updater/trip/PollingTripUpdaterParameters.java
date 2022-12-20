@@ -1,40 +1,22 @@
 package org.opentripplanner.updater.trip;
 
+import java.util.Map;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 
-public class PollingTripUpdaterParameters
+public record PollingTripUpdaterParameters(
+  String configRef,
+  int frequencySec,
+  boolean fuzzyTripMatching,
+  BackwardsDelayPropagationType backwardsDelayPropagationType,
+
+  String feedId,
+  String httpSourceUrl,
+  String fileSource,
+  Map<String, String> headers
+)
   implements PollingGraphUpdaterParameters, UrlUpdaterParameters {
-
-  private final String configRef;
-  private final int frequencySec;
-  private final boolean fuzzyTripMatching;
-  private final BackwardsDelayPropagationType backwardsDelayPropagationType;
-
-  private final String feedId;
-  private final String httpSourceUrl;
-  private final String fileSource;
-
-  public PollingTripUpdaterParameters(
-    String configRef,
-    int frequencySec,
-    boolean fuzzyTripMatching,
-    BackwardsDelayPropagationType backwardsDelayPropagationType,
-    String feedId,
-    String httpSourceUrl,
-    String fileSource
-  ) {
-    this.configRef = configRef;
-    this.frequencySec = frequencySec;
-    this.fuzzyTripMatching = fuzzyTripMatching;
-    this.backwardsDelayPropagationType = backwardsDelayPropagationType;
-    this.feedId = feedId;
-    this.httpSourceUrl = httpSourceUrl;
-    this.fileSource = fileSource;
-  }
-
-  @Override
-  public int frequencySec() {
-    return frequencySec;
+  public PollingTripUpdaterParameters {
+    headers = Map.copyOf(headers);
   }
 
   @Override
@@ -43,16 +25,8 @@ public class PollingTripUpdaterParameters
   }
 
   @Override
-  public String configRef() {
-    return configRef;
-  }
-
   public String getFeedId() {
     return feedId;
-  }
-
-  boolean fuzzyTripMatching() {
-    return fuzzyTripMatching;
   }
 
   BackwardsDelayPropagationType getBackwardsDelayPropagationType() {
@@ -83,6 +57,11 @@ public class PollingTripUpdaterParameters
       @Override
       public String getUrl() {
         return httpSourceUrl;
+      }
+
+      @Override
+      public Map<String, String> headers() {
+        return Map.of();
       }
     };
   }

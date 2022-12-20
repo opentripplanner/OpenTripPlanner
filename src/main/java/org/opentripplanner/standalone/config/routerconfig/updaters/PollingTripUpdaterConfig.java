@@ -1,7 +1,9 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -15,9 +17,9 @@ public class PollingTripUpdaterConfig {
     String url = null;
 
     if (c.exist("file")) {
-      file = c.of("file").since(NA).summary("The path of the GTFS-RT file.").asString();
+      file = c.of("file").since(V1_5).summary("The path of the GTFS-RT file.").asString();
     } else if (c.exist("url")) {
-      url = c.of("url").since(NA).summary("The URL of the GTFS-RT resource.").asString();
+      url = c.of("url").since(V1_5).summary("The URL of the GTFS-RT resource.").asString();
     } else {
       throw new OtpAppException(
         "Need either 'url' or 'file' properties to configure " +
@@ -27,16 +29,22 @@ public class PollingTripUpdaterConfig {
       );
     }
 
+    var headers = c
+      .of("headers")
+      .since(V2_3)
+      .summary("Extra headers to add to the HTTP request fetching the data.")
+      .asStringMap();
+
     return new PollingTripUpdaterParameters(
       configRef,
       c
         .of("frequencySec")
-        .since(NA)
+        .since(V1_5)
         .summary("How often the data should be downloaded in seconds.")
         .asInt(60),
       c
         .of("fuzzyTripMatching")
-        .since(NA)
+        .since(V1_5)
         .summary("If the trips should be matched fuzzily.")
         .asBoolean(false),
       c
@@ -62,7 +70,8 @@ public class PollingTripUpdaterConfig {
         .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA),
       c.of("feedId").since(NA).summary("Which feed the updates apply to.").asString(null),
       url,
-      file
+      file,
+      headers
     );
   }
 }

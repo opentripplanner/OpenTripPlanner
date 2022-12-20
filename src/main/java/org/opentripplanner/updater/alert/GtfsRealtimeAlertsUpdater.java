@@ -4,6 +4,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
@@ -32,9 +33,15 @@ import org.slf4j.LoggerFactory;
 public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements TransitAlertProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
+  public static final Map<String, String> DEFAULT_HEADERS = Map.of(
+    "Accept",
+    "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
+  );
+
   private final String url;
   private final AlertsUpdateHandler updateHandler;
   private final TransitAlertService transitAlertService;
+  private final Map<String, String> extraHeaders;
   private WriteToGraphCallback saveResultOnGraph;
   private Long lastTimestamp = Long.MIN_VALUE;
 
@@ -43,7 +50,8 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     TransitModel transitModel
   ) {
     super(config);
-    this.url = config.getUrl();
+    this.url = config.url();
+    this.extraHeaders = config.headers();
     TransitAlertService transitAlertService = new TransitAlertServiceImpl(transitModel);
 
     var fuzzyTripMatcher = config.fuzzyTripMatching()
@@ -53,8 +61,8 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     this.transitAlertService = transitAlertService;
 
     this.updateHandler = new AlertsUpdateHandler();
-    this.updateHandler.setEarlyStart(config.getEarlyStartSec());
-    this.updateHandler.setFeedId(config.getFeedId());
+    this.updateHandler.setEarlyStart(config.earlyStartSec());
+    this.updateHandler.setFeedId(config.feedId());
     this.updateHandler.setTransitAlertService(transitAlertService);
     this.updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
 
@@ -84,10 +92,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     try {
       InputStream data = HttpUtils.getData(
         URI.create(url),
-        Map.of(
-          "Accept",
-          "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
-        )
+        MapUtils.combine(DEFAULT_HEADERS, extraHeaders)
       );
       if (data == null) {
         throw new RuntimeException("Failed to get data from url " + url);

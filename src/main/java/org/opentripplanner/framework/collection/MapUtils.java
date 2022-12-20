@@ -1,9 +1,11 @@
 package org.opentripplanner.framework.collection;
 
 import gnu.trove.map.TLongObjectMap;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -27,5 +29,11 @@ public class MapUtils {
    */
   public static <S, T> List<T> mapToList(Collection<S> entities, Function<S, T> mapper) {
     return entities == null ? null : entities.stream().map(mapper).collect(Collectors.toList());
+  }
+
+  @SafeVarargs
+  public static <K, V> Map<K, V> combine(Map<K, V>... maps) {
+    var entries = Arrays.stream(maps).flatMap(m -> m.entrySet().stream()).toArray(Map.Entry[]::new);
+    return Map.ofEntries(entries);
   }
 }

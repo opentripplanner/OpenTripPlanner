@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1_5;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
@@ -10,11 +11,24 @@ public class GtfsRealtimeAlertsUpdaterConfig {
   public static GtfsRealtimeAlertsUpdaterParameters create(String configRef, NodeAdapter c) {
     return new GtfsRealtimeAlertsUpdaterParameters(
       configRef,
-      c.of("feedId").since(NA).summary("TODO").asString(null),
-      c.of("url").since(NA).summary("TODO").asString(),
-      c.of("earlyStartSec").since(NA).summary("TODO").asInt(0),
-      c.of("fuzzyTripMatching").since(NA).summary("TODO").asBoolean(false),
-      c.of("frequencySec").since(NA).summary("TODO").asInt(60)
+      c
+        .of("feedId")
+        .since(V1_5)
+        .summary("The id of the feed to apply the alerts to.")
+        .asString(null),
+      c.of("url").since(V1_5).summary("URL to fetch the GTFS-RT feed from.").asString(),
+      c.of("earlyStartSec").since(V1_5).summary("TODO").asInt(0),
+      c
+        .of("fuzzyTripMatching")
+        .since(V1_5)
+        .summary("Whether to match trips fuzzily.")
+        .asBoolean(false),
+      c.of("frequencySec").since(V1_5).summary("How often the URL should be fetched.").asInt(60),
+      c
+        .of("headers")
+        .since(V2_3)
+        .summary("Extra headers to add to the HTTP request fetching the data.")
+        .asStringMap()
     );
   }
 }
