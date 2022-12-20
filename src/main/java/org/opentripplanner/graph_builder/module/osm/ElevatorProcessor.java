@@ -29,6 +29,12 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Contains the logic for extracting elevator data from OSM and converting it to edges.
+ * <p>
+ * I depends heavily on the idiosyncratic processing of the OSM data in {@link OpenStreetMapModule}
+ * which is the reason this is not a public class.
+ */
 class ElevatorProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ElevatorProcessor.class);
