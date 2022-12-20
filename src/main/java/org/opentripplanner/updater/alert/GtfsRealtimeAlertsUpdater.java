@@ -90,10 +90,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   @Override
   protected void runPolling() {
     try {
-      InputStream data = HttpUtils.getData(
-        URI.create(url),
-        this.headers
-      );
+      InputStream data = HttpUtils.getData(URI.create(url), this.headers);
       if (data == null) {
         throw new RuntimeException("Failed to get data from url " + url);
       }

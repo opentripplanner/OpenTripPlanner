@@ -71,18 +71,15 @@ Extra headers to add to the HTTP request fetching the data.
 ```JSON
 // router-config.json
 {
-    "updaters": [
-    {
-      "type" : "real-time-alerts",
-      "frequencySec" : 30,
-      "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
-      "feedId" : "TriMet",
-      "headers" : {
-        "Authorization" : "A-Token"
-      }
+  "updaters" : [ {
+    "type" : "real-time-alerts",
+    "frequencySec" : 30,
+    "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
+    "feedId" : "TriMet",
+    "headers" : {
+      "Authorization" : "A-Token"
     }
-  ]
-
+  } ]
 }
 ```
 
@@ -144,19 +141,16 @@ Extra headers to add to the HTTP request fetching the data.
 ```JSON
 // router-config.json
 {
-    "updaters": [
-    {
-      "type" : "stop-time-updater",
-      "frequencySec" : 60,
-      "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
-      "url" : "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-      "feedId" : "TriMet",
-      "headers" : {
-        "Authorization" : "A-Token"
-      }
+  "updaters" : [ {
+    "type" : "stop-time-updater",
+    "frequencySec" : 60,
+    "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
+    "url" : "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
+    "feedId" : "TriMet",
+    "headers" : {
+      "Authorization" : "A-Token"
     }
-  ]
-
+  } ]
 }
 ```
 
@@ -192,12 +186,9 @@ TODO
 ```JSON
 // router-config.json
 {
-    "updaters": [
-    {
-      "type" : "websocket-gtfs-rt-updater"
-    }
-  ]
-
+  "updaters" : [ {
+    "type" : "websocket-gtfs-rt-updater"
+  } ]
 }
 ```
 
@@ -235,18 +226,15 @@ Extra headers to add to the HTTP request fetching the data.
 ```JSON
 // router-config.json
 {
-    "updaters": [
-    {
-      "type" : "vehicle-positions",
-      "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
-      "feedId" : "1",
-      "frequencySec" : 60,
-      "headers" : {
-        "Authorization" : "A-Token"
-      }
+  "updaters" : [ {
+    "type" : "vehicle-positions",
+    "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
+    "feedId" : "1",
+    "frequencySec" : 60,
+    "headers" : {
+      "Authorization" : "A-Token"
     }
-  ]
-
+  } ]
 }
 ```
 
@@ -331,23 +319,20 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 ```JSON
 // router-config.json
 {
-    "updaters": [
-    {
-      "type" : "vehicle-rental",
-      "network" : "socialbicycles_coast",
-      "sourceType" : "gbfs",
-      "language" : "en",
-      "frequencySec" : 60,
+  "updaters" : [ {
+    "type" : "vehicle-rental",
+    "network" : "socialbicycles_coast",
+    "sourceType" : "gbfs",
+    "language" : "en",
+    "frequencySec" : 60,
       "allowKeepingRentedBicycleAtDestination" : false,
       "geofencingZones" : false,
-      "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
-      "headers" : {
-        "Auth" : "<any-token>",
-        "<key>" : "<value>"
-      }
+    "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
+    "headers" : {
+      "Auth" : "<any-token>",
+      "<key>" : "<value>"
     }
-  ]
-
+  } ]
 }
 ```
 

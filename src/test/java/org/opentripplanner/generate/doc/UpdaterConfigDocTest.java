@@ -10,6 +10,7 @@ import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPL
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ public class UpdaterConfigDocTest {
     "vehicle-parking"
   );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
+  public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
    * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
@@ -94,15 +96,12 @@ public class UpdaterConfigDocTest {
   }
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
-    buf.addExample(
-      ROUTER_CONFIG_FILENAME,
-      """
-      "updaters": [
-        %s
-      ]
-      """.formatted(
-          node.toPrettyString().indent(node.level()).trim()
-        )
-    );
+    var updaters = mapper.createArrayNode();
+    updaters.add(node.rawNode());
+
+    var root = mapper.createObjectNode();
+    root.set("updaters", updaters);
+
+    buf.addExample(ROUTER_CONFIG_FILENAME, root);
   }
 }
