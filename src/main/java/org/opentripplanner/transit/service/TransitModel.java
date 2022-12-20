@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -223,7 +224,7 @@ public class TransitModel implements Serializable {
    * service period {@code null} is returned.
    */
   @Nullable
-  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
+  public FeedScopedId getOrCreateServiceIdForDate(@Nonnull LocalDate serviceDate) {
     // Start of day
     ZonedDateTime time = ServiceDateUtils.asStartOfService(serviceDate, getTimeZone());
 
