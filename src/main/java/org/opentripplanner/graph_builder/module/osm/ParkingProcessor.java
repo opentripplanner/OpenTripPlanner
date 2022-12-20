@@ -37,7 +37,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ParkingProcessor {
+class ParkingProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ParkingProcessor.class);
   private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
