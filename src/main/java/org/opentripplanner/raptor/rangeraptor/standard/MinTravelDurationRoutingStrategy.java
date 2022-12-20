@@ -87,7 +87,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
       .boardWithRegularTransfer(prevArrivalTime(stopIndex), stopPos, boardSlack, onTripIndex)
       .boardWithFallback(
         boarding -> board(stopIndex, boarding),
-        emptyBoarding -> boardSameTrip(emptyBoarding.getEarliestBoardTime(), stopPos, stopIndex)
+        emptyBoarding -> boardSameTrip(emptyBoarding.earliestBoardTime(), stopPos, stopIndex)
       );
   }
 
@@ -112,13 +112,13 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   }
 
   public void board(final int stopIndex, final RaptorBoardOrAlightEvent<T> boarding) {
-    onTripIndex = boarding.getTripIndex();
-    onTrip = boarding.getTrip();
-    onTripBoardTime = boarding.getEarliestBoardTime();
+    onTripIndex = boarding.tripIndex();
+    onTrip = boarding.trip();
+    onTripBoardTime = boarding.earliestBoardTime();
     onTripBoardStop = stopIndex;
     // Calculate the time-shift, the time-shift will be a positive duration in a
     // forward-search, and a negative value in case of a reverse-search.
-    onTripTimeShift = boarding.getTime() - onTripBoardTime;
+    onTripTimeShift = boarding.time() - onTripBoardTime;
   }
 
   /**

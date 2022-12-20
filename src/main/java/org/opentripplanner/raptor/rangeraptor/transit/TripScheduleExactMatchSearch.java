@@ -46,12 +46,12 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule>
       stopPositionInPattern,
       tripIndexLimit
     );
-    if (result.empty() || result.getTransferConstraint().isNotAllowed()) {
+    if (result.empty() || result.transferConstraint().isNotAllowed()) {
       return result;
     }
-    return isWithinSlack(timeLimit, result.getTime())
+    return isWithinSlack(timeLimit, result.time())
       ? result
-      : RaptorBoardOrAlightEvent.empty(result.getEarliestBoardTime());
+      : RaptorBoardOrAlightEvent.empty(result.earliestBoardTime());
   }
 
   @Override

@@ -65,33 +65,33 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   /* RaptorTripScheduleBoardOrAlightEvent implementation */
 
   @Override
-  public int getTripIndex() {
+  public int tripIndex() {
     return tripTimes.getDepartureTime(0) + offset;
   }
 
   @Override
-  public T getTrip() {
+  public T trip() {
     return (T) this;
   }
 
   @Override
-  public int getStopPositionInPattern() {
+  public int stopPositionInPattern() {
     return stopPositionInPattern;
   }
 
   @Override
-  public int getTime() {
+  public int time() {
     return departureTime + offset;
   }
 
   @Override
-  public int getEarliestBoardTime() {
+  public int earliestBoardTime() {
     return earliestDepartureTime;
   }
 
   @Override
   @Nonnull
-  public RaptorTransferConstraint getTransferConstraint() {
+  public RaptorTransferConstraint transferConstraint() {
     return RaptorTransferConstraint.REGULAR_TRANSFER;
   }
 

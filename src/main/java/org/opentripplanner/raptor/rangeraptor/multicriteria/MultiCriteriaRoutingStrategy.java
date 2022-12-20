@@ -101,8 +101,8 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     final int stopIndex,
     final RaptorBoardOrAlightEvent<T> boarding
   ) {
-    final T trip = boarding.getTrip();
-    final int boardTime = boarding.getTime();
+    final T trip = boarding.trip();
+    final int boardTime = boarding.time();
 
     if (prevArrival.arrivedByAccess()) {
       int latestArrivalTime = boardTime - slackProvider.boardSlack(trip.pattern().slackIndex());
@@ -117,7 +117,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
       new PatternRide<>(
         prevArrival,
         stopIndex,
-        boarding.getStopPositionInPattern(),
+        boarding.stopPositionInPattern(),
         boardTime,
         boardCost,
         relativeBoardCost,
@@ -179,10 +179,10 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
       costCalculator.boardingCost(
         prevArrival.isFirstRound(),
         prevArrival.arrivalTime(),
-        boardEvent.getBoardStopIndex(),
-        boardEvent.getTime(),
-        boardEvent.getTrip(),
-        boardEvent.getTransferConstraint()
+        boardEvent.boardStopIndex(),
+        boardEvent.time(),
+        boardEvent.trip(),
+        boardEvent.transferConstraint()
       )
     );
   }
