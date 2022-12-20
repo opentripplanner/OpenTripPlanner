@@ -41,7 +41,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   private final String url;
   private final AlertsUpdateHandler updateHandler;
   private final TransitAlertService transitAlertService;
-  private final Map<String, String> extraHeaders;
+  private final Map<String, String> headers;
   private WriteToGraphCallback saveResultOnGraph;
   private Long lastTimestamp = Long.MIN_VALUE;
 
@@ -51,7 +51,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   ) {
     super(config);
     this.url = config.url();
-    this.extraHeaders = config.headers();
+    this.headers = MapUtils.combine(DEFAULT_HEADERS, config.headers());
     TransitAlertService transitAlertService = new TransitAlertServiceImpl(transitModel);
 
     var fuzzyTripMatcher = config.fuzzyTripMatching()
@@ -92,7 +92,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     try {
       InputStream data = HttpUtils.getData(
         URI.create(url),
-        MapUtils.combine(DEFAULT_HEADERS, extraHeaders)
+        this.headers
       );
       if (data == null) {
         throw new RuntimeException("Failed to get data from url " + url);

@@ -27,7 +27,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
    */
   private final String feedId;
   private final String url;
-  private final Map<String, String> extraHeaders;
+  private final Map<String, String> headers;
   /**
    * True iff the last list with updates represent all updates that are active right now, i.e. all
    * previous updates should be disregarded
@@ -37,7 +37,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
   public GtfsRealtimeHttpTripUpdateSource(Parameters config) {
     this.feedId = config.getFeedId();
     this.url = config.getUrl();
-    this.extraHeaders = config.headers();
+    this.headers = MapUtils.combine(DEFAULT_HEADERS, config.headers());
   }
 
   @Override
@@ -47,10 +47,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     List<TripUpdate> updates = null;
     fullDataset = true;
     try {
-      InputStream is = HttpUtils.getData(
-        URI.create(url),
-        MapUtils.combine(DEFAULT_HEADERS, extraHeaders)
-      );
+      InputStream is = HttpUtils.getData(URI.create(url), this.headers);
       if (is != null) {
         // Decode message
         feedMessage = FeedMessage.parseFrom(is);

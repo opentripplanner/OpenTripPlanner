@@ -61,7 +61,7 @@ public record PollingTripUpdaterParameters(
 
       @Override
       public Map<String, String> headers() {
-        return Map.of();
+        return headers;
       }
     };
   }
