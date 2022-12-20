@@ -96,9 +96,10 @@ public class UpdaterConfigDocTest {
   }
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
+    buf.addSection("##### Example configuration");
+
     var updaters = mapper.createArrayNode();
     updaters.add(node.rawNode());
-
     var root = mapper.createObjectNode();
     root.set("updaters", updaters);
 
