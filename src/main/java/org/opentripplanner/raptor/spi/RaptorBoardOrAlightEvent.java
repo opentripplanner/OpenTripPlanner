@@ -26,30 +26,30 @@ public interface RaptorBoardOrAlightEvent<T extends RaptorTripSchedule> {
    * <p>
    * If not found {@link #NOT_FOUND} is returned.
    */
-  int getTripIndex();
+  int tripIndex();
 
   /**
    * This i a reference to the trip found.
    */
-  T getTrip();
+  T trip();
 
   /**
    * Return the stop-position-in-pattern for the current trip board search.
    */
-  int getStopPositionInPattern();
+  int stopPositionInPattern();
 
   /**
    * Return the stop index for the boarding position.
    */
-  default int getBoardStopIndex() {
-    return getTrip().pattern().stopIndex(getStopPositionInPattern());
+  default int boardStopIndex() {
+    return trip().pattern().stopIndex(stopPositionInPattern());
   }
 
   /**
    * Get the board/alight time for the trip found. For a forward search the boarding time should be
    * returned, and for the reverse search the alight time should be returned.
    */
-  int getTime();
+  int time();
 
   /**
    * For a regular boarding, return the earliest-board-time passed in to the trip search.
@@ -58,7 +58,7 @@ public interface RaptorBoardOrAlightEvent<T extends RaptorTripSchedule> {
    * <p>
    * For a reverse search this method should return the latest-alight-time.
    */
-  int getEarliestBoardTime();
+  int earliestBoardTime();
 
   /**
    * Return the transfer constrains for the transfer before this boarding. If there are no transfer
@@ -66,7 +66,7 @@ public interface RaptorBoardOrAlightEvent<T extends RaptorTripSchedule> {
    * is {@code true}.
    */
   @Nonnull
-  RaptorTransferConstraint getTransferConstraint();
+  RaptorTransferConstraint transferConstraint();
 
   /**
    * This method return true if no result is found, but the algorithm may continue

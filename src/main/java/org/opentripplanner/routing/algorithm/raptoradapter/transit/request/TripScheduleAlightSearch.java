@@ -50,33 +50,33 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
   /* TripScheduleBoardOrAlightEvent implementation using fly-weight pattern */
 
   @Override
-  public T getTrip() {
+  public T trip() {
     return candidateTrip;
   }
 
   @Override
-  public int getTripIndex() {
+  public int tripIndex() {
     return candidateTripIndex;
   }
 
   @Override
-  public int getTime() {
+  public int time() {
     return candidateTrip.arrival(stopPositionInPattern);
   }
 
   @Override
-  public int getEarliestBoardTime() {
+  public int earliestBoardTime() {
     return latestAlightTime;
   }
 
   @Override
-  public int getStopPositionInPattern() {
+  public int stopPositionInPattern() {
     return stopPositionInPattern;
   }
 
   @Override
   @Nonnull
-  public RaptorTransferConstraint getTransferConstraint() {
+  public RaptorTransferConstraint transferConstraint() {
     return RaptorTransferConstraint.REGULAR_TRANSFER;
   }
 

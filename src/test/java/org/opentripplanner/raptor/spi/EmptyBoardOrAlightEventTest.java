@@ -12,8 +12,8 @@ class EmptyBoardOrAlightEventTest {
     var subject = new EmptyBoardOrAlightEvent<>(300);
 
     assertTrue(subject.empty());
-    assertEquals(300, subject.getEarliestBoardTime());
-    assertEquals(RaptorTransferConstraint.REGULAR_TRANSFER, subject.getTransferConstraint());
+    assertEquals(300, subject.earliestBoardTime());
+    assertEquals(RaptorTransferConstraint.REGULAR_TRANSFER, subject.transferConstraint());
     assertEquals("EmptyBoardOrAlightEvent[earliestBoardTime=300]", subject.toString());
   }
 }

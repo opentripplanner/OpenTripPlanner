@@ -6,33 +6,28 @@ import javax.annotation.Nonnull;
 record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTime)
   implements RaptorBoardOrAlightEvent<T> {
   @Override
-  public int getTripIndex() {
+  public int tripIndex() {
     return NOT_FOUND;
   }
 
   @Override
-  public T getTrip() {
+  public T trip() {
     return null;
   }
 
   @Override
-  public int getStopPositionInPattern() {
+  public int stopPositionInPattern() {
     return NOT_FOUND;
   }
 
   @Override
-  public int getTime() {
+  public int time() {
     return NOT_FOUND;
-  }
-
-  @Override
-  public int getEarliestBoardTime() {
-    return earliestBoardTime;
   }
 
   @Nonnull
   @Override
-  public RaptorTransferConstraint getTransferConstraint() {
+  public RaptorTransferConstraint transferConstraint() {
     return RaptorTransferConstraint.REGULAR_TRANSFER;
   }
 

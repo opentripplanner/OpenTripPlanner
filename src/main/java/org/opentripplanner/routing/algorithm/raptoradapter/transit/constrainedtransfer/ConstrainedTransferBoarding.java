@@ -36,34 +36,34 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   }
 
   @Override
-  public int getTripIndex() {
+  public int tripIndex() {
     return tripIndex;
   }
 
   @Override
   @Nonnull
-  public T getTrip() {
+  public T trip() {
     return trip;
   }
 
   @Override
-  public int getStopPositionInPattern() {
+  public int stopPositionInPattern() {
     return stopPositionInPattern;
   }
 
   @Override
-  public int getTime() {
+  public int time() {
     return time;
   }
 
   @Override
-  public int getEarliestBoardTime() {
+  public int earliestBoardTime() {
     return earliestBoardTime;
   }
 
   @Override
   @Nonnull
-  public RaptorTransferConstraint getTransferConstraint() {
+  public RaptorTransferConstraint transferConstraint() {
     return constraint;
   }
 

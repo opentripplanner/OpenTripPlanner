@@ -447,10 +447,10 @@ public class ConstrainedBoardingSearchTest {
   ) {
     if (expectedConstraint != null) {
       assertNotNull(boarding);
-      assertEquals(expectedConstraint, boarding.getTransferConstraint());
-      assertEquals(stopIndex, boarding.getBoardStopIndex());
-      assertEquals(targetStopPos, boarding.getStopPositionInPattern());
-      assertEquals(expectedTripIndex, boarding.getTripIndex());
+      assertEquals(expectedConstraint, boarding.transferConstraint());
+      assertEquals(stopIndex, boarding.boardStopIndex());
+      assertEquals(targetStopPos, boarding.stopPositionInPattern());
+      assertEquals(expectedTripIndex, boarding.tripIndex());
     } else {
       assertTrue(boarding.empty());
     }

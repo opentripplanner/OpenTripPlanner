@@ -52,17 +52,17 @@ class TripAssert {
   }
 
   TripAssert withIndex(int expectedTripIndex) {
-    assertEquals(expectedTripIndex, result.getTripIndex(), "Trip index");
+    assertEquals(expectedTripIndex, result.tripIndex(), "Trip index");
     return this;
   }
 
   TripAssert withBoardTime(int expectedBoardTime) {
-    assertEquals(expectedBoardTime, result.getTrip().departure(stopPosition), "Board time");
+    assertEquals(expectedBoardTime, result.trip().departure(stopPosition), "Board time");
     return this;
   }
 
   TripAssert withAlightTime(int expectedAlightTime) {
-    assertEquals(expectedAlightTime, result.getTrip().arrival(stopPosition), "Alight time");
+    assertEquals(expectedAlightTime, result.trip().arrival(stopPosition), "Alight time");
     return this;
   }
 }
