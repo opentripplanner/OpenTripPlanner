@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 class ElevatorProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ElevatorProcessor.class);
+
   private final DataImportIssueStore issueStore;
   private final Map<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes;
   private final OSMDatabase osmdb;
