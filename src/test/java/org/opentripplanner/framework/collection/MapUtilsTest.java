@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.framework.collection.MapUtils.mapToList;
 
 import java.util.Collections;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -17,9 +18,26 @@ import org.junit.jupiter.api.Test;
 public class MapUtilsTest {
 
   @Test
-  public void mapToListTest() throws Exception {
+  public void mapToListTest() {
     assertNull(mapToList(null, identity()));
     assertTrue(mapToList(Collections.emptyList(), identity()).isEmpty());
     assertEquals(singletonList(5), mapToList(singleton(5), identity()));
+  }
+
+  @Test
+  public void combine() {
+    var combined = MapUtils.combine(Map.of("key", "value"), Map.of("key2", "value"));
+    assertEquals(Map.of("key", "value", "key2", "value"), combined);
+  }
+  @Test
+  public void combineMultiple() {
+    var combined = MapUtils.combine(Map.of("key", "value", "key3", "another"), Map.of("key2", "value"));
+    assertEquals(Map.of("key", "value", "key2", "value", "key3", "another"), combined);
+  }
+
+  @Test
+  public void combineFirstOneWins() {
+    var combined = MapUtils.combine(Map.of("key", "value"), Map.of("key", "another value"));
+    assertEquals(Map.of("key", "value"), combined);
   }
 }
