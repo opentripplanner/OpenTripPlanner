@@ -68,6 +68,8 @@ Extra headers to add to the HTTP request fetching the data.
 
 
 
+##### Example configuration
+
 ```JSON
 // router-config.json
 {
@@ -138,6 +140,8 @@ Extra headers to add to the HTTP request fetching the data.
 
 
 
+##### Example configuration
+
 ```JSON
 // router-config.json
 {
@@ -183,6 +187,8 @@ TODO
 
 
 
+##### Example configuration
+
 ```JSON
 // router-config.json
 {
@@ -222,6 +228,8 @@ geographic coordinates or position relative to their scheduled stops.
 Extra headers to add to the HTTP request fetching the data.
 
 
+
+##### Example configuration
 
 ```JSON
 // router-config.json
@@ -315,6 +323,8 @@ What source of vehicle rental updater to use.
 HTTP headers to add to the request. Any header key, value can be inserted.
 
 
+
+##### Example configuration
 
 ```JSON
 // router-config.json
