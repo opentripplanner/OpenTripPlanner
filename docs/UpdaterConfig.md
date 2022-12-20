@@ -48,14 +48,26 @@ Alerts are text messages attached to GTFS objects, informing riders of disruptio
 <!-- real-time-alerts BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter          |    Type   | Summary                  |  Req./Opt. | Default Value | Since |
-|---------------------------|:---------:|--------------------------|:----------:|---------------|:-----:|
-| type = "REAL_TIME_ALERTS" |   `enum`  | The type of the updater. | *Required* |               |   na  |
-| earlyStartSec             | `integer` | TODO                     | *Optional* | `0`           |   na  |
-| feedId                    |  `string` | TODO                     | *Optional* |               |   na  |
-| frequencySec              | `integer` | TODO                     | *Optional* | `60`          |   na  |
-| fuzzyTripMatching         | `boolean` | TODO                     | *Optional* | `false`       |   na  |
-| url                       |  `string` | TODO                     | *Required* |               |   na  |
+| Config Parameter          |       Type      | Summary                                                     |  Req./Opt. | Default Value | Since |
+|---------------------------|:---------------:|-------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "REAL_TIME_ALERTS" |      `enum`     | The type of the updater.                                    | *Required* |               |   na  |
+| earlyStartSec             |    `integer`    | TODO                                                        | *Optional* | `0`           |  1.5  |
+| feedId                    |     `string`    | The id of the feed to apply the alerts to.                  | *Optional* |               |  1.5  |
+| frequencySec              |    `integer`    | How often the URL should be fetched.                        | *Optional* | `60`          |  1.5  |
+| fuzzyTripMatching         |    `boolean`    | Whether to match trips fuzzily.                             | *Optional* | `false`       |  1.5  |
+| url                       |     `string`    | URL to fetch the GTFS-RT feed from.                         | *Required* |               |  1.5  |
+| [headers](#u_0_headers)   | `map of string` | Extra headers to add to the HTTP request fetching the data. | *Optional* |               |  2.3  |
+
+
+#### Details
+
+<h4 id="u_0_headers">headers</h4>
+
+**Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
+**Path:** /updaters/[0] 
+
+Extra headers to add to the HTTP request fetching the data.
+
 
 
 ```JSON
@@ -66,7 +78,10 @@ Alerts are text messages attached to GTFS objects, informing riders of disruptio
       "type" : "real-time-alerts",
       "frequencySec" : 30,
       "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
-      "feedId" : "TriMet"
+      "feedId" : "TriMet",
+      "headers" : {
+        "Authorization" : "A-Token"
+      }
     }
   ]
 
@@ -84,14 +99,15 @@ predicted arrival and departure times for the remainder of the trip.
 <!-- stop-time-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                                      |    Type   | Summary                                             |  Req./Opt. | Default Value        | Since |
-|-----------------------------------------------------------------------|:---------:|-----------------------------------------------------|:----------:|----------------------|:-----:|
-| type = "STOP_TIME_UPDATER"                                            |   `enum`  | The type of the updater.                            | *Required* |                      |   na  |
-| [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled.        | *Optional* | `"required-no-data"` |  2.2  |
-| feedId                                                                |  `string` | Which feed the updates apply to.                    | *Optional* |                      |   na  |
-| frequencySec                                                          | `integer` | How often the data should be downloaded in seconds. | *Optional* | `60`                 |   na  |
-| fuzzyTripMatching                                                     | `boolean` | If the trips should be matched fuzzily.             | *Optional* | `false`              |   na  |
-| url                                                                   |  `string` | The URL of the GTFS-RT resource.                    | *Required* |                      |   na  |
+| Config Parameter                                                      |       Type      | Summary                                                     |  Req./Opt. | Default Value        | Since |
+|-----------------------------------------------------------------------|:---------------:|-------------------------------------------------------------|:----------:|----------------------|:-----:|
+| type = "STOP_TIME_UPDATER"                                            |      `enum`     | The type of the updater.                                    | *Required* |                      |   na  |
+| [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |      `enum`     | How backwards propagation should be handled.                | *Optional* | `"required-no-data"` |  2.2  |
+| feedId                                                                |     `string`    | Which feed the updates apply to.                            | *Optional* |                      |   na  |
+| frequencySec                                                          |    `integer`    | How often the data should be downloaded in seconds.         | *Optional* | `60`                 |  1.5  |
+| fuzzyTripMatching                                                     |    `boolean`    | If the trips should be matched fuzzily.                     | *Optional* | `false`              |  1.5  |
+| url                                                                   |     `string`    | The URL of the GTFS-RT resource.                            | *Required* |                      |  1.5  |
+| [headers](#u__5__headers)                                             | `map of string` | Extra headers to add to the HTTP request fetching the data. | *Optional* |                      |  2.3  |
 
 
 #### Details
@@ -118,6 +134,13 @@ How backwards propagation should be handled.
   The updated times are exposed through APIs.
 
 
+<h4 id="u__5__headers">headers</h4>
+
+**Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
+**Path:** /updaters/[5] 
+
+Extra headers to add to the HTTP request fetching the data.
+
 
 
 ```JSON
@@ -129,7 +152,10 @@ How backwards propagation should be handled.
       "frequencySec" : 60,
       "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
       "url" : "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-      "feedId" : "TriMet"
+      "feedId" : "TriMet",
+      "headers" : {
+        "Authorization" : "A-Token"
+      }
     }
   ]
 
@@ -188,12 +214,24 @@ geographic coordinates or position relative to their scheduled stops.
 <!-- vehicle-positions BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter           |    Type   | Summary                                                                   |  Req./Opt. | Default Value | Since |
-|----------------------------|:---------:|---------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_POSITIONS" |   `enum`  | The type of the updater.                                                  | *Required* |               |   na  |
-| feedId                     |  `string` | Feed ID to which the update should be applied.                            | *Required* |               |  2.2  |
-| frequencySec               | `integer` | How often the positions should be updated.                                | *Optional* | `60`          |  2.2  |
-| url                        |   `uri`   | The URL of GTFS-RT protobuf HTTP resource to download the positions from. | *Required* |               |  2.2  |
+| Config Parameter           |       Type      | Summary                                                                   |  Req./Opt. | Default Value | Since |
+|----------------------------|:---------------:|---------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "VEHICLE_POSITIONS" |      `enum`     | The type of the updater.                                                  | *Required* |               |   na  |
+| feedId                     |     `string`    | Feed ID to which the update should be applied.                            | *Required* |               |  2.2  |
+| frequencySec               |    `integer`    | How often the positions should be updated.                                | *Optional* | `60`          |  2.2  |
+| url                        |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from. | *Required* |               |  2.2  |
+| [headers](#u__6__headers)  | `map of string` | Extra headers to add to the HTTP request fetching the data.               | *Optional* |               |  2.3  |
+
+
+#### Details
+
+<h4 id="u__6__headers">headers</h4>
+
+**Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
+**Path:** /updaters/[6] 
+
+Extra headers to add to the HTTP request fetching the data.
+
 
 
 ```JSON
@@ -204,7 +242,10 @@ geographic coordinates or position relative to their scheduled stops.
       "type" : "vehicle-positions",
       "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
       "feedId" : "1",
-      "frequencySec" : 60
+      "frequencySec" : 60,
+      "headers" : {
+        "Authorization" : "A-Token"
+      }
     }
   ]
 

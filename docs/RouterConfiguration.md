@@ -541,7 +541,10 @@ Http headers.
     "type" : "real-time-alerts",
     "frequencySec" : 30,
     "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
-    "feedId" : "TriMet"
+    "feedId" : "TriMet",
+    "headers" : {
+      "Authorization" : "A-Token"
+    }
   }, {
     "type" : "vehicle-rental",
     "network" : "socialbicycles_coast",
@@ -589,12 +592,18 @@ Http headers.
     "frequencySec" : 60,
     "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
     "url" : "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-    "feedId" : "TriMet"
+    "feedId" : "TriMet",
+    "headers" : {
+      "Authorization" : "A-Token"
+    }
   }, {
     "type" : "vehicle-positions",
     "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
     "feedId" : "1",
-    "frequencySec" : 60
+    "frequencySec" : 60,
+    "headers" : {
+      "Authorization" : "A-Token"
+    }
   }, {
     "type" : "websocket-gtfs-rt-updater"
   }, {
