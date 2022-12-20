@@ -715,7 +715,7 @@ type QueryType {
     dateTime: DateTime,
     "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters."
     debugItineraryFilter: Boolean = false,
-    "TODO"
+    "A list of filters for which trips should be included. A trip will be included if it matches with at least one filter. An empty list of filters means that all trips should be included. If a search include this parameter, \"whiteListed\", \"banned\" & \"modes.transportModes\" filters will be ignored."
     filters: [TripFilterInput],
     "The start location"
     from: Location!,
@@ -1756,20 +1756,18 @@ input TriangleFactors {
   time: Float!
 }
 
-"List of filters that should be applied on the search. A trip or line has to match with with at least one filter in order to be included in search. Not specifying any filters means that everything should be included. If a search include this parameter, \"whiteListed\", \"banned\" & \"modes.transportModes\" filters will be ignored."
+"A collection of selectors for what lines/trips should be included in / excluded from search"
 input TripFilterInput {
-  "Combination of exclude-lists for which lines/trips should be excluded. In order to be accepted trip/lines cannot match with any exclude-list."
+  "A list of selectors for what lines/trips should be excluded during the search. If line/trip matches with at least one selector it will be excluded."
   not: [TripFilterSelectInput]
-  "Combination of allow-lists for which lines/trips should be included. In order to be accepted trip/line has to match with all allow-lists. An empty list means allow all."
+  "A list of selectors for what lines/trips should be allowed during search. I order to be accepted a trip/line has to match with at least one selector.An empty list means that everything should be allowed. "
   select: [TripFilterSelectInput]
 }
 
-"A list of selectors for filter allow-list / exclude-list"
+"A list of selectors for filter allow-list / exclude-list. An empty list means that everything is allowed. A trip/line will match with selectors if it matches with all non-empty lists."
 input TripFilterSelectInput {
   "Set of ids for authorities that should be included in/excluded from search"
   authorities: [ID] = []
-  "Set of ids for feeds that should be should be included in/excluded from search"
-  feeds: [String!] = []
   "Set of ids for lines that should be included in/excluded from search"
   lines: [ID] = []
   "Set of ids for service journeys that should be included in/excluded from search"
