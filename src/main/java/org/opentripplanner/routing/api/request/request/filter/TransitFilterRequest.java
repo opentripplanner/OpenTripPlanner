@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
@@ -54,13 +55,19 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
   @Override
   public boolean isSubModePredicate() {
     for (var selectRequest : select) {
-      if (selectRequest.transportModes() != null && selectRequest.transportModes().isSubMode()) {
+      if (
+        selectRequest.transportModeFilter() != null &&
+        selectRequest.transportModeFilter().isSubMode()
+      ) {
         return true;
       }
     }
 
     for (var selectRequest : not) {
-      if (selectRequest.transportModes() != null && selectRequest.transportModes().isSubMode()) {
+      if (
+        selectRequest.transportModeFilter() != null &&
+        selectRequest.transportModeFilter().isSubMode()
+      ) {
         return true;
       }
     }
@@ -113,5 +120,14 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
     }
 
     return true;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TransitFilterRequest.class)
+      .addCol("select", select)
+      .addCol("not", not)
+      .toString();
   }
 }
