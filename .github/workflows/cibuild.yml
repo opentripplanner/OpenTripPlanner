@@ -45,7 +45,7 @@ jobs:
 
       - name: Send coverage data to codecov.io
         if: github.repository_owner == 'opentripplanner' && matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v3.1.1
         with:
           files: target/site/jacoco/jacoco.xml
 
