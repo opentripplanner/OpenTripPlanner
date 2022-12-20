@@ -1,8 +1,10 @@
 package org.opentripplanner.framework.collection;
 
+import com.google.common.collect.Lists;
 import gnu.trove.map.TLongObjectMap;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +33,19 @@ public class MapUtils {
     return entities == null ? null : entities.stream().map(mapper).collect(Collectors.toList());
   }
 
+  /**
+   * Takes a list of maps and returns the union of all of them.
+   * <p>
+   * If there are duplicate keys then the one from the earlier argument overwrites the value in a
+   * later argument.
+   */
   @SafeVarargs
   public static <K, V> Map<K, V> combine(Map<K, V>... maps) {
-    var entries = Arrays.stream(maps).flatMap(m -> m.entrySet().stream()).toArray(Map.Entry[]::new);
-    return Map.ofEntries(entries);
+    var ret = new HashMap<K, V>();
+    var entries = Arrays.stream(maps).flatMap(m -> m.entrySet().stream()).toList();
+    // we reverse the entries so that if there are duplicate keys, the earlier method arguments take precedence
+    var reversed = Lists.reverse(entries);
+    reversed.forEach(kv -> ret.put(kv.getKey(), kv.getValue()));
+    return Map.copyOf(ret);
   }
 }
