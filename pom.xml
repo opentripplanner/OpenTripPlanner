@@ -669,7 +669,7 @@
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>2.3.3-SNAPSHOT</version>
+            <version>3.0.0</version>
         </dependency>
 
         <!--
