@@ -2,6 +2,5 @@ coverage:
   status:
     project: off
     patch: off
-    changed: off
 github_checks:
   annotations: false
