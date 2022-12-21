@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
-import static org.opentripplanner.ext.fares.impl.DefaultFareService.getMoney;
-
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -36,7 +35,6 @@ public class OrcaFareServiceImpl extends DefaultFareService {
   public static final String KITSAP_TRANSIT_AGENCY_ID = "kt";
   public static final int ROUTE_TYPE_FERRY = 4;
 
-
   public enum RideType {
     COMM_TRANS_LOCAL_SWIFT,
     COMM_TRANS_COMMUTER_EXPRESS,
@@ -62,6 +60,136 @@ public class OrcaFareServiceImpl extends DefaultFareService {
   private static final Map<String, Map<FareType, Float>> washingtonStateFerriesFares = new HashMap<>();
   private static final Map<String, Map<FareType, Float>> soundTransitLinkFares = new HashMap<>();
   private static final Map<String, Map<FareType, Float>> soundTransitSounderFares = new HashMap<>();
+
+  static {
+    classificationStrategy.put(
+      COMM_TRANS_AGENCY_ID,
+      routeData -> {
+        try {
+          int routeId = Integer.parseInt(routeData.getShortName());
+          if (routeId >= 500 && routeId < 600) {
+            return RideType.SOUND_TRANSIT_BUS; // CommTrans operates some ST routes.
+          }
+          if (routeId >= 400 && routeId <= 899) {
+            return RideType.COMM_TRANS_COMMUTER_EXPRESS;
+          }
+          return RideType.COMM_TRANS_LOCAL_SWIFT;
+        } catch (NumberFormatException e) {
+          LOG.warn("Unable to determine comm trans route id from {}.", routeData.getShortName(), e);
+          return RideType.COMM_TRANS_LOCAL_SWIFT;
+        }
+      }
+    );
+    classificationStrategy.put(
+      KC_METRO_AGENCY_ID,
+      routeData -> {
+        try {
+          int routeId = Integer.parseInt(routeData.getShortName());
+          if (routeId >= 500 && routeId < 600) {
+            return RideType.SOUND_TRANSIT_BUS;
+          }
+        } catch(NumberFormatException ignored) {
+          // Lettered routes exist, are not an error.
+        }
+
+        if (
+          routeData.getGtfsType() == ROUTE_TYPE_FERRY &&
+            routeData.getLongName().toString().contains("Water Taxi: West Seattle")
+        ) {
+          return RideType.KC_WATER_TAXI_WEST_SEATTLE;
+        } else if (
+          routeData.getGtfsType() == ROUTE_TYPE_FERRY &&
+            routeData.getDescription().contains("Water Taxi: Vashon Island")
+        ) {
+          return RideType.KC_WATER_TAXI_VASHON_ISLAND;
+        }
+        return RideType.KC_METRO;
+      }
+    );
+    classificationStrategy.put(SOUND_TRANSIT_AGENCY_ID, routeData -> RideType.SOUND_TRANSIT);
+    classificationStrategy.put(EVERETT_TRANSIT_AGENCY_ID, routeData -> RideType.EVERETT_TRANSIT);
+    classificationStrategy.put(
+      PIERCE_COUNTY_TRANSIT_AGENCY_ID,
+      routeData -> {
+        try {
+          int routeId = Integer.parseInt(routeData.getShortName());
+          if (routeId >= 520 && routeId < 600) {
+            // PierceTransit operates some ST routes. But 500 and 501 are PT routes.
+            return RideType.SOUND_TRANSIT_BUS;
+          }
+          return RideType.PIERCE_COUNTY_TRANSIT;
+        } catch (NumberFormatException e) {
+          LOG.warn("Unable to determine comm trans route id from {}.", routeData.getShortName(), e);
+          return RideType.PIERCE_COUNTY_TRANSIT;
+        }
+      }
+    );
+    classificationStrategy.put(SKAGIT_TRANSIT_AGENCY_ID, routeData -> RideType.SKAGIT_TRANSIT);
+    classificationStrategy.put(SEATTLE_STREET_CAR_AGENCY_ID, routeData -> RideType.SEATTLE_STREET_CAR);
+    classificationStrategy.put(WASHINGTON_STATE_FERRIES_AGENCY_ID, routeData -> RideType.WASHINGTON_STATE_FERRIES);
+    classificationStrategy.put(KITSAP_TRANSIT_AGENCY_ID, routeData -> RideType.KITSAP_TRANSIT);
+
+    // Spaces have been removed from the route name because of inconsistencies in the WSF GTFS route dataset.
+    washingtonStateFerriesFares.put(
+      "Seattle-BainbridgeIsland",
+      ImmutableMap.of(FareType.regular, 9.25f, FareType.senior, 4.60f)
+    );
+    washingtonStateFerriesFares.put(
+      "Seattle-Bremerton",
+      ImmutableMap.of(FareType.regular, 9.25f, FareType.senior, 4.60f)
+    );
+    washingtonStateFerriesFares.put(
+      "Mukilteo-Clinton",
+      ImmutableMap.of(FareType.regular, 5.65f, FareType.senior, 2.80f)
+    );
+    washingtonStateFerriesFares.put(
+      "Fauntleroy-VashonIsland",
+      ImmutableMap.of(FareType.regular, 6.10f, FareType.senior, 3.05f)
+    );
+    washingtonStateFerriesFares.put(
+      "Fauntleroy-Southworth",
+      ImmutableMap.of(FareType.regular, 7.20f, FareType.senior, 3.60f)
+    );
+    washingtonStateFerriesFares.put(
+      "Edmonds-Kingston",
+      ImmutableMap.of(FareType.regular, 9.25f, FareType.senior, 4.60f)
+    );
+    washingtonStateFerriesFares.put(
+      "PointDefiance-Tahlequah",
+      ImmutableMap.of(FareType.regular, 6.10f, FareType.senior, 3.05f)
+    );
+    washingtonStateFerriesFares.put(
+      "Anacortes-FridayHarbor",
+      ImmutableMap.of(FareType.regular, 14.85f, FareType.senior, 7.40f)
+    );
+    washingtonStateFerriesFares.put(
+      "Anacortes-LopezIsland",
+      ImmutableMap.of(FareType.regular, 14.85f, FareType.senior, 7.40f)
+    );
+    washingtonStateFerriesFares.put(
+      "Anacortes-OrcasIsland",
+      ImmutableMap.of(FareType.regular, 14.85f, FareType.senior, 7.40f)
+    );
+    washingtonStateFerriesFares.put(
+      "Anacortes-ShawIsland",
+      ImmutableMap.of(FareType.regular, 14.85f, FareType.senior, 7.40f)
+    );
+    washingtonStateFerriesFares.put(
+      "Coupeville-PortTownsend",
+      ImmutableMap.of(FareType.regular, 3.85f, FareType.senior, 1.90f)
+    );
+    washingtonStateFerriesFares.put(
+      "PortTownsend-Coupeville",
+      ImmutableMap.of(FareType.regular, 3.85f, FareType.senior, 1.90f)
+    );
+    washingtonStateFerriesFares.put(
+      "Southworth-VashonIsland",
+      ImmutableMap.of(FareType.regular, 6.10f, FareType.senior, 3.05f)
+    );
+
+    OrcaSoundTransitLinkFares.populateLinkFares(soundTransitLinkFares);
+    OrcaSoundTransitSounderFares.populateSounderFares(soundTransitSounderFares);
+  }
 
   // If set to true, the test ride price is used instead of the actual agency cash fare.
   public boolean IS_TEST;
