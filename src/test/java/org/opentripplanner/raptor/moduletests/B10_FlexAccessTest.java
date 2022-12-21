@@ -7,7 +7,6 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,7 @@ import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
@@ -66,7 +66,7 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
     requestBuilder.searchParams().earliestDepartureTime(T00_00).latestArrivalTime(T00_30);
 
     // We will test board- and alight-slack in a separate test
-    requestBuilder.slackProvider(defaultSlackProvider(TRANSFER_SLACK, 0, 0));
+    requestBuilder.slackProvider(new DefaultSlackProvider(TRANSFER_SLACK, 0, 0));
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }

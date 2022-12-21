@@ -10,7 +10,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.PathBuilder;
 import org.opentripplanner.raptor.spi.CostCalculator;
-import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 
 /**
@@ -112,7 +112,7 @@ public class TestPathBuilder {
     this.builder =
       PathBuilder.tailPathBuilder(
         null,
-        RaptorSlackProvider.defaultSlackProvider(0, 0, alightSlack),
+        new DefaultSlackProvider(0, 0, alightSlack),
         costCalculator,
         RaptorStopNameResolver.nullSafe(null)
       );

@@ -9,7 +9,6 @@ import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule
 import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
-import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -22,6 +21,7 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 
 /**
  * FEATURE UNDER TEST
@@ -78,7 +78,7 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
       .searchOneIterationOnly();
 
     // We will test board- and alight-slack in a separate test
-    requestBuilder.slackProvider(defaultSlackProvider(D1m, D0s, D0s));
+    requestBuilder.slackProvider(new DefaultSlackProvider(D1m, D0s, D0s));
 
     requestBuilder
       .searchParams()
