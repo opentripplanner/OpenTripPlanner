@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import java.util.Collection;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.StopArrivals;
 
 /**
@@ -31,7 +31,7 @@ public class HeuristicSearch<T extends RaptorTripSchedule> implements Worker<T> 
   }
 
   @Override
-  public Collection<Path<T>> paths() {
+  public Collection<RaptorPath<T>> paths() {
     return worker.paths();
   }
 

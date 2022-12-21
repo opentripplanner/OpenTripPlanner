@@ -35,7 +35,7 @@ import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
  * The {@code PathBuilder} can be extended to override specific things. The {@link
  * org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail} does this to
  * be able to create {@link org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath}
- * instead of regular {@link Path} objects.
+ * instead of regular {@link RaptorPath} objects.
  */
 public abstract class PathBuilder<T extends RaptorTripSchedule> {
 
@@ -144,7 +144,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     add(PathBuilderLeg.egress(egress));
   }
 
-  public Path<T> build(int iterationDepartureTime) {
+  public RaptorPath<T> build(int iterationDepartureTime) {
     updateAggregatedFields();
     return new Path<>(iterationDepartureTime, createPathLegs(costCalculator, slackProvider));
   }

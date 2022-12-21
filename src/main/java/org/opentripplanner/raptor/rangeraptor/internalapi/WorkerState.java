@@ -5,7 +5,7 @@ import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.StopArrivals;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorker;
 import org.opentripplanner.raptor.spi.IntIterator;
@@ -62,7 +62,7 @@ public interface WorkerState<T extends RaptorTripSchedule> {
    *
    * @return return all paths found in the search.
    */
-  Collection<Path<T>> extractPaths();
+  Collection<RaptorPath<T>> extractPaths();
 
   /**
    * Get arrival statistics for each stop reached in the search.

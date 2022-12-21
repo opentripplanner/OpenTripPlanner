@@ -7,6 +7,7 @@ import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 
@@ -24,7 +25,7 @@ public class OptimizedPath<T extends RaptorTripSchedule>
   private final int waitTimeOptimizedCost;
   private final int breakTieCost;
 
-  public OptimizedPath(Path<T> originalPath) {
+  public OptimizedPath(RaptorPath<T> originalPath) {
     this(
       originalPath.accessLeg(),
       originalPath.rangeRaptorIterationDepartureTime(),
@@ -94,7 +95,7 @@ public class OptimizedPath<T extends RaptorTripSchedule>
     return toString(null);
   }
 
-  private static int priorityCost(Path<?> path) {
+  private static int priorityCost(RaptorPath<?> path) {
     return path.legStream().mapToInt(OptimizedPath::priorityCost).sum();
   }
 

@@ -8,6 +8,7 @@ import org.opentripplanner.framework.logging.ThrottleLogger;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -32,8 +33,8 @@ import org.slf4j.LoggerFactory;
  * paths with respect to <em>arrival time</em>, <em>rounds</em> and <em>travel duration</em> are
  * found. You may also add <em>cost</em> as a criteria (multi-criteria search).
  * <p/>
- * This class is a thin wrapper around a ParetoSet of {@link Path}s. Before paths are added the
- * arrival time is checked against the arrival time limit.
+ * This class is a thin wrapper around a ParetoSet of {@link RaptorPath}s. Before paths are added
+ * the arrival time is checked against the arrival time limit.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -42,7 +43,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private static final Logger LOG = LoggerFactory.getLogger(DestinationArrivalPaths.class);
   private static final Logger LOG_MISS_MATCH = ThrottleLogger.throttle(LOG);
 
-  private final ParetoSet<Path<T>> paths;
+  private final ParetoSet<RaptorPath<T>> paths;
   private final TransitCalculator<T> transitCalculator;
 
   @Nullable
@@ -50,13 +51,13 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
   private final SlackProvider slackProvider;
   private final PathMapper<T> pathMapper;
-  private final DebugHandler<Path<?>> debugPathHandler;
+  private final DebugHandler<RaptorPath<?>> debugPathHandler;
   private final RaptorStopNameResolver stopNameResolver;
   private boolean reachedCurrentRound = false;
   private int iterationDepartureTime = -1;
 
   public DestinationArrivalPaths(
-    ParetoComparator<Path<T>> paretoComparator,
+    ParetoComparator<RaptorPath<T>> paretoComparator,
     TransitCalculator<T> transitCalculator,
     @Nullable CostCalculator<T> costCalculator,
     SlackProvider slackProvider,
@@ -87,7 +88,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     if (transitCalculator.exceedsTimeLimit(destArrival.arrivalTime())) {
       debugRejectByTimeLimitOptimization(destArrival);
     } else {
-      Path<T> path = pathMapper.mapToPath(destArrival);
+      RaptorPath<T> path = pathMapper.mapToPath(destArrival);
 
       assertGeneralizedCostIsCalculatedCorrectByMapper(destArrival, path);
 
@@ -119,7 +120,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     );
   }
 
-  public Collection<Path<T>> listPaths() {
+  public Collection<RaptorPath<T>> listPaths() {
     return paths;
   }
 
@@ -200,7 +201,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
    */
   private void assertGeneralizedCostIsCalculatedCorrectByMapper(
     DestinationArrival<T> destArrival,
-    Path<T> path
+    RaptorPath<T> path
   ) {
     if (path.generalizedCost() != destArrival.cost()) {
       // TODO - Bug: Cost mismatch stop-arrivals and paths #3623

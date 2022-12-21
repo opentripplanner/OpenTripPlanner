@@ -5,7 +5,7 @@ import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds
 import java.util.Collection;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
@@ -94,8 +94,8 @@ public class MinSafeTransferTimeCalculator<T extends RaptorTripSchedule> {
     );
   }
 
-  public int minSafeTransferTime(Collection<Path<T>> paths) {
-    ToIntFunction<Path<T>> totalTransitTimeOp = p ->
+  public int minSafeTransferTime(Collection<RaptorPath<T>> paths) {
+    ToIntFunction<RaptorPath<T>> totalTransitTimeOp = p ->
       p.transitLegs().mapToInt(this::durationIncludingSlack).sum();
 
     return minSafeTransferTimeOp(paths, totalTransitTimeOp);

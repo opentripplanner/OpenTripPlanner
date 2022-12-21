@@ -19,7 +19,7 @@ import org.opentripplanner.raptor._data.transit.TestRoute;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
@@ -62,7 +62,7 @@ public class RaptorPathToItineraryMapperTest {
     // Arrange
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
-    Path<TestTripSchedule> path = getTestTripSchedulePath(getTestTripSchedule())
+    RaptorPath<TestTripSchedule> path = getTestTripSchedulePath(getTestTripSchedule())
       .egress(
         TestAccessEgress.zeroDurationAccess(2, RaptorCostConverter.toRaptorCost(LAST_LEG_COST))
       );

@@ -18,8 +18,8 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.debug.DebugTopic;
-import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.PatternRideView;
@@ -92,14 +92,14 @@ public class SystemErrDebugLogger implements DebugLogger {
    * This should be passed into the {@link DebugRequestBuilder#pathFilteringListener(Consumer)}
    * using a lambda to enable debugging paths put in the final result pareto-set.
    */
-  public void pathFilteringListener(DebugEvent<Path<?>> e) {
+  public void pathFilteringListener(DebugEvent<RaptorPath<?>> e) {
     if (printPathHeader) {
       System.err.println();
       System.err.println(pathTable.headerRow());
       printPathHeader = false;
     }
 
-    Path<?> p = e.element();
+    RaptorPath<?> p = e.element();
     System.err.println(
       pathTable.rowAsText(
         e.action().toString(),

@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.path;
 
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.PathBuilder;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
@@ -42,7 +42,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
   }
 
   @Override
-  public Path<T> mapToPath(final DestinationArrival<T> destinationArrival) {
+  public RaptorPath<T> mapToPath(final DestinationArrival<T> destinationArrival) {
     var pathBuilder = PathBuilder.headPathBuilder(
       transferConstraintsSearch,
       slackProvider,

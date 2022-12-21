@@ -28,7 +28,7 @@ import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 
 public class PathTest implements RaptorTestConstants {
 
-  private final Path<TestTripSchedule> subject = BasicPathTestCase.basicTripAsPath();
+  private final RaptorPath<TestTripSchedule> subject = BasicPathTestCase.basicTripAsPath();
 
   @Test
   public void rangeRaptorIterationDepartureTime() {
@@ -137,9 +137,9 @@ public class PathTest implements RaptorTestConstants {
     var p4 = Path.dummyPath(0, 10, 20, 10, 9);
 
     // Order: < EndTime, > StartTime, < Cost, < Transfers
-    List<Path<?>> expected = List.of(p2, p1, p4, p3, p0);
+    List<RaptorPath<?>> expected = List.of(p2, p1, p4, p3, p0);
 
-    List<Path<?>> paths = Stream.of(p4, p3, p2, p1, p0).sorted().collect(Collectors.toList());
+    List<RaptorPath<?>> paths = Stream.of(p4, p3, p2, p1, p0).sorted().collect(Collectors.toList());
 
     assertEquals(expected, paths);
   }
@@ -188,7 +188,7 @@ public class PathTest implements RaptorTestConstants {
       access.generalizedCost(),
       leg2.asTransitLeg()
     );
-    Path<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST);
+    RaptorPath<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST);
     assertEquals(0, path.numberOfTransfers());
   }
 
@@ -230,7 +230,7 @@ public class PathTest implements RaptorTestConstants {
       access.generalizedCost(),
       leg2.asTransitLeg()
     );
-    Path<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST);
+    RaptorPath<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST);
     assertEquals(1, path.numberOfTransfers());
   }
 }
