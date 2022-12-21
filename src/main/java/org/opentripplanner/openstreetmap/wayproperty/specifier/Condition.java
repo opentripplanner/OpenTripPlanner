@@ -13,15 +13,6 @@ public sealed interface Condition {
       return MatchResult.WILDCARD;
     } else if (way.matchesKeyValue(opKey, opValue)) {
       return EXACT;
-    } else if (opValue.contains(":")) {
-      // treat cases like cobblestone:flattened as cobblestone if a more-specific match
-      // does not apply
-      var splitValue = opValue.split(":", 2)[0];
-      if (way.matchesKeyValue(opKey, splitValue)) {
-        return MatchResult.PREFIX;
-      } else {
-        return NONE;
-      }
     } else {
       return NONE;
     }
@@ -61,7 +52,6 @@ public sealed interface Condition {
 
   enum MatchResult {
     EXACT,
-    PREFIX,
     WILDCARD,
     NONE;
 

@@ -1,10 +1,8 @@
 package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.cobblestones;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.cyclewayLaneTrack;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.cyclewayLeft;
-import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.flattenedCobblestones;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -24,10 +22,6 @@ class BestMatchSpecifierTest extends SpecifierTest {
   static OsmSpecifier regularCobblestones = new BestMatchSpecifier(
     "highway=residential;surface=cobblestones"
   );
-  static OsmSpecifier cobblestonesFlattened = new BestMatchSpecifier(
-    "highway=residential;surface=cobblestones:flattened"
-  );
-
   static OsmSpecifier cyclewayTrack = new BestMatchSpecifier("highway=footway;cycleway=track");
   static OsmSpecifier highwayFootwayCyclewayLane = new BestMatchSpecifier(
     "highway=footway;cycleway=lane"
@@ -55,21 +49,6 @@ class BestMatchSpecifierTest extends SpecifierTest {
     var result = bikeLane.matchScores(way);
     assertEquals(210, result.left());
     assertEquals(100, result.right());
-  }
-
-  static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(flattenedCobblestones(), regularCobblestones, 100),
-    Arguments.of(flattenedCobblestones(), cobblestonesFlattened, 210),
-    Arguments.of(cobblestones(), regularCobblestones, 210),
-    Arguments.of(cobblestones(), cobblestonesFlattened, 185)
-  );
-
-  @ParameterizedTest(name = "way {0} with specifier {1} should have a score of {2}")
-  @VariableSource("testCases")
-  void cobblestonesFlattened(OSMWithTags way, OsmSpecifier spec, int expectedScore) {
-    var result = spec.matchScores(way);
-    assertEquals(expectedScore, result.left());
-    assertEquals(expectedScore, result.right());
   }
 
   static Stream<Arguments> leftRightTestCases = Stream.of(
