@@ -8,9 +8,11 @@ import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.HeuristicTrip;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
@@ -71,6 +73,11 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
   @Override
   public RaptorTripScheduleSearch<TestTripSchedule> tripSearch(SearchDirection direction) {
     return TripScheduleSearchFactory.create(direction, new TestTripSearchTimetable(this));
+  }
+
+  @Override
+  public RaptorTripSchedule getHeuristicTrip() {
+    return HeuristicTrip.of(schedules);
   }
 
   public List<TestConstrainedTransfer> listTransferConstraintsForwardSearch() {

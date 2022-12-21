@@ -2,15 +2,18 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.BitSet;
 import java.util.function.IntUnaryOperator;
+import org.opentripplanner.framework.lang.ArrayUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.IntIterators;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.HeuristicTrip;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyAlightSearch;
@@ -59,6 +62,7 @@ public class TripPatternForDates
   // potentially filtered by wheelchair accessibility
   private final BitSet boardingPossible;
   private final BitSet alightingPossible;
+  private final HeuristicTrip heuristicTrip;
 
   TripPatternForDates(
     RoutingTripPattern tripPattern,
@@ -72,6 +76,10 @@ public class TripPatternForDates
     this.offsets = offsets;
     this.boardingPossible = boardingPossible;
     this.alightingPossible = alightningPossible;
+    this.heuristicTrip =
+      ArrayUtils.allValuesEquals(tripPatternForDates, TripPatternForDate::heuristicTrip)
+        ? tripPatternForDates[0].heuristicTrip()
+        : HeuristicTrip.of(tripPatternForDates);
 
     int numberOfTripSchedules = 0;
     boolean hasFrequencies = false;
@@ -220,6 +228,11 @@ public class TripPatternForDates
   @Override
   public int numberOfTripSchedules() {
     return numberOfTripSchedules;
+  }
+
+  @Override
+  public RaptorTripSchedule getHeuristicTrip() {
+    return heuristicTrip;
   }
 
   @Override
