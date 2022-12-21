@@ -15,9 +15,9 @@ import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.framework.text.TableBuilder;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.PathLeg;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.routing.util.DiffTool;
 

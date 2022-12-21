@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.spi;
 
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+
 /**
  * The purpose of the TripScheduleSearch is to search for a trip schedule for a given pattern.
  * The search need to be optimized for speed, this is one of the most frequently called

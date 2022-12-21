@@ -2,6 +2,9 @@ package org.opentripplanner.raptor.spi;
 
 import java.util.Iterator;
 import javax.annotation.Nonnull;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 
 /**

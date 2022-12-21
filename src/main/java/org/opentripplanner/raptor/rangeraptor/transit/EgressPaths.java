@@ -7,8 +7,8 @@ import gnu.trove.map.TIntObjectMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 
 public class EgressPaths {
 

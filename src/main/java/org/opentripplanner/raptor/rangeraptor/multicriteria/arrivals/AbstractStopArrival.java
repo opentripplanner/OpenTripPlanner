@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**

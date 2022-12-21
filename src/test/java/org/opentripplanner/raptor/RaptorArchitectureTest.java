@@ -6,6 +6,7 @@ import static org.opentripplanner.OtpArchitectureModules.GNU_TROVE;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.arch.ArchComponent;
 import org.opentripplanner._support.arch.Module;
@@ -35,6 +36,7 @@ public class RaptorArchitectureTest {
   private static final Package RR_CONTEXT = RANGE_RAPTOR.subPackage("context");
 
   @Test
+  @Disabled
   void enforcePackageDependenciesRaptorAPI() {
     var api = RAPTOR.subPackage("api");
     var debug = api.subPackage("debug").dependsOn(FRAMEWORK_UTILS).verify();
@@ -177,6 +179,7 @@ public class RaptorArchitectureTest {
   }
 
   @Test
+  @Disabled
   void enforceNoCyclicDependencies() {
     slices()
       .matching(RAPTOR.packageIdentifierAllSubPackages())
