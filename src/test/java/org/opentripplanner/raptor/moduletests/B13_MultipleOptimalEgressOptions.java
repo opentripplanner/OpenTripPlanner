@@ -74,14 +74,15 @@ public class B13_MultipleOptimalEgressOptions implements RaptorTestConstants {
       route("R1", STOP_A, STOP_C).withTimetable(schedule("0:04 0:20")),
       route("R2", STOP_A, STOP_B).withTimetable(schedule("0:05 0:16"))
     );
+
+    // We will test board- and alight-slack in a separate test
+    data.withSlackProvider(new DefaultSlackProvider(D1m, D0s, D0s));
+
     requestBuilder
       .searchParams()
       .earliestDepartureTime(T00_00)
       .searchWindowInSeconds(D20m)
       .latestArrivalTime(T00_30);
-
-    // We will test board- and alight-slack in a separate test
-    requestBuilder.slackProvider(new DefaultSlackProvider(D1m, D0s, D0s));
 
     requestBuilder.searchParams().addAccessPaths(TestAccessEgress.walk(STOP_A, D0s));
 

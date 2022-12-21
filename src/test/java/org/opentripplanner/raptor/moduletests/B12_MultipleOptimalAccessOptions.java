@@ -71,14 +71,14 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
       route("L2", STOP_C, STOP_E).withTimetable(schedule("0:15 0:20")),
       route("L3", STOP_D, STOP_F).withTimetable(schedule("0:16 0:22"))
     );
+    // We will test board- and alight-slack in a separate test
+    data.withSlackProvider(new DefaultSlackProvider(D1m, D0s, D0s));
+
     requestBuilder
       .searchParams()
       .earliestDepartureTime(T00_02)
       .latestArrivalTime(T00_30)
       .searchOneIterationOnly();
-
-    // We will test board- and alight-slack in a separate test
-    requestBuilder.slackProvider(new DefaultSlackProvider(D1m, D0s, D0s));
 
     requestBuilder
       .searchParams()

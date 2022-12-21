@@ -47,7 +47,7 @@ public class C03_OnStreetTransfersTest implements RaptorTestConstants {
   @BeforeEach
   public void setup() {
     //Given slack: transfer 1m, board 30s, alight 10s
-    requestBuilder.slackProvider(new DefaultSlackProvider(D30s, 0, 0));
+    data.withSlackProvider(new DefaultSlackProvider(D30s, 0, 0));
 
     data.withRoute(
       route(pattern("R1", STOP_B, STOP_C))

@@ -68,7 +68,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
     // Make sure the slack have values which prevent the normal from happening transfer.
     // The test scenario have zero seconds to transfer, so any slack will do.
-    requestBuilder.slackProvider(new DefaultSlackProvider(30, 20, 10));
+    data.withSlackProvider(new DefaultSlackProvider(30, 20, 10));
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }

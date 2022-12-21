@@ -126,11 +126,11 @@ public class SearchContext<T extends RaptorTripSchedule> {
    * including transfer-slack into board-slack between transits.
    */
   public SlackProvider slackProvider() {
-    return createSlackProvider(request, lifeCycle());
+    return createSlackProvider(searchDirection(), raptorSlackProvider(), lifeCycle());
   }
 
   public RaptorSlackProvider raptorSlackProvider() {
-    return request.slackProvider();
+    return transit.slackProvider();
   }
 
   /**
@@ -141,7 +141,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
    * Unit: seconds.
    */
   public ToIntFunction<RaptorTripPattern> boardSlackProvider() {
-    return createBoardSlackProvider(request);
+    return createBoardSlackProvider(searchDirection(), raptorSlackProvider());
   }
 
   @Nullable
@@ -259,20 +259,22 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   private static SlackProvider createSlackProvider(
-    RaptorRequest<?> request,
+    SearchDirection searchDirection,
+    RaptorSlackProvider slackProvider,
     WorkerLifeCycle lifeCycle
   ) {
-    return request.searchDirection().isForward()
-      ? SlackProviderAdapter.forwardSlackProvider(request.slackProvider(), lifeCycle)
-      : SlackProviderAdapter.reverseSlackProvider(request.slackProvider(), lifeCycle);
+    return searchDirection.isForward()
+      ? SlackProviderAdapter.forwardSlackProvider(slackProvider, lifeCycle)
+      : SlackProviderAdapter.reverseSlackProvider(slackProvider, lifeCycle);
   }
 
   private static ToIntFunction<RaptorTripPattern> createBoardSlackProvider(
-    RaptorRequest<?> request
+    SearchDirection searchDirection,
+    RaptorSlackProvider slackProvider
   ) {
-    return request.searchDirection().isForward()
-      ? p -> request.slackProvider().boardSlack(p.slackIndex())
-      : p -> request.slackProvider().alightSlack(p.slackIndex());
+    return searchDirection.isForward()
+      ? p -> slackProvider.boardSlack(p.slackIndex())
+      : p -> slackProvider.alightSlack(p.slackIndex());
   }
 
   private static AccessPaths accessPaths(RaptorRequest<?> request) {
