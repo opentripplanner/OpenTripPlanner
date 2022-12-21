@@ -4,7 +4,7 @@ import java.util.Collection;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.StopArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -146,7 +146,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
   }
 
   @Override
-  public Collection<Path<T>> paths() {
+  public Collection<RaptorPath<T>> paths() {
     return state.extractPaths();
   }
 

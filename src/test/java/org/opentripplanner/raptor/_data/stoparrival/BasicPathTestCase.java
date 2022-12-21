@@ -21,6 +21,7 @@ import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.PathLeg;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -267,7 +268,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
    * Both {@link #basicTripByForwardSearch()} and {@link #basicTripByReverseSearch()} should return
    * the same trip, here returned as a path.
    */
-  public static Path<TestTripSchedule> basicTripAsPath() {
+  public static RaptorPath<TestTripSchedule> basicTripAsPath() {
     PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(
       EGRESS,
       EGRESS_START,
@@ -311,7 +312,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, TOTAL_COST);
   }
 
-  public static Path<TestTripSchedule> flexTripAsPath() {
+  public static RaptorPath<TestTripSchedule> flexTripAsPath() {
     PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(
       FLEX,
       EGRESS_START,

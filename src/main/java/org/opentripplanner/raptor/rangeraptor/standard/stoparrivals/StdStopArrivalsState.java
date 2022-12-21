@@ -5,7 +5,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 
@@ -64,7 +64,7 @@ public final class StdStopArrivalsState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public Collection<Path<T>> extractPaths() {
+  public Collection<RaptorPath<T>> extractPaths() {
     return results.listPaths();
   }
 

@@ -12,7 +12,7 @@ import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparato
 
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -59,7 +59,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
     );
   }
 
-  private ParetoComparator<Path<T>> paretoComparator(boolean includeCost) {
+  private ParetoComparator<RaptorPath<T>> paretoComparator(boolean includeCost) {
     double relaxedCost = ctx.searchParams().relaxCostAtDestination();
     boolean includeRelaxedCost = includeCost && relaxedCost > 0.0;
     boolean includeTimetable = ctx.searchParams().timetableEnabled();

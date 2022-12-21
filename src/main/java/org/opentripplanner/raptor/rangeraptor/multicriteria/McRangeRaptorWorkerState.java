@@ -7,7 +7,7 @@ import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.StopArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
@@ -113,7 +113,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public Collection<Path<T>> extractPaths() {
+  public Collection<RaptorPath<T>> extractPaths() {
     arrivals.debugStateInfo();
     return paths.listPaths();
   }

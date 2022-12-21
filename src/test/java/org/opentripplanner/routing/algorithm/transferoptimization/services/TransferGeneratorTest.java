@@ -24,7 +24,7 @@ import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
@@ -382,7 +382,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m));
 
-    final Path<TestTripSchedule> path = pathBuilder
+    final RaptorPath<TestTripSchedule> path = pathBuilder
       .access(ACCESS_START, ACCESS_DURATION, STOP_A)
       .bus(l1.getTripSchedule(0), STOP_C)
       .walk(D1m, STOP_D)
@@ -415,7 +415,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m));
 
-    final Path<TestTripSchedule> path = pathBuilder
+    final RaptorPath<TestTripSchedule> path = pathBuilder
       .access(ACCESS_START, ACCESS_DURATION, STOP_A)
       .bus(l1.getTripSchedule(0), STOP_C)
       .walk(D1m, STOP_D)
@@ -608,7 +608,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m));
 
-    final Path<TestTripSchedule> path = pathBuilder
+    final RaptorPath<TestTripSchedule> path = pathBuilder
       .access(ACCESS_START, ACCESS_DURATION, STOP_A)
       .bus(l1.getTripSchedule(0), STOP_C)
       .walk(D1m, STOP_D)
