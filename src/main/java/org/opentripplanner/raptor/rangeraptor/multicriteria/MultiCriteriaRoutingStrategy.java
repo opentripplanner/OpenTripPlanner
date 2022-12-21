@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
@@ -57,7 +58,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
 
     // This access is not available after the iteration departure time
-    if (departureTime == -1) {
+    if (departureTime == SearchParams.TIME_NOT_SET) {
       return;
     }
 

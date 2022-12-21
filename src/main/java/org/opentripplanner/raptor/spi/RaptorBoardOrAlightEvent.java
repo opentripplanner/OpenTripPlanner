@@ -74,12 +74,23 @@ public interface RaptorBoardOrAlightEvent<T extends RaptorTripSchedule> {
    */
   boolean empty();
 
+  /**
+   * This is a helper method for the Raptor implementation to be able to board or execute
+   * a alternativeBoardingFallback method depending on the event. This logic should ideally
+   * be put inside raptor, but due to performance(creating lambda instances, witch for some
+   * reason is not inlined) this need to be here.
+   * <p>
+   * @param boardCallback perform boarding if the event in none empty (or some other special
+   *                      condition depending on the event, like boarding not allowed).
+   * @param alternativeBoardingFallback This is executed if it is allowed to board according to
+   *                                    this event and if the boarding event is empty.
+   */
   default void boardWithFallback(
     Consumer<RaptorBoardOrAlightEvent<T>> boardCallback,
-    Consumer<RaptorBoardOrAlightEvent<T>> fallback
+    Consumer<RaptorBoardOrAlightEvent<T>> alternativeBoardingFallback
   ) {
     if (empty()) {
-      fallback.accept(this);
+      alternativeBoardingFallback.accept(this);
     } else {
       boardCallback.accept(this);
     }
@@ -89,8 +100,9 @@ public interface RaptorBoardOrAlightEvent<T extends RaptorTripSchedule> {
    * Create an empty event with the given {@code earliestBoardTime}.
    * <p>
    * Sometimes we need to override the search result and force an empty result. This
-   * factory method is used to avoid creating new instances, and instead the search
-   * can be cleared (if implementing the fly-weight pattern).
+   * method can be used in none-performance critical parts of the code. The preferred
+   * way for {@link RaptorConstrainedBoardingSearch}s is to clear its state and
+   * implement the fly-weight pattern, avoiding creating new instances.
    */
   static <S extends RaptorTripSchedule> RaptorBoardOrAlightEvent<S> empty(
     final int earliestBoardTime

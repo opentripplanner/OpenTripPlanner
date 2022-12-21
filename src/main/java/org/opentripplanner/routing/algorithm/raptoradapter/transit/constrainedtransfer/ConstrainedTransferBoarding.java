@@ -75,10 +75,10 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   @Override
   public void boardWithFallback(
     Consumer<RaptorBoardOrAlightEvent<T>> boardCallback,
-    Consumer<RaptorBoardOrAlightEvent<T>> fallback
+    Consumer<RaptorBoardOrAlightEvent<T>> alternativeBoardingFallback
   ) {
     if (empty()) {
-      fallback.accept(this);
+      alternativeBoardingFallback.accept(this);
     } else if (!constraint.isNotAllowed()) {
       boardCallback.accept(this);
     }

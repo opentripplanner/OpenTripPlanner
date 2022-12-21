@@ -146,11 +146,6 @@ public class AccessStopArrivalTest {
       }
 
       @Override
-      public int earliestDepartureTime(int t) {
-        return t;
-      }
-
-      @Override
       public int latestArrivalTime(int requestedArrivalTime) {
         return latestArrivalTime;
       }

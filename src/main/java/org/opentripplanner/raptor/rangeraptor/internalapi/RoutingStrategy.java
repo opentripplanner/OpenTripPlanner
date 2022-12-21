@@ -38,10 +38,9 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
 
   /**
    * Board the given trip(event) at the given stop index using constraint transfers
-   * if it exists.
-   *
-   * @return {@code true} if the boarding was processed by the constrained transfers,
-   *         return {@code false} to fall back to boarding with regular transfers.
+   * if it exists. If the boarding is not processed by the constrained transfers,
+   * the implementation is also responsible for performing the fallback to board
+   * from regular transfer.
    */
   void boardWithConstrainedTransfer(
     int stopIndex,
