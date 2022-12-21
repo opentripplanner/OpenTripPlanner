@@ -1,7 +1,7 @@
 coverage:
   status:
-    project: false
-    patch: false
-    changed: false
+    project: off
+    patch: off
+    changed: off
 github_checks:
   annotations: false
