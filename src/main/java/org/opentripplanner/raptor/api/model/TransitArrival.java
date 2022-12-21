@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.api.model;
 
 /**
  * @param <T> The TripSchedule type defined by the user of the raptor API.

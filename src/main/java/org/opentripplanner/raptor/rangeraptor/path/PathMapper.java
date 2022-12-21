@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.path;
 
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.Path;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Responsible for mapping between the domain of routing to the domain of result paths. Especially a

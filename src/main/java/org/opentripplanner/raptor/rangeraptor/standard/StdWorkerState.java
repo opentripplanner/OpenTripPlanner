@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.TransitArrival;
 
 /**
  * This interface define the methods used be the {@link ArrivalTimeRoutingStrategy} to query and
