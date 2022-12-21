@@ -128,7 +128,6 @@ public class TransitRouter {
             serverContext.transitService().getTransferService(),
             requestTransitDataProvider,
             transitLayer.getStopBoardAlightCosts(),
-            raptorRequest,
             request.preferences().transfer().optimization()
           )
           .optimize(transitResponse.paths());
@@ -136,7 +135,7 @@ public class TransitRouter {
 
     // Create itineraries
 
-    RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper(
+    RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper<>(
       serverContext.graph(),
       serverContext.transitService(),
       transitLayer,

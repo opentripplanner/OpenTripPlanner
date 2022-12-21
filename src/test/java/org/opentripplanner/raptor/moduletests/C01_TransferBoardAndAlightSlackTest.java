@@ -49,7 +49,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
   @BeforeEach
   public void setup() {
     //Given slack: transfer 1m, board 30s, alight 10s
-    requestBuilder.slackProvider(new DefaultSlackProvider(D1m, D30s, D10s));
+    data.withSlackProvider(new DefaultSlackProvider(D1m, D30s, D10s));
 
     data.withRoute(
       // Pattern arrive at stop 2 at 0:03:00

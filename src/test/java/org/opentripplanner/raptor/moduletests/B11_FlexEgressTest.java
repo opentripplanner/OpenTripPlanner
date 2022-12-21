@@ -45,6 +45,9 @@ public class B11_FlexEgressTest implements RaptorTestConstants {
       route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
         .withTimetable(schedule("0:10, 0:12, 0:14, 0:16, 0:18"))
     );
+    // We will test board- and alight-slack in a separate test
+    data.withSlackProvider(new DefaultSlackProvider(60, 0, 0));
+
     requestBuilder
       .searchParams()
       .addAccessPaths(TestAccessEgress.walk(STOP_B, D1m))
@@ -56,9 +59,6 @@ public class B11_FlexEgressTest implements RaptorTestConstants {
         TestAccessEgress.walk(STOP_F, D10m) // lowest num-of-transfers (0)
       );
     requestBuilder.searchParams().earliestDepartureTime(T00_00).latestArrivalTime(T00_30);
-
-    // We will test board- and alight-slack in a separate test
-    requestBuilder.slackProvider(new DefaultSlackProvider(60, 0, 0));
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }

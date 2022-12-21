@@ -48,6 +48,9 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
       route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
         .withTimetable(schedule("0:10, 0:12, 0:14, 0:16, 0:20"))
     );
+    // We will test board- and alight-slack in a separate test
+    data.withSlackProvider(new DefaultSlackProvider(TRANSFER_SLACK, 0, 0));
+
     requestBuilder
       .searchParams()
       // All access paths are all pareto-optimal (McRaptor).
@@ -64,9 +67,6 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
       .addEgressPaths(TestAccessEgress.walk(STOP_F, D1m));
 
     requestBuilder.searchParams().earliestDepartureTime(T00_00).latestArrivalTime(T00_30);
-
-    // We will test board- and alight-slack in a separate test
-    requestBuilder.slackProvider(new DefaultSlackProvider(TRANSFER_SLACK, 0, 0));
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }

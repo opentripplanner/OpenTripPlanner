@@ -93,6 +93,11 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
   CostCalculator<T> multiCriteriaCostCalculator();
 
   /**
+   * The board-, alight- and transfer-slack provider.
+   */
+  RaptorSlackProvider slackProvider();
+
+  /**
    * Implement this method to provide a service to search for {@link RaptorTransferConstraint}. This
    * is not used during the routing, but after a path is found to attach constraint information to
    * the path.

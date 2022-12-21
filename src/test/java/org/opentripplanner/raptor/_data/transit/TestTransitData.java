@@ -16,11 +16,13 @@ import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
@@ -49,12 +51,17 @@ public class TestTransitData
     .minTransferTime(3600)
     .build();
 
+  // Slack defaults: 1 minute for transfer-slack, 0 minutes for board- and alight-slack.
+  public static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(60, 0, 0);
+
   private final List<List<RaptorTransfer>> transfersFromStop = new ArrayList<>();
   private final List<List<RaptorTransfer>> transfersToStop = new ArrayList<>();
   private final List<Set<Integer>> routeIndexesByStopIndex = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
   private final List<ConstrainedTransfer> constrainedTransfers = new ArrayList<>();
   private final GeneralizedCostParametersBuilder costParamsBuilder = new GeneralizedCostParametersBuilder();
+
+  private RaptorSlackProvider slackProvider = SLACK_PROVIDER;
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfersFromStop(int fromStop) {
@@ -94,6 +101,16 @@ public class TestTransitData
       costParamsBuilder.build(),
       stopBoardAlightCost()
     );
+  }
+
+  @Override
+  public RaptorSlackProvider slackProvider() {
+    return slackProvider;
+  }
+
+  public TestTransitData withSlackProvider(RaptorSlackProvider slackProvider) {
+    this.slackProvider = slackProvider;
+    return this;
   }
 
   @Override

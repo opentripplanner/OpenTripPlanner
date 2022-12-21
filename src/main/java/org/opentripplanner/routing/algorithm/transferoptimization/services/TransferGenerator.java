@@ -45,11 +45,10 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
   public TransferGenerator(
     TransferServiceAdaptor<T> transferServiceAdaptor,
-    RaptorSlackProvider slackProvider,
     RaptorTransitDataProvider<T> stdTransfers
   ) {
     this.transferServiceAdaptor = transferServiceAdaptor;
-    this.slackProvider = slackProvider;
+    this.slackProvider = stdTransfers.slackProvider();
     this.stdTransfers = stdTransfers;
   }
 
