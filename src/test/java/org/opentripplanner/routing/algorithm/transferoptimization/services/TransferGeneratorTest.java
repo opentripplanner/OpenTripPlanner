@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
 
 import java.time.Duration;
 import java.util.List;
@@ -27,6 +26,7 @@ import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.test.support.VariableSource;
 
@@ -40,7 +40,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   private static final int ACCESS_START = TimeUtils.time("10:00");
   private static final int ACCESS_DURATION = D1m;
 
-  private static final RaptorSlackProvider SLACK_PROVIDER = defaultSlackProvider(
+  private static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
     TRANSFER_SLACK,
     BOARD_SLACK,
     ALIGHT_SLACK
@@ -546,7 +546,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // The only possible place to transfer between A and C is stop B (no extra transfers):
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_C);
 
-    RaptorSlackProvider slackProvider = RaptorSlackProvider.defaultSlackProvider(
+    RaptorSlackProvider slackProvider = new DefaultSlackProvider(
       (int) transferSlack.toSeconds(),
       0,
       0

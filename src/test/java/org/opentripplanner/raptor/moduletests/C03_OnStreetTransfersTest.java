@@ -5,7 +5,6 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 
 /**
  * FEATURE UNDER TEST
@@ -47,7 +47,7 @@ public class C03_OnStreetTransfersTest implements RaptorTestConstants {
   @BeforeEach
   public void setup() {
     //Given slack: transfer 1m, board 30s, alight 10s
-    requestBuilder.slackProvider(defaultSlackProvider(D30s, 0, 0));
+    requestBuilder.slackProvider(new DefaultSlackProvider(D30s, 0, 0));
 
     data.withRoute(
       route(pattern("R1", STOP_B, STOP_C))

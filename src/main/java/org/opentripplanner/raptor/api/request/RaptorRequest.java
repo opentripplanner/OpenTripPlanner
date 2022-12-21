@@ -8,6 +8,7 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     searchDirection = SearchDirection.FORWARD;
     optimizations = Collections.emptySet();
     // Slack defaults: 1 minute for transfer-slack, 0 minutes for board- and alight-slack.
-    slackProvider = RaptorSlackProvider.defaultSlackProvider(60, 0, 0);
+    slackProvider = new DefaultSlackProvider(60, 0, 0);
     performanceTimers = RaptorTimers.NOOP;
     debug = DebugRequest.defaults();
     alias = RaptorRequestBuilder.generateRequestAlias(profile, searchDirection, optimizations);

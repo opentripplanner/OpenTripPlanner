@@ -1,13 +1,13 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 public class SlackProviderAdapterTest implements RaptorTestConstants {
@@ -15,7 +15,7 @@ public class SlackProviderAdapterTest implements RaptorTestConstants {
   private static final int BOARD_SLACK = D20s;
   private static final int ALIGHT_SLACK = D10s;
   private static final int TRANSFER_SLACK = D1m;
-  private static final RaptorSlackProvider EXTERNAL_SLACK_PROVIDER = defaultSlackProvider(
+  private static final RaptorSlackProvider EXTERNAL_SLACK_PROVIDER = new DefaultSlackProvider(
     TRANSFER_SLACK,
     BOARD_SLACK,
     ALIGHT_SLACK
