@@ -2,25 +2,18 @@ package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.MatchResult.EXACT;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.MatchResult.NONE;
+import static org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.MatchResult.WILDCARD;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public sealed interface Condition {
-  @Nonnull
-  static MatchResult getMatchResult(OSMWithTags way, String opKey, String opValue) {
-    if (opValue.equals("*") && way.hasTag(opKey)) {
-      return MatchResult.WILDCARD;
-    } else if (way.matchesKeyValue(opKey, opValue)) {
-      return EXACT;
-    } else {
-      return NONE;
-    }
-  }
+  boolean getMatches(OSMWithTags way, String opKey);
 
   default boolean matches(OSMWithTags way) {
-    return match(way) == EXACT;
+    return getMatches(way, this.key());
   }
+
+  String key();
 
   default boolean isWildcard() {
     return false;
@@ -30,7 +23,18 @@ public sealed interface Condition {
    * Test to what degree the OSM entity matches with this operation when taking the regular tag keys
    * into account.
    */
-  MatchResult match(OSMWithTags way);
+  default MatchResult match(OSMWithTags way) {
+    return matches(way) ? EXACT : NONE;
+  }
+
+  default boolean matchesLeft(OSMWithTags way) {
+    var leftKey = this.key() + ":left";
+    if (way.hasTag(leftKey)) {
+      return getMatches(way, leftKey);
+    } else {
+      return matchesExplicitBoth(way);
+    }
+  }
 
   /**
    * Test to what degree the OSM entity matches with this operation when taking the ':left' key
@@ -39,7 +43,18 @@ public sealed interface Condition {
    * For example, it should not match a way with `cycleway:right=lane` when the `cycleway=lane` was
    * required but `cycleway:left=lane` should match.
    */
-  MatchResult matchLeft(OSMWithTags way);
+  default MatchResult matchLeft(OSMWithTags way) {
+    return matchesLeft(way) ? EXACT : NONE;
+  }
+
+  default boolean matchesRight(OSMWithTags way) {
+    var rightKey = this.key() + ":right";
+    if (way.hasTag(rightKey)) {
+      return getMatches(way, rightKey);
+    } else {
+      return matchesExplicitBoth(way);
+    }
+  }
 
   /**
    * Test to what degree the OSM entity matches with this operation when taking the ':right' key
@@ -48,120 +63,79 @@ public sealed interface Condition {
    * For example, it should not match a way with `cycleway:left=lane` when the `cycleway=lane` was
    * required but `cycleway:right=lane` should match.
    */
-  MatchResult matchRight(OSMWithTags way);
+  default MatchResult matchRight(OSMWithTags way) {
+    return matchesRight(way) ? EXACT: NONE;
+  }
+
+  /**
+   * Test to what degree the OSM entity matches with this operation when taking the ':both' key
+   * suffixes into account.
+   */
+  default boolean matchesExplicitBoth(OSMWithTags way) {
+    var bothKey = this.key() + ":both";
+    if (way.hasTag(bothKey)) {
+      return getMatches(way, bothKey);
+    } else {
+      return matches(way);
+    }
+  }
 
   enum MatchResult {
     EXACT,
     WILDCARD,
-    NONE;
-
-    public MatchResult ifNone(MatchResult ifNone) {
-      if (this == NONE) {
-        return ifNone;
-      } else {
-        return this;
-      }
-    }
+    NONE
   }
 
   record Equals(String key, String value) implements Condition {
     @Override
-    public boolean isWildcard() {
-      return value.equals("*");
+    public boolean getMatches(OSMWithTags way, String opKey) {
+      return way.hasTag(opKey) && way.matchesKeyValue(opKey, value);
     }
+  }
+
+  record Present(String key) implements Condition {
+    public boolean isWildcard() {return true;}
 
     @Override
     public MatchResult match(OSMWithTags way) {
-      return getMatchResult(way, key, value);
+      return matches(way) ? WILDCARD : NONE;
     }
-
     @Override
     public MatchResult matchLeft(OSMWithTags way) {
-      var leftKey = key + ":left";
-      return getOneSideResult(way, leftKey);
+      return matchesLeft(way) ? WILDCARD : NONE;
     }
 
     @Override
     public MatchResult matchRight(OSMWithTags way) {
-      var rightKey = key + ":right";
-      return getOneSideResult(way, rightKey);
+      return matchesRight(way) ? WILDCARD : NONE;
     }
 
-    private MatchResult getOneSideResult(OSMWithTags way, String oneSideKey) {
-      var hasOneSideKey = way.hasTag(oneSideKey);
-      var oneSideResult = getMatchResult(way, oneSideKey, value);
-      var mainRes = match(way);
-
-      if (hasOneSideKey) {
-        return oneSideResult;
-      } else {
-        return oneSideResult.ifNone(mainRes);
-      }
+    @Override
+    public boolean getMatches(OSMWithTags way, String opKey) {
+      return way.hasTag(opKey);
     }
   }
 
   record Absent(String key) implements Condition {
     @Override
-    public MatchResult match(OSMWithTags way) {
-      if (way.hasTag(key)) {
-        return NONE;
-      } else {
-        return EXACT;
-      }
-    }
-
-    @Override
-    public MatchResult matchLeft(OSMWithTags way) {
-      throw new UnsupportedOperationException("Not implemented.");
-    }
-
-    @Override
-    public MatchResult matchRight(OSMWithTags way) {
-      throw new UnsupportedOperationException("Not implemented.");
+    public boolean getMatches(OSMWithTags way, String opKey) {
+      return !way.hasTag(opKey);
     }
   }
 
   record GreaterThan(String key, int value) implements Condition {
     @Override
-    public MatchResult match(OSMWithTags way) {
-      var maybeInt = way.getTagAsInt(key, ignored -> {});
-      if (maybeInt.isPresent() && maybeInt.getAsInt() > value) {
-        return EXACT;
-      } else {
-        return NONE;
-      }
-    }
-
-    @Override
-    public MatchResult matchLeft(OSMWithTags way) {
-      throw new UnsupportedOperationException("Not implemented.");
-    }
-
-    @Override
-    public MatchResult matchRight(OSMWithTags way) {
-      throw new UnsupportedOperationException("Not implemented.");
+    public boolean getMatches(OSMWithTags way, String opKey) {
+      var maybeInt = way.getTagAsInt(opKey, ignored -> {});
+      return maybeInt.isPresent() && maybeInt.getAsInt() > value;
     }
   }
 
   record LessThan(String key, int value) implements Condition {
     @Override
-    public MatchResult match(OSMWithTags way) {
-      var maybeInt = way.getTagAsInt(key, ignored -> {});
-      if (maybeInt.isPresent() && maybeInt.getAsInt() < value) {
-        return EXACT;
-      } else {
-        return NONE;
-      }
-    }
-
-    @Override
-    public MatchResult matchLeft(OSMWithTags way) {
-      throw new UnsupportedOperationException("Not implemented.");
-    }
-
-    @Override
-    public MatchResult matchRight(OSMWithTags way) {
-      throw new UnsupportedOperationException("Not implemented.");
+    public boolean getMatches(OSMWithTags way, String opKey) {
+      var maybeInt = way.getTagAsInt(opKey, ignored -> {});
+      return maybeInt.isPresent() && maybeInt.getAsInt() < value;
     }
   }
 }
