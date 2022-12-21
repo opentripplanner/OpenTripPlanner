@@ -15,6 +15,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
@@ -30,7 +31,6 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateData;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 public class StreetEdgeTest {
 
@@ -137,17 +137,21 @@ public class StreetEdgeTest {
 
   /**
    * Test the traversal of two edges with different traverse modes, with a focus on cycling. This
-   * test will fail unless the following three conditions are met: 1. Turn costs are computed based
+   * test will fail unless the following four conditions are met: 1. Turn costs are computed based
    * on the back edge's traverse mode during reverse traversal. 2. Turn costs are computed such that
    * bike walking is taken into account correctly. 3. User-specified bike speeds are applied
-   * correctly during turn cost computation.
+   * correctly during turn cost computation. 4. Traffic light wait time is taken into account.
    */
   @Test
   public void testTraverseModeSwitchBike() {
-    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN);
-    StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-
-    v1.trafficLight = true;
+    var vWithTrafficLight = new IntersectionVertex(graph, "maple_1st", 2.0, 2.0, false, true);
+    StreetEdge e0 = edge(v0, vWithTrafficLight, 50.0, StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge e1 = edge(
+      vWithTrafficLight,
+      v2,
+      18.4,
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
+    );
 
     StreetSearchRequestBuilder forward = StreetSearchRequest.copyOf(proto);
     forward.withPreferences(p -> p.withBike(it -> it.withSpeed(3.0f)));
@@ -164,23 +168,27 @@ public class StreetEdgeTest {
     State s4 = e1.traverse(s3);
     State s5 = e0.traverse(s4);
 
-    assertEquals(104, s2.getElapsedTimeSeconds());
-    assertEquals(104, s5.getElapsedTimeSeconds());
+    assertEquals(88, s2.getElapsedTimeSeconds());
+    assertEquals(88, s5.getElapsedTimeSeconds());
   }
 
   /**
    * Test the traversal of two edges with different traverse modes, with a focus on walking. This
-   * test will fail unless the following three conditions are met: 1. Turn costs are computed based
+   * test will fail unless the following four conditions are met: 1. Turn costs are computed based
    * on the back edge's traverse mode during reverse traversal. 2. Turn costs are computed such that
    * bike walking is taken into account correctly. 3. Enabling bike mode on a routing request bases
-   * the bike walking speed on the walking speed.
+   * the bike walking speed on the walking speed. 4. Traffic light wait time is taken into account.
    */
   @Test
   public void testTraverseModeSwitchWalk() {
-    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-    StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
-
-    v1.trafficLight = true;
+    var vWithTrafficLight = new IntersectionVertex(graph, "maple_1st", 2.0, 2.0, false, true);
+    StreetEdge e0 = edge(
+      v0,
+      vWithTrafficLight,
+      50.0,
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
+    );
+    StreetEdge e1 = edge(vWithTrafficLight, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
 
     StreetSearchRequestBuilder forward = StreetSearchRequest.copyOf(proto);
 
@@ -195,8 +203,8 @@ public class StreetEdgeTest {
     State s4 = e1.traverse(s3);
     State s5 = e0.traverse(s4);
 
-    assertEquals(42, s2.getElapsedTimeSeconds());
-    assertEquals(42, s5.getElapsedTimeSeconds());
+    assertEquals(57, s2.getElapsedTimeSeconds());
+    assertEquals(57, s5.getElapsedTimeSeconds());
   }
 
   /**
@@ -339,8 +347,8 @@ public class StreetEdgeTest {
     Coordinate c1 = new Coordinate(-122.575033, 45.456773);
     Coordinate c2 = new Coordinate(-122.576668, 45.451426);
 
-    StreetVertex v1 = new IntersectionVertex(null, "v1", c1.x, c1.y, (NonLocalizedString) null);
-    StreetVertex v2 = new IntersectionVertex(null, "v2", c2.x, c2.y, (NonLocalizedString) null);
+    StreetVertex v1 = new IntersectionVertex(null, "v1", c1.x, c1.y, null, false, false);
+    StreetVertex v2 = new IntersectionVertex(null, "v2", c2.x, c2.y, null, false, false);
 
     GeometryFactory factory = new GeometryFactory();
     LineString geometry = factory.createLineString(new Coordinate[] { c1, c2 });

@@ -10,13 +10,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 
 public class TimeUtilsTest {
 
   private static final ZonedDateTime CAL = ZonedDateTime.of(
     LocalDate.of(2019, Month.JANUARY, 15),
     LocalTime.of(9, 36, 7),
-    ZoneId.of("UTC")
+    ZoneIds.UTC
   );
 
   private final int T00_00_01 = time(0, 0, 1);
@@ -136,7 +137,7 @@ public class TimeUtilsTest {
 
   @Test
   public void toZonedDateTimeDST() {
-    ZoneId CET = ZoneId.of("Europe/Oslo");
+    ZoneId CET = ZoneIds.OSLO;
     // test daylight-saving-time
     LocalDate D2021_03_28 = LocalDate.of(2021, 3, 28);
     LocalDate D2021_10_31 = LocalDate.of(2021, 10, 31);

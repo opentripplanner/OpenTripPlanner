@@ -38,8 +38,12 @@ public class OSMNode extends OSMWithTags {
     return hasTag("highway") && "elevator".equals(getTag("highway"));
   }
 
-  public boolean hasTrafficLight() {
+  public boolean hasHighwayTrafficLight() {
     return hasTag("highway") && "traffic_signals".equals(getTag("highway"));
+  }
+
+  public boolean hasCrossingTrafficLight() {
+    return hasTag("crossing") && "traffic_signals".equals(getTag("crossing"));
   }
 
   /**

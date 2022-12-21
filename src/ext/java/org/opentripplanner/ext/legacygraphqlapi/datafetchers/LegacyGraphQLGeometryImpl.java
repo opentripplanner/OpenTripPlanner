@@ -4,8 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.model.EncodedPolyline;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
 
 public class LegacyGraphQLGeometryImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLGeometry {
 
@@ -20,6 +19,6 @@ public class LegacyGraphQLGeometryImpl implements LegacyGraphQLDataFetchers.Lega
   }
 
   private EncodedPolyline getSource(DataFetchingEnvironment environment) {
-    return PolylineEncoder.encodeGeometry((Geometry) environment.getSource());
+    return EncodedPolyline.encode((Geometry) environment.getSource());
   }
 }

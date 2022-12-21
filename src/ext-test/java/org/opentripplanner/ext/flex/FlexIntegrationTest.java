@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
@@ -34,7 +35,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OTPFeature;
 
 /**
  * This test checks the combination of transit and flex works.
@@ -74,10 +74,10 @@ public class FlexIntegrationTest {
 
   @Test
   void shouldReturnARouteTransferringFromBusToFlex() {
-    var from = new GenericLocation(33.84329482265106, -84.583740234375);
-    var to = new GenericLocation(33.86701256815635, -84.61787939071655);
+    var from = new GenericLocation(33.7552, -84.4631);
+    var to = new GenericLocation(33.8694, -84.6233);
 
-    var itin = getItinerary(from, to, 2);
+    var itin = getItinerary(from, to, 3);
 
     assertEquals(4, itin.getLegs().size());
 
@@ -107,7 +107,7 @@ public class FlexIntegrationTest {
     var from = GenericLocation.fromStopId("ALEX DR@ALEX WAY", "MARTA", "97266");
     var to = new GenericLocation(33.86701256815635, -84.61787939071655);
 
-    var itin = getItinerary(from, to, 1);
+    var itin = getItinerary(from, to, 2);
 
     assertEquals(5, itin.getLegs().size());
 
@@ -149,8 +149,8 @@ public class FlexIntegrationTest {
 
     // walk, flex
     assertEquals(2, itin.getLegs().size());
-    assertEquals("2021-12-02T12:53:12-05:00[America/New_York]", itin.startTime().toString());
-    assertEquals(3173, itin.getGeneralizedCost());
+    assertEquals("2021-12-02T12:52:42-05:00[America/New_York]", itin.startTime().toString());
+    assertEquals(3203, itin.getGeneralizedCost());
 
     var walkToFlex = itin.getStreetLeg(0);
     assertEquals(WALK, walkToFlex.getMode());

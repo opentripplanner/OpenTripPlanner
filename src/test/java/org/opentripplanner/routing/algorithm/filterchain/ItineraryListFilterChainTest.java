@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.filterchain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
@@ -67,6 +66,22 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
       .build();
 
     assertEquals(toStr(List.of(i1)), toStr(chain.filter(List.of(i1, i2, i3))));
+  }
+
+  @Test
+  public void withMinBikeParkingDistance() {
+    // Given a "default" chain
+    ItineraryListFilterChain chain = createBuilder(false, false, 10)
+      .withMinBikeParkingDistance(500)
+      .build();
+
+    var shortBikeToStop = newItinerary(A)
+      .bicycle(T11_05, T11_06, B)
+      .rail(30, T11_16, T11_20, C)
+      .build();
+    assertEquals(300, shortBikeToStop.getLegs().get(0).getDistanceMeters());
+    // should do nothing to non-bike trips but remove a bike+ride route that cycles only for one minute
+    assertEquals(List.of(i1), chain.filter(List.of(i1, shortBikeToStop)));
   }
 
   @Test

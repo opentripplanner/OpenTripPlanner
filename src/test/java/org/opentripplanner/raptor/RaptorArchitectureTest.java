@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor;
 
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
+import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK_UTILS;
 import static org.opentripplanner.OtpArchitectureModules.GNU_TROVE;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
-import static org.opentripplanner.OtpArchitectureModules.UTILS;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.arch.ArchComponent;
@@ -37,17 +37,20 @@ public class RaptorArchitectureTest {
   @Test
   void enforcePackageDependenciesRaptorAPI() {
     var api = RAPTOR.subPackage("api");
-    var debug = api.subPackage("debug").dependsOn(UTILS).verify();
-    var spi = RAPTOR.subPackage("spi").dependsOn(UTILS).verify();
-    var view = api.subPackage("view").dependsOn(UTILS, spi).verify();
-    var path = api.subPackage("path").dependsOn(UTILS, spi).verify();
-    var request = api.subPackage("request").dependsOn(UTILS, debug, spi, path, view).verify();
-    api.subPackage("response").dependsOn(UTILS, request, path, spi).verify();
+    var debug = api.subPackage("debug").dependsOn(FRAMEWORK_UTILS).verify();
+    var spi = RAPTOR.subPackage("spi").dependsOn(FRAMEWORK_UTILS).verify();
+    var view = api.subPackage("view").dependsOn(FRAMEWORK_UTILS, spi).verify();
+    var path = api.subPackage("path").dependsOn(FRAMEWORK_UTILS, spi).verify();
+    var request = api
+      .subPackage("request")
+      .dependsOn(FRAMEWORK_UTILS, debug, spi, path, view)
+      .verify();
+    api.subPackage("response").dependsOn(FRAMEWORK_UTILS, request, path, spi).verify();
   }
 
   @Test
   void enforcePackageDependenciesUtil() {
-    RAPTOR_UTIL.dependsOn(UTILS, RAPTOR_SPI).verify();
+    RAPTOR_UTIL.dependsOn(FRAMEWORK_UTILS, RAPTOR_SPI).verify();
     RAPTOR_UTIL_PARETO_SET.verify();
   }
 
@@ -56,7 +59,14 @@ public class RaptorArchitectureTest {
     var internalApi = RR_INTERNAL_API.dependsOn(RAPTOR_API, RAPTOR_SPI).verify();
 
     // RangeRaptor common allowed dependencies
-    var common = Module.of(UTILS, GNU_TROVE, RAPTOR_API, RAPTOR_SPI, RAPTOR_UTILS, internalApi);
+    var common = Module.of(
+      FRAMEWORK_UTILS,
+      GNU_TROVE,
+      RAPTOR_API,
+      RAPTOR_SPI,
+      RAPTOR_UTILS,
+      internalApi
+    );
 
     RR_DEBUG.dependsOn(common).verify();
     RR_LIFECYCLE.dependsOn(common).verify();
@@ -138,7 +148,15 @@ public class RaptorArchitectureTest {
   @Test
   void enforcePackageDependenciesInRaptorService() {
     SERVICE
-      .dependsOn(UTILS, RAPTOR_API, RAPTOR_SPI, RAPTOR_UTIL, CONFIGURE, RR_INTERNAL_API, RR_TRANSIT)
+      .dependsOn(
+        FRAMEWORK_UTILS,
+        RAPTOR_API,
+        RAPTOR_SPI,
+        RAPTOR_UTIL,
+        CONFIGURE,
+        RR_INTERNAL_API,
+        RR_TRANSIT
+      )
       .verify();
   }
 
@@ -161,7 +179,7 @@ public class RaptorArchitectureTest {
   @Test
   void enforceNoCyclicDependencies() {
     slices()
-      .matching("org.opentripplanner.raptor.(*)..")
+      .matching(RAPTOR.packageIdentifierAllSubPackages())
       .should()
       .beFreeOfCycles()
       .check(ArchComponent.OTP_CLASSES);

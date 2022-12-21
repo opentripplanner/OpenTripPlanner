@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.vertex;
 
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * A vertex coming from OpenStreetMap.
@@ -12,8 +12,6 @@ import org.opentripplanner.transit.model.basic.I18NString;
  */
 public class OsmVertex extends IntersectionVertex {
 
-  private static final long serialVersionUID = 1L;
-
   /** The OSM node ID from whence this came */
   public final long nodeId;
 
@@ -22,8 +20,17 @@ public class OsmVertex extends IntersectionVertex {
     this.nodeId = nodeId;
   }
 
-  public OsmVertex(Graph g, String label, double x, double y, long nodeId, I18NString name) {
-    super(g, label, x, y, name);
+  public OsmVertex(
+    Graph g,
+    String label,
+    double x,
+    double y,
+    long nodeId,
+    I18NString name,
+    boolean hasHighwayTrafficLight,
+    boolean hasCrossingTrafficLight
+  ) {
+    super(g, label, x, y, name, hasHighwayTrafficLight, hasCrossingTrafficLight);
     this.nodeId = nodeId;
   }
 }

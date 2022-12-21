@@ -12,7 +12,7 @@ import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Translation;
-import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.framework.i18n.I18NString;
 
 public class TranslationHelperTest {
 

@@ -65,6 +65,15 @@ public class DoubleUtils {
     return Double.compare(a, b) == 0;
   }
 
+  public static double assertInRange(double value, double min, double max, String field) {
+    if (value < min || value > max) {
+      throw new IllegalArgumentException(
+        "The %s is not in range[%.1f, %.1f]: %.1f".formatted(field, min, max, value)
+      );
+    }
+    return value;
+  }
+
   /* private methods */
 
   private static double roundToNDecimals(double value, int decimals) {

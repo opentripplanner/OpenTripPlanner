@@ -6,8 +6,6 @@ import java.util.Objects;
 
 public class ApiStop implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   public String id;
   public String name;
   public Double lat;

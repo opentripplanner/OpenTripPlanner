@@ -57,14 +57,14 @@ We encourage you to read the introductory sections of this documentation to fami
 with OpenTripPlanner use cases and configuration. But if you want to get started right away running
 your own OTP instance, the best place to start is the [Basic Tutorial](Basic-Tutorial.md) page.
 
-# Contact Info
+# Getting help
 
-Send questions and comments to
-the [user mailing list](http://groups.google.com/group/opentripplanner-users). Discuss internal
-development details on the [dev mailing list](http://groups.google.com/group/opentripplanner-dev).
-File bug reports via the Github [issue tracker](https://github.com/openplans/OpenTripPlanner/issues)
-. Note that the issue tracker is not intended for support questions or discussions. Please post them
-to one of the mailing lists instead.
+The fastest way to get help is to use our [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner)
+where most of the core developers are.
+You can also send questions and comments to the [mailing list](http://groups.google.com/group/opentripplanner-users)
+or file bug reports via the Github [issue tracker](https://github.com/openplans/OpenTripPlanner/issues). 
+Note that the issue tracker is not intended for support questions or discussions. Please use the
+chat or the mailing list instead.
 
 # Financial and In-Kind Support
 

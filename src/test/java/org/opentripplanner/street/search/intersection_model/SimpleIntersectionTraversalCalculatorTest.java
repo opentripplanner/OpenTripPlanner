@@ -9,17 +9,18 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
 
 /**
  * Tests for SimpleIntersectionTraversalModel.
  * <p>
- * TODO(flamholz): add tests for traversal with traffic lights and without a car.
  *
  * @author avi
  */
@@ -38,32 +39,36 @@ public class SimpleIntersectionTraversalCalculatorTest {
   @Test
   public void testCalculateTurnAngle() {
     // Graph for a fictional grid city with turn restrictions
-    IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false);
-    IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false);
-    v2.trafficLight = true;
+    IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false, false);
+    IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false, false);
+    IntersectionVertex v3 = vertex("maple_2nd", new Coordinate(1.5, 1.5), false, false);
 
     StreetEdge e1 = edge(v1, v2, 1.0, false);
+
+    // This edge is added so the v2 intersection has more than two edges connected to it so it isn't
+    // free flowing
+    edge(v2, v3, 1.0, false);
 
     // Edge has same first and last angle.
     assertEquals(90, e1.getInAngle());
     assertEquals(90, e1.getOutAngle());
 
     // 2 new ones
-    IntersectionVertex v3 = vertex("test2", new Coordinate(1.0, 1.0), false);
+    IntersectionVertex v4 = vertex("test2", new Coordinate(1.0, 1.0), false, false);
 
-    // Second edge
-    StreetEdge e2 = edge(v2, v3, 1.0, false);
+    // Third edge
+    StreetEdge e3 = edge(v2, v4, 1.0, false);
 
-    assertEquals(0, e2.getInAngle());
-    assertEquals(0, e2.getOutAngle());
+    assertEquals(0, e3.getInAngle());
+    assertEquals(0, e3.getOutAngle());
 
     // Difference should be about 90.
-    int diff = (e1.getOutAngle() - e2.getInAngle());
+    int diff = (e1.getOutAngle() - e3.getInAngle());
     assertEquals(90, diff);
 
     // calculate the angle for driving on the right hand side
 
-    int rightHandDriveAngle = calculator.calculateTurnAngle(e1, e2);
+    int rightHandDriveAngle = calculator.calculateTurnAngle(e1, e3);
     assertEquals(270, rightHandDriveAngle);
     assertTrue(calculator.isTurnAcrossTraffic(rightHandDriveAngle));
     assertFalse(calculator.isSafeTurn(rightHandDriveAngle));
@@ -71,7 +76,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     // and on the left hand side
 
     var leftHandDriveCostModel = new SimpleIntersectionTraversalCalculator(DrivingDirection.LEFT);
-    int leftHandDriveAngle = leftHandDriveCostModel.calculateTurnAngle(e1, e2);
+    int leftHandDriveAngle = leftHandDriveCostModel.calculateTurnAngle(e1, e3);
     assertEquals(270, leftHandDriveAngle);
 
     assertTrue(leftHandDriveCostModel.isSafeTurn(leftHandDriveAngle));
@@ -82,12 +87,12 @@ public class SimpleIntersectionTraversalCalculatorTest {
 
     assertEquals(
       1.6875,
-      calculator.computeTraversalDuration(v2, e1, e2, TraverseMode.BICYCLE, 40, 40),
+      calculator.computeTraversalDuration(v2, e1, e3, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
     assertEquals(
       0.5625,
-      calculator.computeTraversalDuration(v2, e2, e1, TraverseMode.BICYCLE, 40, 40),
+      calculator.computeTraversalDuration(v2, e3, e1, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
 
@@ -95,12 +100,115 @@ public class SimpleIntersectionTraversalCalculatorTest {
 
     assertEquals(
       0.5625,
-      leftHandDriveCostModel.computeTraversalDuration(v2, e1, e2, TraverseMode.BICYCLE, 40, 40),
+      leftHandDriveCostModel.computeTraversalDuration(v2, e1, e3, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
     assertEquals(
       1.6875,
-      leftHandDriveCostModel.computeTraversalDuration(v2, e2, e1, TraverseMode.BICYCLE, 40, 40),
+      leftHandDriveCostModel.computeTraversalDuration(v2, e3, e1, TraverseMode.BICYCLE, 40, 40),
+      0.1
+    );
+  }
+
+  @Test
+  public void testBicycleTrafficLights() {
+    // Graph with an intersection with traffic lights
+    IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false, false);
+    IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false, true);
+
+    StreetEdge e1 = edge(v1, v2, 1.0, false);
+
+    IntersectionVertex v3 = vertex("test2", new Coordinate(1.0, 1.0), false, false);
+
+    StreetEdge e2 = edge(v2, v3, 1.0, false);
+
+    // With traffic lights on both directions
+
+    assertEquals(
+      15.1125,
+      calculator.computeTraversalDuration(v2, e1, e2, TraverseMode.BICYCLE, 40, 40),
+      0.1
+    );
+    assertEquals(
+      15.1125,
+      calculator.computeTraversalDuration(v2, e2, e1, TraverseMode.BICYCLE, 40, 40),
+      0.1
+    );
+  }
+
+  @Test
+  public void testWalk() {
+    IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false, false);
+    IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false, false);
+
+    StreetEdge e1 = edge(v1, v2, 1.0, false);
+
+    IntersectionVertex v3 = vertex("test2", new Coordinate(1.0, 1.0), false, false);
+
+    StreetEdge e2 = edge(v2, v3, 1.0, false);
+
+    // This edge is added so the v2 intersection has more than two edges connected to it so it isn't
+    // free flowing
+    edge(v2, v3, 1.0, false);
+
+    assertEquals(
+      0.1125,
+      calculator.computeTraversalDuration(v2, e1, e2, TraverseMode.WALK, 40, 40),
+      0.1
+    );
+    assertEquals(
+      0.1125,
+      calculator.computeTraversalDuration(v2, e2, e1, TraverseMode.WALK, 40, 40),
+      0.1
+    );
+  }
+
+  @Test
+  public void testWalkFreeFlowing() {
+    // vertices have only one incoming/outgoing edge, so they are interpreted to be free flowing
+    IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false, false);
+    IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false, false);
+
+    StreetEdge e1 = edge(v1, v2, 1.0, false);
+
+    IntersectionVertex v3 = vertex("test2", new Coordinate(1.0, 1.0), false, false);
+
+    StreetEdge e2 = edge(v2, v3, 1.0, false);
+
+    assertEquals(
+      0,
+      calculator.computeTraversalDuration(v2, e1, e2, TraverseMode.WALK, 40, 40),
+      0.1
+    );
+    assertEquals(
+      0,
+      calculator.computeTraversalDuration(v2, e2, e1, TraverseMode.WALK, 40, 40),
+      0.1
+    );
+  }
+
+  @Test
+  public void testWalkTrafficLights() {
+    // Graph with an intersection with traffic lights
+    IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false, false);
+    IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false, true);
+
+    StreetEdge e1 = edge(v1, v2, 1.0, false);
+
+    IntersectionVertex v3 = vertex("test2", new Coordinate(1.0, 1.0), false, false);
+
+    StreetEdge e2 = edge(v2, v3, 1.0, false);
+
+    // With traffic lights on both directions
+
+    assertEquals(
+      15.1125,
+      calculator.computeTraversalDuration(v2, e1, e2, TraverseMode.WALK, 40, 40),
+      0.1
+    );
+    assertEquals(
+      15.1125,
+      calculator.computeTraversalDuration(v2, e2, e1, TraverseMode.WALK, 40, 40),
       0.1
     );
   }
@@ -113,9 +221,9 @@ public class SimpleIntersectionTraversalCalculatorTest {
     Coordinate c = new Coordinate(-73.984981, 40.747761);
 
     // A vertex for each. No light.
-    IntersectionVertex u = vertex("from_v", a, false);
-    IntersectionVertex v = vertex("intersection", b, false);
-    IntersectionVertex w = vertex("to_v", c, false);
+    IntersectionVertex u = vertex("from_v", a, false, false);
+    IntersectionVertex v = vertex("intersection", b, false, false);
+    IntersectionVertex w = vertex("to_v", c, false, false);
 
     // Two edges.
     StreetEdge fromEdge = edge(u, v, 1.0, false);
@@ -135,10 +243,15 @@ public class SimpleIntersectionTraversalCalculatorTest {
     Coordinate c = new Coordinate(-73.984981, 40.747761);
 
     // A vertex for each. No light.
-    IntersectionVertex u = vertex("from_v", a, false);
-    IntersectionVertex v = vertex("intersection", b, false);
-    IntersectionVertex w = vertex("to_v", c, false);
-    v.freeFlowing = true;
+    IntersectionVertex u = vertex("from_v", a, false, false);
+    SplitterVertex v = new SplitterVertex(
+      graph,
+      "intersection",
+      b.getX(),
+      b.getY(),
+      new NonLocalizedString("intersection")
+    );
+    IntersectionVertex w = vertex("to_v", c, false, false);
 
     // Two edges.
     StreetEdge fromEdge = edge(u, v, 1.0, false);
@@ -169,9 +282,9 @@ public class SimpleIntersectionTraversalCalculatorTest {
     Coordinate c = new Coordinate(-73.984981, 40.747761);
 
     // A vertex for each. No light.
-    IntersectionVertex u = vertex("from_v", a, false);
-    IntersectionVertex v = vertex("intersection", b, false);
-    IntersectionVertex w = vertex("to_v", c, false);
+    IntersectionVertex u = vertex("from_v", a, false, false);
+    IntersectionVertex v = vertex("intersection", b, false, false);
+    IntersectionVertex w = vertex("to_v", c, false, false);
 
     // Two edges - will infer that the vertex is free-flowing since there is no light.
     StreetEdge fromEdge = edge(u, v, 1.0, false);
@@ -202,9 +315,9 @@ public class SimpleIntersectionTraversalCalculatorTest {
     Coordinate c = new Coordinate(-73.984981, 40.747761);
 
     // A vertex for each. No light.
-    IntersectionVertex u = vertex("from_v", a, false);
-    IntersectionVertex v = vertex("intersection", b, false);
-    IntersectionVertex w = vertex("to_v", c, false);
+    IntersectionVertex u = vertex("from_v", a, false, false);
+    IntersectionVertex v = vertex("intersection", b, false, false);
+    IntersectionVertex w = vertex("to_v", c, false, false);
 
     // Two edges.
     StreetEdge fromEdge = edge(u, v, 1.0, false);
@@ -238,9 +351,9 @@ public class SimpleIntersectionTraversalCalculatorTest {
     Coordinate c = new Coordinate(40.748509, -73.988693);
 
     // A vertex for each. No light.
-    IntersectionVertex u = vertex("from_v", a, false);
-    IntersectionVertex v = vertex("intersection", b, false);
-    IntersectionVertex w = vertex("to_v", c, false);
+    IntersectionVertex u = vertex("from_v", a, false, false);
+    IntersectionVertex v = vertex("intersection", b, false, false);
+    IntersectionVertex w = vertex("to_v", c, false, false);
 
     // Two edges.
     StreetEdge fromEdge = edge(u, v, 1.0, false);
@@ -278,9 +391,9 @@ public class SimpleIntersectionTraversalCalculatorTest {
     Coordinate c = new Coordinate(40.749760, -73.987749);
 
     // A vertex for each. No light.
-    IntersectionVertex u = vertex("from_v", a, false);
-    IntersectionVertex v = vertex("intersection", b, false);
-    IntersectionVertex w = vertex("to_v", c, false);
+    IntersectionVertex u = vertex("from_v", a, false, false);
+    IntersectionVertex v = vertex("intersection", b, false, false);
+    IntersectionVertex w = vertex("to_v", c, false, false);
 
     // Two edges.
     StreetEdge fromEdge = edge(u, v, 1.0, false);
@@ -314,9 +427,20 @@ public class SimpleIntersectionTraversalCalculatorTest {
    * Private Methods
    ****/
 
-  private IntersectionVertex vertex(String label, Coordinate coord, boolean hasLight) {
-    IntersectionVertex v = new IntersectionVertex(graph, label, coord.y, coord.x);
-    v.trafficLight = hasLight;
+  private IntersectionVertex vertex(
+    String label,
+    Coordinate coord,
+    boolean hasHighwayLight,
+    boolean hasCrossingLight
+  ) {
+    IntersectionVertex v = new IntersectionVertex(
+      graph,
+      label,
+      coord.y,
+      coord.x,
+      hasHighwayLight,
+      hasCrossingLight
+    );
     return v;
   }
 

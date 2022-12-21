@@ -12,6 +12,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -47,7 +48,9 @@ public class UnscheduledTripTest extends FlexTest {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
 
-    var accesses = trip.getFlexAccessTemplates(nearbyStop, flexDate, calculator, params).toList();
+    var accesses = trip
+      .getFlexAccessTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
+      .toList();
 
     assertEquals(1, accesses.size());
 
@@ -60,7 +63,9 @@ public class UnscheduledTripTest extends FlexTest {
   void calculateEgressTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
-    var egresses = trip.getFlexEgressTemplates(nearbyStop, flexDate, calculator, params).toList();
+    var egresses = trip
+      .getFlexEgressTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
+      .toList();
 
     assertEquals(1, egresses.size());
 

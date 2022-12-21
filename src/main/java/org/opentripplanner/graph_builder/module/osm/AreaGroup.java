@@ -15,7 +15,6 @@ import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionException;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
@@ -41,6 +40,8 @@ class AreaGroup {
    */
   List<Ring> outermostRings = new ArrayList<>();
 
+  public final Geometry union;
+
   public AreaGroup(Collection<Area> areas) {
     this.areas = areas;
 
@@ -65,23 +66,25 @@ class AreaGroup {
       }
     }
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-    Geometry u = geometryFactory.createMultiPolygon(allRings.toArray(new Polygon[allRings.size()]));
-    u = u.union();
+    Geometry allPolygons = geometryFactory.createMultiPolygon(
+      allRings.toArray(new Polygon[allRings.size()])
+    );
+    this.union = allPolygons.union();
 
-    if (u instanceof GeometryCollection) {
-      GeometryCollection mp = (GeometryCollection) u;
+    if (this.union instanceof GeometryCollection coll) {
+      GeometryCollection mp = coll;
       for (int i = 0; i < mp.getNumGeometries(); ++i) {
-        Geometry poly = mp.getGeometryN(i);
-        if (!(poly instanceof Polygon)) {
-          LOG.warn("Unexpected non-polygon when merging areas: {}", poly);
-          continue;
+        Geometry geom = mp.getGeometryN(i);
+        if (geom instanceof Polygon polygon) {
+          outermostRings.add(toRing(polygon, nodeMap));
+        } else {
+          LOG.warn("Unexpected non-polygon when merging areas: {}", geom);
         }
-        outermostRings.add(toRing((Polygon) poly, nodeMap));
       }
-    } else if (u instanceof Polygon) {
-      outermostRings.add(toRing((Polygon) u, nodeMap));
+    } else if (this.union instanceof Polygon polygon) {
+      outermostRings.add(toRing(polygon, nodeMap));
     } else {
-      LOG.warn("Unexpected non-polygon when merging areas: {}", u);
+      LOG.warn("Unexpected non-polygon when merging areas: {}", this.union);
     }
   }
 

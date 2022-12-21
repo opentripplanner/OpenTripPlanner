@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.Path;
@@ -30,7 +31,6 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
-import org.opentripplanner.util.OTPFeature;
 
 public class TransitRouter {
 
@@ -218,7 +218,8 @@ public class TransitRouter {
       serverContext.transitService(),
       streetRequest,
       serverContext.dataOverlayContext(accessRequest),
-      isEgress
+      isEgress,
+      accessRequest.preferences().street().maxAccessEgressDuration().valueOf(streetRequest.mode())
     );
 
     var results = new ArrayList<>(accessEgressMapper.mapNearbyStops(nearbyStops, isEgress));
@@ -230,7 +231,7 @@ public class TransitRouter {
         temporaryVertices,
         serverContext,
         additionalSearchDays,
-        serverContext.routerConfig().flexParameters(accessRequest.preferences()),
+        serverContext.flexConfig(),
         serverContext.dataOverlayContext(accessRequest),
         isEgress
       );

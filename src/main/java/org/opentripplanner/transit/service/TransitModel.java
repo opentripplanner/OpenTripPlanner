@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.service;
 
+import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.set.hash.TIntHashSet;
@@ -15,6 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -221,7 +224,7 @@ public class TransitModel implements Serializable {
    * service period {@code null} is returned.
    */
   @Nullable
-  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
+  public FeedScopedId getOrCreateServiceIdForDate(@Nonnull LocalDate serviceDate) {
     // Start of day
     ZonedDateTime time = ServiceDateUtils.asStartOfService(serviceDate, getTimeZone());
 
@@ -324,9 +327,10 @@ public class TransitModel implements Serializable {
       Collection<ZoneId> zones = getAgencyTimeZones();
       if (zones.size() > 1) {
         throw new IllegalStateException(
-          "The graph contains agencies with different time zones: %s. Please configure the one to be used in the build-config.json".formatted(
-              zones
-            )
+          (
+            "The graph contains agencies with different time zones: %s. " +
+            "Please configure the one to be used in the %s"
+          ).formatted(zones, BUILD_CONFIG_FILENAME)
         );
       }
     }

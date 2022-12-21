@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
@@ -18,24 +18,31 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.framework.i18n.LocalizedString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
-import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.wayproperty.CreativeNamer;
+import org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder;
+import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.basic.LocalizedString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class OpenStreetMapModuleTest {
@@ -133,20 +140,20 @@ public class OpenStreetMapModuleTest {
     IntersectionVertex iv2 = (IntersectionVertex) gg.getVertex("osm:node:42442273");
     IntersectionVertex iv3 = (IntersectionVertex) gg.getVertex("osm:node:1919595927");
     IntersectionVertex iv4 = (IntersectionVertex) gg.getVertex("osm:node:42452026");
-    assertTrue(iv1.trafficLight);
-    assertTrue(iv2.trafficLight);
-    assertTrue(iv3.trafficLight);
-    assertTrue(iv4.trafficLight);
+    assertTrue(iv1.hasDrivingTrafficLight());
+    assertTrue(iv2.hasDrivingTrafficLight());
+    assertTrue(iv3.hasDrivingTrafficLight());
+    assertTrue(iv4.hasDrivingTrafficLight());
 
     // These are not.
     IntersectionVertex iv5 = (IntersectionVertex) gg.getVertex("osm:node:42435485");
     IntersectionVertex iv6 = (IntersectionVertex) gg.getVertex("osm:node:42439335");
     IntersectionVertex iv7 = (IntersectionVertex) gg.getVertex("osm:node:42436761");
     IntersectionVertex iv8 = (IntersectionVertex) gg.getVertex("osm:node:42442291");
-    assertFalse(iv5.trafficLight);
-    assertFalse(iv6.trafficLight);
-    assertFalse(iv7.trafficLight);
-    assertFalse(iv8.trafficLight);
+    assertFalse(iv5.hasDrivingTrafficLight());
+    assertFalse(iv6.hasDrivingTrafficLight());
+    assertFalse(iv7.hasDrivingTrafficLight());
+    assertFalse(iv8.hasDrivingTrafficLight());
 
     Set<VertexPair> edgeEndpoints = new HashSet<>();
     for (StreetEdge se : gg.getStreetEdges()) {
@@ -219,8 +226,8 @@ public class OpenStreetMapModuleTest {
 
     // add a mixin
     BestMatchSpecifier gravel = new BestMatchSpecifier("surface=gravel");
-    WayProperties gravel_is_dangerous = new WayPropertiesBuilder(ALL).bicycleSafety(2).build();
-    wayPropertySet.addProperties(gravel, gravel_is_dangerous, true);
+    var gravel_is_dangerous = MixinPropertiesBuilder.ofBicycleSafety(2);
+    wayPropertySet.setMixinProperties(gravel, gravel_is_dangerous);
 
     dataForWay = wayPropertySet.getDataForWay(way);
     assertEquals(dataForWay.getBicycleSafetyFeatures().forward(), 1.5);
@@ -239,9 +246,10 @@ public class OpenStreetMapModuleTest {
 
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().forward()); // right (with traffic) comes
-    // from track
-    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().back()); // left comes from lane
+    // right (with traffic) comes from track
+    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().forward());
+    // left comes from lane
+    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().back());
 
     way = new OSMWay();
     way.addTag("highway", "footway");
@@ -288,6 +296,30 @@ public class OpenStreetMapModuleTest {
 
   @Test
   void addParkingLotsToService() {
+    Graph graph = buildParkingLots();
+
+    var service = graph.getVehicleParkingService();
+    assertEquals(11, service.getVehicleParkings().count());
+    assertEquals(6, service.getBikeParks().count());
+    assertEquals(5, service.getCarParks().count());
+  }
+
+  @Test
+  void createArtificalEntrancesToUnlikedParkingLots() {
+    Graph graph = buildParkingLots();
+
+    graph
+      .getVerticesOfType(VehicleParkingEntranceVertex.class)
+      .stream()
+      .filter(v -> v.getLabel().contains("centroid"))
+      .forEach(v -> {
+        assertFalse(v.getOutgoing().isEmpty());
+        assertFalse(v.getIncoming().isEmpty());
+      });
+  }
+
+  @Nonnull
+  private Graph buildParkingLots() {
     var graph = new Graph();
     var providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
@@ -304,11 +336,7 @@ public class OpenStreetMapModuleTest {
     module.staticParkAndRide = true;
     module.staticBikeParkAndRide = true;
     module.buildGraph();
-
-    var service = graph.getVehicleParkingService();
-    assertEquals(8, service.getVehicleParkings().count());
-    assertEquals(4, service.getBikeParks().count());
-    assertEquals(4, service.getCarParks().count());
+    return graph;
   }
 
   /**

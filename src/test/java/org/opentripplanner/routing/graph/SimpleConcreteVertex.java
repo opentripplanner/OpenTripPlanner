@@ -7,8 +7,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
  */
 public class SimpleConcreteVertex extends Vertex {
 
-  private static final long serialVersionUID = 1L;
-
   public SimpleConcreteVertex(Graph g, String label, double lat, double lon) {
     super(g, label, lon, lat);
   }

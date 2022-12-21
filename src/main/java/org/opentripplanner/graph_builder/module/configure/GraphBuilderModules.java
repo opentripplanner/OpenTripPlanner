@@ -56,7 +56,14 @@ public class GraphBuilderModules {
   ) {
     List<OpenStreetMapProvider> providers = new ArrayList<>();
     for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
-      providers.add(new OpenStreetMapProvider(osmConfiguredDataSource, config.osmCacheDataInMem));
+      providers.add(
+        new OpenStreetMapProvider(
+          osmConfiguredDataSource.dataSource(),
+          osmConfiguredDataSource.config().osmTagMapper(),
+          osmConfiguredDataSource.config().timeZone(),
+          config.osmCacheDataInMem
+        )
+      );
     }
 
     return new OpenStreetMapModule(
@@ -91,10 +98,7 @@ public class GraphBuilderModules {
       graph,
       issueStore,
       config.getTransitServicePeriod(),
-      config.fareServiceFactory,
-      config.discardMinTransferTimes,
-      config.blockBasedInterlining,
-      config.maxInterlineDistance
+      config.fareServiceFactory
     );
   }
 
@@ -165,10 +169,7 @@ public class GraphBuilderModules {
       );
     } else if (dataSources.has(DEM)) {
       gridCoverageFactories.addAll(
-        createDemGeotiffGridCoverageFactories(
-          dataSources.getDemConfiguredDatasource(),
-          config.elevationUnitMultiplier
-        )
+        createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDatasource())
       );
     }
     // Refactoring this class, it was made clear that this allows for adding multiple elevation
@@ -265,15 +266,11 @@ public class GraphBuilderModules {
   }
 
   private static List<ElevationGridCoverageFactory> createDemGeotiffGridCoverageFactories(
-    Iterable<ConfiguredDataSource<DemExtractParameters>> dataSources,
-    double defaultElevationUnitMultiplier
+    Iterable<ConfiguredDataSource<DemExtractParameters>> dataSources
   ) {
     List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
     for (ConfiguredDataSource<DemExtractParameters> demSource : dataSources) {
-      double elevationUnitMultiplier = demSource
-        .config()
-        .elevationUnitMultiplier()
-        .orElse(defaultElevationUnitMultiplier);
+      double elevationUnitMultiplier = demSource.config().elevationUnitMultiplier();
       elevationGridCoverageFactories.add(
         createGeotiffGridCoverageFactoryImpl(demSource.dataSource(), elevationUnitMultiplier)
       );

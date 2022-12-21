@@ -3,9 +3,9 @@ package org.opentripplanner.street.model.vertex;
 import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * A vertex for an OSM node that represents a transit stop and has a tag to cross-reference this to
@@ -29,7 +29,7 @@ public class OsmBoardingLocationVertex extends IntersectionVertex {
     @Nullable I18NString name,
     Collection<String> references
   ) {
-    super(g, label, x, y, name);
+    super(g, label, x, y, name, false, false);
     this.references = Set.copyOf(references);
   }
 

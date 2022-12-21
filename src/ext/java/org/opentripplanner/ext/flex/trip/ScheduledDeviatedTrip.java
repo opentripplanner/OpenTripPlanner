@@ -14,7 +14,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
@@ -25,6 +24,7 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -80,7 +80,7 @@ public class ScheduledDeviatedTrip
     NearbyStop access,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    FlexParameters params
+    FlexConfig config
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
@@ -106,7 +106,7 @@ public class ScheduledDeviatedTrip
             stop,
             date,
             scheduledCalculator,
-            params
+            config
           )
         );
       }
@@ -120,7 +120,7 @@ public class ScheduledDeviatedTrip
     NearbyStop egress,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    FlexParameters params
+    FlexConfig config
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
@@ -146,7 +146,7 @@ public class ScheduledDeviatedTrip
             stop,
             date,
             scheduledCalculator,
-            params
+            config
           )
         );
       }
@@ -172,6 +172,11 @@ public class ScheduledDeviatedTrip
   }
 
   @Override
+  public int earliestDepartureTime(int stopIndex) {
+    return stopTimes[stopIndex].departureTime;
+  }
+
+  @Override
   public int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime) {
     int stopTime = MISSING_VALUE;
     for (int i = toStopIndex; stopTime == MISSING_VALUE && i < stopTimes.length; i++) {
@@ -180,6 +185,11 @@ public class ScheduledDeviatedTrip
     return stopTime != MISSING_VALUE && stopTime <= arrivalTime
       ? stopTime
       : SearchParams.TIME_NOT_SET;
+  }
+
+  @Override
+  public int latestArrivalTime(int stopIndex) {
+    return stopTimes[stopIndex].arrivalTime;
   }
 
   @Override

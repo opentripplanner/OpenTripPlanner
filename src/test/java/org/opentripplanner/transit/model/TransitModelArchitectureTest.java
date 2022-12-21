@@ -1,14 +1,14 @@
 package org.opentripplanner.transit.model;
 
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
+import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK;
+import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK_UTILS;
 import static org.opentripplanner.OtpArchitectureModules.GEO_UTILS;
 import static org.opentripplanner.OtpArchitectureModules.JACKSON_ANNOTATIONS;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_ADAPTER_API;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
 import static org.opentripplanner.OtpArchitectureModules.TRANSIT_MODEL;
-import static org.opentripplanner.OtpArchitectureModules.UTIL;
-import static org.opentripplanner.OtpArchitectureModules.UTILS;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -27,25 +27,31 @@ public class TransitModelArchitectureTest {
 
   @Test
   void enforceFrameworkPackageDependencies() {
-    TRANSIT_FRAMEWORK.dependsOn(UTILS).verify();
+    TRANSIT_FRAMEWORK.dependsOn(FRAMEWORK_UTILS).verify();
   }
 
   @Test
   void enforceBasicPackageDependencies() {
-    // TODO Remove dependency to resources
-    var resources = UTIL.subPackage("resources");
-    BASIC.dependsOn(UTILS, GEO_UTILS, resources, TRANSIT_FRAMEWORK).verify();
+    var resources = FRAMEWORK.subPackage("resources");
+    BASIC.dependsOn(FRAMEWORK_UTILS, GEO_UTILS, resources, TRANSIT_FRAMEWORK).verify();
   }
 
   @Test
   void enforceOrganizationPackageDependencies() {
-    ORGANIZATION.dependsOn(UTILS, TRANSIT_FRAMEWORK, BASIC).verify();
+    ORGANIZATION.dependsOn(FRAMEWORK_UTILS, TRANSIT_FRAMEWORK, BASIC).verify();
   }
 
   @Test
   void enforceSitePackageDependencies() {
     SITE
-      .dependsOn(UTILS, JACKSON_ANNOTATIONS, GEO_UTILS, TRANSIT_FRAMEWORK, BASIC, ORGANIZATION)
+      .dependsOn(
+        FRAMEWORK_UTILS,
+        JACKSON_ANNOTATIONS,
+        GEO_UTILS,
+        TRANSIT_FRAMEWORK,
+        BASIC,
+        ORGANIZATION
+      )
       .verify();
   }
 
@@ -54,7 +60,7 @@ public class TransitModelArchitectureTest {
     // TODO OTP2 temporarily allow circular dependency between network and timetable
     NETWORK
       .dependsOn(
-        UTILS,
+        FRAMEWORK_UTILS,
         GEO_UTILS,
         TRANSIT_FRAMEWORK,
         BASIC,
@@ -71,7 +77,15 @@ public class TransitModelArchitectureTest {
   @Test
   void enforceTimetablePackageDependencies() {
     TIMETABLE
-      .dependsOn(UTILS, TRANSIT_FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL)
+      .dependsOn(
+        FRAMEWORK_UTILS,
+        TRANSIT_FRAMEWORK,
+        BASIC,
+        ORGANIZATION,
+        NETWORK,
+        SITE,
+        LEGACY_MODEL
+      )
       .verify();
   }
 
@@ -80,7 +94,7 @@ public class TransitModelArchitectureTest {
   @Disabled
   void enforceNoCyclicDependencies() {
     slices()
-      .matching("org.opentripplanner.transit.model.(*)..")
+      .matching(TRANSIT_MODEL.packageIdentifierAllSubPackages())
       .should()
       .beFreeOfCycles()
       .check(ArchComponent.OTP_CLASSES);

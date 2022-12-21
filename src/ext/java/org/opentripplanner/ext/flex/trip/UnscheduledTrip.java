@@ -13,7 +13,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
@@ -23,6 +22,7 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -85,7 +85,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     NearbyStop access,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    FlexParameters params
+    FlexConfig config
   ) {
     // Find boarding index
     int fromIndex = getFromIndex(access);
@@ -102,7 +102,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
     for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
       res.add(
-        new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, date, calculator, params)
+        new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, date, calculator, config)
       );
     }
 
@@ -114,7 +114,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     NearbyStop egress,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    FlexParameters params
+    FlexConfig config
   ) {
     // Boarding is always at the first stop for unscheduled trips
     int fromIndex = 0;
@@ -131,7 +131,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
     for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
       res.add(
-        new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, date, calculator, params)
+        new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, date, calculator, config)
       );
     }
 
@@ -158,6 +158,11 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   @Override
+  public int earliestDepartureTime(int stopIndex) {
+    return stopTimes[stopIndex].flexWindowStart;
+  }
+
+  @Override
   public int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime) {
     UnscheduledStopTime fromStopTime = stopTimes[fromStopIndex];
     UnscheduledStopTime toStopTime = stopTimes[toStopIndex];
@@ -169,6 +174,11 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     }
 
     return Math.min(arrivalTime, toStopTime.flexWindowEnd);
+  }
+
+  @Override
+  public int latestArrivalTime(int stopIndex) {
+    return stopTimes[stopIndex].flexWindowEnd;
   }
 
   @Override

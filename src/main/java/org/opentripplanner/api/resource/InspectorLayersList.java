@@ -3,7 +3,7 @@ package org.opentripplanner.api.resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.inspector.TileRenderer;
+import org.opentripplanner.inspector.raster.TileRenderer;
 
 /**
  * @author mabu
