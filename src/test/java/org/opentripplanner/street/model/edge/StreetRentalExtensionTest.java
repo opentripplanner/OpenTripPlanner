@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,6 +11,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.street.model._data.StreetModelForTest;
+import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.BusinessAreaBorder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -25,7 +27,7 @@ class StreetRentalExtensionTest {
   @Test
   public void dontLeaveBusinessArea() {
     var edge = StreetModelForTest.streetEdge(V1, V2);
-    edge.addRentalExtension(new StreetEdgeRentalExtension.BusinessAreaBorder(network));
+    edge.addRentalExtension(new BusinessAreaBorder(network));
     State result = traverse(edge);
     assertNull(result);
   }
@@ -59,6 +61,29 @@ class StreetRentalExtensionTest {
     var edge = StreetModelForTest.streetEdge(V1, V2);
     State result = traverse(edge);
     assertTrue(result.isFinal());
+  }
+
+  @Test
+  public void addTwoExtensions() {
+    var edge = StreetModelForTest.streetEdge(V1, V2);
+    edge.addRentalExtension(new BusinessAreaBorder("a"));
+    edge.addRentalExtension(new BusinessAreaBorder("b"));
+
+    assertEquals(2, edge.getTraversalExtensions().size());
+  }
+
+  @Test
+  public void removeExtensions() {
+    var edge = StreetModelForTest.streetEdge(V1, V2);
+    edge.addRentalExtension(new BusinessAreaBorder("a"));
+    edge.addRentalExtension(new BusinessAreaBorder("b"));
+    edge.addRentalExtension(new BusinessAreaBorder("b"));
+
+    edge.removeTraversalExtension("a");
+    assertEquals(2, edge.getTraversalExtensions().size());
+
+    edge.removeTraversalExtension("b");
+    assertEquals(0, edge.getTraversalExtensions().size());
   }
 
   private State traverse(StreetEdge edge) {
