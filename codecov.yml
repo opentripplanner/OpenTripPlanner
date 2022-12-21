@@ -3,3 +3,5 @@ coverage:
     project: false
     patch: false
     changed: false
+github_checks:
+  annotations: false
