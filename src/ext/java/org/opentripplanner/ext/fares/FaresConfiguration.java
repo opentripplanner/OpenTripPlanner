@@ -9,6 +9,7 @@ import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareSer
 import org.opentripplanner.ext.fares.impl.MultipleFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.NoopFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.NycFareServiceFactory;
+import org.opentripplanner.ext.fares.impl.OrcaFareFactory;
 import org.opentripplanner.ext.fares.impl.SFBayFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.TimeBasedVehicleRentalFareServiceFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -102,6 +103,7 @@ public class FaresConfiguration {
         "highestFareInFreeTransferWindow" -> new HighestFareInFreeTransferWindowFareServiceFactory();
       case "hsl" -> new HSLFareServiceFactory();
       case "atlanta" -> new AtlantaFareServiceFactory();
+      case "orca" -> new OrcaFareFactory();
       case "combine-interlined-legs" -> new CombineInterlinedLegsFactory();
       default -> throw new IllegalArgumentException(String.format("Unknown fare type: '%s'", type));
     };

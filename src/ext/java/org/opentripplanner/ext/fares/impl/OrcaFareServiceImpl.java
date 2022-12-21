@@ -152,21 +152,13 @@ public class OrcaFareServiceImpl extends DefaultFareService {
     if (rideType == null) {
       return defaultFare;
     }
-    switch (fareType) {
-      case youth:
-      case electronicYouth:
-        return getYouthFare();
-      case electronicSpecial:
-        return getLiftFare(rideType, defaultFare, leg.getRoute());
-      case electronicSenior:
-      case senior:
-        return getSeniorFare(fareType, rideType, defaultFare, leg.getRoute());
-      case regular:
-      case electronicRegular:
-        return getRegularFare(fareType, rideType, defaultFare, leg);
-      default:
-        return defaultFare;
-    }
+    return switch (fareType) {
+      case youth, electronicYouth -> getYouthFare();
+      case electronicSpecial -> getLiftFare(rideType, defaultFare, leg.getRoute());
+      case electronicSenior, senior -> getSeniorFare(fareType, rideType, defaultFare, leg.getRoute());
+      case regular, electronicRegular -> getRegularFare(fareType, rideType, defaultFare, leg);
+      default -> defaultFare;
+    };
   }
 
 
@@ -175,20 +167,16 @@ public class OrcaFareServiceImpl extends DefaultFareService {
    */
   private float getRegularFare(FareType fareType, RideType rideType, float defaultFare, Leg leg) {
     Route route = leg.getRoute();
-    switch (rideType) {
-      case KC_WATER_TAXI_VASHON_ISLAND: return 5.75f;
-      case KC_WATER_TAXI_WEST_SEATTLE: return 5.00f;
-      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND: return 2.00f;
-      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND: return 10.00f;
-      case WASHINGTON_STATE_FERRIES:
-        return getWashingtonStateFerriesFare(route.getLongName().toString(), fareType, defaultFare);
-      case SOUND_TRANSIT_LINK:
-      case SOUND_TRANSIT_SOUNDER:
-        return getSoundTransitFare(leg, fareType, defaultFare, rideType);
-      case SOUND_TRANSIT_BUS:
-        return 3.25f;
-      default: return defaultFare;
-    }
+    return switch (rideType) {
+      case KC_WATER_TAXI_VASHON_ISLAND -> 5.75f;
+      case KC_WATER_TAXI_WEST_SEATTLE -> 5.00f;
+      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> 2.00f;
+      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> 10.00f;
+      case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(route.getLongName().toString(), fareType, defaultFare);
+      case SOUND_TRANSIT_LINK, SOUND_TRANSIT_SOUNDER -> getSoundTransitFare(leg, fareType, defaultFare, rideType);
+      case SOUND_TRANSIT_BUS -> 3.25f;
+      default -> defaultFare;
+    };
   }
 
 
@@ -214,62 +202,43 @@ public class OrcaFareServiceImpl extends DefaultFareService {
    * Apply Orca lift discount fares based on the ride type.
    */
   private float getLiftFare(RideType rideType, float defaultFare, Route route) {
-    switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT: return 1.25f;
-      case COMM_TRANS_COMMUTER_EXPRESS: return 2.00f;
-      case KC_WATER_TAXI_VASHON_ISLAND: return 4.50f;
-      case KC_WATER_TAXI_WEST_SEATTLE: return 3.75f;
-      case KITSAP_TRANSIT: return 1.00f;
-      case KC_METRO:
-      case SOUND_TRANSIT:
-      case SOUND_TRANSIT_BUS:
-      case SOUND_TRANSIT_LINK:
-      case SOUND_TRANSIT_SOUNDER:
-      case EVERETT_TRANSIT:
-      case SEATTLE_STREET_CAR:
-        return 1.50f;
-      case WASHINGTON_STATE_FERRIES:
-        return getWashingtonStateFerriesFare(route.getLongName().toString(), FareType.electronicSpecial, defaultFare);
-      case PIERCE_COUNTY_TRANSIT:
-      default:
-        return defaultFare;
-    }
+    return switch (rideType) {
+      case COMM_TRANS_LOCAL_SWIFT -> 1.25f;
+      case COMM_TRANS_COMMUTER_EXPRESS -> 2.00f;
+      case KC_WATER_TAXI_VASHON_ISLAND -> 4.50f;
+      case KC_WATER_TAXI_WEST_SEATTLE -> 3.75f;
+      case KITSAP_TRANSIT -> 1.00f;
+      case KC_METRO, SOUND_TRANSIT, SOUND_TRANSIT_BUS, SOUND_TRANSIT_LINK, SOUND_TRANSIT_SOUNDER, EVERETT_TRANSIT, SEATTLE_STREET_CAR -> 1.50f;
+      case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(route.getLongName().toString(), FareType.electronicSpecial, defaultFare);
+      case PIERCE_COUNTY_TRANSIT -> defaultFare;
+      default -> defaultFare;
+    };
   }
 
   /**
    * Apply senior discount fares based on the fare and ride types.
    */
   private float getSeniorFare(FareType fareType, RideType rideType, float defaultFare, Route route) {
-    switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT: return 1.25f;
-      case COMM_TRANS_COMMUTER_EXPRESS: return 2.00f;
-      case EVERETT_TRANSIT:
-        return 0.50f;
-      case PIERCE_COUNTY_TRANSIT:
-      case SEATTLE_STREET_CAR:
-      case KITSAP_TRANSIT:
+    return switch (rideType) {
+      case COMM_TRANS_LOCAL_SWIFT -> 1.25f;
+      case COMM_TRANS_COMMUTER_EXPRESS -> 2.00f;
+      case EVERETT_TRANSIT -> 0.50f;
+      case PIERCE_COUNTY_TRANSIT, SEATTLE_STREET_CAR, KITSAP_TRANSIT ->
         // Pierce, Seattle Streetcar, and Kitsap only provide discounted senior fare for orca.
-        return fareType.equals(FareType.electronicSenior) ? 1.00f : defaultFare;
-      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND:
+        fareType.equals(FareType.electronicSenior) ? 1.00f : defaultFare;
+      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND ->
         // Kitsap only provide discounted senior fare for orca.
-        return fareType.equals(FareType.electronicSenior) ? 1.00f : 2.00f;
-      case KC_WATER_TAXI_VASHON_ISLAND: return 3.00f;
-      case KC_WATER_TAXI_WEST_SEATTLE: return 2.50f;
-      case KC_METRO:
-      case SOUND_TRANSIT:
-      case SOUND_TRANSIT_BUS:
-      case SOUND_TRANSIT_LINK:
-      case SOUND_TRANSIT_SOUNDER:
-        return 1.00f;
-      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND:
-        return fareType.equals(FareType.electronicSenior) ? 5.00f : 10.00f;
-      case SKAGIT_TRANSIT:
+        fareType.equals(FareType.electronicSenior) ? 1.00f : 2.00f;
+      case KC_WATER_TAXI_VASHON_ISLAND -> 3.00f;
+      case KC_WATER_TAXI_WEST_SEATTLE -> 2.50f;
+      case KC_METRO, SOUND_TRANSIT, SOUND_TRANSIT_BUS, SOUND_TRANSIT_LINK, SOUND_TRANSIT_SOUNDER -> 1.00f;
+      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> fareType.equals(FareType.electronicSenior) ? 5.00f : 10.00f;
+      case SKAGIT_TRANSIT ->
         // Discount specific to Skagit transit and not Orca.
-        return 0.50f;
-      case WASHINGTON_STATE_FERRIES:
-        return getWashingtonStateFerriesFare(route.getLongName().toString(), fareType, defaultFare);
-      default: return defaultFare;
-    }
+        0.50f;
+      case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(route.getLongName().toString(), fareType, defaultFare);
+      default -> defaultFare;
+    };
   }
 
   /**
