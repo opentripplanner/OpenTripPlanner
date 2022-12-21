@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.support;
 import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
 
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
@@ -15,8 +16,8 @@ import org.opentripplanner.raptor.spi.TransitArrival;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleBoardSearch;
 
 /**
- * This class contains code which is shared by all time-dependent routing strategies. It also
- * defines abstract methods, which the individual strategies must implement.
+ * This class contains code which is shared by all time-dependent {@link RoutingStrategy}s.
+ *
  */
 public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
 

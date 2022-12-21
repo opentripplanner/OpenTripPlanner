@@ -39,8 +39,8 @@ record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTi
   @Override
   public void boardWithFallback(
     Consumer<RaptorBoardOrAlightEvent<T>> boardCallback,
-    Consumer<RaptorBoardOrAlightEvent<T>> fallback
+    Consumer<RaptorBoardOrAlightEvent<T>> alternativeBoardingFallback
   ) {
-    fallback.accept(this);
+    alternativeBoardingFallback.accept(this);
   }
 }
