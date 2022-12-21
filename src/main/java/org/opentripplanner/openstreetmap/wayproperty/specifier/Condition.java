@@ -4,6 +4,7 @@ import static org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.MatchResult.NONE;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.MatchResult.WILDCARD;
 
+import java.util.Arrays;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public sealed interface Condition {
@@ -136,6 +137,27 @@ public sealed interface Condition {
     public boolean getMatches(OSMWithTags way, String opKey) {
       var maybeInt = way.getTagAsInt(opKey, ignored -> {});
       return maybeInt.isPresent() && maybeInt.getAsInt() < value;
+    }
+  }
+
+  record InclusiveRange(String key, int upper, int lower) implements Condition {
+    public InclusiveRange {
+      if (upper < lower) {
+        throw new IllegalArgumentException("Upper bound is lower than lower bound");
+      }
+    }
+
+    @Override
+    public boolean getMatches(OSMWithTags way, String opKey) {
+      var maybeInt = way.getTagAsInt(opKey, ignored -> {});
+      return maybeInt.isPresent() && maybeInt.getAsInt() >= lower && maybeInt.getAsInt() <= upper;
+    }
+  }
+
+  record EqualsAnyIn(String key, String... values) implements Condition {
+    @Override
+    public boolean getMatches(OSMWithTags way, String opKey) {
+      return Arrays.stream(values).anyMatch(value -> way.matchesKeyValue(opKey, value));
     }
   }
 }
