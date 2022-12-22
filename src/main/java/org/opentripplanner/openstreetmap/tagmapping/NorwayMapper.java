@@ -12,6 +12,8 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.LogicalOrSpecifier;
 
 /**
@@ -45,270 +47,161 @@ class NorwayMapper implements OsmTagMapper {
     var dedicated_cycleway = 0.62;
     var dual_lane_or_oneway_cycleway = 0.6;
 
-    props.setProperties("highway=motorway", withModes(CAR));
-    props.setProperties("highway=motorway_link", withModes(CAR));
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","motorway", "motorway_link")
+      ),
+      withModes(CAR)
+    );
 
-    // Do not walk on "Motortrafikkvei" ("motorvei klasse b")
-    props.setProperties("highway=trunk;motorroad=yes", withModes(CAR));
-    props.setProperties("highway=trunk_link;motorroad=yes", withModes(CAR));
-
-    props.setProperties("highway=primary;motorroad=yes", withModes(CAR));
-    props.setProperties("highway=primary_link;motorroad=yes", withModes(CAR));
+    // Walking and cycling illegal on "Motortrafikkvei"
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link"),
+        new Condition.Equals("motorroad", "yes")
+      ),
+      withModes(CAR)
+    );
 
     /* "highway=trunk" roads ("Riksveier") are often single carriageway, and not only legal for bicycles,
     but assumed to be  much safer than the  default profile (Except when the speedlimt exceeds 90). */
-    props.setProperties("highway=trunk", withModes(ALL).bicycleSafety(high_traffic));
-    props.setProperties("highway=trunk_link", withModes(ALL).bicycleSafety(high_traffic));
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link")
+      ),
+      withModes(ALL).bicycleSafety(high_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "secondary", "secondary_link", "tertiary", "tertiary_link", "unclassified")
+      ),
+      withModes(ALL).bicycleSafety(medium_high_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","residential", "service")
+      ),
+      withModes(ALL).bicycleSafety(low_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link"),
+        new Condition.GreaterThan("maxspeed", 80)
+      ),
+      withModes(ALL).bicycleSafety(very_high_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link"),
+        new Condition.Equals("maxspeed", "60")
+      ),
+      withModes(ALL).bicycleSafety(medium_high_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","secondary", "secondary_link", "tertiary", "tertiary_link"),
+        new Condition.Equals("maxspeed", "60")
+      ),
+      withModes(ALL).bicycleSafety(medium_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "unclassified", "residential"),
+        new Condition.Equals("maxspeed", "60")
+      ),
+      withModes(ALL).bicycleSafety(medium_low_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.Equals("highway", "unclassified"),
+        new Condition.LessThan("maxspeed", 60)
+      ),
+      withModes(ALL).bicycleSafety(low_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link"),
+        new Condition.InclusiveRange("maxspeed", 50, 40)
+      ),
+      withModes(ALL).bicycleSafety(medium_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "secondary", "secondary_link"),
+        new Condition.InclusiveRange("maxspeed", 50, 40)
+      ),
+      withModes(ALL).bicycleSafety(medium_low_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "tertiary", "tertiary_link"),
+        new Condition.Equals("maxspeed", "50")
+      ),
+      withModes(ALL).bicycleSafety(low_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "tertiary", "tertiary_link"),
+        new Condition.LessThan("maxspeed", 50)
+      ),
+      withModes(ALL).bicycleSafety(low_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link"),
+        new Condition.LessThan("highway", 40)
+      ),
+      withModes(ALL).bicycleSafety(low_traffic)
+    );
+
     // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
-      "highway=trunk;foot=no",
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link"),
+        new Condition.Equals("foot", "no")
+      ),
       withModes(BICYCLE_AND_CAR).bicycleSafety(very_high_traffic)
     );
+
     props.setProperties(
-      "highway=trunk_link;foot=no",
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link"),
+        new Condition.Equals("foot", "no")
+      ),
       withModes(BICYCLE_AND_CAR).bicycleSafety(very_high_traffic)
     );
+
     // Discourage cycling on trunk road tunnels
     props.setProperties(
-      "highway=trunk;tunnel=yes",
-      withModes(CAR).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=trunk_link;tunnel=yes",
-      withModes(CAR).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=trunk;maxspeed=90",
-      withModes(ALL).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=trunk_link;maxspeed=90",
-      withModes(ALL).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=trunk;maxspeed=60",
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
-    props.setProperties(
-      "highway=trunk_link;maxspeed=60",
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
-    props.setProperties("highway=trunk;maxspeed=50", withModes(ALL).bicycleSafety(medium_traffic));
-    props.setProperties(
-      "highway=trunk_link;maxspeed=50",
-      withModes(ALL).bicycleSafety(medium_traffic)
-    );
-    props.setProperties("highway=trunk;maxspeed=40", withModes(ALL).bicycleSafety(medium_traffic));
-    props.setProperties(
-      "highway=trunk_link;maxspeed=40",
-      withModes(ALL).bicycleSafety(medium_traffic)
-    );
-
-    props.setProperties("highway=primary", withModes(ALL).bicycleSafety(high_traffic));
-    props.setProperties("highway=primary_link", withModes(ALL).bicycleSafety(high_traffic));
-    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
-    props.setProperties(
-      "highway=primary;foot=no",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=primary_link;foot=no",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=primary;maxspeed=90",
-      withModes(ALL).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=primary_link;maxspeed=90",
-      withModes(ALL).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=primary;maxspeed=60",
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
-    props.setProperties(
-      "highway=primary_link;maxspeed=60",
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
-    props.setProperties(
-      "highway=primary;maxspeed=50",
-      withModes(ALL).bicycleSafety(medium_traffic)
-    );
-    props.setProperties(
-      "highway=primary_link;maxspeed=50",
-      withModes(ALL).bicycleSafety(medium_traffic)
-    );
-    props.setProperties(
-      "highway=primary;maxspeed=40",
-      withModes(ALL).bicycleSafety(medium_traffic)
-    );
-    props.setProperties(
-      "highway=primary_link;maxspeed=40",
-      withModes(ALL).bicycleSafety(medium_traffic)
-    );
-    props.setProperties("highway=primary;maxspeed=30", withModes(ALL).bicycleSafety(low_traffic));
-    props.setProperties(
-      "highway=primary_link;maxspeed=30",
-      withModes(ALL).bicycleSafety(low_traffic)
-    );
-
-    props.setProperties("highway=secondary", withModes(ALL).bicycleSafety(medium_high_traffic));
-    props.setProperties(
-      "highway=secondary_link",
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
-    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
-    props.setProperties(
-      "highway=secondary;foot=no",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=secondary_link;foot=no",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=secondary;maxspeed=60",
-      withModes(ALL).bicycleSafety(medium_traffic)
-    );
-    props.setProperties(
-      "highway=secondary_link;maxspeed=60",
-      withModes(ALL).bicycleSafety(medium_traffic)
-    );
-    props.setProperties(
-      "highway=secondary;maxspeed=50",
-      withModes(ALL).bicycleSafety(medium_low_traffic)
-    );
-    props.setProperties(
-      "highway=secondary_link;maxspeed=50",
-      withModes(ALL).bicycleSafety(medium_low_traffic)
-    );
-    props.setProperties(
-      "highway=secondary;maxspeed=40",
-      withModes(ALL).bicycleSafety(medium_low_traffic)
-    );
-    props.setProperties(
-      "highway=secondary_link;maxspeed=40",
-      withModes(ALL).bicycleSafety(medium_low_traffic)
-    );
-    props.setProperties("highway=secondary;maxspeed=30", withModes(ALL).bicycleSafety(low_traffic));
-    props.setProperties(
-      "highway=secondary_link;maxspeed=30",
-      withModes(ALL).bicycleSafety(low_traffic)
-    );
-
-    props.setProperties("highway=tertiary", withModes(ALL).bicycleSafety(medium_low_traffic));
-    props.setProperties("highway=tertiary_link", withModes(ALL).bicycleSafety(medium_low_traffic));
-    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
-    props.setProperties(
-      "highway=tertiary;foot=no",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=tertiary_link;foot=no",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(very_high_traffic)
-    );
-    props.setProperties(
-      "highway=tertiary;maxspeed=80",
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
-    props.setProperties(
-      "highway=tertiary_link;maxspeed=80",
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
-    props.setProperties(
-      "highway=tertiary;maxspeed=70",
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
-    props.setProperties(
-      "highway=tertiary_link;maxspeed=70",
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
-    props.setProperties("highway=tertiary;maxspeed=40", withModes(ALL).bicycleSafety(low_traffic));
-    props.setProperties(
-      "highway=tertiary_link;maxspeed=40",
-      withModes(ALL).bicycleSafety(low_traffic)
-    );
-    props.setProperties("highway=tertiary;maxspeed=30", withModes(ALL).bicycleSafety(low_traffic));
-    props.setProperties(
-      "highway=tertiary_link;maxspeed=30",
-      withModes(ALL).bicycleSafety(low_traffic)
-    );
-
-    props.setProperties("highway=unclassified", withModes(ALL).bicycleSafety(low_traffic));
-    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
-    props.setProperties(
-      "highway=unclassified;foot=no",
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","unclassified", "residential", "service"),
+        new Condition.Equals("foot", "no")
+      ),
       withModes(BICYCLE_AND_CAR).bicycleSafety(medium_traffic)
     );
-    // These access tags indicates low traffic
-    props.setProperties(
-      "highway=unclassified;motor_vehicle=no",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
-    props.setProperties(
-      "highway=unclassified;motor_vehicle=private",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
-    props.setProperties(
-      "highway=unclassified;motor_vehicle=permit",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
-    props.setProperties(
-      "highway=unclassified;motor_vehicle=destination",
-      withModes(ALL).bicycleSafety(very_low_traffic)
-    );
-    props.setProperties(
-      "highway=unclassified;maxspeed=70",
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
-    props.setProperties(
-      "highway=unclassified;maxspeed=80",
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
 
-    props.setProperties("highway=residential", withModes(ALL).bicycleSafety(low_traffic));
-    // These access tags indicates low traffic
+    /* No motor vehicle thro traffic means less traffic and safer cycling.
+     Idea: use isMotorVehicleThroughTrafficExplicitlyDisallowed method of OSMTagMapper? */
     props.setProperties(
-      "highway=residential;motor_vehicle=no",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
-    props.setProperties(
-      "highway=residential;motor_vehicle=private",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
-    props.setProperties(
-      "highway=residential;motor_vehicle=permit",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
-    props.setProperties(
-      "highway=residential;motor_vehicle=destination",
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "unclassified", "residential", "service"),
+        new Condition.EqualsAnyIn("motor_vehicle", "no", "private", "permit", "destination")
+      ),
       withModes(ALL).bicycleSafety(very_low_traffic)
     );
 
-    props.setProperties("highway=service", withModes(ALL).bicycleSafety(low_traffic));
-    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
-    props.setProperties(
-      "highway=service;foot=no",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(medium_traffic)
-    );
-    // These access tags indicates low traffic
-    props.setProperties(
-      "highway=service;motor_vehicle=no",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
-    props.setProperties(
-      "highway=service;motor_vehicle=private",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
-    props.setProperties(
-      "highway=service;motor_vehicle=permit",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
-    props.setProperties(
-      "highway=service;motor_vehicle=destination",
-      withModes(ALL).bicycleSafety(very_low_traffic)
-    );
     // Cycling around reversing cars on a parking lot feels unsafe
     props.setProperties(
       "highway=service;service=parking_aisle",
@@ -321,126 +214,38 @@ class NorwayMapper implements OsmTagMapper {
 
     /* bicycle infrastructure */
     props.setProperties(
-      "highway=trunk;cycleway=track;maxspeed=*",
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=track;maxspeed=*",
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-    props.setProperties(
-      "highway=primary;cycleway=track;maxspeed=*",
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-    props.setProperties(
-      "highway=primary_link;cycleway=track;maxspeed=*",
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-    props.setProperties(
-      "highway=secondary;cycleway=track;maxspeed=*",
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-    props.setProperties(
-      "highway=secondary_link;cycleway=track;maxspeed=*",
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-    props.setProperties(
-      "highway=tertiary;cycleway=track;maxspeed=*",
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-    props.setProperties(
-      "highway=tertiary_link;cycleway=track;maxspeed=*",
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-    props.setProperties(
-      "highway=unclassified;cycleway=track;maxspeed=*",
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-    props.setProperties(
-      "highway=residential;cycleway=track;maxspeed=*",
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-    props.setProperties(
-      "highway=living_street;cycleway=track;maxspeed=*",
+      new ExactMatchSpecifier(
+        new Condition.Equals("cycleway", "track"),
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link", "unclassified", "residential", "living_street")
+      ),
       withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
     );
 
     props.setProperties(
-      "highway=trunk;cycleway=lane;maxspeed=*",
+      new ExactMatchSpecifier(
+        new Condition.Equals("cycleway", "lane"),
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link")
+      ),
       withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
     );
+
     props.setProperties(
-      "highway=trunk_link;cycleway=lane;maxspeed=*",
-      withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
-    );
-    props.setProperties(
-      "highway=primary;cycleway=lane;maxspeed=*",
-      withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
-    );
-    props.setProperties(
-      "highway=primary_link;cycleway=lane;maxspeed=*",
-      withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
-    );
-    props.setProperties(
-      "highway=secondary;cycleway=lane;maxspeed=*",
-      withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
-    );
-    props.setProperties(
-      "highway=secondary_link;cycleway=lane;maxspeed=*",
-      withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
-    );
-    props.setProperties(
-      "highway=secondary;cycleway=lane;maxspeed=40",
+      new ExactMatchSpecifier(
+        new Condition.Equals("cycleway", "lane"),
+        new Condition.LessThan("maxspeed", 50),
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link")
+      ),
       withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
     );
+
     props.setProperties(
-      "highway=secondary_link;cycleway=lane;maxspeed=40",
+      new ExactMatchSpecifier(
+        new Condition.Equals("cycleway", "lane"),
+        new Condition.EqualsAnyIn("highway", "unclassified", "residential", "living_street")
+      ),
       withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
     );
-    props.setProperties(
-      "highway=secondary;cycleway=lane;maxspeed=30",
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
-    );
-    props.setProperties(
-      "highway=secondary_link;cycleway=lane;maxspeed=30",
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
-    );
-    props.setProperties(
-      "highway=tertiary;cycleway=lane;maxspeed=*",
-      withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
-    );
-    props.setProperties(
-      "highway=tertiary_link;cycleway=lane;maxspeed=*",
-      withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
-    );
-    props.setProperties(
-      "highway=tertiary;cycleway=lane;maxspeed=40",
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
-    );
-    props.setProperties(
-      "highway=tertiary_link;cycleway=lane;maxspeed=40",
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
-    );
-    props.setProperties(
-      "highway=tertiary;cycleway=lane;maxspeed=30",
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
-    );
-    props.setProperties(
-      "highway=tertiary_link;cycleway=lane;maxspeed=30",
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
-    );
-    props.setProperties(
-      "highway=unclassified;cycleway=lane;maxspeed=*",
-      withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
-    );
-    props.setProperties(
-      "highway=residential;cycleway=lane;maxspeed=*",
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
-    );
-    props.setProperties(
-      "highway=living_street;cycleway=lane;maxspeed=*",
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
-    );
+
 
     /* opposite */
     props.setProperties(
