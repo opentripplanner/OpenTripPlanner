@@ -19,9 +19,6 @@ class BestMatchSpecifierTest extends SpecifierTest {
   );
 
   static OsmSpecifier bikeLane = new BestMatchSpecifier("highway=residential;cycleway=lane");
-  static OsmSpecifier regularCobblestones = new BestMatchSpecifier(
-    "highway=residential;surface=cobblestones"
-  );
   static OsmSpecifier cyclewayTrack = new BestMatchSpecifier("highway=footway;cycleway=track");
   static OsmSpecifier highwayFootwayCyclewayLane = new BestMatchSpecifier(
     "highway=footway;cycleway=lane"
