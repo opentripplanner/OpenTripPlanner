@@ -337,6 +337,16 @@ public class StateEditor {
     return child.getBackState();
   }
 
+  public void dropFloatingVehicle() {
+    cloneStateDataAsNeeded();
+    child.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
+    child.stateData.currentMode = TraverseMode.WALK;
+    child.stateData.vehicleRentalNetwork = null;
+    child.stateData.rentalVehicleFormFactor = null;
+    child.stateData.backWalkingBike = false;
+    setBackMode(null);
+  }
+
   /* PRIVATE METHODS */
 
   /**

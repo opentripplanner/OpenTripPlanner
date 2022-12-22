@@ -392,7 +392,17 @@ public class StreetEdge
     if (traversalExtensions != null) {
       for (var ext : traversalExtensions) {
         if (ext.traversalBanned(s0)) {
-          return null;
+          StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
+          if (walking != null) {
+            walking.dropFloatingVehicle();
+            State forkState = walking.makeState();
+            if (forkState != null) {
+              return forkState;
+            }
+          }
+          else {
+            return null;
+          }
         }
       }
     }
