@@ -16,10 +16,6 @@ public sealed interface Condition {
 
   String key();
 
-  default boolean isWildcard() {
-    return false;
-  }
-
   /**
    * Test to what degree the OSM entity matches with this operation when taking the regular tag keys
    * into account.
@@ -95,8 +91,6 @@ public sealed interface Condition {
   }
 
   record Present(String key) implements Condition {
-    public boolean isWildcard() {return true;}
-
     @Override
     public MatchResult match(OSMWithTags way) {
       return matches(way) ? WILDCARD : NONE;

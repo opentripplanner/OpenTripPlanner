@@ -34,11 +34,6 @@ public class ExactMatchSpecifier implements OsmSpecifier {
 
   public ExactMatchSpecifier(Condition... conditions) {
     this.conditions = Arrays.asList(conditions);
-    if (this.conditions.stream().anyMatch(Condition::isWildcard)) {
-      throw new IllegalArgumentException(
-        "Wildcards are not allowed in %s".formatted(this.getClass().getSimpleName())
-      );
-    }
     bestMatchScore = this.conditions.size() * MATCH_MULTIPLIER;
   }
 
