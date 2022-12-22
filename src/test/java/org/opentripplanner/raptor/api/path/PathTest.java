@@ -24,7 +24,7 @@ import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.BoardAndAlightTime;
+import org.opentripplanner.raptor.spi.Path;
 
 public class PathTest implements RaptorTestConstants {
 
@@ -160,19 +160,29 @@ public class PathTest implements RaptorTestConstants {
       .schedule(pattern("L1", STOP_B, STOP_C))
       .times(time("09:20"), egressStart)
       .build();
-    var times3 = new BoardAndAlightTime(trip3, 0, 1);
-    TransitPathLeg<TestTripSchedule> leg3 = new TransitPathLeg<>(trip3, times3, null, 600, leg4);
+    TransitPathLeg<TestTripSchedule> leg3 = new TransitPathLeg<>(
+      trip3,
+      trip3.departure(0),
+      trip3.arrival(1),
+      0,
+      1,
+      null,
+      600,
+      leg4
+    );
 
     var trip2 = TestTripSchedule
       .schedule(pattern("L1", STOP_A, STOP_B))
       .times(time("09:10"), time("09:20"))
       .build();
-    var times2 = new BoardAndAlightTime(trip2, 0, 1);
 
     var tx = TransferConstraint.create().staySeated().build();
     TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(
       trip2,
-      times2,
+      trip2.departure(0),
+      trip2.arrival(1),
+      0,
+      1,
       () -> tx,
       600,
       leg3
@@ -208,17 +218,32 @@ public class PathTest implements RaptorTestConstants {
       .schedule(pattern("L1", STOP_B, STOP_C))
       .times(time("09:20"), egressStart)
       .build();
-    var times3 = new BoardAndAlightTime(trip3, 0, 1);
-    TransitPathLeg<TestTripSchedule> leg3 = new TransitPathLeg<>(trip3, times3, null, 600, leg4);
+    TransitPathLeg<TestTripSchedule> leg3 = new TransitPathLeg<>(
+      trip3,
+      trip3.departure(0),
+      trip3.arrival(1),
+      0,
+      1,
+      null,
+      600,
+      leg4
+    );
 
     var trip2 = TestTripSchedule
       .schedule(pattern("L1", STOP_A, STOP_B))
       .times(time("09:10"), time("09:20"))
       .build();
-    var times2 = new BoardAndAlightTime(trip2, 0, 1);
 
-    var tx = TransferConstraint.create().staySeated().build();
-    TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(trip2, times2, null, 600, leg3);
+    TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(
+      trip2,
+      trip2.departure(0),
+      trip2.arrival(1),
+      0,
+      1,
+      null,
+      600,
+      leg3
+    );
 
     int accessStart = time("09:00");
     int accessEnd = time("09:10");

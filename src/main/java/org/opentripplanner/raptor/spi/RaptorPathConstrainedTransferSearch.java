@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.spi;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**

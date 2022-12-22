@@ -1,16 +1,19 @@
-package org.opentripplanner.raptor.api.path;
+package org.opentripplanner.raptor.spi;
 
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.AccessPathLeg;
+import org.opentripplanner.raptor.api.path.EgressPathLeg;
+import org.opentripplanner.raptor.api.path.PathLeg;
+import org.opentripplanner.raptor.api.path.PathStringBuilder;
+import org.opentripplanner.raptor.api.path.TransferPathLeg;
+import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.api.request.SearchParams;
-import org.opentripplanner.raptor.spi.BoardAndAlightTime;
-import org.opentripplanner.raptor.spi.CostCalculator;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 
 /**
  * This is the leg implementation for the {@link PathBuilder}. It is a private inner class which
@@ -402,7 +405,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     int cost = transitCost(costCalculator, slackProvider);
     return new TransitPathLeg<>(
       leg.trip,
-      leg.boardAndAlightTime,
+      leg.boardAndAlightTime.boardTime(),
+      leg.boardAndAlightTime.alightTime(),
+      leg.boardAndAlightTime.boardStopPos(),
+      leg.boardAndAlightTime.alightStopPos(),
       leg.constrainedTransferAfterLeg,
       cost,
       nextLeg

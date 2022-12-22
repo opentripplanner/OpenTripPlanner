@@ -1,4 +1,6 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.api.model;
+
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 
 /**
  * Raptor does not need any information from the constrained transfer, but it passes the instance in
