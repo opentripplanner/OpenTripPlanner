@@ -245,14 +245,10 @@ class NorwayMapper implements OsmTagMapper {
       ),
       withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
     );
-    
+
     /* Pedestrian, living and cyclestreet */
     props.setProperties("highway=living_street", withModes(ALL).bicycleSafety(low_traffic));
     props.setProperties("highway=pedestrian", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.2));
-    props.setProperties(
-      "highway=residential;cyclestreet=yes;motor_vehicle=*",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
 
     props.setProperties(
       "highway=footway",
