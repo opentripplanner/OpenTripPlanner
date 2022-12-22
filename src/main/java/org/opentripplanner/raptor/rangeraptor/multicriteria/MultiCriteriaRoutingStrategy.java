@@ -133,7 +133,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     int stopPos,
     int boardSlack
   ) {
-    var result = boardingSupport.boardWithRegularTransfer(
+    var result = boardingSupport.searchRegularTransfer(
       prevArrival.arrivalTime(),
       stopPos,
       boardSlack
@@ -151,7 +151,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     RaptorConstrainedBoardingSearch<T> txSearch
   ) {
     boardingSupport
-      .boardWithConstrainedTransfer(
+      .searchConstrainedTransfer(
         prevArrival.mostRecentTransitArrival(),
         prevArrival.arrivalTime(),
         boardSlack,

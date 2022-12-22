@@ -50,18 +50,18 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Same as {@link #boardWithRegularTransfer(int, int, int, int)}, but with
+   * Same as {@link #searchRegularTransfer(int, int, int, int)}, but with
    * {@code onTripIndex} unbounded.
    */
-  public RaptorBoardOrAlightEvent<T> boardWithRegularTransfer(
+  public RaptorBoardOrAlightEvent<T> searchRegularTransfer(
     int prevArrivalTime,
     int stopPos,
     int boardSlack
   ) {
-    return boardWithRegularTransfer(prevArrivalTime, stopPos, boardSlack, UNBOUNDED_TRIP_INDEX);
+    return searchRegularTransfer(prevArrivalTime, stopPos, boardSlack, UNBOUNDED_TRIP_INDEX);
   }
 
-  public RaptorBoardOrAlightEvent<T> boardWithRegularTransfer(
+  public RaptorBoardOrAlightEvent<T> searchRegularTransfer(
     int prevArrivalTime,
     int stopPos,
     int boardSlack,
@@ -83,7 +83,7 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
    *                               may override this.
    * @param txSearch               The constrained transfer search to use.
    */
-  public RaptorBoardOrAlightEvent<T> boardWithConstrainedTransfer(
+  public RaptorBoardOrAlightEvent<T> searchConstrainedTransfer(
     TransitArrival<T> prevTransitStopArrival,
     int prevArrivalTime,
     int boardSlack,
