@@ -81,7 +81,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   @Override
   public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
     int prevArrivalTime = prevArrivalTime(stopIndex);
-    var boarding = boardingSupport.boardWithRegularTransfer(
+    var boarding = boardingSupport.searchRegularTransfer(
       prevArrivalTime,
       stopPos,
       boardSlack,
@@ -100,7 +100,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
     RaptorConstrainedBoardingSearch<T> txSearch
   ) {
     boardingSupport
-      .boardWithConstrainedTransfer(
+      .searchConstrainedTransfer(
         previousTransitArrival(stopIndex),
         prevArrivalTime(stopIndex),
         boardSlack,
