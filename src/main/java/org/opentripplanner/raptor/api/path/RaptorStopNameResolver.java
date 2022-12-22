@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.api.path;
 
 import javax.annotation.Nullable;
 

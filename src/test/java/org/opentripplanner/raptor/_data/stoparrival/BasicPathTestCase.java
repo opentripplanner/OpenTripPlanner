@@ -16,10 +16,10 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
-import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
@@ -27,10 +27,9 @@ import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
-import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
+import org.opentripplanner.raptor.spi.Path;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 
@@ -275,18 +274,22 @@ public class BasicPathTestCase implements RaptorTestConstants {
       EGRESS_END,
       EGRESS_COST
     );
-    var times5 = BoardAndAlightTime.create(TRIP_3, STOP_D, L31_START, STOP_E, L31_END);
     TransitPathLeg<TestTripSchedule> leg5 = new TransitPathLeg<>(
       TRIP_3,
-      times5,
+      L31_START,
+      L31_END,
+      TRIP_3.findDepartureStopPosition(L31_START, STOP_D),
+      TRIP_3.findArrivalStopPosition(L31_END, STOP_E),
       EMPTY_CONSTRAINTS,
       LINE_31_COST,
       leg6
     );
-    var times4 = BoardAndAlightTime.create(TRIP_2, STOP_C, L21_START, STOP_D, L21_END);
     TransitPathLeg<TestTripSchedule> leg4 = new TransitPathLeg<>(
       TRIP_2,
-      times4,
+      L21_START,
+      L21_END,
+      TRIP_2.findDepartureStopPosition(L21_START, STOP_C),
+      TRIP_2.findArrivalStopPosition(L21_END, STOP_D),
       EMPTY_CONSTRAINTS,
       LINE_21_COST,
       leg5
@@ -300,8 +303,16 @@ public class BasicPathTestCase implements RaptorTestConstants {
       transfer,
       leg4.asTransitLeg()
     );
-    var times2 = BoardAndAlightTime.create(TRIP_1, STOP_A, L11_START, STOP_B, L11_END);
-    var leg2 = new TransitPathLeg<>(TRIP_1, times2, EMPTY_CONSTRAINTS, LINE_11_COST, leg3);
+    var leg2 = new TransitPathLeg<>(
+      TRIP_1,
+      L11_START,
+      L11_END,
+      TRIP_1.findDepartureStopPosition(L11_START, STOP_A),
+      TRIP_1.findArrivalStopPosition(L11_END, STOP_B),
+      EMPTY_CONSTRAINTS,
+      LINE_11_COST,
+      leg3
+    );
     AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
       ACCESS,
       ACCESS_START,
@@ -328,8 +339,16 @@ public class BasicPathTestCase implements RaptorTestConstants {
       transfer,
       leg6
     );
-    var times2 = BoardAndAlightTime.create(TRIP_1, STOP_A, L11_START, STOP_B, L11_END);
-    var leg2 = new TransitPathLeg<>(TRIP_1, times2, EMPTY_CONSTRAINTS, LINE_11_COST, leg3);
+    var leg2 = new TransitPathLeg<>(
+      TRIP_1,
+      L11_START,
+      L11_END,
+      TRIP_1.findDepartureStopPosition(L11_START, STOP_A),
+      TRIP_1.findArrivalStopPosition(L11_END, STOP_B),
+      EMPTY_CONSTRAINTS,
+      LINE_11_COST,
+      leg3
+    );
     AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
       ACCESS,
       ACCESS_START,

@@ -133,6 +133,15 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     int toTime = TRIP.arrival(TRIP.findArrivalStopPosition(Integer.MAX_VALUE, egressStop));
     var times = BoardAndAlightTime.create(TRIP, STOP_A, T10_00, egressStop, toTime);
     int cost = 100 * (T10_40 - T10_00);
-    return new TransitPathLeg<>(TRIP, times, null, cost, egress);
+    return new TransitPathLeg<>(
+      TRIP,
+      T10_00,
+      toTime,
+      TRIP.findDepartureStopPosition(T10_00, STOP_A),
+      TRIP.findArrivalStopPosition(toTime, egressStop),
+      null,
+      cost,
+      egress
+    );
   }
 }

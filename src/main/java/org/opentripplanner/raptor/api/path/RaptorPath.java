@@ -3,7 +3,6 @@ package org.opentripplanner.raptor.api.path;
 import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 
 /**
  * The result path of a Raptor search describing the one possible journey.
