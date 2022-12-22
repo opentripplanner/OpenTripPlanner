@@ -111,14 +111,14 @@ public final class GtfsFaresV2Service implements Serializable {
 
     return (
       allLegsInProductFeed &&
-      (
-        transitLegs.size() == 1 ||
         (
-          pwt.product().coversDuration(i.getTransitDuration()) &&
-          appliesToAllLegs(pwt.legRule(), transitLegs)
-        ) ||
-        coversItineraryWithFreeTransfers(i, pwt)
-      )
+          transitLegs.size() == 1 ||
+            (
+              pwt.product().coversDuration(i.getTransitDuration()) &&
+                appliesToAllLegs(pwt.legRule(), transitLegs)
+            ) ||
+            coversItineraryWithFreeTransfers(i, pwt)
+        )
     );
   }
 
@@ -138,7 +138,7 @@ public final class GtfsFaresV2Service implements Serializable {
 
     return (
       feedIdsInItinerary.size() == 1 &&
-      pwt.transferRules().stream().anyMatch(r -> r.fareProduct().amount().cents() == 0)
+        pwt.transferRules().stream().anyMatch(r -> r.fareProduct().amount().cents() == 0)
     );
   }
 
@@ -146,12 +146,15 @@ public final class GtfsFaresV2Service implements Serializable {
     // make sure that you only get rules for the correct feed
     return (
       leg.getAgency().getId().getFeedId().equals(rule.feedId()) &&
-      matchesNetworkId(leg, rule) &&
-      // apply only those fare leg rules which have the correct area ids
-      // if area id is null, the rule applies to all legs UNLESS there is another rule that
-      // covers this area
-      matchesArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules) &&
-      matchesArea(leg.getTo().stop, rule.toAreadId(), toAreasWithRules)
+        matchesNetworkId(leg, rule) &&
+        // apply only those fare leg rules which have the correct area ids
+        // if area id is null, the rule applies to all legs UNLESS there is another rule that
+        // covers this area
+        matchesArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules) &&
+        matchesArea(leg.getTo().stop, rule.toAreadId(), toAreasWithRules)
+
+        &&
+        matchesDistance(leg, rule)
     );
   }
 
@@ -213,7 +216,7 @@ public final class GtfsFaresV2Service implements Serializable {
     var stopAreas = this.stopAreas.get(stop.getId());
     return (
       (isNull(areaId) && stopAreas.stream().noneMatch(areasWithRules::contains)) ||
-      (nonNull(areaId) && stopAreas.contains(areaId))
+        (nonNull(areaId) && stopAreas.contains(areaId))
     );
   }
 
@@ -234,28 +237,41 @@ public final class GtfsFaresV2Service implements Serializable {
       (
         isNull(rule.networkId()) && networksWithRules.stream().noneMatch(routesNetworkIds::contains)
       ) ||
-      routesNetworkIds.contains(rule.networkId())
+        routesNetworkIds.contains(rule.networkId())
     );
   }
-}
 
-/**
- * @param itineraryProducts The fare products that cover the entire itinerary, like a daily pass.
- * @param legProducts       The fare products that cover only individual legs.
- */
-record ProductResult(Set<FareProduct> itineraryProducts, Set<LegProducts> legProducts) {
-  public Set<FareProduct> getProducts(Leg leg) {
-    return legProducts
-      .stream()
-      .filter(lp -> lp.leg().equals(leg))
-      .findFirst()
-      .map(l ->
-        l
-          .products()
-          .stream()
-          .map(LegProducts.ProductWithTransfer::product)
-          .collect(Collectors.toSet())
-      )
-      .orElse(Set.of());
+
+  private boolean matchesDistance(ScheduledTransitLeg leg, FareLegRule rule) {
+    if (rule.distanceType() == null) return false;
+    Double minDistance = rule.minDistance() == null ? 0 : rule.minDistance();
+    Double maxDistance = rule.maxDistance() == null ? Double.POSITIVE_INFINITY : rule.maxDistance();
+
+    if (rule.distanceType() == 0) {
+      return leg.getIntermediateStops().size() >= minDistance && leg.getIntermediateStops().size() <= maxDistance;
+    } else if (rule.distanceType() == 1) {
+      return leg.getDirectDistanceMeters() >= minDistance && leg.getDirectDistanceMeters() <= maxDistance;
+    } else return false;
+  }
+
+  /**
+   * @param itineraryProducts The fare products that cover the entire itinerary, like a daily pass.
+   * @param legProducts       The fare products that cover only individual legs.
+   */
+  record ProductResult(Set<FareProduct> itineraryProducts, Set<LegProducts> legProducts) {
+    public Set<FareProduct> getProducts(Leg leg) {
+      return legProducts
+        .stream()
+        .filter(lp -> lp.leg().equals(leg))
+        .findFirst()
+        .map(l ->
+          l
+            .products()
+            .stream()
+            .map(LegProducts.ProductWithTransfer::product)
+            .collect(Collectors.toSet())
+        )
+        .orElse(Set.of());
+    }
   }
 }

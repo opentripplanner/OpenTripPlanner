@@ -222,7 +222,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   protected void setDirectDistanceMeters(double directDistanceMeters) {
-    this.directDistanceMeters = DoubleUtils.roundTo2Decimals(distanceMeters);
+    this.directDistanceMeters = DoubleUtils.roundTo2Decimals(directDistanceMeters);
   }
 
   @Override
@@ -430,7 +430,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     return distance;
   }
 
-  private double getDirectDistance(Coordinate coord1, Coordinate coord2) {
+  public double getDirectDistance(Coordinate coord1, Coordinate coord2) {
     return SphericalDistanceLibrary.distance(coord1, coord2);
   }
 }
