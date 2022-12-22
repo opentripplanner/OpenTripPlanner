@@ -1,6 +1,6 @@
 # Changelog
 
-The changelog list most feature changes between each release. The list is automatically created
+The changelog lists most feature changes between each release. The list is automatically created
 based on merged pull requests. Search GitHub issues and pull requests for smaller issues.
 
 ## 2.3.0 (in progress)
