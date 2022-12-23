@@ -146,8 +146,17 @@ public class TestItineraryBuilder implements PlanTestConstants {
     Place to,
     LocalDate serviceDate
   ) {
-    return bus(Integer.toString(tripId), startTime, endTime, fromStopIndex, toStopIndex, to, serviceDate);
+    return bus(
+      Integer.toString(tripId),
+      startTime,
+      endTime,
+      fromStopIndex,
+      toStopIndex,
+      to,
+      serviceDate
+    );
   }
+
   public TestItineraryBuilder bus(
     String tripId,
     int startTime,
@@ -172,7 +181,15 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   public TestItineraryBuilder bus(int tripId, int startTime, int endTime, Place to) {
-    return bus(Integer.toString(tripId), startTime, endTime, TRIP_FROM_STOP_INDEX, TRIP_TO_STOP_INDEX, to, null);
+    return bus(
+      Integer.toString(tripId),
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      null
+    );
   }
 
   public TestItineraryBuilder bus(String tripId, int startTime, int endTime, Place to) {
@@ -240,7 +257,13 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return bus(route, Integer.toString(tripId), startTime, endTime, to);
   }
 
-  public TestItineraryBuilder bus(Route route, String tripId, int startTime, int endTime, Place to) {
+  public TestItineraryBuilder bus(
+    Route route,
+    String tripId,
+    int startTime,
+    int endTime,
+    Place to
+  ) {
     return transit(
       route,
       tripId,
@@ -262,14 +285,9 @@ public class TestItineraryBuilder implements PlanTestConstants {
     Place to,
     LocalDate serviceDay
   ) {
-    return bus(
-      Integer.toString(tripId),
-      startTime,
-      endTime,
-      to,
-      serviceDay
-    );
+    return bus(Integer.toString(tripId), startTime, endTime, to, serviceDay);
   }
+
   public TestItineraryBuilder bus(
     String tripId,
     int startTime,
@@ -405,7 +423,18 @@ public class TestItineraryBuilder implements PlanTestConstants {
     Integer headwaySecs,
     ConstrainedTransfer transferFromPreviousLeg
   ) {
-    return transit(route, Integer.toString(tripId), start, end, fromStopIndex, toStopIndex, to, serviceDate, headwaySecs, transferFromPreviousLeg);
+    return transit(
+      route,
+      Integer.toString(tripId),
+      start,
+      end,
+      fromStopIndex,
+      toStopIndex,
+      to,
+      serviceDate,
+      headwaySecs,
+      transferFromPreviousLeg
+    );
   }
 
   private TestItineraryBuilder transit(

@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.fares.impl;
 
-
 import static org.opentripplanner.ext.fares.impl.OrcaFareServiceImpl.COMM_TRANS_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareServiceImpl.KC_METRO_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareServiceImpl.KITSAP_TRANSIT_AGENCY_ID;
@@ -53,10 +52,7 @@ public class OrcaFareServiceTest {
    * substitute {@link OrcaFareServiceImpl#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash fare
    * types.
    */
-  private static void calculateFare(List<Leg> legs,
-                                    FareType fareType,
-                                    float expectedFareInCents
-  ) {
+  private static void calculateFare(List<Leg> legs, FareType fareType, float expectedFareInCents) {
     ItineraryFares fare = new ItineraryFares();
     orcaFareService.populateFare(fare, null, fareType, legs, null);
     Assertions.assertEquals(expectedFareInCents, fare.getFare(fareType).cents());
@@ -67,9 +63,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateFareForSingleAgency() {
-    List<Leg> rides = Collections.singletonList(
-      getLeg(COMM_TRANS_AGENCY_ID, "400", 0)
-    );
+    List<Leg> rides = Collections.singletonList(getLeg(COMM_TRANS_AGENCY_ID, "400", 0));
     calculateFare(rides, FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS);
     calculateFare(rides, FareType.senior, 200f);
     calculateFare(rides, FareType.youth, 0f);
@@ -91,10 +85,18 @@ public class OrcaFareServiceTest {
       getLeg(COMM_TRANS_AGENCY_ID, 2)
     );
     calculateFare(rides, FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 3);
-    calculateFare(rides, FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS + 125);
+    calculateFare(
+      rides,
+      FareType.senior,
+      DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS + 125
+    );
     calculateFare(rides, FareType.youth, 0f);
     calculateFare(rides, FareType.electronicSpecial, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 125f);
-    calculateFare(rides, FareType.electronicRegular, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS);
+    calculateFare(
+      rides,
+      FareType.electronicRegular,
+      0f + DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS
+    );
     calculateFare(rides, FareType.electronicSenior, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 125f);
     calculateFare(rides, FareType.electronicYouth, 0f);
   }
@@ -102,19 +104,19 @@ public class OrcaFareServiceTest {
   /**
    * Check to make sure the fare by leg is calculated properly for a trip with two rides.
    */
-//  @Test
-//  public void calculateFareByLeg() {
-//    List<Leg> rides = Arrays.asList(
-//      getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
-//      getLeg(COMM_TRANS_AGENCY_ID, 2)
-//    );
-//    ItineraryFares fare = new ItineraryFares();
-//    orcaFareService.populateFare(fare, null, FareType.electronicRegular, rides, null);
-//    Assertions.assertEquals(349, rides.get(0).fareComponents.get(FareType.electronicRegular).price.getCents());
-//    Assertions.assertEquals(0, rides.get(1).fareComponents.get(FareType.electronicRegular).price.getCents());
-//    Assertions.assertFalse(rides.get(0).fareComponents.get(FareType.electronicRegular).isTransfer);
-//    Assertions.assertTrue(rides.get(1).fareComponents.get(FareType.electronicRegular).isTransfer);
-//  }
+  //  @Test
+  //  public void calculateFareByLeg() {
+  //    List<Leg> rides = Arrays.asList(
+  //      getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
+  //      getLeg(COMM_TRANS_AGENCY_ID, 2)
+  //    );
+  //    ItineraryFares fare = new ItineraryFares();
+  //    orcaFareService.populateFare(fare, null, FareType.electronicRegular, rides, null);
+  //    Assertions.assertEquals(349, rides.get(0).fareComponents.get(FareType.electronicRegular).price.getCents());
+  //    Assertions.assertEquals(0, rides.get(1).fareComponents.get(FareType.electronicRegular).price.getCents());
+  //    Assertions.assertFalse(rides.get(0).fareComponents.get(FareType.electronicRegular).isTransfer);
+  //    Assertions.assertTrue(rides.get(1).fareComponents.get(FareType.electronicRegular).isTransfer);
+  //  }
 
   /**
    * Total trip time is 2h 30m. The first four transfers are within the permitted two hour window. A single (highest)
@@ -136,11 +138,15 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 6);
     calculateFare(rides, FareType.youth, 0f);
     calculateFare(rides, FareType.electronicSpecial, 100f + 0f + 0f + 0f + 100f + 0f);
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f +
-      DEFAULT_RIDE_PRICE_IN_CENTS + 0f);
+    calculateFare(
+      rides,
+      FareType.electronicRegular,
+      DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f
+    );
     calculateFare(rides, FareType.electronicSenior, 100f + 0f + 0f + 0f + 100f + 0f);
     calculateFare(rides, FareType.electronicYouth, 0f);
   }
+
   /**
    * Total trip time is 2h 30m. Calculate fare with two free transfer windows which include agencies which do not permit
    * free transfers. The free transfers will be applied for Kitsap, but not for WSF nor Skagit. Note: Not a real world
@@ -159,7 +165,11 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 4 + 610f);
     calculateFare(rides, FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 3 + 50f + 305f);
     calculateFare(rides, FareType.youth, 0f);
-    calculateFare(rides, FareType.electronicSpecial, 100f + DEFAULT_RIDE_PRICE_IN_CENTS + 100f + 610f);
+    calculateFare(
+      rides,
+      FareType.electronicSpecial,
+      100f + DEFAULT_RIDE_PRICE_IN_CENTS + 100f + 610f
+    );
     calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS * 3 + 610f);
     calculateFare(rides, FareType.electronicSenior, 100f + 50f + 100f + 305f);
     calculateFare(rides, FareType.electronicYouth, 0f);
@@ -185,10 +195,29 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 10);
     calculateFare(rides, FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 10);
     calculateFare(rides, FareType.youth, 0f);
-    calculateFare(rides, FareType.electronicSpecial, 100f + 0f + 0f + 0f + 100f + 0f + 0f + 0f + 100f + 0f);
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f +
-      DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS);
-    calculateFare(rides, FareType.electronicSenior, 100f + 0f + 0f + 0f + 100f + 0f + 0f + 0f + 100f + 0f);
+    calculateFare(
+      rides,
+      FareType.electronicSpecial,
+      100f + 0f + 0f + 0f + 100f + 0f + 0f + 0f + 100f + 0f
+    );
+    calculateFare(
+      rides,
+      FareType.electronicRegular,
+      DEFAULT_RIDE_PRICE_IN_CENTS +
+      0f +
+      0f +
+      0f +
+      DEFAULT_RIDE_PRICE_IN_CENTS +
+      0f +
+      0f +
+      0f +
+      DEFAULT_RIDE_PRICE_IN_CENTS
+    );
+    calculateFare(
+      rides,
+      FareType.electronicSenior,
+      100f + 0f + 0f + 0f + 100f + 0f + 0f + 0f + 100f + 0f
+    );
     calculateFare(rides, FareType.electronicYouth, 0f);
   }
 
@@ -209,10 +238,21 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 6);
     calculateFare(rides, FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 6);
     calculateFare(rides, FareType.youth, 0f);
-    calculateFare(rides, FareType.electronicSpecial, DEFAULT_RIDE_PRICE_IN_CENTS + 100f + 0f + 0f + 0f + 0f);
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS +
-      DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f);
-    calculateFare(rides, FareType.electronicSenior, DEFAULT_RIDE_PRICE_IN_CENTS + 100f + 0f + 0f + 0f + 0f);
+    calculateFare(
+      rides,
+      FareType.electronicSpecial,
+      DEFAULT_RIDE_PRICE_IN_CENTS + 100f + 0f + 0f + 0f + 0f
+    );
+    calculateFare(
+      rides,
+      FareType.electronicRegular,
+      DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f
+    );
+    calculateFare(
+      rides,
+      FareType.electronicSenior,
+      DEFAULT_RIDE_PRICE_IN_CENTS + 100f + 0f + 0f + 0f + 0f
+    );
     calculateFare(rides, FareType.electronicYouth, 0f);
   }
 
@@ -266,9 +306,10 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicSenior, 100f);
     calculateFare(rides, FareType.electronicYouth, 0f);
     // Ensure that it works in reverse
-    rides = Collections.singletonList(
-      getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Int'l Dist/Chinatown", "Roosevelt Station")
-    );
+    rides =
+      Collections.singletonList(
+        getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Int'l Dist/Chinatown", "Roosevelt Station")
+      );
     calculateFare(rides, FareType.regular, 250f);
     calculateFare(rides, FareType.senior, 100f);
     calculateFare(rides, FareType.youth, 0f);
@@ -291,9 +332,10 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicSenior, 100f);
     calculateFare(rides, FareType.electronicYouth, 0f);
     // Ensure that it works in reverse
-    rides = Collections.singletonList(
-      getLeg(SOUND_TRANSIT_AGENCY_ID, "N Line", 0, "King Street Station", "Everett Station")
-    );
+    rides =
+      Collections.singletonList(
+        getLeg(SOUND_TRANSIT_AGENCY_ID, "N Line", 0, "King Street Station", "Everett Station")
+      );
     calculateFare(rides, FareType.regular, 500f);
     calculateFare(rides, FareType.senior, 100f);
     calculateFare(rides, FareType.youth, 0f);
@@ -324,10 +366,11 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicYouth, 0f);
 
     // Also make sure that PT's 500 and 501 get regular Pierce fare and not ST's fare
-    rides = Arrays.asList(
-      getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "500", 0),
-      getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "501", 60)
-    );
+    rides =
+      Arrays.asList(
+        getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "500", 0),
+        getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "501", 60)
+      );
     calculateFare(rides, FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
     calculateFare(rides, FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
     calculateFare(rides, FareType.youth, 0f);
@@ -358,20 +401,18 @@ public class OrcaFareServiceTest {
   @Test
   public void calculateTransferExtension() {
     List<Leg> rides = Arrays.asList(
-      getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Int'l Dist/Chinatown", "Roosevelt Station"),// 2.50
+      getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Int'l Dist/Chinatown", "Roosevelt Station"), // 2.50
       getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 60, "Roosevelt Station", "Angle Lake Station"), // 3.25, should extend transfer
       getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 140, "Int'l Dist/Chinatown", "Angle Lake Station") // 3.00, should be free under extended transfer
     );
-    calculateFare(rides, FareType.regular, 250f+325f+300f);
-    calculateFare(rides, FareType.senior, 100f*3);
+    calculateFare(rides, FareType.regular, 250f + 325f + 300f);
+    calculateFare(rides, FareType.senior, 100f * 3);
     calculateFare(rides, FareType.youth, 0f);
-    calculateFare(rides, FareType.electronicSpecial, 150f*2);
+    calculateFare(rides, FareType.electronicSpecial, 150f * 2);
     calculateFare(rides, FareType.electronicRegular, 325f); // transfer extended on second leg
-    calculateFare(rides, FareType.electronicSenior, 100f*2);
+    calculateFare(rides, FareType.electronicSenior, 100f * 2);
     calculateFare(rides, FareType.electronicYouth, 0f);
-
   }
-
 
   private static Leg getLeg(String agencyId, long startTimeMins) {
     return createLeg(agencyId, "-1", 3, startTimeMins, "test", "test", "");
@@ -381,7 +422,13 @@ public class OrcaFareServiceTest {
     return createLeg(agencyId, "-1", 3, startTimeMins, "test", "test", routeLongName);
   }
 
-  private static Leg getLeg(String agencyId, long startTimeMins, int routeType, String routeId, String tripId) {
+  private static Leg getLeg(
+    String agencyId,
+    long startTimeMins,
+    int routeType,
+    String routeId,
+    String tripId
+  ) {
     return createLeg(agencyId, "-1", routeType, startTimeMins, routeId, tripId, "");
   }
 
@@ -389,38 +436,66 @@ public class OrcaFareServiceTest {
     return createLeg(agencyId, shortName, 3, startTimeMins, "test", "test", "");
   }
 
-  private static Leg getLeg(String agencyId, String shortName, long startTimeMins, String firstStopName, String lastStopName) {
-    return createLeg(agencyId, shortName, 3, startTimeMins, "test", "test", "", firstStopName, lastStopName);
-  }
-
-  /**
-   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareServiceImpl} to determine the
-   * correct ride type.
-   */
-  private static Leg createLeg(String agencyId,
-                                 String shortName,
-                                 int routeType,
-                                 long startTimeMins,
-                                 String routeId,
-                                 String tripId,
-                                 String routeLongName
+  private static Leg getLeg(
+    String agencyId,
+    String shortName,
+    long startTimeMins,
+    String firstStopName,
+    String lastStopName
   ) {
-    return createLeg(agencyId, shortName, routeType, startTimeMins, routeId, tripId, routeLongName, "", "");
+    return createLeg(
+      agencyId,
+      shortName,
+      3,
+      startTimeMins,
+      "test",
+      "test",
+      "",
+      firstStopName,
+      lastStopName
+    );
   }
 
   /**
    * Create a {@link Leg} containing route data that will be used by {@link OrcaFareServiceImpl} to determine the
    * correct ride type.
    */
-  private static Leg createLeg(String agencyId,
-                                 String shortName,
-                                 int transitMode,
-                                 long startTimeMins,
-                                 String routeId,
-                                 String tripId,
-                                 String routeLongName,
-                                 String firstStopName,
-                                 String lastStopName
+  private static Leg createLeg(
+    String agencyId,
+    String shortName,
+    int routeType,
+    long startTimeMins,
+    String routeId,
+    String tripId,
+    String routeLongName
+  ) {
+    return createLeg(
+      agencyId,
+      shortName,
+      routeType,
+      startTimeMins,
+      routeId,
+      tripId,
+      routeLongName,
+      "",
+      ""
+    );
+  }
+
+  /**
+   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareServiceImpl} to determine the
+   * correct ride type.
+   */
+  private static Leg createLeg(
+    String agencyId,
+    String shortName,
+    int transitMode,
+    long startTimeMins,
+    String routeId,
+    String tripId,
+    String routeLongName,
+    String firstStopName,
+    String lastStopName
   ) {
     Agency agency = Agency
       .of(new FeedScopedId("A", agencyId))
@@ -440,7 +515,7 @@ public class OrcaFareServiceTest {
       .withName(new NonLocalizedString(lastStopName))
       .build();
 
-    FeedScopedId routeFeedScopeId = new FeedScopedId("A", routeId );
+    FeedScopedId routeFeedScopeId = new FeedScopedId("A", routeId);
     Route route = Route
       .of(routeFeedScopeId)
       .withAgency(agency)
