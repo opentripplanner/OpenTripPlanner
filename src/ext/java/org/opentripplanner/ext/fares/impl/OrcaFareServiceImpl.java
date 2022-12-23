@@ -241,7 +241,7 @@ public class OrcaFareServiceImpl extends DefaultFareService {
    * route data is enough to define the agency, but addition trip id checks are needed to define the fast ferry direction.
    */
   private static RideType classify(Route routeData, String tripId) {
-    Function<Route, RideType> classifier = classificationStrategy.get(routeData.getAgency().getId());
+    Function<Route, RideType> classifier = classificationStrategy.get(routeData.getAgency().getId().getId());
     if (classifier == null) {
       return null;
     }
@@ -516,6 +516,8 @@ public class OrcaFareServiceImpl extends DefaultFareService {
    * @param currentLegStartTime
    */
   private boolean inFreeTransferWindow(ZonedDateTime freeTransferStartTime, ZonedDateTime currentLegStartTime) {
+    // If there is no free transfer, then return false.
+    if(freeTransferStartTime == null) return false;
     Duration duration = Duration.between(freeTransferStartTime, currentLegStartTime);
     return duration.compareTo(MAX_TRANSFER_DISCOUNT_DURATION) < 0;
   }
