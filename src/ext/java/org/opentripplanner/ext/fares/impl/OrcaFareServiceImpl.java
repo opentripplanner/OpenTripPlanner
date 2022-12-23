@@ -390,12 +390,14 @@ public class OrcaFareServiceImpl extends DefaultFareService {
       case COMM_TRANS_LOCAL_SWIFT -> 1.25f;
       case COMM_TRANS_COMMUTER_EXPRESS -> 2.00f;
       case EVERETT_TRANSIT -> 0.50f;
-      case PIERCE_COUNTY_TRANSIT,
-        SEATTLE_STREET_CAR,
-        KITSAP_TRANSIT -> // Pierce, Seattle Streetcar, and Kitsap only provide discounted senior fare for orca.
-      fareType.equals(FareType.electronicSenior) ? 1.00f : defaultFare;
-      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> // Kitsap only provide discounted senior fare for orca.
-      fareType.equals(FareType.electronicSenior) ? 1.00f : 2.00f;
+      case PIERCE_COUNTY_TRANSIT, SEATTLE_STREET_CAR, KITSAP_TRANSIT -> fareType.equals( // Pierce, Seattle Streetcar, and Kitsap only provide discounted senior fare for orca.
+          FareType.electronicSenior
+        )
+        ? 1.00f
+        : defaultFare;
+      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> fareType.equals(FareType.electronicSenior) // Kitsap only provide discounted senior fare for orca.
+        ? 1.00f
+        : 2.00f;
       case KC_WATER_TAXI_VASHON_ISLAND -> 3.00f;
       case KC_WATER_TAXI_WEST_SEATTLE -> 2.50f;
       case KC_METRO,
@@ -406,8 +408,7 @@ public class OrcaFareServiceImpl extends DefaultFareService {
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> fareType.equals(FareType.electronicSenior)
         ? 5.00f
         : 10.00f;
-      case SKAGIT_TRANSIT -> // Discount specific to Skagit transit and not Orca.
-      0.50f;
+      case SKAGIT_TRANSIT -> 0.50f; // Discount specific to Skagit transit and not Orca.
       case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(
         route.getLongName().toString(),
         fareType,
