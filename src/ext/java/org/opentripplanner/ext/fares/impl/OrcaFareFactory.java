@@ -10,6 +10,7 @@ import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class OrcaFareFactory extends DefaultFareServiceFactory {
+
   protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
 
   @Override
