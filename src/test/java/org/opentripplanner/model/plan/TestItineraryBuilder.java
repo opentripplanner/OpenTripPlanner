@@ -146,8 +146,19 @@ public class TestItineraryBuilder implements PlanTestConstants {
     Place to,
     LocalDate serviceDate
   ) {
+    return bus(Integer.toString(tripId), startTime, endTime, fromStopIndex, toStopIndex, to, serviceDate);
+  }
+  public TestItineraryBuilder bus(
+    String tripId,
+    int startTime,
+    int endTime,
+    int fromStopIndex,
+    int toStopIndex,
+    Place to,
+    LocalDate serviceDate
+  ) {
     return transit(
-      BUS_ROUTE.copy().withShortName(Integer.toString(tripId)).build(),
+      BUS_ROUTE.copy().withShortName(tripId).build(),
       tripId,
       startTime,
       endTime,
@@ -161,6 +172,10 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   public TestItineraryBuilder bus(int tripId, int startTime, int endTime, Place to) {
+    return bus(Integer.toString(tripId), startTime, endTime, TRIP_FROM_STOP_INDEX, TRIP_TO_STOP_INDEX, to, null);
+  }
+
+  public TestItineraryBuilder bus(String tripId, int startTime, int endTime, Place to) {
     return bus(tripId, startTime, endTime, TRIP_FROM_STOP_INDEX, TRIP_TO_STOP_INDEX, to, null);
   }
 
@@ -175,7 +190,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     StopTime toStopTime = new StopTime();
     toStopTime.setStop(to.stop);
 
-    Trip trip = trip(1, route("flex").build());
+    Trip trip = trip("1", route("flex").build());
 
     var flexTrip = UnscheduledTrip
       .of(id("flex-1"))
@@ -222,6 +237,10 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   public TestItineraryBuilder bus(Route route, int tripId, int startTime, int endTime, Place to) {
+    return bus(route, Integer.toString(tripId), startTime, endTime, to);
+  }
+
+  public TestItineraryBuilder bus(Route route, String tripId, int startTime, int endTime, Place to) {
     return transit(
       route,
       tripId,
@@ -238,6 +257,21 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   public TestItineraryBuilder bus(
     int tripId,
+    int startTime,
+    int endTime,
+    Place to,
+    LocalDate serviceDay
+  ) {
+    return bus(
+      Integer.toString(tripId),
+      startTime,
+      endTime,
+      to,
+      serviceDay
+    );
+  }
+  public TestItineraryBuilder bus(
+    String tripId,
     int startTime,
     int endTime,
     Place to,
@@ -351,8 +385,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
   /* private methods */
 
   /** Create a dummy trip */
-  private static Trip trip(int id, Route route) {
-    return TransitModelForTest.trip(Integer.toString(id)).withRoute(route).build();
+  private static Trip trip(String id, Route route) {
+    return TransitModelForTest.trip(id).withRoute(route).build();
   }
 
   private static Place stop(Place source) {
@@ -362,6 +396,21 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private TestItineraryBuilder transit(
     Route route,
     int tripId,
+    int start,
+    int end,
+    int fromStopIndex,
+    int toStopIndex,
+    Place to,
+    LocalDate serviceDate,
+    Integer headwaySecs,
+    ConstrainedTransfer transferFromPreviousLeg
+  ) {
+    return transit(route, Integer.toString(tripId), start, end, fromStopIndex, toStopIndex, to, serviceDate, headwaySecs, transferFromPreviousLeg);
+  }
+
+  private TestItineraryBuilder transit(
+    Route route,
+    String tripId,
     int start,
     int end,
     int fromStopIndex,
