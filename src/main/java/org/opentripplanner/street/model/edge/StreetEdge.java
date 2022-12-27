@@ -389,26 +389,14 @@ public class StreetEdge
   public State traverse(State s0) {
     final StateEditor editor;
 
-    if (traversalExtensions != null) {
-      for (var ext : traversalExtensions) {
-        if (ext.traversalBanned(s0)) {
-          StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
-          if (walking != null) {
-            walking.dropFloatingVehicle();
-            State forkState = walking.makeState();
-            if (forkState != null) {
-              return forkState;
-            }
-          }
-          else {
-            return null;
-          }
-        }
+    if (isTraversalBannedByRentalExtension(s0)) {
+      editor = doTraverse(s0, TraverseMode.WALK, false);
+      if (editor != null) {
+        editor.dropFloatingVehicle();
       }
     }
-
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
-    if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
+    else if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
         editor = doTraverse(s0, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
@@ -423,6 +411,19 @@ public class StreetEdge
     }
 
     State state = editor != null ? editor.makeState() : null;
+
+    // we are transitioning into a no-drop-off zone therefore we add a second state for dropping
+    // off the vehicle and walking
+    if (entersNoDropOffZone(s0)) {
+      StateEditor afterTraversal = doTraverse(s0, TraverseMode.WALK, false);
+      if (afterTraversal != null) {
+        afterTraversal.dropFloatingVehicle();
+        afterTraversal.leaveNoRentalDropOffArea();
+        var forkState = afterTraversal.makeState();
+        forkState.addToExistingResultChain(state);
+        return forkState;
+      }
+    }
 
     if (canPickupAndDrive(s0) && canTraverse(TraverseMode.CAR)) {
       StateEditor inCar = doTraverse(s0, TraverseMode.CAR, false);
@@ -451,6 +452,18 @@ public class StreetEdge
     }
 
     return state;
+  }
+
+  /**
+   * Checks if the state is entering a no-drop-off zone for rental vehicles.
+   */
+  private boolean entersNoDropOffZone(State s0) {
+    return (
+      s0.getBackEdge() != null &&
+      s0.getBackEdge() instanceof StreetEdge backStreetEdge &&
+      !backStreetEdge.isDropOffBanned(s0) &&
+      this.isDropOffBanned(s0)
+    );
   }
 
   /**
@@ -1160,13 +1173,28 @@ public class StreetEdge
     return editor;
   }
 
-  private boolean isDropOffBanned(State currentState) {
+  protected boolean isDropOffBanned(State currentState) {
     if (traversalExtensions == null) {
       return false;
     }
     for (var ext : traversalExtensions) {
       if (ext.dropOffBanned(currentState)) {
         return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns if a traversal is banned by a rental extension, for example because you're not allowed
+   * to use the edge on a rental vehicle.
+   */
+  protected boolean isTraversalBannedByRentalExtension(State state) {
+    if (traversalExtensions != null) {
+      for (var ext : traversalExtensions) {
+        if (ext.traversalBanned(state)) {
+          return true;
+        }
       }
     }
     return false;

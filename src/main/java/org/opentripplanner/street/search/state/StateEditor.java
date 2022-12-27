@@ -344,7 +344,6 @@ public class StateEditor {
     child.stateData.vehicleRentalNetwork = null;
     child.stateData.rentalVehicleFormFactor = null;
     child.stateData.backWalkingBike = false;
-    setBackMode(null);
   }
 
   /* PRIVATE METHODS */

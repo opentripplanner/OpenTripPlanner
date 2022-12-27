@@ -71,7 +71,8 @@ public class GraphPathToItineraryMapper {
 
   public static boolean isRentalDropOff(State state) {
     return (
-      !state.isRentingVehicle() && (state.getBackState() !=null && state.getBackState().isRentingVehicle())
+      !state.isRentingVehicle() &&
+      (state.getBackState() != null && state.getBackState().isRentingVehicle())
     );
   }
 

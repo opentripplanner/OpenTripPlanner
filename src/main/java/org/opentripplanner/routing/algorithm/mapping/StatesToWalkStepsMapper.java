@@ -100,7 +100,10 @@ public class StatesToWalkStepsMapper {
       ).getVertex();
       steps.get(steps.size() - 1).setVehicleRentalOffStation(new VehicleRentalStationInfo(vertex));
     }
-    if (GraphPathToItineraryMapper.isRentalDropOff(states.get(0)) && states.get(0).getVertex() instanceof VehicleRentalPlaceVertex rentalVertex) {
+    if (
+      GraphPathToItineraryMapper.isRentalDropOff(states.get(0)) &&
+      states.get(0).getVertex() instanceof VehicleRentalPlaceVertex rentalVertex
+    ) {
       steps.get(0).setVehicleRentalOffStation(new VehicleRentalStationInfo(rentalVertex));
     }
 
