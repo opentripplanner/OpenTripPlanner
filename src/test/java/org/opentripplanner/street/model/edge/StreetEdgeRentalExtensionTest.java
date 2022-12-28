@@ -117,6 +117,17 @@ class StreetEdgeRentalExtensionTest {
     assertEquals(0, edge.getTraversalExtensions().size());
   }
 
+  @Test
+  public void checkNetwork() {
+    var edge = streetEdge(V1, V2);
+    edge.addRentalExtension(new BusinessAreaBorder("a"));
+
+    var state = traverse(edge);
+
+    assertEquals(RENTING_FLOATING, state.getVehicleRentalState());
+    assertNull(state.getNextResult());
+  }
+
   private State traverse(StreetEdge edge) {
     var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
     var editor = new StateEditor(V1, req);
