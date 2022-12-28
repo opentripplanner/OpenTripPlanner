@@ -187,11 +187,11 @@ public class StreetMatcherTest {
     }
 
     @Override
-    public State traverse(State s0) {
+    public State traverse(State currentState) {
       double d = getDistanceMeters();
-      TraverseMode mode = s0.getNonTransitMode();
-      int t = (int) (d / s0.getRequest().preferences().getSpeed(mode, false));
-      StateEditor s1 = s0.edit(this);
+      TraverseMode mode = currentState.getNonTransitMode();
+      int t = (int) (d / currentState.getRequest().preferences().getSpeed(mode, false));
+      StateEditor s1 = currentState.edit(this);
       s1.incrementTimeInSeconds(t);
       s1.incrementWeight(d);
       return s1.makeState();

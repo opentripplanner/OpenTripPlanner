@@ -386,26 +386,26 @@ public class StreetEdge
   }
 
   @Override
-  public State traverse(State s0) {
+  public State traverse(State currentState) {
     final StateEditor editor;
 
-    if (isTraversalBannedByRentalExtension(s0)) {
-      editor = doTraverse(s0, TraverseMode.WALK, false);
+    if (isTraversalBannedByRentalExtension(currentState)) {
+      editor = doTraverse(currentState, TraverseMode.WALK, false);
       if (editor != null) {
         editor.dropFloatingVehicle();
       }
     }
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
-    else if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
+    else if (currentState.getNonTransitMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
-        editor = doTraverse(s0, TraverseMode.BICYCLE, false);
+        editor = doTraverse(currentState, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
-        editor = doTraverse(s0, TraverseMode.WALK, true);
+        editor = doTraverse(currentState, TraverseMode.WALK, true);
       } else {
         return null;
       }
-    } else if (canTraverse(s0.getNonTransitMode())) {
-      editor = doTraverse(s0, s0.getNonTransitMode(), false);
+    } else if (canTraverse(currentState.getNonTransitMode())) {
+      editor = doTraverse(currentState, currentState.getNonTransitMode(), false);
     } else {
       editor = null;
     }
@@ -414,8 +414,8 @@ public class StreetEdge
 
     // we are transitioning into a no-drop-off zone therefore we add a second state for dropping
     // off the vehicle and walking
-    if (entersNoDropOffZone(s0)) {
-      StateEditor afterTraversal = doTraverse(s0, TraverseMode.WALK, false);
+    if (entersNoDropOffZone(currentState)) {
+      StateEditor afterTraversal = doTraverse(currentState, TraverseMode.WALK, false);
       if (afterTraversal != null) {
         afterTraversal.dropFloatingVehicle();
         afterTraversal.leaveNoRentalDropOffArea();
@@ -425,10 +425,10 @@ public class StreetEdge
       }
     }
 
-    if (canPickupAndDrive(s0) && canTraverse(TraverseMode.CAR)) {
-      StateEditor inCar = doTraverse(s0, TraverseMode.CAR, false);
+    if (canPickupAndDrive(currentState) && canTraverse(TraverseMode.CAR)) {
+      StateEditor inCar = doTraverse(currentState, TraverseMode.CAR, false);
       if (inCar != null) {
-        driveAfterPickup(s0, inCar);
+        driveAfterPickup(currentState, inCar);
         State forkState = inCar.makeState();
         if (forkState != null) {
           // Return both the original WALK state, along with the new IN_CAR state
@@ -439,13 +439,13 @@ public class StreetEdge
     }
 
     if (
-      canDropOffAfterDriving(s0) &&
+      canDropOffAfterDriving(currentState) &&
       !getPermission().allows(TraverseMode.CAR) &&
       canTraverse(TraverseMode.WALK)
     ) {
-      StateEditor dropOff = doTraverse(s0, TraverseMode.WALK, false);
+      StateEditor dropOff = doTraverse(currentState, TraverseMode.WALK, false);
       if (dropOff != null) {
-        dropOffAfterDriving(s0, dropOff);
+        dropOffAfterDriving(currentState, dropOff);
         // Only the walk state is returned, since traversing by car was not possible
         return dropOff.makeState();
       }
