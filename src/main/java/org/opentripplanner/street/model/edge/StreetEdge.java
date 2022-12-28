@@ -457,12 +457,12 @@ public class StreetEdge
   /**
    * Checks if the state is entering a no-drop-off zone for rental vehicles.
    */
-  private boolean entersNoDropOffZone(State s0) {
+  private boolean entersNoDropOffZone(State state) {
     return (
-      s0.getBackEdge() != null &&
-      s0.getBackEdge() instanceof StreetEdge backStreetEdge &&
-      !backStreetEdge.isDropOffBanned(s0) &&
-      this.isDropOffBanned(s0)
+      state.getBackEdge() != null &&
+      state.getBackEdge() instanceof StreetEdge backStreetEdge &&
+      !backStreetEdge.isDropOffBanned(state) &&
+      this.isDropOffBanned(state)
     );
   }
 

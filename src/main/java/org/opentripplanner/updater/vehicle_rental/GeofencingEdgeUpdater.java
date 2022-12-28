@@ -101,8 +101,13 @@ class GeofencingEdgeUpdater {
   private Collection<StreetEdge> applyExtension(Geometry geom, StreetEdgeRentalExtension ext) {
     var edgesUpdated = new ArrayList<StreetEdge>();
     Set<Edge> candidates;
-    if (geom instanceof MultiLineString mls) {
-      candidates = getEdgesAlongLineStrings(mls);
+    // for business areas we only care about the borders so we compute the boundary of the
+    // (multi) polygon. this can either be a MultiLineString or a LineString
+    if (geom instanceof LineString ring) {
+      candidates = getEdgesAlongLineStrings(List.of(ring));
+    } else if (geom instanceof MultiLineString mls) {
+      var lineStrings = GeometryUtils.getLineStrings(mls);
+      candidates = getEdgesAlongLineStrings(lineStrings);
     } else {
       candidates = Set.copyOf(getEdgesForEnvelope.apply(geom.getEnvelopeInternal()));
     }
@@ -130,9 +135,7 @@ class GeofencingEdgeUpdater {
    * from ~25 seconds to ~3 seconds (on 2021 hardware).
    */
   @Nonnull
-  private Set<Edge> getEdgesAlongLineStrings(MultiLineString mls) {
-    var lineStrings = GeometryUtils.getLineStrings(mls);
-
+  private Set<Edge> getEdgesAlongLineStrings(Collection<LineString> lineStrings) {
     return lineStrings
       .stream()
       .flatMap(ls -> GeometryUtils.partitionLineString(ls, 10).stream())

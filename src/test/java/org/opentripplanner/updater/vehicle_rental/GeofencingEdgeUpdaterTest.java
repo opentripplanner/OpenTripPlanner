@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
@@ -34,30 +36,35 @@ class GeofencingEdgeUpdaterTest {
     List.of(insideFrognerPark, halfInHalfOutFrognerPark, businessBorder)
   );
   StreetEdge outsideFrognerPark = streetEdge(outsideFrognerPark1, outsideFrognerPark2);
-  Polygon frognerPark = GeometryUtils
-    .getGeometryFactory()
-    .createPolygon(
-      new Coordinate[] {
-        new Coordinate(59.93112978539807, 10.691099320272173),
-        new Coordinate(59.92231848097069, 10.691099320272173),
-        new Coordinate(59.92231848097069, 10.711758464910503),
-        new Coordinate(59.92231848097069, 10.691099320272173),
-        new Coordinate(59.93112978539807, 10.691099320272173),
-      }
-    );
+
+  GeometryFactory fac = GeometryUtils.getGeometryFactory();
+  Polygon frognerPark = fac.createPolygon(
+    new Coordinate[] {
+      new Coordinate(59.93112978539807, 10.691099320272173),
+      new Coordinate(59.92231848097069, 10.691099320272173),
+      new Coordinate(59.92231848097069, 10.711758464910503),
+      new Coordinate(59.92231848097069, 10.691099320272173),
+      new Coordinate(59.93112978539807, 10.691099320272173),
+    }
+  );
   final GeofencingZone zone = new GeofencingZone(id("frogner-park"), frognerPark, true, false);
-  Polygon oslo = GeometryUtils
-    .getGeometryFactory()
-    .createPolygon(
-      new Coordinate[] {
-        new Coordinate(59.961055202323195, 10.62535658370308),
-        new Coordinate(59.889009435700416, 10.62535658370308),
-        new Coordinate(59.889009435700416, 10.849791142928694),
-        new Coordinate(59.961055202323195, 10.849791142928694),
-        new Coordinate(59.961055202323195, 10.62535658370308),
-      }
-    );
-  final GeofencingZone businessArea = new GeofencingZone(id("oslo"), oslo, false, false);
+  Polygon osloPolygon = fac.createPolygon(
+    new Coordinate[] {
+      new Coordinate(59.961055202323195, 10.62535658370308),
+      new Coordinate(59.889009435700416, 10.62535658370308),
+      new Coordinate(59.889009435700416, 10.849791142928694),
+      new Coordinate(59.961055202323195, 10.849791142928694),
+      new Coordinate(59.961055202323195, 10.62535658370308),
+    }
+  );
+
+  MultiPolygon osloMultiPolygon = fac.createMultiPolygon(new Polygon[] { osloPolygon });
+  final GeofencingZone businessArea = new GeofencingZone(
+    id("oslo"),
+    osloMultiPolygon,
+    false,
+    false
+  );
 
   @Test
   void insideZone() {

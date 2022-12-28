@@ -11,6 +11,10 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 
 public class StreetModelForTest {
 
+  public static StreetVertex V1 = intersectionVertex("V1", 0, 0);
+  public static StreetVertex V2 = intersectionVertex("V2", 1, 1);
+  public static StreetVertex V3 = intersectionVertex("V3", 2, 2);
+
   public static IntersectionVertex intersectionVertex(double lat, double lon) {
     var label = "%s_%s".formatted(lat, lon);
     return new IntersectionVertex(null, label, lat, lon, label);
