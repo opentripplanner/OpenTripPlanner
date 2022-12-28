@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.V1;
 import static org.opentripplanner.street.model._data.StreetModelForTest.V2;
 import static org.opentripplanner.street.model._data.StreetModelForTest.V3;
+import static org.opentripplanner.street.model._data.StreetModelForTest.V4;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
 import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
@@ -53,11 +54,12 @@ class StreetEdgeRentalExtensionTest {
 
   @Test
   public void forkStateWhenEnteringNoDropOffZone() {
-    var edge = streetEdge(V3, V1);
+    var edge1 = streetEdge(V4, V1);
+    var edge2 = streetEdge(V2, V3);
     var restrictedEdge = streetEdge(V1, V2);
 
     var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
-    var editor = new StateEditor(V3, req);
+    var editor = new StateEditor(edge1.getFromVertex(), req);
     editor.beginFloatingVehicleRenting(RentalVehicleType.FormFactor.SCOOTER, network, false);
     restrictedEdge.addRentalExtension(
       new StreetEdgeRentalExtension.GeofencingZoneExtension(
@@ -65,7 +67,7 @@ class StreetEdgeRentalExtensionTest {
       )
     );
 
-    var isRenting = edge.traverse(editor.makeState());
+    var isRenting = edge1.traverse(editor.makeState());
     var continueOnFoot = restrictedEdge.traverse(isRenting);
     assertEquals(HAVE_RENTED, continueOnFoot.getVehicleRentalState());
     assertEquals(WALK, continueOnFoot.getBackMode());
@@ -73,6 +75,11 @@ class StreetEdgeRentalExtensionTest {
     var continueRenting = continueOnFoot.getNextResult();
     assertEquals(RENTING_FLOATING, continueRenting.getVehicleRentalState());
     assertEquals(BICYCLE, continueRenting.getBackMode());
+    assertTrue(continueRenting.isInsideNoRentalDropOffArea());
+
+    var leftNoDropOff = edge2.traverse(continueRenting);
+    assertFalse(leftNoDropOff.isInsideNoRentalDropOffArea());
+    assertEquals(RENTING_FLOATING, continueRenting.getVehicleRentalState());
   }
 
   @Test
