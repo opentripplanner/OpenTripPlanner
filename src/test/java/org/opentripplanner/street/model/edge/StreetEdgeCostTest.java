@@ -2,27 +2,19 @@ package org.opentripplanner.street.model.edge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
+import static org.opentripplanner.street.model._data.StreetModelForTest.V1;
+import static org.opentripplanner.street.model._data.StreetModelForTest.V2;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.VariableSource;
 
 class StreetEdgeCostTest {
-
-  StreetVertex V1;
-  StreetVertex V2;
-
-  public StreetEdgeCostTest() {
-    V1 = intersectionVertex("V1", 0.0, 0.0);
-    V2 = intersectionVertex("V2", 2.0, 0.0);
-  }
 
   static Stream<Arguments> walkReluctanceCases = Stream.of(
     Arguments.of(0.5, 37),
