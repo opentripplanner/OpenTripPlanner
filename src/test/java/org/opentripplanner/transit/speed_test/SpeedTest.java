@@ -190,21 +190,7 @@ public class SpeedTest {
     }
     printProfileStatistics();
 
-    final var transitService = serverContext.transitService();
-    timer.globalCount("transitdata_stops", transitService.listStopLocations().size());
-    timer.globalCount("transitdata_patterns", transitService.getAllTripPatterns().size());
-    timer.globalCount("transitdata_trips", transitService.getAllTrips().size());
-
-    // we want to get the numbers after the garbage collection
-    forceGCToAvoidGCLater();
-
-    final var runtime = Runtime.getRuntime();
-    timer.globalCount("jvm_free_memory", runtime.freeMemory());
-    timer.globalCount("jvm_max_memory", runtime.maxMemory());
-    timer.globalCount("jvm_total_memory", runtime.totalMemory());
-    timer.globalCount("jvm_used_memory", runtime.totalMemory() - runtime.freeMemory());
-
-    timer.finishUp();
+    updateTimersWithGlobalCounters();
 
     System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
   }
@@ -314,6 +300,26 @@ public class SpeedTest {
 
   private List<TestCase> createNewSetOfTestCases() {
     return testCaseInputs.stream().map(in -> in.createTestCase(opts.skipCost())).toList();
+  }
+
+  /**
+   * Add "static" transit statistics and JVM memory usages to the "timers" logging.
+   */
+  private void updateTimersWithGlobalCounters() {
+    final var transitService = serverContext.transitService();
+    timer.globalCount("transitdata_stops", transitService.listStopLocations().size());
+    timer.globalCount("transitdata_patterns", transitService.getAllTripPatterns().size());
+    timer.globalCount("transitdata_trips", transitService.getAllTrips().size());
+
+    // we want to get the numbers after the garbage collection
+    forceGCToAvoidGCLater();
+
+    final var runtime = Runtime.getRuntime();
+    timer.globalCount("jvm_free_memory", runtime.freeMemory());
+    timer.globalCount("jvm_max_memory", runtime.maxMemory());
+    timer.globalCount("jvm_total_memory", runtime.totalMemory());
+    timer.globalCount("jvm_used_memory", runtime.totalMemory() - runtime.freeMemory());
+    timer.finishUp();
   }
 
   private static boolean includeCategory(Collection<String> includeCategories, TestCaseInput c) {
