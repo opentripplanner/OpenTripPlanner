@@ -48,8 +48,6 @@ public class SpeedTest {
 
   private final TransitModel transitModel;
 
-  private final BuildConfig buildConfig;
-
   private final SpeedTestTimer timer = new SpeedTestTimer();
 
   private final SpeedTestCmdLineOpts opts;
@@ -61,24 +59,26 @@ public class SpeedTest {
   private final CsvFileIO tcIO;
   private SpeedTestProfile routeProfile;
 
-  private SpeedTest(SpeedTestCmdLineOpts opts) {
+  public SpeedTest(
+    SpeedTestCmdLineOpts opts,
+    SpeedTestConfig config,
+    Graph graph,
+    TransitModel transitModel
+  ) {
     this.opts = opts;
     this.config = SpeedTestConfig.config(opts.rootDir());
+    this.transitModel = transitModel;
 
     var features = new OtpConfigLoader(opts.rootDir()).loadOtpConfig();
     OTPFeature.enableFeatures(features.otpFeatures);
     OTPFeature.logFeatureSetup();
-
-    var model = loadGraph(opts.rootDir(), config.graph);
-    this.transitModel = model.transitModel();
-    this.buildConfig = model.buildConfig();
 
     this.tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME, config.feedId);
 
     // Read Test-case definitions and expected results from file
     this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
 
-    UpdaterConfigurator.configure(model.graph(), transitModel, config.updatersConfig);
+    UpdaterConfigurator.configure(graph, transitModel, config.updatersConfig);
     if (transitModel.getUpdaterManager() != null) {
       transitModel.getUpdaterManager().startUpdaters();
     }
@@ -89,7 +89,7 @@ public class SpeedTest {
         config.request,
         null,
         new RaptorConfig<>(config.transitRoutingParams),
-        model.graph(),
+        graph,
         new DefaultTransitService(transitModel),
         timer.getRegistry(),
         List::of,
@@ -111,8 +111,16 @@ public class SpeedTest {
       // Given the following setup
       SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
 
+      var config = SpeedTestConfig.config(opts.rootDir());
+      var model = loadGraph(opts.rootDir(), config.graph);
+      var transitModel = model.transitModel();
+      var buildConfig = model.buildConfig();
+      var graph = model.graph();
+
       // create a new test
-      SpeedTest speedTest = new SpeedTest(opts);
+      var speedTest = new SpeedTest(opts, config, graph, transitModel);
+
+      assertTestDateHasData(transitModel, config, buildConfig);
 
       // and run it
       speedTest.runTest();
@@ -169,12 +177,10 @@ public class SpeedTest {
     return cases;
   }
 
-  private void runTest() {
+  public void runTest() {
     System.err.println("Run Speed Test");
     final SpeedTestProfile[] speedTestProfiles = opts.profiles();
     final int nSamples = opts.numberOfTestsSamplesToRun();
-
-    assertTestDateHasData(transitModel, config, buildConfig);
 
     initProfileStatistics();
 

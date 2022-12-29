@@ -15,16 +15,16 @@ public class SpeedTestCmdLineOpts {
 
   private static final String HELP = "h";
   private static final String VERBOSE = "v";
-  private static final String ROOT_DIR = "d";
-  private static final String PROFILES = "p";
-  private static final String TEST_CASES = "c";
-  private static final String CATEGORIES = "t";
+  static final String ROOT_DIR = "d";
+  static final String PROFILES = "p";
+  static final String TEST_CASES = "c";
+  static final String CATEGORIES = "t";
+  static final String NUM_OF_ITINERARIES = "i";
+  static final String NUM_OF_SAMPLES = "n";
+  static final String SKIP_COST = "0";
+  static final String DEBUG_STOPS = "S";
+  static final String DEBUG_PATH = "P";
   private static final String GROUP_RESULTS_BY_CATEGORY = "T";
-  private static final String NUM_OF_ITINERARIES = "i";
-  private static final String SAMPLE_TEST_N_TIMES = "n";
-  private static final String SKIP_COST = "0";
-  private static final String DEBUG_STOPS = "S";
-  private static final String DEBUG_PATH = "P";
   private static final boolean OPTION_UNKNOWN_THEN_FAIL = false;
 
   private CommandLine cmd;
@@ -81,7 +81,7 @@ public class SpeedTestCmdLineOpts {
 
   public int numberOfTestsSamplesToRun() {
     String defaultValue = Integer.toString(profiles().length);
-    return Integer.parseInt(cmd.getOptionValue(SAMPLE_TEST_N_TIMES, defaultValue));
+    return Integer.parseInt(cmd.getOptionValue(NUM_OF_SAMPLES, defaultValue));
   }
 
   public SpeedTestProfile[] profiles() {
@@ -153,7 +153,7 @@ public class SpeedTestCmdLineOpts {
       "metric results for each test-case category."
     );
     options.addOption(
-      SAMPLE_TEST_N_TIMES,
+      NUM_OF_SAMPLES,
       "sampleTestNTimes",
       true,
       "Repeat the test N times. Profiles are altered in a round robin fashion."

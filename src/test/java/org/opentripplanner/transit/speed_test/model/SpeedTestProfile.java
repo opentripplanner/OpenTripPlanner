@@ -14,7 +14,7 @@ public enum SpeedTestProfile {
     RaptorProfile.STANDARD,
     SearchDirection.FORWARD
   ),
-  std_reverse(
+  standard_reverse(
     "rrr",
     "Reverse Standard Range Raptor",
     RaptorProfile.STANDARD,
@@ -22,23 +22,23 @@ public enum SpeedTestProfile {
   ),
   best_time(
     "bt",
-    "Best Time Range Raptor, super fast. Arrival time only, no path.",
+    "Best Time Range Raptor, super fast. Arrival times only, no path.",
     RaptorProfile.BEST_TIME,
     SearchDirection.FORWARD
   ),
-  std_best_time_reverse(
+  best_time_reverse(
     "btr",
     "Reverse Best Time Range Raptor",
     RaptorProfile.BEST_TIME,
     SearchDirection.REVERSE
   ),
-  min_travel_duration_std(
+  min_travel_duration(
     "td",
     "Standard Range Raptor without waiting time.",
     RaptorProfile.MIN_TRAVEL_DURATION,
     SearchDirection.FORWARD
   ),
-  min_travel_duration_std_reverse(
+  min_travel_duration_reverse(
     "tdr",
     "Reverse Standard Range Raptor without waiting time.",
     RaptorProfile.MIN_TRAVEL_DURATION,
@@ -56,13 +56,13 @@ public enum SpeedTestProfile {
     RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME,
     SearchDirection.REVERSE
   ),
-  mc_range_raptor(
+  multi_criteria(
     "mc",
     "Multi-Criteria Range Raptor [ transfers, arrival time, travel time, cost ].",
     RaptorProfile.MULTI_CRITERIA,
     SearchDirection.FORWARD
   ),
-  mc_destination(
+  multi_criteria_destination(
     "md",
     "Multi-Criteria Range Raptor with destination pruning.",
     RaptorProfile.MULTI_CRITERIA,
