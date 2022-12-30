@@ -9,7 +9,7 @@ import org.opentripplanner.routing.core.FareType;
  * A matrix or CSV parser would be a better approach to storing this data,
  * but a refactor is unneeded given the proximity of GTFS Fares V2 which will render this redundant.
  */
-public class OrcaFaresData {
+class OrcaFaresData {
 
   public static Map<String, Map<FareType, Float>> sounderFares = Map.ofEntries(
     entry("everett-mukilteo", 3.25f, 3.25f),
