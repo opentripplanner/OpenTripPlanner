@@ -9,6 +9,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_CAR;
 
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
@@ -29,7 +30,7 @@ class NorwayMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    var very_high_traffic = 8;
+    var very_high_traffic = 8.;
     var high_traffic = 2.25;
     var medium_high_traffic = 2.06;
     var medium_traffic = 1.5;
@@ -47,6 +48,36 @@ class NorwayMapper implements OsmTagMapper {
     var dedicated_cycleway = 0.62;
     var dual_lane_or_oneway_cycleway = 0.6;
 
+    props.setDefaultBicycleSafetyForPermission((
+      permission,
+      speedLimit
+    ) ->
+      switch (permission) {
+        case ALL -> {
+          // ~30 km/h or under
+          if (speedLimit <= 8.4f) {
+            yield low_traffic;
+          }
+          // ~60 km/h or under
+          else if (speedLimit <= 16.7f) {
+            yield medium_low_traffic;
+          }
+          // ~80 km/h or under
+          else if (speedLimit <= 22.3f) {
+            yield medium_high_traffic;
+          }
+          // over 80 km/h
+          else {
+            yield very_high_traffic;
+          }
+        }
+        case BICYCLE_AND_CAR -> very_high_traffic;
+        case PEDESTRIAN_AND_BICYCLE -> mixed_cycleway;
+        case BICYCLE -> dedicated_cycleway;
+        // these don't include cycling
+        case PEDESTRIAN_AND_CAR, PEDESTRIAN, CAR, NONE -> 8.;
+    });
+
     props.setProperties(
       new ExactMatchSpecifier(
         new Condition.EqualsAnyIn("highway","motorway", "motorway_link")
@@ -63,20 +94,67 @@ class NorwayMapper implements OsmTagMapper {
       withModes(CAR)
     );
 
-    /* "highway=trunk" roads ("Riksveier") are often single carriageway, and not only legal for bicycles,
-    but assumed to be  much safer than the  default profile (Except when the speedlimt exceeds 90). */
     props.setProperties(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link")
+        new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link", "unclassified")
+      ),
+      withModes(ALL)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link"),
+        new Condition.Absent("maxspeed")
       ),
       withModes(ALL).bicycleSafety(high_traffic)
     );
 
     props.setProperties(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway", "secondary", "secondary_link", "tertiary", "tertiary_link", "unclassified")
+        new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link"),
+        new Condition.InclusiveRange("maxspeed", 80, 70)
+      ),
+      withModes(ALL).bicycleSafety(high_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link"),
+        new Condition.Equals("maxspeed", "60")
       ),
       withModes(ALL).bicycleSafety(medium_high_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link"),
+        new Condition.InclusiveRange("maxspeed", 50, 40)
+      ),
+      withModes(ALL).bicycleSafety(medium_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","secondary", "secondary_link"),
+        new Condition.Equals("maxspeed", "60")
+      ),
+      withModes(ALL).bicycleSafety(medium_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway", "tertiary", "tertiary_link"),
+        new Condition.Equals("maxspeed", "40")
+      ),
+      withModes(ALL).bicycleSafety(low_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.Equals("highway", "unclassified"),
+        new Condition.LessThan("maxspeed", 70)
+      ),
+      withModes(ALL).bicycleSafety(low_traffic)
     );
 
     props.setProperties(
@@ -86,95 +164,8 @@ class NorwayMapper implements OsmTagMapper {
       withModes(ALL).bicycleSafety(low_traffic)
     );
 
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link"),
-        new Condition.GreaterThan("maxspeed", 80)
-      ),
-      withModes(ALL).bicycleSafety(very_high_traffic)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link"),
-        new Condition.Equals("maxspeed", "60")
-      ),
-      withModes(ALL).bicycleSafety(medium_high_traffic)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway","secondary", "secondary_link", "tertiary", "tertiary_link"),
-        new Condition.Equals("maxspeed", "60")
-      ),
-      withModes(ALL).bicycleSafety(medium_traffic)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway", "unclassified", "residential"),
-        new Condition.Equals("maxspeed", "60")
-      ),
-      withModes(ALL).bicycleSafety(medium_low_traffic)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.Equals("highway", "unclassified"),
-        new Condition.LessThan("maxspeed", 60)
-      ),
-      withModes(ALL).bicycleSafety(low_traffic)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link"),
-        new Condition.InclusiveRange("maxspeed", 50, 40)
-      ),
-      withModes(ALL).bicycleSafety(medium_traffic)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway", "secondary", "secondary_link"),
-        new Condition.InclusiveRange("maxspeed", 50, 40)
-      ),
-      withModes(ALL).bicycleSafety(medium_low_traffic)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway", "tertiary", "tertiary_link"),
-        new Condition.Equals("maxspeed", "50")
-      ),
-      withModes(ALL).bicycleSafety(low_traffic)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway", "tertiary", "tertiary_link"),
-        new Condition.LessThan("maxspeed", 50)
-      ),
-      withModes(ALL).bicycleSafety(low_traffic)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link"),
-        new Condition.LessThan("highway", 40)
-      ),
-      withModes(ALL).bicycleSafety(low_traffic)
-    );
 
     // Discourage cycling on roads with no infrastructure for neither walking nor cycling
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link"),
-        new Condition.Equals("foot", "no")
-      ),
-      withModes(BICYCLE_AND_CAR).bicycleSafety(very_high_traffic)
-    );
-
     props.setProperties(
       new ExactMatchSpecifier(
         new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link"),
@@ -186,8 +177,8 @@ class NorwayMapper implements OsmTagMapper {
     // Discourage cycling on trunk road tunnels
     props.setProperties(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway","unclassified", "residential", "service"),
-        new Condition.Equals("foot", "no")
+        new Condition.EqualsAnyIn("highway","trunk", "trunk_link"),
+        new Condition.Equals("tunnel", "yes")
       ),
       withModes(BICYCLE_AND_CAR).bicycleSafety(medium_traffic)
     );
@@ -286,7 +277,10 @@ class NorwayMapper implements OsmTagMapper {
       withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dedicated_cycleway)
     );
     props.setProperties(
-      "highway=cycleway;lanes=2",
+        new ExactMatchSpecifier(
+          new Condition.Equals("highway", "cycleway"),
+          new Condition.GreaterThan("lanes", 1)
+        ),
       withModes(BICYCLE).bicycleSafety(dual_lane_or_oneway_cycleway)
     );
     props.setProperties(
@@ -352,16 +346,23 @@ class NorwayMapper implements OsmTagMapper {
     props.setMixinProperties("smoothness=intermediate", ofBicycleSafety(1.5));
     props.setMixinProperties("smoothness=bad", ofBicycleSafety(2));
     props.setProperties("highway=*;smoothness=very_bad", withModes(PEDESTRIAN));
-    props.setProperties("highway=*;smoothness=horrible", withModes(NONE));
-    props.setProperties("highway=*;smoothness=very_horrible", withModes(NONE));
-    props.setProperties("highway=*;smoothness=impassable", withModes(NONE));
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("smoothness", "horrible", "very_horrible", "impassable"),
+        new Condition.EqualsAnyIn("highway", "path", "bridleway", "track")
+      ),
+      withModes(NONE)
+    );
 
     props.setProperties("highway=*;mtb:scale=1", withModes(PEDESTRIAN));
     props.setProperties("highway=*;mtb:scale=2", withModes(PEDESTRIAN));
-    props.setProperties("highway=*;mtb:scale=3", withModes(NONE));
-    props.setProperties("highway=*;mtb:scale=4", withModes(NONE));
-    props.setProperties("highway=*;mtb:scale=5", withModes(NONE));
-    props.setProperties("highway=*;mtb:scale=6", withModes(NONE));
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.GreaterThan("mtb:scale", 2),
+        new Condition.EqualsAnyIn("highway", "path", "bridleway", "track")
+      ),
+      withModes(NONE)
+    );
 
     props.setProperties(
       "highway=track;tracktype=grade1",
