@@ -53,8 +53,8 @@ public class SpeedTestRequest {
       request.setArriveBy(true);
     }
 
-    if (input.window() != TestCase.NOT_SET) {
-      request.setSearchWindow(Duration.ofSeconds(input.window()));
+    if (input.window() != null) {
+      request.setSearchWindow(input.window());
     }
 
     request.setFrom(input.fromPlace());

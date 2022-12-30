@@ -101,10 +101,6 @@ abstract class AbstractCsvFile<T> {
 
   /* private methods */
 
-  static String time2str(Integer timeOrDuration) {
-    return TimeUtils.timeToStrLong(timeOrDuration);
-  }
-
   protected String parseString(String colName) throws IOException {
     return currentReader.get(colName);
   }
@@ -117,16 +113,16 @@ abstract class AbstractCsvFile<T> {
     return Double.parseDouble(parseString(colName));
   }
 
-  protected int parseDurationsSeconds(String colName) throws IOException {
-    String timeOrDuration = parseString(colName);
-    if (timeOrDuration.isBlank()) {
-      return TestCase.NOT_SET;
-    }
-    return DurationUtils.durationInSeconds(timeOrDuration);
+  static String time2str(Integer timeOrDuration) {
+    return TimeUtils.timeToStrLong(timeOrDuration);
   }
 
   protected Integer parseTime(String colName) throws IOException {
     return TimeUtils.time(parseString(colName), TestCase.NOT_SET);
+  }
+
+  protected String duration2Str(Duration duration) {
+    return DurationUtils.durationToStr(duration);
   }
 
   protected Duration parseDuration(String colName) throws IOException {
@@ -142,15 +138,7 @@ abstract class AbstractCsvFile<T> {
     return DurationUtils.duration(timeOrDuration);
   }
 
-  protected Integer parseDurationOld(String colName) throws IOException {
-    String timeOrDuration = parseString(colName);
-    if (timeOrDuration.isBlank()) {
-      return TestCase.NOT_SET;
-    }
-    return DurationUtils.durationInSeconds(timeOrDuration);
-  }
-
-  protected <T> List<T> parseCollection(String colName, Function<String, T> mapFunction)
+  protected <S> List<S> parseCollection(String colName, Function<String, S> mapFunction)
     throws IOException {
     String value = parseString(colName);
     if (value == null || value.isBlank()) {
@@ -166,10 +154,6 @@ abstract class AbstractCsvFile<T> {
 
   private static String[] toArray(String value) {
     return value.split(Pattern.quote(ARRAY_DELIMITER));
-  }
-
-  static List<String> asSortedList(String[] values) {
-    return Arrays.stream(values).sorted().distinct().toList();
   }
 
   protected static String col2Str(Collection<?> c) {

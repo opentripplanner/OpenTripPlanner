@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.speed_test.model.testcase;
 
-import org.opentripplanner.framework.lang.OtpNumberFormat;
+import java.time.Duration;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
@@ -12,7 +12,7 @@ public record TestCaseDefinition(
   String description,
   int departureTime,
   int arrivalTime,
-  int window,
+  Duration window,
   GenericLocation fromPlace,
   GenericLocation toPlace,
   /**
@@ -24,7 +24,6 @@ public record TestCaseDefinition(
 ) {
   @Override
   public String toString() {
-    var numFormat = new OtpNumberFormat();
     return String.format(
       "#%s %s - %s, %s - %s, %s-%s(%s)",
       id,
@@ -34,7 +33,7 @@ public record TestCaseDefinition(
       coordinateString(toPlace),
       TimeUtils.timeToStrCompact(departureTime, TestCase.NOT_SET),
       TimeUtils.timeToStrCompact(arrivalTime, TestCase.NOT_SET),
-      DurationUtils.durationToStr(window, TestCase.NOT_SET)
+      DurationUtils.durationToStr(window)
     );
   }
 

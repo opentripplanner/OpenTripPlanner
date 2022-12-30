@@ -28,7 +28,7 @@ public class TestCaseDefinitionCsvFile extends AbstractCsvFile<TestCaseDefinitio
       parseString("description"),
       parseTime("departure"),
       parseTime("arrival"),
-      parseDurationsSeconds("window"),
+      parseDuration("window"),
       new GenericLocation(
         parseString("origin"),
         FeedScopedId.ofNullable(feedId, parseString("fromPlace")),

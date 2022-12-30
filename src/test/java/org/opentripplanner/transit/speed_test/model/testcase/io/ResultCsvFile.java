@@ -47,7 +47,7 @@ public class ResultCsvFile extends AbstractCsvFile<Result> {
     return switch (colName) {
       case TC_ID -> row.testCaseId();
       case N_TRANSFERS -> Integer.toString(row.nTransfers());
-      case DURATION -> time2str((int) row.duration().toSeconds());
+      case DURATION -> duration2Str(row.duration());
       case COST -> Integer.toString(row.cost());
       case WALK_DISTANCE -> Integer.toString(row.walkDistance());
       case START_TIME -> time2str(row.startTime());
