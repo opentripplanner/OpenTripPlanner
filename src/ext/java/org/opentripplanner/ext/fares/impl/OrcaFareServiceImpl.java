@@ -5,11 +5,9 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Currency;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareType;
@@ -35,7 +33,7 @@ public class OrcaFareServiceImpl extends DefaultFareService {
   public static final String KITSAP_TRANSIT_AGENCY_ID = "kt";
   public static final int ROUTE_TYPE_FERRY = 4;
 
-  public enum RideType {
+  private enum RideType {
     COMM_TRANS_LOCAL_SWIFT,
     COMM_TRANS_COMMUTER_EXPRESS,
     EVERETT_TRANSIT,
@@ -55,7 +53,6 @@ public class OrcaFareServiceImpl extends DefaultFareService {
     WASHINGTON_STATE_FERRIES,
   }
 
-  private static final Map<String, Function<Route, RideType>> classificationStrategy = new HashMap<>();
   private static final Map<String, Map<FareType, Float>> washingtonStateFerriesFares =
     OrcaFaresData.washingtonStateFerriesFares;
   private static final Map<String, Map<FareType, Float>> soundTransitLinkFares =
@@ -63,32 +60,28 @@ public class OrcaFareServiceImpl extends DefaultFareService {
   private static final Map<String, Map<FareType, Float>> soundTransitSounderFares =
     OrcaFaresData.sounderFares;
 
-  static {
-    classificationStrategy.put(
-      COMM_TRANS_AGENCY_ID,
-      routeData -> {
+  static RideType getRideType(String agencyId, Route routeData) {
+    return switch (agencyId) {
+      case COMM_TRANS_AGENCY_ID -> {
         try {
           int routeId = Integer.parseInt(routeData.getShortName());
           if (routeId >= 500 && routeId < 600) {
-            return RideType.SOUND_TRANSIT_BUS; // CommTrans operates some ST routes.
+            yield RideType.SOUND_TRANSIT_BUS; // CommTrans operates some ST routes.
           }
           if (routeId >= 400 && routeId <= 899) {
-            return RideType.COMM_TRANS_COMMUTER_EXPRESS;
+            yield RideType.COMM_TRANS_COMMUTER_EXPRESS;
           }
-          return RideType.COMM_TRANS_LOCAL_SWIFT;
+          yield RideType.COMM_TRANS_LOCAL_SWIFT;
         } catch (NumberFormatException e) {
           LOG.warn("Unable to determine comm trans route id from {}.", routeData.getShortName(), e);
-          return RideType.COMM_TRANS_LOCAL_SWIFT;
+          yield RideType.COMM_TRANS_LOCAL_SWIFT;
         }
       }
-    );
-    classificationStrategy.put(
-      KC_METRO_AGENCY_ID,
-      routeData -> {
+      case KC_METRO_AGENCY_ID -> {
         try {
           int routeId = Integer.parseInt(routeData.getShortName());
           if (routeId >= 500 && routeId < 600) {
-            return RideType.SOUND_TRANSIT_BUS;
+            yield RideType.SOUND_TRANSIT_BUS;
           }
         } catch (NumberFormatException ignored) {
           // Lettered routes exist, are not an error.
@@ -98,44 +91,36 @@ public class OrcaFareServiceImpl extends DefaultFareService {
           routeData.getGtfsType() == ROUTE_TYPE_FERRY &&
           routeData.getLongName().toString().contains("Water Taxi: West Seattle")
         ) {
-          return RideType.KC_WATER_TAXI_WEST_SEATTLE;
+          yield RideType.KC_WATER_TAXI_WEST_SEATTLE;
         } else if (
           routeData.getGtfsType() == ROUTE_TYPE_FERRY &&
           routeData.getDescription().contains("Water Taxi: Vashon Island")
         ) {
-          return RideType.KC_WATER_TAXI_VASHON_ISLAND;
+          yield RideType.KC_WATER_TAXI_VASHON_ISLAND;
         }
-        return RideType.KC_METRO;
+        yield RideType.KC_METRO;
       }
-    );
-    classificationStrategy.put(SOUND_TRANSIT_AGENCY_ID, routeData -> RideType.SOUND_TRANSIT);
-    classificationStrategy.put(EVERETT_TRANSIT_AGENCY_ID, routeData -> RideType.EVERETT_TRANSIT);
-    classificationStrategy.put(
-      PIERCE_COUNTY_TRANSIT_AGENCY_ID,
-      routeData -> {
+      case PIERCE_COUNTY_TRANSIT_AGENCY_ID -> {
         try {
           int routeId = Integer.parseInt(routeData.getShortName());
           if (routeId >= 520 && routeId < 600) {
             // PierceTransit operates some ST routes. But 500 and 501 are PT routes.
-            return RideType.SOUND_TRANSIT_BUS;
+            yield RideType.SOUND_TRANSIT_BUS;
           }
-          return RideType.PIERCE_COUNTY_TRANSIT;
+          yield RideType.PIERCE_COUNTY_TRANSIT;
         } catch (NumberFormatException e) {
           LOG.warn("Unable to determine comm trans route id from {}.", routeData.getShortName(), e);
-          return RideType.PIERCE_COUNTY_TRANSIT;
+          yield RideType.PIERCE_COUNTY_TRANSIT;
         }
       }
-    );
-    classificationStrategy.put(SKAGIT_TRANSIT_AGENCY_ID, routeData -> RideType.SKAGIT_TRANSIT);
-    classificationStrategy.put(
-      SEATTLE_STREET_CAR_AGENCY_ID,
-      routeData -> RideType.SEATTLE_STREET_CAR
-    );
-    classificationStrategy.put(
-      WASHINGTON_STATE_FERRIES_AGENCY_ID,
-      routeData -> RideType.WASHINGTON_STATE_FERRIES
-    );
-    classificationStrategy.put(KITSAP_TRANSIT_AGENCY_ID, routeData -> RideType.KITSAP_TRANSIT);
+      case SOUND_TRANSIT_AGENCY_ID -> RideType.SOUND_TRANSIT;
+      case EVERETT_TRANSIT_AGENCY_ID -> RideType.EVERETT_TRANSIT;
+      case SKAGIT_TRANSIT_AGENCY_ID -> RideType.SKAGIT_TRANSIT;
+      case SEATTLE_STREET_CAR_AGENCY_ID -> RideType.SEATTLE_STREET_CAR;
+      case WASHINGTON_STATE_FERRIES_AGENCY_ID -> RideType.WASHINGTON_STATE_FERRIES;
+      case KITSAP_TRANSIT_AGENCY_ID -> RideType.KITSAP_TRANSIT;
+      default -> null;
+    };
   }
 
   // If set to true, the test ride price is used instead of the actual agency cash fare.
@@ -186,13 +171,10 @@ public class OrcaFareServiceImpl extends DefaultFareService {
    * route data is enough to define the agency, but addition trip id checks are needed to define the fast ferry direction.
    */
   private static RideType classify(Route routeData, String tripId) {
-    Function<Route, RideType> classifier = classificationStrategy.get(
-      routeData.getAgency().getId().getId()
-    );
-    if (classifier == null) {
+    var rideType = getRideType(routeData.getAgency().getId().getId(), routeData);
+    if (rideType == null) {
       return null;
     }
-    RideType rideType = classifier.apply(routeData);
     if (
       rideType == RideType.KITSAP_TRANSIT &&
       routeData.getId().getId().equalsIgnoreCase("Kitsap Fast Ferry") &&
