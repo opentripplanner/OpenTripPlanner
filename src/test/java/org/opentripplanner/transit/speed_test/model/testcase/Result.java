@@ -15,61 +15,38 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  * <p>
  * Implementation details: This is NOT converted into a record, because it is hard to enforce the
  * restrictions on agencies, modes, routes and stops. Second, it is not much simpler/less code.
+ * <p>
+ * @param testCaseId The status is not final; This allows to update the status when matching
+ *                   expected and actual results.
+ * @param agencies Alphabetical distinct list of agencies. A {@code List} is used because the order
+ *               is important.
+ * @param modes Alphabetical distinct list of modes. A {@code List} is used because the order is
+ *              important.
+ * @param routes A list of routes in tha same order as they appear in the journey.
+ * @param stops A list of stops in tha same order as they appear in the journey.
+ * @param details Summary description of the journey, like: "Walk 2m ~ Stop A ~ Route L1 12:00 -
+ *                12:30 ~ Stop B ~ Walk 3m"
  */
-class Result {
+public record Result(
+  String testCaseId,
+  Integer nTransfers,
+  Duration duration,
+  Integer cost,
+  Integer walkDistance,
+  Integer startTime,
+  Integer endTime,
 
-  /**
-   * The status is not final; This allows to update the status when matching expected and actual
-   * results.
-   */
-  final String testCaseId;
-  final Integer nTransfers;
-  final Duration duration;
-  final Integer cost;
-  final Integer walkDistance;
-  final Integer startTime;
-  final Integer endTime;
-
-  /** Alphabetical distinct list of agencies. A {@code List} is used because the order is important. */
-  final List<String> agencies;
-  /** Alphabetical distinct list of modes. A {@code List} is used because the order is important. */
-  final List<TransitMode> modes;
-  /** A list of routes in tha same order as they appear in the journey. */
-  final List<String> routes;
-  /** A list of stops in tha same order as they appear in the journey. */
-  final List<String> stops;
-  /**
-   * Summary description of the journey, like: "Walk 2m ~ Stop A ~ Route L1 12:00 - 12:30 ~ Stop B ~
-   * Walk 3m"
-   */
-  final String details;
-
-  Result(
-    String testCaseId,
-    Integer nTransfers,
-    Duration duration,
-    Integer cost,
-    Integer walkDistance,
-    Integer startTime,
-    Integer endTime,
-    Collection<String> agencies,
-    Collection<TransitMode> modes,
-    Collection<String> routes,
-    Collection<String> stops,
-    String details
-  ) {
-    this.testCaseId = testCaseId;
-    this.nTransfers = nTransfers;
-    this.duration = duration;
-    this.cost = cost;
-    this.walkDistance = walkDistance;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.agencies = sortedList(agencies);
-    this.modes = sortedModes(modes);
-    this.routes = List.copyOf(routes);
-    this.stops = List.copyOf(stops);
-    this.details = details;
+  List<String> agencies,
+  List<TransitMode> modes,
+  List<String> routes,
+  List<String> stops,
+  String details
+) {
+  public Result {
+    agencies = sortedList(agencies);
+    modes = sortedModes(modes);
+    routes = List.copyOf(routes);
+    stops = List.copyOf(stops);
   }
 
   public static Comparator<Result> comparator(boolean skipCost) {

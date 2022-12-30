@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.routing.api.request.RoutingTag;
 
 public class SpeedTestTimer {
+
   private static final int NOT_AVAILABLE = -1;
 
   private static final NamingConvention NAMING_CONVENTION = createNamingConvention();

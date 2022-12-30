@@ -3,8 +3,8 @@ package org.opentripplanner.transit.speed_test.model.testcase;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -117,7 +117,7 @@ class ItineraryResultMapper {
   private Result map(Itinerary itinerary) {
     List<String> agencies = new ArrayList<>();
     List<String> routes = new ArrayList<>();
-    Set<TransitMode> modes = new HashSet<>();
+    Set<TransitMode> modes = EnumSet.noneOf(TransitMode.class);
     List<String> stops = new ArrayList<>();
 
     for (Leg it : itinerary.getLegs()) {
@@ -145,7 +145,7 @@ class ItineraryResultMapper {
       itinerary.startTime().get(ChronoField.SECOND_OF_DAY),
       itinerary.endTime().get(ChronoField.SECOND_OF_DAY),
       agencies,
-      modes,
+      List.copyOf(modes),
       routes,
       stops,
       details(itinerary)

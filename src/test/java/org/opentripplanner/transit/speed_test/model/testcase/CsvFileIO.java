@@ -94,18 +94,18 @@ public class CsvFileIO {
       for (TestCase tc : testCases) {
         for (Result result : tc.actualResults()) {
           write(out, tc.id());
-          write(out, result.nTransfers);
-          write(out, time2str((int) result.duration.toSeconds()));
-          write(out, result.cost);
-          write(out, result.walkDistance);
-          write(out, time2str(result.startTime));
-          write(out, time2str(result.endTime));
-          write(out, col2Str(result.agencies));
-          write(out, col2Str(result.modes));
-          write(out, col2Str(result.routes));
-          write(out, col2Str(result.stops));
+          write(out, result.nTransfers());
+          write(out, time2str((int) result.duration().toSeconds()));
+          write(out, result.cost());
+          write(out, result.walkDistance());
+          write(out, time2str(result.startTime()));
+          write(out, time2str(result.endTime()));
+          write(out, col2Str(result.agencies()));
+          write(out, col2Str(result.modes()));
+          write(out, col2Str(result.routes()));
+          write(out, col2Str(result.stops()));
           // Skip delimiter for the last value
-          out.print(result.details.replace(CSV_DELIMITER, '_'));
+          out.print(result.details().replace(CSV_DELIMITER, '_'));
           out.println();
         }
       }
@@ -139,10 +139,6 @@ public class CsvFileIO {
 
   private static String[] toArray(String value) {
     return value.split(Pattern.quote(ARRAY_DELIMITER));
-  }
-
-  private static List<String> asSortedList(String[] values) {
-    return Arrays.stream(values).sorted().distinct().toList();
   }
 
   private static String col2Str(Collection<?> c) {
@@ -243,7 +239,7 @@ public class CsvFileIO {
         continue;
       }
       Result expRes = readExpectedResult(csvReader);
-      results.put(expRes.testCaseId, expRes);
+      results.put(expRes.testCaseId(), expRes);
     }
     return results;
   }
