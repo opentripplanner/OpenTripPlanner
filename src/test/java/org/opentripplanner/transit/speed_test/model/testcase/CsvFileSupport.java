@@ -18,12 +18,12 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is responsible for reading and writing test cases and test case results to CSV files.
  */
-public class CsvFileIO {
+public class CsvFileSupport {
 
   private static final String EXPECTED_RESULTS_FILE_NAME = "expected-results";
   private static final String RESULTS_FILE_NAME = "results";
 
-  private static final Logger LOG = LoggerFactory.getLogger(CsvFileIO.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CsvFileSupport.class);
   private static final Set<SpeedTestProfile> writeResultsForFirstSampleRun = EnumSet.noneOf(
     SpeedTestProfile.class
   );
@@ -34,7 +34,7 @@ public class CsvFileIO {
   private final Map<SpeedTestProfile, File> expectedResultsFileByProfile = new HashMap<>();
   private final String feedId;
 
-  public CsvFileIO(
+  public CsvFileSupport(
     File dir,
     String testSetName,
     String feedId,

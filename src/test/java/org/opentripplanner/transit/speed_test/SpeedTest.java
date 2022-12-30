@@ -30,7 +30,7 @@ import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
-import org.opentripplanner.transit.speed_test.model.testcase.CsvFileIO;
+import org.opentripplanner.transit.speed_test.model.testcase.CsvFileSupport;
 import org.opentripplanner.transit.speed_test.model.testcase.TestCase;
 import org.opentripplanner.transit.speed_test.model.testcase.TestCaseInput;
 import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
@@ -57,7 +57,7 @@ public class SpeedTest {
   private final OtpServerRequestContext serverContext;
   private final Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
   private final Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
-  private final CsvFileIO tcIO;
+  private final CsvFileSupport tcIO;
   private SpeedTestProfile profile;
   private TestStatus status = TestStatus.OK;
 
@@ -76,7 +76,7 @@ public class SpeedTest {
     OTPFeature.logFeatureSetup();
 
     this.tcIO =
-      new CsvFileIO(
+      new CsvFileSupport(
         opts.rootDir(),
         TRAVEL_SEARCH_FILENAME,
         config.feedId,
