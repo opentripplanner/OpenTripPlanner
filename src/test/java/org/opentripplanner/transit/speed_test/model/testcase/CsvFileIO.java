@@ -1,11 +1,15 @@
 package org.opentripplanner.transit.speed_test.model.testcase;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import java.io.File;
 import java.io.IOException;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.speed_test.model.testcase.io.ResultCsvFile;
 import org.opentripplanner.transit.speed_test.model.testcase.io.TestCaseDefinitionCsvFile;
 import org.slf4j.Logger;
@@ -16,26 +20,48 @@ import org.slf4j.LoggerFactory;
  */
 public class CsvFileIO {
 
+  private static final String EXPECTED_RESULTS_FILE_NAME = "expected-results";
+  private static final String RESULTS_FILE_NAME = "results";
+
   private static final Logger LOG = LoggerFactory.getLogger(CsvFileIO.class);
-  private static boolean printResultsForFirstStrategyRun = true;
+  private static final Set<SpeedTestProfile> writeResultsForFirstSampleRun = EnumSet.noneOf(
+    SpeedTestProfile.class
+  );
 
   private final File testCasesFile;
   private final File expectedResultsFile;
-  private final File expectedResultsOutputFile;
+  private final Map<SpeedTestProfile, File> resultsFileByProfile = new HashMap<>();
+  private final Map<SpeedTestProfile, File> expectedResultsFileByProfile = new HashMap<>();
   private final String feedId;
 
-  public CsvFileIO(File dir, String testSetName, String feedId) {
+  public CsvFileIO(
+    File dir,
+    String testSetName,
+    String feedId,
+    boolean replaceExpectedResultsFiles
+  ) {
     this.feedId = Objects.requireNonNull(feedId);
     testCasesFile = new File(dir, testSetName + ".csv");
-    expectedResultsFile = new File(dir, testSetName + "-expected-results.csv");
-    expectedResultsOutputFile = new File(dir, testSetName + "-results.csv");
+    expectedResultsFile = csvFile(dir, testSetName, EXPECTED_RESULTS_FILE_NAME);
+
+    var resultsFilesName = replaceExpectedResultsFiles
+      ? EXPECTED_RESULTS_FILE_NAME
+      : RESULTS_FILE_NAME;
+
+    for (SpeedTestProfile p : SpeedTestProfile.values()) {
+      resultsFileByProfile.put(p, csvFile(dir, testSetName, resultsFilesName, p.shortName()));
+      expectedResultsFileByProfile.put(
+        p,
+        csvFile(dir, testSetName, EXPECTED_RESULTS_FILE_NAME, p.shortName())
+      );
+    }
   }
 
   public List<TestCaseInput> readTestCasesFromFile() {
     try {
       List<TestCaseDefinition> definitions = new TestCaseDefinitionCsvFile(testCasesFile, feedId)
         .read();
-      var expectedResults = readExpectedResultsFromFile();
+      var expectedResults = readExpectedResults();
 
       return definitions
         .stream()
@@ -50,12 +76,10 @@ public class CsvFileIO {
    * Write all results to a CSV file. This file can be renamed and used as expected-result input
    * file.
    */
-  public void writeResultsToFile(List<TestCase> testCases) {
-    if (!printResultsForFirstStrategyRun) {
+  public void writeResultsToFile(SpeedTestProfile profile, List<TestCase> testCases) {
+    if (skipIfNotFirstSampleRun(profile)) {
       return;
     }
-
-    printResultsForFirstStrategyRun = false;
 
     var tcIds = testCases.stream().filter(TestCase::notRunOrNoResults).map(TestCase::id).toList();
 
@@ -68,22 +92,54 @@ public class CsvFileIO {
       return;
     }
 
-    new ResultCsvFile(expectedResultsOutputFile)
+    new ResultCsvFile(resultsFileByProfile.get(profile))
       .write(testCases.stream().flatMap(it -> it.actualResults().stream()).toList());
   }
 
   /* private methods */
 
-  private Multimap<String, Result> readExpectedResultsFromFile() throws IOException {
-    Multimap<String, Result> results = ArrayListMultimap.create();
+  private Map<String, ResultsByProfile> readExpectedResults() throws IOException {
+    final Map<String, ResultsByProfile> resultsById = new HashMap<>();
 
-    if (!expectedResultsFile.exists()) {
-      return results;
-    }
+    addFileToResultsMap(resultsById, expectedResultsFile, ResultsByProfile::addDefault);
 
-    for (var it : new ResultCsvFile(expectedResultsFile).read()) {
-      results.put(it.testCaseId(), it);
+    for (var profile : SpeedTestProfile.values()) {
+      addFileToResultsMap(
+        resultsById,
+        expectedResultsFileByProfile.get(profile),
+        (results, r) -> results.add(profile, r)
+      );
     }
-    return results;
+    return resultsById;
+  }
+
+  private static void addFileToResultsMap(
+    Map<String, ResultsByProfile> resultsById,
+    File file,
+    BiConsumer<ResultsByProfile, Result> addOp
+  ) {
+    if (file.exists()) {
+      for (var line : new ResultCsvFile(file).read()) {
+        var res = resultsById.computeIfAbsent(line.testCaseId(), id -> new ResultsByProfile());
+        addOp.accept(res, line);
+      }
+    }
+  }
+
+  private static File csvFile(File dir, String... names) {
+    StringBuilder name = new StringBuilder(names[0]);
+    for (int i = 1; i < names.length; ++i) {
+      name.append("-").append(names[i]);
+    }
+    name.append(".csv");
+    return new File(dir, name.toString());
+  }
+
+  /**
+   * The SpeedTest may run n samples to improve the test results, we only write the results for
+   * the first sample run - pr profile.
+   */
+  private boolean skipIfNotFirstSampleRun(SpeedTestProfile profile) {
+    return !writeResultsForFirstSampleRun.add(profile);
   }
 }

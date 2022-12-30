@@ -101,6 +101,10 @@ public enum SpeedTestProfile {
     return Arrays.stream(values()).map(SpeedTestProfile::description).collect(Collectors.toList());
   }
 
+  public String shortName() {
+    return shortName;
+  }
+
   public RaptorProfile raptorProfile() {
     return raptorProfile;
   }

@@ -6,11 +6,14 @@ import static org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpt
 import static org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts.NUM_OF_ITINERARIES;
 import static org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts.NUM_OF_SAMPLES;
 import static org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts.PROFILES;
+import static org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts.REPLACE_EXPECTED_RESULTS_FILES;
 import static org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts.ROOT_DIR;
 import static org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts.SKIP_COST;
 import static org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts.TEST_CASES;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -21,17 +24,19 @@ import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
  * <p>
  * THIS CLASS IS NOT THREAD-SAFE
  */
+@SuppressWarnings({ "unused", "SameParameterValue" })
 public class SpeedTestCmdLineOptsBuilder {
 
-  private String rootDirectory;
-  private List<SpeedTestProfile> profiles = new ArrayList<>();
-  private List<Integer> testCases = new ArrayList<>();
-  private List<String> categories = new ArrayList<>();
+  private File rootDirectory;
+  private final List<SpeedTestProfile> profiles = new ArrayList<>();
+  private final List<Integer> testCases = new ArrayList<>();
+  private final List<String> categories = new ArrayList<>();
   private int nItineraries = -1;
   private int nSamples = -1;
   private boolean skipCost = false;
-  private List<String> debugStops = new ArrayList<>();
-  private List<String> debugPath = new ArrayList<>();
+  private boolean replaceExpectedResultsFile = false;
+  private final List<String> debugStops = new ArrayList<>();
+  private final List<String> debugPath = new ArrayList<>();
 
   /**
    * The result options, kept as a member to avoid passing it to helper methods during
@@ -40,7 +45,7 @@ public class SpeedTestCmdLineOptsBuilder {
    */
   private List<String> opts;
 
-  public SpeedTestCmdLineOptsBuilder withRootDirectory(String rootDirectory) {
+  public SpeedTestCmdLineOptsBuilder withRootDirectory(File rootDirectory) {
     this.rootDirectory = rootDirectory;
     return this;
   }
@@ -55,13 +60,13 @@ public class SpeedTestCmdLineOptsBuilder {
     return this;
   }
 
-  public SpeedTestCmdLineOptsBuilder withTestCases(List<Integer> testCases) {
-    this.testCases = testCases;
+  public SpeedTestCmdLineOptsBuilder withTestCase(int testCase) {
+    this.testCases.add(testCase);
     return this;
   }
 
-  public SpeedTestCmdLineOptsBuilder withCategories(List<String> categories) {
-    this.categories = categories;
+  public SpeedTestCmdLineOptsBuilder withCategory(String category) {
+    this.categories.add(category);
     return this;
   }
 
@@ -75,13 +80,18 @@ public class SpeedTestCmdLineOptsBuilder {
     return this;
   }
 
-  public SpeedTestCmdLineOptsBuilder withDebugStops(List<String> debugStops) {
-    this.debugStops = debugStops;
+  public SpeedTestCmdLineOptsBuilder replaceExpectedResultsFile() {
+    this.replaceExpectedResultsFile = true;
     return this;
   }
 
-  public SpeedTestCmdLineOptsBuilder withDebugPath(List<String> debugPath) {
-    this.debugPath = debugPath;
+  public SpeedTestCmdLineOptsBuilder withDebugStops(String... debugStops) {
+    Collections.addAll(this.debugStops, debugStops);
+    return this;
+  }
+
+  public SpeedTestCmdLineOptsBuilder withDebugPath(String... debugPath) {
+    Collections.addAll(this.debugPath, debugPath);
     return this;
   }
 
@@ -92,13 +102,14 @@ public class SpeedTestCmdLineOptsBuilder {
       throw new IllegalStateException();
     }
 
-    add(ROOT_DIR, rootDirectory);
+    add(ROOT_DIR, rootDirectory.getAbsolutePath());
     add(PROFILES, profiles.stream().map(SpeedTestProfile::name).collect(Collectors.joining()));
     addOptInt(NUM_OF_ITINERARIES, nItineraries);
     addOptInts(TEST_CASES, testCases);
     addOptStrings(CATEGORIES, categories);
     addOptInt(NUM_OF_SAMPLES, nSamples);
     addOptBool(SKIP_COST, skipCost);
+    addOptBool(REPLACE_EXPECTED_RESULTS_FILES, replaceExpectedResultsFile);
     addOptStrings(DEBUG_STOPS, debugStops);
     addOptStrings(DEBUG_PATH, debugPath);
     return new SpeedTestCmdLineOpts(opts.toArray(new String[0]));

@@ -22,6 +22,7 @@ public class SpeedTestCmdLineOpts {
   static final String NUM_OF_ITINERARIES = "i";
   static final String NUM_OF_SAMPLES = "n";
   static final String SKIP_COST = "0";
+  static final String REPLACE_EXPECTED_RESULTS_FILES = "R";
   static final String DEBUG_STOPS = "S";
   static final String DEBUG_PATH = "P";
   private static final String GROUP_RESULTS_BY_CATEGORY = "T";
@@ -92,6 +93,10 @@ public class SpeedTestCmdLineOpts {
 
   public boolean skipCost() {
     return cmd.hasOption(SKIP_COST);
+  }
+
+  public boolean replaceExpectedResultsFiles() {
+    return cmd.hasOption(REPLACE_EXPECTED_RESULTS_FILES);
   }
 
   public List<String> testCaseIds() {
@@ -168,6 +173,13 @@ public class SpeedTestCmdLineOpts {
     );
 
     options.addOption(SKIP_COST, "skipCost", false, "Skip cost when comparing results.");
+    options.addOption(
+      REPLACE_EXPECTED_RESULTS_FILES,
+      "replaceResultsExpectedFiles",
+      false,
+      "If result differ, replace the 'expected-results' files instead of creating 'results' " +
+      "files. This is especially useful if the expected files are under version control."
+    );
     // Debug options
     options.addOption(DEBUG_STOPS, "debugStops", true, "A coma separated list of stops to debug.");
     options.addOption(

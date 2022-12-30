@@ -126,7 +126,7 @@ class ResultPrinter {
     boolean printItineraries,
     String errorDetails
   ) {
-    if (printItineraries || !tc.success()) {
+    if (printItineraries || tc.status().notOk()) {
       System.err.printf(
         "TC %-4s %-7s  %4d ms  %-66s %s %n",
         tc.id(),

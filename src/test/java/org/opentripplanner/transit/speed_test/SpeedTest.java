@@ -33,6 +33,7 @@ import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.speed_test.model.testcase.CsvFileIO;
 import org.opentripplanner.transit.speed_test.model.testcase.TestCase;
 import org.opentripplanner.transit.speed_test.model.testcase.TestCaseInput;
+import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
@@ -57,7 +58,8 @@ public class SpeedTest {
   private final Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
   private final Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
   private final CsvFileIO tcIO;
-  private SpeedTestProfile routeProfile;
+  private SpeedTestProfile profile;
+  private TestStatus status = TestStatus.OK;
 
   public SpeedTest(
     SpeedTestCmdLineOpts opts,
@@ -73,7 +75,13 @@ public class SpeedTest {
     OTPFeature.enableFeatures(features.otpFeatures);
     OTPFeature.logFeatureSetup();
 
-    this.tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME, config.feedId);
+    this.tcIO =
+      new CsvFileIO(
+        opts.rootDir(),
+        TRAVEL_SEARCH_FILENAME,
+        config.feedId,
+        opts.replaceExpectedResultsFiles()
+      );
 
     // Read Test-case definitions and expected results from file
     this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
@@ -195,11 +203,13 @@ public class SpeedTest {
     System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
   }
 
+  public TestStatus status() {
+    return status;
+  }
+
   /* Run a single test with all testcases */
   private void runSingleTest(int sample, int nSamples) {
     List<TestCase> testCases = createNewSetOfTestCases();
-
-    int nSuccess = 0;
 
     // Force GC to avoid GC during the test
     forceGCToAvoidGCLater();
@@ -214,29 +224,30 @@ public class SpeedTest {
       runSingleTestCase(testCases.get(index), true);
     }
 
-    ResultPrinter.logSingleTestHeader(routeProfile);
+    ResultPrinter.logSingleTestHeader(profile);
 
     timer.startTest();
 
     for (TestCase testCase : testCases) {
-      nSuccess += runSingleTestCase(testCase, false) ? 1 : 0;
+      runSingleTestCase(testCase, false);
     }
 
-    workerResults.get(routeProfile).add(timer.totalTimerMean(DebugTimingAggregator.ROUTING_RAPTOR));
-    totalResults.get(routeProfile).add(timer.totalTimerMean(DebugTimingAggregator.ROUTING_TOTAL));
+    int nSuccess = (int) testCases.stream().filter(TestCase::success).count();
+    workerResults.get(profile).add(timer.totalTimerMean(DebugTimingAggregator.ROUTING_RAPTOR));
+    totalResults.get(profile).add(timer.totalTimerMean(DebugTimingAggregator.ROUTING_TOTAL));
 
     timer.lapTest();
 
-    ResultPrinter.logSingleTestResult(routeProfile, testCases, sample, nSamples, nSuccess, timer);
+    ResultPrinter.logSingleTestResult(profile, testCases, sample, nSamples, nSuccess, timer);
 
-    tcIO.writeResultsToFile(testCases);
+    tcIO.writeResultsToFile(profile, testCases);
   }
 
   private void setupSingleTest(SpeedTestProfile[] profilesToRun, int sample) {
-    routeProfile = profilesToRun[sample % profilesToRun.length];
+    profile = profilesToRun[sample % profilesToRun.length];
   }
 
-  private boolean runSingleTestCase(TestCase testCase, boolean ignoreResults) {
+  private void runSingleTestCase(TestCase testCase, boolean ignoreResults) {
     try {
       if (!ignoreResults) {
         System.err.println(
@@ -244,13 +255,7 @@ public class SpeedTest {
         );
       }
 
-      var speedTestRequest = new SpeedTestRequest(
-        testCase,
-        opts,
-        config,
-        routeProfile,
-        getTimeZoneId()
-      );
+      var speedTestRequest = new SpeedTestRequest(testCase, opts, config, profile, getTimeZoneId());
       var routingRequest = speedTestRequest.toRouteRequest();
       RoutingResponse routingResponse = serverContext.routingService().route(routingRequest);
 
@@ -261,17 +266,21 @@ public class SpeedTest {
         int transitTime = SpeedTestTimer.nanosToMillisecond(times.transitRouterTime);
 
         // assert throws Exception on failure
-        testCase.assertResult(routingResponse.getTripPlan().itineraries, transitTime, totalTime);
-
+        testCase.assertResult(
+          profile,
+          routingResponse.getTripPlan().itineraries,
+          transitTime,
+          totalTime
+        );
         // Report success
         ResultPrinter.printResultOk(testCase, opts.verbose());
       }
-      return true;
     } catch (Exception e) {
       if (!ignoreResults) {
         ResultPrinter.printResultFailed(testCase, e);
       }
-      return false;
+    } finally {
+      status = status.highestSeverity(testCase.status());
     }
   }
 
