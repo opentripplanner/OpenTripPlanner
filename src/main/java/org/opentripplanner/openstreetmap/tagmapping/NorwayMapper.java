@@ -418,22 +418,36 @@ class NorwayMapper implements OsmTagMapper {
      *
      */
 
-    props.setCarSpeed("highway=motorway", 22.22f); // 80 km/t
-    props.setCarSpeed("highway=motorway_link", 22.22f); // 80 km/t
-    props.setCarSpeed("highway=trunk", 22.22f); // 80 km/t
-    props.setCarSpeed("highway=trunk_link", 22.22f); // 80 km/t
-    props.setCarSpeed("highway=primary", 22.22f); // 80 km/t
-    props.setCarSpeed("highway=primary_link", 22.22f); // 80 km/t
-    props.setCarSpeed("highway=secondary", 22.22f); // 80 km/t
-    props.setCarSpeed("highway=secondary_link", 22.22f); // 80 km/t
-    props.setCarSpeed("highway=tertiary", 22.22f); // 80 km/t
-    props.setCarSpeed("highway=tertiary_link", 22.22f); // 80 km/t
+    props.setCarSpeed(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","motorway", "motorway_link")
+      ),
+      30.56f // 110 km/t
+    );
+    props.setCarSpeed(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link"),
+        new Condition.Equals("motorroad", "yes")
+      ),
+      25.f // 90 km/t
+    );
+    props.setCarSpeed(
+      new ExactMatchSpecifier(
+      new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link", "unclassified")
+      ),
+      22.22f // 80 km/t
+    );
+    props.setCarSpeed(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("sidewalk", "yes", "both", "left", "right", "separate"),
+        new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link", "unclassified")
+      ),
+      13.89f // 50 km/t
+    );
     props.setCarSpeed("highway=living_street", 1.94f); // 7 km/t
-
     props.setCarSpeed("highway=pedestrian", 1.94f); // 7 km/t
 
-    props.setCarSpeed("highway=residential", 8.33f); // 30 km/t
-    props.setCarSpeed("highway=unclassified", 22.22f); // 80 km/t
+    props.setCarSpeed("highway=residential", 13.89f); // 50 km/t
     props.setCarSpeed("highway=service", 13.89f); // 50 km/t
     props.setCarSpeed("highway=track", 8.33f); // 30 km/t
     props.setCarSpeed("highway=road", 13.89f); // 50 km/t

@@ -425,6 +425,13 @@ public class WayPropertySet {
     addSpeedPicker(picker);
   }
 
+  public void setCarSpeed(OsmSpecifier spec, float speed) {
+    SpeedPicker picker = new SpeedPicker();
+    picker.specifier = spec;
+    picker.speed = speed;
+    addSpeedPicker(picker);
+  }
+
   public List<WayPropertyPicker> getWayProperties() {
     return Collections.unmodifiableList(wayProperties);
   }
