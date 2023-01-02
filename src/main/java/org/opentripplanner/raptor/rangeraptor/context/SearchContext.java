@@ -187,7 +187,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   public boolean enableConstrainedTransfers() {
-    return searchParams().constrainedTransfersEnabled();
+    return searchParams().constrainedTransfers();
   }
 
   /* private methods */

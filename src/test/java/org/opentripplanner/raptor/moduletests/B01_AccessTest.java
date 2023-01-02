@@ -87,7 +87,7 @@ public class B01_AccessTest implements RaptorTestConstants {
 
   @Test
   public void multiCriteria() {
-    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetableEnabled(true);
+    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetable(true);
 
     var response = raptorService.route(requestBuilder.build(), data);
 

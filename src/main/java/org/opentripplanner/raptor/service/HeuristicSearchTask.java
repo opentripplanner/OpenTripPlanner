@@ -125,7 +125,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (search == null) {
       var profile = MIN_TRAVEL_DURATION_BEST_TIME;
 
-      if (request.searchParams().constrainedTransfersEnabled()) {
+      if (request.searchParams().constrainedTransfers()) {
         // We need to look up the previous transit arrival, this is not possible with the
         // BEST_TIMES only states.
         profile = MIN_TRAVEL_DURATION;

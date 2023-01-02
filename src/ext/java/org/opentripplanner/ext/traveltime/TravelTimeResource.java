@@ -317,9 +317,9 @@ public class TravelTimeResource {
       .latestArrivalTime(ServiceDateUtils.secondsSinceStartOfTime(startOfTime, endTime))
       .addAccessPaths(accessList)
       .searchOneIterationOnly()
-      .timetableEnabled(false)
+      .timetable(false)
       .allowEmptyEgressPaths(true)
-      .constrainedTransfersEnabled(false) // TODO: Not compatible with best times
+      .constrainedTransfers(false) // TODO: Not compatible with best times
       .build();
 
     return raptorService.route(request, requestTransitDataProvider);

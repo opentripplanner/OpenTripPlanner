@@ -90,7 +90,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
   @Test
   public void multiCriteriaWithTimetable() {
-    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetableEnabled(true);
+    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetable(true);
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -118,7 +118,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
    */
   @Test
   public void multiCriteriaWithoutTimetable() {
-    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetableEnabled(false);
+    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetable(false);
 
     var response = raptorService.route(requestBuilder.build(), data);
 

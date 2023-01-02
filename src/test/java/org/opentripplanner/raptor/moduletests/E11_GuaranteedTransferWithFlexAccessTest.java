@@ -59,7 +59,7 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
       .searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
-      .constrainedTransfersEnabled(true);
+      .constrainedTransfers(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }

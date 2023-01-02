@@ -119,8 +119,8 @@ public class RaptorRequestMapper {
 
     builder
       .searchParams()
-      .timetableEnabled(request.timetableView())
-      .constrainedTransfersEnabled(OTPFeature.TransferConstraints.isOn())
+      .timetable(request.timetableView())
+      .constrainedTransfers(OTPFeature.TransferConstraints.isOn())
       .addAccessPaths(accessPaths)
       .addEgressPaths(egressPaths);
 
