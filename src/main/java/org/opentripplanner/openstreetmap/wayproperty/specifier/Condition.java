@@ -169,4 +169,17 @@ public sealed interface Condition {
       return Arrays.stream(values).anyMatch(value -> way.matchesKeyValue(opKey, value));
     }
   }
+  record EqualsAnyInOrAbsent(String key, String... values) implements Condition {
+
+    /* A use case for this is to detect the absence of a sidewalk, cycle lane or verge*/
+    public EqualsAnyInOrAbsent(String key) {
+      this(key, "no", "none");
+    }
+    
+    @Override
+    public boolean getMatches(OSMWithTags way, String opKey) {
+      return !way.hasTag(opKey) ||
+        Arrays.stream(values).anyMatch(value -> way.matchesKeyValue(opKey, value));
+    }
+  }
 }
