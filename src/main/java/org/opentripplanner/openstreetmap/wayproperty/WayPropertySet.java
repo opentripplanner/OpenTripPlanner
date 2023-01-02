@@ -121,6 +121,7 @@ public class WayPropertySet {
     float backSpeed = getCarSpeedForWay(way, true);
     StreetTraversalPermission permission = rightResult.getPermission();
 
+    // TODO: Seems to assume right hand traffic
     WayProperties result = rightResult
       .mutate()
       .bicycleSafety(
@@ -179,7 +180,7 @@ public class WayPropertySet {
   /**
    * Calculate the automobile speed, in meters per second, for this way.
    */
-  public float getCarSpeedForWay(OSMWithTags way, boolean back) {
+  public float getCarSpeedForWay(OSMWithTags way, boolean backward) {
     // first, check for maxspeed tags
     Float speed = null;
     Float currentSpeed;
@@ -187,11 +188,11 @@ public class WayPropertySet {
     if (way.hasTag("maxspeed:motorcar")) speed =
       getMetersSecondFromSpeed(way.getTag("maxspeed:motorcar"));
 
-    if (speed == null && !back && way.hasTag("maxspeed:forward")) speed =
+    if (speed == null && !backward && way.hasTag("maxspeed:forward")) speed =
       getMetersSecondFromSpeed(way.getTag("maxspeed:forward"));
 
-    if (speed == null && back && way.hasTag("maxspeed:reverse")) speed =
-      getMetersSecondFromSpeed(way.getTag("maxspeed:reverse"));
+    if (speed == null && backward && way.hasTag("maxspeed:backward")) speed =
+      getMetersSecondFromSpeed(way.getTag("maxspeed:backward"));
 
     if (speed == null && way.hasTag("maxspeed:lanes")) {
       for (String lane : way.getTag("maxspeed:lanes").split("\\|")) {
