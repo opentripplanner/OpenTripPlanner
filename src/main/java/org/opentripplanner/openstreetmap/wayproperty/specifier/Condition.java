@@ -27,15 +27,6 @@ public sealed interface Condition {
     return matches(way) ? EXACT : NONE;
   }
 
-  default boolean matchesLeft(OSMWithTags way) {
-    var leftKey = this.key() + ":left";
-    if (way.hasTag(leftKey)) {
-      return getMatches(way, leftKey);
-    } else {
-      return matchesExplicitBoth(way);
-    }
-  }
-
   /**
    * Test to what degree the OSM entity matches with this operation when taking the ':left' key
    * suffixes into account.
@@ -43,14 +34,10 @@ public sealed interface Condition {
    * For example, it should not match a way with `cycleway:right=lane` when the `cycleway=lane` was
    * required but `cycleway:left=lane` should match.
    */
-  default MatchResult matchLeft(OSMWithTags way) {
-    return matchesLeft(way) ? matchType() : NONE;
-  }
-
-  default boolean matchesRight(OSMWithTags way) {
-    var rightKey = this.key() + ":right";
-    if (way.hasTag(rightKey)) {
-      return getMatches(way, rightKey);
+  default boolean matchesLeft(OSMWithTags way) {
+    var leftKey = this.key() + ":left";
+    if (way.hasTag(leftKey)) {
+      return getMatches(way, leftKey);
     } else {
       return matchesExplicitBoth(way);
     }
@@ -63,8 +50,13 @@ public sealed interface Condition {
    * For example, it should not match a way with `cycleway:left=lane` when the `cycleway=lane` was
    * required but `cycleway:right=lane` should match.
    */
-  default MatchResult matchRight(OSMWithTags way) {
-    return matchesRight(way) ? matchType(): NONE;
+  default boolean matchesRight(OSMWithTags way) {
+    var rightKey = this.key() + ":right";
+    if (way.hasTag(rightKey)) {
+      return getMatches(way, rightKey);
+    } else {
+      return matchesExplicitBoth(way);
+    }
   }
 
   /**
@@ -82,17 +74,26 @@ public sealed interface Condition {
 
   default boolean matchesForward(OSMWithTags way) {
     var forwardKey = this.key() + ":forward";
-    return getMatches(way, forwardKey);
+    if (way.hasTag(forwardKey)) {
+      return getMatches(way, forwardKey);
+    } else {
+      /* Assumes right hand traffic */
+      return matchesRight(way);
+    }
   }
 
   default MatchResult matchForward(OSMWithTags way) {
     return matchesForward(way) ? matchType(): NONE;
   }
 
-
   default boolean matchesBackward(OSMWithTags way) {
     var BackwardKey = this.key() + ":backward";
-    return getMatches(way, BackwardKey);
+    if (way.hasTag(BackwardKey)) {
+      return getMatches(way, BackwardKey);
+    } else {
+      /* Assumes right hand traffic */
+      return matchesLeft(way);
+    }
   }
 
   default MatchResult matchBackward(OSMWithTags way) {

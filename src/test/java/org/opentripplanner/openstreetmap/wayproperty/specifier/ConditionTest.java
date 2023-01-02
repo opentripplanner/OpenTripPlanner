@@ -38,16 +38,16 @@ class ConditionTest {
     Arguments.of(cyclewayLaneTrack(), cyclewayTrack, NONE, EXACT)
   );
 
-  @ParameterizedTest(name = "way {0} with op {1} should have a left result {2}, right result {3}")
+  @ParameterizedTest(name = "way {0} with op {1} should have a backward result {2}, forward result {3}")
   @VariableSource("equalsCases")
   void leftRight(
     OSMWithTags way,
     Condition op,
-    MatchResult leftExpectation,
-    MatchResult rightExpectation
+    MatchResult backwardExpectation,
+    MatchResult forwardExpectation
   ) {
-    assertEquals(leftExpectation, op.matchLeft(way));
-    assertEquals(rightExpectation, op.matchRight(way));
+    assertEquals(backwardExpectation, op.matchBackward(way));
+    assertEquals(forwardExpectation, op.matchForward(way));
   }
 
   static Stream<Arguments> otherCases = Stream.of(

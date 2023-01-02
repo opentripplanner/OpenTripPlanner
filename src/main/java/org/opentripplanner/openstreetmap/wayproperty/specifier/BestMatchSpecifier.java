@@ -30,34 +30,30 @@ public class BestMatchSpecifier implements OsmSpecifier {
 
   @Override
   public Scores matchScores(OSMWithTags way) {
-    int leftScore = 0, rightScore = 0;
-    int leftMatches = 0, rightMatches = 0;
+    int backwardScore = 0, forwardScore = 0;
+    int backwardMatches = 0, forwardMatches = 0;
 
     for (var test : conditions) {
-      var leftMatch = test.matchLeft(way);
-      var rightMatch = test.matchRight(way);
+      var forwardMatch = test.matchForward(way);
+      var backwardMatch = test.matchBackward(way);
 
-      // TODO: Assumes right hand traffic for now, because upstream code does
-      var forwardMatch = leftMatch == Condition.MatchResult.NONE ? test.matchBackward(way) : leftMatch;
-      var backwardMatch = rightMatch == Condition.MatchResult.NONE ? test.matchForward(way) : rightMatch;
-
-      int leftTagScore = toTagScore(forwardMatch);
-      leftScore += leftTagScore;
-      if (leftTagScore > 0) {
-        leftMatches++;
+      int backwardTagScore = toTagScore(backwardMatch);
+      backwardScore += backwardTagScore;
+      if (backwardTagScore > 0) {
+        backwardMatches++;
       }
-      int rightTagScore = toTagScore(backwardMatch);
-      rightScore += rightTagScore;
-      if (rightTagScore > 0) {
-        rightMatches++;
+      int forwardTagScore = toTagScore(forwardMatch);
+      forwardScore += forwardTagScore;
+      if (forwardTagScore > 0) {
+        forwardMatches++;
       }
     }
 
-    int allMatchLeftBonus = (leftMatches == conditions.length) ? 10 : 0;
-    leftScore += allMatchLeftBonus;
-    int allMatchRightBonus = (rightMatches == conditions.length) ? 10 : 0;
-    rightScore += allMatchRightBonus;
-    return new Scores(leftScore, rightScore);
+    int allMatchBackwardBonus = (backwardMatches == conditions.length) ? 10 : 0;
+    backwardScore += allMatchBackwardBonus;
+    int allMatchForwardBonus = (forwardMatches == conditions.length) ? 10 : 0;
+    forwardScore += allMatchForwardBonus;
+    return new Scores(forwardScore, backwardScore);
   }
 
   @Override

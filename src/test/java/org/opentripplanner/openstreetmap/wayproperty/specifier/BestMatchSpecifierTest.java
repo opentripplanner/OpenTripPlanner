@@ -44,8 +44,8 @@ class BestMatchSpecifierTest extends SpecifierTest {
   void leftRightMatch() {
     var way = WayTestData.cyclewayLeft();
     var result = bikeLane.matchScores(way);
-    assertEquals(210, result.left());
-    assertEquals(100, result.right());
+    assertEquals(210, result.backward());
+    assertEquals(100, result.forward());
   }
 
   static Stream<Arguments> leftRightTestCases = Stream.of(
@@ -56,12 +56,12 @@ class BestMatchSpecifierTest extends SpecifierTest {
   );
 
   @ParameterizedTest(
-    name = "way {0} with specifier {1} should have a left score {2} and right score {3}"
+    name = "way {0} with specifier {1} should have a backward score {2} and forward score {3}"
   )
   @VariableSource("leftRightTestCases")
-  void leftRight(OSMWithTags way, OsmSpecifier spec, int expectedLeft, int expectedRight) {
+  void leftRight(OSMWithTags way, OsmSpecifier spec, int expectedBackward, int expectedForward) {
     var result = spec.matchScores(way);
-    assertEquals(expectedLeft, result.left());
-    assertEquals(expectedRight, result.right());
+    assertEquals(expectedBackward, result.backward());
+    assertEquals(expectedForward, result.forward());
   }
 }

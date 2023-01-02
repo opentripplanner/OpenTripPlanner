@@ -28,7 +28,7 @@ public interface OsmSpecifier {
   /**
    * Calculates a pair of scores expressing how well an OSM entity's tags match this specifier.
    * <p>
-   * Tags in this specifier are matched against those for the left and right side of the OSM way
+   * Tags in this specifier are matched against those for the forward and backward direction of the OSM way
    * separately. See: http://wiki.openstreetmap.org/wiki/Forward_%26_backward,_left_%26_right
    *
    * @param way an OSM tagged object to compare to this specifier
@@ -38,11 +38,11 @@ public interface OsmSpecifier {
   /**
    * Calculates a score expressing how well an OSM entity's tags match this specifier. This does
    * exactly the same thing as {@link OsmSpecifier#matchScores(OSMWithTags)} but without regard for
-   * :left and :right.
+   * :left, :right, :forward, :backward and :both.
    */
   int matchScore(OSMWithTags way);
 
-  record Scores(int left, int right) {
+  record Scores(int forward, int backward) {
     public static Scores of(int s) {
       return new Scores(s, s);
     }

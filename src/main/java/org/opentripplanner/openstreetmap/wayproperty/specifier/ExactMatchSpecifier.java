@@ -41,8 +41,8 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   public Scores matchScores(OSMWithTags way) {
 
     return new Scores(
-      allLeftSidedTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE,
-      allRightSidedTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE
+      allForwardTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE,
+      allBackwardTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE
     );
   }
 
@@ -59,14 +59,12 @@ public class ExactMatchSpecifier implements OsmSpecifier {
     return conditions.stream().allMatch(o -> o.matches(way));
   }
 
-  public boolean allLeftSidedTagsMatch(OSMWithTags way) {
-    // TODO: Assumes right hand traffic for now, because upstream code does
-    return conditions.stream().allMatch(c -> c.matchesLeft(way) || c.matchesBackward(way));
+  public boolean allBackwardTagsMatch(OSMWithTags way) {
+    return conditions.stream().allMatch(c -> c.matchesBackward(way));
   }
 
-  public boolean allRightSidedTagsMatch(OSMWithTags way) {
-    // TODO: Assumes right hand traffic for now, because upstream code does
-    return conditions.stream().allMatch(c -> c.matchesRight(way) || c.matchesForward(way));
+  public boolean allForwardTagsMatch(OSMWithTags way) {
+    return conditions.stream().allMatch(c -> c.matchesForward(way));
   }
 
   public static ExactMatchSpecifier exact(String spec) {
