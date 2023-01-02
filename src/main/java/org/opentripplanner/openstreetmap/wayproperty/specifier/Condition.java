@@ -124,6 +124,9 @@ public sealed interface Condition {
   }
 
   record Absent(String key) implements Condition {
+    public MatchResult matchType() {
+      return WILDCARD;
+    }
     @Override
     public boolean getMatches(OSMWithTags way, String opKey) {
       return !way.hasTag(opKey);
