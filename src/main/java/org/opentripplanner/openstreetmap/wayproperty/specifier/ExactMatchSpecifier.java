@@ -60,11 +60,13 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   }
 
   public boolean allLeftSidedTagsMatch(OSMWithTags way) {
-    return conditions.stream().allMatch(c -> c.matchesLeft(way));
+    // TODO: Assumes right hand traffic for now, because upstream code does
+    return conditions.stream().allMatch(c -> c.matchesLeft(way) || c.matchesBackward(way));
   }
 
   public boolean allRightSidedTagsMatch(OSMWithTags way) {
-    return conditions.stream().allMatch(c -> c.matchesRight(way));
+    // TODO: Assumes right hand traffic for now, because upstream code does
+    return conditions.stream().allMatch(c -> c.matchesRight(way) || c.matchesForward(way));
   }
 
   public static ExactMatchSpecifier exact(String spec) {

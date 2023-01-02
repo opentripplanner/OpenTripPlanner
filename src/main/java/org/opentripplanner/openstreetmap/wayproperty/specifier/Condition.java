@@ -14,6 +14,9 @@ public sealed interface Condition {
     return getMatches(way, this.key());
   }
 
+  default MatchResult matchType() {
+    return EXACT;
+  }
   String key();
 
   /**
@@ -41,7 +44,7 @@ public sealed interface Condition {
    * required but `cycleway:left=lane` should match.
    */
   default MatchResult matchLeft(OSMWithTags way) {
-    return matchesLeft(way) ? EXACT : NONE;
+    return matchesLeft(way) ? matchType() : NONE;
   }
 
   default boolean matchesRight(OSMWithTags way) {
@@ -61,7 +64,7 @@ public sealed interface Condition {
    * required but `cycleway:right=lane` should match.
    */
   default MatchResult matchRight(OSMWithTags way) {
-    return matchesRight(way) ? EXACT: NONE;
+    return matchesRight(way) ? matchType(): NONE;
   }
 
   /**
@@ -75,6 +78,25 @@ public sealed interface Condition {
     } else {
       return matches(way);
     }
+  }
+
+  default boolean matchesForward(OSMWithTags way) {
+    var forwardKey = this.key() + ":forward";
+    return getMatches(way, forwardKey);
+  }
+
+  default MatchResult matchForward(OSMWithTags way) {
+    return matchesForward(way) ? matchType(): NONE;
+  }
+
+
+  default boolean matchesBackward(OSMWithTags way) {
+    var BackwardKey = this.key() + ":backward";
+    return getMatches(way, BackwardKey);
+  }
+
+  default MatchResult matchBackward(OSMWithTags way) {
+    return matchesBackward(way) ? matchType(): NONE;
   }
 
   enum MatchResult {
@@ -92,19 +114,9 @@ public sealed interface Condition {
 
   record Present(String key) implements Condition {
     @Override
-    public MatchResult match(OSMWithTags way) {
-      return matches(way) ? WILDCARD : NONE;
+    public MatchResult matchType() {
+      return WILDCARD;
     }
-    @Override
-    public MatchResult matchLeft(OSMWithTags way) {
-      return matchesLeft(way) ? WILDCARD : NONE;
-    }
-
-    @Override
-    public MatchResult matchRight(OSMWithTags way) {
-      return matchesRight(way) ? WILDCARD : NONE;
-    }
-
     @Override
     public boolean getMatches(OSMWithTags way, String opKey) {
       return way.hasTag(opKey);

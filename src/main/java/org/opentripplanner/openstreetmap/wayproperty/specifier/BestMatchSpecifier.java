@@ -37,12 +37,16 @@ public class BestMatchSpecifier implements OsmSpecifier {
       var leftMatch = test.matchLeft(way);
       var rightMatch = test.matchRight(way);
 
-      int leftTagScore = toTagScore(leftMatch);
+      // TODO: Assumes right hand traffic for now, because upstream code does
+      var forwardMatch = leftMatch == Condition.MatchResult.NONE ? test.matchBackward(way) : leftMatch;
+      var backwardMatch = rightMatch == Condition.MatchResult.NONE ? test.matchForward(way) : rightMatch;
+
+      int leftTagScore = toTagScore(forwardMatch);
       leftScore += leftTagScore;
       if (leftTagScore > 0) {
         leftMatches++;
       }
-      int rightTagScore = toTagScore(rightMatch);
+      int rightTagScore = toTagScore(backwardMatch);
       rightScore += rightTagScore;
       if (rightTagScore > 0) {
         rightMatches++;
