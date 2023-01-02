@@ -68,7 +68,7 @@ public class SpeedTest {
     TransitModel transitModel
   ) {
     this.opts = opts;
-    this.config = SpeedTestConfig.config(opts.rootDir());
+    this.config = config;
     this.transitModel = transitModel;
 
     var features = new OtpConfigLoader(opts.rootDir()).loadOtpConfig();

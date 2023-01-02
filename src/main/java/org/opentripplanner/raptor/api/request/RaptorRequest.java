@@ -70,6 +70,15 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
   }
 
   /**
+   * Return true is Raptor will use constrained transfers. Raptor will only use constrained
+   * transfers if the {@link RaptorProfile} allowes it and the
+   * {@link SearchParams#constrainedTransfers()} is turned on.
+   */
+  public boolean useConstrainedTransfers() {
+    return profile.spportConstrainedTransfers() && searchParams.constrainedTransfers();
+  }
+
+  /**
    * A dynamic search is a search which uses heuristics to resolve search parameters as
    * earliest-departure-time, latest-arrival-time and search-window. This is an aggregated value:
    * <ul>

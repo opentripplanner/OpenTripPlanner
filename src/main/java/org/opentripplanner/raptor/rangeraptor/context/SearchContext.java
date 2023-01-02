@@ -186,8 +186,11 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return publisher;
   }
 
-  public boolean enableConstrainedTransfers() {
-    return searchParams().constrainedTransfers();
+  /**
+   * See {@link RaptorRequest#useConstrainedTransfers()}
+   */
+  public boolean useConstrainedTransfers() {
+    return request.useConstrainedTransfers();
   }
 
   /* private methods */
