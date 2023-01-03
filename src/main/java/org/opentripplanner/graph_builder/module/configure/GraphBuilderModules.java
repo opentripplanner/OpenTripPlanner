@@ -149,6 +149,8 @@ public class GraphBuilderModules {
       config.pruningThresholdIslandWithoutStops
     );
     pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
+    pruneNoThruIslands.setAdaptivePruningFactor(config.adaptivePruningFactor);
+    pruneNoThruIslands.setAdaptivePruningDistance(config.adaptivePruningDistance);
     return pruneNoThruIslands;
   }
 

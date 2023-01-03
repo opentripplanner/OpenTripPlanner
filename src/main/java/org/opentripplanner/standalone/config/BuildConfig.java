@@ -145,6 +145,8 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final boolean osmCacheDataInMem;
   public final int pruningThresholdIslandWithoutStops;
   public final int pruningThresholdIslandWithStops;
+  public final double adaptivePruningDistance;
+  public final double adaptivePruningFactor;
   public final boolean banDiscouragedWalking;
   public final boolean banDiscouragedBiking;
   public final double maxTransferDurationSeconds;
@@ -292,10 +294,10 @@ all of the elevation values in the street edges.
         .description(
           """
         This field indicates the pruning threshold for islands with stops. Any such island under this
-        size will be pruned.
+        edge count will be pruned.
         """
         )
-        .asInt(5);
+        .asInt(2);
     pruningThresholdIslandWithoutStops =
       root
         .of("islandWithoutStopsMaxSize")
@@ -304,10 +306,33 @@ all of the elevation values in the street edges.
         .description(
           """
         This field indicates the pruning threshold for islands without stops. Any such island under
-        this size will be pruned.
+        this edge count will be pruned.
         """
         )
-        .asInt(40);
+        .asInt(10);
+    adaptivePruningDistance =
+      root
+        .of("adaptivePruningDistance")
+        .since(V2_2)
+        .summary("Search distance for analyzing islands in pruning.")
+        .description(
+          """
+        The distance after which disconnected sub graph is considered as real island in pruning heuristics.
+        """
+        )
+        .asDouble(250);
+    adaptivePruningFactor =
+      root
+        .of("adaptivePruningFactor")
+        .since(V2_2)
+        .summary("Defines how much pruning thresholds grow maximally by distance.")
+        .description(
+          """
+        Expands the pruning thresholds as the distance of an island from the rest of the graph gets smaller.
+        Even fairly large disconnected sub graphs should be removed if they are badly entangled with other graph.
+        """
+        )
+        .asDouble(20);
     matchBusRoutesToStreets =
       root
         .of("matchBusRoutesToStreets")

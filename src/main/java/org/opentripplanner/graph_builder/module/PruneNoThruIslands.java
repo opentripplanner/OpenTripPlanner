@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.graph_builder.issues.GraphIsland;
@@ -16,6 +17,7 @@ import org.opentripplanner.graph_builder.issues.PrunedIslandStop;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
@@ -31,6 +33,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +65,16 @@ public class PruneNoThruIslands implements GraphBuilderModule {
    */
   private int pruningThresholdIslandWithStops;
 
+  /**
+   * search radius as meters when looking for island neighbours
+   */
+  private static double adaptivePruningDistance;
+
+  /**
+   * Coefficient how much larger islands (compared to max sizes defined above) get pruned if they are close enough
+   */
+  private static double adaptivePruningFactor;
+
   public PruneNoThruIslands(
     Graph graph,
     TransitModel transitModel,
@@ -77,12 +90,21 @@ public class PruneNoThruIslands implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     LOG.info("Pruning islands and areas isolated by nothru edges in street network");
+    LOG.info(
+      "Threshold with stops {} without stops {}, adaptive coeff {} and distance {}",
+      pruningThresholdIslandWithStops,
+      pruningThresholdIslandWithoutStops,
+      adaptivePruningFactor,
+      adaptivePruningDistance
+    );
 
     var vertexLinker = graph.getLinkerSafe(transitModel.getStopModel());
+    StreetIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
 
     pruneNoThruIslands(
       graph,
       vertexLinker,
+      streetIndex,
       pruningThresholdIslandWithoutStops,
       pruningThresholdIslandWithStops,
       issueStore,
@@ -91,6 +113,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     pruneNoThruIslands(
       graph,
       vertexLinker,
+      streetIndex,
       pruningThresholdIslandWithoutStops,
       pruningThresholdIslandWithStops,
       issueStore,
@@ -99,6 +122,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     pruneNoThruIslands(
       graph,
       vertexLinker,
+      streetIndex,
       pruningThresholdIslandWithoutStops,
       pruningThresholdIslandWithStops,
       issueStore,
@@ -144,18 +168,27 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     this.pruningThresholdIslandWithStops = pruningThresholdIslandWithStops;
   }
 
+  public void setAdaptivePruningDistance(double adaptivePruningDistance) {
+    this.adaptivePruningDistance = adaptivePruningDistance;
+  }
+
+  public void setAdaptivePruningFactor(double adaptivePruningFactor) {
+    this.adaptivePruningFactor = adaptivePruningFactor;
+  }
+
   /* Island pruning strategy:
        1. Extract islands without using noThruTraffic edges at all
        2. Then create expanded islands by accepting noThruTraffic edges, but do not jump across original islands!
           Note: these expanded islands can overlap.
        3  Relax connectivity even more: generate islands by allowing jumps between islands. Find out unreachable edges of small islands.
        4. Analyze small expanded islands (from step 2). Convert edges which are reachable only via noThruTraffic edges
-          to noThruTraffic state. Remove traversal mode specific access from unreachable edges. Removed unconnected edges.
+          to noThruTraffic state. Remove traversal mode specific access from unreachable edges. Remove unconnected edges.
      */
 
   private static void pruneNoThruIslands(
     Graph graph,
     VertexLinker vertexLinker,
+    StreetIndex streetIndex,
     int maxIslandSize,
     int islandWithStopMaxSize,
     DataImportIssueStore issueStore,
@@ -189,6 +222,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     processIslands(
       graph,
       vertexLinker,
+      streetIndex,
       islands,
       isolated,
       true,
@@ -202,8 +236,8 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     islands = new ArrayList<>(); // reset this too
 
     /* Recompute expanded subgraphs by accepting noThruTraffic edges in graph expansion.
-           However, expansion is not allowed to jump from an original island to another one
-         */
+       However, expansion is not allowed to jump from an original island to another one
+     */
     collectSubGraphs(graph, neighborsForVertex, extgraphs, subgraphs, islands);
 
     /* Next round: generate purely noThruTraffic islands if such ones exist */
@@ -212,11 +246,11 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
     LOG.info("Total {} sub graphs found", islands.size());
 
-    /* remove all tiny subgraphs and large subgraphs without stops */
     count =
       processIslands(
         graph,
         vertexLinker,
+        streetIndex,
         islands,
         isolated,
         false,
@@ -231,6 +265,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
   private static int processIslands(
     Graph graph,
     VertexLinker vertexLinker,
+    StreetIndex streetIndex,
     ArrayList<Subgraph> islands,
     Map<Edge, Boolean> isolated,
     boolean markIsolated,
@@ -254,36 +289,60 @@ public class PruneNoThruIslands implements GraphBuilderModule {
       if (island.stopSize() > 0) {
         //for islands with stops
         islandsWithStops++;
-        if (island.streetSize() < islandWithStopMaxSize) {
-          restrictOrRemove(
-            graph,
-            vertexLinker,
-            island,
-            isolated,
-            stats,
-            markIsolated,
-            traverseMode,
-            issueStore
-          );
-          changed = true;
-          islandsWithStopsChanged++;
-          count++;
+        boolean onlyFerry = true;
+        for (Iterator<Vertex> vIter = island.stopIterator(); vIter.hasNext();) {
+          TransitStopVertex v = (TransitStopVertex) vIter.next();
+          Set<TransitMode> modes = v.getModes();
+          // test if stop has other transit modes than FERRY
+          if (!modes.isEmpty() && !modes.contains(TransitMode.FERRY)) {
+            onlyFerry = false;
+            break;
+          }
+        }
+        // do not remove real islands which have only ferry stops
+        if (!onlyFerry && island.streetSize() < islandWithStopMaxSize * adaptivePruningFactor) {
+          double sizeCoeff = (adaptivePruningFactor > 1.0)
+            ? island.distanceFromOtherGraph(streetIndex, adaptivePruningDistance) /
+            adaptivePruningDistance
+            : 1.0;
+
+          if (island.streetSize() * sizeCoeff < islandWithStopMaxSize) {
+            restrictOrRemove(
+              graph,
+              vertexLinker,
+              island,
+              isolated,
+              stats,
+              markIsolated,
+              traverseMode,
+              issueStore
+            );
+            changed = true;
+            islandsWithStopsChanged++;
+            count++;
+          }
         }
       } else {
         //for islands without stops
-        if (island.streetSize() < maxIslandSize) {
-          restrictOrRemove(
-            graph,
-            vertexLinker,
-            island,
-            isolated,
-            stats,
-            markIsolated,
-            traverseMode,
-            issueStore
-          );
-          changed = true;
-          count++;
+        if (island.streetSize() < maxIslandSize * adaptivePruningFactor) {
+          double sizeCoeff = (adaptivePruningFactor > 1.0)
+            ? island.distanceFromOtherGraph(streetIndex, adaptivePruningDistance) /
+            adaptivePruningDistance
+            : 1.0;
+          if (island.streetSize() * sizeCoeff < maxIslandSize) {
+            restrictOrRemove(
+              graph,
+              vertexLinker,
+              island,
+              isolated,
+              stats,
+              markIsolated,
+              traverseMode,
+              issueStore
+            );
+            changed = true;
+            count++;
+          }
         }
       }
     }
@@ -490,7 +549,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             graph.removeEdge(e);
           }
         }
-        issueStore.add(new PrunedIslandStop(v));
+        issueStore.add(new PrunedIslandStop(v, island.streetSize(), island.stopSize()));
       }
     }
     issueStore.add(new GraphIsland(island.getRepresentativeVertex(), island.streetSize()));
