@@ -19,6 +19,8 @@ Sections follow that describe particular settings in more depth.
 
 | Config Parameter                                                         |     Type    | Summary                                                                                                                                                        |  Req./Opt. | Default Value                     | Since |
 |--------------------------------------------------------------------------|:-----------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------------------|:-----:|
+| [adaptivePruningDistance](#adaptivePruningDistance)                      |   `double`  | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250.0`                           |  2.2  |
+| [adaptivePruningFactor](#adaptivePruningFactor)                          |   `double`  | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `20.0`                            |  2.2  |
 | [areaVisibility](#areaVisibility)                                        |  `boolean`  | Perform visibility calculations.                                                                                                                               | *Optional* | `false`                           |  1.5  |
 | banDiscouragedBiking                                                     |  `boolean`  | Should biking be allowed on OSM ways tagged with `bicycle=discouraged`                                                                                         | *Optional* | `false`                           |  2.0  |
 | banDiscouragedWalking                                                    |  `boolean`  | Should walking be allowed on OSM ways tagged with `foot=discouraged`                                                                                           | *Optional* | `false`                           |  2.0  |
@@ -31,8 +33,8 @@ Sections follow that describe particular settings in more depth.
 | [graph](#graph)                                                          |    `uri`    | URI to the graph object file for reading and writing.                                                                                                          | *Optional* |                                   |  2.0  |
 | [gsCredentials](#gsCredentials)                                          |   `string`  | Local file system path to Google Cloud Platform service accounts credentials file.                                                                             | *Optional* |                                   |  2.0  |
 | [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)  |  `boolean`  | Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.                                              | *Optional* | `false`                           |  2.0  |
-| [islandWithStopsMaxSize](#islandWithStopsMaxSize)                        |  `integer`  | When a graph island with stops in it should be pruned.                                                                                                         | *Optional* | `5`                               |  2.1  |
-| [islandWithoutStopsMaxSize](#islandWithoutStopsMaxSize)                  |  `integer`  | When a graph island without stops should be pruned.                                                                                                            | *Optional* | `40`                              |  2.1  |
+| [islandWithStopsMaxSize](#islandWithStopsMaxSize)                        |  `integer`  | When a graph island with stops in it should be pruned.                                                                                                         | *Optional* | `2`                               |  2.1  |
+| [islandWithoutStopsMaxSize](#islandWithoutStopsMaxSize)                  |  `integer`  | When a graph island without stops should be pruned.                                                                                                            | *Optional* | `10`                              |  2.1  |
 | matchBusRoutesToStreets                                                  |  `boolean`  | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking.                                                                    | *Optional* | `false`                           |  1.5  |
 | maxAreaNodes                                                             |  `integer`  | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                                  | *Optional* | `500`                             |  2.1  |
 | [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                |  `integer`  | When to split the import report.                                                                                                                               | *Optional* | `1000`                            |  2.0  |
@@ -407,6 +409,27 @@ See [writeCachedElevations](#writeCachedElevations) for details.
 <!-- PARAMETERS-DETAILS BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
+<h3 id="adaptivePruningDistance">adaptivePruningDistance</h3>
+
+**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `250.0`   
+**Path:** / 
+
+Search distance for analyzing islands in pruning.
+
+The distance after which disconnected sub graph is considered as real island in pruning heuristics.
+
+
+<h3 id="adaptivePruningFactor">adaptivePruningFactor</h3>
+
+**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `20.0`   
+**Path:** / 
+
+Defines how much pruning thresholds grow maximally by distance.
+
+Expands the pruning thresholds as the distance of an island from the rest of the graph gets smaller.
+Even fairly large disconnected sub graphs should be removed if they are badly entangled with other graph.
+
+
 <h3 id="areaVisibility">areaVisibility</h3>
 
 **Since version:** `1.5` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
@@ -506,24 +529,24 @@ all of the elevation values in the street edges.
 
 <h3 id="islandWithStopsMaxSize">islandWithStopsMaxSize</h3>
 
-**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `5`   
+**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2`   
 **Path:** / 
 
 When a graph island with stops in it should be pruned.
 
 This field indicates the pruning threshold for islands with stops. Any such island under this
-size will be pruned.
+edge count will be pruned.
 
 
 <h3 id="islandWithoutStopsMaxSize">islandWithoutStopsMaxSize</h3>
 
-**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`   
+**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10`   
 **Path:** / 
 
 When a graph island without stops should be pruned.
 
 This field indicates the pruning threshold for islands without stops. Any such island under
-this size will be pruned.
+this edge count will be pruned.
 
 
 <h3 id="maxDataImportIssuesPerFile">maxDataImportIssuesPerFile</h3>
