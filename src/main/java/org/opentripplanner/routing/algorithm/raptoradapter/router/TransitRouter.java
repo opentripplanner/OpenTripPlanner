@@ -119,7 +119,7 @@ public class TransitRouter {
 
     Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
 
-    if (OTPFeature.OptimizeTransfers.isOn()) {
+    if (OTPFeature.OptimizeTransfers.isOn() && !transitResponse.containsUnknownPaths()) {
       paths =
         TransferOptimizationServiceConfigurator
           .createOptimizeTransferService(

@@ -45,6 +45,8 @@ class ItinerariesCalculateLegTotals {
       } else if (leg.isStreetLeg()) {
         nonTransitDuration = nonTransitDuration.plus(dt);
         nonTransitDistanceMeters += leg.getDistanceMeters();
+      } else if (leg instanceof UnknownTransitPathLeg unknownTransitPathLeg) {
+        nTransitLegs += unknownTransitPathLeg.getNumberOfTransfers() + 1;
       }
 
       if (!leg.isWalkingLeg()) {

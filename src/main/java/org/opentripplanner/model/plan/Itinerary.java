@@ -23,6 +23,8 @@ import org.opentripplanner.routing.core.ItineraryFares;
  */
 public class Itinerary {
 
+  public static final int UNKNOWN = -1;
+
   /* final primitive properties */
   private final Duration duration;
   private final Duration transitDuration;
@@ -36,9 +38,9 @@ public class Itinerary {
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
-  private int generalizedCost = -1;
-  private int waitTimeOptimizedCost = -1;
-  private int transferPriorityCost = -1;
+  private int generalizedCost = UNKNOWN;
+  private int waitTimeOptimizedCost = UNKNOWN;
+  private int transferPriorityCost = UNKNOWN;
   private boolean tooSloped = false;
   private Double maxSlope = null;
   private boolean arrivedAtDestinationWithRentedVehicle = false;
@@ -121,7 +123,12 @@ public class Itinerary {
    * Total distance in meters.
    */
   public double distanceMeters() {
-    return getLegs().stream().mapToDouble(Leg::getDistanceMeters).sum();
+    return getLegs()
+      .stream()
+      // An unknown distance is -1
+      .filter(l -> l.getDistanceMeters() > 0)
+      .mapToDouble(Leg::getDistanceMeters)
+      .sum();
   }
 
   /**
@@ -161,11 +168,11 @@ public class Itinerary {
   /**
    * An itinerary can be flagged for removal with a system notice.
    * <p>
-   * For example when tuning or manually testing the itinerary-filter-chain it you can enable {@link
-   * ItineraryFilterPreferences#debug} and instead of
-   * removing itineraries from the result the itineraries will be tagged by the filters instead.
-   * This enables investigating, why an expected itinerary is missing from the result set. It can be
-   * also used by other filters to see the already filtered itineraries.
+   * For example when tuning or manually testing the itinerary-filter-chain it you can enable
+   * {@link ItineraryFilterPreferences#debug()} and instead of removing itineraries from the result
+   * the itineraries will be tagged by the filters instead. This enables investigating, why an
+   * expected itinerary is missing from the result set. It can be also used by other filters to see
+   * the already filtered itineraries.
    */
   public void flagForDeletion(SystemNotice notice) {
     systemNotices.add(notice);
