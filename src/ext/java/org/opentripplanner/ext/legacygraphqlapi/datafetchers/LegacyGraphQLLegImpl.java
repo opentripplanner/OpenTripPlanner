@@ -7,14 +7,18 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.LocalDateMapper;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
+import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -217,5 +221,33 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   private Leg getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
+  }
+
+  @Override
+  public DataFetcher<Iterable<Leg>> nextLegs() {
+
+    return  environment -> {
+
+      if(environment.getSource() instanceof ScheduledTransitLeg) {
+
+        int numberOfLegs = environment.getArgumentOrDefault("numberOfLegs", 2);
+        ScheduledTransitLeg originalLeg = environment.getSource();
+        List<String> modesWithParentStation = environment.getArgumentOrDefault("modesWithParentStation", List.of());
+        boolean limitToExactOriginStop = !modesWithParentStation.contains(originalLeg.getMode().name());
+
+        var res = AlternativeLegs.getAlternativeLegs(
+            environment.getSource(),
+            numberOfLegs,
+            environment.<LegacyGraphQLRequestContext>getContext().getTransitService(),
+            false,
+            AlternativeLegsFilter.NO_FILTER,
+            limitToExactOriginStop
+          ).stream().map(l -> (Leg) l).
+          collect(Collectors.toList());
+        return res;
+      }
+      else return null;
+    };
+
   }
 }

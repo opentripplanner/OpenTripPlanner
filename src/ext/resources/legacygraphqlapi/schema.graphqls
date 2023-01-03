@@ -1376,6 +1376,8 @@ type Leg {
     dropOffBookingInfo: BookingInfo
 
     pickupBookingInfo: BookingInfo
+
+    nextLegs(numberOfLegs: Int, modesWithParentStation: [Mode]): [Leg]
 }
 
 """A span of time."""
