@@ -39,7 +39,6 @@ public class AlternativeLegs {
 
   public static final int ZERO_COST = 0;
 
-
   public static List<ScheduledTransitLeg> getAlternativeLegs(
     Leg leg,
     Integer numberLegs,
@@ -48,8 +47,8 @@ public class AlternativeLegs {
     AlternativeLegsFilter filter
   ) {
     return getAlternativeLegs(leg, numberLegs, transitService, searchBackward, filter, false);
-
   }
+
   public static List<ScheduledTransitLeg> getAlternativeLegs(
     Leg leg,
     Integer numberLegs,
@@ -57,8 +56,6 @@ public class AlternativeLegs {
     boolean searchBackward,
     AlternativeLegsFilter filter,
     boolean exactOriginStop
-
-
   ) {
     StopLocation fromStop = leg.getFrom().stop;
     StopLocation toStop = leg.getTo().stop;
@@ -66,7 +63,7 @@ public class AlternativeLegs {
     Station fromStation = fromStop.getParentStation();
     Station toStation = toStop.getParentStation();
 
-    Collection<StopLocation> origins = fromStation == null ||exactOriginStop
+    Collection<StopLocation> origins = fromStation == null || exactOriginStop
       ? List.of(fromStop)
       : fromStation.getChildStops();
 

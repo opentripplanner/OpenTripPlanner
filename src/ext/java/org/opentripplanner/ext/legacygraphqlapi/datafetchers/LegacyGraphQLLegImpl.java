@@ -225,29 +225,32 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Iterable<Leg>> nextLegs() {
-
-    return  environment -> {
-
-      if(environment.getSource() instanceof ScheduledTransitLeg) {
-
+    return environment -> {
+      if (environment.getSource() instanceof ScheduledTransitLeg) {
         int numberOfLegs = environment.getArgumentOrDefault("numberOfLegs", 2);
         ScheduledTransitLeg originalLeg = environment.getSource();
-        List<String> modesWithParentStation = environment.getArgumentOrDefault("modesWithParentStation", List.of());
-        boolean limitToExactOriginStop = !modesWithParentStation.contains(originalLeg.getMode().name());
+        List<String> modesWithParentStation = environment.getArgumentOrDefault(
+          "modesWithParentStation",
+          List.of()
+        );
+        boolean limitToExactOriginStop = !modesWithParentStation.contains(
+          originalLeg.getMode().name()
+        );
 
-        var res = AlternativeLegs.getAlternativeLegs(
+        var res = AlternativeLegs
+          .getAlternativeLegs(
             environment.getSource(),
             numberOfLegs,
             environment.<LegacyGraphQLRequestContext>getContext().getTransitService(),
             false,
             AlternativeLegsFilter.NO_FILTER,
             limitToExactOriginStop
-          ).stream().map(l -> (Leg) l).
-          collect(Collectors.toList());
+          )
+          .stream()
+          .map(l -> (Leg) l)
+          .collect(Collectors.toList());
         return res;
-      }
-      else return null;
+      } else return null;
     };
-
   }
 }
