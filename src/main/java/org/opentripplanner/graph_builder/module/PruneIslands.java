@@ -281,10 +281,25 @@ public class PruneIslands implements GraphBuilderModule {
     stats.put("noThru", 0);
     stats.put("restricted", 0);
 
+    Subgraph largest = null;
+    int maxSize = 0;
+
+    // Find largest sub graph
+    for (Subgraph island : islands) {
+      int streetCount = island.streetSize();
+      if (streetCount >= maxSize) {
+        maxSize = streetCount;
+        largest = island;
+      }
+    }
+
     int count = 0;
     int islandsWithStops = 0;
     int islandsWithStopsChanged = 0;
     for (Subgraph island : islands) {
+      if (island == largest) {
+        continue;
+      }
       boolean changed = false;
       if (island.stopSize() > 0) {
         //for islands with stops
