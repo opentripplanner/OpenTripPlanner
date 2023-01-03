@@ -9,13 +9,13 @@ import org.opentripplanner.raptor.api.request.RaptorProfile;
 
 public enum SpeedTestProfile {
   standard(
-    "rr",
+    "sr",
     "Standard Range Raptor, super fast [ transfers, arrival time, travel time ].",
     RaptorProfile.STANDARD,
     SearchDirection.FORWARD
   ),
   standard_reverse(
-    "rrr",
+    "srr",
     "Reverse Standard Range Raptor",
     RaptorProfile.STANDARD,
     SearchDirection.REVERSE
@@ -33,25 +33,25 @@ public enum SpeedTestProfile {
     SearchDirection.REVERSE
   ),
   min_travel_duration(
-    "td",
+    "sd",
     "Standard Range Raptor without waiting time.",
     RaptorProfile.MIN_TRAVEL_DURATION,
     SearchDirection.FORWARD
   ),
   min_travel_duration_reverse(
-    "tdr",
+    "sdr",
     "Reverse Standard Range Raptor without waiting time.",
     RaptorProfile.MIN_TRAVEL_DURATION,
     SearchDirection.REVERSE
   ),
   min_travel_duration_best_time(
-    "tb",
+    "bd",
     "Best Time Range Raptor without waiting time.",
     RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME,
     SearchDirection.FORWARD
   ),
   min_travel_duration_best_time_reverse(
-    "tbr",
+    "bdr",
     "Reverse Best Time Range Raptor without waiting time.",
     RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME,
     SearchDirection.REVERSE
