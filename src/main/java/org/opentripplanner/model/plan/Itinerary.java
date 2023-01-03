@@ -63,7 +63,7 @@ public class Itinerary {
     this.transitDuration = totals.transitDuration;
     this.nonTransitDuration = totals.nonTransitDuration;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
-    this.waitingDuration = totals.walkingDuration;
+    this.waitingDuration = totals.waitingDuration;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
     this.setElevationGained(totals.totalElevationGained);
