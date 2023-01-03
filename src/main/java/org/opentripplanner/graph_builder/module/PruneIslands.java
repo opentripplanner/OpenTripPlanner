@@ -45,9 +45,9 @@ import org.slf4j.LoggerFactory;
  * islands. The quality of the graph can be improved by converting such islands to nothru state so
  * that routing can start / end from such an island.
  */
-public class PruneNoThruIslands implements GraphBuilderModule {
+public class PruneIslands implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(PruneNoThruIslands.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PruneIslands.class);
 
   private static final int islandCounter = 0;
   private final Graph graph;
@@ -75,7 +75,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
    */
   private static double adaptivePruningFactor;
 
-  public PruneNoThruIslands(
+  public PruneIslands(
     Graph graph,
     TransitModel transitModel,
     DataImportIssueStore issueStore,
@@ -101,7 +101,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     var vertexLinker = graph.getLinkerSafe(transitModel.getStopModel());
     StreetIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
 
-    pruneNoThruIslands(
+    pruneIslands(
       graph,
       vertexLinker,
       streetIndex,
@@ -110,7 +110,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
       issueStore,
       TraverseMode.BICYCLE
     );
-    pruneNoThruIslands(
+    pruneIslands(
       graph,
       vertexLinker,
       streetIndex,
@@ -119,7 +119,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
       issueStore,
       TraverseMode.WALK
     );
-    pruneNoThruIslands(
+    pruneIslands(
       graph,
       vertexLinker,
       streetIndex,
@@ -185,7 +185,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
           to noThruTraffic state. Remove traversal mode specific access from unreachable edges. Remove unconnected edges.
      */
 
-  private static void pruneNoThruIslands(
+  private static void pruneIslands(
     Graph graph,
     VertexLinker vertexLinker,
     StreetIndex streetIndex,
