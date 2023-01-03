@@ -111,6 +111,7 @@ public class PruneNoThruIslandsTest {
       );
       pruneNoThruIslands.setPruningThresholdIslandWithoutStops(40);
       pruneNoThruIslands.setPruningThresholdIslandWithStops(5);
+      pruneNoThruIslands.setAdaptivePruningFactor(1);
       pruneNoThruIslands.buildGraph();
 
       return graph;
