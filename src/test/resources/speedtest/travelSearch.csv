@@ -1,2 +1,2 @@
 testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon,destination,toPlace,toLat,toLon,category,modes
-1,Center-NE-to-SW,12:00,14:00,1h20m,,,45.53381,-122.64344,,,45.49511,-122.69723,transit,TRANSIT|WALK
+1,Window-1h20m-NE-to-SW,12:00,14:00,1h20m,,,45.53381,-122.64344,,,45.49511,-122.69723,transit,TRANSIT

@@ -13,10 +13,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
@@ -258,13 +260,14 @@ public class SpeedTest {
       int totalTime = SpeedTestTimer.nanosToMillisecond(times.totalTime);
       int transitTime = SpeedTestTimer.nanosToMillisecond(times.transitRouterTime);
 
+      List<Itinerary> itineraries = routingResponse.getTripPlan().itineraries;
+
+      if (config.ignoreStreetResults) {
+        itineraries = itineraries.stream().filter(Predicate.not(Itinerary::isStreetOnly)).limit(opts.numOfItineraries()).toList();
+      }
+
       // assert throws Exception on failure
-      testCase.assertResult(
-        profile,
-        routingResponse.getTripPlan().itineraries,
-        transitTime,
-        totalTime
-      );
+      testCase.assertResult(profile, itineraries, transitTime, totalTime);
       // Report success
       ResultPrinter.printResultOk(testCase, opts.verbose());
     } catch (Exception e) {
