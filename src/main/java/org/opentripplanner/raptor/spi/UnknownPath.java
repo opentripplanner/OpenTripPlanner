@@ -23,9 +23,15 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
   private final int arrivalTime;
   private final int numberOfTransfers;
 
-  public UnknownPath(int departureTime, int arrivalTime, int numberOfTransfers) {
-    this.departureTime = departureTime;
-    this.arrivalTime = arrivalTime;
+  public UnknownPath(int sourceTime, int targetTime, int numberOfTransfers) {
+    if (sourceTime <= targetTime) {
+      this.departureTime = sourceTime;
+      this.arrivalTime = targetTime;
+    } else {
+      // Flip departure and arrival for reverse search
+      this.departureTime = targetTime;
+      this.arrivalTime = sourceTime;
+    }
     this.numberOfTransfers = numberOfTransfers;
   }
 
@@ -46,7 +52,7 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
 
   @Override
   public int durationInSeconds() {
-    return Math.abs(arrivalTime - departureTime);
+    return arrivalTime - departureTime;
   }
 
   @Override

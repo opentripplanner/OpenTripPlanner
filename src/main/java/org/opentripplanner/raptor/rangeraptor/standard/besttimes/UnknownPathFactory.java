@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.standard.besttimes;
 
+import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetable;
+
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -9,6 +11,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.UnknownPath;
+import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
 /**
  * Used to create "unknown" paths if the Raptor state implementation does not
@@ -42,29 +45,18 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
   }
 
   Collection<RaptorPath<T>> extractPaths() {
-    int bestTime = transitCalculator.unreachedTime();
-    int stop = -1;
+    ParetoSet<RaptorPath<T>> paths = new ParetoSet<>(comparatorWithTimetable());
     for (RaptorAccessEgress egress : egressPaths) {
-      stop = egress.stop();
+      int stop = egress.stop();
       if (bestTimes.isStopReachedByTransit(stop)) {
         int destArrTime = transitCalculator.plusDuration(
           bestTimes.transitArrivalTime(stop),
           egress.durationInSeconds()
         );
-        if (transitCalculator.isBefore(destArrTime, bestTime)) {
-          bestTime = destArrTime;
-        }
+        int nTransfer = bestNumberOfTransfers.calculateMinNumberOfTransfers(stop);
+        paths.add(new UnknownPath<>(currentIterationDepartureTime, destArrTime, nTransfer));
       }
     }
-    if (bestTime != transitCalculator.unreachedTime()) {
-      return List.of(
-        new UnknownPath<>(
-          currentIterationDepartureTime,
-          bestTime,
-          bestNumberOfTransfers.calculateMinNumberOfTransfers(stop)
-        )
-      );
-    }
-    return List.of();
+    return paths.stream().toList();
   }
 }
