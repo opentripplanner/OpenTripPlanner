@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
@@ -102,7 +103,10 @@ public class SpeedIntegrationTest {
     var opts = speedTestOptions(profile);
     var config = SpeedTestConfig.config(opts.rootDir());
     var speedTest = new SpeedTest(opts, config, model.graph(), model.transitModel());
-    speedTest.runTest();
+
+    // Run without Transfer Optimization
+    OTPFeature.OptimizeTransfers.testOff(speedTest::runTest);
+
     assertEquals(
       TestStatus.OK,
       speedTest.status(),
