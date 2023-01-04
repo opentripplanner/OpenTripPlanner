@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -313,7 +314,7 @@ all of the elevation values in the street edges.
     adaptivePruningDistance =
       root
         .of("adaptivePruningDistance")
-        .since(V2_2)
+        .since(V2_3)
         .summary("Search distance for analyzing islands in pruning.")
         .description(
           """
@@ -324,7 +325,7 @@ all of the elevation values in the street edges.
     adaptivePruningFactor =
       root
         .of("adaptivePruningFactor")
-        .since(V2_2)
+        .since(V2_3)
         .summary("Defines how much pruning thresholds grow maximally by distance.")
         .description(
           """

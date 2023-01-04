@@ -19,8 +19,8 @@ Sections follow that describe particular settings in more depth.
 
 | Config Parameter                                                         |     Type    | Summary                                                                                                                                                        |  Req./Opt. | Default Value                     | Since |
 |--------------------------------------------------------------------------|:-----------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------------------|:-----:|
-| [adaptivePruningDistance](#adaptivePruningDistance)                      |   `double`  | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250.0`                           |  2.2  |
-| [adaptivePruningFactor](#adaptivePruningFactor)                          |   `double`  | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `50.0`                            |  2.2  |
+| [adaptivePruningDistance](#adaptivePruningDistance)                      |   `double`  | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250.0`                           |  2.3  |
+| [adaptivePruningFactor](#adaptivePruningFactor)                          |   `double`  | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `50.0`                            |  2.3  |
 | [areaVisibility](#areaVisibility)                                        |  `boolean`  | Perform visibility calculations.                                                                                                                               | *Optional* | `false`                           |  1.5  |
 | banDiscouragedBiking                                                     |  `boolean`  | Should biking be allowed on OSM ways tagged with `bicycle=discouraged`                                                                                         | *Optional* | `false`                           |  2.0  |
 | banDiscouragedWalking                                                    |  `boolean`  | Should walking be allowed on OSM ways tagged with `foot=discouraged`                                                                                           | *Optional* | `false`                           |  2.0  |
@@ -411,7 +411,7 @@ See [writeCachedElevations](#writeCachedElevations) for details.
 
 <h3 id="adaptivePruningDistance">adaptivePruningDistance</h3>
 
-**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `250.0`   
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `250.0`   
 **Path:** / 
 
 Search distance for analyzing islands in pruning.
@@ -421,7 +421,7 @@ The distance after which disconnected sub graph is considered as real island in 
 
 <h3 id="adaptivePruningFactor">adaptivePruningFactor</h3>
 
-**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `50.0`   
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `50.0`   
 **Path:** / 
 
 Defines how much pruning thresholds grow maximally by distance.
