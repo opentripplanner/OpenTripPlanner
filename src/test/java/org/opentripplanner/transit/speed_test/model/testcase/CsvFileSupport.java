@@ -1,13 +1,10 @@
 package org.opentripplanner.transit.speed_test.model.testcase;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.speed_test.model.testcase.io.ResultCsvFile;
@@ -22,11 +19,7 @@ public class CsvFileSupport {
 
   private static final String EXPECTED_RESULTS_FILE_NAME = "expected-results";
   private static final String RESULTS_FILE_NAME = "results";
-
   private static final Logger LOG = LoggerFactory.getLogger(CsvFileSupport.class);
-  private static final Set<SpeedTestProfile> writeResultsForFirstSampleRun = EnumSet.noneOf(
-    SpeedTestProfile.class
-  );
 
   private final File testCasesFile;
   private final File expectedResultsFile;
@@ -57,30 +50,30 @@ public class CsvFileSupport {
     }
   }
 
-  public List<TestCaseInput> readTestCasesFromFile() {
-    try {
-      List<TestCaseDefinition> definitions = new TestCaseDefinitionCsvFile(testCasesFile, feedId)
-        .read();
-      var expectedResults = readExpectedResults();
+  public List<TestCaseDefinition> readTestCaseDefinitions() {
+    return new TestCaseDefinitionCsvFile(testCasesFile, feedId).read();
+  }
 
-      return definitions
-        .stream()
-        .map(def -> new TestCaseInput(def, expectedResults.get(def.id())))
-        .toList();
-    } catch (IOException e) {
-      throw new IllegalStateException(e.getMessage(), e);
+  public Map<String, ExpectedResults> readExpectedResults() {
+    final Map<String, ExpectedResults> resultsById = new HashMap<>();
+
+    addFileToResultsMap(resultsById, expectedResultsFile, ExpectedResults::addDefault);
+
+    for (var profile : SpeedTestProfile.values()) {
+      addFileToResultsMap(
+        resultsById,
+        expectedResultsFileByProfile.get(profile),
+        (results, r) -> results.add(profile, r)
+      );
     }
+    return resultsById;
   }
 
   /**
    * Write all results to a CSV file. This file can be renamed and used as expected-result input
    * file.
    */
-  public void writeResultsToFile(SpeedTestProfile profile, List<TestCase> testCases) {
-    if (skipIfNotFirstSampleRun(profile)) {
-      return;
-    }
-
+  public void writeResultsToFile(SpeedTestProfile profile, TestCases testCases) {
     var tcIds = testCases.stream().filter(TestCase::notRunOrNoResults).map(TestCase::id).toList();
 
     if (!tcIds.isEmpty()) {
@@ -98,29 +91,14 @@ public class CsvFileSupport {
 
   /* private methods */
 
-  private Map<String, ResultsByProfile> readExpectedResults() throws IOException {
-    final Map<String, ResultsByProfile> resultsById = new HashMap<>();
-
-    addFileToResultsMap(resultsById, expectedResultsFile, ResultsByProfile::addDefault);
-
-    for (var profile : SpeedTestProfile.values()) {
-      addFileToResultsMap(
-        resultsById,
-        expectedResultsFileByProfile.get(profile),
-        (results, r) -> results.add(profile, r)
-      );
-    }
-    return resultsById;
-  }
-
   private static void addFileToResultsMap(
-    Map<String, ResultsByProfile> resultsById,
+    Map<String, ExpectedResults> resultsById,
     File file,
-    BiConsumer<ResultsByProfile, Result> addOp
+    BiConsumer<ExpectedResults, Result> addOp
   ) {
     if (file.exists()) {
       for (var line : new ResultCsvFile(file).read()) {
-        var res = resultsById.computeIfAbsent(line.testCaseId(), id -> new ResultsByProfile());
+        var res = resultsById.computeIfAbsent(line.testCaseId(), id -> new ExpectedResults());
         addOp.accept(res, line);
       }
     }
@@ -133,13 +111,5 @@ public class CsvFileSupport {
     }
     name.append(".csv");
     return new File(dir, name.toString());
-  }
-
-  /**
-   * The SpeedTest may run n samples to improve the test results, we only write the results for
-   * the first sample run - pr profile.
-   */
-  private boolean skipIfNotFirstSampleRun(SpeedTestProfile profile) {
-    return !writeResultsForFirstSampleRun.add(profile);
   }
 }

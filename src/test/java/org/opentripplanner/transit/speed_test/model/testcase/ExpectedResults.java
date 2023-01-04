@@ -12,7 +12,7 @@ import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
  * for each {@link SpeedTestProfile} is kept. A default set is also available,
  * witch can be used if there is not set for a given profile.
  */
-public class ResultsByProfile {
+public class ExpectedResults {
 
   private final List<Result> defaults = new ArrayList<>();
   private final Multimap<SpeedTestProfile, Result> map = ArrayListMultimap.create();

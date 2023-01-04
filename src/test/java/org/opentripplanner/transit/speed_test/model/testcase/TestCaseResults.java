@@ -21,17 +21,17 @@ class TestCaseResults {
 
   private final String testCaseId;
   private final boolean skipCost;
-  private final ResultsByProfile expected;
+  private final ExpectedResults expected;
   private final List<Result> actual = new ArrayList<>();
   private final List<DiffEntry<Result>> matchedResults = new ArrayList<>();
   private TestStatus status = TestStatus.NA;
   private int transitTimeMs = 0;
   private int totalTimeMs = 0;
 
-  TestCaseResults(String testCaseId, boolean skipCost, ResultsByProfile expected) {
+  TestCaseResults(String testCaseId, boolean skipCost, ExpectedResults expected) {
     this.testCaseId = testCaseId;
     this.skipCost = skipCost;
-    this.expected = expected;
+    this.expected = expected == null ? new ExpectedResults() : expected;
   }
 
   public int transitTimeMs() {

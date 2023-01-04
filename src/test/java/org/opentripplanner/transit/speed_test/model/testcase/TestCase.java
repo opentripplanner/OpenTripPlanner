@@ -11,6 +11,14 @@ import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 public record TestCase(TestCaseDefinition definition, TestCaseResults results) {
   public static final int NOT_SET = -1;
 
+  public TestCase(
+    TestCaseDefinition definition,
+    ExpectedResults expectedResults,
+    boolean skipCost
+  ) {
+    this(definition, new TestCaseResults(definition.id(), skipCost, expectedResults));
+  }
+
   public String id() {
     return definition.id();
   }

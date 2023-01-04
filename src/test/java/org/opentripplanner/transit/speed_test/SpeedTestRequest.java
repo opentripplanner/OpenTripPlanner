@@ -59,7 +59,12 @@ public class SpeedTestRequest {
 
     request.setFrom(input.fromPlace());
     request.setTo(input.toPlace());
-    request.setNumItineraries(opts.numOfItineraries());
+
+    // Filter the results inside the SpeedTest, not in the itineraries filter,
+    // when ignoring street results. This will use the default witch is 50.
+    if (!config.ignoreStreetResults) {
+      request.setNumItineraries(opts.numOfItineraries());
+    }
     request.journey().setModes(input.modes());
 
     if (profile.raptorProfile().isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
