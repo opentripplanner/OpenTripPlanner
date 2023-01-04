@@ -332,7 +332,7 @@ all of the elevation values in the street edges.
         Even fairly large disconnected sub graphs should be removed if they are badly entangled with other graph.
         """
         )
-        .asDouble(20);
+        .asDouble(50);
     matchBusRoutesToStreets =
       root
         .of("matchBusRoutesToStreets")
