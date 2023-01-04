@@ -221,7 +221,7 @@ public class SpeedTest {
       // Warm-up JIT compiler, run the second test-case if it exist to avoid the same
       // test case from being repeated. If there is just one case, then run it.
       int index = testCases.size() == 1 ? 0 : 1;
-      runSingleTestCase(testCases.get(index), true);
+      performRouting(testCases.get(index));
     }
 
     ResultPrinter.logSingleTestHeader(profile);
@@ -229,7 +229,7 @@ public class SpeedTest {
     timer.startTest();
 
     for (TestCase testCase : testCases) {
-      runSingleTestCase(testCase, false);
+      runSingleTestCase(testCase);
     }
 
     int nSuccess = (int) testCases.stream().filter(TestCase::success).count();
@@ -247,41 +247,37 @@ public class SpeedTest {
     profile = profilesToRun[sample % profilesToRun.length];
   }
 
-  private void runSingleTestCase(TestCase testCase, boolean ignoreResults) {
+  private void runSingleTestCase(TestCase testCase) {
     try {
-      if (!ignoreResults) {
-        System.err.println(
-          ResultPrinter.headerLine("#" + testCase.definition().idAndDescription())
-        );
-      }
+      System.err.println(ResultPrinter.headerLine("#" + testCase.definition().idAndDescription()));
 
-      var speedTestRequest = new SpeedTestRequest(testCase, opts, config, profile, getTimeZoneId());
-      var routingRequest = speedTestRequest.toRouteRequest();
-      RoutingResponse routingResponse = serverContext.routingService().route(routingRequest);
+      RoutingResponse routingResponse = performRouting(testCase);
 
       var times = routingResponse.getDebugTimingAggregator().finishedRendering();
 
-      if (!ignoreResults) {
-        int totalTime = SpeedTestTimer.nanosToMillisecond(times.totalTime);
-        int transitTime = SpeedTestTimer.nanosToMillisecond(times.transitRouterTime);
+      int totalTime = SpeedTestTimer.nanosToMillisecond(times.totalTime);
+      int transitTime = SpeedTestTimer.nanosToMillisecond(times.transitRouterTime);
 
-        // assert throws Exception on failure
-        testCase.assertResult(
-          profile,
-          routingResponse.getTripPlan().itineraries,
-          transitTime,
-          totalTime
-        );
-        // Report success
-        ResultPrinter.printResultOk(testCase, opts.verbose());
-      }
+      // assert throws Exception on failure
+      testCase.assertResult(
+        profile,
+        routingResponse.getTripPlan().itineraries,
+        transitTime,
+        totalTime
+      );
+      // Report success
+      ResultPrinter.printResultOk(testCase, opts.verbose());
     } catch (Exception e) {
-      if (!ignoreResults) {
-        ResultPrinter.printResultFailed(testCase, e);
-      }
+      ResultPrinter.printResultFailed(testCase, e);
     } finally {
       status = status.highestSeverity(testCase.status());
     }
+  }
+
+  private RoutingResponse performRouting(TestCase testCase) {
+    var speedTestRequest = new SpeedTestRequest(testCase, opts, config, profile, getTimeZoneId());
+    var routingRequest = speedTestRequest.toRouteRequest();
+    return serverContext.routingService().route(routingRequest);
   }
 
   private void initProfileStatistics() {
