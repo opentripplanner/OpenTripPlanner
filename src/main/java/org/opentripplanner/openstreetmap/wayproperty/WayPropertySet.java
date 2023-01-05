@@ -120,6 +120,7 @@ public class WayPropertySet {
     float forwardSpeed = getCarSpeedForWay(way, false);
     float backSpeed = getCarSpeedForWay(way, true);
     StreetTraversalPermission permission = forwardResult.getPermission();
+    StreetTraversalPermission backwardPermission = backwardResult.getPermission();
 
     WayProperties result = forwardResult
       .mutate()
@@ -129,7 +130,7 @@ public class WayPropertySet {
           : defaultBicycleSafetyForPermission.apply(permission, forwardSpeed),
         backwardResult.getBicycleSafetyFeatures() != null
           ? backwardResult.getBicycleSafetyFeatures().back()
-          : defaultBicycleSafetyForPermission.apply(permission, backSpeed)
+          : defaultBicycleSafetyForPermission.apply(backwardPermission, backSpeed)
       )
       .walkSafety(
         forwardResult.getWalkSafetyFeatures() != null
@@ -137,7 +138,7 @@ public class WayPropertySet {
           : defaultWalkSafetyForPermission.apply(permission, forwardSpeed),
         backwardResult.getWalkSafetyFeatures() != null
           ? backwardResult.getWalkSafetyFeatures().back()
-          : defaultWalkSafetyForPermission.apply(permission, backSpeed)
+          : defaultWalkSafetyForPermission.apply(backwardPermission, backSpeed)
       )
       .build();
 
