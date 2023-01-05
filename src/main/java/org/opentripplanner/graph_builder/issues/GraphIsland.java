@@ -35,6 +35,11 @@ public class GraphIsland implements DataImportIssue {
   }
 
   @Override
+  public int getPriority() {
+    return size;
+  }
+
+  @Override
   public Vertex getReferencedVertex() {
     return vertex;
   }

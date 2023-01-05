@@ -10,8 +10,11 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
@@ -70,26 +73,33 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
       if (!deleteReportDirectoryAndContent()) {
         return;
       }
-
-      //Groups issues in multimap according to issue type
-      for (DataImportIssue it : issueStore.listIssues()) {
-        //writer.println("<p>" + it.getHTMLMessage() + "</p>");
-        // writer.println("<small>" + it.getTypeName()+"</small>");
-        addIssue(it);
-      }
       LOG.info("Creating data import issue log");
 
-      //Creates list of HTML writers. Each writer has whole class of HTML issues
-      //Or multiple HTML writers can have parts of one class of HTML issues if number
-      // of issues is larger than maxNumberOfIssuesPerFile.
-      for (Map.Entry<String, Collection<String>> entry : issues.asMap().entrySet()) {
-        List<String> issueList;
-        if (entry.getValue() instanceof List) {
-          issueList = (List<String>) entry.getValue();
-        } else {
-          issueList = new ArrayList<>(entry.getValue());
-        }
-        addIssues(entry.getKey(), issueList);
+      //Groups issues according to issue type
+      Map<String, List<DataImportIssue>> sortedIssuesByType = issueStore
+        .listIssues()
+        .stream()
+        .collect(Collectors.groupingBy(DataImportIssue::getType));
+
+      // Sort each issue type by priority and convert issues to HTML string
+      for (Map.Entry<String, List<DataImportIssue>> entry : sortedIssuesByType.entrySet()) {
+        addIssues(
+          entry.getKey(),
+          entry
+            .getValue()
+            .stream()
+            .sorted(Comparator.comparing(DataImportIssue::getPriority))
+            .map(DataImportIssue::getHTMLMessage)
+            .collect(
+              Collectors.collectingAndThen(
+                Collectors.toList(),
+                l -> {
+                  Collections.reverse(l);
+                  return l;
+                }
+              )
+            )
+        );
       }
 
       //Actual writing to the file is made here since

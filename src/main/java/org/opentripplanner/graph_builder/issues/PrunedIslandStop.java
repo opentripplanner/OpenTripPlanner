@@ -31,6 +31,11 @@ public class PrunedIslandStop implements DataImportIssue {
   }
 
   @Override
+  public int getPriority() {
+    return streetSize + stopSize;
+  }
+
+  @Override
   public Vertex getReferencedVertex() {
     return vertex;
   }

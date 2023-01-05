@@ -20,4 +20,9 @@ public class AreaTooComplicated implements DataImportIssue {
   public String getMessage() {
     return String.format(FMT, areaId, nbNodes, maxAreaNodes);
   }
+
+  @Override
+  public int getPriority() {
+    return nbNodes;
+  }
 }
