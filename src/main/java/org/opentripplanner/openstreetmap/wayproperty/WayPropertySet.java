@@ -112,7 +112,7 @@ public class WayPropertySet {
       if (score.backward() > 0) {
         backwardMixins.add(mixin);
       }
-      if (score.backward() > 0) {
+      if (score.forward() > 0) {
         forwardMixins.add(mixin);
       }
     }
@@ -143,10 +143,10 @@ public class WayPropertySet {
 
     /* apply mixins */
     if (backwardMixins.size() > 0) {
-      result = applyMixins(result, backwardMixins, false);
+      result = applyMixins(result, backwardMixins, true);
     }
     if (forwardMixins.size() > 0) {
-      result = applyMixins(result, forwardMixins, true);
+      result = applyMixins(result, forwardMixins, false);
     }
     if (
       (bestBackwardScore == 0 || bestForwardScore == 0) &&
@@ -449,7 +449,7 @@ public class WayPropertySet {
   private WayProperties applyMixins(
     WayProperties result,
     List<MixinProperties> mixins,
-    boolean back
+    boolean backward
   ) {
     SafetyFeatures bicycleSafetyFeatures = result.getBicycleSafetyFeatures();
     double forwardBicycle = bicycleSafetyFeatures.forward();
@@ -458,7 +458,7 @@ public class WayPropertySet {
     double forwardWalk = walkSafetyFeatures.forward();
     double backWalk = walkSafetyFeatures.back();
     for (var mixin : mixins) {
-      if (back) {
+      if (backward) {
         if (mixin.bicycleSafety() != null) {
           backBicycle *= mixin.bicycleSafety().back();
         }
