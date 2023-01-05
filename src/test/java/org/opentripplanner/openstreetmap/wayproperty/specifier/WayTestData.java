@@ -174,4 +174,11 @@ public class WayTestData {
     way.addTag("cycleway:right", "track");
     return way;
   }
+
+  public static OSMWithTags tramsForward() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "tertiary");
+    way.addTag("embedded_rails:forward", "tram");
+    return way;
+  }
 }

@@ -11,6 +11,7 @@ import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestDat
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.fiveLanes;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.pedestrianTunnel;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.threeLanes;
+import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.tramsForward;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,10 +33,13 @@ class ConditionTest {
   static Condition moreThanFourLanes = new GreaterThan("lanes", 4);
   static Condition lessThanFourLanes = new LessThan("lanes", 4);
 
+  static Condition embeddedTrams = new Equals("embedded_rails", "tram");
+
   static Stream<Arguments> equalsCases = Stream.of(
     Arguments.of(cyclewayLeft(), cyclewayLane, EXACT, NONE),
     Arguments.of(cyclewayLaneTrack(), cyclewayLane, EXACT, NONE),
-    Arguments.of(cyclewayLaneTrack(), cyclewayTrack, NONE, EXACT)
+    Arguments.of(cyclewayLaneTrack(), cyclewayTrack, NONE, EXACT),
+    Arguments.of(tramsForward(), embeddedTrams, NONE, EXACT)
   );
 
   @ParameterizedTest(name = "way {0} with op {1} should have a backward result {2}, forward result {3}")
