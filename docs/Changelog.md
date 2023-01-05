@@ -1,6 +1,6 @@
 # Changelog
 
-The changelog list most feature changes between each release. The list is automatically created
+The changelog lists most feature changes between each release. The list is automatically created
 based on merged pull requests. Search GitHub issues and pull requests for smaller issues.
 
 ## 2.3.0 (in progress)
@@ -40,6 +40,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Make Prometheus endpoint take Accept header into account [#4674](https://github.com/opentripplanner/OpenTripPlanner/pull/4674)
 - Add entrances to parking lots that are unconnected in OSM [#4666](https://github.com/opentripplanner/OpenTripPlanner/pull/4666)
 - Include crossing=traffic_signals and use it for walking/cycling penalty on crossings [#4574](https://github.com/opentripplanner/OpenTripPlanner/pull/4574)
+- Improve support for replaced departure in siri [#4620](https://github.com/opentripplanner/OpenTripPlanner/pull/4620)
+- Replace surface=cobblestone:flattened with surface=set as a mixin spec in default OsmTagMapper [#4683](https://github.com/opentripplanner/OpenTripPlanner/pull/4683)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
