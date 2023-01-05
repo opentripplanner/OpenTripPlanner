@@ -16,26 +16,31 @@ public class SelectInputType {
     .name("TripFilterSelectInput")
     .description(
       "A list of selectors for filter allow-list / exclude-list. " +
-      "An empty list means that everything is allowed." +
-      " A trip/line will match with selectors if it matches with all non-empty lists."
+      "An empty list means that everything is allowed. " +
+      "A trip/line will match with selectors if it matches with all non-empty lists. " +
+        "The `select` is always applied first, then `not`. If only `not` not is present, the exclude " +
+        "is applied to the existing set of lines. "
     )
-    .field(
-      newIdListInputField(
-        "lines",
-        "Set of ids for lines that should be included in/excluded from search"
-      )
+    .field(GraphQLInputObjectField
+      .newInputObjectField()
+      .name("lines")
+      .description("Set of ids for lines that should be included in/excluded from search")
+      .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
+      .build()
     )
-    .field(
-      newIdListInputField(
-        "authorities",
-        "Set of ids for authorities that should be included in/excluded from search"
-      )
+    .field(GraphQLInputObjectField
+      .newInputObjectField()
+      .name("authorities")
+      .description("Set of ids for authorities that should be included in/excluded from search")
+      .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
+      .build()
     )
-    .field(
-      newIdListInputField(
-        "serviceJourneys",
-        "Set of ids for service journeys that should be included in/excluded from search"
-      )
+    .field(GraphQLInputObjectField
+      .newInputObjectField()
+      .name("serviceJourneys")
+      .description("Set of ids for service journeys that should be included in/excluded from search")
+      .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
+      .build()
     )
     .field(
       GraphQLInputObjectField
@@ -46,7 +51,7 @@ public class SelectInputType {
           "disallow transit for this search. If the element is not present or null, it will " +
           "default to all transport modes."
         )
-        .type(new GraphQLList(ModeAndSubModeInputType.INPUT_TYPE))
+        .type(new GraphQLList(new GraphQLNonNull(ModeAndSubModeInputType.INPUT_TYPE)))
         .build()
     )
     // TODO: 2022-11-29 filters: groups of lines

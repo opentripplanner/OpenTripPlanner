@@ -240,7 +240,7 @@ public class TripQuery {
             "An empty list of filters means that all trips should be included. " +
             "If a search include this parameter, \"whiteListed\", \"banned\" & \"modes.transportModes\" filters will be ignored."
           )
-          .type(new GraphQLList(FilterInputType.INPUT_TYPE))
+          .type(new GraphQLList(new GraphQLNonNull(FilterInputType.INPUT_TYPE)))
           .build()
       )
       .argument(

@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
 
 public class FilterInputType {
 
@@ -21,7 +22,7 @@ public class FilterInputType {
           " I order to be accepted a trip/line has to match with at least one selector." +
           "An empty list means that everything should be allowed. "
         )
-        .type(new GraphQLList(SelectInputType.INPUT_TYPE))
+        .type(new GraphQLList(new GraphQLNonNull(SelectInputType.INPUT_TYPE)))
         .build()
     )
     .field(
@@ -32,7 +33,7 @@ public class FilterInputType {
           "A list of selectors for what lines/trips should be excluded during the search. " +
           "If line/trip matches with at least one selector it will be excluded."
         )
-        .type(new GraphQLList(SelectInputType.INPUT_TYPE))
+        .type(new GraphQLList(new GraphQLNonNull(SelectInputType.INPUT_TYPE)))
         .build()
     )
     .build();
