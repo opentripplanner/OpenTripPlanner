@@ -543,7 +543,7 @@ Http headers.
     "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
     "feedId" : "TriMet",
     "headers" : {
-      "Authorization" : "A-Token"
+      "Some-Header" : "A-Value"
     }
   }, {
     "type" : "vehicle-rental",
@@ -603,7 +603,7 @@ Http headers.
     "feedId" : "1",
     "frequencySec" : 60,
     "headers" : {
-      "Authorization" : "A-Token"
+      "Header-Name" : "Header-Value"
     }
   }, {
     "type" : "websocket-gtfs-rt-updater"
