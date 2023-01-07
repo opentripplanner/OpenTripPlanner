@@ -35,7 +35,7 @@ public class GtfsRealtimeHttpVehiclePositionSource implements VehiclePositionSou
 
   public GtfsRealtimeHttpVehiclePositionSource(URI url, Map<String, String> headers) {
     this.url = url;
-    this.headers = MapUtils.combine(DEFAULT_HEADERS, headers);
+    this.headers = MapUtils.combine(headers, DEFAULT_HEADERS);
   }
 
   /**

@@ -37,7 +37,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
   public GtfsRealtimeHttpTripUpdateSource(Parameters config) {
     this.feedId = config.getFeedId();
     this.url = config.getUrl();
-    this.headers = MapUtils.combine(DEFAULT_HEADERS, config.headers());
+    this.headers = MapUtils.combine(config.headers(), DEFAULT_HEADERS);
   }
 
   @Override
