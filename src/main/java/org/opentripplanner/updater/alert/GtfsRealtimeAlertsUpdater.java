@@ -51,7 +51,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   ) {
     super(config);
     this.url = config.url();
-    this.headers = MapUtils.combine(DEFAULT_HEADERS, config.headers());
+    this.headers = MapUtils.combine(config.headers(), DEFAULT_HEADERS);
     TransitAlertService transitAlertService = new TransitAlertServiceImpl(transitModel);
 
     var fuzzyTripMatcher = config.fuzzyTripMatching()
