@@ -1,6 +1,7 @@
 package org.opentripplanner.openstreetmap.wayproperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
@@ -28,6 +29,14 @@ class WayPropertySetTest {
     assertEquals(NONE, wps.getDataForWay(tunnel).getPermission());
   }
 
+  @Test
+  void mixinLeftSide() {
+    var cycleway = WayTestData.cyclewayLeft();
+    WayPropertySet wps = wps();
+    SafetyFeatures expected = new SafetyFeatures(1, 5);
+    assertEquals(expected, wps.getDataForWay(cycleway).getBicycleSafetyFeatures());
+  }
+
   @Nonnull
   private static WayPropertySet wps() {
     var wps = new WayPropertySet();
@@ -39,6 +48,7 @@ class WayPropertySetTest {
           new ExactMatchSpecifier("highway=footway;layer=-1;tunnel=yes;indoor=yes"),
           withModes(NONE)
         );
+        props.setMixinProperties("cycleway=lane", ofBicycleSafety(5));
       }
     };
     source.populateProperties(wps);
