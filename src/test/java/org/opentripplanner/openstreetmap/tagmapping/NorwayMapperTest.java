@@ -33,12 +33,12 @@ public class NorwayMapperTest {
 
   static Stream<Arguments> createExpectedBicycleSafetyForMaxspeedCases() {
     Double[][] expectedBicycleSafetyMatrix = {
-      {8.,  2.25, 2.25, 2.06, 1.5 , 1.5 , 1.1},
-      {8.,  2.25, 2.25, 2.06, 1.5 , 1.5 , 1.1},
-      {NaN, 2.06, 2.06, 1.5,  1.42, 1.42, 1.1},
-      {NaN, 2.06, 2.06, 1.42, 1.42, 1.1 , 1.1},
-      {NaN, 2.06, 2.06, 1.1 , 1.1 , 1.1 , 1.1},
-      {NaN, NaN , NaN , 1.1 , 1.1 , 1.1 , 1.1},
+      {10., 3.75, 3.75, 3.43, 2.5,  2.5,  1.83},
+      {10., 3.75, 3.75, 3.43, 2.5,  2.5,  1.83},
+      {NaN, 3.43, 3.43, 2.5,  2.37, 2.37, 1.83},
+      {NaN, 3.43, 3.43, 2.37, 2.37, 1.83, 1.83},
+      {NaN, 3.43, 3.43, 1.83, 1.83, 1.83, 1.83},
+      {NaN, NaN , NaN , 1.83, 1.83, 1.83, 1.83},
     };
     ArrayList<Arguments> argumentsList = new ArrayList<>();
     for (int i = 0; i < expectedHighways.length; i++) {
@@ -59,7 +59,7 @@ public class NorwayMapperTest {
 
   static Stream<Arguments> createBicycleSafetyWitoutExplisitMaxspeed() {
     Double[] expectedBicycleSafety = {
-      2.25, 2.25, 2.06, 2.06, 2.06, 1.1
+      3.75, 3.75, 3.43, 3.43, 3.43, 1.83
     };
     ArrayList<Arguments> argumentsList = new ArrayList<>();
     for (int i = 0; i < expectedHighways.length; i++) {

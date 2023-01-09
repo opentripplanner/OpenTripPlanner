@@ -30,23 +30,21 @@ class NorwayMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    var very_high_traffic = 8.;
-    var high_traffic = 2.25;
-    var medium_high_traffic = 2.06;
-    var medium_traffic = 1.5;
-    var medium_low_traffic = 1.42;
-    var low_traffic = 1.1;
-    var very_low_traffic = 0.94;
+    var very_high_traffic = 10.;
+    var high_traffic = 3.75;
+    var medium_high_traffic = 3.43;
+    var medium_traffic = 2.5;
+    var medium_low_traffic = 2.37;
+    var low_traffic = 1.83;
+    var very_low_traffic = 1.57;
 
-    var cycle_lane_medium_traffic = 0.76;
-    var cycle_lane_low_traffic = 0.66;
+    var cycle_lane_medium_traffic = 1.27;
+    var cycle_lane_low_traffic = 1.10;
 
-    var dedicated_footway = 0.85;
-    var sidewalk = 1.16;
-    var footway_crossing = 1.4;
-    var mixed_cycleway = 0.67;
-    var dedicated_cycleway = 0.62;
-    var dual_lane_or_oneway_cycleway = 0.6;
+    var dedicated_footway = 1.42;
+    var mixed_cycleway = 1.12;
+    var dedicated_cycleway = 1.05;
+    var dual_lane_or_oneway_cycleway = 1;
 
     props.setDefaultBicycleSafetyForPermission((
       permission,
@@ -75,7 +73,7 @@ class NorwayMapper implements OsmTagMapper {
         case PEDESTRIAN_AND_BICYCLE -> mixed_cycleway;
         case BICYCLE -> dedicated_cycleway;
         // these don't include cycling
-        case PEDESTRIAN_AND_CAR, PEDESTRIAN, CAR, NONE -> 8.;
+        case PEDESTRIAN_AND_CAR, PEDESTRIAN, CAR, NONE -> very_high_traffic;
     });
 
     props.setProperties(
@@ -253,23 +251,15 @@ class NorwayMapper implements OsmTagMapper {
 
     props.setProperties(
       "highway=footway;footway=sidewalk",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(sidewalk)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.93)
     );
     props.setProperties(
       "highway=footway;footway=crossing",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(footway_crossing)
-    );
-    props.setProperties(
-      "highway=cycleway;footway=sidewalk",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dedicated_footway)
-    );
-    props.setProperties(
-      "highway=cycleway;footway=crossing",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(footway_crossing)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.33)
     );
     props.setProperties(
       "highway=cycleway;cycleway=crossing",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(footway_crossing)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.33)
     );
 
     props.setProperties(
@@ -327,7 +317,7 @@ class NorwayMapper implements OsmTagMapper {
     //relation properties are copied over to ways
     props.setMixinProperties(
       new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
-      ofBicycleSafety(0.7)
+      ofBicycleSafety(0.85)
     );
 
     props.setProperties(
@@ -370,11 +360,11 @@ class NorwayMapper implements OsmTagMapper {
     );
     props.setProperties(
       "highway=track;tracktype=grade2",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.83)
     );
     props.setProperties(
       "highway=track;tracktype=grade3",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.5)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.5)
     );
     props.setProperties("highway=track;tracktype=grade4", withModes(PEDESTRIAN));
     props.setProperties("highway=track;tracktype=grade5", withModes(PEDESTRIAN));
