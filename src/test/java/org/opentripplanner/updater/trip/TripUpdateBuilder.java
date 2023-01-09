@@ -6,6 +6,7 @@ import de.mfdz.MfdzRealtimeExtensions;
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 
 public class TripUpdateBuilder {
@@ -15,9 +16,10 @@ public class TripUpdateBuilder {
   private static final StopTimeUpdate.ScheduleRelationship DEFAULT_SCHEDULE_RELATIONSHIP =
     StopTimeUpdate.ScheduleRelationship.SCHEDULED;
   public static final int NO_VALUE = -1;
+  public static final int NO_DELAY = Integer.MIN_VALUE;
   private final GtfsRealtime.TripDescriptor.Builder tripDescriptorBuilder;
   private final GtfsRealtime.TripUpdate.Builder tripUpdateBuilder;
-  private final long midnightSecondsSinceEpoch;
+  private final ZonedDateTime midnight;
 
   public TripUpdateBuilder(
     String tripId,
@@ -32,8 +34,7 @@ public class TripUpdateBuilder {
     tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
 
     this.tripUpdateBuilder = GtfsRealtime.TripUpdate.newBuilder();
-    this.midnightSecondsSinceEpoch =
-      ServiceDateUtils.asStartOfService(serviceDate, zoneId).toEpochSecond();
+    this.midnight = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
   }
 
   public TripUpdateBuilder addStopTime(String stopName, int minutes) {
@@ -41,8 +42,8 @@ public class TripUpdateBuilder {
       stopName,
       minutes,
       NO_VALUE,
-      NO_VALUE,
-      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
       null
     );
@@ -53,8 +54,8 @@ public class TripUpdateBuilder {
       stopName,
       minutes,
       NO_VALUE,
-      NO_VALUE,
-      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
       pickDrop
     );
@@ -71,7 +72,7 @@ public class TripUpdateBuilder {
   ) {
     return addStopTime(
       null,
-      -1,
+      NO_VALUE,
       stopSequence,
       arrivalDelay,
       departureDelay,
@@ -103,7 +104,7 @@ public class TripUpdateBuilder {
       stopTimeUpdateBuilder.setStopId(stopId);
     }
 
-    if (stopSequence > -1) {
+    if (stopSequence > NO_VALUE) {
       stopTimeUpdateBuilder.setStopSequence(stopSequence);
     }
 
@@ -120,15 +121,16 @@ public class TripUpdateBuilder {
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
 
-    if (minutes > -1) {
-      arrivalBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (minutes * 60));
-      departureBuilder.setTime(midnightSecondsSinceEpoch + (8 * 3600) + (minutes * 60));
+    if (minutes > NO_VALUE) {
+      var epochSeconds = midnight.plusHours(8).plusMinutes(minutes).toEpochSecond();
+      arrivalBuilder.setTime(epochSeconds);
+      departureBuilder.setTime(epochSeconds);
     }
 
-    if (arrivalDelay > -1) {
+    if (arrivalDelay != NO_DELAY) {
       arrivalBuilder.setDelay(arrivalDelay);
     }
-    if (departureDelay > -1) {
+    if (departureDelay != NO_DELAY) {
       departureBuilder.setDelay(departureDelay);
     }
 
