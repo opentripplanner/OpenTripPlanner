@@ -37,9 +37,9 @@ public class TripUpdateBuilder {
     this.midnight = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
   }
 
-  public TripUpdateBuilder addStopTime(String stopName, int minutes) {
+  public TripUpdateBuilder addStopTime(String stopId, int minutes) {
     return addStopTime(
-      stopName,
+      stopId,
       minutes,
       NO_VALUE,
       NO_DELAY,
@@ -49,9 +49,9 @@ public class TripUpdateBuilder {
     );
   }
 
-  public TripUpdateBuilder addStopTime(String stopName, int minutes, DropOffPickupType pickDrop) {
+  public TripUpdateBuilder addStopTime(String stopId, int minutes, DropOffPickupType pickDrop) {
     return addStopTime(
-      stopName,
+      stopId,
       minutes,
       NO_VALUE,
       NO_DELAY,
