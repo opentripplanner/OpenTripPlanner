@@ -99,6 +99,49 @@ class NorwayMapper implements OsmTagMapper {
       withModes(ALL)
     );
 
+    /* bicycle infrastructure */
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.Equals("cycleway", "track"),
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link", "unclassified", "residential", "living_street")
+      ),
+      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.Equals("cycleway", "lane"),
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link")
+      ),
+      withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.Equals("cycleway", "lane"),
+        new Condition.LessThan("maxspeed", 50),
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link")
+      ),
+      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
+    );
+
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.Equals("cycleway", "lane"),
+        new Condition.EqualsAnyIn("highway", "unclassified", "residential", "living_street")
+      ),
+      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
+    );
+
+    props.setMixinProperties(
+      new ExactMatchSpecifier(
+        new Condition.Equals("oneway", "yes"),
+        new Condition.EqualsAnyInOrAbsent("cycleway"),
+        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link", "unclassified", "residential")
+      ),
+      ofBicycleSafety(1, 1.15)
+    );
+
     props.setProperties(
       new ExactMatchSpecifier(
         new Condition.EqualsAnyIn("highway","trunk", "trunk_link", "primary", "primary_link"),
@@ -162,7 +205,6 @@ class NorwayMapper implements OsmTagMapper {
       withModes(ALL).bicycleSafety(low_traffic)
     );
 
-
     // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
       new ExactMatchSpecifier(
@@ -201,40 +243,6 @@ class NorwayMapper implements OsmTagMapper {
       withModes(ALL).bicycleSafety(medium_traffic)
     );
 
-    /* bicycle infrastructure */
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.Equals("cycleway", "track"),
-        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link", "unclassified", "residential", "living_street")
-      ),
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.Equals("cycleway", "lane"),
-        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link")
-      ),
-      withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.Equals("cycleway", "lane"),
-        new Condition.LessThan("maxspeed", 50),
-        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link")
-      ),
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
-    );
-
-    props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.Equals("cycleway", "lane"),
-        new Condition.EqualsAnyIn("highway", "unclassified", "residential", "living_street")
-      ),
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
-    );
-
     /* Pedestrian, living and cyclestreet */
     props.setProperties("highway=living_street", withModes(ALL).bicycleSafety(low_traffic));
     props.setProperties("highway=pedestrian", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.2));
@@ -271,11 +279,11 @@ class NorwayMapper implements OsmTagMapper {
           new Condition.Equals("highway", "cycleway"),
           new Condition.GreaterThan("lanes", 1)
         ),
-      withModes(BICYCLE).bicycleSafety(dual_lane_or_oneway_cycleway)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dual_lane_or_oneway_cycleway)
     );
     props.setProperties(
       "highway=cycleway;oneway=yes",
-      withModes(BICYCLE).bicycleSafety(dual_lane_or_oneway_cycleway)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dual_lane_or_oneway_cycleway)
     );
     // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
     props.setProperties(
@@ -294,7 +302,7 @@ class NorwayMapper implements OsmTagMapper {
     );
     props.setProperties(
       "highway=cycleway;foot=designated;segregated=yes;lanes=2",
-      withModes(BICYCLE).bicycleSafety(dual_lane_or_oneway_cycleway)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dual_lane_or_oneway_cycleway)
     );
     props.setProperties(
       "highway=path;foot=designated;bicycle=designated;segregated=no",
@@ -402,6 +410,12 @@ class NorwayMapper implements OsmTagMapper {
     props.setMixinProperties("surface=grass", ofBicycleSafety(1.5));
     props.setMixinProperties("surface=mud", ofBicycleSafety(2));
     props.setMixinProperties("surface=sand", ofBicycleSafety(2));
+
+    props.setMixinProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn("embedded_rails", "tram", "light_rail", "disused")
+      ), 
+      ofBicycleSafety(1.2));
 
     /*
      * Automobile speeds in Norway. General speed limit is 80kph unless signs says otherwise
