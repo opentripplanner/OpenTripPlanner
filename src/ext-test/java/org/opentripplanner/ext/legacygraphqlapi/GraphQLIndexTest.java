@@ -1,12 +1,15 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import graphql.schema.AsyncDataFetcher;
+import graphql.schema.DataFetcher;
 import graphql.schema.FieldCoordinates;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLSchema;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -25,19 +28,26 @@ public class GraphQLIndexTest {
   void asyncDataFetchers(String fieldName) {
     OTPFeature.AsyncGraphqlFetchers.testOn(() -> {
       var schema = LegacyGraphQLIndex.buildSchema();
-
-      var x = schema
-        .getCodeRegistry()
-        .getDataFetcher(
-          FieldCoordinates.coordinates("QueryType", fieldName),
-          GraphQLFieldDefinition
-            .newFieldDefinition()
-            .name(fieldName)
-            .type(GraphQLObjectType.newObject().name(fieldName).build())
-            .build()
-        );
-
-      assertEquals(x.getClass(), AsyncDataFetcher.class);
+      var fetcher = getQueryType(fieldName, schema);
+      assertSame(fetcher.getClass(), AsyncDataFetcher.class);
     });
+    OTPFeature.AsyncGraphqlFetchers.testOff(() -> {
+      var schema = LegacyGraphQLIndex.buildSchema();
+      var fetcher = getQueryType(fieldName, schema);
+      assertNotSame(fetcher.getClass(), AsyncDataFetcher.class);
+    });
+  }
+
+  private static DataFetcher<?> getQueryType(String fieldName, GraphQLSchema schema) {
+    return schema
+      .getCodeRegistry()
+      .getDataFetcher(
+        FieldCoordinates.coordinates("QueryType", fieldName),
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name(fieldName)
+          .type(GraphQLObjectType.newObject().name(fieldName).build())
+          .build()
+      );
   }
 }
