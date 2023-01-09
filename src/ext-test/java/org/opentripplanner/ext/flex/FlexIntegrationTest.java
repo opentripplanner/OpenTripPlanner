@@ -34,7 +34,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
-import org.opentripplanner.routing.api.request.request.filter.ExcludeAllTransitFilter;
+import org.opentripplanner.filter.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
 

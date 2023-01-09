@@ -13,7 +13,7 @@ import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.filter.ExcludeAllTransitFilter;
+import org.opentripplanner.filter.ExcludeAllTransitFilter;
 
 @ExtendWith(SnapshotExtension.class)
 @ResourceLock(Resources.LOCALE)

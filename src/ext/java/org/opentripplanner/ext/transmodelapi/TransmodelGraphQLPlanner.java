@@ -215,10 +215,9 @@ public class TransmodelGraphQLPlanner {
   ) {
     if (
       !GqlUtil.hasArgument(environment, "modes.transportModes") &&
-      GqlUtil.hasArgument(environment, "whiteListed") &&
-      GqlUtil.hasArgument(environment, "banned")
+      !GqlUtil.hasArgument(environment, "whiteListed") &&
+      !GqlUtil.hasArgument(environment, "banned")
     ) {
-      request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
       return;
     }
 
@@ -338,8 +337,6 @@ public class TransmodelGraphQLPlanner {
       }
 
       request.journey().transit().setFilters(filterRequests);
-    } else {
-      request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
     }
   }
 

@@ -1,6 +1,7 @@
-package org.opentripplanner.routing.api.request.request.filter;
+package org.opentripplanner.filter;
 
 import java.io.Serializable;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 

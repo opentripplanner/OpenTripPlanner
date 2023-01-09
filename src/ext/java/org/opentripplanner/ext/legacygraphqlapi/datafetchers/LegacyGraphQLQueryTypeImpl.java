@@ -746,9 +746,7 @@ public class LegacyGraphQLQueryTypeImpl
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
 
-      if (!hasArgument(environment, "banned") && !hasArgument(environment, "transportModes")) {
-        request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
-      } else {
+      if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
         var filterRequestBuilder = TransitFilterRequest.of();
 
         if (hasArgument(environment, "banned.routes")) {

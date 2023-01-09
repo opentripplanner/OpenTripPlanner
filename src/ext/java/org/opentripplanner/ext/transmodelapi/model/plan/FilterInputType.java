@@ -18,8 +18,8 @@ public class FilterInputType {
         .newInputObjectField()
         .name("select")
         .description(
-          "A list of selectors for what lines/trips should be allowed during search." +
-          " I order to be accepted a trip/line has to match with at least one selector." +
+          "A list of selectors for what lines/trips should be allowed during search. " +
+          "In order to be accepted a trip/line has to match with at least one selector. " +
           "An empty list means that everything should be allowed. "
         )
         .type(new GraphQLList(new GraphQLNonNull(SelectInputType.INPUT_TYPE)))
