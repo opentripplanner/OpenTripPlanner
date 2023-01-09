@@ -10,6 +10,7 @@ import graphql.schema.GraphQLObjectType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.framework.application.OTPFeature;
 
 public class GraphQLIndexTest {
 
@@ -22,19 +23,21 @@ public class GraphQLIndexTest {
   @ValueSource(strings = { "plan", "nearest" })
   @ParameterizedTest(name = "\"{0}\" must be a an async fetcher")
   void asyncDataFetchers(String fieldName) {
-    var schema = LegacyGraphQLIndex.buildSchema();
+    OTPFeature.AsyncGraphqlFetchers.testOn(() -> {
+      var schema = LegacyGraphQLIndex.buildSchema();
 
-    var x = schema
-      .getCodeRegistry()
-      .getDataFetcher(
-        FieldCoordinates.coordinates("QueryType", fieldName),
-        GraphQLFieldDefinition
-          .newFieldDefinition()
-          .name(fieldName)
-          .type(GraphQLObjectType.newObject().name(fieldName).build())
-          .build()
-      );
+      var x = schema
+        .getCodeRegistry()
+        .getDataFetcher(
+          FieldCoordinates.coordinates("QueryType", fieldName),
+          GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name(fieldName)
+            .type(GraphQLObjectType.newObject().name(fieldName).build())
+            .build()
+        );
 
-    assertEquals(x.getClass(), AsyncDataFetcher.class);
+      assertEquals(x.getClass(), AsyncDataFetcher.class);
+    });
   }
 }

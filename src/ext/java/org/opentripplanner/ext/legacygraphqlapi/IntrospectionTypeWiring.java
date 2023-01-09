@@ -12,6 +12,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.application.OTPFeature;
 
 class IntrospectionTypeWiring {
 
@@ -72,6 +73,7 @@ class IntrospectionTypeWiring {
                     );
                   }
                   if (
+                    OTPFeature.AsyncGraphqlFetchers.isOn() &&
                     objectType
                       .getFieldDefinitions()
                       .stream()
