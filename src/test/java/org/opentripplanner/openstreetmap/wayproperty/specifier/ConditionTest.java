@@ -42,7 +42,9 @@ class ConditionTest {
     Arguments.of(tramsForward(), embeddedTrams, NONE, EXACT)
   );
 
-  @ParameterizedTest(name = "way {0} with op {1} should have a backward result {2}, forward result {3}")
+  @ParameterizedTest(
+    name = "way {0} with op {1} should have a backward result {2}, forward result {3}"
+  )
   @VariableSource("equalsCases")
   void leftRight(
     OSMWithTags way,

@@ -39,7 +39,6 @@ public class ExactMatchSpecifier implements OsmSpecifier {
 
   @Override
   public Scores matchScores(OSMWithTags way) {
-
     return new Scores(
       allForwardTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE,
       allBackwardTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE
