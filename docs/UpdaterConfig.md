@@ -50,7 +50,7 @@ Alerts are text messages attached to GTFS objects, informing riders of disruptio
 
 | Config Parameter          |       Type      | Summary                                                                      |  Req./Opt. | Default Value | Since |
 |---------------------------|:---------------:|------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "REAL_TIME_ALERTS" |      `enum`     | The type of the updater.                                                     | *Required* |               |   na  |
+| type = "REAL_TIME_ALERTS" |      `enum`     | The type of the updater.                                                     | *Required* |               |  1.5  |
 | earlyStartSec             |    `integer`    | How long before the posted start of an event it should be displayed to users | *Optional* | `0`           |  1.5  |
 | feedId                    |     `string`    | The id of the feed to apply the alerts to.                                   | *Optional* |               |  1.5  |
 | frequencySec              |    `integer`    | How often the URL should be fetched.                                         | *Optional* | `60`          |  1.5  |
@@ -102,9 +102,9 @@ predicted arrival and departure times for the remainder of the trip.
 
 | Config Parameter                                                      |       Type      | Summary                                                     |  Req./Opt. | Default Value        | Since |
 |-----------------------------------------------------------------------|:---------------:|-------------------------------------------------------------|:----------:|----------------------|:-----:|
-| type = "STOP_TIME_UPDATER"                                            |      `enum`     | The type of the updater.                                    | *Required* |                      |   na  |
+| type = "STOP_TIME_UPDATER"                                            |      `enum`     | The type of the updater.                                    | *Required* |                      |  1.5  |
 | [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |      `enum`     | How backwards propagation should be handled.                | *Optional* | `"required-no-data"` |  2.2  |
-| feedId                                                                |     `string`    | Which feed the updates apply to.                            | *Optional* |                      |   na  |
+| feedId                                                                |     `string`    | Which feed the updates apply to.                            | *Optional* |                      |  1.5  |
 | frequencySec                                                          |    `integer`    | How often the data should be downloaded in seconds.         | *Optional* | `60`                 |  1.5  |
 | fuzzyTripMatching                                                     |    `boolean`    | If the trips should be matched fuzzily.                     | *Optional* | `false`              |  1.5  |
 | url                                                                   |     `string`    | The URL of the GTFS-RT resource.                            | *Required* |                      |  1.5  |
@@ -174,18 +174,18 @@ Extra headers to add to the HTTP request fetching the data.
 
 | Config Parameter                                                      |    Type   | Summary                  |  Req./Opt. | Default Value        | Since |
 |-----------------------------------------------------------------------|:---------:|--------------------------|:----------:|----------------------|:-----:|
-| type = "WEBSOCKET_GTFS_RT_UPDATER"                                    |   `enum`  | The type of the updater. | *Required* |                      |   na  |
-| [backwardsDelayPropagationType](#u__7__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |   na  |
-| feedId                                                                |  `string` | TODO                     | *Optional* |                      |   na  |
-| reconnectPeriodSec                                                    | `integer` | TODO                     | *Optional* | `60`                 |   na  |
-| url                                                                   |  `string` | TODO                     | *Optional* |                      |   na  |
+| type = "WEBSOCKET_GTFS_RT_UPDATER"                                    |   `enum`  | The type of the updater. | *Required* |                      |  1.5  |
+| [backwardsDelayPropagationType](#u__7__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |  1.5  |
+| feedId                                                                |  `string` | TODO                     | *Optional* |                      |  1.5  |
+| reconnectPeriodSec                                                    | `integer` | TODO                     | *Optional* | `60`                 |  1.5  |
+| url                                                                   |  `string` | TODO                     | *Optional* |                      |  1.5  |
 
 
 #### Details
 
 <h4 id="u__7__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
+**Since version:** `1.5` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
 **Path:** /updaters/[7]   
 **Enum values:** `required-no-data` | `required` | `always`
 
@@ -219,7 +219,7 @@ geographic coordinates or position relative to their scheduled stops.
 
 | Config Parameter           |       Type      | Summary                                                                   |  Req./Opt. | Default Value | Since |
 |----------------------------|:---------------:|---------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_POSITIONS" |      `enum`     | The type of the updater.                                                  | *Required* |               |   na  |
+| type = "VEHICLE_POSITIONS" |      `enum`     | The type of the updater.                                                  | *Required* |               |  1.5  |
 | feedId                     |     `string`    | Feed ID to which the update should be applied.                            | *Required* |               |  2.2  |
 | frequencySec               |    `integer`    | How often the positions should be updated.                                | *Optional* | `60`          |  2.2  |
 | url                        |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from. | *Required* |               |  2.2  |
@@ -297,12 +297,12 @@ can be configured as a json. Any header key, value can be inserted.
 
 | Config Parameter                                                                      |       Type      | Summary                                                                         |  Req./Opt. | Default Value | Since |
 |---------------------------------------------------------------------------------------|:---------------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_RENTAL"                                                               |      `enum`     | The type of the updater.                                                        | *Required* |               |   na  |
+| type = "VEHICLE_RENTAL"                                                               |      `enum`     | The type of the updater.                                                        | *Required* |               |  1.5  |
 | [allowKeepingRentedBicycleAtDestination](#u_1_allowKeepingRentedBicycleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental. | *Optional* | `false`       |   na  |
-| frequencySec                                                                          |    `integer`    | How often the data should be updated in seconds.                                | *Optional* | `60`          |   na  |
+| frequencySec                                                                          |    `integer`    | How often the data should be updated in seconds.                                | *Optional* | `60`          |  1.5  |
 | language                                                                              |     `string`    | TODO                                                                            | *Optional* |               |   na  |
 | [network](#u_1_network)                                                               |     `string`    | The name of the network to override the one derived from the source data.       | *Optional* |               |   na  |
-| [sourceType](#u_1_sourceType)                                                         |      `enum`     | What source of vehicle rental updater to use.                                   | *Required* |               |   na  |
+| [sourceType](#u_1_sourceType)                                                         |      `enum`     | What source of vehicle rental updater to use.                                   | *Required* |               |  1.5  |
 | url                                                                                   |     `string`    | The URL to download the data from.                                              | *Required* |               |   na  |
 | [headers](#u_1_headers)                                                               | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |   na  |
 
@@ -329,7 +329,7 @@ GBFS feeds must include a system_id which will be used as the default `network`.
 
 <h4 id="u_1_sourceType">sourceType</h4>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
+**Since version:** `1.5` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[1]   
 **Enum values:** `gbfs` | `smoove` | `vilkku`
 
