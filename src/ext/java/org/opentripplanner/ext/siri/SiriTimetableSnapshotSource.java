@@ -579,8 +579,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     if (tripResult.isFailure()) {
-      // need to put it into a new result so the success value is correct
-      return Result.failure(tripResult.failureValue());
+      // need to create a new result so the success type is correct
+      return tripResult.toFailureResult();
     }
     Trip trip = tripResult.successValue();
 

@@ -35,6 +35,16 @@ public abstract sealed class Result<T, E> {
   }
 
   /**
+   * Creates a new instance of this class with a new success type. This is useful if you know
+   * that it is a failure and want to return it in a method without having to cast the success type.
+   * <p>
+   * If this instance is not a failure an exception is thrown.
+   */
+  public <NewType> Result<NewType, E> toFailureResult() {
+    return Result.failure(failureValue());
+  }
+
+  /**
    * Get the value contained with an erased type. If you want to use the typed version of the value
    * use {@link Result#ifFailure(Consumer)} or  {@link Result#ifSuccess(Consumer)}}.
    */

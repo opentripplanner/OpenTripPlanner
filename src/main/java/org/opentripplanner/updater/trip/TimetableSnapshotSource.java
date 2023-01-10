@@ -436,8 +436,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate, backwardsDelayPropagationType);
 
     if (result.isFailure()) {
-      // needs to be put into a new Result so the success type is correct
-      return Result.failure(result.failureValue());
+      // necessary so the success type is correct
+      return result.toFailureResult();
     }
 
     var tripTimesPatch = result.successValue();
