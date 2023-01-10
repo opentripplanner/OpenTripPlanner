@@ -54,8 +54,8 @@ final class AddedStopTime {
     GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship
   ) {
     return switch (scheduleRelationship) {
-      case SCHEDULED, NO_DATA -> PickDrop.SCHEDULED;
-      case SKIPPED, UNSCHEDULED -> PickDrop.NONE;
+      case SCHEDULED, NO_DATA, UNSCHEDULED -> PickDrop.SCHEDULED;
+      case SKIPPED -> PickDrop.CANCELLED;
     };
   }
 }
