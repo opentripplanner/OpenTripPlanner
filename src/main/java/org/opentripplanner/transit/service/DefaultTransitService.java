@@ -80,8 +80,8 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Optional<Agency> getAgencyById(FeedScopedId id) {
-    return this.transitModel.getAgencyById(id);
+  public Optional<Agency> findAgencyById(FeedScopedId id) {
+    return this.transitModel.findAgencyById(id);
   }
 
   @Override

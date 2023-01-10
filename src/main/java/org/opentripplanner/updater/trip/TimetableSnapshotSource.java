@@ -714,21 +714,25 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private Route getOrCreateRoute(TripDescriptor tripDescriptor, FeedScopedId tripId) {
-    Route route;
-
-    // this route in this update doesn't already exist so it will be created
-    if (
+    if (routeExists(tripId.getFeedId(), tripDescriptor)) {
+      // Try to find route
+      return transitService.getRouteForId(
+        new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
+      );
+    }
+    // the route in this update doesn't already exist, but the update contains the information so it will be created
+    else if (
       tripDescriptor.hasExtension(MfdzRealtimeExtensions.tripDescriptor) &&
       !routeExists(tripId.getFeedId(), tripDescriptor)
     ) {
-      FeedScopedId id = new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId());
+      FeedScopedId routeId = new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId());
 
-      var builder = Route.of(id);
+      var builder = Route.of(routeId);
 
       var addedRouteExtension = AddedRoute.ofTripDescriptor(tripDescriptor);
 
       var agency = transitService
-        .getAgencyById(new FeedScopedId(tripId.getFeedId(), addedRouteExtension.agencyId()))
+        .findAgencyById(new FeedScopedId(tripId.getFeedId(), addedRouteExtension.agencyId()))
         .orElseGet(() -> fallbackAgency(tripId.getFeedId()));
 
       builder.withAgency(agency);
@@ -742,17 +746,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       builder.withLongName(new NonLocalizedString(name));
       builder.withUrl(addedRouteExtension.routeUrl());
 
-      route = builder.build();
-
+      var route = builder.build();
       transitService.addRoutes(route);
-    } else if (routeExists(tripId.getFeedId(), tripDescriptor)) {
-      // Try to find route
-      route =
-        transitService.getRouteForId(
-          new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
-        );
-    } else {
-      // Create new dummy Route
+      return route;
+    }
+    // no information about the rout is given, so we create a dummy one
+    else {
       var builder = Route.of(tripId);
 
       builder.withAgency(fallbackAgency(tripId.getFeedId()));
@@ -763,11 +762,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Create route name
       I18NString longName = NonLocalizedString.ofNullable(tripDescriptor.getTripId());
       builder.withLongName(longName);
-      route = builder.build();
+      var route = builder.build();
       transitService.addRoutes(route);
+      return route;
     }
-
-    return route;
   }
 
   /**

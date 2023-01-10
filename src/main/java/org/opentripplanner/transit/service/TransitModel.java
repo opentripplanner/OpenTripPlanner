@@ -448,7 +448,7 @@ public class TransitModel implements Serializable {
     return hasTransit;
   }
 
-  public Optional<Agency> getAgencyById(FeedScopedId id) {
+  public Optional<Agency> findAgencyById(FeedScopedId id) {
     return agencies.stream().filter(a -> a.getId().equals(id)).findAny();
   }
 

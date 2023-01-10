@@ -49,7 +49,7 @@ public interface TransitService {
   Collection<String> getFeedIds();
 
   Collection<Agency> getAgencies();
-  Optional<Agency> getAgencyById(FeedScopedId id);
+  Optional<Agency> findAgencyById(FeedScopedId id);
 
   FeedInfo getFeedInfo(String feedId);
 
