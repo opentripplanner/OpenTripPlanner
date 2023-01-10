@@ -129,7 +129,7 @@ The current list of custom fare type is:
   between them) as a single leg for the purpose of fare calculation.
   It has a single parameter `mode` which controls when exactly the combination should happen:
     - `ALWAYS`: All interlined legs are combined. (default)
-    - `SAME_ROUTE`: Only interlined legs whose route ID are identical are encountered.
+    - `SAME_ROUTE`: Only interlined legs whose route ID are identical are combined.
 - `off` (no parameters)
 
 The current list of `combinationStrategy` is:
