@@ -88,9 +88,9 @@ public sealed interface Condition {
   }
 
   default boolean matchesBackward(OSMWithTags way) {
-    var BackwardKey = this.key() + ":backward";
-    if (way.hasTag(BackwardKey)) {
-      return getMatches(way, BackwardKey);
+    var backwardKey = this.key() + ":backward";
+    if (way.hasTag(backwardKey)) {
+      return getMatches(way, backwardKey);
     } else {
       /* Assumes right hand traffic */
       return matchesLeft(way);

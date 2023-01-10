@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 public class OsmSpecifierTest extends SpecifierTest {
 
-  Condition[] wildcardSpec = OsmSpecifier.parseEqualsTests("highway=*", ";");
+  Condition[] wildcardSpec = OsmSpecifier.parseConditions("highway=*", ";");
 
   @Test
   public void parseWildcardAsPresent() {

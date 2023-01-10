@@ -29,7 +29,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   private final int bestMatchScore;
 
   public ExactMatchSpecifier(String spec) {
-    this(OsmSpecifier.parseEqualsTests(spec, ";"));
+    this(OsmSpecifier.parseConditions(spec, ";"));
   }
 
   public ExactMatchSpecifier(Condition... conditions) {

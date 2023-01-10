@@ -25,7 +25,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
   private final Condition[] conditions;
 
   public BestMatchSpecifier(String spec) {
-    conditions = OsmSpecifier.parseEqualsTests(spec, ";");
+    conditions = OsmSpecifier.parseConditions(spec, ";");
   }
 
   @Override
