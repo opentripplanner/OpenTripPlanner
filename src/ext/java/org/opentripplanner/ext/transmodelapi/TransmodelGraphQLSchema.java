@@ -70,7 +70,7 @@ import org.opentripplanner.ext.transmodelapi.model.plan.TripPatternType;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripQuery;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripType;
 import org.opentripplanner.ext.transmodelapi.model.plan.ViaLocationInputType;
-import org.opentripplanner.ext.transmodelapi.model.plan.ViaRequestInputType;
+import org.opentripplanner.ext.transmodelapi.model.plan.ViaSegmentInputType;
 import org.opentripplanner.ext.transmodelapi.model.plan.ViaTripQuery;
 import org.opentripplanner.ext.transmodelapi.model.plan.ViaTripType;
 import org.opentripplanner.ext.transmodelapi.model.siri.et.EstimatedCallType;
@@ -336,13 +336,13 @@ public class TransmodelGraphQLSchema {
 
     GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
     GraphQLInputObjectType viaLocationInputType = ViaLocationInputType.create(gqlUtil);
-    GraphQLInputObjectType viaRequestInputType = ViaRequestInputType.create();
+    GraphQLInputObjectType viaSegmentInputType = ViaSegmentInputType.create();
 
     GraphQLFieldDefinition viaTripQuery = ViaTripQuery.create(
       routing,
       viaTripType,
       viaLocationInputType,
-      viaRequestInputType,
+      viaSegmentInputType,
       gqlUtil
     );
 

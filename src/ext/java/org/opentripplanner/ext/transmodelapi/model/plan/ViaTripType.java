@@ -1,12 +1,15 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.Scalars;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class ViaTripType {
 
@@ -14,6 +17,51 @@ public class ViaTripType {
     GraphQLObjectType tripPatternType,
     GraphQLObjectType routingErrorType
   ) {
+    var viaTripPatternSegment = GraphQLObjectType
+      .newObject()
+      .name("ViaTripPatternSegment")
+      .description("A segment of the via search")
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("tripPatterns")
+          .description("A list of trip patterns for this segment of the search")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(tripPatternType))))
+          .dataFetcher(DataFetchingEnvironment::getSource)
+          .build()
+      )
+      .build();
+
+    var viaTripPatternCombinations = GraphQLObjectType
+      .newObject()
+      .name("ViaTripPatternPair")
+      .description(
+        "An acceptable combination of trip patterns between two segments of the via search"
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("from")
+          .description("The index of the trip pattern in the segment before the via point")
+          .type(Scalars.GraphQLInt)
+          .dataFetcher(dataFetchingEnvironment ->
+            ((ViaTripPatternPair) dataFetchingEnvironment.getSource()).from()
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("to")
+          .description("The index of the trip pattern in the segment after the via point")
+          .type(Scalars.GraphQLInt)
+          .dataFetcher(dataFetchingEnvironment ->
+            ((ViaTripPatternPair) dataFetchingEnvironment.getSource()).to()
+          )
+          .build()
+      )
+      .build();
+
     return GraphQLObjectType
       .newObject()
       .name("ViaTrip")
@@ -21,15 +69,13 @@ public class ViaTripType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
-          .name("tripPatterns")
-          .description("A list of lists of the trip patterns for each segment of the journey")
-          .type(
-            new GraphQLNonNull(
-              new GraphQLList(
-                new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(tripPatternType)))
-              )
-            )
+          .name("tripPatternsPerSegment")
+          .description(
+            "A list of segments of the via search. The first segment is from the start location " +
+            "to the first entry in the locations list and the last is from the last entry in the " +
+            "locations list to the end location."
           )
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(viaTripPatternSegment))))
           .dataFetcher(env -> ((ViaPlanResponse) env.getSource()).viaJourneys())
           .build()
       )
@@ -38,20 +84,16 @@ public class ViaTripType {
           .newFieldDefinition()
           .name("tripPatternCombinations")
           .description(
-            "A list of lists of which indices of the next segment the trip pattern can be combined with"
+            "A list of the acceptable combinations of the trip patterns in this segment and the " +
+            "next segment."
           )
-          .type(
-            new GraphQLNonNull(
-              new GraphQLList(
-                new GraphQLNonNull(
-                  new GraphQLList(
-                    new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLInt)))
-                  )
-                )
-              )
-            )
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(viaTripPatternCombinations))))
+          .dataFetcher(env ->
+            ((ViaPlanResponse) env.getSource()).viaJourneyConnections()
+              .stream()
+              .flatMap(ViaTripPatternPair::map)
+              .toList()
           )
-          .dataFetcher(env -> ((ViaPlanResponse) env.getSource()).viaJourneyConnections())
           .build()
       )
       .field(
@@ -64,5 +106,22 @@ public class ViaTripType {
           .build()
       )
       .build();
+  }
+
+  private record ViaTripPatternPair(int from, int to) {
+    /**
+     * Convert a list supplied by {@link ViaPlanResponse#viaJourneyConnections()} to a stream of
+     * {@link ViaTripPatternPair}s
+     */
+    private static Stream<ViaTripPatternPair> map(List<List<Integer>> connections) {
+      var ret = new ArrayList<ViaTripPatternPair>();
+      for (int from = 0; from < connections.size(); from++) {
+        for (int to : connections.get(from)) {
+          ret.add(new ViaTripPatternPair(from, to));
+        }
+      }
+
+      return ret.stream();
+    }
   }
 }

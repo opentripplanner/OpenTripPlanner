@@ -799,6 +799,8 @@ type QueryType {
     from: Location!,
     "The preferable language to use for text targeted the end user. Note! The data quality is limited, only stop and quay names are translates, and not in all places of the API."
     locale: Locale = no,
+    "The locations needed to be visited along the route."
+    locations: [ViaLocationInput!]!,
     "The maximum number of trip patterns per part of the search to return. Note! This reduces the number of trip patterns AFTER the OTP travel search is done in a post-filtering process. There is little performance gain in reducing the number of trip patterns returned. The post-filtering will reduce the number of trip-patterns down to this size. It does not make the search faster, as it did in OTP1. See also the trip meta-data on how to implement paging."
     numTripPatterns: Int = 50,
     "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from the last response and keep the original request as is. This will enable you to search for itineraries in the next or previous time-window."
@@ -815,12 +817,10 @@ type QueryType {
     The search-window used is returned to the response metadata as `searchWindowUsed` for debugging purposes.
     """
     searchWindow: Duration!,
+    "The requests for the individual segments of the search. The first segment is from the start location to the first entry in the locations list and the last is from the last entry in the locations list to the end location. Note that the list must have length of exactly one greater than the locations field."
+    segments: [ViaSegmentInput!],
     "The end location"
     to: Location!,
-    "The locations needed to be visited along hte route."
-    viaLocations: [ViaLocation!]!,
-    "The requests for the individual parts of the search. Note that the list must have length of exactly one greater than the viaLocations field."
-    viaRequests: [ViaRequest!],
     "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit jet."
     wheelchairAccessible: Boolean = false
   ): ViaTrip! @deprecated @timingData
@@ -1205,10 +1205,24 @@ type ValidityPeriod {
 type ViaTrip {
   "A list of routing errors, and fields which caused them"
   routingErrors: [RoutingError!]!
-  "A list of lists of which indices of the next segment the trip pattern can be combined with"
-  tripPatternCombinations: [[[Int!]!]!]!
-  "A list of lists of the trip patterns for each segment of the journey"
-  tripPatterns: [[TripPattern!]!]!
+  "A list of the acceptable combinations of the trip patterns in this segment and the next segment."
+  tripPatternCombinations: [ViaTripPatternPair!]!
+  "A list of segments of the via search. The first segment is from the start location to the first entry in the locations list and the last is from the last entry in the locations list to the end location."
+  tripPatternsPerSegment: [ViaTripPatternSegment!]!
+}
+
+"An acceptable combination of trip patterns between two segments of the via search"
+type ViaTripPatternPair {
+  "The index of the trip pattern in the segment before the via point"
+  from: Int
+  "The index of the trip pattern in the segment after the via point"
+  to: Int
+}
+
+"A segment of the via search"
+type ViaTripPatternSegment {
+  "A list of trip patterns for this segment of the search"
+  tripPatterns: [TripPattern!]!
 }
 
 type debugOutput {
@@ -1801,7 +1815,7 @@ input TriangleFactors {
 }
 
 "Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known. The location also contain information about the minimum and maximum time the user is willing to stay at the via location."
-input ViaLocation {
+input ViaLocationInput {
   "Coordinates for the location. This can be used alone or as fallback if the place id is not found."
   coordinates: InputCoordinates
   "The maximum time the user wants to stay in the via location before continuing his journey"
@@ -1814,7 +1828,7 @@ input ViaLocation {
   place: String
 }
 
-input ViaRequest {
+input ViaSegmentInput {
   "The set of access/egress/direct/transit modes to be used for this search. Note that this only works at the Line level. If individual ServiceJourneys have modes that differ from the Line mode, this will NOT be accounted for."
   modes: Modes
 }

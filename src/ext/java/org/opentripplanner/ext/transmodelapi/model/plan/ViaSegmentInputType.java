@@ -3,12 +3,12 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 
-public class ViaRequestInputType {
+public class ViaSegmentInputType {
 
   public static GraphQLInputObjectType create() {
     return GraphQLInputObjectType
       .newInputObject()
-      .name("ViaRequest")
+      .name("ViaSegmentInput")
       .field(
         GraphQLInputObjectField
           .newInputObjectField()

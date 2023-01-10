@@ -12,7 +12,6 @@ import org.opentripplanner.ext.transmodelapi.model.DefaultRouteRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 
 public class ViaTripQuery {
 
@@ -20,11 +19,9 @@ public class ViaTripQuery {
     DefaultRouteRequestType routing,
     GraphQLOutputType viaTripType,
     GraphQLInputObjectType viaLocationInputType,
-    GraphQLInputObjectType viaRequestInputType,
+    GraphQLInputObjectType viaSegmentInputType,
     GqlUtil gqlUtil
   ) {
-    RoutingPreferences preferences = routing.request.preferences();
-
     return GraphQLFieldDefinition
       .newFieldDefinition()
       .name("viaTrip")
@@ -111,19 +108,21 @@ public class ViaTripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
-          .name("viaLocations")
-          .description("The locations needed to be visited along hte route.")
+          .name("locations")
+          .description("The locations needed to be visited along the route.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(viaLocationInputType))))
       )
       .argument(
         GraphQLArgument
           .newArgument()
-          .name("viaRequests")
+          .name("segments")
           .description(
-            "The requests for the individual parts of the search. Note that the list must have " +
-            "length of exactly one greater than the viaLocations field."
+            "The requests for the individual segments of the search. The first segment is from " +
+            "the start location to the first entry in the locations list and the last is from " +
+            "the last entry in the locations list to the end location. Note that the list must " +
+            "have length of exactly one greater than the locations field."
           )
-          .type(new GraphQLList(new GraphQLNonNull(viaRequestInputType)))
+          .type(new GraphQLList(new GraphQLNonNull(viaSegmentInputType)))
       )
       .argument(
         GraphQLArgument
@@ -137,7 +136,7 @@ public class ViaTripQuery {
             "down to this size. It does not make the search faster, as it did in OTP1. See also " +
             "the trip meta-data on how to implement paging."
           )
-          .defaultValue(routing.request.numItineraries())
+          .defaultValueProgrammatic(routing.request.numItineraries())
           .type(Scalars.GraphQLInt)
           .build()
       )
@@ -150,7 +149,7 @@ public class ViaTripQuery {
             "the search, not implemented for the transit jet."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(routing.request.wheelchair())
+          .defaultValueProgrammatic(routing.request.wheelchair())
           .build()
       )
       .argument(
@@ -163,7 +162,7 @@ public class ViaTripQuery {
             "places of the API."
           )
           .type(EnumTypes.LOCALE)
-          .defaultValue("no")
+          .defaultValueProgrammatic("no")
           .build()
       )
       .dataFetcher(environment -> new TransmodelGraphQLPlanner().planVia(environment))

@@ -12,7 +12,7 @@ public class ViaLocationInputType {
   public static GraphQLInputObjectType create(GqlUtil gqlUtil) {
     return GraphQLInputObjectType
       .newInputObject()
-      .name("ViaLocation")
+      .name("ViaLocationInput")
       .description(
         "Input format for specifying a location through either a place reference (id), " +
         "coordinates or both. If both place and coordinates are provided the place ref will be " +
