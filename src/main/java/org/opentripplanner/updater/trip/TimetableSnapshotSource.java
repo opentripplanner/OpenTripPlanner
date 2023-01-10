@@ -15,6 +15,7 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOU
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimaps;
+import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
@@ -704,7 +705,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     return addTripToGraphAndBuffer(
       tripBuilder.build(),
-      tripUpdate,
+      tripUpdate.getVehicle(),
       stopTimeUpdates,
       stops,
       serviceDate,
@@ -795,7 +796,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * Add a (new) trip to the graph and the buffer
    *
    * @param trip          trip
-   * @param tripUpdate    trip update containing stop time updates
+   * @param vehicleDescriptor accessibility information of the vehicle
    * @param stops         list of stops corresponding to stop time updates
    * @param serviceDate   service date of trip
    * @param realTimeState real-time state of new trip
@@ -803,7 +804,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(
     final Trip trip,
-    final TripUpdate tripUpdate,
+    final GtfsRealtime.VehicleDescriptor vehicleDescriptor,
     final List<StopTimeUpdate> stopTimeUpdates,
     final List<StopLocation> stops,
     final LocalDate serviceDate,
@@ -902,8 +903,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Make sure that updated trip times have the correct real time state
     newTripTimes.setRealTimeState(realTimeState);
 
-    if (tripUpdate.hasVehicle()) {
-      var vehicleDescriptor = tripUpdate.getVehicle();
+    if (vehicleDescriptor != null) {
       if (vehicleDescriptor.hasWheelchairAccessible()) {
         GtfsRealtimeMapper
           .mapWheelchairAccessible(vehicleDescriptor.getWheelchairAccessible())
@@ -1086,7 +1086,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Add new trip
     return addTripToGraphAndBuffer(
       trip,
-      tripUpdate,
+      tripUpdate.getVehicle(),
       tripUpdate.getStopTimeUpdateList(),
       stops,
       serviceDate,
