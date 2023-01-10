@@ -344,7 +344,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             // Updated trip
             var result = handleModifiedTrip(transitModel, fuzzyTripMatcher, feedId, journey);
             // need to put it in a new instance so the type is correct
-            result.ifSuccess(ignored -> results.add(Result.success(result.successValue())));
+            result.ifSuccess(value -> results.add(Result.success(value)));
             result.ifFailure(failures -> {
               List<Result<UpdateSuccess, UpdateError>> f = failures
                 .stream()

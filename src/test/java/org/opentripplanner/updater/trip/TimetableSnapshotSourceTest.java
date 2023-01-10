@@ -901,9 +901,8 @@ public class TimetableSnapshotSourceTest {
       var fromTransitModel = transitModel.getTransitModelIndex().getRouteForId(route.getId());
       assertEquals(fromTransitModel, route);
 
-      var stopPattern = pattern.getStopPattern();
-      assertEquals(PickDrop.CALL_AGENCY, stopPattern.getPickup(0));
-      assertEquals(PickDrop.CALL_AGENCY, stopPattern.getDropoff(0));
+      assertEquals(PickDrop.CALL_AGENCY, pattern.getBoardType(0));
+      assertEquals(PickDrop.CALL_AGENCY, pattern.getAlightType(0));
 
       assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getPickup(1));
       assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getDropoff(1));
