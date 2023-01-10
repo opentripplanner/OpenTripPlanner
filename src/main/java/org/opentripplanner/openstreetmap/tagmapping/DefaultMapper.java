@@ -569,7 +569,8 @@ class DefaultMapper implements OsmTagMapper {
     props.setMixinProperties("surface=wood", ofBicycleSafety(1.18));
 
     props.setMixinProperties("surface=cobblestone", ofBicycleSafety(1.3));
-    props.setMixinProperties("surface=cobblestone:flattened", ofBicycleSafety(1.3));
+    props.setMixinProperties("surface=sett", ofBicycleSafety(1.3));
+    props.setMixinProperties("surface=unhewn_cobblestone", ofBicycleSafety(1.5));
     props.setMixinProperties("surface=grass_paver", ofBicycleSafety(1.3));
     props.setMixinProperties("surface=pebblestone", ofBicycleSafety(1.3));
     // Can be slick if wet, but otherwise not unfavorable to bikes
