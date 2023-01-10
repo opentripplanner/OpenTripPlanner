@@ -3,7 +3,6 @@ package org.opentripplanner.updater.trip;
 import com.google.transit.realtime.GtfsRealtime;
 import de.mfdz.MfdzRealtimeExtensions;
 import java.util.Objects;
-import org.opentripplanner.transit.model.organization.Agency;
 
 final class AddedRoute {
 
@@ -19,10 +18,6 @@ final class AddedRoute {
     this.agencyId = agencyId;
     this.routeType = routeType;
     this.routeLongName = routeLongName;
-  }
-
-  public boolean matchesAgencyId(Agency agency) {
-    return agencyId != null && agencyId.equals(agency.getId().getId());
   }
 
   /**

@@ -9,6 +9,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
@@ -76,6 +77,11 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<Agency> getAgencies() {
     return this.transitModel.getAgencies();
+  }
+
+  @Override
+  public Optional<Agency> getAgencyById(FeedScopedId id) {
+    return this.transitModel.getAgencyById(id);
   }
 
   @Override

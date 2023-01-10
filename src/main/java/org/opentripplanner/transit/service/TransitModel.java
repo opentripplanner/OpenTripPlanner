@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -445,6 +446,10 @@ public class TransitModel implements Serializable {
   /** True if there are active transit services loaded into this Graph. */
   public boolean hasTransit() {
     return hasTransit;
+  }
+
+  public Optional<Agency> getAgencyById(FeedScopedId id) {
+    return agencies.stream().filter(a -> a.getId().equals(id)).findAny();
   }
 
   private void updateHasTransit(boolean hasTransit) {
