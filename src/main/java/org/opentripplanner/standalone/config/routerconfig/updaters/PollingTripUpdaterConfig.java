@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
@@ -68,7 +67,7 @@ public class PollingTripUpdaterConfig {
 """
         )
         .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA),
-      c.of("feedId").since(NA).summary("Which feed the updates apply to.").asString(null),
+      c.of("feedId").since(V1_5).summary("Which feed the updates apply to.").asString(null),
       url,
       file,
       headers
