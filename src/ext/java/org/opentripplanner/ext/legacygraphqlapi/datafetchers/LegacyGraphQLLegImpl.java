@@ -244,7 +244,8 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
             environment.<LegacyGraphQLRequestContext>getContext().getTransitService(),
             false,
             AlternativeLegsFilter.NO_FILTER,
-            limitToExactOriginStop
+            limitToExactOriginStop,
+            false
           )
           .stream()
           .map(Leg.class::cast)

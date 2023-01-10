@@ -46,7 +46,15 @@ public class AlternativeLegs {
     boolean searchBackward,
     AlternativeLegsFilter filter
   ) {
-    return getAlternativeLegs(leg, numberLegs, transitService, searchBackward, filter, false);
+    return getAlternativeLegs(
+      leg,
+      numberLegs,
+      transitService,
+      searchBackward,
+      filter,
+      false,
+      false
+    );
   }
 
   public static List<ScheduledTransitLeg> getAlternativeLegs(
@@ -55,7 +63,8 @@ public class AlternativeLegs {
     TransitService transitService,
     boolean searchBackward,
     AlternativeLegsFilter filter,
-    boolean exactOriginStop
+    boolean exactOriginStop,
+    boolean exactDestinationStop
   ) {
     StopLocation fromStop = leg.getFrom().stop;
     StopLocation toStop = leg.getTo().stop;
@@ -67,7 +76,7 @@ public class AlternativeLegs {
       ? List.of(fromStop)
       : fromStation.getChildStops();
 
-    Collection<StopLocation> destinations = toStation == null
+    Collection<StopLocation> destinations = toStation == null || exactDestinationStop
       ? List.of(toStop)
       : toStation.getChildStops();
 
