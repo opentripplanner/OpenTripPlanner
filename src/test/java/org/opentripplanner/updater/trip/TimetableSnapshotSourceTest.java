@@ -904,8 +904,8 @@ public class TimetableSnapshotSourceTest {
       assertEquals(PickDrop.CALL_AGENCY, pattern.getBoardType(0));
       assertEquals(PickDrop.CALL_AGENCY, pattern.getAlightType(0));
 
-      assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getPickup(1));
-      assertEquals(PickDrop.COORDINATE_WITH_DRIVER, stopPattern.getDropoff(1));
+      assertEquals(PickDrop.COORDINATE_WITH_DRIVER, pattern.getBoardType(1));
+      assertEquals(PickDrop.COORDINATE_WITH_DRIVER, pattern.getAlightType(1));
     }
 
     @Test
