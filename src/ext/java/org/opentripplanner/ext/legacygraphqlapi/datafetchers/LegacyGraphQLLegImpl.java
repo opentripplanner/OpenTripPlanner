@@ -227,7 +227,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   public DataFetcher<Iterable<Leg>> nextLegs() {
     return environment -> {
       if (environment.getSource() instanceof ScheduledTransitLeg) {
-        int numberOfLegs = environment.getArgumentOrDefault("numberOfLegs", 2);
+        int numberOfLegs = environment.getArgument("numberOfLegs");
         ScheduledTransitLeg originalLeg = environment.getSource();
         List<String> modesWithParentStation = environment.getArgumentOrDefault(
           "modesWithParentStation",

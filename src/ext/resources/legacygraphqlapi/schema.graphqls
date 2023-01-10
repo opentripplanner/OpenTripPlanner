@@ -1382,7 +1382,7 @@ type Leg {
     """
     nextLegs(
     """The number of alternative legs searched. If fewer than the requested number are found, then only the found legs are returned"""
-    numberOfLegs: Int,
+    numberOfLegs: Int!,
      """Transportation modes for which all stops in the parent station are used as origin stops. For modes not listed, only the exact origin stop of the leg is considered"""
      modesWithParentStation: [Mode]): [Leg]
 }
