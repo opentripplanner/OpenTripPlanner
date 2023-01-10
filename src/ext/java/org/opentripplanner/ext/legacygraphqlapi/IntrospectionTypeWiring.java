@@ -73,7 +73,7 @@ class IntrospectionTypeWiring {
                     );
                   }
                   if (
-                    OTPFeature.AsyncGraphqlFetchers.isOn() &&
+                    OTPFeature.AsyncGraphQLFetchers.isOn() &&
                     objectType
                       .getFieldDefinitions()
                       .stream()

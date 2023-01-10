@@ -26,12 +26,12 @@ public class GraphQLIndexTest {
   @ValueSource(strings = { "plan", "nearest" })
   @ParameterizedTest(name = "\"{0}\" must be a an async fetcher")
   void asyncDataFetchers(String fieldName) {
-    OTPFeature.AsyncGraphqlFetchers.testOn(() -> {
+    OTPFeature.AsyncGraphQLFetchers.testOn(() -> {
       var schema = LegacyGraphQLIndex.buildSchema();
       var fetcher = getQueryType(fieldName, schema);
       assertSame(fetcher.getClass(), AsyncDataFetcher.class);
     });
-    OTPFeature.AsyncGraphqlFetchers.testOff(() -> {
+    OTPFeature.AsyncGraphQLFetchers.testOff(() -> {
       var schema = LegacyGraphQLIndex.buildSchema();
       var fetcher = getQueryType(fieldName, schema);
       assertNotSame(fetcher.getClass(), AsyncDataFetcher.class);
