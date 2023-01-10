@@ -247,7 +247,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
             limitToExactOriginStop
           )
           .stream()
-          .map(l -> (Leg) l)
+          .map(Leg.class::cast)
           .collect(Collectors.toList());
         return res;
       } else return null;
