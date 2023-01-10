@@ -740,7 +740,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Create route name
       var name = Objects.requireNonNullElse(addedRouteExtension.routeLongName(), tripId.toString());
       builder.withLongName(new NonLocalizedString(name));
-      builder.withShortName(name);
       builder.withUrl(addedRouteExtension.routeUrl());
 
       route = builder.build();
