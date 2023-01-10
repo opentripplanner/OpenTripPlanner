@@ -58,6 +58,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
@@ -99,7 +100,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private final TripPatternCache tripPatternCache = new TripPatternCache();
 
   private final ZoneId timeZone;
-  private final DefaultTransitService transitService;
+  private final TransitEditorService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
 
   /**
