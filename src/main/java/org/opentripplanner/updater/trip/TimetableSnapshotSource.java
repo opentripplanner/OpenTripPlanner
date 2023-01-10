@@ -329,41 +329,46 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     var updateResult = UpdateResult.ofResults(results);
 
     if (fullDataset) {
-      LOG.info(
-        "[feedId: {}] {} of {} update messages were applied successfully (success rate: {}%)",
-        feedId,
-        updateResult.successful(),
-        updates.size(),
-        DoubleUtils.roundTo2Decimals((double) updateResult.successful() / updates.size() * 100)
-      );
-
-      var errorIndex = updateResult.failures();
-
-      errorIndex
-        .keySet()
-        .forEach(key -> {
-          var value = errorIndex.get(key);
-          var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
-          LOG.error("[feedId: {}] {} failures of type {}: {}", feedId, value.size(), key, tripIds);
-        });
-
-      if (!failuresByRelationship.isEmpty()) {
-        LOG.info(
-          "[feedId: {}] Failures by scheduleRelationship {}",
-          feedId,
-          failuresByRelationship
-        );
-      }
-
-      var warnings = Multimaps.index(updateResult.warnings(), w -> w);
-      warnings
-        .keySet()
-        .forEach(key -> {
-          var count = warnings.get(key).size();
-          LOG.info("[feedId: {}] {} warnings of type {}", feedId, count, key);
-        });
+      logUpdateResult(feedId, updates.size(), failuresByRelationship, updateResult);
     }
     return updateResult;
+  }
+
+  private static void logUpdateResult(
+    String feedId,
+    int updates,
+    Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship,
+    UpdateResult updateResult
+  ) {
+    LOG.info(
+      "[feedId: {}] {} of {} update messages were applied successfully (success rate: {}%)",
+      feedId,
+      updateResult.successful(),
+      updates,
+      DoubleUtils.roundTo2Decimals((double) updateResult.successful() / updates * 100)
+    );
+
+    var errorIndex = updateResult.failures();
+
+    errorIndex
+      .keySet()
+      .forEach(key -> {
+        var value = errorIndex.get(key);
+        var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
+        LOG.error("[feedId: {}] {} failures of type {}: {}", feedId, value.size(), key, tripIds);
+      });
+
+    if (!failuresByRelationship.isEmpty()) {
+      LOG.info("[feedId: {}] Failures by scheduleRelationship {}", feedId, failuresByRelationship);
+    }
+
+    var warnings = Multimaps.index(updateResult.warnings(), w -> w);
+    warnings
+      .keySet()
+      .forEach(key -> {
+        var count = warnings.get(key).size();
+        LOG.info("[feedId: {}] {} warnings of type {}", feedId, count, key);
+      });
   }
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
