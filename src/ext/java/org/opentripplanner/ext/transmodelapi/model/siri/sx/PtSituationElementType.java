@@ -13,9 +13,11 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.AbstractMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
+import org.opentripplanner.ext.transmodelapi.model.stop.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -30,6 +32,7 @@ public class PtSituationElementType {
   public static GraphQLObjectType create(
     GraphQLOutputType authorityType,
     GraphQLOutputType quayType,
+    GraphQLOutputType stopPlaceType,
     GraphQLOutputType lineType,
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType multilingualStringType,
@@ -110,7 +113,7 @@ public class PtSituationElementType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("quays")
-          .type(new GraphQLNonNull(new GraphQLList(quayType)))
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
             return ((TransitAlert) environment.getSource()).getEntities()
@@ -119,17 +122,35 @@ public class PtSituationElementType {
               .map(EntitySelector.Stop.class::cast)
               .map(EntitySelector.Stop::stopId)
               .map(transitService::getRegularStop)
+              .filter(Objects::nonNull)
               .collect(Collectors.toList());
           })
           .build()
       )
-      //                .field(GraphQLFieldDefinition.newFieldDefinition()
-      //                        .name("stopPlaces")
-      //                        .type(new GraphQLNonNull(new GraphQLList(stopPlaceType)))
-      //                        .dataFetcher(environment ->
-      //                                wrapInListUnlessNull(index.stationForId.get(((AlertPatch) environment.getSource()).getStop()))
-      //                        )
-      //                        .build())
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("stopPlaces")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopPlaceType))))
+          .dataFetcher(environment -> {
+            TransitService transitService = GqlUtil.getTransitService(environment);
+            return ((TransitAlert) environment.getSource()).getEntities()
+              .stream()
+              .filter(EntitySelector.Stop.class::isInstance)
+              .map(EntitySelector.Stop.class::cast)
+              .map(EntitySelector.Stop::stopId)
+              .map(transitService::getStationById)
+              .filter(Objects::nonNull)
+              .map(station ->
+                new MonoOrMultiModalStation(
+                  station,
+                  transitService.getMultiModalStationForStation(station)
+                )
+              )
+              .toList();
+          })
+          .build()
+      )
       //                .field(GraphQLFieldDefinition.newFieldDefinition()
       //                        .name("journeyPatterns")
       //                        .description("Get all journey patterns for this situation element")

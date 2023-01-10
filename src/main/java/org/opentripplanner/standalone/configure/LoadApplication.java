@@ -4,7 +4,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
-import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -47,7 +47,7 @@ public class LoadApplication {
 
   /** Construct application from serialized graph */
   public ConstructApplication appConstruction(SerializedGraphObject obj) {
-    return createAppConstruction(obj.graph, obj.transitModel, obj.worldEnvelopeModel);
+    return createAppConstruction(obj.graph, obj.transitModel, obj.worldEnvelopeRepository);
   }
 
   /** Construct application with an empty model. */
@@ -55,7 +55,7 @@ public class LoadApplication {
     return createAppConstruction(
       factory.emptyGraph(),
       factory.emptyTransitModel(),
-      factory.emptyWorldWorldEnvelopeModel()
+      factory.emptyWorldEnvelopeRepository()
     );
   }
 
@@ -73,13 +73,13 @@ public class LoadApplication {
   private ConstructApplication createAppConstruction(
     Graph graph,
     TransitModel transitModel,
-    WorldEnvelopeModel worldEnvelopeModel
+    WorldEnvelopeRepository worldEnvelopeRepository
   ) {
     return new ConstructApplication(
       cli,
       graph,
       transitModel,
-      worldEnvelopeModel,
+      worldEnvelopeRepository,
       config(),
       graphBuilderDataSources()
     );

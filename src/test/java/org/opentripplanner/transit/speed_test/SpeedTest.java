@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -21,7 +22,6 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
-import org.opentripplanner.service.worldenvelope.service.WorldEnvelopeModel;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -93,7 +93,7 @@ public class SpeedTest {
         new DefaultTransitService(transitModel),
         timer.getRegistry(),
         List::of,
-        new WorldEnvelopeModel(),
+        TestServerContext.createWorldEnvelopeService(),
         config.flexConfig,
         null,
         null

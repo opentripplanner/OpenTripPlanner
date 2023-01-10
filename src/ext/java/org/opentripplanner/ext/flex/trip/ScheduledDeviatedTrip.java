@@ -169,12 +169,22 @@ public class ScheduledDeviatedTrip
   }
 
   @Override
+  public int earliestDepartureTime(int stopIndex) {
+    return stopTimes[stopIndex].departureTime;
+  }
+
+  @Override
   public int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime) {
     int stopTime = MISSING_VALUE;
     for (int i = toStopIndex; stopTime == MISSING_VALUE && i < stopTimes.length; i++) {
       stopTime = stopTimes[i].arrivalTime;
     }
     return stopTime != MISSING_VALUE && stopTime <= arrivalTime ? stopTime : -1;
+  }
+
+  @Override
+  public int latestArrivalTime(int stopIndex) {
+    return stopTimes[stopIndex].arrivalTime;
   }
 
   @Override

@@ -26,6 +26,7 @@ have one of the following tag combinations:
 - `railway=station`
 - `railway=halt`
 - `amenity=bus_station`
+- `amenity=ferry_terminal`
 
 #### Notes
 
