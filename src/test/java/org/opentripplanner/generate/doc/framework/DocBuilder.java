@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,8 +20,16 @@ import org.opentripplanner.standalone.config.framework.json.EnumMapper;
 @SuppressWarnings("UnusedReturnValue")
 public class DocBuilder {
 
-  public static final ObjectMapper objectMapper = new ObjectMapper();
-  public static final DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
+  public static final ObjectWriter PRETTY_PRINTER;
+
+  static {
+    var mapper = new ObjectMapper();
+    mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    var pp = new DefaultPrettyPrinter();
+    pp.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
+    PRETTY_PRINTER = mapper.writer(pp);
+  }
+
   private final StringBuilder buffer = new StringBuilder();
 
   /**
@@ -135,9 +144,7 @@ public class DocBuilder {
 
   private static String prettyPrintJson(JsonNode body) {
     try {
-      objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-      prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
-      return objectMapper.writer(prettyPrinter).writeValueAsString(body);
+      return PRETTY_PRINTER.writeValueAsString(body);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
