@@ -739,7 +739,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         .stream()
         .filter(a -> a.getId().getFeedId().equals(tripId.getFeedId()))
         .filter(addedRouteExtension::matchesAgencyId)
-        .findFirst()
+        .findAny()
         .orElse(fallbackAgency);
 
       builder.withAgency(agency);
@@ -910,13 +910,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           .ifPresent(newTripTimes::updateWheelchairAccessibility);
       }
     }
-    final List<StopLocation> stops1 = pattern.getStops();
     LOG.trace(
       "Trip pattern added with mode {} on {} from {} to {}",
       trip.getRoute().getMode(),
       serviceDate,
-      stops1.get(1).getName(),
-      stops1.get(stops1.size() - 1).getName()
+      pattern.firstStop().getName(),
+      pattern.lastStop().getName()
     );
     // Add new trip times to the buffer
     return buffer.update(pattern, newTripTimes, serviceDate);
