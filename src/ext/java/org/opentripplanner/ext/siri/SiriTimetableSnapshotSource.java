@@ -164,11 +164,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public void applyVehicleMonitoring(
-    final TransitModel transitModel,
-    final SiriFuzzyTripMatcher fuzzyTripMatcher,
-    final String feedId,
-    final boolean fullDataset,
-    final List<VehicleMonitoringDeliveryStructure> updates
+    TransitModel transitModel,
+    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
+    EntityResolver entityResolver,
+    String feedId,
+    boolean fullDataset,
+    List<VehicleMonitoringDeliveryStructure> updates
   ) {
     if (updates == null) {
       LOG.warn("updates is null");
@@ -199,7 +200,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               fuzzyTripMatcher,
               activity,
               serviceDate,
-              feedId
+              entityResolver
             );
             if (handled) {
               handledCounter++;
@@ -250,11 +251,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public UpdateResult applyEstimatedTimetable(
-    final TransitModel transitModel,
-    @Nullable final SiriFuzzyTripMatcher fuzzyTripMatcher,
-    final String feedId,
-    final boolean fullDataset,
-    final List<EstimatedTimetableDeliveryStructure> updates
+    TransitModel transitModel,
+    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
+    EntityResolver entityResolver,
+    String feedId,
+    boolean fullDataset,
+    List<EstimatedTimetableDeliveryStructure> updates
   ) {
     if (updates == null) {
       LOG.warn("updates is null");
@@ -273,7 +275,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       for (EstimatedTimetableDeliveryStructure etDelivery : updates) {
-        var res = apply(etDelivery, transitModel, feedId, fuzzyTripMatcher);
+        var res = apply(etDelivery, transitModel, feedId, fuzzyTripMatcher, entityResolver);
         results.addAll(res);
       }
 
@@ -300,7 +302,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     EstimatedTimetableDeliveryStructure etDelivery,
     TransitModel transitModel,
     String feedId,
-    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher
+    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
+    EntityResolver entityResolver
   ) {
     List<Result<?, UpdateError>> results = new ArrayList<>();
     List<EstimatedVersionFrameStructure> estimatedJourneyVersions = etDelivery.getEstimatedJourneyVersionFrames();
@@ -326,7 +329,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             }
           } else {
             // Updated trip
-            var result = handleModifiedTrip(transitModel, fuzzyTripMatcher, feedId, journey);
+            var result = handleModifiedTrip(
+              transitModel,
+              fuzzyTripMatcher,
+              entityResolver,
+              feedId,
+              journey
+            );
             result.ifSuccess(ignored -> results.add(Result.success()));
             result.ifFailure(failures -> {
               failures.stream().map(Result::failure).forEach(results::add);
@@ -385,7 +394,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     SiriFuzzyTripMatcher fuzzyTripMatcher,
     VehicleActivityStructure activity,
     LocalDate serviceDate,
-    String feedId
+    EntityResolver entityResolver
   ) {
     if (activity.getValidUntilTime().isBefore(ZonedDateTime.now())) {
       //Activity has expired
@@ -408,7 +417,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    Set<Trip> trips = fuzzyTripMatcher.match(monitoredVehicleJourney, feedId);
+    Set<Trip> trips;
+    Trip serviceJourney = entityResolver.resolveTrip(monitoredVehicleJourney);
+    if (serviceJourney != null) {
+      trips = Set.of(serviceJourney);
+    } else {
+      trips = fuzzyTripMatcher.match(monitoredVehicleJourney, entityResolver);
+    }
 
     if (trips == null || trips.isEmpty()) {
       if (keepLogging) {
@@ -870,6 +885,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private Result<?, List<UpdateError>> handleModifiedTrip(
     TransitModel transitModel,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
+    EntityResolver entityResolver,
     String feedId,
     EstimatedVehicleJourney estimatedVehicleJourney
   ) {
@@ -909,11 +925,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Set<TripTimes> times = new HashSet<>();
     Set<TripPattern> patterns = new HashSet<>();
 
-    Trip tripMatchedByServiceJourneyId = SiriFuzzyTripMatcher.resolveVehicleJourneyRef(
-      estimatedVehicleJourney,
-      feedId,
-      transitService
-    );
+    Trip tripMatchedByServiceJourneyId = entityResolver.resolveTrip(estimatedVehicleJourney);
 
     if (tripMatchedByServiceJourneyId != null) {
       /*
@@ -944,7 +956,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
     } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
-      Set<Trip> trips = fuzzyTripMatcher.match(estimatedVehicleJourney, feedId);
+      Set<Trip> trips = fuzzyTripMatcher.match(estimatedVehicleJourney, entityResolver);
 
       if (trips == null || trips.isEmpty()) {
         LOG.debug(

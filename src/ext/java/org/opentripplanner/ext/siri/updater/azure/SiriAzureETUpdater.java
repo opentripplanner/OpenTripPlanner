@@ -122,6 +122,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         snapshotSource.applyEstimatedTimetable(
           transitModel,
           fuzzyTripMatcher(),
+          entityResolver(),
           feedId,
           false,
           updates
@@ -146,6 +147,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         var result = snapshotSource.applyEstimatedTimetable(
           transitModel,
           fuzzyTripMatcher(),
+          entityResolver(),
           feedId,
           false,
           updates
