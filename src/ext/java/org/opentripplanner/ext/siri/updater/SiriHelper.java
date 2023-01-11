@@ -2,6 +2,7 @@ package org.opentripplanner.ext.siri.updater;
 
 import jakarta.xml.bind.JAXBException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -104,7 +105,7 @@ public class SiriHelper {
     etRequest.setVersion("2.0");
 
     if (previewIntervalMillis > 0) {
-      etRequest.setPreviewInterval(datatypeFactory.newDuration(previewIntervalMillis));
+      etRequest.setPreviewInterval(Duration.ofMillis(previewIntervalMillis));
     }
 
     MessageQualifierStructure messageIdentifier = new MessageQualifierStructure();
