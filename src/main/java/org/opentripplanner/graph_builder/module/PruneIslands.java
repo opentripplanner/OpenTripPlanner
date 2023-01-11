@@ -68,12 +68,12 @@ public class PruneIslands implements GraphBuilderModule {
   /**
    * search radius as meters when looking for island neighbours
    */
-  private static double adaptivePruningDistance;
+  private double adaptivePruningDistance;
 
   /**
    * Coefficient how much larger islands (compared to max sizes defined above) get pruned if they are close enough
    */
-  private static double adaptivePruningFactor;
+  private double adaptivePruningFactor;
 
   public PruneIslands(
     Graph graph,
@@ -185,7 +185,7 @@ public class PruneIslands implements GraphBuilderModule {
           to noThruTraffic state. Remove traversal mode specific access from unreachable edges. Remove unconnected edges.
      */
 
-  private static void pruneIslands(
+  private void pruneIslands(
     Graph graph,
     VertexLinker vertexLinker,
     StreetIndex streetIndex,
@@ -262,7 +262,7 @@ public class PruneIslands implements GraphBuilderModule {
     LOG.info("Modified {} islands", count);
   }
 
-  private static int processIslands(
+  private int processIslands(
     Graph graph,
     VertexLinker vertexLinker,
     StreetIndex streetIndex,
