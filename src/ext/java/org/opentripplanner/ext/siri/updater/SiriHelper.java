@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.UUID;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.stream.XMLStreamException;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
@@ -22,16 +20,6 @@ import uk.org.siri.siri20.VehicleMonitoringRequestStructure;
 public class SiriHelper {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriHelper.class);
-
-  private static final DatatypeFactory datatypeFactory;
-
-  static {
-    try {
-      datatypeFactory = DatatypeFactory.newInstance();
-    } catch (DatatypeConfigurationException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   public static Siri unmarshal(InputStream is) throws JAXBException, XMLStreamException {
     return SiriXml.parseXml(is);
