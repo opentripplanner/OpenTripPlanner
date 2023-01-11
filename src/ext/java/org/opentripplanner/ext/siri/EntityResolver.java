@@ -3,6 +3,8 @@ package org.opentripplanner.ext.siri;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
@@ -32,6 +34,10 @@ public class EntityResolver {
     this.feedId = feedId;
   }
 
+  public FeedScopedId resolveId(String entityId) {
+    return new FeedScopedId(feedId, entityId);
+  }
+
   /**
    * Resolve a {@link Trip} either by resolving a service journey id from EstimatedVehicleJourney ->
    * FramedVehicleJourneyRef -> DatedVehicleJourneyRef or a dated service journey id from
@@ -46,7 +52,7 @@ public class EntityResolver {
     if (journey.getDatedVehicleJourneyRef() != null) {
       String datedServiceJourneyId = journey.getDatedVehicleJourneyRef().getValue();
       TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDateById(
-        new FeedScopedId(feedId, datedServiceJourneyId)
+        resolveId(datedServiceJourneyId)
       );
 
       if (tripOnServiceDate != null) {
@@ -76,7 +82,7 @@ public class EntityResolver {
   }
 
   public TripOnServiceDate resolveTripOnServiceDate(String datedServiceJourneyId) {
-    return resolveTripOnServiceDate(new FeedScopedId(feedId, datedServiceJourneyId));
+    return resolveTripOnServiceDate(resolveId(datedServiceJourneyId));
   }
 
   public TripOnServiceDate resolveTripOnServiceDate(
@@ -90,7 +96,7 @@ public class EntityResolver {
 
     return transitService.getTripOnServiceDateForTripAndDay(
       new TripIdAndServiceDate(
-        new FeedScopedId(feedId, framedVehicleJourney.getDatedVehicleJourneyRef()),
+        resolveId(framedVehicleJourney.getDatedVehicleJourneyRef()),
         serviceDate
       )
     );
@@ -105,11 +111,11 @@ public class EntityResolver {
   ) {
     DatedVehicleJourneyRef datedVehicleJourneyRef = estimatedVehicleJourney.getDatedVehicleJourneyRef();
     if (datedVehicleJourneyRef != null) {
-      return new FeedScopedId(feedId, datedVehicleJourneyRef.getValue());
+      return resolveId(datedVehicleJourneyRef.getValue());
     }
 
     if (estimatedVehicleJourney.getEstimatedVehicleJourneyCode() != null) {
-      return new FeedScopedId(feedId, estimatedVehicleJourney.getEstimatedVehicleJourneyCode());
+      return resolveId(estimatedVehicleJourney.getEstimatedVehicleJourneyCode());
     }
 
     return null;
@@ -136,7 +142,7 @@ public class EntityResolver {
   public Trip resolveTrip(FramedVehicleJourneyRefStructure journey) {
     if (journey != null) {
       String serviceJourneyId = journey.getDatedVehicleJourneyRef();
-      return transitService.getTripForId(new FeedScopedId(feedId, serviceJourneyId));
+      return transitService.getTripForId(resolveId(serviceJourneyId));
     }
     return null;
   }
@@ -145,6 +151,17 @@ public class EntityResolver {
    * Resolve a {@link RegularStop} from a quay id.
    */
   public RegularStop resolveQuay(String quayRef) {
-    return transitService.getRegularStop(new FeedScopedId(feedId, quayRef));
+    return transitService.getRegularStop(resolveId(quayRef));
+  }
+
+  /**
+   * Resolve a {@link Route} from a line id.
+   */
+  public Route resolveRoute(String lineRef) {
+    return transitService.getRouteForId(resolveId(lineRef));
+  }
+
+  public Operator resolveOperator(String operatorRef) {
+    return transitService.getOperatorForId(resolveId(operatorRef));
   }
 }

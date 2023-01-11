@@ -273,7 +273,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       for (EstimatedTimetableDeliveryStructure etDelivery : updates) {
-        var res = apply(etDelivery, transitModel, feedId, fuzzyTripMatcher, entityResolver);
+        var res = apply(etDelivery, transitModel, fuzzyTripMatcher, entityResolver);
         results.addAll(res);
       }
 
@@ -299,7 +299,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private List<Result<?, UpdateError>> apply(
     EstimatedTimetableDeliveryStructure etDelivery,
     TransitModel transitModel,
-    String feedId,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver
   ) {
@@ -314,12 +313,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           if (isReplacementDeparture(journey, entityResolver)) {
             // Added trip
             try {
-              Result<?, UpdateError> res = handleAddedTrip(
-                transitModel,
-                feedId,
-                journey,
-                entityResolver
-              );
+              Result<?, UpdateError> res = handleAddedTrip(transitModel, journey, entityResolver);
               results.add(res);
             } catch (Throwable t) {
               // Since this is work in progress - catch everything to continue processing updates
@@ -507,7 +501,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private Result<?, UpdateError> handleAddedTrip(
     TransitModel transitModel,
-    String feedId,
     EstimatedVehicleJourney estimatedVehicleJourney,
     EntityResolver entityResolver
   ) {
@@ -532,17 +525,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       externalLineRef = lineRef;
     }
 
-    Operator operator = transitModel
-      .getTransitModelIndex()
-      .getOperatorForId()
-      .get(new FeedScopedId(feedId, operatorRef));
-
-    FeedScopedId tripId = new FeedScopedId(feedId, newServiceJourneyRef);
-
-    Route replacedRoute = getReplacedRoute(transitModel, feedId, externalLineRef);
-
-    FeedScopedId routeId = new FeedScopedId(feedId, lineRef);
-    Route route = transitModel.getTransitModelIndex().getRouteForId(routeId);
+    Operator operator = entityResolver.resolveOperator(operatorRef);
+    FeedScopedId tripId = entityResolver.resolveId(newServiceJourneyRef);
+    Route replacedRoute = entityResolver.resolveRoute(externalLineRef);
+    Route route = entityResolver.resolveRoute(lineRef);
 
     Mode transitMode = AddedTripHelper.getTransitMode(
       estimatedVehicleJourney.getVehicleModes(),
@@ -556,10 +542,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           estimatedVehicleJourney.getPublishedLineNames(),
           operator,
           replacedRoute,
-          routeId,
+          entityResolver.resolveId(lineRef),
           transitMode
         );
-      LOG.info("Adding route {} to transitModel.", routeId);
+      LOG.info("Adding route {} to transitModel.", route);
       transitModel.getTransitModelIndex().addRoutes(route);
     }
 
@@ -613,27 +599,25 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     int stopSequence = 0;
     stopSequence =
       handleRecordedCalls(
-        transitModel,
-        feedId,
         trip,
         addedStops,
         aimedStopTimes,
         recordedCalls,
         numStops,
         departureDate,
-        stopSequence
+        stopSequence,
+        entityResolver
       );
 
     handleEstimatedCalls(
-      transitModel,
-      feedId,
       trip,
       addedStops,
       aimedStopTimes,
       estimatedCalls,
       numStops,
       departureDate,
-      stopSequence
+      stopSequence,
+      entityResolver
     );
 
     StopPattern stopPattern = new StopPattern(aimedStopTimes);
@@ -727,18 +711,17 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private void handleEstimatedCalls(
-    TransitModel transitModel,
-    String feedId,
     Trip trip,
     List<StopLocation> addedStops,
     List<StopTime> aimedStopTimes,
     List<EstimatedCall> estimatedCalls,
     int numStops,
     ZonedDateTime departureDate,
-    int stopSequence
+    int stopSequence,
+    EntityResolver entityResolver
   ) {
     for (EstimatedCall estimatedCall : estimatedCalls) {
-      var stop = getStopForStopId(transitModel, feedId, estimatedCall.getStopPointRef().getValue());
+      var stop = entityResolver.resolveQuay(estimatedCall.getStopPointRef().getValue());
 
       // Update destination display
       String destinationDisplay = AddedTripHelper.getFirstNameFromList(
@@ -804,18 +787,17 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private int handleRecordedCalls(
-    TransitModel transitModel,
-    String feedId,
     Trip trip,
     List<StopLocation> addedStops,
     List<StopTime> aimedStopTimes,
     List<RecordedCall> recordedCalls,
     int numStops,
     ZonedDateTime departureDate,
-    int stopSequence
+    int stopSequence,
+    EntityResolver entityResolver
   ) {
     for (RecordedCall recordedCall : recordedCalls) {
-      var stop = getStopForStopId(transitModel, feedId, recordedCall.getStopPointRef().getValue());
+      var stop = entityResolver.resolveQuay(recordedCall.getStopPointRef().getValue());
       StopTime stopTime = createStopTime(
         trip,
         numStops,
@@ -859,16 +841,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       i,
       numStops
     );
-  }
-
-  private StopLocation getStopForStopId(TransitModel transitModel, String feedId, String id) {
-    return transitModel.getStopLocationById(new FeedScopedId(feedId, id));
-  }
-
-  private Route getReplacedRoute(TransitModel transitModel, String feedId, String externalLineRef) {
-    return externalLineRef != null
-      ? transitModel.getTransitModelIndex().getRouteForId(new FeedScopedId(feedId, externalLineRef))
-      : null;
   }
 
   private Result<?, List<UpdateError>> handleModifiedTrip(

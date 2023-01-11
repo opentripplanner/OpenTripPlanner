@@ -73,8 +73,6 @@ public class AddedTripHelper {
     return routeBuilder.build();
   }
 
-  public static void getStopTime(StopLocation stop) {}
-
   public static String getFirstNameFromList(List<NaturalLanguageStringStructure> names) {
     if (isNotNullOrEmpty(names)) {
       return names.stream().findFirst().map(NaturalLanguageStringStructure::getValue).orElse("");
