@@ -110,12 +110,9 @@ public class SiriFuzzyTripMatcher {
     }
 
     if (trips == null || trips.isEmpty()) {
-      String serviceJourneyId = resolveDatedVehicleJourneyRef(journey);
-      if (serviceJourneyId != null) {
-        Trip trip = transitService.getTripForId(new FeedScopedId(feedId, serviceJourneyId));
-        if (trip != null) {
-          trips = Set.of(trip);
-        }
+      Trip serviceJourney = resolveVehicleJourneyRef(journey, feedId, transitService);
+      if (serviceJourney != null) {
+        trips = Set.of(serviceJourney);
       }
     }
     if (trips == null || trips.isEmpty()) {
@@ -177,26 +174,30 @@ public class SiriFuzzyTripMatcher {
     return matches;
   }
 
-  static Trip findTripByDatedVehicleJourneyRef(
+  static Trip resolveVehicleJourneyRef(
     EstimatedVehicleJourney journey,
     String feedId,
     TransitService transitService
   ) {
-    String serviceJourneyId = resolveDatedVehicleJourneyRef(journey);
-    if (serviceJourneyId != null) {
+    if (journey.getFramedVehicleJourneyRef() != null) {
+      String serviceJourneyId = journey.getFramedVehicleJourneyRef().getDatedVehicleJourneyRef();
       Trip trip = transitService.getTripForId(new FeedScopedId(feedId, serviceJourneyId));
       if (trip != null) {
         return trip;
-      } else {
-        //Attempt to find trip using datedServiceJourneyId
-        TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDateById(
-          new FeedScopedId(feedId, serviceJourneyId)
-        );
-        if (tripOnServiceDate != null) {
-          return tripOnServiceDate.getTrip();
-        }
       }
     }
+
+    if (journey.getDatedVehicleJourneyRef() != null) {
+      String datedServiceJourneyId = journey.getDatedVehicleJourneyRef().getValue();
+      TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDateById(
+        new FeedScopedId(feedId, datedServiceJourneyId)
+      );
+
+      if (tripOnServiceDate != null) {
+        return tripOnServiceDate.getTrip();
+      }
+    }
+
     return null;
   }
 
@@ -237,16 +238,6 @@ public class SiriFuzzyTripMatcher {
 
   private static String createStartStopKey(String lastStopId, int lastStopArrivalTime) {
     return lastStopId + ":" + lastStopArrivalTime;
-  }
-
-  private static String resolveDatedVehicleJourneyRef(EstimatedVehicleJourney journey) {
-    if (journey.getFramedVehicleJourneyRef() != null) {
-      return journey.getFramedVehicleJourneyRef().getDatedVehicleJourneyRef();
-    } else if (journey.getDatedVehicleJourneyRef() != null) {
-      return journey.getDatedVehicleJourneyRef().getValue();
-    }
-
-    return null;
   }
 
   private Set<Trip> getMatchingTripsOnStopOrSiblings(

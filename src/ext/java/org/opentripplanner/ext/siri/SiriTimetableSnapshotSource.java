@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -250,7 +251,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   public UpdateResult applyEstimatedTimetable(
     final TransitModel transitModel,
-    final SiriFuzzyTripMatcher fuzzyTripMatcher,
+    @Nullable final SiriFuzzyTripMatcher fuzzyTripMatcher,
     final String feedId,
     final boolean fullDataset,
     final List<EstimatedTimetableDeliveryStructure> updates
@@ -299,7 +300,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     EstimatedTimetableDeliveryStructure etDelivery,
     TransitModel transitModel,
     String feedId,
-    SiriFuzzyTripMatcher fuzzyTripMatcher
+    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher
   ) {
     List<Result<?, UpdateError>> results = new ArrayList<>();
     List<EstimatedVersionFrameStructure> estimatedJourneyVersions = etDelivery.getEstimatedJourneyVersionFrames();
@@ -868,7 +869,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private Result<?, List<UpdateError>> handleModifiedTrip(
     TransitModel transitModel,
-    SiriFuzzyTripMatcher fuzzyTripMatcher,
+    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     String feedId,
     EstimatedVehicleJourney estimatedVehicleJourney
   ) {
@@ -908,7 +909,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Set<TripTimes> times = new HashSet<>();
     Set<TripPattern> patterns = new HashSet<>();
 
-    Trip tripMatchedByServiceJourneyId = SiriFuzzyTripMatcher.findTripByDatedVehicleJourneyRef(
+    Trip tripMatchedByServiceJourneyId = SiriFuzzyTripMatcher.resolveVehicleJourneyRef(
       estimatedVehicleJourney,
       feedId,
       transitService
