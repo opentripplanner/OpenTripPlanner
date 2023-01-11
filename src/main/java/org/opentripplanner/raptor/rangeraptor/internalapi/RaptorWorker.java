@@ -11,7 +11,7 @@ import org.opentripplanner.raptor.api.response.StopArrivals;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface Worker<T extends RaptorTripSchedule> {
+public interface RaptorWorker<T extends RaptorTripSchedule> {
   /**
    * Perform the routing request.
    *

@@ -6,10 +6,10 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.StopArrivals;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
-import org.opentripplanner.raptor.rangeraptor.internalapi.Worker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
@@ -46,7 +46,8 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 @SuppressWarnings("Duplicates")
-public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Worker<T> {
+public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
+  implements RaptorWorker<T> {
 
   private final RoutingStrategy<T> transitWorker;
 
@@ -86,7 +87,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
   // TODO: this is meaningful only for time-based strategies
   private int iterationDepartureTime;
 
-  public RangeRaptorWorker(
+  public DefaultRangeRaptorWorker(
     WorkerState<T> state,
     RoutingStrategy<T> transitWorker,
     RaptorTransitDataProvider<T> transitData,

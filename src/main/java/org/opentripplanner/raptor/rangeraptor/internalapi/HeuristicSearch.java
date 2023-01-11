@@ -13,11 +13,11 @@ import org.opentripplanner.raptor.api.response.StopArrivals;
  */
 public class HeuristicSearch<T extends RaptorTripSchedule> {
 
-  private final Worker<T> worker;
+  private final RaptorWorker<T> raptorWorker;
   private final Heuristics heuristics;
 
-  public HeuristicSearch(Worker<T> worker, Heuristics heuristics) {
-    this.worker = worker;
+  public HeuristicSearch(RaptorWorker<T> raptorWorker, Heuristics heuristics) {
+    this.raptorWorker = raptorWorker;
     this.heuristics = heuristics;
   }
 
@@ -26,15 +26,15 @@ public class HeuristicSearch<T extends RaptorTripSchedule> {
   }
 
   public void route() {
-    worker.route();
+    raptorWorker.route();
   }
 
   public Collection<RaptorPath<T>> paths() {
-    return worker.paths();
+    return raptorWorker.paths();
   }
 
   public StopArrivals stopArrivals() {
-    return worker.stopArrivals();
+    return raptorWorker.stopArrivals();
   }
 
   public boolean destinationReached() {

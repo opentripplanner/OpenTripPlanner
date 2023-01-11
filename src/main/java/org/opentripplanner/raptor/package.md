@@ -269,11 +269,11 @@ Some important notes on the diagram above:
 - The path(itinerary) mapping process should swap the parts between to _stop-arrivals_ into an  
   intuitive order seen from a user perspective, this may include time-shifting access or egress.
 - The _wait_ after the access and before the egress leg should be removed by the itinerary mapper.
-- In a _reverse-search_ the `Worker` code is the same - the exact same algorithm implementation is
-  used. To be able to do this, a special _reverse_ `TransitCalculator`, `SlackProvider` and
-  `TripScheduleSearch` is injected into the `RaptorWorker`. The terminology in the diagram above is
-  the terminology used in the algorithm (`worker`). For example the _board-time_ and _alight-time_
-  is swapped, compared with the `RaptorTripSchedule` in the _transit-layer_.
+- In a _reverse-search_ the `RaptorWorker` code is the same - the exact same algorithm 
+  implementation is used. To be able to do this, a special _reverse_ `TransitCalculator`, 
+  `SlackProvider` and `TripScheduleSearch` is injected into the `RaptorWorker`. The terminology in
+  the diagram above is  the terminology used in the algorithm. For example the  _board-time_ and 
+  _alight-time_  is swapped, compared with the `RaptorTripSchedule` in the _transit-layer_.
     - So be aware that the `ReverseSearchTransitCalculator` have some awkward variable names -
       depending on the point-of-view.
     - The `TripScheduleAlightSearch` search the _alight-times_ and return it as a _board-time_.
@@ -284,7 +284,7 @@ The _transfer-slack_ is incorporated into the _board-slack_, instead of being ap
 transfer for the following reasons:
 
 - It is valid to do so. The Raptor algorithm branching happens at _stop-arrivals_ where the arrivals
-  are compared. Therefore it is important that the comparison is fare. You can arrive at a stop by
+  are compared. Therefore, it is important that the comparison is fare. You can arrive at a stop by
   access/transfer or transit. So, because the _transfer-slack_ is constant we can safely remove it
   from transfer-arrivals at a particular stop and add it to all transit-legs leaving from the same
   stop.

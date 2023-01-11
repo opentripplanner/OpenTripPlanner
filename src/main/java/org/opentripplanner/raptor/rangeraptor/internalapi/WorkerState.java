@@ -7,11 +7,11 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.StopArrivals;
-import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
 import org.opentripplanner.raptor.spi.IntIterator;
 
 /**
- * The contract the state must implement for the {@link RangeRaptorWorker} to do its job. This
+ * The contract the state must implement for the {@link DefaultRangeRaptorWorker} to do its job. This
  * allows us to mix workers and states to implement different versions of the algorithm like
  * Standard, Standard-reversed and multi-criteria and use this with different states keeping only
  * the information needed by the use-case. Some example use-cases are calculating heuristics,

@@ -4,8 +4,8 @@ import java.util.function.BiFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
-import org.opentripplanner.raptor.rangeraptor.internalapi.Worker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McStopArrivals;
@@ -34,9 +34,9 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   /**
    * Create new multi-criteria worker with optional heuristics.
    */
-  public Worker<T> createWorker(
+  public RaptorWorker<T> createWorker(
     Heuristics heuristics,
-    BiFunction<WorkerState<T>, RoutingStrategy<T>, Worker<T>> createWorker
+    BiFunction<WorkerState<T>, RoutingStrategy<T>, RaptorWorker<T>> createWorker
   ) {
     McRangeRaptorWorkerState<T> state = createState(heuristics);
     return createWorker.apply(state, createTransitWorkerStrategy(state));

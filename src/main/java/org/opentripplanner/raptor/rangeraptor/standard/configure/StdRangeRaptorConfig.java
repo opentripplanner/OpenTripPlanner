@@ -7,8 +7,8 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicSearch;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
-import org.opentripplanner.raptor.rangeraptor.internalapi.Worker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
@@ -60,7 +60,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
    * not be added to the worker lifecycle and fails.
    */
   public HeuristicSearch<T> createHeuristicSearch(
-    BiFunction<WorkerState<T>, RoutingStrategy<T>, Worker<T>> createWorker,
+    BiFunction<WorkerState<T>, RoutingStrategy<T>, RaptorWorker<T>> createWorker,
     CostCalculator<T> costCalculator
   ) {
     StdRangeRaptorWorkerState<T> state = createState();
@@ -71,8 +71,8 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     );
   }
 
-  public Worker<T> createSearch(
-    BiFunction<WorkerState<T>, RoutingStrategy<T>, Worker<T>> createWorker
+  public RaptorWorker<T> createSearch(
+    BiFunction<WorkerState<T>, RoutingStrategy<T>, RaptorWorker<T>> createWorker
   ) {
     StdRangeRaptorWorkerState<T> state = createState();
     return createWorker.apply(state, createWorkerStrategy(state));
