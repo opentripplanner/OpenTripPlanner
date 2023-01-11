@@ -1,9 +1,9 @@
 package org.opentripplanner.standalone.server;
 
+import jakarta.ws.rs.core.Application;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
-import javax.ws.rs.core.Application;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpHandler;
