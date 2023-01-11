@@ -19,7 +19,7 @@ import org.opentripplanner.raptor.spi.IntIterator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface WorkerState<T extends RaptorTripSchedule> {
+public interface RaptorWorkerState<T extends RaptorTripSchedule> {
   /** Used to signal iteration termination, no more paths can be found for this iteration. */
   boolean isNewRoundAvailable();
 

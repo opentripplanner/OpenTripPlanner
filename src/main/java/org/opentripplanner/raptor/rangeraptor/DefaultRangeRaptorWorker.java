@@ -7,10 +7,10 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.StopArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
-import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
@@ -60,7 +60,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
    * object-oriented approach. There were no performance differences(=> GC is not the bottle neck),
    * so we dropped the integer array implementation.
    */
-  private final WorkerState<T> state;
+  private final RaptorWorkerState<T> state;
 
   /**
    * The round tracker keep track for the current Raptor round, and abort the search if the round
@@ -88,7 +88,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
   private int iterationDepartureTime;
 
   public DefaultRangeRaptorWorker(
-    WorkerState<T> state,
+    RaptorWorkerState<T> state,
     RoutingStrategy<T> transitWorker,
     RaptorTransitDataProvider<T> transitData,
     SlackProvider slackProvider,

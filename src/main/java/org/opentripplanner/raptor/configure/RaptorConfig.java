@@ -11,8 +11,8 @@ import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicSearch;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
-import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
@@ -95,7 +95,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
 
   private RaptorWorker<T> createWorker(
     SearchContext<T> ctx,
-    WorkerState<T> workerState,
+    RaptorWorkerState<T> workerState,
     RoutingStrategy<T> routingStrategy
   ) {
     return new DefaultRangeRaptorWorker<>(

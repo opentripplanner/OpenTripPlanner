@@ -9,8 +9,8 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.StopArrivals;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
-import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
@@ -32,7 +32,7 @@ import org.opentripplanner.raptor.spi.IntIterator;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
-  implements WorkerState<T> {
+  implements RaptorWorkerState<T> {
 
   private final McStopArrivals<T> arrivals;
   private final DestinationArrivalPaths<T> paths;

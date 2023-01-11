@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.standard;
 
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
-import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 
 /**
  * This interface define the methods used be the {@link ArrivalTimeRoutingStrategy} to query and
@@ -10,7 +10,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface StdWorkerState<T extends RaptorTripSchedule> extends WorkerState<T> {
+public interface StdWorkerState<T extends RaptorTripSchedule> extends RaptorWorkerState<T> {
   /**
    * Return the best time at the given stop found in the last round. This is used to find the right
    * trip to board in the current round.
