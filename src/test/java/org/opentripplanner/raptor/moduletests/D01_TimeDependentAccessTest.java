@@ -328,4 +328,17 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
       pathsToString(response)
     );
   }
+
+  @Test
+  public void closed() {
+    requestBuilder
+      .profile(RaptorProfile.MULTI_CRITERIA)
+      .searchParams()
+      .searchWindow(Duration.ofDays(2))
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, T00_01, T00_00));
+
+    var response = raptorService.route(requestBuilder.build(), data);
+
+    assertEquals(0, response.paths().size());
+  }
 }

@@ -34,6 +34,10 @@ public class ParetoSetWithMarker<T> extends ParetoSet<T> {
     }
   }
 
+  public boolean hasElementsAfterMarker() {
+    return marker != size();
+  }
+
   /**
    * List all elements added after the marker.
    */
