@@ -3,10 +3,10 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
+import jakarta.xml.bind.JAXBElement;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LineStringType;
 import org.junit.jupiter.api.Test;

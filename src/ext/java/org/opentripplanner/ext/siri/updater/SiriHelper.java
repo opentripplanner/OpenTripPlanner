@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.siri.updater;
 
+import jakarta.xml.bind.JAXBException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.UUID;
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.stream.XMLStreamException;

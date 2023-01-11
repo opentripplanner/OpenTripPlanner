@@ -1,10 +1,10 @@
 package org.opentripplanner.model.calendar.openinghours;
 
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Objects;
-import javax.inject.Inject;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.standalone.config.api.TransitServicePeriod;
 import org.opentripplanner.transit.model.framework.Deduplicator;
