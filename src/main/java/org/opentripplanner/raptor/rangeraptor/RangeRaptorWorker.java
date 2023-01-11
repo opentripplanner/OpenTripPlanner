@@ -28,7 +28,7 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
  * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,”
  * January 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
  * <p>
- * This version support the following features:
+ * This version supports the following features:
  * <ul>
  *     <li>Raptor (R)
  *     <li>Range Raptor (RR)
