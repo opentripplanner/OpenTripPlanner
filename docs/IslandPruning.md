@@ -54,7 +54,7 @@ Pruning uses four parameters and some heuristics to decide if disconnected sub g
 - adaptivePruningDistance defines search radius as meters when estimating distance between graphs (default value 250)
 
 Pruning thresholds are increased adaptively so that if distance between examined sub graph and other graph is zero, the threshold is multiplied by a full adaptivePruningFactor value.
-The idea is that if a sub graph is closely entangled with another graph, it is likely to be harmful modeling error, not a remote place like a true geographic island.
+The idea is that if a sub graph is closely entangled with another graph, it is likely to be a harmful modeling error, not a remote place like a true geographic island.
 If distance is more than adaptivePruningDistance, the actual nominal threshold values will be used. So, adaptiveness prunes much larger disconnected graphs in places where they
 have potential to cause routing errors.
 
