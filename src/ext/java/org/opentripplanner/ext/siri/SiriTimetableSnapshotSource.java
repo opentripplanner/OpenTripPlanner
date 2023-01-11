@@ -20,7 +20,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
@@ -47,17 +46,16 @@ import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.trip.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.EstimatedVersionFrameStructure;
-import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
 import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityCancellationStructure;
 import uk.org.siri.siri20.VehicleActivityStructure;
+import uk.org.siri.siri20.VehicleJourneyRef;
 import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
 
 /**
@@ -313,10 +311,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         List<EstimatedVehicleJourney> journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
         LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
         for (EstimatedVehicleJourney journey : journeys) {
-          if (isReplacementDeparture(journey, feedId)) {
+          if (isReplacementDeparture(journey, entityResolver)) {
             // Added trip
             try {
-              Result<?, UpdateError> res = handleAddedTrip(transitModel, feedId, journey);
+              Result<?, UpdateError> res = handleAddedTrip(
+                transitModel,
+                feedId,
+                journey,
+                entityResolver
+              );
               results.add(res);
             } catch (Throwable t) {
               // Since this is work in progress - catch everything to continue processing updates
@@ -333,7 +336,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               transitModel,
               fuzzyTripMatcher,
               entityResolver,
-              feedId,
               journey
             );
             result.ifSuccess(ignored -> results.add(Result.success()));
@@ -354,23 +356,19 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Check if VehicleJourney is an replacement departure according to SIRI-ET requirements.
+   * Check if VehicleJourney is a replacement departure according to SIRI-ET requirements.
    */
-  private boolean isReplacementDeparture(EstimatedVehicleJourney vehicleJourney, String feedId) {
+  private boolean isReplacementDeparture(
+    EstimatedVehicleJourney vehicleJourney,
+    EntityResolver entityResolver
+  ) {
     // Replacement departure only if ExtraJourney is true
     if (!Optional.ofNullable(vehicleJourney.isExtraJourney()).orElse(false)) {
       return false;
     }
 
     // If Trip exists by DatedServiceJourney then this is not replacement departure
-    var datedServiceJourneyId = resolveDatedServiceJourneyId(vehicleJourney);
-    return datedServiceJourneyId
-      .map(dsjId ->
-        getTimetableSnapshot()
-          .getRealtimeAddedTripOnServiceDate()
-          .containsKey(new FeedScopedId(feedId, dsjId))
-      )
-      .orElse(false);
+    return entityResolver.resolveTripOnServiceDate(vehicleJourney) != null;
   }
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
@@ -510,7 +508,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private Result<?, UpdateError> handleAddedTrip(
     TransitModel transitModel,
     String feedId,
-    EstimatedVehicleJourney estimatedVehicleJourney
+    EstimatedVehicleJourney estimatedVehicleJourney,
+    EntityResolver entityResolver
   ) {
     // Verifying values required in SIRI Profile
 
@@ -716,14 +715,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     /* commit */
     return addTripToGraphAndBuffer(
-      feedId,
       transitModel,
       trip,
       aimedStopTimes,
       addedStops,
       tripTimes,
       serviceDate,
-      estimatedVehicleJourney
+      estimatedVehicleJourney,
+      entityResolver
     );
   }
 
@@ -876,7 +875,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     TransitModel transitModel,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
-    String feedId,
     EstimatedVehicleJourney estimatedVehicleJourney
   ) {
     //Check if EstimatedVehicleJourney is reported as NOT monitored
@@ -1030,14 +1028,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             } else {
               // Add new trip
               addTripToGraphAndBuffer(
-                feedId,
                 transitModel,
                 trip,
                 modifiedStopTimes,
                 modifiedStops,
                 tripTimes,
                 serviceDate,
-                estimatedVehicleJourney
+                estimatedVehicleJourney,
+                entityResolver
               )
                 .ifFailure(errors::add);
             }
@@ -1106,14 +1104,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * Add a (new) trip to the transitModel and the buffer
    */
   private Result<?, UpdateError> addTripToGraphAndBuffer(
-    final String feedId,
     final TransitModel transitModel,
     final Trip trip,
     final List<StopTime> stopTimes,
     final List<StopLocation> stops,
     TripTimes updatedTripTimes,
     final LocalDate serviceDate,
-    EstimatedVehicleJourney estimatedVehicleJourney
+    EstimatedVehicleJourney estimatedVehicleJourney,
+    EntityResolver entityResolver
   ) {
     // Preconditions
     Objects.requireNonNull(stops);
@@ -1137,7 +1135,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     var result = buffer.update(pattern, updatedTripTimes, serviceDate);
 
     // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
-    addTripOnServiceDateToBuffer(trip, serviceDate, estimatedVehicleJourney, feedId);
+    addTripOnServiceDateToBuffer(trip, serviceDate, estimatedVehicleJourney, entityResolver);
 
     return result;
   }
@@ -1146,60 +1144,45 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Trip trip,
     LocalDate serviceDate,
     EstimatedVehicleJourney estimatedVehicleJourney,
-    String feedId
+    EntityResolver entityResolver
   ) {
-    var datedServiceJourney = resolveDatedServiceJourneyId(estimatedVehicleJourney);
+    var datedServiceJourneyId = entityResolver.resolveDatedServiceJourneyId(
+      estimatedVehicleJourney
+    );
 
-    datedServiceJourney.ifPresent(datedServiceJourneyId -> {
-      // VehicleJourneyRef is the reference to the serviceJourney being replaced.
-      var replacementRef = Optional.ofNullable(estimatedVehicleJourney.getVehicleJourneyRef());
-      List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
-      replacementRef.ifPresent(ref -> {
-        var id = new FeedScopedId(feedId, ref.getValue());
-        var replacedTrip = buffer.getRealtimeAddedTripOnServiceDate().get(id);
-        listOfReplacedVehicleJourneys.add(replacedTrip);
-      });
+    if (datedServiceJourneyId == null) {
+      return;
+    }
 
-      // Add additional replaced service journeys if present.
-      Optional
-        .ofNullable(estimatedVehicleJourney.getAdditionalVehicleJourneyReves())
-        .ifPresent(additionalVehicleJourneyReves -> {
-          additionalVehicleJourneyReves.forEach(vehicleJourneyRef -> {
-            var id = new FeedScopedId(feedId, vehicleJourneyRef.getDatedVehicleJourneyRef());
-            var replacedTrip = buffer.getRealtimeAddedTripOnServiceDate().get(id);
-            listOfReplacedVehicleJourneys.add(replacedTrip);
-          });
-        });
+    List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
 
-      buffer.addLastAddedTripOnServiceDate(
-        TripOnServiceDate
-          .of(new FeedScopedId(feedId, datedServiceJourneyId))
-          .withTrip(trip)
-          .withReplacementFor(listOfReplacedVehicleJourneys)
-          .withServiceDate(serviceDate)
-          .build()
+    // VehicleJourneyRef is the reference to the serviceJourney being replaced.
+    VehicleJourneyRef vehicleJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef();
+    if (vehicleJourneyRef != null) {
+      var replacedDatedServiceJourney = entityResolver.resolveTripOnServiceDate(
+        vehicleJourneyRef.getValue()
       );
-    });
-  }
+      if (replacedDatedServiceJourney != null) {
+        listOfReplacedVehicleJourneys.add(replacedDatedServiceJourney);
+      }
+    }
 
-  private Optional<String> resolveDatedServiceJourneyId(
-    EstimatedVehicleJourney estimatedVehicleJourney
-  ) {
-    // Fallback to FramedVehicleJourneyRef if DatedVehicleJourneyRef is not set
-    Supplier<Optional<String>> getFramedVehicleJourney = () ->
-      Optional
-        .ofNullable(estimatedVehicleJourney.getFramedVehicleJourneyRef())
-        .map(FramedVehicleJourneyRefStructure::getDatedVehicleJourneyRef);
+    // Add additional replaced service journeys if present.
+    estimatedVehicleJourney
+      .getAdditionalVehicleJourneyReves()
+      .stream()
+      .map(entityResolver::resolveTripOnServiceDate)
+      .filter(Objects::nonNull)
+      .forEach(listOfReplacedVehicleJourneys::add);
 
-    // Support for an added DatedServiceJourney ID.
-    Supplier<Optional<String>> getEstimatedVehicleJourneyCode = () ->
-      Optional.ofNullable(estimatedVehicleJourney.getEstimatedVehicleJourneyCode());
-
-    return Optional
-      .ofNullable(estimatedVehicleJourney.getDatedVehicleJourneyRef())
-      .map(DatedVehicleJourneyRef::getValue)
-      .or(getFramedVehicleJourney)
-      .or(getEstimatedVehicleJourneyCode);
+    buffer.addLastAddedTripOnServiceDate(
+      TripOnServiceDate
+        .of(datedServiceJourneyId)
+        .withTrip(trip)
+        .withReplacementFor(listOfReplacedVehicleJourneys)
+        .withServiceDate(serviceDate)
+        .build()
+    );
   }
 
   /**
