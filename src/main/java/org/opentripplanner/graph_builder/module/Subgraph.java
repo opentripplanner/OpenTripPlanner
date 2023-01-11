@@ -68,7 +68,7 @@ class Subgraph {
 
   // Estimate distance of a subgraph from other parts of the graph.
   // For speed reasons, graph geometry only within given search radius is considered.
-  // Distance is estimated using minimal vertex to verter search instead of computing
+  // Distance is estimated using minimal vertex to vertex search instead of computing
   // distances between graph edges. This is good enough for our heuristics.
   double distanceFromOtherGraph(StreetIndex index, double searchRadius) {
     Vertex v = getRepresentativeVertex();
