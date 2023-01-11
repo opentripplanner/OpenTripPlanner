@@ -1,7 +1,7 @@
 # Street graph pruning
 
-Street graph created from OpenStreetMap data has sections which cannot be reached with some or all traverse modes. For example,
-true geographic islands are usually disconnected from the main graph. Street network of such islands should be kept so that routing
+A street graph created from OpenStreetMap data has sections which cannot be reached with some or all traverse modes. For example,
+true geographic islands are usually disconnected from the main graph. The street network of such islands should be kept so that routing
 within the island or continuing from a ferry stop on it works as expected. Even a tiny street network connected to a ferry stop improves
 routing to an island a lot, because coordinate based itinerary searches find something to project onto.
 
@@ -13,8 +13,8 @@ region which cannot and should not be accessed when using door to door routing o
 of such graph sections is harmful, because start and end points of an itinerary search request may accidentally get projected to such a private pathway.
 As a result, user does not receive any itineraries and gets no explanation for the routing problem.
 
-In most cases, connectivity problems are caused by incorrect modeling of OSM data. The number of such erros is usually very large,
-and the problem cannot be solved  by simply fixing OSM data as soon as errors  get detected. OSM street network in Finland contains
+In most cases, connectivity problems are caused by incorrect modeling of OSM data. The number of such errors is usually very large,
+and the problem cannot be solved  by simply fixing OSM data as soon as errors  get detected. The OSM street network in Finland contains
 over 10 000 detected walk connectivity issues. An algorithmic solution is needed to address a problem of such magnitude.
 
 ![](images/osmislands.png)\
@@ -39,7 +39,7 @@ to have the same access properties.
 
 ![](images/nothruisland.png)\
 *Some regular (gray colored) streets are blocked behind access restricted (red colored) connections. Walk routing to them fails because it would be considered as pass through traffic.
-Image on the right shows that pruning added walk nothrough restricition to those streets, and routing works again.*
+The image on the right shows that pruning added walk nothrough restricition to those streets, and routing works again.*
 
 ## Pruning algorithm
 
@@ -54,7 +54,7 @@ Pruning uses four parameters and some heuristics to decide if disconnected sub g
 - adaptivePruningDistance defines search radius as meters when estimating distance between graphs (default value 250)
 
 Pruning thresholds are increased adaptively so that if distance between examined sub graph and other graph is zero, the threshold is multiplied by a full adaptivePruningFactor value.
-The idea is that if a sub graph is closely entangled with another graph, it is likely to be harmful modeling error, not a remote place like a true geographic island.
+The idea is that if a sub graph is closely entangled with another graph, it is likely to be a harmful modeling error, not a remote place like a true geographic island.
 If distance is more than adaptivePruningDistance, the actual nominal threshold values will be used. So, adaptiveness prunes much larger disconnected graphs in places where they
 have potential to cause routing errors.
 
