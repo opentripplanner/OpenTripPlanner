@@ -13,7 +13,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.graph_builder.issues.GraphIsland;
 import org.opentripplanner.graph_builder.issues.IsolatedStop;
-import org.opentripplanner.graph_builder.issues.PrunedIslandStop;
+import org.opentripplanner.graph_builder.issues.PrunedStopIsland;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -495,6 +495,7 @@ public class PruneIslands implements GraphBuilderModule {
     TraverseMode traverseMode,
     DataImportIssueStore issueStore
   ) {
+    int nothru = 0, removed = 0, restricted = 0;
     //iterate over the street vertex of the subgraph
     for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {
       Vertex v = vIter.next();
@@ -517,6 +518,7 @@ public class PruneIslands implements GraphBuilderModule {
                 pse.setWalkNoThruTraffic(true);
               }
               stats.put("noThru", stats.get("noThru") + 1);
+              nothru++;
             } else {
               StreetTraversalPermission permission = pse.getPermission();
               if (traverseMode == TraverseMode.CAR) {
@@ -531,9 +533,11 @@ public class PruneIslands implements GraphBuilderModule {
                 vertexLinker.removePermanentEdgeFromIndex(pse);
                 graph.removeEdge(pse);
                 stats.put("removed", stats.get("removed") + 1);
+                removed++;
               } else {
                 pse.setPermission(permission);
                 stats.put("restricted", stats.get("restricted") + 1);
+                restricted++;
               }
             }
           }
@@ -551,12 +555,13 @@ public class PruneIslands implements GraphBuilderModule {
       }
     }
 
-    //remove street connection form
     if (traverseMode == TraverseMode.WALK) {
       // note: do not unlink stop if only CAR mode is pruned
       // maybe this needs more logic for flex routing cases
+      List<String> stopLabels = new ArrayList<String>();
       for (Iterator<Vertex> vIter = island.stopIterator(); vIter.hasNext();) {
         Vertex v = vIter.next();
+        stopLabels.add(v.getLabel());
         Collection<Edge> edges = new ArrayList<>(v.getOutgoing());
         edges.addAll(v.getIncoming());
         for (Edge e : edges) {
@@ -564,10 +569,33 @@ public class PruneIslands implements GraphBuilderModule {
             graph.removeEdge(e);
           }
         }
-        issueStore.add(new PrunedIslandStop(v, island.streetSize(), island.stopSize()));
+      }
+      if (island.stopSize() > 0) {
+        // issue about stops that got unlinked in pruning
+        issueStore.add(
+          new PrunedStopIsland(
+            island.getRepresentativeVertex(),
+            island.streetSize(),
+            island.stopSize(),
+            nothru,
+            restricted,
+            removed,
+            String.join(", ", stopLabels)
+          )
+        );
       }
     }
-    issueStore.add(new GraphIsland(island.getRepresentativeVertex(), island.streetSize()));
+    issueStore.add(
+      new GraphIsland(
+        island.getRepresentativeVertex(),
+        island.streetSize(),
+        island.stopSize(),
+        nothru,
+        restricted,
+        removed,
+        traverseMode.name()
+      )
+    );
   }
 
   private static Subgraph computeConnectedSubgraph(
