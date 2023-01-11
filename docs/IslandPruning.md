@@ -14,7 +14,7 @@ of such graph sections is harmful, because start and end points of an itinerary 
 As a result, user does not receive any itineraries and gets no explanation for the routing problem.
 
 In most cases, connectivity problems are caused by incorrect modeling of OSM data. The number of such errors is usually very large,
-and the problem cannot be solved  by simply fixing OSM data as soon as errors  get detected. OSM street network in Finland contains
+and the problem cannot be solved  by simply fixing OSM data as soon as errors  get detected. The OSM street network in Finland contains
 over 10 000 detected walk connectivity issues. An algorithmic solution is needed to address a problem of such magnitude.
 
 ![](images/osmislands.png)\
