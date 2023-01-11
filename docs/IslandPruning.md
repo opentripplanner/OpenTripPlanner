@@ -1,6 +1,6 @@
 # Street graph pruning
 
-Street graph created from OpenStreetMap data has sections which cannot be reached with some or all traverse modes. For example,
+A street graph created from OpenStreetMap data has sections which cannot be reached with some or all traverse modes. For example,
 true geographic islands are usually disconnected from the main graph. Street network of such islands should be kept so that routing
 within the island or continuing from a ferry stop on it works as expected. Even a tiny street network connected to a ferry stop improves
 routing to an island a lot, because coordinate based itinerary searches find something to project onto.
