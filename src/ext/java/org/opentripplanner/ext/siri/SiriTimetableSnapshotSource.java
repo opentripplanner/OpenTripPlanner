@@ -184,7 +184,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       for (VehicleMonitoringDeliveryStructure vmDelivery : updates) {
-        LocalDate serviceDate = LocalDate.now(transitService.getTimeZone());
+        LocalDate serviceDate = LocalDate.now(timeZone);
 
         List<VehicleActivityStructure> activities = vmDelivery.getVehicleActivities();
         if (activities != null) {
@@ -1085,19 +1085,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private int calculateSecondsSinceMidnight(ZonedDateTime dateTime) {
-    return ServiceDateUtils.secondsSinceStartOfService(
-      dateTime,
-      dateTime,
-      transitService.getTimeZone()
-    );
+    return ServiceDateUtils.secondsSinceStartOfService(dateTime, dateTime, timeZone);
   }
 
   private int calculateSecondsSinceMidnight(ZonedDateTime startOfService, ZonedDateTime dateTime) {
-    return ServiceDateUtils.secondsSinceStartOfService(
-      startOfService,
-      dateTime,
-      transitService.getTimeZone()
-    );
+    return ServiceDateUtils.secondsSinceStartOfService(startOfService, dateTime, timeZone);
   }
 
   /**
@@ -1263,7 +1255,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     ZonedDateTime date = monitoredVehicleJourney.getOriginAimedDepartureTime();
     if (date == null) {
       //If no date is set - assume Realtime-data is reported for 'today'.
-      date = ZonedDateTime.now(transitService.getTimeZone());
+      date = ZonedDateTime.now(timeZone);
     }
     LocalDate realTimeReportedServiceDate = date.toLocalDate();
 
