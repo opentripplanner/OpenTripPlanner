@@ -13,7 +13,7 @@ region which cannot and should not be accessed when using door to door routing o
 of such graph sections is harmful, because start and end points of an itinerary search request may accidentally get projected to such a private pathway.
 As a result, user does not receive any itineraries and gets no explanation for the routing problem.
 
-In most cases, connectivity problems are caused by incorrect modeling of OSM data. The number of such erros is usually very large,
+In most cases, connectivity problems are caused by incorrect modeling of OSM data. The number of such errors is usually very large,
 and the problem cannot be solved  by simply fixing OSM data as soon as errors  get detected. OSM street network in Finland contains
 over 10 000 detected walk connectivity issues. An algorithmic solution is needed to address a problem of such magnitude.
 
