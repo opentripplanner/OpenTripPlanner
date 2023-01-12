@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.standalone.config.framework.json.EnumMapper;
+import org.opentripplanner.test.support.PrettyPrinter;
 
 /**
  * Builder for creating a new document

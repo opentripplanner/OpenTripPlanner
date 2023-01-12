@@ -15,9 +15,10 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.test.support.FilePatternSource;
+import org.opentripplanner.test.support.PrettyPrinter;
 
 @Execution(ExecutionMode.CONCURRENT)
-class HttpTest {
+class GraphQLApiTest {
 
   static OtpServerRequestContext context = new TestServerRequestContext();
   static LegacyGraphQLAPI resource = new LegacyGraphQLAPI(context, "");
@@ -37,7 +38,11 @@ class HttpTest {
       .resolve(path.getFileName().toString().replace(".graphql", ".json"));
 
     if (!expectationFile.toFile().exists()) {
-      Files.writeString(expectationFile, actualJson, StandardOpenOption.CREATE_NEW);
+      Files.writeString(
+        expectationFile,
+        PrettyPrinter.json(actualJson),
+        StandardOpenOption.CREATE_NEW
+      );
     }
 
     var expectedJson = Files.readString(expectationFile);
