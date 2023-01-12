@@ -1,8 +1,11 @@
 package org.opentripplanner.raptor._data.transit;
 
+import java.util.Arrays;
 import java.util.function.IntUnaryOperator;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.spi.SearchDirection;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.HeuristicTrip;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripSearchTimetable;
 
@@ -42,5 +45,10 @@ public class TestTripSearchTimetable implements TripSearchTimetable<TestTripSche
   @Override
   public RaptorTripScheduleSearch<TestTripSchedule> tripSearch(SearchDirection direction) {
     return TripScheduleSearchFactory.create(direction, this);
+  }
+
+  @Override
+  public RaptorTripSchedule getHeuristicTrip() {
+    return HeuristicTrip.of(Arrays.asList(trips));
   }
 }

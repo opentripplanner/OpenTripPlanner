@@ -56,6 +56,18 @@ public enum SpeedTestProfile {
     RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME,
     SearchDirection.REVERSE
   ),
+  min_travel_duration_best_time_and_cost(
+    "tbc",
+    "Best Time and Cost Range Raptor without waiting time.",
+    RaptorProfile.MIN_TRAVEL_DURATION_AND_COST_BEST_TIME,
+    SearchDirection.FORWARD
+  ),
+  min_travel_duration_best_time_and_cost_reverse(
+    "tbcr",
+    "Reverse Best Time and Cost Range Raptor without waiting time.",
+    RaptorProfile.MIN_TRAVEL_DURATION_AND_COST_BEST_TIME,
+    SearchDirection.REVERSE
+  ),
   mc_range_raptor(
     "mc",
     "Multi-Criteria Range Raptor [ transfers, arrival time, travel time, cost ].",

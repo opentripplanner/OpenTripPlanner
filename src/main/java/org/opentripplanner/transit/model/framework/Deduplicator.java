@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,15 +26,15 @@ public class Deduplicator implements Serializable {
   private static final String ZERO_COUNT = sizeAndCount(0, 0);
 
   private final Map<BitSet, BitSet> canonicalBitSets = new HashMap<>();
-  private final Map<IntArray, IntArray> canonicalIntArrays = new HashMap<>();
+  private final Map<IntArray, IntArray> canonicalIntArrays = new ConcurrentHashMap<>();
   private final Map<String, String> canonicalStrings = new HashMap<>();
   private final Map<StringArray, StringArray> canonicalStringArrays = new HashMap<>();
   private final Map<String2DArray, String2DArray> canonicalString2DArrays = new HashMap<>();
-  private final Map<Class<?>, Map<?, ?>> canonicalObjects = new HashMap<>();
+  private final Map<Class<?>, Map<?, ?>> canonicalObjects = new ConcurrentHashMap<>();
   private final Map<Class<?>, Map<?, ?>> canonicalObjArrays = new HashMap<>();
   private final Map<Class<?>, Map<List<?>, List<?>>> canonicalLists = new HashMap<>();
 
-  private final Map<String, Integer> effectCounter = new HashMap<>();
+  private final Map<String, Integer> effectCounter = new ConcurrentHashMap<>();
 
   @Inject
   public Deduplicator() {}
@@ -71,10 +72,9 @@ public class Deduplicator implements Serializable {
       return null;
     }
     IntArray intArray = new IntArray(original);
-    IntArray canonical = canonicalIntArrays.get(intArray);
+    IntArray canonical = canonicalIntArrays.putIfAbsent(intArray, intArray);
     if (canonical == null) {
       canonical = intArray;
-      canonicalIntArrays.put(canonical, canonical);
     }
     incrementEffectCounter(IntArray.class);
     return canonical.array;

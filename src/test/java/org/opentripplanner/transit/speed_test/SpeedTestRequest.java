@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.speed_test;
 
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
+import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_AND_COST_BEST_TIME;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
 
 import java.time.Duration;
@@ -62,7 +63,15 @@ public class SpeedTestRequest {
     request.setNumItineraries(opts.numOfItineraries());
     request.journey().setModes(input.modes());
 
-    if (profile.raptorProfile().isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
+    if (
+      profile
+        .raptorProfile()
+        .isOneOf(
+          MIN_TRAVEL_DURATION,
+          MIN_TRAVEL_DURATION_BEST_TIME,
+          MIN_TRAVEL_DURATION_AND_COST_BEST_TIME
+        )
+    ) {
       request.setSearchWindow(Duration.ZERO);
     }
 

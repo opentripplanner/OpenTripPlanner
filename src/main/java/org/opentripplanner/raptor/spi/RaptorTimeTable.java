@@ -28,4 +28,10 @@ public interface RaptorTimeTable<T extends RaptorTripSchedule> {
    * Factory method to create the trip search
    */
   RaptorTripScheduleSearch<T> tripSearch(SearchDirection direction);
+
+  /**
+   * Get a heuristic trip for this TimeTable, which represents the lower bound of travel and dwell
+   * times available in the pattern, but is unrelated to the actual schedule.
+   */
+  RaptorTripSchedule getHeuristicTrip();
 }

@@ -1,6 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.standard.configure;
 
 import java.util.function.BiFunction;
+import org.opentripplanner.raptor.heuristic.HeuristicRoutingStrategy;
+import org.opentripplanner.raptor.heuristic.TimeAndCostHeuristicState;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicSearch;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
@@ -60,10 +62,15 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     BiFunction<WorkerState<T>, RoutingStrategy<T>, Worker<T>> createWorker,
     CostCalculator<T> costCalculator
   ) {
-    StdRangeRaptorWorkerState<T> state = createState();
-    Heuristics heuristics = createHeuristicsAdapter(costCalculator);
+    StdWorkerState<T> state = createState();
+    Heuristics heuristics;
+    if (state instanceof TimeAndCostHeuristicState<T> heuristicState) {
+      heuristics = heuristicState.heuristics();
+    } else {
+      heuristics = createHeuristicsAdapter(costCalculator);
+    }
     return new HeuristicSearch<>(
-      createWorker.apply(state, createWorkerStrategy(state)),
+      createWorker.apply(state, createWorkerStrategy(state, costCalculator)),
       heuristics
     );
   }
@@ -71,26 +78,26 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   public Worker<T> createSearch(
     BiFunction<WorkerState<T>, RoutingStrategy<T>, Worker<T>> createWorker
   ) {
-    StdRangeRaptorWorkerState<T> state = createState();
-    return createWorker.apply(state, createWorkerStrategy(state));
+    StdWorkerState<T> state = createState();
+    return createWorker.apply(state, createWorkerStrategy(state, ctx.costCalculator()));
   }
 
   /* private factory methods */
 
-  private StdRangeRaptorWorkerState<T> createState() {
+  private StdWorkerState<T> createState() {
     new VerifyRequestIsValid(ctx).verify();
-    switch (ctx.profile()) {
-      case STANDARD:
-      case MIN_TRAVEL_DURATION:
-        return workerState(stdStopArrivalsState());
-      case BEST_TIME:
-      case MIN_TRAVEL_DURATION_BEST_TIME:
-        return workerState(bestTimeStopArrivalsState());
-    }
-    throw new IllegalArgumentException(ctx.profile().toString());
+    return switch (ctx.profile()) {
+      case STANDARD, MIN_TRAVEL_DURATION -> workerState(stdStopArrivalsState());
+      case BEST_TIME, MIN_TRAVEL_DURATION_BEST_TIME -> workerState(bestTimeStopArrivalsState());
+      case MIN_TRAVEL_DURATION_AND_COST_BEST_TIME -> heuristicWorkerState();
+      case MULTI_CRITERIA -> throw new IllegalArgumentException(ctx.profile().toString());
+    };
   }
 
-  private RoutingStrategy<T> createWorkerStrategy(StdWorkerState<T> state) {
+  private RoutingStrategy<T> createWorkerStrategy(
+    StdWorkerState<T> state,
+    CostCalculator<T> mcCostCalculator
+  ) {
     switch (ctx.profile()) {
       case STANDARD:
       case BEST_TIME:
@@ -105,6 +112,13 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
           state,
           ctx.createTimeBasedBoardingSupport(),
           ctx.calculator()
+        );
+      case MIN_TRAVEL_DURATION_AND_COST_BEST_TIME:
+        return new HeuristicRoutingStrategy<>(
+          state,
+          ctx.roundProvider(),
+          ctx.calculator(),
+          mcCostCalculator
         );
     }
     throw new IllegalArgumentException(ctx.profile().toString());
@@ -128,6 +142,15 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
       bestTimes(),
       stopArrivalsState,
       destinationCheck()
+    );
+  }
+
+  private TimeAndCostHeuristicState<T> heuristicWorkerState() {
+    return new TimeAndCostHeuristicState<>(
+      ctx.egressStops(),
+      ctx.nStops(),
+      ctx.roundProvider(),
+      ctx.lifeCycle()
     );
   }
 

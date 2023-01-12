@@ -51,6 +51,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
    * The date on which the last trip arrives.
    */
   private final LocalDate endOfRunningPeriod;
+  private final HeuristicTrip heuristicTrip;
 
   public TripPatternForDate(
     RoutingTripPattern tripPattern,
@@ -62,6 +63,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     this.tripTimes = tripTimes.toArray(new TripTimes[0]);
     this.frequencies = frequencies.toArray(new FrequencyEntry[0]);
     this.localDate = localDate;
+    this.heuristicTrip = HeuristicTrip.of(this);
 
     // TODO: We expect a pattern only containing trips or frequencies, fix ability to merge
     if (hasFrequencies()) {
@@ -141,6 +143,10 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
   public boolean hasFrequencies() {
     return frequencies.length != 0;
+  }
+
+  public HeuristicTrip heuristicTrip() {
+    return heuristicTrip;
   }
 
   @Override
