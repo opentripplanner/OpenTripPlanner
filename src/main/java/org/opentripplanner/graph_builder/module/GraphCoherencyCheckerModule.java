@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;

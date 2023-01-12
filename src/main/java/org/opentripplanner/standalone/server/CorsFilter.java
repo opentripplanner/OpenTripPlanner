@@ -1,13 +1,13 @@
 package org.opentripplanner.standalone.server;
 
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import java.io.IOException;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 /**
  * The Same Origin Policy states that JavaScript code (or other scripts) running on a web page may

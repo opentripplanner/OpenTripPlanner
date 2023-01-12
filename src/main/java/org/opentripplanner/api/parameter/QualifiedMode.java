@@ -1,10 +1,10 @@
 package org.opentripplanner.api.parameter;
 
+import jakarta.ws.rs.BadRequestException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
-import javax.ws.rs.BadRequestException;
 
 public class QualifiedMode implements Serializable {
 

@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.module;
 
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
