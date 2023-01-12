@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.server;
 
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.cache.GuavaCacheMetrics;
@@ -18,6 +19,7 @@ import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.service.TransitModel;
@@ -27,6 +29,10 @@ import org.opentripplanner.transit.service.TransitModel;
  * performance logging, through the Actuator API.
  */
 public class MetricsLogging {
+
+  private static final int GIT_COMMIT_HASH_SHORT = OtpProjectInfo
+    .projectInfo()
+    .getShortCommitHashAsInt();
 
   @Inject
   public MetricsLogging(TransitModel transitModel, RaptorConfig<TripSchedule> raptorConfig) {
@@ -81,5 +87,13 @@ public class MetricsLogging {
       )
         .bindTo(Metrics.globalRegistry);
     }
+    // Log Git commit (2 last digits)
+    Gauge
+      .builder("otp.git.commit.hash.short", () -> GIT_COMMIT_HASH_SHORT)
+      .description(
+        "A four decimal representation of the last two HEX digits in the git commit hash. " +
+        "Example: f9 -> 1509"
+      )
+      .register(Metrics.globalRegistry);
   }
 }

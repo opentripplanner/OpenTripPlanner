@@ -1,11 +1,16 @@
 package org.opentripplanner.model.projectinfo;
 
 import java.io.Serializable;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OtpProjectInfo implements Serializable {
+
+  private static final Logger LOG = LoggerFactory.getLogger(OtpProjectInfo.class);
 
   static final String UNKNOWN = "UNKNOWN";
   private static final OtpProjectInfo INSTANCE = OtpProjectInfoParser.loadFromProperties();
@@ -88,6 +93,24 @@ public class OtpProjectInfo implements Serializable {
       versionControl.commit,
       versionControl.branch
     );
+  }
+
+  /**
+   * Return to last characters in the git hash as a 4 digit integer. Examples:
+   * "01" -> 1, "0F" -> 15, "1F" -> 115, "AF" -> 1015, "FF" -> 1515.
+   * <p>
+   * Return a negative value on errors.
+   */
+  public int getShortCommitHashAsInt() {
+    try {
+      String value = versionControl.commit;
+      return (value != null && value.length() >= 2)
+        ? IntUtils.hexToReadableInt(value.substring(value.length() - 2))
+        : -1;
+    } catch (IllegalArgumentException e) {
+      LOG.warn("OTP git commit hash is not valid: {}", e.getMessage(), e);
+      return -2;
+    }
   }
 
   /**

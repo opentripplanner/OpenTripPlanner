@@ -49,4 +49,35 @@ public final class IntUtils {
 
     return Math.sqrt(sum / v.size());
   }
+
+  /**
+   * Convert a hex string to a human-readable decimal number like this:
+   * <pre>
+   *    '0'  ->  0
+   *    '1'  ->  1
+   *    'f'  ->  15
+   *   '10'  ->  100
+   *   'f0'  ->  1500
+   *   'ff'  ->  1515
+   * 'a3f7'  ->  10031507
+   * </pre>
+   * @throws NullPointerException if the given value is {@code null}
+   * @throws IllegalArgumentException if the value is more than 4 characters or not a hex number.
+   */
+  public static int hexToReadableInt(String value) {
+    if (value.length() > 4) {
+      throw new IllegalArgumentException(
+        "The value have too many characters(max 4): '" + value + "'"
+      );
+    }
+    if (!value.matches("^[\\da-fA-F]+$")) {
+      throw new IllegalArgumentException("The value is not a hex string: '" + value + "'");
+    }
+    int r = 0;
+    for (int i = 0; i < value.length(); ++i) {
+      r *= 100;
+      r += Integer.parseInt(value.substring(i, i + 1), 16);
+    }
+    return r;
+  }
 }
