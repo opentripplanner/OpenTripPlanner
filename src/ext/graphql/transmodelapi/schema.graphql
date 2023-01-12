@@ -1201,25 +1201,25 @@ type ValidityPeriod {
   startTime: DateTime
 }
 
-"Description of a travel between three or more places."
-type ViaTrip {
-  "A list of routing errors, and fields which caused them"
-  routingErrors: [RoutingError!]!
-  "A list of the acceptable combinations of the trip patterns in this segment and the next segment."
-  tripPatternCombinations: [ViaTripPatternPair!]!
-  "A list of segments of the via search. The first segment is from the start location to the first entry in the locations list and the last is from the last entry in the locations list to the end location."
-  tripPatternsPerSegment: [ViaTripPatternSegment!]!
-}
-
 "An acceptable combination of trip patterns between two segments of the via search"
-type ViaTripPatternPair {
+type ViaConnection {
   "The index of the trip pattern in the segment before the via point"
   from: Int
   "The index of the trip pattern in the segment after the via point"
   to: Int
 }
 
-"A segment of the via search"
+"Description of a travel between three or more places."
+type ViaTrip {
+  "A list of routing errors, and fields which caused them"
+  routingErrors: [RoutingError!]!
+  "A list of the acceptable combinations of the trip patterns in this segment and the next segment."
+  tripPatternCombinations: [ViaConnection!]!
+  "A list of segments of the via search. The first segment is from the start location to the first entry in the locations list and the last is from the last entry in the locations list to the end location."
+  tripPatternsPerSegment: [ViaTripPatternSegment!]!
+}
+
+"A segment of the via search. The first segment is from the start location to the first entry in the locations list and the last is from the last entry in the locations list to the end location."
 type ViaTripPatternSegment {
   "A list of trip patterns for this segment of the search"
   tripPatterns: [TripPattern!]!

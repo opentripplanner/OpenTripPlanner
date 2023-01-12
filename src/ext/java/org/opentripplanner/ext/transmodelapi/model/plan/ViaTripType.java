@@ -20,7 +20,11 @@ public class ViaTripType {
     var viaTripPatternSegment = GraphQLObjectType
       .newObject()
       .name("ViaTripPatternSegment")
-      .description("A segment of the via search")
+      .description(
+        "A segment of the via search. The first segment is from the start location to the first " +
+        "entry in the locations list and the last is from the last entry in the locations list " +
+        "to the end location."
+      )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
@@ -34,7 +38,7 @@ public class ViaTripType {
 
     var viaTripPatternCombinations = GraphQLObjectType
       .newObject()
-      .name("ViaTripPatternPair")
+      .name("ViaConnection")
       .description(
         "An acceptable combination of trip patterns between two segments of the via search"
       )
