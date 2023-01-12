@@ -43,6 +43,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Improve support for replaced departure in siri [#4620](https://github.com/opentripplanner/OpenTripPlanner/pull/4620)
 - Replace surface=cobblestone:flattened with surface=set as a mixin spec in default OsmTagMapper [#4683](https://github.com/opentripplanner/OpenTripPlanner/pull/4683)
 - Remove NYC fare service [#4694](https://github.com/opentripplanner/OpenTripPlanner/pull/4694)
+- Migration to Jakarta EE 9 [#4698](https://github.com/opentripplanner/OpenTripPlanner/pull/4698)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
