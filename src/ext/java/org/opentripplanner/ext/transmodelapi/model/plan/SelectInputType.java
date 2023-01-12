@@ -18,29 +18,34 @@ public class SelectInputType {
       "A list of selectors for filter allow-list / exclude-list. " +
       "An empty list means that everything is allowed. " +
       "A trip/line will match with selectors if it matches with all non-empty lists. " +
-        "The `select` is always applied first, then `not`. If only `not` not is present, the exclude " +
-        "is applied to the existing set of lines. "
+      "The `select` is always applied first, then `not`. If only `not` not is present, the exclude " +
+      "is applied to the existing set of lines. "
     )
-    .field(GraphQLInputObjectField
-      .newInputObjectField()
-      .name("lines")
-      .description("Set of ids for lines that should be included in/excluded from search")
-      .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
-      .build()
+    .field(
+      GraphQLInputObjectField
+        .newInputObjectField()
+        .name("lines")
+        .description("Set of ids for lines that should be included in/excluded from search")
+        .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
+        .build()
     )
-    .field(GraphQLInputObjectField
-      .newInputObjectField()
-      .name("authorities")
-      .description("Set of ids for authorities that should be included in/excluded from search")
-      .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
-      .build()
+    .field(
+      GraphQLInputObjectField
+        .newInputObjectField()
+        .name("authorities")
+        .description("Set of ids for authorities that should be included in/excluded from search")
+        .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
+        .build()
     )
-    .field(GraphQLInputObjectField
-      .newInputObjectField()
-      .name("serviceJourneys")
-      .description("Set of ids for service journeys that should be included in/excluded from search")
-      .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
-      .build()
+    .field(
+      GraphQLInputObjectField
+        .newInputObjectField()
+        .name("serviceJourneys")
+        .description(
+          "Set of ids for service journeys that should be included in/excluded from search"
+        )
+        .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
+        .build()
     )
     .field(
       GraphQLInputObjectField
