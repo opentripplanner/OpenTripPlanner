@@ -56,7 +56,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                     | *Optional* |               |   na  |
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                           | *Optional* | `false`       |   na  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                       | *Optional* |               |   na  |
-| [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                        | *Optional* |               |   na  |
+| [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                        | *Optional* |               |  1.5  |
 | [vectorTileLayers](sandbox/MapboxVectorTilesApi.md)                                       |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                               | *Optional* |               |  2.0  |
 | vehicleRentalServiceDirectory                                                             |        `object`       | Configuration for the vehicle rental service directory.                                           | *Optional* |               |  2.0  |
 |    language                                                                               |        `string`       | Language code.                                                                                    | *Optional* |               |   na  |
@@ -541,7 +541,10 @@ Http headers.
     "type" : "real-time-alerts",
     "frequencySec" : 30,
     "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
-    "feedId" : "TriMet"
+    "feedId" : "TriMet",
+    "headers" : {
+      "Some-Header" : "A-Value"
+    }
   }, {
     "type" : "vehicle-rental",
     "network" : "socialbicycles_coast",
@@ -589,12 +592,18 @@ Http headers.
     "frequencySec" : 60,
     "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
     "url" : "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-    "feedId" : "TriMet"
+    "feedId" : "TriMet",
+    "headers" : {
+      "Authorization" : "A-Token"
+    }
   }, {
     "type" : "vehicle-positions",
     "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
     "feedId" : "1",
-    "frequencySec" : 60
+    "frequencySec" : 60,
+    "headers" : {
+      "Header-Name" : "Header-Value"
+    }
   }, {
     "type" : "websocket-gtfs-rt-updater"
   }, {
