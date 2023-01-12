@@ -3,12 +3,12 @@ package org.opentripplanner.standalone.server;
 import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
 
 import com.google.common.hash.Hashing;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpStatus;
 

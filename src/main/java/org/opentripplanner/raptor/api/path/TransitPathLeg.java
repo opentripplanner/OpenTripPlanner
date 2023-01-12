@@ -1,9 +1,8 @@
 package org.opentripplanner.raptor.api.path;
 
 import java.util.Objects;
-import org.opentripplanner.raptor.spi.BoardAndAlightTime;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
  * Represent a transit leg in a path.
@@ -13,7 +12,10 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathLeg<T> {
 
   private final T trip;
-  private final BoardAndAlightTime boardAndAlightTime;
+  private final int boardTime;
+  private final int alightTime;
+  private final int boardStopPos;
+  private final int alightStopPos;
   private final RaptorConstrainedTransfer constrainedTransferAfterLeg;
   private final int cost;
   private final PathLeg<T> next;
@@ -22,18 +24,24 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
 
   public TransitPathLeg(
     T trip,
-    BoardAndAlightTime boardAndAlightTime,
+    int boardTime,
+    int alightTime,
+    int boardStopPos,
+    int alightStopPos,
     RaptorConstrainedTransfer constrainedTransferAfterLeg,
     int cost,
     PathLeg<T> next
   ) {
     this.trip = trip;
-    this.boardAndAlightTime = boardAndAlightTime;
+    this.boardTime = boardTime;
+    this.alightTime = alightTime;
+    this.boardStopPos = boardStopPos;
+    this.alightStopPos = alightStopPos;
     this.constrainedTransferAfterLeg = constrainedTransferAfterLeg;
     this.cost = cost;
     this.next = next;
-    this.boardStop = trip.pattern().stopIndex(boardAndAlightTime.boardStopPos());
-    this.alightStop = trip.pattern().stopIndex(boardAndAlightTime.alightStopPos());
+    this.boardStop = trip.pattern().stopIndex(boardStopPos);
+    this.alightStop = trip.pattern().stopIndex(alightStopPos);
   }
 
   /**
@@ -44,11 +52,11 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
   }
 
   public int getFromStopPosition() {
-    return boardAndAlightTime.boardStopPos();
+    return boardStopPos;
   }
 
   public int getToStopPosition() {
-    return boardAndAlightTime.alightStopPos();
+    return alightStopPos;
   }
 
   public RaptorConstrainedTransfer getConstrainedTransferAfterLeg() {
@@ -57,7 +65,7 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
 
   @Override
   public int fromTime() {
-    return boardAndAlightTime.boardTime();
+    return boardTime;
   }
 
   /**
@@ -70,7 +78,7 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
 
   @Override
   public int toTime() {
-    return boardAndAlightTime.alightTime();
+    return alightTime;
   }
 
   /**
@@ -105,7 +113,7 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
 
   @Override
   public int hashCode() {
-    return Objects.hash(boardAndAlightTime, trip, next);
+    return Objects.hash(boardTime, boardStopPos, alightTime, alightStopPos, trip, next);
   }
 
   @Override
@@ -118,7 +126,10 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
     }
     TransitPathLeg<?> that = (TransitPathLeg<?>) o;
     return (
-      boardAndAlightTime.equals(that.boardAndAlightTime) &&
+      boardTime == that.boardTime &&
+      boardStopPos == that.boardStopPos &&
+      alightTime == that.alightTime &&
+      alightStopPos == that.alightStopPos &&
       trip.equals(that.trip) &&
       next.equals(that.next)
     );

@@ -1,10 +1,10 @@
 package org.opentripplanner.api.model;
 
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.UriInfo;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.UriInfo;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;

@@ -1,10 +1,10 @@
 package org.opentripplanner.inspector.vector;
 
 import edu.colorado.cires.cmg.mvt.VectorTile;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Response;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.routing.graph.Graph;

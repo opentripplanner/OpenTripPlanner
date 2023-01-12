@@ -272,6 +272,17 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
     );
   }
 
+  @Test
+  public void closed() {
+    requestBuilder
+      .profile(RaptorProfile.MULTI_CRITERIA)
+      .searchParams()
+      .searchWindow(D25h)
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_01, T00_00));
+
+    assertEquals("", runSearch());
+  }
+
   private String runSearch() {
     return pathsToString(raptorService.route(requestBuilder.build(), data));
   }

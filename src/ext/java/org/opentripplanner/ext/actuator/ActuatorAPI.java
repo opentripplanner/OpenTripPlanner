@@ -1,21 +1,25 @@
 package org.opentripplanner.ext.actuator;
 
+import static org.apache.http.HttpHeaders.ACCEPT;
+
 import io.micrometer.prometheus.PrometheusMeterRegistry;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import io.prometheus.client.exporter.common.TextFormat;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/actuators")
-@Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class ActuatorAPI {
 
   private static final Logger LOG = LoggerFactory.getLogger(ActuatorAPI.class);
@@ -24,6 +28,7 @@ public class ActuatorAPI {
    * List the actuator endpoints available
    */
   @GET
+  @Produces(MediaType.APPLICATION_JSON)
   public Response actuator(@Context UriInfo uriInfo) {
     return Response
       .status(Response.Status.OK)
@@ -58,6 +63,7 @@ public class ActuatorAPI {
    */
   @GET
   @Path("/health")
+  @Produces(MediaType.APPLICATION_JSON)
   public Response health(@Context OtpServerRequestContext serverContext) {
     GraphUpdaterStatus updaterStatus = serverContext.transitService().getUpdaterStatus();
     if (updaterStatus != null) {
@@ -87,11 +93,19 @@ public class ActuatorAPI {
    */
   @GET
   @Path("/prometheus")
-  public Response prometheus(@Context PrometheusMeterRegistry prometheusRegistry) {
+  @Produces({ TextFormat.CONTENT_TYPE_004, TextFormat.CONTENT_TYPE_OPENMETRICS_100 })
+  public Response prometheus(
+    @Context final PrometheusMeterRegistry prometheusRegistry,
+    @HeaderParam(ACCEPT) @DefaultValue("*/*") final String acceptHeader
+  ) {
+    final var contentType = acceptHeader.contains("application/openmetrics-text")
+      ? TextFormat.CONTENT_TYPE_OPENMETRICS_100
+      : TextFormat.CONTENT_TYPE_004;
+
     return Response
       .status(Response.Status.OK)
-      .entity(prometheusRegistry.scrape())
-      .type("text/plain")
+      .entity(prometheusRegistry.scrape(contentType))
+      .type(contentType)
       .build();
   }
 }

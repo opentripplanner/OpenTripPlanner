@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.api.model;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,16 +6,13 @@ import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
-import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.SearchDirection;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * All input parameters to RangeRaptor that is specific to a routing request. See {@link
- * RaptorTransitDataProvider} for transit data.
+ * All input parameters to RangeRaptor that is specific to a routing request.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -29,7 +26,6 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
   private final SearchDirection searchDirection;
   private final Set<Optimization> optimizations;
   private final DebugRequest debug;
-  private final RaptorSlackProvider slackProvider;
   private final RaptorTimers performanceTimers;
 
   private RaptorRequest() {
@@ -37,8 +33,6 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     profile = RaptorProfile.MULTI_CRITERIA;
     searchDirection = SearchDirection.FORWARD;
     optimizations = Collections.emptySet();
-    // Slack defaults: 1 minute for transfer-slack, 0 minutes for board- and alight-slack.
-    slackProvider = RaptorSlackProvider.defaultSlackProvider(60, 0, 0);
     performanceTimers = RaptorTimers.NOOP;
     debug = DebugRequest.defaults();
     alias = RaptorRequestBuilder.generateRequestAlias(profile, searchDirection, optimizations);
@@ -50,7 +44,6 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     this.profile = builder.profile();
     this.searchDirection = builder.searchDirection();
     this.optimizations = Set.copyOf(builder.optimizations());
-    this.slackProvider = builder.slackProvider();
     this.performanceTimers = builder.performanceTimers();
     this.debug = builder.debug().build();
     verify();
@@ -108,10 +101,6 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
 
   public SearchDirection searchDirection() {
     return searchDirection;
-  }
-
-  public RaptorSlackProvider slackProvider() {
-    return slackProvider;
   }
 
   /**

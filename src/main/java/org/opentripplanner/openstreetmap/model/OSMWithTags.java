@@ -406,6 +406,7 @@ public class OSMWithTags {
       "station".equals(getTag("railway")) ||
       "halt".equals(getTag("railway")) ||
       "bus_station".equals(getTag("amenity")) ||
+      "ferry_terminal".equals(getTag("amenity")) ||
       isPlatform()
     );
   }

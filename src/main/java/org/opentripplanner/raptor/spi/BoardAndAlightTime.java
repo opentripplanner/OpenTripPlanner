@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.spi;
 
 import java.util.Objects;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
  * Board and alight time tuple value object.

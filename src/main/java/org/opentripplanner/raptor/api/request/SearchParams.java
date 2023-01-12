@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
 
 /**
  * The responsibility of this class is to encapsulate a Range Raptor travel request search

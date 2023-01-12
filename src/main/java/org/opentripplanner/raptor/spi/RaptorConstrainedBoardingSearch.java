@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
-import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
  * This interface enable the transit layer to override the normal trip search in Raptor. Each {@link
@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface RaptorConstrainedTripScheduleBoardingSearch<T extends RaptorTripSchedule> {
+public interface RaptorConstrainedBoardingSearch<T extends RaptorTripSchedule> {
   /**
    * Check if the current pattern have any guaranteed transfers for the given stop position in
    * pattern. If not, then Raptor will fall back to a regular trip search.
@@ -25,10 +25,9 @@ public interface RaptorConstrainedTripScheduleBoardingSearch<T extends RaptorTri
    * source stop and trip with the given source arrival board-/alight time (exclude slack).
    * <p>
    *
-   * @return {@code null} if no target trip is found
+   * @return An "empty" event if no target trip is found
    */
-  @Nullable
-  RaptorTripScheduleBoardOrAlightEvent<T> find(
+  RaptorBoardOrAlightEvent<T> find(
     RaptorTimeTable<T> targetTimetable,
     int transferSlack,
     T sourceTrip,

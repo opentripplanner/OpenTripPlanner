@@ -1,11 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.Multimap;
+import jakarta.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;

@@ -2,11 +2,11 @@ package org.opentripplanner.netex.loader.parser;
 
 import static org.opentripplanner.framework.logging.MaxCountLogger.maxCount;
 
+import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.bind.JAXBElement;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.logging.MaxCountLogger;
 import org.opentripplanner.netex.index.NetexEntityIndex;
