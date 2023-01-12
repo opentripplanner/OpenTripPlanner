@@ -25,7 +25,7 @@ class GraphQLApiTest {
 
   @FilePatternSource(pattern = "src/ext-test/resources/legacygraphqlapi/queries/*.graphql")
   @ParameterizedTest(name = "Check GraphQL query in {0}")
-  void pure(Path path) throws IOException {
+  void graphQL(Path path) throws IOException {
     var query = Files.readString(path);
     var response = resource.getGraphQL(query, 2000, 10000, new TestHeaders());
     var actualJson = extracted(response);

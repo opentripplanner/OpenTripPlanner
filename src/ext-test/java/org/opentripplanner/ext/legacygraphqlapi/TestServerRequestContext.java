@@ -66,7 +66,6 @@ public class TestServerRequestContext implements OtpServerRequestContext {
   public TransitService transitService() {
     var transitModel = new TransitModel();
     transitModel.index();
-
     transitModel.getTransitModelIndex().addRoutes(TransitModelForTest.route("123").build());
     return new DefaultTransitService(transitModel);
   }

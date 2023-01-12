@@ -27,6 +27,7 @@ public class PrettyPrinter {
       throw new RuntimeException(e);
     }
   }
+
   public static String json(String input) {
     try {
       var json = mapper.readTree(input);
