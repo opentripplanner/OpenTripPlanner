@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.network;
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 

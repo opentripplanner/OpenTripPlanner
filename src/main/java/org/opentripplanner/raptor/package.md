@@ -150,13 +150,64 @@ convert it and passes it to the listeners passed in using the Raptor debug reque
 # Design
 
 The Raptor implementation is implemented as a Java library with its own API and has a single point
-of access the`RaptorService`.
+of access, the`RaptorService`.
 
-- It is self contained and has no dependencies on any other library or code inside OTP (except a few
-  utility functions).
+- It is self contained and has no dependencies on any other library or code inside OTP. The only 
+  exception is the utility functions in framwork. See the `RaptorArchitectureTest` for details.
 - It is modular, with several pluggable components. The wiring is done in separate assembly classes
   (configure classes).
-- To provide Transit data for the algorithm you need to implement a _data provider_.
+- To provide Transit data for the algorithm you need to implement a _data provider_ in the `spi` 
+  package.
+
+## Components
+TODO - Add a package diagram here.
+
+The main point of entry is the `RaptorService`.
+
+### API
+
+The Raptor API request and response classes. This package also contains some elements used by
+both the API and SPI, like the `o.o.raptor.api.model` package.
+
+
+### SPI
+
+The SPI has all the interfaces and data classes needed to provide Raptor with a transit model for 
+routing. Raptor does not hold onto any transit data, only the state needed to do a search. No state 
+is preserved in Raptor between routing calls.
+
+
+### Configure
+
+The `RaptorConfig` is responsible for the "manual" dependency injection used to create a valid 
+set of Raptor components based on the configuration passed in. The api `RaptorProfile` lists all valid 
+combinations of router and state. The api `Optimization` is used to turn on/off optimizations, 
+currently only the destination pruning is used.
+
+
+### Service
+
+The service puts components together to be able to serve different use-cases. Its responsibility is 
+to run and inject heuristics, manage threading and so on. It is mainly just orchestration using the
+`configure` to create components. 
+
+
+### Range Raptor
+
+This is the algorithm implementation. There are two main versions, the multi-critera and the single-
+criteria range raptor. The multi-critera version has its own state implementation and can only do 
+forward (in time) routing. The single criteria router can search both forward and backward in time,
+and has different state implementation for keeping track of the result. For example, if you do not 
+need to produce result paths, only stop-arrivals information, then the faster "Best time" state 
+can be used. Some features like support for constrained transfers, need to look back to the 
+previous arrival while searching, so the service/configure module will automatically choose the 
+optimal state to use, based on the request/features enabled.
+
+
+### Util
+
+Shared utility functions. The most important component is the pareto-set implementation.
+
 
 ## Optimizations
 

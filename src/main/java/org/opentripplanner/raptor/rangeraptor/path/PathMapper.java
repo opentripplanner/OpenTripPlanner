@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.path;
 
-import org.opentripplanner.raptor.api.path.Path;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 
 /**
  * Responsible for mapping between the domain of routing to the domain of result paths. Especially a
@@ -16,5 +16,5 @@ public interface PathMapper<T extends RaptorTripSchedule> {
    * Build a path from a destination arrival - this maps between the domain of routing to the domain
    * of result paths. All values not needed for routing is computed as part of this mapping.
    */
-  Path<T> mapToPath(final DestinationArrival<T> destinationArrival);
+  RaptorPath<T> mapToPath(final DestinationArrival<T> destinationArrival);
 }

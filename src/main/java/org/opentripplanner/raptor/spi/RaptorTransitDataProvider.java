@@ -2,6 +2,11 @@ package org.opentripplanner.raptor.spi;
 
 import java.util.Iterator;
 import javax.annotation.Nonnull;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 
 /**
@@ -88,6 +93,11 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * Create/provide the cost criteria calculator.
    */
   CostCalculator<T> multiCriteriaCostCalculator();
+
+  /**
+   * The board-, alight- and transfer-slack provider.
+   */
+  RaptorSlackProvider slackProvider();
 
   /**
    * Implement this method to provide a service to search for {@link RaptorTransferConstraint}. This

@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.api.path;
 
 import java.util.Objects;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
  * Represent a egress leg in a path. The egress leg is the last leg arriving at the destination. The

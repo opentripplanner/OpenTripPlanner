@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
@@ -100,7 +100,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     this.stopNameTranslator = stopNameTranslator;
   }
 
-  public Set<OptimizedPath<T>> findBestTransitPath(Path<T> originalPath) {
+  public Set<OptimizedPath<T>> findBestTransitPath(RaptorPath<T> originalPath) {
     List<TransitPathLeg<T>> transitLegs = originalPath.transitLegs().collect(Collectors.toList());
 
     // Find all possible transfers between each pair of transit legs, and sort on arrival time
@@ -121,7 +121,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   }
 
   private Set<OptimizedPathTail<T>> findBestTransferOption(
-    Path<T> originalPath,
+    RaptorPath<T> originalPath,
     List<TransitPathLeg<T>> originalTransitLegs,
     List<List<TripToTripTransfer<T>>> possibleTransfers
   ) {
@@ -196,7 +196,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
    * Insert the access leg and the following transfer. The transfer can only exist if the access has
    * rides (is FLEX).
    */
-  private void insertAccess(Path<T> originalPath, Set<OptimizedPathTail<T>> tails) {
+  private void insertAccess(RaptorPath<T> originalPath, Set<OptimizedPathTail<T>> tails) {
     var accessLeg = originalPath.accessLeg();
     var nextLeg = accessLeg.nextLeg();
     TransferPathLeg<T> nextTransferLeg = null;

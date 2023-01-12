@@ -5,32 +5,6 @@ package org.opentripplanner.raptor.spi;
  */
 public interface RaptorSlackProvider {
   /**
-   * Return a default implementation which can be used in unit-tests. Unit: seconds.
-   */
-  static RaptorSlackProvider defaultSlackProvider(
-    int transferSlack,
-    int boardSlack,
-    int alightSlack
-  ) {
-    return new RaptorSlackProvider() {
-      @Override
-      public int transferSlack() {
-        return transferSlack;
-      }
-
-      @Override
-      public int boardSlack(int slackIndex) {
-        return boardSlack;
-      }
-
-      @Override
-      public int alightSlack(int slackIndex) {
-        return alightSlack;
-      }
-    };
-  }
-
-  /**
    * The transfer-slack (duration time in seconds) to add between transfers. This is in addition to
    * {@link #boardSlack(int)} and {@link #alightSlack(int)}.
    * <p>

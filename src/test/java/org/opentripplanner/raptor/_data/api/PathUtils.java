@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 
 /**
@@ -23,7 +23,7 @@ public class PathUtils {
     return pathsToString(response.paths());
   }
 
-  public static String pathsToString(Collection<? extends Path<?>> paths) {
+  public static String pathsToString(Collection<? extends RaptorPath<?>> paths) {
     return pathsToString(paths, p -> p.toString(TRANSLATOR::stopIndexToName));
   }
 
@@ -38,8 +38,8 @@ public class PathUtils {
   /* private methods */
 
   private static String pathsToString(
-    Collection<? extends Path<?>> paths,
-    Function<Path<?>, String> mapToStr
+    Collection<? extends RaptorPath<?>> paths,
+    Function<RaptorPath<?>, String> mapToStr
   ) {
     return paths.stream().sorted().map(mapToStr).collect(Collectors.joining("\n"));
   }

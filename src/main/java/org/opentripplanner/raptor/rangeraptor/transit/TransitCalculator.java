@@ -3,14 +3,14 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 
 import java.util.Iterator;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.IntIterator;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
-import org.opentripplanner.raptor.spi.RaptorTripPattern;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 
 /**

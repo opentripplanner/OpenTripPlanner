@@ -2,15 +2,15 @@ package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 
 import java.util.function.ToIntFunction;
 import javax.annotation.Nonnull;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.raptor.spi.RaptorTripPattern;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Used to create a view to the internal StdRangeRaptor model and to navigate between stop arrivals.

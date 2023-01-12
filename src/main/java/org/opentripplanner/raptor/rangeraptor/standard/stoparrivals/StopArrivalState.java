@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals;
 
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 public interface StopArrivalState<T extends RaptorTripSchedule> {
   static <T extends RaptorTripSchedule> StopArrivalState<T> create() {

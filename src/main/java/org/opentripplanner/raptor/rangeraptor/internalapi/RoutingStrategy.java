@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorker;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Provides alternative implementations of some logic within the {@link RangeRaptorWorker}.

@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.ToIntFunction;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 

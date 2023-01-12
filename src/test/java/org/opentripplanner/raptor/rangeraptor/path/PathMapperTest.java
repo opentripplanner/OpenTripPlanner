@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 
@@ -51,7 +51,7 @@ public class PathMapperTest implements RaptorTestConstants {
     );
 
     //When:
-    Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+    RaptorPath<TestTripSchedule> path = mapper.mapToPath(destArrival);
 
     // Then: verify path - should be the same for reverse and forward mapper
     assertPath(path);
@@ -71,7 +71,7 @@ public class PathMapperTest implements RaptorTestConstants {
     );
 
     //When:
-    Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+    RaptorPath<TestTripSchedule> path = mapper.mapToPath(destArrival);
 
     // Then: verify path - should be the same for reverse and forward mapper
     assertPath(path);
@@ -123,7 +123,7 @@ public class PathMapperTest implements RaptorTestConstants {
 
   /* private helper methods */
 
-  private void assertPath(Path<TestTripSchedule> path) {
+  private void assertPath(RaptorPath<TestTripSchedule> path) {
     assertEquals(BASIC_PATH_AS_DETAILED_STRING, path.toStringDetailed(this::stopIndexToName));
   }
 
@@ -141,7 +141,7 @@ public class PathMapperTest implements RaptorTestConstants {
       false
     );
     // When:
-    Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+    RaptorPath<TestTripSchedule> path = mapper.mapToPath(destArrival);
     // Then:
     assertEquals(expected, path.toStringDetailed(this::stopIndexToName));
   }
@@ -160,7 +160,7 @@ public class PathMapperTest implements RaptorTestConstants {
       false
     );
     // When:
-    Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+    RaptorPath<TestTripSchedule> path = mapper.mapToPath(destArrival);
     // Then:
     assertEquals(expected, path.toStringDetailed(this::stopIndexToName));
   }

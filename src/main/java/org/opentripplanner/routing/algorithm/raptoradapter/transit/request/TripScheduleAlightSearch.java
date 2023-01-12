@@ -4,11 +4,11 @@ import java.util.function.IntUnaryOperator;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
-import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
-import org.opentripplanner.raptor.spi.SearchDirection;
 
 /**
  * The purpose of this class is to optimize the search for a trip schedule for a given pattern and
