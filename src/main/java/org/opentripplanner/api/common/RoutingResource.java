@@ -3,6 +3,10 @@ package org.opentripplanner.api.common;
 import static org.opentripplanner.api.common.LocationStringParser.fromOldStyleString;
 import static org.opentripplanner.api.common.RequestToPreferencesMapper.setIfNotNull;
 
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MultivaluedMap;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 
 import java.util.function.ToIntFunction;
 import javax.annotation.Nonnull;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
@@ -175,7 +176,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
   }
 
   /**
-   * A access stop arrival, time-shifted according to the {@code preferredDepartureTime} and the
+   * An access stop arrival, time-shifted according to the {@code preferredDepartureTime} and the
    * possible restrictions in the access.
    */
   private ArrivalView<T> newAccessView(
@@ -185,6 +186,11 @@ public class StopsCursor<T extends RaptorTripSchedule> {
   ) {
     // Get the real 'departureTime' honoring the time-shift restriction in the access
     int departureTime = transitCalculator.departureTime(accessPath, preferredDepartureTime);
+
+    if (departureTime == SearchParams.TIME_NOT_SET) {
+      throw new IllegalStateException("The departureTime is not found");
+    }
+
     int arrivalTime = transitCalculator.plusDuration(departureTime, accessPath.durationInSeconds());
     return new Access<>(round, arrivalTime, accessPath);
   }

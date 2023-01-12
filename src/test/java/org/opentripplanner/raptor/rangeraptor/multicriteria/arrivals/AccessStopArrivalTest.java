@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
@@ -97,7 +98,7 @@ public class AccessStopArrivalTest {
   @Test
   public void timeShiftNotAllowed() {
     AbstractStopArrival<RaptorTripSchedule> original, result;
-    RaptorAccessEgress access = access(-1);
+    RaptorAccessEgress access = access(SearchParams.TIME_NOT_SET);
 
     original = new AccessStopArrival<>(DEPARTURE_TIME, access);
 
@@ -142,11 +143,6 @@ public class AccessStopArrivalTest {
       @Override
       public int durationInSeconds() {
         return 0;
-      }
-
-      @Override
-      public int earliestDepartureTime(int t) {
-        return t;
       }
 
       @Override

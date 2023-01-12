@@ -103,6 +103,14 @@ public final class McStopArrivals<T extends RaptorTripSchedule> implements StopA
     debugStats.debugStatInfo(arrivals);
   }
 
+  public boolean hasArrivalsAfterMarker(int stop) {
+    StopArrivalParetoSet<T> it = arrivals[stop];
+    if (it == null) {
+      return false;
+    }
+    return it.hasElementsAfterMarker();
+  }
+
   /** List all transits arrived this round. */
   Iterable<AbstractStopArrival<T>> listArrivalsAfterMarker(final int stop) {
     StopArrivalParetoSet<T> it = arrivals[stop];

@@ -19,6 +19,7 @@ import static org.opentripplanner.transit.model.basic.TransitMode.SUBWAY;
 import static org.opentripplanner.transit.model.basic.TransitMode.TRAM;
 import static org.opentripplanner.transit.model.basic.TransitMode.TROLLEYBUS;
 
+import jakarta.ws.rs.BadRequestException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.ws.rs.BadRequestException;

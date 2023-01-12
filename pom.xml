@@ -56,21 +56,24 @@
 
 
     <properties>
-        <otp.serialization.version.id>80</otp.serialization.version.id>
+        <otp.serialization.version.id>81</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>27.1</geotools.version>
         <google.dagger.version>2.44</google.dagger.version>
         <!-- Cannot update Jackson until this is merged: https://github.com/OneBusAway/onebusaway-gtfs-modules/pull/206 -->
         <jackson.version>2.13.3</jackson.version>
-        <jersey.version>2.34</jersey.version>
+        <jersey.version>3.0.9</jersey.version>
         <junit.version>5.9.1</junit.version>
         <micrometer.version>1.9.5</micrometer.version>
         <netcdf4.version>5.5.2</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
-        <logback.version>1.3.4</logback.version>
+        <logback.version>1.4.5</logback.version>
         <lucene.version>9.4.1</lucene.version>
         <graphql.version>19.2</graphql.version>
         <slf4j.version>2.0.3</slf4j.version>
+        <netex-java-model.version>2.0.14</netex-java-model.version>
+        <siri-java-model.version>1.21</siri-java-model.version>
+        <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -80,6 +83,7 @@
         <argLine/>
         <plugin.prettier.version>0.18</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
+
     </properties>
 
     <distributionManagement>
@@ -519,6 +523,33 @@
 
     <dependencyManagement>
         <dependencies>
+
+
+            <!-- Jakarta EE-->
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+            </dependency>
+            <!--
+                The jaxb-api provides annotations like XmlElement indicating how classes should be (de)serialized.
+                The jaxb-runtime pulls in the jaxb-api of the same version transitively. But we specify both api and
+                runtime dependencies anyway here at the top level to prevent transitive dependencies from pulling in
+                mismatched versions. This is overriding an older version of jaxb-api pulled in by the netex-java-model.
+            -->
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>3.0.1</version>
+            </dependency>
+
             <dependency>
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
@@ -624,11 +655,6 @@
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-jersey2</artifactId>
-            <version>1.8.11</version>
-        </dependency>
-        <dependency>
-            <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-influx</artifactId>
             <version>${micrometer.version}</version>
             <scope>test</scope>
@@ -649,14 +675,14 @@
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>netex-java-model</artifactId>
-            <version>1.0.13</version>
+            <version>${netex-java-model.version}</version>
         </dependency>
 
         <!-- SIRI -->
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>siri-java-model</artifactId>
-            <version>0.12</version>
+            <version>${siri-java-model.version}</version>
         </dependency>
 
         <!-- XML <-> protobuf-mapper for SIRI-->
@@ -670,18 +696,6 @@
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
             <version>2.2.6</version>
-        </dependency>
-
-        <!--
-            The jaxb-api provides annotations like XmlElement indicating how classes should be (de)serialized.
-            The jaxb-runtime pulls in the jaxb-api of the same version transitively. But we specify both api and
-            runtime dependencies anyway here at the top level to prevent transitive dependencies from pulling in
-            mismatched versions. This is overriding an older version of jaxb-api pulled in by the netex-java-model.
-        -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
         </dependency>
 
         <!-- TESTING -->
@@ -757,7 +771,7 @@
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.6</version>
+            <version>${jaxb-runtime.version}</version>
         </dependency>
 
         <!-- Jackson modules. -->

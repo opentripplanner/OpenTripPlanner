@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
+import jakarta.xml.bind.JAXBElement;
 import javax.annotation.Nonnull;
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;

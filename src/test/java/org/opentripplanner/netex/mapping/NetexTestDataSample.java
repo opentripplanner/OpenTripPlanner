@@ -4,6 +4,7 @@ import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
 import com.google.common.collect.ArrayListMultimap;
+import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -11,7 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;

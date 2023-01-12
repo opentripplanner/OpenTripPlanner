@@ -15,8 +15,8 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
@@ -157,14 +157,14 @@ public class TestTransitData
   }
 
   @Override
-  public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsForwardSearch(
+  public RaptorConstrainedBoardingSearch<TestTripSchedule> transferConstraintsForwardSearch(
     int routeIndex
   ) {
     return getRoute(routeIndex).transferConstraintsForwardSearch();
   }
 
   @Override
-  public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsReverseSearch(
+  public RaptorConstrainedBoardingSearch<TestTripSchedule> transferConstraintsReverseSearch(
     int routeIndex
   ) {
     return getRoute(routeIndex).transferConstraintsReverseSearch();

@@ -5,6 +5,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 
 /**
@@ -168,7 +169,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
       return requestedDepartureTime;
     }
     if (isClosed()) {
-      return -1;
+      return SearchParams.TIME_NOT_SET;
     }
 
     int days = Math.floorDiv(requestedDepartureTime, SECONDS_IN_DAY);
