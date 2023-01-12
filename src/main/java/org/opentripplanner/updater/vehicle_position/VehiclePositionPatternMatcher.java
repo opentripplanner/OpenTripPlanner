@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.vehicle_position;
 
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 
 import com.google.common.base.Strings;
@@ -296,7 +297,7 @@ public class VehiclePositionPatternMatcher {
     var pattern = getRealtimePattern.apply(trip, serviceDate);
     if (pattern == null) {
       LOG.debug("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
-      return UpdateError.result(new FeedScopedId(feedId, tripId), TRIP_NOT_FOUND);
+      return UpdateError.result(new FeedScopedId(feedId, tripId), NO_SERVICE_ON_DATE);
     }
 
     // Add position to pattern
