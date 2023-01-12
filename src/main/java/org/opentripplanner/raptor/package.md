@@ -166,8 +166,8 @@ The main point of entry is the `RaptorService`.
 
 ### API
 
-The Raptor API request and response classes. This package also contain some elements used by
-the API and SPI, like the `o.o.raptor.api.model` package.
+The Raptor API request and response classes. This package also contains some elements used by
+both the API and SPI, like the `o.o.raptor.api.model` package.
 
 
 ### SPI
