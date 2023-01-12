@@ -3,11 +3,10 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -19,7 +18,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * and the "to" point in the reverse search.
  */
 public final class ConstrainedBoardingSearch
-  implements RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> {
+  implements RaptorConstrainedBoardingSearch<TripSchedule> {
 
   /**
    * Abort the search after looking at 5 valid boardings. In the case where this happens, one of
@@ -30,15 +29,14 @@ public final class ConstrainedBoardingSearch
 
   private static final ConstrainedBoardingSearchStrategy FORWARD_STRATEGY = new ConstrainedBoardingSearchForward();
   private static final ConstrainedBoardingSearchStrategy REVERSE_STRATEGY = new ConstrainedBoardingSearchReverse();
-  public static final RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> NOOP_SEARCH = new RaptorConstrainedTripScheduleBoardingSearch<>() {
+  public static final RaptorConstrainedBoardingSearch<TripSchedule> NOOP_SEARCH = new RaptorConstrainedBoardingSearch<>() {
     @Override
     public boolean transferExist(int targetStopPos) {
       return false;
     }
 
-    @Nullable
     @Override
-    public RaptorTripScheduleBoardOrAlightEvent<TripSchedule> find(
+    public RaptorBoardOrAlightEvent<TripSchedule> find(
       RaptorTimeTable<TripSchedule> targetTimetable,
       int transferSlack,
       TripSchedule sourceTrip,
@@ -46,7 +44,7 @@ public final class ConstrainedBoardingSearch
       int prevTransitArrivalTime,
       int earliestBoardTime
     ) {
-      return null;
+      return RaptorBoardOrAlightEvent.empty(earliestBoardTime);
     }
   };
 
@@ -82,9 +80,8 @@ public final class ConstrainedBoardingSearch
     return currentTransfers != null;
   }
 
-  @Nullable
   @Override
-  public RaptorTripScheduleBoardOrAlightEvent<TripSchedule> find(
+  public RaptorBoardOrAlightEvent<TripSchedule> find(
     RaptorTimeTable<TripSchedule> timetable,
     int transferSlack,
     TripSchedule sourceTripSchedule,
@@ -95,7 +92,7 @@ public final class ConstrainedBoardingSearch
     var transfers = findMatchingTransfers(sourceTripSchedule, sourceStopIndex);
 
     if (!transfers.iterator().hasNext()) {
-      return null;
+      return RaptorBoardOrAlightEvent.empty(earliestBoardTime);
     }
 
     boolean found = findTimetableTripInfo(
@@ -108,7 +105,7 @@ public final class ConstrainedBoardingSearch
     );
 
     if (!found) {
-      return null;
+      return RaptorBoardOrAlightEvent.empty(earliestBoardTime);
     }
 
     var trip = timetable.getTripSchedule(onTripIndex);

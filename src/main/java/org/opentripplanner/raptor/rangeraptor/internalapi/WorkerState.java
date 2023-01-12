@@ -2,20 +2,20 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import java.util.Collection;
 import java.util.Iterator;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.StopArrivals;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorker;
 import org.opentripplanner.raptor.spi.IntIterator;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
- * The contract the state must implement for the {@link RangeRaptorWorker} to do its job. This allow
- * us to mix workers and states to implement different versions of the algorithm like Standard,
- * Standard-reversed and multi-criteria and use this with different states keeping only the
- * information needed by the use-case. Some example use-cases are calculating heuristics, debugging
- * and returning result paths.
+ * The contract the state must implement for the {@link RangeRaptorWorker} to do its job. This
+ * allows us to mix workers and states to implement different versions of the algorithm like
+ * Standard, Standard-reversed and multi-criteria and use this with different states keeping only
+ * the information needed by the use-case. Some example use-cases are calculating heuristics,
+ * debugging and returning result paths.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -40,9 +40,14 @@ public interface WorkerState<T extends RaptorTripSchedule> {
   boolean isDestinationReachedInCurrentRound();
 
   /**
+   * Return TRUE if a stop is reached by transit or transfer in the previous round.
+   */
+  boolean isStopReachedInPreviousRound(int stopIndex);
+
+  /**
    * Add access path to state. This should be called in the matching round and appropriate place in
-   * the algorithm according to the {@link RaptorTransfer#numberOfRides()} and {@link
-   * RaptorTransfer#stopReachedOnBoard()}.
+   * the algorithm according to the {@link RaptorAccessEgress#numberOfRides()} and {@link
+   * RaptorAccessEgress#stopReachedOnBoard()}.
    */
   void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime);
 
@@ -57,7 +62,7 @@ public interface WorkerState<T extends RaptorTripSchedule> {
    *
    * @return return all paths found in the search.
    */
-  Collection<Path<T>> extractPaths();
+  Collection<RaptorPath<T>> extractPaths();
 
   /**
    * Get arrival statistics for each stop reached in the search.

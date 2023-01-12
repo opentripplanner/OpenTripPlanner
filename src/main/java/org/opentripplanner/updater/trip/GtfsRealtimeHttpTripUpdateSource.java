@@ -11,6 +11,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -19,11 +20,16 @@ import org.slf4j.LoggerFactory;
 public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeHttpTripUpdateSource.class);
+  public static final Map<String, String> DEFAULT_HEADERS = Map.of(
+    "Accept",
+    "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
+  );
   /**
    * Feed id that is used to match trip ids in the TripUpdates
    */
   private final String feedId;
   private final String url;
+  private final Map<String, String> headers;
   /**
    * True iff the last list with updates represent all updates that are active right now, i.e. all
    * previous updates should be disregarded
@@ -34,6 +40,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
   public GtfsRealtimeHttpTripUpdateSource(Parameters config) {
     this.feedId = config.getFeedId();
     this.url = config.getUrl();
+    this.headers = MapUtils.combine(config.headers(), DEFAULT_HEADERS);
     MfdzRealtimeExtensions.registerAllExtensions(registry);
   }
 
@@ -44,13 +51,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     List<TripUpdate> updates = null;
     fullDataset = true;
     try {
-      InputStream is = HttpUtils.openInputStream(
-        URI.create(url),
-        Map.of(
-          "Accept",
-          "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
-        )
-      );
+      InputStream is = HttpUtils.openInputStream(URI.create(url), this.headers);
       if (is != null) {
         // Decode message
         feedMessage = FeedMessage.parseFrom(is, registry);
@@ -104,5 +105,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     String getFeedId();
 
     String getUrl();
+
+    Map<String, String> headers();
   }
 }

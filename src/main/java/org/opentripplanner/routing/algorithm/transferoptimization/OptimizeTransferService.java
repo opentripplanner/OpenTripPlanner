@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.framework.logging.ThrottleLogger;
-import org.opentripplanner.raptor.api.path.Path;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.routing.algorithm.raptoradapter.path.PathDiff;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
@@ -42,14 +42,14 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
     this.transferWaitTimeCostCalculator = null;
   }
 
-  public List<Path<T>> optimize(Collection<Path<T>> paths) {
+  public List<RaptorPath<T>> optimize(Collection<RaptorPath<T>> paths) {
     setup(paths);
 
     long start = LOG.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
-    List<Path<T>> results = new ArrayList<>();
+    List<RaptorPath<T>> results = new ArrayList<>();
 
-    for (Path<T> path : paths) {
+    for (var path : paths) {
       results.addAll(optimize(path));
     }
 
@@ -64,7 +64,7 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
    * Initiate calculation.
    */
   @SuppressWarnings("ConstantConditions")
-  private void setup(Collection<Path<T>> paths) {
+  private void setup(Collection<RaptorPath<T>> paths) {
     if (transferWaitTimeCostCalculator != null) {
       transferWaitTimeCostCalculator.setMinSafeTransferTime(
         minSafeTransferTimeCalculator.minSafeTransferTime(paths)
@@ -76,7 +76,7 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
    * Optimize a single transfer, finding all possible permutations of transfers for the path and
    * filtering the list down one path, or a few equally good paths.
    */
-  private Collection<OptimizedPath<T>> optimize(Path<T> path) {
+  private Collection<OptimizedPath<T>> optimize(RaptorPath<T> path) {
     // Skip transfer optimization if no transfers exist.
     if (path.numberOfTransfersExAccessEgress() == 0) {
       return List.of(new OptimizedPath<>(path));

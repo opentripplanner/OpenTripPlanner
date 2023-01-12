@@ -6,10 +6,9 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
-import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
-import static org.opentripplanner.raptor.spi.SearchDirection.REVERSE;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +20,7 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
@@ -74,14 +74,15 @@ public class B13_MultipleOptimalEgressOptions implements RaptorTestConstants {
       route("R1", STOP_A, STOP_C).withTimetable(schedule("0:04 0:20")),
       route("R2", STOP_A, STOP_B).withTimetable(schedule("0:05 0:16"))
     );
+
+    // We will test board- and alight-slack in a separate test
+    data.withSlackProvider(new DefaultSlackProvider(D1m, D0s, D0s));
+
     requestBuilder
       .searchParams()
       .earliestDepartureTime(T00_00)
       .searchWindowInSeconds(D20m)
       .latestArrivalTime(T00_30);
-
-    // We will test board- and alight-slack in a separate test
-    requestBuilder.slackProvider(defaultSlackProvider(D1m, D0s, D0s));
 
     requestBuilder.searchParams().addAccessPaths(TestAccessEgress.walk(STOP_A, D0s));
 

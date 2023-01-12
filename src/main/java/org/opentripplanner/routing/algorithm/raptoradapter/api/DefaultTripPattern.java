@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.api;
 
-import org.opentripplanner.raptor.spi.RaptorTripPattern;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator;
 import org.opentripplanner.transit.model.network.Route;
 

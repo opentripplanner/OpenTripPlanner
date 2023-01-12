@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 
 /**
  * @see org.opentripplanner.routing.algorithm.transferoptimization package documantation.
@@ -15,7 +15,7 @@ public interface TransferOptimizationParameters {
 
   /**
    * This enables the transfer wait time optimization. If not enabled the {@link
-   * Path#generalizedCost()} function is used to pick the optimal transfer point.
+   * RaptorPath#generalizedCost()} function is used to pick the optimal transfer point.
    */
   boolean optimizeTransferWaitTime();
 

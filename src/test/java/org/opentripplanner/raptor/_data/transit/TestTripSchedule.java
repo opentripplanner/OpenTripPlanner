@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.basic.Accessibility;

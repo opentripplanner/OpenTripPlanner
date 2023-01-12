@@ -4,6 +4,7 @@ import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
+import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import javax.xml.bind.JAXBElement;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;

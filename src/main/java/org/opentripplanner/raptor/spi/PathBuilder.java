@@ -1,17 +1,16 @@
-package org.opentripplanner.raptor.api.path;
+package org.opentripplanner.raptor.spi;
 
 import java.util.Objects;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.spi.BoardAndAlightTime;
-import org.opentripplanner.raptor.spi.CostCalculator;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
-import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.AccessPathLeg;
+import org.opentripplanner.raptor.api.path.PathStringBuilder;
+import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 
 /**
  * The path builder is a utility to build paths. The path builder is responsible for reconstructing
@@ -35,7 +34,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * The {@code PathBuilder} can be extended to override specific things. The {@link
  * org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail} does this to
  * be able to create {@link org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath}
- * instead of regular {@link Path} objects.
+ * instead of regular {@link RaptorPath} objects.
  */
 public abstract class PathBuilder<T extends RaptorTripSchedule> {
 
@@ -144,7 +143,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     add(PathBuilderLeg.egress(egress));
   }
 
-  public Path<T> build(int iterationDepartureTime) {
+  public RaptorPath<T> build(int iterationDepartureTime) {
     updateAggregatedFields();
     return new Path<>(iterationDepartureTime, createPathLegs(costCalculator, slackProvider));
   }

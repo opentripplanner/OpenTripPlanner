@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
+import jakarta.xml.bind.JAXBElement;
 import java.util.Arrays;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import net.opengis.gml._3.LineStringType;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;

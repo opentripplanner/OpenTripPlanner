@@ -75,3 +75,4 @@ on this API and the [Legacy GraphQL Api](LegacyGraphQLApi.md). The new API will 
 - Add built-in GraphQL client. (October 2022, [#4499](https://github.com/opentripplanner/OpenTripPlanner/pull/4499))
 - Implement support for omitCanceled parameter in some stop's stoptime queries (October 2022, [#4504]([#4504](https://github.com/opentripplanner/OpenTripPlanner/pull/4504)))
 - Rename unpreferredRouteCost to unpreferredCost (October 2022, [#4543](https://github.com/opentripplanner/OpenTripPlanner/pull/4543))
+- Make plan fetcher async (December 2022, [#4676](https://github.com/opentripplanner/OpenTripPlanner/pull/4676))

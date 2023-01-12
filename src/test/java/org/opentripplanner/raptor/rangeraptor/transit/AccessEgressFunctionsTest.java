@@ -9,7 +9,6 @@ import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctio
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByRound;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByStop;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForStandardRaptor;
-import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,8 +17,10 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 class AccessEgressFunctionsTest implements RaptorTestConstants {
@@ -28,7 +29,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
   public static final int BOARD_SLACK = D20s;
   public static final int ALIGHT_SLACK = D10s;
   public static final int TRANSFER_SLACK = D1m;
-  public static final RaptorSlackProvider EXTERNAL_SLACK_PROVIDER = defaultSlackProvider(
+  public static final RaptorSlackProvider EXTERNAL_SLACK_PROVIDER = new DefaultSlackProvider(
     TRANSFER_SLACK,
     BOARD_SLACK,
     ALIGHT_SLACK
@@ -100,7 +101,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
 
     // If egress is are closed (opening hours) then -1 should be returned
     assertEquals(
-      -1,
+      SearchParams.TIME_NOT_SET,
       calculateEgressDepartureTime(
         T00_30,
         TestAccessEgress.walk(STOP, D8m).openingHours(5, 4),

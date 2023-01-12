@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
 
 import java.time.Duration;
 import java.util.List;
@@ -25,8 +24,9 @@ import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.test.support.VariableSource;
 
@@ -40,7 +40,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   private static final int ACCESS_START = TimeUtils.time("10:00");
   private static final int ACCESS_DURATION = D1m;
 
-  private static final RaptorSlackProvider SLACK_PROVIDER = defaultSlackProvider(
+  private static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
     TRANSFER_SLACK,
     BOARD_SLACK,
     ALIGHT_SLACK
@@ -48,9 +48,9 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
   private final TestPathBuilder pathBuilder = new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
 
-  private final TestTransitData data = new TestTransitData();
+  private final TestTransitData data = new TestTransitData().withSlackProvider(SLACK_PROVIDER);
 
-  private final TransferServiceAdaptor<TestTripSchedule> TS_ADAPTOR = data.transferServiceAdaptor();
+  private final TransferServiceAdaptor<TestTripSchedule> tsAdaptor = data.transferServiceAdaptor();
 
   @Test
   void findTransferPathWithoutTransfers() {
@@ -67,7 +67,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = path.transitLegs().collect(Collectors.toList());
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     assertEquals("[]", subject.findAllPossibleTransfers(transitLegs).toString());
   }
@@ -81,7 +81,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     // The only possible place to transfer between A and C is stop B:
     var transitLegs = transitLegsSameRoute(STOP_A, STOP_B, STOP_C);
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
     assertEquals(
       "[[TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:12 BUS L1]}]]",
       subject.findAllPossibleTransfers(transitLegs).toString()
@@ -89,7 +89,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     // The only possible place to transfer between B and D is stop C:
     transitLegs = transitLegsSameRoute(STOP_B, STOP_C, STOP_D);
-    subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    subject = new TransferGenerator<>(tsAdaptor, data);
     assertEquals(
       "[[TripToTripTransfer{from: [3 10:20 BUS L1], to: [3 10:22 BUS L1]}]]",
       subject.findAllPossibleTransfers(transitLegs).toString()
@@ -98,7 +98,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // Between A and D transfers may happen at stop B and C. The transfers should be sorted on
     // the to-trip-departure-time (descending)
     transitLegs = transitLegsSameRoute(STOP_A, STOP_C, STOP_D);
-    subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    subject = new TransferGenerator<>(tsAdaptor, data);
     assertEquals(
       "[[TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:12 BUS L1]}, " +
       "TripToTripTransfer{from: [3 10:20 BUS L1], to: [3 10:22 BUS L1]}]]",
@@ -133,7 +133,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = path.transitLegs().collect(Collectors.toList());
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -163,7 +163,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // The only possible place to transfer between A and D is stop C (no extra transfers):
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_C, STOP_G);
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
     assertEquals(
@@ -188,7 +188,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_D, STOP_F);
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -221,7 +221,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = path.transitLegs().collect(Collectors.toList());
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -246,7 +246,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_D, STOP_F);
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -271,7 +271,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_D, STOP_F);
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -309,7 +309,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
       .egress(D1m);
 
     var transitLegs = path.transitLegs().collect(Collectors.toList());
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -333,7 +333,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_D, STOP_F);
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -346,6 +346,14 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
   @Test
   void findTransferForDifferentRoutesWithCustomBoardingSlack() {
+    RaptorSlackProvider slackProvider = new DefaultSlackProvider(0, 0, 0) {
+      @Override
+      public int boardSlack(int slackIndex) {
+        return slackIndex == 1 ? 20 * 60 : 0;
+      }
+    };
+    data.withSlackProvider(slackProvider);
+
     TestRoute l1 = route("L1", STOP_A, STOP_B).withTimetable(schedule("10:00 10:10"));
     TestRoute l2 = route("L2", STOP_B, STOP_C).withTimetable(schedule("10:20 10:30"));
 
@@ -355,24 +363,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // The only possible place to transfer between A and D is stop C (no extra transfers):
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_C);
 
-    RaptorSlackProvider slackProvider = new RaptorSlackProvider() {
-      @Override
-      public int transferSlack() {
-        return 0;
-      }
-
-      @Override
-      public int boardSlack(int slackIndex) {
-        return slackIndex == 1 ? 20 * 60 : 0;
-      }
-
-      @Override
-      public int alightSlack(int slackIndex) {
-        return 0;
-      }
-    };
-
-    var subject = new TransferGenerator<>(TS_ADAPTOR, slackProvider, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
     assertEquals(
@@ -391,7 +382,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m));
 
-    final Path<TestTripSchedule> path = pathBuilder
+    final RaptorPath<TestTripSchedule> path = pathBuilder
       .access(ACCESS_START, ACCESS_DURATION, STOP_A)
       .bus(l1.getTripSchedule(0), STOP_C)
       .walk(D1m, STOP_D)
@@ -400,7 +391,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = path.transitLegs().collect(Collectors.toList());
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -424,7 +415,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m));
 
-    final Path<TestTripSchedule> path = pathBuilder
+    final RaptorPath<TestTripSchedule> path = pathBuilder
       .access(ACCESS_START, ACCESS_DURATION, STOP_A)
       .bus(l1.getTripSchedule(0), STOP_C)
       .walk(D1m, STOP_D)
@@ -433,7 +424,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = path.transitLegs().collect(Collectors.toList());
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -458,7 +449,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_E);
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -482,7 +473,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_E);
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -546,13 +537,9 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // The only possible place to transfer between A and C is stop B (no extra transfers):
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_C);
 
-    RaptorSlackProvider slackProvider = RaptorSlackProvider.defaultSlackProvider(
-      (int) transferSlack.toSeconds(),
-      0,
-      0
-    );
+    data.withSlackProvider(new DefaultSlackProvider((int) transferSlack.toSeconds(), 0, 0));
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, slackProvider, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     if (expectTransfer) {
       var result = subject.findAllPossibleTransfers(transitLegs);
@@ -590,7 +577,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var transitLegs = path.transitLegs().collect(Collectors.toList());
 
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var result = subject.findAllPossibleTransfers(transitLegs);
 
@@ -621,7 +608,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m));
 
-    final Path<TestTripSchedule> path = pathBuilder
+    final RaptorPath<TestTripSchedule> path = pathBuilder
       .access(ACCESS_START, ACCESS_DURATION, STOP_A)
       .bus(l1.getTripSchedule(0), STOP_C)
       .walk(D1m, STOP_D)
@@ -629,7 +616,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
       .egress(D1m);
 
     var transitLegs = path.transitLegs().collect(Collectors.toList());
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+    var subject = new TransferGenerator<>(tsAdaptor, data);
 
     var tripA = l1.getTripSchedule(0);
     var tripB = l2.getTripSchedule(0);

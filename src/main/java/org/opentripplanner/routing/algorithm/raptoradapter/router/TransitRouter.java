@@ -9,7 +9,7 @@ import java.util.concurrent.CompletionException;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
@@ -117,7 +117,7 @@ public class TransitRouter {
 
     debugTimingAggregator.finishedRaptorSearch();
 
-    Collection<Path<TripSchedule>> paths = transitResponse.paths();
+    Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
 
     if (OTPFeature.OptimizeTransfers.isOn()) {
       paths =
@@ -128,7 +128,6 @@ public class TransitRouter {
             serverContext.transitService().getTransferService(),
             requestTransitDataProvider,
             transitLayer.getStopBoardAlightCosts(),
-            raptorRequest,
             request.preferences().transfer().optimization()
           )
           .optimize(transitResponse.paths());
@@ -136,7 +135,7 @@ public class TransitRouter {
 
     // Create itineraries
 
-    RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper(
+    RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper<>(
       serverContext.graph(),
       serverContext.transitService(),
       transitLayer,
