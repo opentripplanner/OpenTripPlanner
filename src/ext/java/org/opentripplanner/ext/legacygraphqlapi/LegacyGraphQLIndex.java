@@ -16,6 +16,7 @@ import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.micrometer.core.instrument.Metrics;
+import jakarta.ws.rs.core.Response;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -27,7 +28,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import javax.ws.rs.core.Response;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLAgencyImpl;
@@ -100,6 +100,7 @@ class LegacyGraphQLIndex {
       URL url = Resources.getResource("legacygraphqlapi/schema.graphqls");
       String sdl = Resources.toString(url, StandardCharsets.UTF_8);
       TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(sdl);
+      IntrospectionTypeWiring typeWiring = new IntrospectionTypeWiring(typeRegistry);
       RuntimeWiring runtimeWiring = RuntimeWiring
         .newRuntimeWiring()
         .scalar(LegacyGraphQLScalars.polylineScalar)
@@ -111,55 +112,55 @@ class LegacyGraphQLIndex {
           "PlaceInterface",
           type -> type.typeResolver(new LegacyGraphQLPlaceInterfaceTypeResolver())
         )
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLAgencyImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLAlertImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLBikeParkImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLVehicleParkingImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLBikeRentalStationImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLCarParkImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLCoordinatesImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLdebugOutputImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLDepartureRowImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLelevationProfileComponentImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLfareComponentImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLfareImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLFeedImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLFeedImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLGeometryImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLItineraryImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLLegImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLPatternImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLPlaceImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLplaceAtDistanceImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLPlanImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLQueryTypeImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLRouteImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLserviceTimeRangeImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLstepImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLStopImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLstopAtDistanceImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLStoptimeImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLStoptimesInPatternImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLTicketTypeImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLTranslatedStringImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLTripImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLSystemNoticeImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLContactInfoImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLBookingTimeImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLBookingInfoImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLVehicleRentalStationImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLRentalVehicleImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLRentalVehicleTypeImpl.class))
+        .type(typeWiring.build(LegacyGraphQLAgencyImpl.class))
+        .type(typeWiring.build(LegacyGraphQLAlertImpl.class))
+        .type(typeWiring.build(LegacyGraphQLBikeParkImpl.class))
+        .type(typeWiring.build(LegacyGraphQLVehicleParkingImpl.class))
+        .type(typeWiring.build(LegacyGraphQLBikeRentalStationImpl.class))
+        .type(typeWiring.build(LegacyGraphQLCarParkImpl.class))
+        .type(typeWiring.build(LegacyGraphQLCoordinatesImpl.class))
+        .type(typeWiring.build(LegacyGraphQLdebugOutputImpl.class))
+        .type(typeWiring.build(LegacyGraphQLDepartureRowImpl.class))
+        .type(typeWiring.build(LegacyGraphQLelevationProfileComponentImpl.class))
+        .type(typeWiring.build(LegacyGraphQLfareComponentImpl.class))
+        .type(typeWiring.build(LegacyGraphQLfareImpl.class))
+        .type(typeWiring.build(LegacyGraphQLFeedImpl.class))
+        .type(typeWiring.build(LegacyGraphQLFeedImpl.class))
+        .type(typeWiring.build(LegacyGraphQLGeometryImpl.class))
+        .type(typeWiring.build(LegacyGraphQLItineraryImpl.class))
+        .type(typeWiring.build(LegacyGraphQLLegImpl.class))
+        .type(typeWiring.build(LegacyGraphQLPatternImpl.class))
+        .type(typeWiring.build(LegacyGraphQLPlaceImpl.class))
+        .type(typeWiring.build(LegacyGraphQLplaceAtDistanceImpl.class))
+        .type(typeWiring.build(LegacyGraphQLPlanImpl.class))
+        .type(typeWiring.build(LegacyGraphQLQueryTypeImpl.class))
+        .type(typeWiring.build(LegacyGraphQLRouteImpl.class))
+        .type(typeWiring.build(LegacyGraphQLserviceTimeRangeImpl.class))
+        .type(typeWiring.build(LegacyGraphQLstepImpl.class))
+        .type(typeWiring.build(LegacyGraphQLStopImpl.class))
+        .type(typeWiring.build(LegacyGraphQLstopAtDistanceImpl.class))
+        .type(typeWiring.build(LegacyGraphQLStoptimeImpl.class))
+        .type(typeWiring.build(LegacyGraphQLStoptimesInPatternImpl.class))
+        .type(typeWiring.build(LegacyGraphQLTicketTypeImpl.class))
+        .type(typeWiring.build(LegacyGraphQLTranslatedStringImpl.class))
+        .type(typeWiring.build(LegacyGraphQLTripImpl.class))
+        .type(typeWiring.build(LegacyGraphQLSystemNoticeImpl.class))
+        .type(typeWiring.build(LegacyGraphQLContactInfoImpl.class))
+        .type(typeWiring.build(LegacyGraphQLBookingTimeImpl.class))
+        .type(typeWiring.build(LegacyGraphQLBookingInfoImpl.class))
+        .type(typeWiring.build(LegacyGraphQLVehicleRentalStationImpl.class))
+        .type(typeWiring.build(LegacyGraphQLRentalVehicleImpl.class))
+        .type(typeWiring.build(LegacyGraphQLRentalVehicleTypeImpl.class))
         .type("AlertEntity", type -> type.typeResolver(new LegacyGraphQLAlertEntityTypeResolver()))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLStopOnRouteImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLStopOnTripImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLUnknownImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLRouteTypeImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLRoutingErrorImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLStopGeometriesImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLVehiclePositionImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLStopRelationshipImpl.class))
-        .type(IntrospectionTypeWiring.build(LegacyGraphQLOpeningHoursImpl.class))
+        .type(typeWiring.build(LegacyGraphQLStopOnRouteImpl.class))
+        .type(typeWiring.build(LegacyGraphQLStopOnTripImpl.class))
+        .type(typeWiring.build(LegacyGraphQLUnknownImpl.class))
+        .type(typeWiring.build(LegacyGraphQLRouteTypeImpl.class))
+        .type(typeWiring.build(LegacyGraphQLRoutingErrorImpl.class))
+        .type(typeWiring.build(LegacyGraphQLStopGeometriesImpl.class))
+        .type(typeWiring.build(LegacyGraphQLVehiclePositionImpl.class))
+        .type(typeWiring.build(LegacyGraphQLStopRelationshipImpl.class))
+        .type(typeWiring.build(LegacyGraphQLOpeningHoursImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

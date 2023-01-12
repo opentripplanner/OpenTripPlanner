@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.mapping.support;
 
+import jakarta.ws.rs.NotSupportedException;
 import java.util.Collection;
 import java.util.Comparator;
-import javax.ws.rs.NotSupportedException;
 import org.rutebanken.netex.model.ValidBetween;
 
 /**

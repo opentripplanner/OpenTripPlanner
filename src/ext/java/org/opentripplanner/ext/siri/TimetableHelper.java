@@ -8,6 +8,7 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOP
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -19,7 +20,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import javax.xml.datatype.Duration;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.PickDrop;
@@ -576,9 +576,7 @@ public class TimetableHelper {
       Duration delay = monitoredVehicleJourney.getDelay();
       int updatedDelay = 0;
       if (delay != null) {
-        updatedDelay =
-          delay.getSign() *
-          (delay.getHours() * 3600 + delay.getMinutes() * 60 + delay.getSeconds());
+        updatedDelay = (int) delay.toSeconds();
       }
 
       MonitoredCallStructure monitoredCall = monitoredVehicleJourney.getMonitoredCall();

@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.loader.parser;
 
+import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.CompositeFrame;

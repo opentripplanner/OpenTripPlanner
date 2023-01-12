@@ -1,8 +1,8 @@
 package org.opentripplanner.api.parameter;
 
+import jakarta.ws.rs.BadRequestException;
 import java.util.Arrays;
 import java.util.Collection;
-import javax.ws.rs.BadRequestException;
 
 public class MIMEImageFormat {
 
