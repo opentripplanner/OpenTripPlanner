@@ -3,9 +3,9 @@ package org.opentripplanner.raptor.api.response;
 import java.util.Collection;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.RaptorService;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * This is the result of a raptor search including the the result paths, the original request
@@ -17,13 +17,13 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  */
 public class RaptorResponse<T extends RaptorTripSchedule> {
 
-  private final Collection<Path<T>> paths;
+  private final Collection<RaptorPath<T>> paths;
   private final RaptorRequest<T> requestOriginal;
   private final RaptorRequest<T> requestUsed;
   private final StopArrivals arrivals;
 
   public RaptorResponse(
-    Collection<Path<T>> paths,
+    Collection<RaptorPath<T>> paths,
     StopArrivals arrivals,
     RaptorRequest<T> requestOriginal,
     RaptorRequest<T> requestUsed
@@ -37,7 +37,7 @@ public class RaptorResponse<T extends RaptorTripSchedule> {
   /**
    * The result paths found in the search.
    */
-  public Collection<Path<T>> paths() {
+  public Collection<RaptorPath<T>> paths() {
     return paths;
   }
 

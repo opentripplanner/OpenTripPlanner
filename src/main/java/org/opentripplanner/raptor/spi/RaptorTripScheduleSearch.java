@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
-import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
  * The purpose of the TripScheduleSearch is to search for a trip schedule for a given pattern.
@@ -21,22 +21,18 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
 
   /**
    * Find the best trip matching the given {@code timeLimit}. This is the same as calling {@link
-   * #search(int, int, int)} with {@code tripIndexLimit: -1}.
+   * #search(int, int, int)} with {@code tripIndexLimit: UNBOUNDED_TRIP_INDEX}.
    *
    * @see #search(int, int, int)
    */
-  @Nullable
   @Flyweight
-  default RaptorTripScheduleBoardOrAlightEvent<T> search(
-    int earliestBoardTime,
-    int stopPositionInPattern
-  ) {
+  default RaptorBoardOrAlightEvent<T> search(int earliestBoardTime, int stopPositionInPattern) {
     return search(earliestBoardTime, stopPositionInPattern, UNBOUNDED_TRIP_INDEX);
   }
 
   /**
    * Find the best trip matching the given {@code timeLimit} and {@code tripIndexLimit}. This method
-   * returns {@code null} if no trip is found.
+   * returns an empty event if no trip is found.
    * <p>
    * Note! The implementation may use a "fly-weight" pattern to implement this, which mean no
    * objects are created for the result, but the result object will instead be reused for the next
@@ -46,14 +42,13 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
    * @param earliestBoardTime     The time of arrival(departure for reverse search) at the given
    *                              stop.
    * @param stopPositionInPattern The stop to board
-   * @param tripIndexLimit        Upper bound for trip index to search. Inclusive. Use {@code -1}
-   *                              for an unbounded search. This is an optimization which allow us to
-   *                              search faster, and it exclude results which is less favorable than
-   *                              trips already processed.
+   * @param tripIndexLimit        Upper bound for trip index to search. Inclusive. Use
+   *                              {@code UNBOUNDED_TRIP_INDEX} for an unbounded search. This is an
+   *                              optimization which allow us to search faster, and it excludes
+   *                              results which is less favorable than trips already processed.
    */
-  @Nullable
   @Flyweight
-  RaptorTripScheduleBoardOrAlightEvent<T> search(
+  RaptorBoardOrAlightEvent<T> search(
     int earliestBoardTime,
     int stopPositionInPattern,
     int tripIndexLimit

@@ -3,14 +3,14 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 
 import java.util.Iterator;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.IntIterator;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
-import org.opentripplanner.raptor.spi.RaptorTripPattern;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 
 /**
@@ -86,7 +86,8 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
    * search it will be the earliest possible departure time, while for reverse search it uses the
    * latest arrival time.
    * <p>
-   * Returns -1 if transfer is not possible after the requested departure time
+   * Returns {@link org.opentripplanner.raptor.api.request.SearchParams#TIME_NOT_SET} if transfer
+   * is not possible after the requested departure time
    */
   int departureTime(RaptorAccessEgress accessPath, int departureTime);
 
@@ -130,7 +131,7 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
    * target} is the TO pattern/stop, while when searching in reverse the given target is the FROM
    * pattern/stop.
    */
-  RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(
+  RaptorConstrainedBoardingSearch<T> transferConstraintsSearch(
     RaptorTransitDataProvider<T> transitData,
     int routeIndex
   );

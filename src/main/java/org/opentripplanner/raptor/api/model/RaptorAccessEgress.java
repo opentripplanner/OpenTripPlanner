@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.api.model;
 
 import org.opentripplanner.framework.time.DurationUtils;
 
@@ -48,7 +48,8 @@ public interface RaptorAccessEgress {
    * when the access path can't start immediately, but have to wait for a vehicle arriving. Also DRT
    * systems or bike shares can have operation time limitations.
    * <p>
-   * Returns -1 if transfer is not possible after the requested departure time
+   * Returns {@link org.opentripplanner.raptor.api.request.SearchParams#TIME_NOT_SET} if transfer
+   * is not possible after the requested departure time.
    */
   default int earliestDepartureTime(int requestedDepartureTime) {
     return requestedDepartureTime;
@@ -58,7 +59,8 @@ public interface RaptorAccessEgress {
    * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares where
    * they can have operation time limitations.
    * <p>
-   * Returns -1 if transfer is not possible before the requested arrival time
+   * Returns {@link org.opentripplanner.raptor.api.request.SearchParams#TIME_NOT_SET} if transfer
+   * is not possible before the requested arrival time.
    */
   default int latestArrivalTime(int requestedArrivalTime) {
     return requestedArrivalTime;

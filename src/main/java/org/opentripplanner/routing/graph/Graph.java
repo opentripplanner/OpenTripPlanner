@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.graph;
 
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
@@ -13,7 +14,6 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;

@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.api.model;
 
 /**
  * This enum describe the direction which a search is performed.

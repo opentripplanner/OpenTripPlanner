@@ -1,11 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
-import java.util.function.IntConsumer;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorker;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.raptor.spi.TransitArrival;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorTimeTable;
 
 /**
  * Provides alternative implementations of some logic within the {@link RangeRaptorWorker}.
@@ -18,20 +17,14 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
    * every Raptor iteration. The access path can have more than one "leg"; hence the implementation
    * need to be aware of the round (Walk access in round 0, Flex with one leg in round 1, ...).
    *
-   * @param iterationDepartureTime     The current iteration departure time.
-   * @param timeDependentDepartureTime The access might be restricted to a given time window, if so
-   *                                   this is the time shifted to fit the window.
+   * @param iterationDepartureTime The current iteration departure time.
    */
-  void setAccessToStop(
-    RaptorAccessEgress accessPath,
-    int iterationDepartureTime,
-    int timeDependentDepartureTime
-  );
+  void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime);
 
   /**
-   * Prepare the {@link RoutingStrategy} to route.
+   * Prepare the {@link RoutingStrategy} to route using the {@link RaptorTimeTable}.
    */
-  void prepareForTransitWith();
+  void prepareForTransitWith(RaptorTimeTable<T> timeTable);
 
   /**
    * Alight the current trip at the given stop with the arrival times.
@@ -39,47 +32,20 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   void alight(final int stopIndex, final int stopPos, final int alightSlack);
 
   /**
-   * Board trip for each stopArrival (Std have only one "best" arrival, while Mc may have many).
-   */
-  void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer);
-
-  /**
-   * Get the current boarding previous transit arrival. This is used to look up any guaranteed
-   * transfers.
-   */
-  TransitArrival<T> previousTransit(int boardStopIndex);
-
-  /**
    * Board the given trip(event) at the given stop index.
-   *
-   * @param earliestBoardTime used to calculate wait-time (if needed)
    */
-  void board(
-    final int stopIndex,
-    final int earliestBoardTime,
-    RaptorTripScheduleBoardOrAlightEvent<T> boarding
+  void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack);
+
+  /**
+   * Board the given trip(event) at the given stop index using constraint transfers
+   * if it exists. If the boarding is not processed by the constrained transfers,
+   * the implementation is also responsible for performing the fallback to board
+   * from regular transfer.
+   */
+  void boardWithConstrainedTransfer(
+    int stopIndex,
+    int stopPos,
+    int boardSlack,
+    RaptorConstrainedBoardingSearch<T> txSearch
   );
-
-  /**
-   * The trip search will use this index to search relative to an existing boarding. This make a
-   * subsequent search faster since it must board an earlier trip, and the trip search can start at
-   * the given onTripIndex. if not the current trip is used.
-   * <p>
-   * Return -1 to if the tripIndex is unknown.
-   */
-  default int onTripIndex() {
-    return -1;
-  }
-
-  /**
-   * This method allow the strategy to replace the existing boarding (if it exists) with a better
-   * option. It is left to the implementation to check that a boarding already exist.
-   *
-   * @param earliestBoardTime - the earliest possible time a boarding can take place
-   * @param stopPos           - the pattern stop position
-   * @param stopIndex         - the global stop index
-   */
-  default void boardSameTrip(int earliestBoardTime, int stopPos, int stopIndex) {
-    // Do nothing. For standard and multi-criteria Raptor we do not need to do anything.
-  }
 }

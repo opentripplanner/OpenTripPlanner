@@ -29,5 +29,22 @@
     // for performance allow a maximum of 4 minutes of walking from a flex vehicle to a transit stop
     "maxTransferDuration": "4m"
   },
-  "updaters": []
+  "updaters": [
+    {
+      "type": "stop-time-updater",
+      "url": "https://api.provider.com/real-time/gtfs-rt-trip-updates",
+      "feedId": "MARTA",
+      "headers": {
+        "Authorization": "A-Token"
+      }
+    },
+    {
+      "type": "vehicle-positions",
+      "url": "https://api.provider.com/real-time/gtfs-rt-vehicle-positions",
+      "feedId": "MARTA",
+      "headers": {
+        "Authorization": "A-Token"
+      }
+    }
+  ]
 }

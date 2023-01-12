@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 
 public class AccessPaths {
 
@@ -65,5 +65,22 @@ public class AccessPaths {
       groupByRound(paths, Predicate.not(RaptorAccessEgress::hasRides)),
       groupByRound(paths, RaptorAccessEgress::hasRides)
     );
+  }
+
+  /** Raptor uses this information to optimize boarding of the first trip */
+  public boolean hasTimeDependentAccess() {
+    return (
+      hasTimeDependentAccess(arrivedOnBoardByNumOfRides) ||
+      hasTimeDependentAccess(arrivedOnStreetByNumOfRides)
+    );
+  }
+
+  private static boolean hasTimeDependentAccess(TIntObjectMap<List<RaptorAccessEgress>> map) {
+    for (List<RaptorAccessEgress> list : map.valueCollection()) {
+      if (list.stream().anyMatch(RaptorAccessEgress::hasOpeningHours)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

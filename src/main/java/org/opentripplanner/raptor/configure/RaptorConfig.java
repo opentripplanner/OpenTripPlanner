@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.configure;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorker;
@@ -17,7 +18,6 @@ import org.opentripplanner.raptor.rangeraptor.standard.configure.StdRangeRaptorC
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * This class is responsible for creating a new search and holding application scoped Raptor state.

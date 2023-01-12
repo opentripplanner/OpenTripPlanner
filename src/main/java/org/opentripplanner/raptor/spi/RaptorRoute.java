@@ -1,5 +1,8 @@
 package org.opentripplanner.raptor.spi;
 
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+
 /**
  * The {@link RaptorRoute} serve as the aggregate root for the transit model needed by Raptor to
  * perform the routing. From this class you should be able to navigate to the time-table, the

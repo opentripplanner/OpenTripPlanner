@@ -3,10 +3,10 @@ package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The egress stop arrival state is responsible for sending arrival notifications. This is used to

@@ -3,11 +3,9 @@ package org.opentripplanner.raptor.api.request;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
-import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.SearchDirection;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 
 /**
  * This is a Request builder to help construct valid requests. Se the request classes for
@@ -29,7 +27,6 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
   // Debug
   private final DebugRequestBuilder debug;
   private SearchDirection searchDirection;
-  private RaptorSlackProvider slackProvider;
 
   // Performance monitoring
   private RaptorTimers performanceTimers;
@@ -49,7 +46,6 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
   RaptorRequestBuilder(RaptorRequest<T> defaults) {
     this.searchParams = new SearchParamsBuilder<>(this, defaults.searchParams());
     this.searchDirection = defaults.searchDirection();
-    this.slackProvider = defaults.slackProvider();
 
     // Algorithm
     this.profile = defaults.profile();
@@ -84,14 +80,6 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     verifyAliasNotGeneratedYet();
     this.searchDirection = searchDirection;
     return this;
-  }
-
-  public RaptorSlackProvider slackProvider() {
-    return slackProvider;
-  }
-
-  public void slackProvider(@Nonnull RaptorSlackProvider slackProvider) {
-    this.slackProvider = slackProvider;
   }
 
   public Collection<Optimization> optimizations() {

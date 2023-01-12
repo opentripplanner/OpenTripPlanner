@@ -1,13 +1,13 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals;
 
 import java.util.Collection;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.TransitArrival;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.TransitArrival;
 
 /**
  * Tracks the state necessary to construct paths at the end of each iteration.
@@ -64,7 +64,7 @@ public final class StdStopArrivalsState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public Collection<Path<T>> extractPaths() {
+  public Collection<RaptorPath<T>> extractPaths() {
     return results.listPaths();
   }
 

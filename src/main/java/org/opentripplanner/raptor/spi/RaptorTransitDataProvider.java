@@ -2,6 +2,11 @@ package org.opentripplanner.raptor.spi;
 
 import java.util.Iterator;
 import javax.annotation.Nonnull;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 
 /**
@@ -90,6 +95,11 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
   CostCalculator<T> multiCriteriaCostCalculator();
 
   /**
+   * The board-, alight- and transfer-slack provider.
+   */
+  RaptorSlackProvider slackProvider();
+
+  /**
    * Implement this method to provide a service to search for {@link RaptorTransferConstraint}. This
    * is not used during the routing, but after a path is found to attach constraint information to
    * the path.
@@ -129,11 +139,11 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * List of transfers TO this pattern for each stop position in pattern used by Raptor during the
    * FORWARD search.
    */
-  RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsForwardSearch(int routeIndex);
+  RaptorConstrainedBoardingSearch<T> transferConstraintsForwardSearch(int routeIndex);
 
   /**
    * List of transfers FROM this pattern for each stop position in pattern used by Raptor during the
    * REVERSE search.
    */
-  RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsReverseSearch(int routeIndex);
+  RaptorConstrainedBoardingSearch<T> transferConstraintsReverseSearch(int routeIndex);
 }

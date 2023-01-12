@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 public class StopArrivalStateParetoSetTest {
 

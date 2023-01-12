@@ -1,12 +1,17 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
-import java.util.function.IntConsumer;
+import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
+
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.TransitArrival;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.raptor.spi.TransitArrival;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorTimeTable;
 
 /**
  * The purpose of this class is to implement a routing strategy for finding the best arrival-time.
@@ -25,31 +30,41 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
 
   private static final int NOT_SET = -1;
 
-  private final TransitCalculator<T> calculator;
   private final StdWorkerState<T> state;
+  private final TimeBasedBoardingSupport<T> boardingSupport;
+  private final TransitCalculator<T> calculator;
 
   private int onTripIndex;
   private int onTripBoardTime;
   private int onTripBoardStop;
   private T onTrip;
 
-  public ArrivalTimeRoutingStrategy(TransitCalculator<T> calculator, StdWorkerState<T> state) {
-    this.calculator = calculator;
-    this.state = state;
-  }
-
-  @Override
-  public void setAccessToStop(
-    RaptorAccessEgress accessPath,
-    int iterationDepartureTime,
-    int timeDependentDepartureTime
+  public ArrivalTimeRoutingStrategy(
+    StdWorkerState<T> state,
+    TimeBasedBoardingSupport<T> boardingSupport,
+    TransitCalculator<T> calculator
   ) {
-    state.setAccessToStop(accessPath, timeDependentDepartureTime);
+    this.state = state;
+    this.boardingSupport = boardingSupport;
+    this.calculator = calculator;
   }
 
   @Override
-  public void prepareForTransitWith() {
-    this.onTripIndex = NOT_SET;
+  public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
+    int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
+
+    // This access is not available after the iteration departure time
+    if (departureTime == SearchParams.TIME_NOT_SET) {
+      return;
+    }
+
+    state.setAccessToStop(accessPath, departureTime);
+  }
+
+  @Override
+  public void prepareForTransitWith(RaptorTimeTable<T> timeTable) {
+    boardingSupport.prepareForTransitWith(timeTable);
+    this.onTripIndex = UNBOUNDED_TRIP_INDEX;
     this.onTripBoardTime = NOT_SET;
     this.onTripBoardStop = NOT_SET;
     this.onTrip = null;
@@ -57,40 +72,58 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
 
   @Override
   public void alight(final int stopIndex, final int stopPos, final int alightSlack) {
-    if (onTripIndex != NOT_SET) {
+    if (onTripIndex != UNBOUNDED_TRIP_INDEX) {
       final int stopArrivalTime = calculator.stopArrivalTime(onTrip, stopPos, alightSlack);
       state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStop, onTripBoardTime, onTrip);
     }
   }
 
   @Override
-  public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
-    // Don't attempt to board if this stop was not reached in the last round.
-    // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
-    if (state.isStopReachedInPreviousRound(stopIndex)) {
-      prevStopArrivalTimeConsumer.accept(state.bestTimePreviousRound(stopIndex));
+  public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
+    int prevArrivalTime = prevArrivalTime(stopIndex);
+    var boarding = boardingSupport.searchRegularTransfer(
+      prevArrivalTime,
+      stopPos,
+      boardSlack,
+      onTripIndex
+    );
+    if (!boarding.empty()) {
+      board(stopIndex, boarding);
     }
   }
 
   @Override
-  public TransitArrival<T> previousTransit(int boardStopIndex) {
-    return state.previousTransit(boardStopIndex);
+  public void boardWithConstrainedTransfer(
+    int stopIndex,
+    int stopPos,
+    int boardSlack,
+    RaptorConstrainedBoardingSearch<T> txSearch
+  ) {
+    boardingSupport
+      .searchConstrainedTransfer(
+        previousTransitArrival(stopIndex),
+        prevArrivalTime(stopIndex),
+        boardSlack,
+        txSearch
+      )
+      .boardWithFallback(
+        boarding -> board(stopIndex, boarding),
+        emptyBoarding -> boardWithRegularTransfer(stopIndex, stopPos, boardSlack)
+      );
   }
 
-  @Override
-  public void board(
-    int stopIndex,
-    final int earliestBoardTime,
-    RaptorTripScheduleBoardOrAlightEvent<T> boarding
-  ) {
-    onTripIndex = boarding.getTripIndex();
-    onTrip = boarding.getTrip();
-    onTripBoardTime = boarding.getTime();
+  private void board(int stopIndex, RaptorBoardOrAlightEvent<T> boarding) {
+    onTripIndex = boarding.tripIndex();
+    onTrip = boarding.trip();
+    onTripBoardTime = boarding.time();
     onTripBoardStop = stopIndex;
   }
 
-  @Override
-  public int onTripIndex() {
-    return onTripIndex;
+  private int prevArrivalTime(int stopIndex) {
+    return state.bestTimePreviousRound(stopIndex);
+  }
+
+  private TransitArrival<T> previousTransitArrival(int boardStopIndex) {
+    return state.previousTransit(boardStopIndex);
   }
 }

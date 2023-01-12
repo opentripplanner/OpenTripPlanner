@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.api.view;
 
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 
 /**
  * Provide egress path information to debugger and path mapping.

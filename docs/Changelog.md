@@ -1,6 +1,6 @@
 # Changelog
 
-The changelog list most feature changes between each release. The list is automatically created
+The changelog lists most feature changes between each release. The list is automatically created
 based on merged pull requests. Search GitHub issues and pull requests for smaller issues.
 
 ## 2.3.0 (in progress)
@@ -37,6 +37,15 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix batch queries in legacy graphql API [#4663](https://github.com/opentripplanner/OpenTripPlanner/pull/4663)
 - Add filter for minimum bike parking distance [#4626](https://github.com/opentripplanner/OpenTripPlanner/pull/4626)
 - Add limits for flex access/egress walking [#4655](https://github.com/opentripplanner/OpenTripPlanner/pull/4655)
+- Make Prometheus endpoint take Accept header into account [#4674](https://github.com/opentripplanner/OpenTripPlanner/pull/4674)
+- Add entrances to parking lots that are unconnected in OSM [#4666](https://github.com/opentripplanner/OpenTripPlanner/pull/4666)
+- Include crossing=traffic_signals and use it for walking/cycling penalty on crossings [#4574](https://github.com/opentripplanner/OpenTripPlanner/pull/4574)
+- Improve support for replaced departure in siri [#4620](https://github.com/opentripplanner/OpenTripPlanner/pull/4620)
+- Replace surface=cobblestone:flattened with surface=set as a mixin spec in default OsmTagMapper [#4683](https://github.com/opentripplanner/OpenTripPlanner/pull/4683)
+- Remove NYC fare service [#4694](https://github.com/opentripplanner/OpenTripPlanner/pull/4694)
+- Migration to Jakarta EE 9 [#4698](https://github.com/opentripplanner/OpenTripPlanner/pull/4698)
+- Upgrade dependencies to take newest GTFS Flex spec into account [#4693](https://github.com/opentripplanner/OpenTripPlanner/pull/4693)
+- Configuration of additional HTTP headers for GTFS-RT updaters [#4684](https://github.com/opentripplanner/OpenTripPlanner/pull/4684)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
