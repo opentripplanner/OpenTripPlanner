@@ -74,13 +74,18 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Ed
       ) {
         // TODO: 2022-12-05 filters: check performance on that and verify that this is right. Previously we were filtering just on modes
         var stop = stopVertex.getStop();
-        var score = getRoutesForStop
-          .apply(stop)
-          .stream()
-          .filter(route -> filters.stream().anyMatch(f -> f.matchRoute(route)))
-          .map(Route::getMode)
-          .mapToInt(VehicleToStopSkipEdgeStrategy::score)
-          .sum();
+
+        // Not using streams. Performance is important here
+        var routes = getRoutesForStop.apply(stop);
+        var score = 0;
+        for (var route : routes) {
+          for (var filter : filters) {
+            if (filter.matchRoute(route)) {
+              score += VehicleToStopSkipEdgeStrategy.score(route.getMode());
+              break;
+            }
+          }
+        }
 
         stopsCounted.add(stop.getId());
 
