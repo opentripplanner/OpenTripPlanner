@@ -84,6 +84,9 @@ public class SiriFuzzyTripMatcher {
           arrivalTime,
           entityResolver
         );
+        if (trips == null || trips.isEmpty()) {
+          return null;
+        }
         return getTripForJourney(trips, monitoredVehicleJourney);
       }
     }
@@ -144,6 +147,9 @@ public class SiriFuzzyTripMatcher {
       if (arrivalTime != null) {
         trips = getMatchingTripsOnStopOrSiblings(lastStopPoint, arrivalTime, entityResolver);
       }
+    }
+    if (trips == null || trips.isEmpty()) {
+      return null;
     }
     return getTripForJourney(trips, journey, getCurrentTimetable);
   }
