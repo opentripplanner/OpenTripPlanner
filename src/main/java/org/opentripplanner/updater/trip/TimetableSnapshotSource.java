@@ -29,10 +29,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -57,6 +55,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
+import org.opentripplanner.updater.ResultLogger;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -325,23 +324,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     var updateResult = UpdateResult.ofResults(results);
 
     if (fullDataset) {
-      LOG.info(
-        "[feedId: {}] {} of {} update messages were applied successfully (success rate: {}%)",
-        feedId,
-        updateResult.successful(),
-        updates.size(),
-        DoubleUtils.roundTo2Decimals((double) updateResult.successful() / updates.size() * 100)
-      );
-
-      var errorIndex = updateResult.failures();
-
-      errorIndex
-        .keySet()
-        .forEach(key -> {
-          var value = errorIndex.get(key);
-          var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
-          LOG.error("[feedId: {}] {} failures of type {}: {}", feedId, value.size(), key, tripIds);
-        });
+      ResultLogger.logUpdateResult(feedId, "trip-updates", updates.size(), updateResult);
 
       if (!failuresByRelationship.isEmpty()) {
         LOG.info(
