@@ -1,15 +1,12 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
-import java.util.Collection;
 import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
-import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.response.StopArrivals;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
-import org.opentripplanner.raptor.rangeraptor.standard.besttimes.StopArrivalsAdaptor;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
@@ -127,11 +124,6 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public Collection<RaptorPath<T>> extractPaths() {
-    return stopArrivalsState.extractPaths();
-  }
-
-  @Override
   public boolean isStopReachedInPreviousRound(int stop) {
     return bestTimes.isStopReachedLastRound(stop);
   }
@@ -188,11 +180,6 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     return stopArrivalsState.previousTransit(boardStopIndex);
   }
 
-  @Override
-  public StopArrivals extractStopArrivals() {
-    return new StopArrivalsAdaptor(bestTimes, stopArrivalsState);
-  }
-
   private void transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transfer) {
     // Use the calculator to make sure the calculation is done correct for a normal
     // forward search and a reverse search.
@@ -212,6 +199,11 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     } else {
       stopArrivalsState.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
     }
+  }
+
+  @Override
+  public RaptorWorkerResult<T> results() {
+    return new StdRaptorWorkerResult<>(bestTimes, stopArrivalsState);
   }
 
   /* private methods */

@@ -139,12 +139,12 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     }
 
     // Route
-    raptorWorker.route();
+    var result = raptorWorker.route();
 
     // create and return response
     return new RaptorResponse<>(
-      raptorWorker.paths(),
-      raptorWorker.stopArrivals(),
+      result.extractPaths(),
+      result.stopArrivals(),
       originalRequest,
       request
     );

@@ -4,9 +4,8 @@ import java.util.Collection;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.response.StopArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -127,7 +126,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
    *
    */
   @Override
-  public void route() {
+  public RaptorWorkerResult<T> route() {
     timers.route(() -> {
       lifeCycle.notifyRouteSearchStart(calculator.searchForward());
       transitData.setup();
@@ -144,16 +143,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
         runRaptorForMinute();
       }
     });
-  }
-
-  @Override
-  public Collection<RaptorPath<T>> paths() {
-    return state.extractPaths();
-  }
-
-  @Override
-  public StopArrivals stopArrivals() {
-    return state.extractStopArrivals();
+    return state.results();
   }
 
   /**

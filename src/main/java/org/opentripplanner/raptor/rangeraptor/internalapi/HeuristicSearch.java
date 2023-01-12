@@ -1,9 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
-import java.util.Collection;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.response.StopArrivals;
 
 /**
  * Combine Heuristics and Worker into one class to be able to retrieve the heuristics after the
@@ -27,14 +24,6 @@ public class HeuristicSearch<T extends RaptorTripSchedule> {
 
   public void route() {
     raptorWorker.route();
-  }
-
-  public Collection<RaptorPath<T>> paths() {
-    return raptorWorker.paths();
-  }
-
-  public StopArrivals stopArrivals() {
-    return raptorWorker.stopArrivals();
   }
 
   public boolean destinationReached() {

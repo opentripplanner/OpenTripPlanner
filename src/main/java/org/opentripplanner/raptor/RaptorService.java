@@ -75,7 +75,8 @@ public class RaptorService<T extends RaptorTripSchedule> {
     RaptorRequest<T> request
   ) {
     var worker = config.createStdWorker(transitData, request);
-    worker.route();
-    return new RaptorResponse<>(worker.paths(), worker.stopArrivals(), request, request);
+    var result = worker.route();
+    var arrivals = result.stopArrivals();
+    return new RaptorResponse<>(result.extractPaths(), arrivals, request, request);
   }
 }

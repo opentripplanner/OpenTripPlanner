@@ -1,12 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
-import java.util.Collection;
 import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.response.StopArrivals;
 import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
 import org.opentripplanner.raptor.spi.IntIterator;
 
@@ -56,16 +53,5 @@ public interface RaptorWorkerState<T extends RaptorTripSchedule> {
    */
   void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers);
 
-  /**
-   * Extract paths after the search is complete. This method is optional, returning an empty set by
-   * default.
-   *
-   * @return return all paths found in the search.
-   */
-  Collection<RaptorPath<T>> extractPaths();
-
-  /**
-   * Get arrival statistics for each stop reached in the search.
-   */
-  StopArrivals extractStopArrivals();
+  RaptorWorkerResult<T> results();
 }
