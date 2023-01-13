@@ -10,6 +10,7 @@ import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
 import org.opentripplanner.transit.model.site.AreaStop;
 
 /**
@@ -39,7 +40,7 @@ public class GeofencingZonesLayerBuilder extends LayerBuilder<StreetEdge> {
       .stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
-      .filter(se -> !se.getTraversalExtensions().isEmpty())
+      .filter(se -> !(se.getTraversalExtension() instanceof StreetEdgeRentalExtension.NoExtension))
       .map(edge -> {
         Geometry geometry = edge.getGeometry().copy();
         geometry.setUserData(edge);

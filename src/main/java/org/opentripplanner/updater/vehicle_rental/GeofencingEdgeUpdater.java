@@ -32,7 +32,9 @@ class GeofencingEdgeUpdater {
    * Applies the restrictions described in the geofencing zones to eges by adding
    * {@link StreetEdgeRentalExtension} to them.
    */
-  Map<StreetEdge,StreetEdgeRentalExtension> applyGeofencingZones(List<GeofencingZone> geofencingZones) {
+  Map<StreetEdge, StreetEdgeRentalExtension> applyGeofencingZones(
+    List<GeofencingZone> geofencingZones
+  ) {
     var restrictedZones = geofencingZones.stream().filter(GeofencingZone::hasRestriction).toList();
 
     // these are the edges inside business area where exceptions like "no pass through"
@@ -98,7 +100,10 @@ class GeofencingEdgeUpdater {
     return edgesUpdated;
   }
 
-  private Map<StreetEdge, StreetEdgeRentalExtension> applyExtension(Geometry geom, StreetEdgeRentalExtension ext) {
+  private Map<StreetEdge, StreetEdgeRentalExtension> applyExtension(
+    Geometry geom,
+    StreetEdgeRentalExtension ext
+  ) {
     var edgesUpdated = new HashMap<StreetEdge, StreetEdgeRentalExtension>();
     Set<Edge> candidates;
     // for business areas we only care about the borders so we compute the boundary of the

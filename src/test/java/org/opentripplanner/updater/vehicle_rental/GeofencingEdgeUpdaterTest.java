@@ -7,7 +7,6 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.streetEd
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -18,6 +17,7 @@ import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.GeofencingZoneExtension;
+import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.NoExtension;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 
 class GeofencingEdgeUpdaterTest {
@@ -68,12 +68,11 @@ class GeofencingEdgeUpdaterTest {
 
   @Test
   void insideZone() {
-    assertEquals(0, insideFrognerPark.getTraversalExtensions().size());
+    assertInstanceOf(NoExtension.class, insideFrognerPark.getTraversalExtension());
 
     updater.applyGeofencingZones(List.of(zone, businessArea));
 
-    assertEquals(1, insideFrognerPark.getTraversalExtensions().size());
-    var ext = insideFrognerPark.getTraversalExtensions().get(0);
+    var ext = insideFrognerPark.getTraversalExtension();
 
     assertInstanceOf(GeofencingZoneExtension.class, ext);
 
@@ -84,12 +83,11 @@ class GeofencingEdgeUpdaterTest {
 
   @Test
   void halfInHalfOutZone() {
-    assertEquals(0, halfInHalfOutFrognerPark.getTraversalExtensions().size());
+    assertInstanceOf(NoExtension.class, insideFrognerPark.getTraversalExtension());
 
     updater.applyGeofencingZones(List.of(zone, businessArea));
 
-    assertEquals(1, halfInHalfOutFrognerPark.getTraversalExtensions().size());
-    var ext = insideFrognerPark.getTraversalExtensions().get(0);
+    var ext = insideFrognerPark.getTraversalExtension();
 
     assertInstanceOf(GeofencingZoneExtension.class, ext);
 
@@ -100,21 +98,19 @@ class GeofencingEdgeUpdaterTest {
 
   @Test
   void outsideZone() {
-    assertEquals(0, outsideFrognerPark.getTraversalExtensions().size());
+    assertInstanceOf(NoExtension.class, insideFrognerPark.getTraversalExtension());
     updater.applyGeofencingZones(List.of(zone, businessArea));
-    assertEquals(0, outsideFrognerPark.getTraversalExtensions().size());
+    assertInstanceOf(GeofencingZoneExtension.class, insideFrognerPark.getTraversalExtension());
   }
 
   @Test
   void businessAreaBorder() {
-    assertEquals(0, businessBorder.getTraversalExtensions().size());
+    assertInstanceOf(NoExtension.class, insideFrognerPark.getTraversalExtension());
     var updated = updater.applyGeofencingZones(List.of(zone, businessArea));
-    assertEquals(Set.of(insideFrognerPark, halfInHalfOutFrognerPark, businessBorder), updated);
-    assertEquals(1, businessBorder.getTraversalExtensions().size());
 
-    var ext = (StreetEdgeRentalExtension.BusinessAreaBorder) businessBorder
-      .getTraversalExtensions()
-      .get(0);
+    assertEquals(1, updated.size());
+
+    var ext = (StreetEdgeRentalExtension.BusinessAreaBorder) businessBorder.getTraversalExtension();
     assertInstanceOf(StreetEdgeRentalExtension.BusinessAreaBorder.class, ext);
   }
 }

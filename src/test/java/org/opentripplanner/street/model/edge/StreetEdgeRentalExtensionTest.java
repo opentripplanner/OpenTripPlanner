@@ -14,6 +14,7 @@ import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.street.search.state.VehicleRentalState.HAVE_RENTED;
 import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
 
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
@@ -107,7 +108,8 @@ class StreetEdgeRentalExtensionTest {
     edge.addRentalExtension(new BusinessAreaBorder("a"));
     edge.addRentalExtension(new BusinessAreaBorder("b"));
 
-    assertEquals(2, edge.getTraversalExtensions().size());
+    assertTrue(edge.getTraversalExtension().traversalBanned(state("a")));
+    assertTrue(edge.getTraversalExtension().traversalBanned(state("b")));
   }
 
   @Test
@@ -118,14 +120,20 @@ class StreetEdgeRentalExtensionTest {
     final BusinessAreaBorder c = new BusinessAreaBorder("c");
 
     edge.addRentalExtension(a);
+
+    assertTrue(edge.getTraversalExtension().traversalBanned(state("a")));
+
     edge.addRentalExtension(b);
     edge.addRentalExtension(c);
 
     edge.removeTraversalExtension(a);
-    assertEquals(2, edge.getTraversalExtensions().size());
+
+    assertTrue(edge.getTraversalExtension().traversalBanned(state("b")));
+    assertTrue(edge.getTraversalExtension().traversalBanned(state("c")));
 
     edge.removeTraversalExtension(b);
-    assertEquals(0, edge.getTraversalExtensions().size());
+
+    assertTrue(edge.getTraversalExtension().traversalBanned(state("c")));
   }
 
   @Test
@@ -140,9 +148,15 @@ class StreetEdgeRentalExtensionTest {
   }
 
   private State traverse(StreetEdge edge) {
+    var state = state(network);
+    return edge.traverse(state);
+  }
+
+  @Nonnull
+  private State state(String network) {
     var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
     var editor = new StateEditor(V1, req);
     editor.beginFloatingVehicleRenting(RentalVehicleType.FormFactor.SCOOTER, network, false);
-    return edge.traverse(editor.makeState());
+    return editor.makeState();
   }
 }

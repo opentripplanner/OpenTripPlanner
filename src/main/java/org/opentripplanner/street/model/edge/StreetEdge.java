@@ -505,19 +505,15 @@ public class StreetEdge
       : getDistanceMeters();
   }
 
-  public List<StreetEdgeRentalExtension> getTraversalExtensions() {
-    if (traversalExtensions == null) {
-      return List.of();
-    } else {
-      return Arrays.asList(traversalExtensions);
-    }
+  public StreetEdgeRentalExtension getTraversalExtension() {
+    return traversalExtensions;
   }
 
   /**
    * This method is not thread-safe.
    */
   public void removeTraversalExtension(StreetEdgeRentalExtension ext) {
-      traversalExtensions = traversalExtensions.remove(ext);
+    traversalExtensions = traversalExtensions.remove(ext);
   }
 
   private void setGeometry(LineString geometry) {
