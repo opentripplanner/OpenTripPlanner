@@ -1,14 +1,45 @@
 package org.opentripplanner.street.model.edge;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.street.search.state.State;
 
 public sealed interface StreetEdgeRentalExtension {
+  /**
+   * The static default instance which doesn't have any restrictions at all.
+   */
+  public static final StreetEdgeRentalExtension NO_EXTENSION = new NoExtension();
+
   boolean traversalBanned(State state);
 
   boolean dropOffBanned(State state);
 
-  String network();
+  default StreetEdgeRentalExtension add(StreetEdgeRentalExtension other) {
+    return new Composite(this, other);
+  }
+
+  default StreetEdgeRentalExtension remove(StreetEdgeRentalExtension toRemove) {
+    return NO_EXTENSION;
+  }
+
+  final class NoExtension implements StreetEdgeRentalExtension {
+
+    @Override
+    public boolean traversalBanned(State state) {
+      return false;
+    }
+
+    @Override
+    public boolean dropOffBanned(State state) {
+      return false;
+    }
+
+    @Override
+    public StreetEdgeRentalExtension add(StreetEdgeRentalExtension other) {
+      return other;
+    }
+  }
 
   final class GeofencingZoneExtension implements StreetEdgeRentalExtension {
 
@@ -46,11 +77,6 @@ public sealed interface StreetEdgeRentalExtension {
     }
 
     @Override
-    public String network() {
-      return zone.id().getFeedId();
-    }
-
-    @Override
     public String toString() {
       return zone.id().toString();
     }
@@ -73,10 +99,55 @@ public sealed interface StreetEdgeRentalExtension {
     public boolean dropOffBanned(State state) {
       return traversalBanned(state);
     }
+  }
+
+  final class Composite implements StreetEdgeRentalExtension {
+
+    private final StreetEdgeRentalExtension[] exts;
+
+    public Composite(StreetEdgeRentalExtension... exts) {
+      this.exts = exts;
+    }
 
     @Override
-    public String network() {
-      return network;
+    public boolean traversalBanned(State state) {
+      for (var ext : exts) {
+        if (ext.traversalBanned(state)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public boolean dropOffBanned(State state) {
+      for (var ext : exts) {
+        if (ext.dropOffBanned(state)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public StreetEdgeRentalExtension add(StreetEdgeRentalExtension other) {
+      var list = new ArrayList<>(Arrays.asList(exts));
+      list.add(other);
+      var array = list.toArray(StreetEdgeRentalExtension[]::new);
+      return new Composite(array);
+    }
+
+    @Override
+    public StreetEdgeRentalExtension remove(StreetEdgeRentalExtension toRemove) {
+      var newExts = Arrays
+        .stream(exts)
+        .filter(e -> !e.equals(toRemove))
+        .toArray(StreetEdgeRentalExtension[]::new);
+      if (newExts.length == 0) {
+        return null;
+      } else {
+        return new Composite(newExts);
+      }
     }
   }
 }

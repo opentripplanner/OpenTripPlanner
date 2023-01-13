@@ -113,14 +113,18 @@ class StreetEdgeRentalExtensionTest {
   @Test
   public void removeExtensions() {
     var edge = streetEdge(V1, V2);
-    edge.addRentalExtension(new BusinessAreaBorder("a"));
-    edge.addRentalExtension(new BusinessAreaBorder("b"));
-    edge.addRentalExtension(new BusinessAreaBorder("b"));
+    final BusinessAreaBorder a = new BusinessAreaBorder("a");
+    final BusinessAreaBorder b = new BusinessAreaBorder("b");
+    final BusinessAreaBorder c = new BusinessAreaBorder("c");
 
-    edge.removeTraversalExtension("a");
+    edge.addRentalExtension(a);
+    edge.addRentalExtension(b);
+    edge.addRentalExtension(c);
+
+    edge.removeTraversalExtension(a);
     assertEquals(2, edge.getTraversalExtensions().size());
 
-    edge.removeTraversalExtension("b");
+    edge.removeTraversalExtension(b);
     assertEquals(0, edge.getTraversalExtensions().size());
   }
 

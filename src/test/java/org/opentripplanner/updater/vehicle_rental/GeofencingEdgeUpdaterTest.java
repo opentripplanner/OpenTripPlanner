@@ -74,7 +74,6 @@ class GeofencingEdgeUpdaterTest {
 
     assertEquals(1, insideFrognerPark.getTraversalExtensions().size());
     var ext = insideFrognerPark.getTraversalExtensions().get(0);
-    assertEquals("F", ext.network());
 
     assertInstanceOf(GeofencingZoneExtension.class, ext);
 
@@ -91,7 +90,6 @@ class GeofencingEdgeUpdaterTest {
 
     assertEquals(1, halfInHalfOutFrognerPark.getTraversalExtensions().size());
     var ext = insideFrognerPark.getTraversalExtensions().get(0);
-    assertEquals("F", ext.network());
 
     assertInstanceOf(GeofencingZoneExtension.class, ext);
 

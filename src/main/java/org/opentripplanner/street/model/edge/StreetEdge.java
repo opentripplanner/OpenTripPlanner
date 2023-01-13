@@ -2,7 +2,6 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -64,7 +63,7 @@ public class StreetEdge
   private static final int WALK_NOTHRUTRAFFIC = 8;
   private static final int CLASS_LINK = 9;
   private StreetEdgeCostExtension costExtension;
-  protected StreetEdgeRentalExtension[] traversalExtensions;
+  protected StreetEdgeRentalExtension traversalExtensions = StreetEdgeRentalExtension.NO_EXTENSION;
   /** back, roundabout, stairs, ... */
   private short flags;
 
@@ -389,7 +388,7 @@ public class StreetEdge
   public State traverse(State currentState) {
     final StateEditor editor;
 
-    if (isTraversalBannedByRentalExtension(currentState)) {
+    if (traversalExtensions.traversalBanned(currentState)) {
       editor = doTraverse(currentState, TraverseMode.WALK, false);
       if (editor != null) {
         editor.dropFloatingVehicle();
@@ -517,14 +516,8 @@ public class StreetEdge
   /**
    * This method is not thread-safe.
    */
-  public void removeTraversalExtension(String network) {
-    if (traversalExtensions != null) {
-      traversalExtensions =
-        Arrays
-          .stream(traversalExtensions)
-          .filter(e -> !e.network().equals(network))
-          .toArray(StreetEdgeRentalExtension[]::new);
-    }
+  public void removeTraversalExtension(StreetEdgeRentalExtension ext) {
+      traversalExtensions = traversalExtensions.remove(ext);
   }
 
   private void setGeometry(LineString geometry) {
@@ -704,13 +697,7 @@ public class StreetEdge
    * This method is not thread-safe!
    */
   public void addRentalExtension(StreetEdgeRentalExtension ext) {
-    if (traversalExtensions == null) {
-      this.traversalExtensions = new StreetEdgeRentalExtension[] { ext };
-    } else {
-      var list = new ArrayList<>(Arrays.asList(traversalExtensions));
-      list.add(ext);
-      this.traversalExtensions = list.toArray(new StreetEdgeRentalExtension[0]);
-    }
+    traversalExtensions = traversalExtensions.add(ext);
   }
 
   /**
@@ -1174,30 +1161,7 @@ public class StreetEdge
   }
 
   protected boolean isDropOffBanned(State currentState) {
-    if (traversalExtensions == null) {
-      return false;
-    }
-    for (var ext : traversalExtensions) {
-      if (ext.dropOffBanned(currentState)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Returns if a traversal is banned by a rental extension, for example because you're not allowed
-   * to use the edge on a rental vehicle.
-   */
-  protected boolean isTraversalBannedByRentalExtension(State state) {
-    if (traversalExtensions != null) {
-      for (var ext : traversalExtensions) {
-        if (ext.traversalBanned(state)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return traversalExtensions.dropOffBanned(currentState);
   }
 
   @Nonnull

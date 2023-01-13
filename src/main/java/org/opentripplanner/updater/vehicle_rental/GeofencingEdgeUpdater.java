@@ -1,9 +1,9 @@
 package org.opentripplanner.updater.vehicle_rental;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,7 +32,7 @@ class GeofencingEdgeUpdater {
    * Applies the restrictions described in the geofencing zones to eges by adding
    * {@link StreetEdgeRentalExtension} to them.
    */
-  Set<StreetEdge> applyGeofencingZones(List<GeofencingZone> geofencingZones) {
+  Map<StreetEdge,StreetEdgeRentalExtension> applyGeofencingZones(List<GeofencingZone> geofencingZones) {
     var restrictedZones = geofencingZones.stream().filter(GeofencingZone::hasRestriction).toList();
 
     // these are the edges inside business area where exceptions like "no pass through"
@@ -42,7 +42,7 @@ class GeofencingEdgeUpdater {
       GeofencingZoneExtension::new
     );
 
-    var updatedEdges = new HashSet<>(restrictedEdges);
+    var updates = new HashMap<StreetEdge, StreetEdgeRentalExtension>();
 
     var generalBusinessAreas = geofencingZones
       .stream()
@@ -71,10 +71,10 @@ class GeofencingEdgeUpdater {
         new BusinessAreaBorder(network)
       );
 
-      updatedEdges.addAll(updated);
+      updates.putAll(updated);
     }
 
-    return updatedEdges;
+    return Map.copyOf(updates);
   }
 
   private static Envelope toEnvelope(LineString ls) {
@@ -85,21 +85,21 @@ class GeofencingEdgeUpdater {
     return env;
   }
 
-  private Collection<StreetEdge> addExtensionToIntersectingStreetEdges(
+  private Map<StreetEdge, StreetEdgeRentalExtension> addExtensionToIntersectingStreetEdges(
     List<GeofencingZone> zones,
     Function<GeofencingZone, StreetEdgeRentalExtension> createExtension
   ) {
-    var edgesUpdated = new ArrayList<StreetEdge>();
+    var edgesUpdated = new HashMap<StreetEdge, StreetEdgeRentalExtension>();
     for (GeofencingZone zone : zones) {
       var geom = zone.geometry();
       var ext = createExtension.apply(zone);
-      edgesUpdated.addAll(applyExtension(geom, ext));
+      edgesUpdated.putAll(applyExtension(geom, ext));
     }
     return edgesUpdated;
   }
 
-  private Collection<StreetEdge> applyExtension(Geometry geom, StreetEdgeRentalExtension ext) {
-    var edgesUpdated = new ArrayList<StreetEdge>();
+  private Map<StreetEdge, StreetEdgeRentalExtension> applyExtension(Geometry geom, StreetEdgeRentalExtension ext) {
+    var edgesUpdated = new HashMap<StreetEdge, StreetEdgeRentalExtension>();
     Set<Edge> candidates;
     // for business areas we only care about the borders so we compute the boundary of the
     // (multi) polygon. this can either be a MultiLineString or a LineString
@@ -114,7 +114,7 @@ class GeofencingEdgeUpdater {
     for (var e : candidates) {
       if (e instanceof StreetEdge streetEdge && streetEdge.getGeometry().intersects(geom)) {
         streetEdge.addRentalExtension(ext);
-        edgesUpdated.add(streetEdge);
+        edgesUpdated.put(streetEdge, ext);
       }
     }
     return edgesUpdated;
