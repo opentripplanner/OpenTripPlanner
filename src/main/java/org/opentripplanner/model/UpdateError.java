@@ -33,6 +33,7 @@ public record UpdateError(
     TRIP_ALREADY_EXISTS,
     NO_START_DATE,
     NO_UPDATES,
+    NO_TRIP_ID,
     TOO_FEW_STOPS,
     NO_VALID_STOPS,
     NO_SERVICE_ON_DATE,
@@ -44,7 +45,6 @@ public record UpdateError(
     NOT_IMPLEMENTED_UNSCHEDULED,
     NOT_IMPLEMENTED_DUPLICATED,
     NOT_MONITORED,
-    MISSING_TRIP_ID,
   }
 
   public static <T> Result<T, UpdateError> result(FeedScopedId tripId, UpdateErrorType errorType) {

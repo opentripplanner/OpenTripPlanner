@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
@@ -279,18 +280,19 @@ public class VehiclePositionPatternMatcher {
 
     var tripId = vehiclePosition.getTrip().getTripId();
 
-    if (tripId == null) {
-      return Result.failure(UpdateError.noTripId(UpdateError.UpdateErrorType.MISSING_TRIP_ID));
+    if (!StringUtils.hasValue(tripId)) {
+      return Result.failure(UpdateError.noTripId(UpdateError.UpdateErrorType.NO_TRIP_ID));
     }
 
-    var trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
+    var scopedTripId = new FeedScopedId(feedId, tripId);
+    var trip = getTripForId.apply(scopedTripId);
     if (trip == null) {
       LOG.debug(
         "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
         feedId,
         tripId
       );
-      return UpdateError.result(new FeedScopedId(feedId, tripId), TRIP_NOT_FOUND);
+      return UpdateError.result(scopedTripId, TRIP_NOT_FOUND);
     }
 
     var serviceDate = Optional
@@ -302,7 +304,7 @@ public class VehiclePositionPatternMatcher {
     var pattern = getRealtimePattern.apply(trip, serviceDate);
     if (pattern == null) {
       LOG.debug("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
-      return UpdateError.result(new FeedScopedId(feedId, tripId), NO_SERVICE_ON_DATE);
+      return UpdateError.result(scopedTripId, NO_SERVICE_ON_DATE);
     }
 
     // Add position to pattern
