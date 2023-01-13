@@ -16,17 +16,22 @@ import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public class FilterTest {
 
-  final String AGENCY_1 = "RUT:Agency:1";
-  final String AGENCY_2 = "RUT:Agency:2";
-  final String AGENCY_3 = "RUT:Agency:3";
+  final String AGENCY_ID_1 = "RUT:Agency:1";
+  final String AGENCY_ID_2 = "RUT:Agency:2";
+  final String AGENCY_ID_3 = "RUT:Agency:3";
 
-  final String ROUTE_1 = "RUT:Route:1";
-  final String ROUTE_2 = "RUT:Route:2";
-  final String ROUTE_3 = "RUT:Route:3";
-  final String ROUTE_4 = "RUT:Route:4";
+  final Agency AGENCY_1 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_ID_1)).build();
+  final Agency AGENCY_2 = TransitModelForTest.agency("B").copy().withId(id(AGENCY_ID_2)).build();
+  final Agency AGENCY_3 = TransitModelForTest.agency("C").copy().withId(id(AGENCY_ID_3)).build();
+
+  final String ROUTE_ID_1 = "RUT:Route:1";
+  final String ROUTE_ID_2 = "RUT:Route:2";
+  final String ROUTE_ID_3 = "RUT:Route:3";
+  final String ROUTE_ID_4 = "RUT:Route:4";
 
   @Test
   @DisplayName(
@@ -43,19 +48,15 @@ public class FilterTest {
     """
   )
   public void testOne() {
-    var agency1 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_1)).build();
-    var agency2 = TransitModelForTest.agency("B").copy().withId(id(AGENCY_2)).build();
-    var agency3 = TransitModelForTest.agency("C").copy().withId(id(AGENCY_3)).build();
-
     var routes = List.of(
-      TransitModelForTest.route(ROUTE_1).withAgency(agency1).build(),
-      TransitModelForTest.route(ROUTE_2).withAgency(agency2).build(),
-      TransitModelForTest.route(ROUTE_3).withAgency(agency3).build()
+      TransitModelForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build(),
+      TransitModelForTest.route(ROUTE_ID_2).withAgency(AGENCY_2).build(),
+      TransitModelForTest.route(ROUTE_ID_3).withAgency(AGENCY_3).build()
     );
 
     var filterRequest = TransitFilterRequest
       .of()
-      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_1)).build())
+      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_1)).build())
       .build();
 
     var bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
@@ -64,8 +65,8 @@ public class FilterTest {
     );
 
     assertEquals(2, bannedRoutes.size());
-    assertTrue(bannedRoutes.contains(id(ROUTE_2)));
-    assertTrue(bannedRoutes.contains(id(ROUTE_3)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_2)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_3)));
   }
 
   @Test
@@ -83,20 +84,16 @@ public class FilterTest {
     """
   )
   public void testTwo() {
-    var agency1 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_1)).build();
-    var agency2 = TransitModelForTest.agency("B").copy().withId(id(AGENCY_2)).build();
-    var agency3 = TransitModelForTest.agency("C").copy().withId(id(AGENCY_3)).build();
-
     var routes = List.of(
-      TransitModelForTest.route(ROUTE_1).withAgency(agency1).build(),
-      TransitModelForTest.route(ROUTE_2).withAgency(agency2).build(),
-      TransitModelForTest.route(ROUTE_3).withAgency(agency3).build()
+      TransitModelForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build(),
+      TransitModelForTest.route(ROUTE_ID_2).withAgency(AGENCY_2).build(),
+      TransitModelForTest.route(ROUTE_ID_3).withAgency(AGENCY_3).build()
     );
 
     var filterRequest = TransitFilterRequest
       .of()
       .addNot(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_1))).build()
+        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1))).build()
       )
       .build();
 
@@ -106,7 +103,7 @@ public class FilterTest {
     );
 
     assertEquals(1, bannedRoutes.size());
-    assertTrue(bannedRoutes.contains(id(ROUTE_1)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_1)));
   }
 
   @Test
@@ -124,24 +121,20 @@ public class FilterTest {
     """
   )
   public void testThree() {
-    var agency1 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_1)).build();
-    var agency2 = TransitModelForTest.agency("B").copy().withId(id(AGENCY_2)).build();
-    var agency3 = TransitModelForTest.agency("C").copy().withId(id(AGENCY_3)).build();
-
     var routes = List.of(
       TransitModelForTest
-        .route(ROUTE_1)
-        .withAgency(agency1)
+        .route(ROUTE_ID_1)
+        .withAgency(AGENCY_1)
         .withMode(TransitMode.BUS)
         .withNetexSubmode("schoolBus")
         .build(),
       TransitModelForTest
-        .route(ROUTE_2)
-        .withAgency(agency2)
+        .route(ROUTE_ID_2)
+        .withAgency(AGENCY_2)
         .withMode(TransitMode.RAIL)
         .withNetexSubmode("railShuttle")
         .build(),
-      TransitModelForTest.route(ROUTE_3).withAgency(agency3).withMode(TransitMode.TRAM).build()
+      TransitModelForTest.route(ROUTE_ID_3).withAgency(AGENCY_3).withMode(TransitMode.TRAM).build()
     );
 
     var filterRequest = TransitFilterRequest
@@ -168,7 +161,7 @@ public class FilterTest {
     );
 
     assertEquals(1, bannedRoutes.size());
-    assertTrue(bannedRoutes.contains(id(ROUTE_3)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_3)));
   }
 
   @Test
@@ -190,19 +183,19 @@ public class FilterTest {
   )
   public void testFour() {
     var routes = List.of(
-      TransitModelForTest.route(ROUTE_1).build(),
-      TransitModelForTest.route(ROUTE_2).build(),
-      TransitModelForTest.route(ROUTE_3).build()
+      TransitModelForTest.route(ROUTE_ID_1).build(),
+      TransitModelForTest.route(ROUTE_ID_2).build(),
+      TransitModelForTest.route(ROUTE_ID_3).build()
     );
 
     var filter1 = TransitFilterRequest
       .of()
-      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_1)).build())
+      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_1)).build())
       .build();
 
     var filter2 = TransitFilterRequest
       .of()
-      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_2)).build())
+      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_2)).build())
       .build();
 
     var bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
@@ -211,7 +204,7 @@ public class FilterTest {
     );
 
     assertEquals(1, bannedRoutes.size());
-    assertTrue(bannedRoutes.contains(id(ROUTE_3)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_3)));
   }
 
   @Test
@@ -233,18 +226,18 @@ public class FilterTest {
   )
   public void testFive() {
     var routes = List.of(
-      TransitModelForTest.route(ROUTE_1).build(),
-      TransitModelForTest.route(ROUTE_2).build()
+      TransitModelForTest.route(ROUTE_ID_1).build(),
+      TransitModelForTest.route(ROUTE_ID_2).build()
     );
 
     var filter1 = TransitFilterRequest
       .of()
-      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_1)).build())
+      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_1)).build())
       .build();
 
     var filter2 = TransitFilterRequest
       .of()
-      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_1)).build())
+      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_1)).build())
       .build();
 
     var bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
@@ -271,20 +264,18 @@ public class FilterTest {
     """
   )
   public void testSix() {
-    var agency1 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_1)).build();
-
     var routes = List.of(
-      TransitModelForTest.route(ROUTE_1).withAgency(agency1).build(),
-      TransitModelForTest.route(ROUTE_2).withAgency(agency1).build(),
-      TransitModelForTest.route(ROUTE_3).withAgency(agency1).build()
+      TransitModelForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build(),
+      TransitModelForTest.route(ROUTE_ID_2).withAgency(AGENCY_1).build(),
+      TransitModelForTest.route(ROUTE_ID_3).withAgency(AGENCY_1).build()
     );
 
     var filterRequest = TransitFilterRequest
       .of()
       .addSelect(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_1))).build()
+        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1))).build()
       )
-      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_3)).build())
+      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_3)).build())
       .build();
 
     var bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
@@ -293,7 +284,7 @@ public class FilterTest {
     );
 
     assertEquals(1, bannedRoutes.size());
-    assertTrue(bannedRoutes.contains(id(ROUTE_3)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_3)));
   }
 
   @Test
@@ -315,28 +306,25 @@ public class FilterTest {
     """
   )
   public void testSeven() {
-    var agency1 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_1)).build();
-    var agency2 = TransitModelForTest.agency("B").copy().withId(id(AGENCY_2)).build();
-
     var routes = List.of(
-      TransitModelForTest.route(ROUTE_1).withAgency(agency1).build(),
-      TransitModelForTest.route(ROUTE_2).withAgency(agency2).build(),
-      TransitModelForTest.route(ROUTE_3).withAgency(agency2).build()
+      TransitModelForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).build(),
+      TransitModelForTest.route(ROUTE_ID_2).withAgency(AGENCY_2).build(),
+      TransitModelForTest.route(ROUTE_ID_3).withAgency(AGENCY_2).build()
     );
 
     var filter1 = TransitFilterRequest
       .of()
       .addSelect(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_1))).build()
+        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1))).build()
       )
       .build();
 
     var filter2 = TransitFilterRequest
       .of()
       .addSelect(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_2))).build()
+        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_2))).build()
       )
-      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_3)).build())
+      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_3)).build())
       .build();
 
     var bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
@@ -345,7 +333,7 @@ public class FilterTest {
     );
 
     assertEquals(1, bannedRoutes.size());
-    assertTrue(bannedRoutes.contains(id(ROUTE_3)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_3)));
   }
 
   @Test
@@ -363,13 +351,10 @@ public class FilterTest {
     """
   )
   public void testEight() {
-    var agency1 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_1)).build();
-    var agency2 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_2)).build();
-
     var routes = List.of(
-      TransitModelForTest.route(ROUTE_1).withMode(TransitMode.BUS).withAgency(agency1).build(),
-      TransitModelForTest.route(ROUTE_2).withMode(TransitMode.RAIL).withAgency(agency1).build(),
-      TransitModelForTest.route(ROUTE_3).withMode(TransitMode.BUS).withAgency(agency2).build()
+      TransitModelForTest.route(ROUTE_ID_1).withMode(TransitMode.BUS).withAgency(AGENCY_1).build(),
+      TransitModelForTest.route(ROUTE_ID_2).withMode(TransitMode.RAIL).withAgency(AGENCY_1).build(),
+      TransitModelForTest.route(ROUTE_ID_3).withMode(TransitMode.BUS).withAgency(AGENCY_2).build()
     );
 
     var filter = TransitFilterRequest
@@ -377,7 +362,7 @@ public class FilterTest {
       .addSelect(
         SelectRequest
           .of()
-          .withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_1)))
+          .withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1)))
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
           .build()
       )
@@ -386,8 +371,8 @@ public class FilterTest {
     var bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(List.of(filter), routes);
 
     assertEquals(2, bannedRoutes.size());
-    assertTrue(bannedRoutes.contains(id(ROUTE_2)));
-    assertTrue(bannedRoutes.contains(id(ROUTE_3)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_2)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_3)));
   }
 
   @Test
@@ -406,14 +391,11 @@ public class FilterTest {
     """
   )
   public void testNine() {
-    var agency1 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_1)).build();
-    var agency2 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_2)).build();
-
     var routes = List.of(
-      TransitModelForTest.route(ROUTE_1).withAgency(agency1).withMode(TransitMode.BUS).build(),
-      TransitModelForTest.route(ROUTE_2).withAgency(agency1).withMode(TransitMode.RAIL).build(),
-      TransitModelForTest.route(ROUTE_3).withAgency(agency1).withMode(TransitMode.BUS).build(),
-      TransitModelForTest.route(ROUTE_4).withAgency(agency2).withMode(TransitMode.BUS).build()
+      TransitModelForTest.route(ROUTE_ID_1).withAgency(AGENCY_1).withMode(TransitMode.BUS).build(),
+      TransitModelForTest.route(ROUTE_ID_2).withAgency(AGENCY_1).withMode(TransitMode.RAIL).build(),
+      TransitModelForTest.route(ROUTE_ID_3).withAgency(AGENCY_1).withMode(TransitMode.BUS).build(),
+      TransitModelForTest.route(ROUTE_ID_4).withAgency(AGENCY_2).withMode(TransitMode.BUS).build()
     );
 
     var filter = TransitFilterRequest
@@ -421,19 +403,19 @@ public class FilterTest {
       .addSelect(
         SelectRequest
           .of()
-          .withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_1)))
+          .withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1)))
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
           .build()
       )
-      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_3)).build())
+      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_3)).build())
       .build();
 
     var bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(List.of(filter), routes);
 
     assertEquals(3, bannedRoutes.size());
-    assertTrue(bannedRoutes.contains(id(ROUTE_2)));
-    assertTrue(bannedRoutes.contains(id(ROUTE_3)));
-    assertTrue(bannedRoutes.contains(id(ROUTE_4)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_2)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_3)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_4)));
   }
 
   @Test
@@ -452,26 +434,23 @@ public class FilterTest {
     """
   )
   public void testTen() {
-    var agency1 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_1)).build();
-    var agency2 = TransitModelForTest.agency("A").copy().withId(id(AGENCY_2)).build();
-
     var routes = List.of(
-      TransitModelForTest.route(ROUTE_1).withMode(TransitMode.BUS).withAgency(agency1).build(),
-      TransitModelForTest.route(ROUTE_2).withMode(TransitMode.RAIL).withAgency(agency1).build(),
-      TransitModelForTest.route(ROUTE_3).withMode(TransitMode.BUS).withAgency(agency1).build(),
-      TransitModelForTest.route(ROUTE_4).withAgency(agency2).build()
+      TransitModelForTest.route(ROUTE_ID_1).withMode(TransitMode.BUS).withAgency(AGENCY_1).build(),
+      TransitModelForTest.route(ROUTE_ID_2).withMode(TransitMode.RAIL).withAgency(AGENCY_1).build(),
+      TransitModelForTest.route(ROUTE_ID_3).withMode(TransitMode.BUS).withAgency(AGENCY_1).build(),
+      TransitModelForTest.route(ROUTE_ID_4).withAgency(AGENCY_2).build()
     );
 
     var filter = TransitFilterRequest
       .of()
       .addSelect(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_1))).build()
+        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1))).build()
       )
       .addNot(
         SelectRequest
           .of()
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
-          .withRoutes(RouteMatcher.parse("F__" + ROUTE_3))
+          .withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_3))
           .build()
       )
       .build();
@@ -479,7 +458,7 @@ public class FilterTest {
     var bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(List.of(filter), routes);
 
     assertEquals(2, bannedRoutes.size());
-    assertTrue(bannedRoutes.contains(id(ROUTE_4)));
-    assertTrue(bannedRoutes.contains(id(ROUTE_3)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_4)));
+    assertTrue(bannedRoutes.contains(id(ROUTE_ID_3)));
   }
 }
