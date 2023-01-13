@@ -4,6 +4,10 @@ import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 
+/**
+ * Detailed information about a failure to apply a realtime update, for example for trips or vehicle
+ * positions.
+ */
 public record UpdateError(
   @Nullable FeedScopedId tripId,
   UpdateErrorType errorType,

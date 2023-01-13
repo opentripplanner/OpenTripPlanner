@@ -20,6 +20,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.updater.UpdateResult;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;

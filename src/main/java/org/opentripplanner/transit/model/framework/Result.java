@@ -26,7 +26,13 @@ public abstract sealed class Result<T, E> {
     return new Success<>(null);
   }
 
-  public <NewType> Result<NewType, E> mapSuccess(Function<T, NewType> mapper) {
+  /**
+   * If this instance is a success then the mapper transforms its value. If this instance is a
+   * failure then a new failed instance with the correct success type is returned.
+   *
+   * @param <N> The success type of the new Result instance.
+   */
+  public <N> Result<N, E> mapSuccess(Function<T, N> mapper) {
     if (isSuccess()) {
       return Result.success(mapper.apply(successValue()));
     } else {
@@ -39,8 +45,10 @@ public abstract sealed class Result<T, E> {
    * that it is a failure and want to return it in a method without having to cast the success type.
    * <p>
    * If this instance is not a failure an exception is thrown.
+   *
+   * @param <N> The success type of the new Result instance.
    */
-  public <NewType> Result<NewType, E> toFailureResult() {
+  public <N> Result<N, E> toFailureResult() {
     return Result.failure(failureValue());
   }
 
