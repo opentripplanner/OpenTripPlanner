@@ -46,7 +46,7 @@ Alerts are text messages attached to GTFS objects, informing riders of disruptio
 <!-- INSERT: real-time-alerts -->
 
 
-### TripUpdates
+### TripUpdates via HTTP
 
 TripUpdates report on the status of scheduled trips as they happen, providing observed and 
 predicted arrival and departure times for the remainder of the trip.
@@ -54,7 +54,7 @@ predicted arrival and departure times for the remainder of the trip.
 <!-- INSERT: stop-time-updater -->
 
 
-### TripUpdates Websocket GTFS RT
+### TripUpdates via web socket
 
 <!-- INSERT: websocket-gtfs-rt-updater -->
 
@@ -67,7 +67,7 @@ geographic coordinates or position relative to their scheduled stops.
 <!-- INSERT: vehicle-positions -->
 
 
-## Vehicle rental systems using GBFS
+## GBFS vehicle rental systems
 
 Besides GTFS-RT transit data, OTP can also fetch real-time data about vehicle rental networks
 including the number of bikes and free parking spaces at each station. We support vehicle rental
@@ -78,27 +78,6 @@ partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.
 
 <!-- INSERT: vehicle-rental -->
 
-### Header Settings
-Sometimes GBFS Feeds might need some headers e.g. for authentication. For those use cases headers
-can be configured as a json. Any header key, value can be inserted.
-
-### Arriving with rental bikes at the destination
-
-In some cases it may be useful to not drop off the rented bicycle before arriving at the
-destination. This is useful if bicycles may only be rented for round trips, or the destination is an
-intermediate place.
-
-For this to be possible three things need to be configured:
-
-1. In the updater configuration `allowKeepingRentedBicycleAtDestination` should be set to `true`.
-
-2. `allowKeepingRentedBicycleAtDestination` should also be set for each request, either using
-   [routing defaults](#routing-defaults), or per-request.
-
-3. If keeping the bicycle at the destination should be discouraged, then
-   `keepingRentedBicycleAtDestinationCost` (default: `0`) may also be set in the
-   [routing defaults](#routing-defaults).
-
 ## Vehicle parking (sandbox feature)
 
 Vehicle parking options and configuration is documented in
@@ -107,10 +86,9 @@ its [sandbox documentation](sandbox/VehicleParking.md).
 <!-- INSERT: vehicle-parking -->
 
 
-
 ## SIRI SX updater for Azure Service Bus (sandbox feature)
 
-This is a Sandbox updater se [sandbox documentation](sandbox/SiriAzureUpdater.md).
+This is a Sandbox updater, see [sandbox documentation](sandbox/SiriAzureUpdater.md).
 
 <!-- INSERT: siri-azure-sx-updater -->
 

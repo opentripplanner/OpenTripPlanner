@@ -93,8 +93,16 @@ public class VehicleRentalSourceFactory {
       .since(V2_1)
       .summary("If a vehicle should be allowed to be kept at the end of a station-based rental.")
       .description(
-        "This behaviour is useful in towns that have only a single rental station. Without it you " +
-        "would need see any results as you would have to always bring it back to the station."
+        """
+          In some cases it may be useful to not drop off the rented bicycle before arriving at the destination.
+          This is useful if bicycles may only be rented for round trips, or the destination is an intermediate place.
+                  
+          For this to be possible three things need to be configured:
+                         
+           - In the updater configuration `allowKeepingRentedBicycleAtDestination` should be set to `true`.
+           - `allowKeepingRentedBicycleAtDestination` should also be set for each request, either using routing defaults, or per-request.
+           - If keeping the bicycle at the destination should be discouraged, then `keepingRentedBicycleAtDestinationCost` (default: 0) may also be set in the routing defaults.
+          """
       )
       .asBoolean(false);
   }
