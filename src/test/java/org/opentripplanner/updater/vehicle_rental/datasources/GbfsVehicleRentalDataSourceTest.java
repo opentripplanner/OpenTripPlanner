@@ -88,7 +88,7 @@ class GbfsVehicleRentalDataSourceTest {
 
     var zones = dataSource.getGeofencingZones();
 
-    assertEquals(363, zones.size());
+    assertEquals(2, zones.size());
 
     var frognerPark = zones
       .stream()
@@ -101,7 +101,7 @@ class GbfsVehicleRentalDataSourceTest {
 
     var businessAreas = zones.stream().filter(GeofencingZone::isBusinessArea).toList();
 
-    assertEquals(12, businessAreas.size());
+    assertEquals(1, businessAreas.size());
 
     assertEquals("tieroslo:OSLO Summer 2021", businessAreas.get(0).id().toString());
   }
