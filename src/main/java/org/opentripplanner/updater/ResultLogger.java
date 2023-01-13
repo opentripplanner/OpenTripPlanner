@@ -21,30 +21,34 @@ public class ResultLogger {
     int totalUpdates,
     UpdateResult updateResult
   ) {
-    LOG.info(
-      "[feedId: {}, type={}] {} of {} update messages were applied successfully (success rate: {}%)",
-      feedId,
-      type,
-      updateResult.successful(),
-      totalUpdates,
-      DoubleUtils.roundTo2Decimals((double) updateResult.successful() / totalUpdates * 100)
-    );
+    if (totalUpdates > 0) {
+      LOG.info(
+        "[feedId: {}, type={}] {} of {} update messages were applied successfully (success rate: {}%)",
+        feedId,
+        type,
+        updateResult.successful(),
+        totalUpdates,
+        DoubleUtils.roundTo2Decimals((double) updateResult.successful() / totalUpdates * 100)
+      );
 
-    var errorIndex = updateResult.failures();
+      var errorIndex = updateResult.failures();
 
-    errorIndex
-      .keySet()
-      .forEach(key -> {
-        var value = errorIndex.get(key);
-        var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
-        LOG.error(
-          "[feedId: {}, type={}] {} failures of type {}: {}",
-          feedId,
-          type,
-          value.size(),
-          key,
-          tripIds
-        );
-      });
+      errorIndex
+        .keySet()
+        .forEach(key -> {
+          var value = errorIndex.get(key);
+          var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
+          LOG.error(
+            "[feedId: {}, type={}] {} failures of type {}: {}",
+            feedId,
+            type,
+            value.size(),
+            key,
+            tripIds
+          );
+        });
+    } else {
+      LOG.info("[feedId: {}, type={}] Feed did not contain any updates", feedId, type);
+    }
   }
 }
