@@ -272,21 +272,21 @@ partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.
 | Config Parameter                                                                      |       Type      | Summary                                                                         |  Req./Opt. | Default Value | Since |
 |---------------------------------------------------------------------------------------|:---------------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "VEHICLE_RENTAL"                                                               |      `enum`     | The type of the updater.                                                        | *Required* |               |  1.5  |
-| [allowKeepingRentedBicycleAtDestination](#u_1_allowKeepingRentedBicycleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental. | *Optional* | `false`       |   na  |
+| [allowKeepingRentedBicycleAtDestination](#u_1_allowKeepingRentedBicycleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental. | *Optional* | `false`       |  2.1  |
 | frequencySec                                                                          |    `integer`    | How often the data should be updated in seconds.                                | *Optional* | `60`          |  1.5  |
 | [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                 | *Optional* | `false`       |  2.3  |
-| language                                                                              |     `string`    | TODO                                                                            | *Optional* |               |   na  |
-| [network](#u_1_network)                                                               |     `string`    | The name of the network to override the one derived from the source data.       | *Optional* |               |   na  |
+| language                                                                              |     `string`    | TODO                                                                            | *Optional* |               |  2.1  |
+| [network](#u_1_network)                                                               |     `string`    | The name of the network to override the one derived from the source data.       | *Optional* |               |  1.5  |
 | [sourceType](#u_1_sourceType)                                                         |      `enum`     | What source of vehicle rental updater to use.                                   | *Required* |               |  1.5  |
-| url                                                                                   |     `string`    | The URL to download the data from.                                              | *Required* |               |   na  |
-| [headers](#u_1_headers)                                                               | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |   na  |
+| url                                                                                   |     `string`    | The URL to download the data from.                                              | *Required* |               |  1.5  |
+| [headers](#u_1_headers)                                                               | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |  1.5  |
 
 
 #### Details
 
 <h4 id="u_1_allowKeepingRentedBicycleAtDestination">allowKeepingRentedBicycleAtDestination</h4>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Since version:** `2.1` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** /updaters/[1] 
 
 If a vehicle should be allowed to be kept at the end of a station-based rental.
@@ -308,7 +308,7 @@ This feature is somewhat experimental and therefore turned off by default for th
 
 <h4 id="u_1_network">network</h4>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
+**Since version:** `1.5` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[1] 
 
 The name of the network to override the one derived from the source data.
@@ -325,7 +325,7 @@ What source of vehicle rental updater to use.
 
 <h4 id="u_1_headers">headers</h4>
 
-**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
+**Since version:** `1.5` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[1] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
