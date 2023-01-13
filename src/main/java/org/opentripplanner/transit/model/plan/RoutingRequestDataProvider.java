@@ -13,10 +13,10 @@ import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.util.BitSetIterator;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.transit.model.api.TransitRoutingRequest;
 import org.opentripplanner.transit.model.calendar.ServiceCalendar;
-import org.opentripplanner.transit.model.stop.StopService;
 import org.opentripplanner.transit.model.transfers.StreetTransfers;
 import org.opentripplanner.transit.model.trip.TripOnDate;
 import org.opentripplanner.transit.model.trip.TripService;
@@ -28,7 +28,7 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
 
   private final TransitRoutingRequest request;
   private final ServiceCalendar serviceCalendar;
-  private final StopService stopService;
+  private final TransitLayer transitLayer;
   private final TripService tripService;
   private final StreetTransfers transfersFromStop;
   private final StreetTransfers transfersToStop;
@@ -38,7 +38,7 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
   public RoutingRequestDataProvider(
     TransitRoutingRequest request,
     ServiceCalendar serviceCalendar,
-    StopService stopService,
+    TransitLayer transitLayer,
     TripService tripService,
     StreetTransfers transfersFromStop,
     StreetTransfers transfersToStop,
@@ -46,7 +46,7 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
   ) {
     this.request = request;
     this.serviceCalendar = serviceCalendar;
-    this.stopService = stopService;
+    this.transitLayer = transitLayer;
     this.tripService = tripService;
     this.transfersFromStop = transfersFromStop;
     this.transfersToStop = transfersToStop;
@@ -54,13 +54,13 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
     this.generalizedCostCalculator =
       CostCalculatorFactory.createCostCalculator(
         request.generalizedCostParams(),
-        stopService.stopBoardAlightCosts()
+        transitLayer.getStopBoardAlightCosts()
       );
   }
 
   @Override
   public int numberOfStops() {
-    return stopService.numberOfStops();
+    return transitLayer.getStopCount();
   }
 
   @Override
@@ -68,7 +68,8 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
     BitSet patternMask = new BitSet(tripService.numberOfRoutingPatterns());
 
     while (stops.hasNext()) {
-      patternMask.or(stopService.patternMaskForStop(stops.next()));
+      // TODO RTM
+      //patternMask.or(transitLayer.patternMaskForStop(stops.next()));
     }
     // Filter patterns based on the request (time, mode, operator ...)
     patternMask.and(filteredPatternIndexes);
@@ -111,7 +112,10 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
 
   @Override
   public RaptorStopNameResolver stopNameResolver() {
-    return stopService.stopNameResolver();
+    return stopIndex -> {
+      var s = transitLayer.getStopByIndex(stopIndex);
+      return s == null ? "null" : s.getName() + "(" + stopIndex + ")";
+    };
   }
 
   @Override
