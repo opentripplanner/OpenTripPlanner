@@ -278,6 +278,11 @@ public class VehiclePositionPatternMatcher {
     }
 
     var tripId = vehiclePosition.getTrip().getTripId();
+
+    if (tripId == null) {
+      return Result.failure(UpdateError.noTripId(UpdateError.UpdateErrorType.MISSING_TRIP_ID));
+    }
+
     var trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
     if (trip == null) {
       LOG.debug(
