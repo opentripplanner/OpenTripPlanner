@@ -1,0 +1,29 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "enabledManagers": [
+    "maven",
+    "pip_requirements"
+  ],
+  "prConcurrentLimit": 3,
+  "labels": [
+    "skip changelog"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "jakarta.xml.bind:jakarta.xml.bind-api",
+        // need to ask Skanetrafiken if these can be auto-updated
+        "com.microsoft.azure:azure-servicebus",
+        "com.azure.resourcemanager:azure-resourcemanager-servicebus",
+        "com.azure:azure-core",
+        "com.azure:azure-messaging-servicebus",
+        // need code changes
+        "io.github.origin-energy:java-snapshot-testing-junit5"
+      ],
+      "enabled": false
+    }
+  ]
+}
