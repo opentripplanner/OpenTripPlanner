@@ -3,5 +3,6 @@
   "extends": [
     "config:base"
   ],
-  "enabledManagers": ["maven", "python"]
+  "enabledManagers": ["maven", "pip_requirements"],
+  "prConcurrentLimit": 3
 }
