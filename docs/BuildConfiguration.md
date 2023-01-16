@@ -65,6 +65,10 @@ Sections follow that describe particular settings in more depth.
 |    removeRepeatedStops                                                   |  `boolean`  | Should consecutive identical stops be merged into one stop time entry.                                                                                         | *Optional* | `true`                            |  2.3  |
 |    [stationTransferPreference](#gd_stationTransferPreference)            |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                                                                 | *Optional* | `"allowed"`                       |  2.3  |
 | islandPruning                                                            |   `object`  | Settings for fixing street graph connectivity errors                                                                                                           | *Optional* |                                   |  2.3  |
+|    [adaptivePruningDistance](#islandPruning_adaptivePruningDistance)     |   `double`  | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250.0`                           |  2.3  |
+|    [adaptivePruningFactor](#islandPruning_adaptivePruningFactor)         |   `double`  | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `50.0`                            |  2.3  |
+|    [islandWithStopsMaxSize](#islandPruning_islandWithStopsMaxSize)       |  `integer`  | When a graph island with stops in it should be pruned.                                                                                                         | *Optional* | `2`                               |  2.3  |
+|    [islandWithoutStopsMaxSize](#islandPruning_islandWithoutStopsMaxSize) |  `integer`  | When a graph island without stops should be pruned.                                                                                                            | *Optional* | `10`                              |  2.3  |
 | [localFileNamePatterns](#localFileNamePatterns)                          |   `object`  | Patterns for matching OTP file types in the base directory                                                                                                     | *Optional* |                                   |  2.0  |
 |    [dem](#lfp_dem)                                                       |   `regexp`  | Pattern for matching elevation DEM files.                                                                                                                      | *Optional* | `"(?i)\.tiff?$"`                  |  2.0  |
 |    [gtfs](#lfp_gtfs)                                                     |   `regexp`  | Patterns for matching GTFS zip-files or directories.                                                                                                           | *Optional* | `"(?i)gtfs"`                      |  2.0  |
@@ -764,6 +768,49 @@ This parameter sets the generic level of preference. What is the actual cost can
 with the `stopTransferCost` parameter in the router configuration.
 
 
+<h3 id="islandPruning_adaptivePruningDistance">adaptivePruningDistance</h3>
+
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `250.0`   
+**Path:** /islandPruning 
+
+Search distance for analyzing islands in pruning.
+
+The distance after which disconnected sub graph is considered as real island in pruning heuristics.
+
+
+<h3 id="islandPruning_adaptivePruningFactor">adaptivePruningFactor</h3>
+
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `50.0`   
+**Path:** /islandPruning 
+
+Defines how much pruning thresholds grow maximally by distance.
+
+Expands the pruning thresholds as the distance of an island from the rest of the graph gets smaller.
+Even fairly large disconnected sub graphs should be removed if they are badly entangled with other graph.
+
+
+<h3 id="islandPruning_islandWithStopsMaxSize">islandWithStopsMaxSize</h3>
+
+**Since version:** `2.3` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2`   
+**Path:** /islandPruning 
+
+When a graph island with stops in it should be pruned.
+
+This field indicates the pruning threshold for islands with stops. Any such island under this
+edge count will be pruned.
+
+
+<h3 id="islandPruning_islandWithoutStopsMaxSize">islandWithoutStopsMaxSize</h3>
+
+**Since version:** `2.3` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10`   
+**Path:** /islandPruning 
+
+When a graph island without stops should be pruned.
+
+This field indicates the pruning threshold for islands without stops. Any such island under
+this edge count will be pruned.
+
+
 <h3 id="localFileNamePatterns">localFileNamePatterns</h3>
 
 **Since version:** `2.0` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
@@ -1098,6 +1145,12 @@ case where this is not the case.
     "discardMinTransferTimes" : false,
     "blockBasedInterlining" : true,
     "maxInterlineDistance" : 200
+  },
+  "islandPruning" : {
+    "islandWithStopsMaxSize" : 2,
+    "islandWithoutStopsMaxSize" : 10,
+    "adaptivePruningFactor" : 50.0,
+    "adaptivePruningDistance" : 250.0
   },
   "transitFeeds" : [ {
     "type" : "gtfs",
