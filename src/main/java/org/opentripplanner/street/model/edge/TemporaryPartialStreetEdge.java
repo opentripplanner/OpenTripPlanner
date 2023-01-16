@@ -30,7 +30,8 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
     double length
   ) {
     super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
-    v2.addTraversalExtension(parentEdge.getFromVertex().traversalExtension());
+    v1.addTraversalExtension(parentEdge.getFromVertex().traversalExtension());
+    v2.addTraversalExtension(parentEdge.getToVertex().traversalExtension());
     this.parentEdge = parentEdge;
     this.geometry = super.getGeometry();
   }

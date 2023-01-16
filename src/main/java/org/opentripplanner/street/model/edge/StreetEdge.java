@@ -412,7 +412,7 @@ public class StreetEdge
 
     // we are transitioning into a no-drop-off zone therefore we add a second state for dropping
     // off the vehicle and walking
-    if (entersNoDropOffZone(currentState)) {
+    if (!fromv.dropOffBanned(currentState) && tov.dropOffBanned(currentState)) {
       StateEditor afterTraversal = doTraverse(currentState, TraverseMode.WALK, false);
       if (afterTraversal != null) {
         afterTraversal.dropFloatingVehicle();
@@ -450,13 +450,6 @@ public class StreetEdge
     }
 
     return state;
-  }
-
-  /**
-   * Checks if the state is entering a no-drop-off zone for rental vehicles.
-   */
-  private boolean entersNoDropOffZone(State state) {
-    return fromv.dropOffBanned(state);
   }
 
   /**
