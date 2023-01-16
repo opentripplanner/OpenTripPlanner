@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.standard.internalapi;
 
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 
 public interface DestinationArrivalListener {
   void newDestinationArrival(

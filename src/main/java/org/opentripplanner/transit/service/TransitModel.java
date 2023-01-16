@@ -5,6 +5,7 @@ import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFI
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.set.hash.TIntHashSet;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -19,7 +20,6 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;

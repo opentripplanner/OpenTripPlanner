@@ -1,10 +1,10 @@
 package org.opentripplanner.netex;
 
+import jakarta.xml.bind.JAXBElement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import javax.annotation.Nullable;
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayOfWeekEnumeration;

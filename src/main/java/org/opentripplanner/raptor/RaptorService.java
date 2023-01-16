@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor;
 
 import java.util.stream.Collectors;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -8,7 +9,6 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.Worker;
 import org.opentripplanner.raptor.service.HeuristicSearchTask;
 import org.opentripplanner.raptor.service.RangeRaptorDynamicSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -7,15 +7,14 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
@@ -121,14 +120,7 @@ public class RaptorRequestMapper {
 
     builder
       .profile(RaptorProfile.MULTI_CRITERIA)
-      .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION)
-      .slackProvider(
-        new SlackProvider(
-          preferences.transfer().slack(),
-          preferences.transit().boardSlack(),
-          preferences.transit().alightSlack()
-        )
-      );
+      .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
 
     builder
       .searchParams()

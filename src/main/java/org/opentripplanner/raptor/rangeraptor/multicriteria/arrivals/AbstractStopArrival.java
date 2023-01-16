@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
@@ -15,7 +15,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
   /**
    * We want transits to dominate transfers so we increment the round not only between RangeRaptor
    * rounds, but for transits and transfers also. The access path is paretoRound 0, the first
-   * transit path is 1. The following transfer path, if it exist, is paretoRound 2, and the next
+   * transit path is 1. The following transfer path, if it exists, is paretoRound 2, and the next
    * transit is 3, and so on.
    * <p/>
    * The relationship between Range Raptor round and paretoRound can be described by this formula:

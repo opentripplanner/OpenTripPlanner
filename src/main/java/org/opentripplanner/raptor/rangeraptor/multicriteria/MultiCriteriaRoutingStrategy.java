@@ -2,16 +2,19 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
-import java.util.function.IntConsumer;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
+import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.raptor.spi.TransitArrival;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
 /**
@@ -24,21 +27,25 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   implements RoutingStrategy<T> {
 
   private final McRangeRaptorWorkerState<T> state;
+  private final TimeBasedBoardingSupport<T> boardingSupport;
+  private final ParetoSet<PatternRide<T>> patternRides;
+  private final TransitCalculator<T> calculator;
   private final CostCalculator<T> costCalculator;
   private final SlackProvider slackProvider;
-  private final ParetoSet<PatternRide<T>> patternRides;
-
-  private AbstractStopArrival<T> prevArrival;
 
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
-    SlackProvider slackProvider,
+    TimeBasedBoardingSupport<T> boardingSupport,
+    TransitCalculator<T> calculator,
     CostCalculator<T> costCalculator,
+    SlackProvider slackProvider,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     this.state = state;
-    this.slackProvider = slackProvider;
+    this.boardingSupport = boardingSupport;
+    this.calculator = calculator;
     this.costCalculator = costCalculator;
+    this.slackProvider = slackProvider;
     this.patternRides =
       new ParetoSet<>(
         paretoComparatorRelativeCost(),
@@ -47,16 +54,20 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void setAccessToStop(
-    RaptorAccessEgress accessPath,
-    int iterationDepartureTime,
-    int timeDependentDepartureTime
-  ) {
-    state.setAccessToStop(accessPath, timeDependentDepartureTime);
+  public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
+    int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
+
+    // This access is not available after the iteration departure time
+    if (departureTime == SearchParams.TIME_NOT_SET) {
+      return;
+    }
+
+    state.setAccessToStop(accessPath, departureTime);
   }
 
   @Override
-  public void prepareForTransitWith() {
+  public void prepareForTransitWith(RaptorTimeTable<T> timeTable) {
+    boardingSupport.prepareForTransitWith(timeTable);
     this.patternRides.clear();
   }
 
@@ -68,30 +79,33 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
+  public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
     for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
-      this.prevArrival = prevArrival;
-      prevStopArrivalTimeConsumer.accept(prevArrival.arrivalTime());
+      boardWithRegularTransfer(prevArrival, stopIndex, stopPos, boardSlack);
     }
   }
 
   @Override
-  public TransitArrival<T> previousTransit(int boardStopIndex) {
-    return prevArrival.mostRecentTransitArrival();
+  public void boardWithConstrainedTransfer(
+    int stopIndex,
+    int stopPos,
+    int boardSlack,
+    RaptorConstrainedBoardingSearch<T> txSearch
+  ) {
+    for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
+      boardWithConstrainedTransfer(prevArrival, stopIndex, stopPos, boardSlack, txSearch);
+    }
   }
 
-  @Override
-  public void board(
+  private void board(
+    AbstractStopArrival<T> prevArrival,
     final int stopIndex,
-    final int earliestBoardTime,
-    final RaptorTripScheduleBoardOrAlightEvent<T> boarding
+    final RaptorBoardOrAlightEvent<T> boarding
   ) {
-    final T trip = boarding.getTrip();
-    final int boardTime = boarding.getTime();
+    final T trip = boarding.trip();
+    final int boardTime = boarding.time();
 
     if (prevArrival.arrivedByAccess()) {
-      // TODO: What if access is FLEX with rides, should not FLEX transfersSlack be taken
-      //       into account as well?
       int latestArrivalTime = boardTime - slackProvider.boardSlack(trip.pattern().slackIndex());
       prevArrival = prevArrival.timeShiftNewArrivalTime(latestArrivalTime);
     }
@@ -101,10 +115,10 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     final int relativeBoardCost = boardCost + calculateOnTripRelativeCost(boardTime, trip);
 
     patternRides.add(
-      new PatternRide<T>(
+      new PatternRide<>(
         prevArrival,
         stopIndex,
-        boarding.getStopPositionInPattern(),
+        boarding.stopPositionInPattern(),
         boardTime,
         boardCost,
         relativeBoardCost,
@@ -113,27 +127,63 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     );
   }
 
+  private void boardWithRegularTransfer(
+    AbstractStopArrival<T> prevArrival,
+    int stopIndex,
+    int stopPos,
+    int boardSlack
+  ) {
+    var result = boardingSupport.searchRegularTransfer(
+      prevArrival.arrivalTime(),
+      stopPos,
+      boardSlack
+    );
+    if (!result.empty()) {
+      board(prevArrival, stopIndex, result);
+    }
+  }
+
+  private void boardWithConstrainedTransfer(
+    AbstractStopArrival<T> prevArrival,
+    int stopIndex,
+    int stopPos,
+    int boardSlack,
+    RaptorConstrainedBoardingSearch<T> txSearch
+  ) {
+    boardingSupport
+      .searchConstrainedTransfer(
+        prevArrival.mostRecentTransitArrival(),
+        prevArrival.arrivalTime(),
+        boardSlack,
+        txSearch
+      )
+      .boardWithFallback(
+        boarding -> board(prevArrival, stopIndex, boarding),
+        emptyBoarding -> boardWithRegularTransfer(prevArrival, stopIndex, stopPos, boardSlack)
+      );
+  }
+
   /**
    * Calculate a cost for riding a trip. It should include the cost from the beginning of the
    * journey all the way until a trip is boarded. Any slack at the end of the last leg is not part
    * of this, because that is already accounted for. If the previous leg is an access leg, then it
    * is already time-shifted, which is important for this calculation to be correct.
-   *
-   * @param prevArrival The stop-arrival where the trip was boarded.
+   * <p>
+   * Note! This depends on the {@code prevArrival} being set.
    */
   private int calculateCostAtBoardTime(
-    final AbstractStopArrival<T> prevArrival,
-    final RaptorTripScheduleBoardOrAlightEvent<T> boardEvent
+    AbstractStopArrival<T> prevArrival,
+    final RaptorBoardOrAlightEvent<T> boardEvent
   ) {
     return (
       prevArrival.cost() +
       costCalculator.boardingCost(
         prevArrival.isFirstRound(),
         prevArrival.arrivalTime(),
-        boardEvent.getBoardStopIndex(),
-        boardEvent.getTime(),
-        boardEvent.getTrip(),
-        boardEvent.getTransferConstraint()
+        boardEvent.boardStopIndex(),
+        boardEvent.time(),
+        boardEvent.trip(),
+        boardEvent.transferConstraint()
       )
     );
   }

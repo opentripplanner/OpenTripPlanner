@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.path;
+package org.opentripplanner.raptor.spi;
 
 import java.util.List;
 import java.util.Objects;
@@ -7,16 +7,22 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
-import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.AccessPathLeg;
+import org.opentripplanner.raptor.api.path.EgressPathLeg;
+import org.opentripplanner.raptor.api.path.PathLeg;
+import org.opentripplanner.raptor.api.path.PathStringBuilder;
+import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
+import org.opentripplanner.raptor.api.path.TransitPathLeg;
 
 /**
  * The result path of a Raptor search describing the one possible journey.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>> {
+public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
 
   private final int iterationDepartureTime;
   private final int startTime;
@@ -58,16 +64,19 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>> {
   }
 
   /** Copy constructor */
-  @SuppressWarnings("CopyConstructorMissesField")
-  protected Path(Path<T> original) {
-    this(original.iterationDepartureTime, original.accessLeg, original.generalizedCost);
+  protected Path(RaptorPath<T> original) {
+    this(
+      original.rangeRaptorIterationDepartureTime(),
+      original.accessLeg(),
+      original.generalizedCost()
+    );
   }
 
   /**
    * Create a "dummy" path without legs. Can be used to test if a path is pareto optimal without
    * creating the hole path.
    */
-  public static <T extends RaptorTripSchedule> Path<T> dummyPath(
+  public static <T extends RaptorTripSchedule> RaptorPath<T> dummyPath(
     int iteration,
     int startTime,
     int endTime,
@@ -77,110 +86,79 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>> {
     return new Path<>(iteration, startTime, endTime, numberOfTransfers, cost);
   }
 
-  /**
-   * The Range Raptor iteration departure time. This can be used in the path-pareto-function to make
-   * sure all results found in previous iterations are kept, and not dominated by new results. This
-   * is used for the time-table view.
-   */
+  @Override
   public final int rangeRaptorIterationDepartureTime() {
     return iterationDepartureTime;
   }
 
-  /**
-   * The journey start time. The departure time from the journey origin.
-   */
+  @Override
   public final int startTime() {
     return startTime;
   }
 
-  /**
-   * The journey end time. The arrival time at the journey destination.
-   */
+  @Override
   public final int endTime() {
     return endTime;
   }
 
-  /**
-   * The total journey duration in seconds.
-   */
+  @Override
   public final int durationInSeconds() {
     return endTime - startTime;
   }
 
-  /**
-   * The total number of transfers for this journey.
-   */
+  @Override
   public final int numberOfTransfers() {
     return numberOfTransfers;
   }
 
-  /**
-   * The total number of transfers for this journey, excluding any transfers from/to/within access
-   * or egress transfers. This method returns the number of transit legs minus one.
-   *
-   * @return the number of transfers or zero.
-   */
+  @Override
   public final int numberOfTransfersExAccessEgress() {
     return Math.max(0, (int) transitLegs().count() - 1);
   }
 
-  /**
-   * The total Raptor cost computed for this path. This is for debugging and filtering purposes.
-   * <p>
-   * {@code -1} is returned if no cost exist.
-   * <p>
-   * The unit is centi-seconds
-   */
+  @Override
   public final int generalizedCost() {
     return generalizedCost;
   }
 
-  /**
-   * The first leg/path of this journey - which is linked to the next and so on. The leg can contain
-   * sub-legs, for example: walk-flex-walk.
-   */
+  @Override
   public final AccessPathLeg<T> accessLeg() {
     return accessLeg;
   }
 
-  /**
-   * The last leg of this journey. The leg can contain sub-legs, for example: walk-flex-walk.
-   */
+  @Override
   public final EgressPathLeg<T> egressLeg() {
     return egressPathLeg;
   }
 
-  /**
-   * Utility method to list all visited stops.
-   */
+  @Override
   public List<Integer> listStops() {
     return accessLeg.nextLeg().stream().map(PathLeg::fromStop).collect(Collectors.toList());
   }
 
-  /**
-   * Aggregated wait-time in seconds. This method compute the total wait time for this path.
-   */
+  @Override
   public int waitTime() {
     // Get the total duration for all legs exclusive slack/wait time.
     int legsTotalDuration = legStream().mapToInt(PathLeg::duration).sum();
     return durationInSeconds() - legsTotalDuration;
   }
 
+  @Override
   public Stream<PathLeg<T>> legStream() {
     return accessLeg.stream();
   }
 
-  /**
-   * Stream all transit legs in the path
-   */
+  @Override
   public Stream<TransitPathLeg<T>> transitLegs() {
     return legStream().filter(PathLeg::isTransitLeg).map(PathLeg::asTransitLeg);
   }
 
+  @Override
   public String toStringDetailed(RaptorStopNameResolver stopNameResolver) {
     return buildString(true, stopNameResolver, null);
   }
 
+  @Override
   public String toString(RaptorStopNameResolver stopNameTranslator) {
     return buildString(false, stopNameTranslator, null);
   }
@@ -222,20 +200,20 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>> {
    * </ol>
    */
   @Override
-  public int compareTo(Path<T> other) {
-    int c = endTime - other.endTime;
+  public int compareTo(RaptorPath<T> other) {
+    int c = endTime - other.endTime();
     if (c != 0) {
       return c;
     }
-    c = other.startTime - startTime;
+    c = other.startTime() - startTime;
     if (c != 0) {
       return c;
     }
-    c = generalizedCost - other.generalizedCost;
+    c = generalizedCost - other.generalizedCost();
     if (c != 0) {
       return c;
     }
-    c = numberOfTransfers - other.numberOfTransfers;
+    c = numberOfTransfers - other.numberOfTransfers();
     return c;
   }
 

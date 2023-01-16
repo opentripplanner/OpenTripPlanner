@@ -1,10 +1,10 @@
 package org.opentripplanner.netex;
 
+import jakarta.xml.bind.JAXBException;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import javax.xml.bind.JAXBException;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;

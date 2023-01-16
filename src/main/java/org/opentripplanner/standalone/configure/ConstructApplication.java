@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
+import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
-import javax.ws.rs.core.Application;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;

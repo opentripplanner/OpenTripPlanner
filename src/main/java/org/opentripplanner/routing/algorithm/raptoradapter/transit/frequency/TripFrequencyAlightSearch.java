@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
 import org.opentripplanner.raptor.spi.IntIterator;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
@@ -22,7 +22,7 @@ public final class TripFrequencyAlightSearch<T extends DefaultTripSchedule>
   }
 
   @Override
-  public RaptorTripScheduleBoardOrAlightEvent<T> search(
+  public RaptorBoardOrAlightEvent<T> search(
     int earliestBoardTime,
     int stopPositionInPattern,
     int tripIndexLimit
@@ -51,6 +51,7 @@ public final class TripFrequencyAlightSearch<T extends DefaultTripSchedule>
             patternForDates,
             tripTimes,
             stopPositionInPattern,
+            earliestBoardTime,
             arrivalTime + headway,
             headway,
             offset,

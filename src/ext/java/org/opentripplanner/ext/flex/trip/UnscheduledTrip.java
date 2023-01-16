@@ -20,6 +20,7 @@ import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -150,7 +151,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       fromStopTime.flexWindowEnd < departureTime ||
       toStopTime.flexWindowEnd < (departureTime + flexTime)
     ) {
-      return -1;
+      return SearchParams.TIME_NOT_SET;
     }
 
     return Math.max(departureTime, fromStopTime.flexWindowStart);
@@ -169,7 +170,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       toStopTime.flexWindowStart > arrivalTime ||
       fromStopTime.flexWindowStart > (arrivalTime - flexTime)
     ) {
-      return -1;
+      return SearchParams.TIME_NOT_SET;
     }
 
     return Math.min(arrivalTime, toStopTime.flexWindowEnd);

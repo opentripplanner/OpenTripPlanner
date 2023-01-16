@@ -1,5 +1,8 @@
 package org.opentripplanner.raptor.spi;
 
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.SearchDirection;
+
 /**
  * A TimeTable is a list of trips in service for the given search date and a limited time before and
  * after. This can be a subset of all trips available to speed up the trip search - that is left to
