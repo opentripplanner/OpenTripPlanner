@@ -1,10 +1,10 @@
 package org.opentripplanner.netex.loader;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.InputStream;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 
 /** Simple wrapper to perform typesafe xml parsing and simple error handling. */

@@ -18,7 +18,7 @@ public interface RoundProvider {
   int round();
 
   /**
-   * Return true if this round is the fist round, calculating the first transit path. Access is
+   * Return true if this round is the first round, calculating the first transit path. Access is
    * calculated in round zero (0).
    */
   boolean isFirstRound();

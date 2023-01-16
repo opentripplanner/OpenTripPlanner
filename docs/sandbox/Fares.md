@@ -4,18 +4,10 @@
 
 - Leonard Ehrenfried ([mail@leonard.io](mailto:mail@leonard.io))
 
-## Changelog
-
-- Initial move into sandbox [#4241](https://github.com/opentripplanner/OpenTripPlanner/pull/4241)
-- Add HighestFareInFreeTransferWindowFareService [#4267](https://github.com/opentripplanner/OpenTripPlanner/pull/4267)
-- Add Fares V2 [#4338](https://github.com/opentripplanner/OpenTripPlanner/pull/4338)
-- Add CombineInterlinedLegsFareService [#4509](https://github.com/opentripplanner/OpenTripPlanner/pull/4509)
-
 ## Documentation
 
 The code in this sandbox used to be part of OTP core but to allow more experimentation - in 
 particular regarding GTFS Fares V2 - it was moved into a sandbox.
-
 
 ## Fares V2
 
@@ -52,19 +44,8 @@ The classes and their maintainers are as follows:
 | AtlantaFareService                         | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
 | CombinedInterlinedLegsFareService          | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
 | HSLFareServiceImpl                         | HSL ([Viljami Nurminen](mailto:viljami.nurminen@cgi.com))  |
-| NycFareServiceImpl                         | unmaintained                                               |
 | SFBayFareServiceImpl                       | unmaintained                                               |
 
-## Removed fare calculators
-
-The following calculators used to be part of the OTP codebase but since their maintainership
-was unclear and no-one [offered to maintain](https://groups.google.com/g/opentripplanner-users/c/ZPzx1lhZ9HU), 
-they were [removed](https://github.com/opentripplanner/OpenTripPlanner/pull/4273) in July 2022.
-
-- SeattleFareServiceImpl
-- DutchFareServiceImpl
-
-If you were using these calculators, you're welcome to re-add them to the code base.
 
 
 ## Fares configuration
@@ -135,8 +116,6 @@ The current list of custom fare type is:
     - `prices` - a list of {time, price}. The resulting cost is the smallest cost where the elapsed
       time of vehicle rental is lower than the defined time.
 - `san-francisco` (no parameters)
-- `new-york` (no parameters)
-- `seattle` (no parameters)
 - `highest-fare-in-free-transfer-window` Will apply the highest observed transit fare (across all
   operators) within a free transfer window, adding to the cost if a trip is boarded outside the free
   transfer window. It accepts the following parameters:
@@ -150,9 +129,30 @@ The current list of custom fare type is:
   between them) as a single leg for the purpose of fare calculation.
   It has a single parameter `mode` which controls when exactly the combination should happen:
     - `ALWAYS`: All interlined legs are combined. (default)
-    - `SAME_ROUTE`: Only interlined legs whose route ID are identical are encountered.
+    - `SAME_ROUTE`: Only interlined legs whose route ID are identical are combined.
 - `off` (no parameters)
 
 The current list of `combinationStrategy` is:
 
 - `additive` - simply adds all sub-fares.
+ 
+## Removed fare calculators
+
+The following calculators used to be part of the OTP codebase but since their maintainership
+was unclear and no-one [offered to maintain](https://groups.google.com/g/opentripplanner-users/c/ZPzx1lhZ9HU),
+they were [removed](https://github.com/opentripplanner/OpenTripPlanner/pull/4273) in July 2022.
+
+- SeattleFareServiceImpl
+- DutchFareServiceImpl
+
+The NYC fare calculator was removed in [#4694](https://github.com/opentripplanner/OpenTripPlanner/pull/4694).
+
+If you were using these calculators, you're welcome to re-add them to the code base and become their
+maintainer.
+
+## Changelog
+
+- Initial move into sandbox [#4241](https://github.com/opentripplanner/OpenTripPlanner/pull/4241)
+- Add HighestFareInFreeTransferWindowFareService [#4267](https://github.com/opentripplanner/OpenTripPlanner/pull/4267)
+- Add Fares V2 [#4338](https://github.com/opentripplanner/OpenTripPlanner/pull/4338)
+- Add CombineInterlinedLegsFareService [#4509](https://github.com/opentripplanner/OpenTripPlanner/pull/4509)

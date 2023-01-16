@@ -61,6 +61,11 @@ public enum OTPFeature {
   /* Sandbox extension features - Must be turned OFF by default */
 
   ActuatorAPI(false, true, "Endpoint for actuators (service health status)."),
+  AsyncGraphQLFetchers(
+    false,
+    false,
+    "Whether the @async annotation in the GraphQL schema should lead to the fetch being executed asynchronously. This allows batch or alias queries to run in parallel at the cost of consuming extra threads."
+  ),
 
   DataOverlay(
     false,

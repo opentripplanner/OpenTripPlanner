@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
+import jakarta.inject.Inject;
 import java.util.Collection;
-import javax.inject.Inject;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
