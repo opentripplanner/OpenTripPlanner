@@ -49,7 +49,7 @@ public class PruneIslands implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(PruneIslands.class);
 
-  private static final int islandCounter = 0;
+  private final int islandCounter = 0;
   private final Graph graph;
   private final TransitModel transitModel;
   private final DataImportIssueStore issueStore;
@@ -384,7 +384,7 @@ public class PruneIslands implements GraphBuilderModule {
     return count;
   }
 
-  private static void collectNeighbourVertices(
+  private void collectNeighbourVertices(
     Graph graph,
     Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
     TraverseMode traverseMode,
@@ -447,7 +447,7 @@ public class PruneIslands implements GraphBuilderModule {
     }
   }
 
-  private static int collectSubGraphs(
+  private int collectSubGraphs(
     Graph graph,
     Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
     Map<Vertex, Subgraph> newgraphs, // put new subgraphs here
@@ -485,7 +485,7 @@ public class PruneIslands implements GraphBuilderModule {
     return count;
   }
 
-  private static void restrictOrRemove(
+  private void restrictOrRemove(
     Graph graph,
     VertexLinker vertexLinker,
     Subgraph island,
@@ -598,7 +598,7 @@ public class PruneIslands implements GraphBuilderModule {
     );
   }
 
-  private static Subgraph computeConnectedSubgraph(
+  private Subgraph computeConnectedSubgraph(
     Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
     Vertex startVertex,
     Map<Vertex, Subgraph> anchors
