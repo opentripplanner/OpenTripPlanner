@@ -108,7 +108,7 @@ class GeofencingEdgeUpdaterTest {
     assertInstanceOf(NoExtension.class, insideFrognerPark.getTraversalExtension());
     var updated = updater.applyGeofencingZones(List.of(zone, businessArea));
 
-    assertEquals(1, updated.size());
+    assertEquals(3, updated.size());
 
     var ext = (StreetEdgeRentalExtension.BusinessAreaBorder) businessBorder.getTraversalExtension();
     assertInstanceOf(StreetEdgeRentalExtension.BusinessAreaBorder.class, ext);

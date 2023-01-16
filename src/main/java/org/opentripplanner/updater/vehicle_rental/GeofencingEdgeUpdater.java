@@ -33,9 +33,11 @@ class GeofencingEdgeUpdater {
    * {@link StreetEdgeRentalExtension} to them.
    */
   Map<StreetEdge, StreetEdgeRentalExtension> applyGeofencingZones(
-    List<GeofencingZone> geofencingZones
+    Collection<GeofencingZone> geofencingZones
   ) {
     var restrictedZones = geofencingZones.stream().filter(GeofencingZone::hasRestriction).toList();
+
+    var updates = new HashMap<StreetEdge, StreetEdgeRentalExtension>();
 
     // these are the edges inside business area where exceptions like "no pass through"
     // or "no drop-off" are added
@@ -44,7 +46,7 @@ class GeofencingEdgeUpdater {
       GeofencingZoneExtension::new
     );
 
-    var updates = new HashMap<StreetEdge, StreetEdgeRentalExtension>();
+    updates.putAll(restrictedEdges);
 
     var generalBusinessAreas = geofencingZones
       .stream()

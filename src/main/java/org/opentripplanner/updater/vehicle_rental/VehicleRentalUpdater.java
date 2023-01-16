@@ -47,7 +47,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   private final VehicleRentalDatasource source;
   private WriteToGraphCallback saveResultOnGraph;
 
-  private Map<StreetEdge, StreetEdgeRentalExtension> latestAppliedGeofencingZones = Map.of();
+  private Map<StreetEdge, StreetEdgeRentalExtension> latestModifiedEdges = Map.of();
+  private Set<GeofencingZone> latestAppliedGeofencingZones = Set.of();
   Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
   Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
   private final VertexLinker linker;
@@ -133,14 +134,14 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {
 
     private final List<VehicleRentalPlace> stations;
-    private final List<GeofencingZone> geofencingZones;
+    private final Set<GeofencingZone> geofencingZones;
 
     public VehicleRentalGraphWriterRunnable(
       List<VehicleRentalPlace> stations,
       List<GeofencingZone> geofencingZones
     ) {
       this.stations = stations;
-      this.geofencingZones = geofencingZones;
+      this.geofencingZones = Set.copyOf(geofencingZones);
     }
 
     @Override
@@ -201,24 +202,22 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
       // this check relies on the generated equals for the record which also recursively checks that
       // the JTS geometries are equal
-      if (
-        // TODO: need to find a way to figure out when to update the zones
-        !geofencingZones.isEmpty() && geofencingZones.size() != latestAppliedGeofencingZones.size()
-      ) {
+      if (!geofencingZones.isEmpty() && !geofencingZones.equals(latestAppliedGeofencingZones)) {
         LOG.info("Computing geofencing zones");
         var start = System.currentTimeMillis();
 
-        latestAppliedGeofencingZones.forEach(StreetEdge::removeTraversalExtension);
+        latestModifiedEdges.forEach(StreetEdge::removeTraversalExtension);
 
         var updater = new GeofencingEdgeUpdater(graph.getStreetIndex()::getEdgesForEnvelope);
-        latestAppliedGeofencingZones = updater.applyGeofencingZones(geofencingZones);
+        latestModifiedEdges = updater.applyGeofencingZones(geofencingZones);
+        latestAppliedGeofencingZones = geofencingZones;
 
         var end = System.currentTimeMillis();
         var millis = Duration.ofMillis(end - start);
         LOG.info(
           "Geofencing zones computation took {}. Added extension to {} edges.",
           TimeUtils.durationToStrCompact(millis),
-          latestAppliedGeofencingZones.size()
+          latestModifiedEdges.size()
         );
       }
 
