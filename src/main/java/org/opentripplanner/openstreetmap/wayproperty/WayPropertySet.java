@@ -9,11 +9,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
@@ -34,11 +36,21 @@ import org.slf4j.LoggerFactory;
  */
 public class WayPropertySet {
 
+  @FunctionalInterface
+  public interface TriFunction<A, B, C, R> {
+    R apply(A a, B b, C c);
+
+    default <V> TriFunction<A, B, C, V> andThen(Function<? super R, ? extends V> after) {
+      Objects.requireNonNull(after);
+      return (A a, B b, C c) -> after.apply(apply(a, b, c));
+    }
+  }
+
   private static final Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
   /** Sets 1.0 as default safety value for all permissions. */
-  private final BiFunction<StreetTraversalPermission, Float, Double> DEFAULT_SAFETY_RESOLVER =
-    ((permission, speedLimit) -> 1.0);
+  private final TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> DEFAULT_SAFETY_RESOLVER =
+    ((permission, speedLimit, osmWay) -> 1.0);
 
   private final List<WayPropertyPicker> wayProperties;
 
@@ -54,9 +66,9 @@ public class WayPropertySet {
   /** The automobile speed for street segments that do not match any SpeedPicker. */
   public Float defaultSpeed;
   /** Resolves walk safety value for each {@link StreetTraversalPermission}. */
-  private BiFunction<StreetTraversalPermission, Float, Double> defaultWalkSafetyForPermission;
+  private TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultWalkSafetyForPermission;
   /** Resolves bicycle safety value for each {@link StreetTraversalPermission}. */
-  private BiFunction<StreetTraversalPermission, Float, Double> defaultBicycleSafetyForPermission;
+  private TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultBicycleSafetyForPermission;
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
   private final WayProperties defaultProperties;
 
@@ -126,18 +138,18 @@ public class WayPropertySet {
       .bicycleSafety(
         forwardResult.getBicycleSafetyFeatures() != null
           ? forwardResult.getBicycleSafetyFeatures().forward()
-          : defaultBicycleSafetyForPermission.apply(permission, forwardSpeed),
+          : defaultBicycleSafetyForPermission.apply(permission, forwardSpeed, way),
         backwardResult.getBicycleSafetyFeatures() != null
           ? backwardResult.getBicycleSafetyFeatures().back()
-          : defaultBicycleSafetyForPermission.apply(permission, backSpeed)
+          : defaultBicycleSafetyForPermission.apply(permission, backSpeed, way)
       )
       .walkSafety(
         forwardResult.getWalkSafetyFeatures() != null
           ? forwardResult.getWalkSafetyFeatures().forward()
-          : defaultWalkSafetyForPermission.apply(permission, forwardSpeed),
+          : defaultWalkSafetyForPermission.apply(permission, forwardSpeed, way),
         backwardResult.getWalkSafetyFeatures() != null
           ? backwardResult.getWalkSafetyFeatures().back()
-          : defaultWalkSafetyForPermission.apply(permission, backSpeed)
+          : defaultWalkSafetyForPermission.apply(permission, backSpeed, way)
       )
       .build();
 
@@ -373,7 +385,7 @@ public class WayPropertySet {
    * provide a default for each permission. Safety can vary based on car speed limit on a way.
    */
   public void setDefaultWalkSafetyForPermission(
-    BiFunction<StreetTraversalPermission, Float, Double> defaultWalkSafetyForPermission
+    TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultWalkSafetyForPermission
   ) {
     if (!this.defaultWalkSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default walk safety resolver was already set");
@@ -386,7 +398,7 @@ public class WayPropertySet {
    * provide a default for each permission. Safety can vary based on car speed limit on a way.
    */
   public void setDefaultBicycleSafetyForPermission(
-    BiFunction<StreetTraversalPermission, Float, Double> defaultBicycleSafetyForPermission
+    TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultBicycleSafetyForPermission
   ) {
     if (!this.defaultBicycleSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default cycling safety resolver was already set");
