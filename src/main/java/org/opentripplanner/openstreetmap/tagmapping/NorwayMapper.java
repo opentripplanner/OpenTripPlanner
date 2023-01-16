@@ -32,6 +32,42 @@ class NorwayMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
+    var sidewalk = new Condition.EqualsAnyIn("sidewalk", "yes", "left", "right", "both");
+    var sidewalk_prefix = new Condition.Equals("sidewalk", "yes");
+    props.setDefaultWalkSafetyForPermission((permission, speedLimit, way) ->
+      switch (permission) {
+        case ALL, PEDESTRIAN_AND_CAR -> {
+          if (
+            sidewalk.matches(way) ||
+            sidewalk_prefix.matchesLeft(way) ||
+            sidewalk_prefix.matchesRight(way)
+          ) {
+            yield 1.1;
+          }
+          // ~30 km/h or under
+          else if (speedLimit <= 8.4f) {
+            yield 1.4;
+          }
+          // ~50 km/h or under
+          else if (speedLimit <= 13.9f) {
+            yield 1.6;
+          }
+          // ~80 km/h or under
+          else if (speedLimit <= 22.3f) {
+            yield 1.9;
+          }
+          // over 80 km/h
+          else {
+            yield 3.;
+          }
+        }
+        case PEDESTRIAN_AND_BICYCLE -> 1.1;
+        case PEDESTRIAN -> 1.;
+        // these don't include walking
+        case BICYCLE_AND_CAR, BICYCLE, CAR, NONE -> 3.;
+      }
+    );
+
     var very_high_traffic = 10.;
     var high_traffic = 3.75;
     var medium_high_traffic = 3.43;
