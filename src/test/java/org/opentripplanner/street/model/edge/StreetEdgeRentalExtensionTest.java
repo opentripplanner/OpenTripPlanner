@@ -33,7 +33,7 @@ class StreetEdgeRentalExtensionTest {
   @Test
   public void leaveBusinessAreaOnFoot() {
     var edge = streetEdge(V1, V2);
-    edge.addRentalExtension(new BusinessAreaBorder(network));
+    edge.addTraversalExtension(new BusinessAreaBorder(network));
     State result = traverse(edge);
     assertEquals(HAVE_RENTED, result.getVehicleRentalState());
     assertEquals(TraverseMode.WALK, result.getBackMode());
@@ -43,7 +43,7 @@ class StreetEdgeRentalExtensionTest {
   @Test
   public void dontEnterGeofencingZoneOnFoot() {
     var edge = streetEdge(V1, V2);
-    edge.addRentalExtension(
+    edge.addTraversalExtension(
       new StreetEdgeRentalExtension.GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, true)
       )
@@ -62,7 +62,7 @@ class StreetEdgeRentalExtensionTest {
     var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
     var editor = new StateEditor(edge1.getFromVertex(), req);
     editor.beginFloatingVehicleRenting(RentalVehicleType.FormFactor.SCOOTER, network, false);
-    restrictedEdge.addRentalExtension(
+    restrictedEdge.addTraversalExtension(
       new StreetEdgeRentalExtension.GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
       )
@@ -86,7 +86,7 @@ class StreetEdgeRentalExtensionTest {
   @Test
   public void dontFinishInNoDropOffZone() {
     var edge = streetEdge(V1, V2);
-    edge.addRentalExtension(
+    edge.addTraversalExtension(
       new StreetEdgeRentalExtension.GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
       )
@@ -105,8 +105,8 @@ class StreetEdgeRentalExtensionTest {
   @Test
   public void addTwoExtensions() {
     var edge = streetEdge(V1, V2);
-    edge.addRentalExtension(new BusinessAreaBorder("a"));
-    edge.addRentalExtension(new BusinessAreaBorder("b"));
+    edge.addTraversalExtension(new BusinessAreaBorder("a"));
+    edge.addTraversalExtension(new BusinessAreaBorder("b"));
 
     assertTrue(edge.getTraversalExtension().traversalBanned(state("a")));
     assertTrue(edge.getTraversalExtension().traversalBanned(state("b")));
@@ -119,12 +119,12 @@ class StreetEdgeRentalExtensionTest {
     final BusinessAreaBorder b = new BusinessAreaBorder("b");
     final BusinessAreaBorder c = new BusinessAreaBorder("c");
 
-    edge.addRentalExtension(a);
+    edge.addTraversalExtension(a);
 
     assertTrue(edge.getTraversalExtension().traversalBanned(state("a")));
 
-    edge.addRentalExtension(b);
-    edge.addRentalExtension(c);
+    edge.addTraversalExtension(b);
+    edge.addTraversalExtension(c);
 
     edge.removeTraversalExtension(a);
 
@@ -139,7 +139,7 @@ class StreetEdgeRentalExtensionTest {
   @Test
   public void checkNetwork() {
     var edge = streetEdge(V1, V2);
-    edge.addRentalExtension(new BusinessAreaBorder("a"));
+    edge.addTraversalExtension(new BusinessAreaBorder("a"));
 
     var state = traverse(edge);
 

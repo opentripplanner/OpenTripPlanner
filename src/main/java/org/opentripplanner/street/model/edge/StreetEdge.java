@@ -63,7 +63,6 @@ public class StreetEdge
   private static final int WALK_NOTHRUTRAFFIC = 8;
   private static final int CLASS_LINK = 9;
   private StreetEdgeCostExtension costExtension;
-  protected StreetEdgeRentalExtension traversalExtensions = StreetEdgeRentalExtension.NO_EXTENSION;
   /** back, roundabout, stairs, ... */
   private short flags;
 
@@ -388,7 +387,7 @@ public class StreetEdge
   public State traverse(State currentState) {
     final StateEditor editor;
 
-    if (traversalExtensions.traversalBanned(currentState)) {
+    if (tov.traversalBanned(currentState)) {
       editor = doTraverse(currentState, TraverseMode.WALK, false);
       if (editor != null) {
         editor.dropFloatingVehicle();
@@ -457,12 +456,7 @@ public class StreetEdge
    * Checks if the state is entering a no-drop-off zone for rental vehicles.
    */
   private boolean entersNoDropOffZone(State state) {
-    return (
-      state.getBackEdge() != null &&
-      state.getBackEdge() instanceof StreetEdge backStreetEdge &&
-      !backStreetEdge.isDropOffBanned(state) &&
-      this.isDropOffBanned(state)
-    );
+    return fromv.dropOffBanned(state);
   }
 
   /**
@@ -506,14 +500,15 @@ public class StreetEdge
   }
 
   public StreetEdgeRentalExtension getTraversalExtension() {
-    return traversalExtensions;
+    return fromv.traversalExtension();
   }
 
   /**
    * This method is not thread-safe.
    */
   public void removeTraversalExtension(StreetEdgeRentalExtension ext) {
-    traversalExtensions = traversalExtensions.remove(ext);
+    fromv.removeTraversalExtension(ext);
+    tov.removeTraversalExtension(ext);
   }
 
   private void setGeometry(LineString geometry) {
@@ -692,8 +687,9 @@ public class StreetEdge
   /**
    * This method is not thread-safe!
    */
-  public void addRentalExtension(StreetEdgeRentalExtension ext) {
-    traversalExtensions = traversalExtensions.add(ext);
+  public void addTraversalExtension(StreetEdgeRentalExtension ext) {
+    fromv.addTraversalExtension(ext);
+    tov.addTraversalExtension(ext);
   }
 
   /**
@@ -945,6 +941,7 @@ public class StreetEdge
     splitEdge.setLink(isLink());
     splitEdge.setCarSpeed(getCarSpeed());
     splitEdge.setElevationExtensionUsingParent(this, fromDistance, toDistance);
+    splitEdge.addTraversalExtension(fromv.traversalExtension());
   }
 
   protected void setElevationExtensionUsingParent(
@@ -1044,9 +1041,9 @@ public class StreetEdge
       return null;
     }
 
-    if (isDropOffBanned(currentState)) {
+    if (tov.dropOffBanned(currentState)) {
       editor.enterNoRentalDropOffArea();
-    } else if (currentState.isInsideNoRentalDropOffArea()) {
+    } else if (currentState.isInsideNoRentalDropOffArea() && !tov.dropOffBanned(currentState)) {
       editor.leaveNoRentalDropOffArea();
     }
 
@@ -1154,10 +1151,6 @@ public class StreetEdge
     editor.incrementWeight(weight);
 
     return editor;
-  }
-
-  protected boolean isDropOffBanned(State currentState) {
-    return traversalExtensions.dropOffBanned(currentState);
   }
 
   @Nonnull

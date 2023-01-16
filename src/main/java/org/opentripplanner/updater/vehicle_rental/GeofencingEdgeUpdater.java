@@ -37,8 +37,6 @@ class GeofencingEdgeUpdater {
   ) {
     var restrictedZones = geofencingZones.stream().filter(GeofencingZone::hasRestriction).toList();
 
-    var updates = new HashMap<StreetEdge, StreetEdgeRentalExtension>();
-
     // these are the edges inside business area where exceptions like "no pass through"
     // or "no drop-off" are added
     var restrictedEdges = addExtensionToIntersectingStreetEdges(
@@ -46,7 +44,7 @@ class GeofencingEdgeUpdater {
       GeofencingZoneExtension::new
     );
 
-    updates.putAll(restrictedEdges);
+    var updates = new HashMap<>(restrictedEdges);
 
     var generalBusinessAreas = geofencingZones
       .stream()
@@ -120,7 +118,7 @@ class GeofencingEdgeUpdater {
     }
     for (var e : candidates) {
       if (e instanceof StreetEdge streetEdge && streetEdge.getGeometry().intersects(geom)) {
-        streetEdge.addRentalExtension(ext);
+        streetEdge.addTraversalExtension(ext);
         edgesUpdated.put(streetEdge, ext);
       }
     }

@@ -16,6 +16,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
 import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   private transient Edge[] incoming = new Edge[0];
 
   private transient Edge[] outgoing = new Edge[0];
+  private StreetEdgeRentalExtension traversalExtension = StreetEdgeRentalExtension.NO_RESTRICTIONS;
 
   /* CONSTRUCTORS */
 
@@ -196,6 +198,26 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
       result.add((StreetEdge) out);
     }
     return result;
+  }
+
+  public boolean traversalBanned(State currentState) {
+    return traversalExtension.traversalBanned(currentState);
+  }
+
+  public void addTraversalExtension(StreetEdgeRentalExtension ext) {
+    traversalExtension = traversalExtension.add(ext);
+  }
+
+  public StreetEdgeRentalExtension traversalExtension() {
+    return traversalExtension;
+  }
+
+  public boolean dropOffBanned(State currentState) {
+    return traversalExtension.dropOffBanned(currentState);
+  }
+
+  public void removeTraversalExtension(StreetEdgeRentalExtension ext) {
+    traversalExtension.remove(ext);
   }
 
   /**
