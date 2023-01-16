@@ -5,18 +5,19 @@ import java.util.Map;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
-import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 
 /**
  * A vector tile layer containing all {@link AreaStop}s inside the vector tile bounds.
  */
-public class GeofencingZonesLayerBuilder extends LayerBuilder<StreetEdge> {
+public class GeofencingZonesLayerBuilder extends LayerBuilder<Vertex> {
 
   private static final Map<MapperType, MapperFactory> mappers = Map.of(
     MapperType.DebugClient,
@@ -36,14 +37,12 @@ public class GeofencingZonesLayerBuilder extends LayerBuilder<StreetEdge> {
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
     return streetIndex
-      .getEdgesForEnvelope(query)
+      .getVerticesForEnvelope(query)
       .stream()
-      .filter(StreetEdge.class::isInstance)
-      .map(StreetEdge.class::cast)
-      .filter(se -> !(se.getTraversalExtension() instanceof StreetEdgeRentalExtension.NoExtension))
-      .map(edge -> {
-        Geometry geometry = edge.getGeometry().copy();
-        geometry.setUserData(edge);
+      .filter(se -> !(se.traversalExtension() instanceof StreetEdgeRentalExtension.NoExtension))
+      .map(vertex -> {
+        Geometry geometry = GeometryUtils.getGeometryFactory().createPoint(vertex.getCoordinate());
+        geometry.setUserData(vertex);
         return geometry;
       })
       .toList();
@@ -55,6 +54,6 @@ public class GeofencingZonesLayerBuilder extends LayerBuilder<StreetEdge> {
 
   @FunctionalInterface
   private interface MapperFactory {
-    PropertyMapper<StreetEdge> build(Graph transitService);
+    PropertyMapper<Vertex> build(Graph transitService);
   }
 }

@@ -42,13 +42,74 @@ otp.layers.GeofencingZonesLayer = otp.Class({
         "layers": [
           {
             "id": "business-area-border",
-            "type": "line",
+            "type": "circle",
+            "source": "vertices",
+            "source-layer": "geofencingZones",
+            "filter": ["==", "type", "business-area-border"],
+            "paint": {
+              "circle-radius": {
+                "base": 1.1,
+                "stops": [
+                  [
+                    6,
+                    0.5
+                  ],
+                  [
+                    17,
+                    4
+                  ]
+                ]
+              },
+              "circle-color": "#f65173",
+              "circle-opacity": 0.9
+            }
+          },
+          {
+            "id": "drop-off-banned",
+            "type": "circle",
             "source": "vertices",
             "source-layer": "geofencingZones",
             "filter": ["==", "type", "drop-off-banned"],
             "paint": {
-              "line-color": "#cca217",
-              "line-width": {"base": 2.3, "stops": [[13, 2], [20, 6]]}
+              "circle-radius": {
+                "base": 1.1,
+                "stops": [
+                  [
+                    6,
+                    0.5
+                  ],
+                  [
+                    17,
+                    4
+                  ]
+                ]
+              },
+              "circle-color": "#cbaf3c",
+              "circle-opacity": 0.9
+            }
+          },
+          {
+            "id": "traversal-banned",
+            "type": "circle",
+            "source": "vertices",
+            "source-layer": "geofencingZones",
+            "filter": ["==", "type", "traversal-banned"],
+            "paint": {
+              "circle-radius": {
+                "base": 1.1,
+                "stops": [
+                  [
+                    6,
+                    0.5
+                  ],
+                  [
+                    17,
+                    4
+                  ]
+                ]
+              },
+              "circle-color": "#62081a",
+              "circle-opacity": 0.9
             }
           },
         ]

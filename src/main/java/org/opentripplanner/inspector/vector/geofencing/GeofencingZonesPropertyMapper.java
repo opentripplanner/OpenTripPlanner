@@ -8,16 +8,16 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
-import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * A {@link PropertyMapper} for the {@link GeofencingZonesLayerBuilder} for the OTP debug client.
  */
-public class GeofencingZonesPropertyMapper extends PropertyMapper<StreetEdge> {
+public class GeofencingZonesPropertyMapper extends PropertyMapper<Vertex> {
 
   @Override
-  protected Collection<KeyValue> map(StreetEdge input) {
-    var ext = input.getTraversalExtension();
+  protected Collection<KeyValue> map(Vertex input) {
+    var ext = input.traversalExtension();
 
     // this logic does a best effort attempt at a simple mapping
     // once you have several networks on the same edge it breaks down for that you would
