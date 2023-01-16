@@ -21,7 +21,7 @@ import org.opentripplanner.test.support.PrettyPrinter;
 class GraphQLApiTest {
 
   static OtpServerRequestContext context = new TestServerRequestContext();
-  static LegacyGraphQLAPI resource = new LegacyGraphQLAPI(context, "");
+  static LegacyGraphQLAPI resource = new LegacyGraphQLAPI(context, "ignored");
 
   @FilePatternSource(pattern = "src/ext-test/resources/legacygraphqlapi/queries/*.graphql")
   @ParameterizedTest(name = "Check GraphQL query in {0}")
@@ -42,6 +42,9 @@ class GraphQLApiTest {
         expectationFile,
         PrettyPrinter.json(actualJson),
         StandardOpenOption.CREATE_NEW
+      );
+      fail(
+        "No expectations file for %s so generated it. Please check the content.".formatted(path)
       );
     }
 

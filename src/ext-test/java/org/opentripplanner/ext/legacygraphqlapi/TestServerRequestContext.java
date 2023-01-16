@@ -29,6 +29,28 @@ import org.slf4j.Logger;
 
 public class TestServerRequestContext implements OtpServerRequestContext {
 
+  private final DefaultTransitService transitService;
+  private final Graph graph = new Graph();
+
+  public TestServerRequestContext() {
+    graph
+      .getVehicleParkingService()
+      .updateVehicleParking(
+        List.of(
+          VehicleParking
+            .builder()
+            .id(TransitModelForTest.id("parking-1"))
+            .name(NonLocalizedString.ofNullable("parking"))
+            .build()
+        ),
+        List.of()
+      );
+    var transitModel = new TransitModel();
+    transitModel.index();
+    transitModel.getTransitModelIndex().addRoutes(TransitModelForTest.route("123").build());
+    transitService = new DefaultTransitService(transitModel);
+  }
+
   @Override
   public RouteRequest defaultRouteRequest() {
     return new RouteRequest();
@@ -46,28 +68,12 @@ public class TestServerRequestContext implements OtpServerRequestContext {
 
   @Override
   public Graph graph() {
-    var g = new Graph();
-    g
-      .getVehicleParkingService()
-      .updateVehicleParking(
-        List.of(
-          VehicleParking
-            .builder()
-            .id(TransitModelForTest.id("parking-1"))
-            .name(NonLocalizedString.ofNullable("parking"))
-            .build()
-        ),
-        List.of()
-      );
-    return g;
+    return graph;
   }
 
   @Override
   public TransitService transitService() {
-    var transitModel = new TransitModel();
-    transitModel.index();
-    transitModel.getTransitModelIndex().addRoutes(TransitModelForTest.route("123").build());
-    return new DefaultTransitService(transitModel);
+    return transitService;
   }
 
   @Override
