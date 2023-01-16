@@ -18,28 +18,41 @@ otp.layers.GeofencingZonesLayer = otp.Class({
   module: null,
 
   url:
-    otp.config.hostname +
-    "/" +
-    otp.config.restService +
-    "/inspector/vectortile/geofencingZones/{z}/{x}/{y}.pbf",
+      otp.config.hostname +
+      "/" +
+      otp.config.restService +
+      "/inspector/vectortile/geofencingZones/tilejson.json",
 
   initialize: function (module) {
     this.module = module;
 
     this.stopsLookup = {};
 
-    this.layer = VectorTileLayer(this.url, {
-      style: (feature) => {
-        if(feature.properties.type === "business-area-border") {
-          return { stroke: true, color: "#f65173" };
-        }
-        else if(feature.properties.type === "traversal-banned") {
-          return { stroke: true, color: "#62081a" };
-        }
-        else if(feature.properties.type === "drop-off-banned") {
-          return { stroke: true, color: "#ecc029" };
-        }
-      },
+    this.layer = L.maplibreGL({
+      style: {
+        "version": 8,
+        "name": "Geofencing zones",
+        "metadata": {},
+        "sources": {
+          "vertices": {
+            "type": "vector",
+            "url": this.url
+          }
+        },
+        "layers": [
+          {
+            "id": "business-area-border",
+            "type": "line",
+            "source": "vertices",
+            "source-layer": "geofencingZones",
+            "filter": ["==", "type", "drop-off-banned"],
+            "paint": {
+              "line-color": "#cca217",
+              "line-width": {"base": 2.3, "stops": [[13, 2], [20, 6]]}
+            }
+          },
+        ]
+      }
     });
 
     this.module.webapp.map.layer_control.addOverlay(this.layer, "Geofencing Zones");

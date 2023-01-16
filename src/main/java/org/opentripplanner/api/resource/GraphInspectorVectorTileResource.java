@@ -72,7 +72,7 @@ public class GraphInspectorVectorTileResource {
       grizzlyRequest.getLocale(),
       Arrays.asList(requestedLayers.split(",")),
       DEBUG_LAYERS,
-      GraphInspectorVectorTileResource::crateLayerBuilder,
+      GraphInspectorVectorTileResource::createLayerBuilder,
       serverContext.graph(),
       serverContext.transitService()
     );
@@ -106,7 +106,7 @@ public class GraphInspectorVectorTileResource {
     );
   }
 
-  private static LayerBuilder<?> crateLayerBuilder(
+  private static LayerBuilder<?> createLayerBuilder(
     LayerParameters<LayerType> layerParameters,
     Locale locale,
     Graph graph,
