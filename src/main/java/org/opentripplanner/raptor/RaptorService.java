@@ -5,6 +5,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.service.DefaultStopArrivals;
 import org.opentripplanner.raptor.service.HeuristicSearchTask;
 import org.opentripplanner.raptor.service.RangeRaptorDynamicSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
@@ -76,7 +77,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
   ) {
     var worker = config.createStdWorker(transitData, request);
     var result = worker.route();
-    var arrivals = result.stopArrivals();
+    var arrivals = new DefaultStopArrivals(result);
     return new RaptorResponse<>(result.extractPaths(), arrivals, request, request);
   }
 }

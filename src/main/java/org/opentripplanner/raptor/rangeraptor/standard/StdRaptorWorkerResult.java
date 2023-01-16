@@ -3,10 +3,9 @@ package org.opentripplanner.raptor.rangeraptor.standard;
 import java.util.Collection;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.response.StopArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
-import org.opentripplanner.raptor.rangeraptor.standard.besttimes.StopArrivalsAdaptor;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 
 /**
@@ -28,7 +27,17 @@ public class StdRaptorWorkerResult<T extends RaptorTripSchedule> implements Rapt
   }
 
   @Override
-  public StopArrivals stopArrivals() {
-    return new StopArrivalsAdaptor(bestTimes, state);
+  public SingleCriteriaStopArrivals extractBestOverallArrivals() {
+    return bestTimes.extractBestOverallArrivals();
+  }
+
+  @Override
+  public SingleCriteriaStopArrivals extractBestTransitArrivals() {
+    return bestTimes.extractBestTransitArrivals();
+  }
+
+  @Override
+  public SingleCriteriaStopArrivals extractBestNumberOfTransfers() {
+    return state.extractBestNumberOfTransfers();
   }
 }

@@ -5,8 +5,10 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
+import org.opentripplanner.raptor.rangeraptor.support.IntArraySingleCriteriaArrivals;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 
 /**
@@ -14,6 +16,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
  */
 public final class StdStopArrivals<T extends RaptorTripSchedule> implements BestNumberOfTransfers {
 
+  // Arrivals by round and stop - [round][stop]
   private final StopArrivalState<T>[][] arrivals;
   private final RoundProvider roundProvider;
 
@@ -55,6 +58,17 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
       }
     }
     return unreachedMinNumberOfTransfers();
+  }
+
+  @Override
+  public SingleCriteriaStopArrivals extractBestNumberOfTransfers() {
+    long start = System.currentTimeMillis();
+    var res = IntArraySingleCriteriaArrivals.create(
+      arrivals[0].length,
+      unreachedMinNumberOfTransfers(),
+      this::calculateMinNumberOfTransfers
+    );
+    return res;
   }
 
   void setAccessTime(int time, RaptorAccessEgress access, boolean bestTime) {

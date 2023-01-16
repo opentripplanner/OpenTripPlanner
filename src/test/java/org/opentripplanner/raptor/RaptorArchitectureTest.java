@@ -6,7 +6,6 @@ import static org.opentripplanner.OtpArchitectureModules.GNU_TROVE;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.arch.ArchComponent;
 import org.opentripplanner._support.arch.Module;
@@ -52,7 +51,6 @@ public class RaptorArchitectureTest {
   }
 
   @Test
-  @Disabled
   void enforcePackageDependenciesRaptorSPI() {
     RAPTOR.subPackage("spi").dependsOn(FRAMEWORK_UTILS, API_MODEL, API_PATH).verify();
   }
@@ -95,7 +93,7 @@ public class RaptorArchitectureTest {
     // Standard Range Raptor Implementation
     var stdInternalApi = RR_STANDARD
       .subPackage("internalapi")
-      .dependsOn(RAPTOR_API, RAPTOR_SPI)
+      .dependsOn(RAPTOR_API, RAPTOR_SPI, RR_INTERNAL_API)
       .verify();
     var stdBestTimes = RR_STANDARD
       .subPackage("besttimes")
@@ -186,7 +184,6 @@ public class RaptorArchitectureTest {
   }
 
   @Test
-  @Disabled
   void enforceNoCyclicDependencies() {
     slices()
       .matching(RAPTOR.packageIdentifierAllSubPackages())

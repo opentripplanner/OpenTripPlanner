@@ -4,7 +4,9 @@ import static org.opentripplanner.framework.lang.IntUtils.intArray;
 
 import java.util.BitSet;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
+import org.opentripplanner.raptor.rangeraptor.support.IntArraySingleCriteriaArrivals;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.util.BitSetIterator;
 
@@ -128,6 +130,14 @@ public final class BestTimes {
 
   public int size() {
     return times.length;
+  }
+
+  public SingleCriteriaStopArrivals extractBestOverallArrivals() {
+    return new IntArraySingleCriteriaArrivals(calculator.unreachedTime(), times);
+  }
+
+  public SingleCriteriaStopArrivals extractBestTransitArrivals() {
+    return new IntArraySingleCriteriaArrivals(calculator.unreachedTime(), transitArrivalTimes);
   }
 
   @Override

@@ -144,7 +144,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     // create and return response
     return new RaptorResponse<>(
       result.extractPaths(),
-      result.stopArrivals(),
+      new DefaultStopArrivals(result),
       originalRequest,
       request
     );

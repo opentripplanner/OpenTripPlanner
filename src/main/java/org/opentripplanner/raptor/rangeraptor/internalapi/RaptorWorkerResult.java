@@ -3,7 +3,6 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
 import java.util.Collection;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.response.StopArrivals;
 
 /**
  * This is the result of the {@link RaptorWorker#route()} call.
@@ -15,8 +14,24 @@ public interface RaptorWorkerResult<T extends RaptorTripSchedule> {
   Collection<RaptorPath<T>> extractPaths();
 
   /**
-   * Return best over-all-arrival-times, best transit-arrival-times, and lowest number of
-   * transfers for all stops.
+   * Get "best-overall" arrival statistics for each stop reached in the search.
    */
-  StopArrivals stopArrivals();
+  SingleCriteriaStopArrivals extractBestOverallArrivals();
+
+  /**
+   * Get transit arrival statistics for each stop reached in the search.
+   */
+  SingleCriteriaStopArrivals extractBestTransitArrivals();
+
+  /**
+   * Extract information about the best number of transfers for each stop arrival.
+   */
+  SingleCriteriaStopArrivals extractBestNumberOfTransfers();
+
+  /**
+   * Return {@code true} if the destination was reached at least once.
+   */
+  default boolean isDestinationReached() {
+    return !extractPaths().isEmpty();
+  }
 }
