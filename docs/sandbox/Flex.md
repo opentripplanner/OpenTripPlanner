@@ -26,10 +26,12 @@ following to `router-config.json`.
 ```JSON
 // router-config.json
 {
-  "maxTransferDuration" : "5m",
-  "maxFlexTripDuration" : "45m",
-  "maxAccessWalkDuration" : "15m",
-  "maxEgressWalkDuration" : "15m"
+  "flex" : {
+    "maxTransferDuration" : "5m",
+    "maxFlexTripDuration" : "45m",
+    "maxAccessWalkDuration" : "15m",
+    "maxEgressWalkDuration" : "15m"
+  }
 }
 ```
 ### Overview
