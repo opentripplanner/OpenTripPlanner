@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - gbfs-geofencing-vertices
 
 jobs:
   perf-test:
