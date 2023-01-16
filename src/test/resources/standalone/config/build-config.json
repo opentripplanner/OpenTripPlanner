@@ -40,6 +40,12 @@
     "blockBasedInterlining": true,
     "maxInterlineDistance": 200
   },
+  "islandPruning" : {
+    "islandWithStopsMaxSize": 2,
+    "islandWithoutStopsMaxSize": 10,
+    "adaptivePruningFactor": 50.0,
+    "adaptivePruningDistance": 250.0,
+  },
   "transitFeeds" : [
     {
       "type" : "gtfs",

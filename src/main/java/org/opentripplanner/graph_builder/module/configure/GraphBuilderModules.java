@@ -145,10 +145,14 @@ public class GraphBuilderModules {
       issueStore,
       new StreetLinkerModule(graph, transitModel, issueStore, config.areaVisibility)
     );
-    pruneIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
-    pruneIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-    pruneIslands.setAdaptivePruningFactor(config.adaptivePruningFactor);
-    pruneIslands.setAdaptivePruningDistance(config.adaptivePruningDistance);
+    pruneIslands.setPruningThresholdIslandWithoutStops(
+      config.islandPruning.pruningThresholdIslandWithoutStops
+    );
+    pruneIslands.setPruningThresholdIslandWithStops(
+      config.islandPruning.pruningThresholdIslandWithStops
+    );
+    pruneIslands.setAdaptivePruningFactor(config.islandPruning.adaptivePruningFactor);
+    pruneIslands.setAdaptivePruningDistance(config.islandPruning.adaptivePruningDistance);
     return pruneIslands;
   }
 
