@@ -46,7 +46,7 @@ public class RouterConfigurationDocTest {
    */
   @Test
   public void updateBuildConfigurationDoc() {
-    NodeAdapter node = readBuildConfig();
+    NodeAdapter node = readRouterConfig();
 
     // Read and close inout file (same as output file)
     String doc = readFile(TEMPLATE);
@@ -61,7 +61,7 @@ public class RouterConfigurationDocTest {
     assertFileEquals(original, OUT_FILE);
   }
 
-  private NodeAdapter readBuildConfig() {
+  private NodeAdapter readRouterConfig() {
     var json = jsonNodeFromResource(CONFIG_PATH);
     var conf = new RouterConfig(json, CONFIG_PATH, true);
     return conf.asNodeAdapter();

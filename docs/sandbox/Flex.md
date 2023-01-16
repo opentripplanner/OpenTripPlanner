@@ -15,21 +15,21 @@ the [GTFS-Flex v2.1 draft](https://github.com/MobilityData/gtfs-flex/blob/master
 
 ## Configuration
 
+This feature allows a limited number of config options. To change the configuration, add the 
+following to `router-config.json`.
+
 <!-- config BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
 ### Example configuration
 
 ```JSON
-// This feature allows a limited number of config options. To change the configuration, add the following to `router-config.json`.
+// router-config.json
 {
-    "flex": {
-      "maxTransferDuration" : "5m",
-      "maxFlexTripDuration" : "45m",
-      "maxAccessWalkDuration" : "15m",
-      "maxEgressWalkDuration" : "15m"
-    }
-
+  "maxTransferDuration" : "5m",
+  "maxFlexTripDuration" : "45m",
+  "maxAccessWalkDuration" : "15m",
+  "maxEgressWalkDuration" : "15m"
 }
 ```
 ### Overview

@@ -4,6 +4,7 @@ import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
+import static org.opentripplanner.generate.doc.framework.DocBuilder.MAPPER;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
@@ -69,12 +70,8 @@ public class FlexConfigurationDocTest {
   }
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
-    buf
-      .header(3, "Example configuration", null)
-      .addExample(
-        "This feature allows a limited number of config options. To change the " +
-        "configuration, add the following to `router-config.json`.",
-        "\"flex\": %s".formatted(node.toPrettyString().indent(node.level() + 1).trim())
-      );
+    var root = MAPPER.createObjectNode();
+    root.set("flex", node.rawNode());
+    buf.header(3, "Example configuration", null).addExample("router-config.json", node.rawNode());
   }
 }

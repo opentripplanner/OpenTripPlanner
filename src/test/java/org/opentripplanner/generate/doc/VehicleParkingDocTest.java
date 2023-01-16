@@ -82,15 +82,6 @@ public class VehicleParkingDocTest {
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
     buf.addSection("##### Example configuration");
-    buf.addExample(
-      ROUTER_CONFIG_FILENAME,
-      """
-      "updaters": [
-        %s
-      ]
-      """.formatted(
-          node.toPrettyString().indent(node.level()).trim()
-        )
-    );
+    buf.addUpdaterExample(ROUTER_CONFIG_FILENAME, node.rawNode());
   }
 }

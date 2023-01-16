@@ -20,7 +20,7 @@ import org.opentripplanner.standalone.config.framework.json.EnumMapper;
 @SuppressWarnings("UnusedReturnValue")
 public class DocBuilder {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  public static final ObjectMapper MAPPER = new ObjectMapper();
   public static final ObjectWriter PRETTY_PRINTER;
 
   static {
@@ -115,22 +115,6 @@ public class DocBuilder {
     return endParagraph();
   }
 
-  public void addExample(String comment, String body) {
-    buffer.append(
-      """
-      ```JSON
-      // %s
-      {
-        %s
-      }
-      ```
-      """.formatted(
-          comment,
-          body.indent(2)
-        )
-    );
-  }
-
   public void addExample(String comment, JsonNode body) {
     String json = prettyPrintJson(body);
 
@@ -140,6 +124,14 @@ public class DocBuilder {
       %s
       ```
       """.formatted(comment, json));
+  }
+
+  public void addUpdaterExample(String comment, JsonNode node) {
+    var updaters = MAPPER.createArrayNode();
+    updaters.add(node);
+    var root = MAPPER.createObjectNode();
+    root.set("updaters", updaters);
+    addExample(comment, root);
   }
 
   private static String prettyPrintJson(JsonNode body) {

@@ -15,6 +15,9 @@ the [GTFS-Flex v2.1 draft](https://github.com/MobilityData/gtfs-flex/blob/master
 
 ## Configuration
 
+This feature allows a limited number of config options. To change the configuration, add the 
+following to `router-config.json`.
+
 <!-- INSERT: config -->
 
 ## Changelog
