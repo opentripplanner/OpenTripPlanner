@@ -1095,25 +1095,32 @@ case where this is not the case.
     "timeZone" : "Europe/Rome",
     "osmTagMapping" : "default"
   },
-  "osm" : [ {
-    "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",
-    "timeZone" : "Europe/Oslo",
-    "osmTagMapping" : "norway"
-  } ],
+  "osm" : [
+    {
+      "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",
+      "timeZone" : "Europe/Oslo",
+      "osmTagMapping" : "norway"
+    }
+  ],
   "demDefaults" : {
     "elevationUnitMultiplier" : 1.0
   },
-  "dem" : [ {
-    "source" : "gs://my-bucket/otp-work-dir/norway.dem.tiff",
-    "elevationUnitMultiplier" : 2.5
-  } ],
+  "dem" : [
+    {
+      "source" : "gs://my-bucket/otp-work-dir/norway.dem.tiff",
+      "elevationUnitMultiplier" : 2.5
+    }
+  ],
   "netexDefaults" : {
     "feedId" : "EN",
     "sharedFilePattern" : "_stops.xml",
     "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
     "groupFilePattern" : "(\\w{3})_.*\\.xml",
     "ignoreFilePattern" : "(temp|tmp)",
-    "ferryIdsNotAllowedForBicycle" : [ "RUT:B107", "RUT:B209" ]
+    "ferryIdsNotAllowedForBicycle" : [
+      "RUT:B107",
+      "RUT:B209"
+    ]
   },
   "gtfsDefaults" : {
     "stationTransferPreference" : "recommended",
@@ -1122,27 +1129,33 @@ case where this is not the case.
     "blockBasedInterlining" : true,
     "maxInterlineDistance" : 200
   },
-  "transitFeeds" : [ {
-    "type" : "gtfs",
-    "feedId" : "SE",
-    "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/sweeden-gtfs.obj"
-  }, {
-    "type" : "netex",
-    "feedId" : "NO",
-    "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/norway-netex.obj",
-    "sharedFilePattern" : "_stops.xml",
-    "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
-    "groupFilePattern" : "(\\w{3})_.*\\.xml",
-    "ignoreFilePattern" : "(temp|tmp)"
-  } ],
-  "transferRequests" : [ {
-    "modes" : "WALK"
-  }, {
-    "modes" : "WALK",
-    "wheelchairAccessibility" : {
-      "enabled" : true
+  "transitFeeds" : [
+    {
+      "type" : "gtfs",
+      "feedId" : "SE",
+      "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/sweeden-gtfs.obj"
+    },
+    {
+      "type" : "netex",
+      "feedId" : "NO",
+      "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/norway-netex.obj",
+      "sharedFilePattern" : "_stops.xml",
+      "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
+      "groupFilePattern" : "(\\w{3})_.*\\.xml",
+      "ignoreFilePattern" : "(temp|tmp)"
     }
-  } ]
+  ],
+  "transferRequests" : [
+    {
+      "modes" : "WALK"
+    },
+    {
+      "modes" : "WALK",
+      "wheelchairAccessibility" : {
+        "enabled" : true
+      }
+    }
+  ]
 }
 ```
 

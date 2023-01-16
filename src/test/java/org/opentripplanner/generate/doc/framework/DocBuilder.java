@@ -1,14 +1,9 @@
 package org.opentripplanner.generate.doc.framework;
 
 import static org.opentripplanner.framework.text.MarkdownFormatter.NEW_LINE;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.MAPPER;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.text.MarkdownFormatter;
@@ -19,16 +14,6 @@ import org.opentripplanner.standalone.config.framework.json.EnumMapper;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class DocBuilder {
-
-  public static final ObjectMapper MAPPER = new ObjectMapper();
-  public static final ObjectWriter PRETTY_PRINTER;
-
-  static {
-    MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
-    var pp = new DefaultPrettyPrinter();
-    pp.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
-    PRETTY_PRINTER = MAPPER.writer(pp);
-  }
 
   private final StringBuilder buffer = new StringBuilder();
 
@@ -116,7 +101,7 @@ public class DocBuilder {
   }
 
   public void addExample(String comment, JsonNode body) {
-    String json = prettyPrintJson(body);
+    String json = TemplateUtil.prettyPrintJson(body);
 
     buffer.append("""
       ```JSON
@@ -132,14 +117,6 @@ public class DocBuilder {
     var root = MAPPER.createObjectNode();
     root.set("updaters", updaters);
     addExample(comment, root);
-  }
-
-  private static String prettyPrintJson(JsonNode body) {
-    try {
-      return PRETTY_PRINTER.writeValueAsString(body);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   /**

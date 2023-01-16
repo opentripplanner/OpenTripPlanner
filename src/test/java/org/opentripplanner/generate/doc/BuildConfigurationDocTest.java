@@ -12,6 +12,7 @@ import static org.opentripplanner.generate.doc.framework.TemplateUtil.replacePar
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
@@ -22,6 +23,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 @OnlyIfDocsExist
+@Tag("docs")
 public class BuildConfigurationDocTest {
 
   private static final String CONFIG_JSON = OtpFileNames.BUILD_CONFIG_FILENAME;
