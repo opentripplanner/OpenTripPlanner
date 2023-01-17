@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
+
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -69,10 +71,20 @@ public class GraphPathToItineraryMapper {
     );
   }
 
-  public static boolean isRentalDropOff(State state) {
+  public static boolean isRentalStationDropOff(State state) {
+    return (
+      state.getBackEdge() instanceof VehicleRentalEdge && state.getBackState().isRentingVehicle()
+    );
+  }
+
+  /**
+   * Dropping of a free-floating vehicle can happen at any edge so be sure to select the correct
+   * state (forward, not backward).
+   */
+  public static boolean isFloatingRentalDropoff(State state) {
     return (
       !state.isRentingVehicle() &&
-      (state.getBackState() != null && state.getBackState().isRentingVehicle())
+      (state.getBackState() != null && state.getVehicleRentalState() == RENTING_FLOATING)
     );
   }
 
@@ -152,7 +164,10 @@ public class GraphPathToItineraryMapper {
 
       var flexChange =
         forwardState.backEdge instanceof FlexTripEdge || backState.backEdge instanceof FlexTripEdge;
-      var rentalChange = isRentalPickUp(backState) || isRentalDropOff(forwardState);
+      var rentalChange =
+        isRentalPickUp(backState) ||
+        isRentalStationDropOff(backState) ||
+        isFloatingRentalDropoff(forwardState);
       var parkingChange = backState.isVehicleParked() != forwardState.isVehicleParked();
       var carPickupChange = backState.getCarPickupState() != forwardState.getCarPickupState();
 
