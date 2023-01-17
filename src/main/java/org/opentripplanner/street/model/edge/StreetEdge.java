@@ -492,10 +492,6 @@ public class StreetEdge
       : getDistanceMeters();
   }
 
-  public StreetEdgeRentalExtension getTraversalExtension() {
-    return fromv.traversalExtension();
-  }
-
   /**
    * This method is not thread-safe.
    */

@@ -68,11 +68,11 @@ class GeofencingEdgeUpdaterTest {
 
   @Test
   void insideZone() {
-    assertInstanceOf(NoExtension.class, insideFrognerPark.getTraversalExtension());
+    assertInstanceOf(NoExtension.class, insideFrognerPark.getFromVertex().traversalExtension());
 
     updater.applyGeofencingZones(List.of(zone, businessArea));
 
-    var ext = insideFrognerPark.getTraversalExtension();
+    var ext = insideFrognerPark.getFromVertex().traversalExtension();
 
     assertInstanceOf(GeofencingZoneExtension.class, ext);
 
@@ -83,11 +83,11 @@ class GeofencingEdgeUpdaterTest {
 
   @Test
   void halfInHalfOutZone() {
-    assertInstanceOf(NoExtension.class, insideFrognerPark.getTraversalExtension());
+    assertInstanceOf(NoExtension.class, insideFrognerPark.getFromVertex().traversalExtension());
 
     updater.applyGeofencingZones(List.of(zone, businessArea));
 
-    var ext = insideFrognerPark.getTraversalExtension();
+    var ext = insideFrognerPark.getFromVertex().traversalExtension();
 
     assertInstanceOf(GeofencingZoneExtension.class, ext);
 
@@ -98,19 +98,24 @@ class GeofencingEdgeUpdaterTest {
 
   @Test
   void outsideZone() {
-    assertInstanceOf(NoExtension.class, insideFrognerPark.getTraversalExtension());
+    assertInstanceOf(NoExtension.class, insideFrognerPark.getFromVertex().traversalExtension());
     updater.applyGeofencingZones(List.of(zone, businessArea));
-    assertInstanceOf(GeofencingZoneExtension.class, insideFrognerPark.getTraversalExtension());
+    assertInstanceOf(
+      GeofencingZoneExtension.class,
+      insideFrognerPark.getFromVertex().traversalExtension()
+    );
   }
 
   @Test
   void businessAreaBorder() {
-    assertInstanceOf(NoExtension.class, insideFrognerPark.getTraversalExtension());
+    assertInstanceOf(NoExtension.class, insideFrognerPark.getFromVertex().traversalExtension());
     var updated = updater.applyGeofencingZones(List.of(zone, businessArea));
 
     assertEquals(3, updated.size());
 
-    var ext = (StreetEdgeRentalExtension.BusinessAreaBorder) businessBorder.getTraversalExtension();
+    var ext = (StreetEdgeRentalExtension.BusinessAreaBorder) businessBorder
+      .getFromVertex()
+      .traversalExtension();
     assertInstanceOf(StreetEdgeRentalExtension.BusinessAreaBorder.class, ext);
   }
 }

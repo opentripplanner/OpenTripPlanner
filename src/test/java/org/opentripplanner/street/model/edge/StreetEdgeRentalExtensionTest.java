@@ -108,8 +108,8 @@ class StreetEdgeRentalExtensionTest {
     edge.addTraversalExtension(new BusinessAreaBorder("a"));
     edge.addTraversalExtension(new BusinessAreaBorder("b"));
 
-    assertTrue(edge.getTraversalExtension().traversalBanned(state("a")));
-    assertTrue(edge.getTraversalExtension().traversalBanned(state("b")));
+    assertTrue(edge.fromv.traversalBanned(state("a")));
+    assertTrue(edge.fromv.traversalBanned(state("b")));
   }
 
   @Test
@@ -121,19 +121,19 @@ class StreetEdgeRentalExtensionTest {
 
     edge.addTraversalExtension(a);
 
-    assertTrue(edge.getTraversalExtension().traversalBanned(state("a")));
+    assertTrue(edge.fromv.traversalExtension().traversalBanned(state("a")));
 
     edge.addTraversalExtension(b);
     edge.addTraversalExtension(c);
 
     edge.removeTraversalExtension(a);
 
-    assertTrue(edge.getTraversalExtension().traversalBanned(state("b")));
-    assertTrue(edge.getTraversalExtension().traversalBanned(state("c")));
+    assertTrue(edge.fromv.traversalExtension().traversalBanned(state("b")));
+    assertTrue(edge.fromv.traversalExtension().traversalBanned(state("c")));
 
     edge.removeTraversalExtension(b);
 
-    assertTrue(edge.getTraversalExtension().traversalBanned(state("c")));
+    assertTrue(edge.fromv.traversalExtension().traversalBanned(state("c")));
   }
 
   @Test
