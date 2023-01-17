@@ -64,7 +64,7 @@
         <jersey.version>3.0.9</jersey.version>
         <junit.version>5.9.1</junit.version>
         <micrometer.version>1.10.2</micrometer.version>
-        <netcdf4.version>5.5.2</netcdf4.version>
+        <netcdf4.version>5.5.3</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
         <logback.version>1.4.5</logback.version>
         <lucene.version>9.4.2</lucene.version>
