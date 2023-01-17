@@ -97,7 +97,7 @@ class GbfsVehicleRentalDataSourceTest {
       .get();
 
     assertTrue(frognerPark.dropOffBanned());
-    assertFalse(frognerPark.passingThroughBanned());
+    assertFalse(frognerPark.traversalBanned());
 
     var businessAreas = zones.stream().filter(GeofencingZone::isBusinessArea).toList();
 

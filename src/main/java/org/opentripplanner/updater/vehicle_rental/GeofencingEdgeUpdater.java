@@ -16,9 +16,9 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
-import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.BusinessAreaBorder;
-import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.GeofencingZoneExtension;
+import org.opentripplanner.street.model.vertex.RentalExtension;
+import org.opentripplanner.street.model.vertex.RentalExtension.BusinessAreaBorder;
+import org.opentripplanner.street.model.vertex.RentalExtension.GeofencingZoneExtension;
 
 class GeofencingEdgeUpdater {
 
@@ -30,9 +30,9 @@ class GeofencingEdgeUpdater {
 
   /**
    * Applies the restrictions described in the geofencing zones to eges by adding
-   * {@link StreetEdgeRentalExtension} to them.
+   * {@link RentalExtension} to them.
    */
-  Map<StreetEdge, StreetEdgeRentalExtension> applyGeofencingZones(
+  Map<StreetEdge, RentalExtension> applyGeofencingZones(
     Collection<GeofencingZone> geofencingZones
   ) {
     var restrictedZones = geofencingZones.stream().filter(GeofencingZone::hasRestriction).toList();
@@ -87,11 +87,11 @@ class GeofencingEdgeUpdater {
     return env;
   }
 
-  private Map<StreetEdge, StreetEdgeRentalExtension> addExtensionToIntersectingStreetEdges(
+  private Map<StreetEdge, RentalExtension> addExtensionToIntersectingStreetEdges(
     List<GeofencingZone> zones,
-    Function<GeofencingZone, StreetEdgeRentalExtension> createExtension
+    Function<GeofencingZone, RentalExtension> createExtension
   ) {
-    var edgesUpdated = new HashMap<StreetEdge, StreetEdgeRentalExtension>();
+    var edgesUpdated = new HashMap<StreetEdge, RentalExtension>();
     for (GeofencingZone zone : zones) {
       var geom = zone.geometry();
       var ext = createExtension.apply(zone);
@@ -100,11 +100,8 @@ class GeofencingEdgeUpdater {
     return edgesUpdated;
   }
 
-  private Map<StreetEdge, StreetEdgeRentalExtension> applyExtension(
-    Geometry geom,
-    StreetEdgeRentalExtension ext
-  ) {
-    var edgesUpdated = new HashMap<StreetEdge, StreetEdgeRentalExtension>();
+  private Map<StreetEdge, RentalExtension> applyExtension(Geometry geom, RentalExtension ext) {
+    var edgesUpdated = new HashMap<StreetEdge, RentalExtension>();
     Set<Edge> candidates;
     // for business areas we only care about the borders so we compute the boundary of the
     // (multi) polygon. this can either be a MultiLineString or a LineString

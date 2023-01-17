@@ -1,4 +1,4 @@
-package org.opentripplanner.street.model.edge;
+package org.opentripplanner.street.model.vertex;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -6,11 +6,14 @@ import java.util.Set;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.street.search.state.State;
 
-public sealed interface StreetEdgeRentalExtension {
+/**
+ * An extension which defines rules for how rental vehicles may or may not traverse a vertex.
+ */
+public sealed interface RentalExtension {
   /**
    * The static default instance which doesn't have any restrictions at all.
    */
-  public static final StreetEdgeRentalExtension NO_RESTRICTIONS = new NoExtension();
+  public static final RentalExtension NO_RESTRICTIONS = new NoExtension();
 
   boolean traversalBanned(State state);
 
@@ -18,15 +21,15 @@ public sealed interface StreetEdgeRentalExtension {
 
   Set<DebugInfo> debug();
 
-  default StreetEdgeRentalExtension add(StreetEdgeRentalExtension other) {
+  default RentalExtension add(RentalExtension other) {
     return Composite.of(this, other);
   }
 
-  default StreetEdgeRentalExtension remove(StreetEdgeRentalExtension toRemove) {
+  default RentalExtension remove(RentalExtension toRemove) {
     return NO_RESTRICTIONS;
   }
 
-  final class NoExtension implements StreetEdgeRentalExtension {
+  final class NoExtension implements RentalExtension {
 
     @Override
     public boolean traversalBanned(State state) {
@@ -44,12 +47,12 @@ public sealed interface StreetEdgeRentalExtension {
     }
 
     @Override
-    public StreetEdgeRentalExtension add(StreetEdgeRentalExtension other) {
+    public RentalExtension add(RentalExtension other) {
       return other;
     }
   }
 
-  final class GeofencingZoneExtension implements StreetEdgeRentalExtension {
+  final class GeofencingZoneExtension implements RentalExtension {
 
     private final GeofencingZone zone;
 
@@ -65,8 +68,7 @@ public sealed interface StreetEdgeRentalExtension {
     public boolean traversalBanned(State state) {
       if (state.isRentingVehicle()) {
         return (
-          zone.id().getFeedId().equals(state.getVehicleRentalNetwork()) &&
-          zone.passingThroughBanned()
+          zone.id().getFeedId().equals(state.getVehicleRentalNetwork()) && zone.traversalBanned()
         );
       } else {
         return false;
@@ -87,7 +89,7 @@ public sealed interface StreetEdgeRentalExtension {
     @Override
     public Set<DebugInfo> debug() {
       var set = new HashSet<DebugInfo>();
-      if (zone.passingThroughBanned()) {
+      if (zone.traversalBanned()) {
         set.add(DebugInfo.NO_TRAVERSAL);
       }
       if (zone.dropOffBanned()) {
@@ -102,7 +104,7 @@ public sealed interface StreetEdgeRentalExtension {
     }
   }
 
-  final class BusinessAreaBorder implements StreetEdgeRentalExtension {
+  final class BusinessAreaBorder implements RentalExtension {
 
     private final String network;
 
@@ -126,13 +128,13 @@ public sealed interface StreetEdgeRentalExtension {
     }
   }
 
-  final class Composite implements StreetEdgeRentalExtension {
+  final class Composite implements RentalExtension {
 
-    private final StreetEdgeRentalExtension[] exts;
+    private final RentalExtension[] exts;
 
-    private Composite(StreetEdgeRentalExtension... exts) {
+    private Composite(RentalExtension... exts) {
       var set = new HashSet<>(Arrays.asList(exts));
-      this.exts = set.toArray(StreetEdgeRentalExtension[]::new);
+      this.exts = set.toArray(RentalExtension[]::new);
     }
 
     @Override
@@ -165,25 +167,25 @@ public sealed interface StreetEdgeRentalExtension {
     }
 
     @Override
-    public StreetEdgeRentalExtension add(StreetEdgeRentalExtension other) {
+    public RentalExtension add(RentalExtension other) {
       return Composite.of(this, other);
     }
 
-    private static StreetEdgeRentalExtension of(StreetEdgeRentalExtension... exts) {
+    private static RentalExtension of(RentalExtension... exts) {
       var set = new HashSet<>(Arrays.asList(exts));
       if (set.size() == 1) {
         return exts[0];
       } else {
-        return new Composite(set.toArray(StreetEdgeRentalExtension[]::new));
+        return new Composite(set.toArray(RentalExtension[]::new));
       }
     }
 
     @Override
-    public StreetEdgeRentalExtension remove(StreetEdgeRentalExtension toRemove) {
+    public RentalExtension remove(RentalExtension toRemove) {
       var newExts = Arrays
         .stream(exts)
         .filter(e -> !e.equals(toRemove))
-        .toArray(StreetEdgeRentalExtension[]::new);
+        .toArray(RentalExtension[]::new);
       if (newExts.length == 0) {
         return null;
       } else {

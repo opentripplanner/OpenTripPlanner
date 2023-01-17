@@ -1,8 +1,8 @@
 package org.opentripplanner.inspector.vector.geofencing;
 
-import static org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.DebugInfo.BUSINESS_AREA_BORDER;
-import static org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.DebugInfo.NO_DROP_OFF;
-import static org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.DebugInfo.NO_TRAVERSAL;
+import static org.opentripplanner.street.model.vertex.RentalExtension.DebugInfo.BUSINESS_AREA_BORDER;
+import static org.opentripplanner.street.model.vertex.RentalExtension.DebugInfo.NO_DROP_OFF;
+import static org.opentripplanner.street.model.vertex.RentalExtension.DebugInfo.NO_TRAVERSAL;
 
 import java.util.Collection;
 import java.util.List;

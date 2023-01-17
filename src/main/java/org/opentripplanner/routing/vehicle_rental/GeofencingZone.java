@@ -7,12 +7,12 @@ public record GeofencingZone(
   FeedScopedId id,
   Geometry geometry,
   boolean dropOffBanned,
-  boolean passingThroughBanned
+  boolean traversalBanned
 ) {
   public boolean hasRestriction() {
-    return dropOffBanned || passingThroughBanned;
+    return dropOffBanned || traversalBanned;
   }
   public boolean isBusinessArea() {
-    return !dropOffBanned && !passingThroughBanned;
+    return !dropOffBanned && !traversalBanned;
   }
 }

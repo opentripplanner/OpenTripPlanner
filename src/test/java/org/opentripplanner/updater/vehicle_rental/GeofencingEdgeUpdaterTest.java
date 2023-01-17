@@ -15,9 +15,9 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension;
-import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.GeofencingZoneExtension;
-import org.opentripplanner.street.model.edge.StreetEdgeRentalExtension.NoExtension;
+import org.opentripplanner.street.model.vertex.RentalExtension;
+import org.opentripplanner.street.model.vertex.RentalExtension.GeofencingZoneExtension;
+import org.opentripplanner.street.model.vertex.RentalExtension.NoExtension;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 
 class GeofencingEdgeUpdaterTest {
@@ -113,9 +113,9 @@ class GeofencingEdgeUpdaterTest {
 
     assertEquals(3, updated.size());
 
-    var ext = (StreetEdgeRentalExtension.BusinessAreaBorder) businessBorder
+    var ext = (RentalExtension.BusinessAreaBorder) businessBorder
       .getFromVertex()
       .traversalExtension();
-    assertInstanceOf(StreetEdgeRentalExtension.BusinessAreaBorder.class, ext);
+    assertInstanceOf(RentalExtension.BusinessAreaBorder.class, ext);
   }
 }
