@@ -11,7 +11,7 @@ public class IslandPruningConfig {
 
   public int pruningThresholdIslandWithoutStops;
   public int pruningThresholdIslandWithStops;
-  public double adaptivePruningDistance;
+  public int adaptivePruningDistance;
   public double adaptivePruningFactor;
 
   public static IslandPruningConfig fromConfig(NodeAdapter root) {
@@ -64,7 +64,7 @@ public class IslandPruningConfig {
         The distance after which disconnected sub graph is considered as real island in pruning heuristics.
         """
         )
-        .asDouble(250);
+        .asInt(250);
 
     islandPruning.adaptivePruningFactor =
       config

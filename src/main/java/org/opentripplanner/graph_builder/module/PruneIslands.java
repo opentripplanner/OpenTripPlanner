@@ -54,25 +54,9 @@ public class PruneIslands implements GraphBuilderModule {
   private final TransitModel transitModel;
   private final DataImportIssueStore issueStore;
   private final StreetLinkerModule streetLinkerModule;
-  /**
-   * this field indicate the maximum size for island without stops island under this size will be
-   * pruned.
-   */
   private int pruningThresholdIslandWithoutStops;
-  /**
-   * this field indicate the maximum size for island with stops island under this size will be
-   * pruned.
-   */
   private int pruningThresholdIslandWithStops;
-
-  /**
-   * search radius as meters when looking for island neighbours
-   */
-  private double adaptivePruningDistance;
-
-  /**
-   * Coefficient how much larger islands (compared to max sizes defined above) get pruned if they are close enough
-   */
+  private int adaptivePruningDistance;
   private double adaptivePruningFactor;
 
   public PruneIslands(
@@ -160,18 +144,30 @@ public class PruneIslands implements GraphBuilderModule {
     //no inputs
   }
 
+  /**
+   * island without stops and with less than this number of street vertices will be pruned
+   */
   public void setPruningThresholdIslandWithoutStops(int pruningThresholdIslandWithoutStops) {
     this.pruningThresholdIslandWithoutStops = pruningThresholdIslandWithoutStops;
   }
 
+  /**
+   * island with stops and with less than this number of street vertices will be pruned
+   */
   public void setPruningThresholdIslandWithStops(int pruningThresholdIslandWithStops) {
     this.pruningThresholdIslandWithStops = pruningThresholdIslandWithStops;
   }
 
-  public void setAdaptivePruningDistance(double adaptivePruningDistance) {
+  /**
+   * search radius as meters when looking for island neighbours
+   */
+  public void setAdaptivePruningDistance(int adaptivePruningDistance) {
     this.adaptivePruningDistance = adaptivePruningDistance;
   }
 
+  /**
+   * coefficient how much larger islands (compared to max sizes defined above) get pruned if they are close enough
+   */
   public void setAdaptivePruningFactor(double adaptivePruningFactor) {
     this.adaptivePruningFactor = adaptivePruningFactor;
   }
@@ -242,6 +238,7 @@ public class PruneIslands implements GraphBuilderModule {
 
     /* Next round: generate purely noThruTraffic islands if such ones exist */
     count = collectSubGraphs(graph, neighborsForVertex, extgraphs, null, islands);
+
     LOG.info("{} noThruTraffic island count: {}", traverseMode, count);
 
     LOG.info("Total {} sub graphs found", islands.size());
@@ -437,6 +434,7 @@ public class PruneIslands implements GraphBuilderModule {
         }
         vertexList.add(out);
 
+        // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
         vertexList = neighborsForVertex.get(out);
         if (vertexList == null) {
           vertexList = new ArrayList<>();
@@ -470,7 +468,7 @@ public class PruneIslands implements GraphBuilderModule {
       if (!neighborsForVertex.containsKey(gv)) {
         continue;
       }
-      Subgraph subgraph = computeConnectedSubgraph(neighborsForVertex, gv, subgraphs);
+      Subgraph subgraph = computeConnectedSubgraph(neighborsForVertex, gv, subgraphs, newgraphs);
       if (subgraph != null) {
         for (Iterator<Vertex> vIter = subgraph.streetIterator(); vIter.hasNext();) {
           Vertex subnode = vIter.next();
@@ -601,7 +599,8 @@ public class PruneIslands implements GraphBuilderModule {
   private Subgraph computeConnectedSubgraph(
     Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
     Vertex startVertex,
-    Map<Vertex, Subgraph> anchors
+    Map<Vertex, Subgraph> anchors,
+    Map<Vertex, Subgraph> alreadyMapped
   ) {
     Subgraph subgraph = new Subgraph();
     Queue<Vertex> q = new LinkedList<>();
@@ -615,7 +614,7 @@ public class PruneIslands implements GraphBuilderModule {
     while (!q.isEmpty()) {
       Vertex vertex = q.poll();
       for (Vertex neighbor : neighborsForVertex.get(vertex)) {
-        if (!subgraph.contains(neighbor)) {
+        if (!subgraph.contains(neighbor) && !alreadyMapped.containsKey(neighbor)) {
           if (anchor != null) {
             Subgraph compare = anchors.get(neighbor);
             if (compare != null && compare != anchor) { // do not enter a new island

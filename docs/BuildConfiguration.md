@@ -65,7 +65,7 @@ Sections follow that describe particular settings in more depth.
 |    removeRepeatedStops                                                   |  `boolean`  | Should consecutive identical stops be merged into one stop time entry.                                                                                         | *Optional* | `true`                            |  2.3  |
 |    [stationTransferPreference](#gd_stationTransferPreference)            |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                                                                 | *Optional* | `"allowed"`                       |  2.3  |
 | islandPruning                                                            |   `object`  | Settings for fixing street graph connectivity errors                                                                                                           | *Optional* |                                   |  2.3  |
-|    [adaptivePruningDistance](#islandPruning_adaptivePruningDistance)     |   `double`  | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250.0`                           |  2.3  |
+|    [adaptivePruningDistance](#islandPruning_adaptivePruningDistance)     |  `integer`  | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250`                             |  2.3  |
 |    [adaptivePruningFactor](#islandPruning_adaptivePruningFactor)         |   `double`  | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `50.0`                            |  2.3  |
 |    [islandWithStopsMaxSize](#islandPruning_islandWithStopsMaxSize)       |  `integer`  | When a graph island with stops in it should be pruned.                                                                                                         | *Optional* | `2`                               |  2.3  |
 |    [islandWithoutStopsMaxSize](#islandPruning_islandWithoutStopsMaxSize) |  `integer`  | When a graph island without stops should be pruned.                                                                                                            | *Optional* | `10`                              |  2.3  |
@@ -770,7 +770,7 @@ with the `stopTransferCost` parameter in the router configuration.
 
 <h3 id="islandPruning_adaptivePruningDistance">adaptivePruningDistance</h3>
 
-**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `250.0`   
+**Since version:** `2.3` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `250`   
 **Path:** /islandPruning 
 
 Search distance for analyzing islands in pruning.
@@ -1150,7 +1150,7 @@ case where this is not the case.
     "islandWithStopsMaxSize" : 2,
     "islandWithoutStopsMaxSize" : 10,
     "adaptivePruningFactor" : 50.0,
-    "adaptivePruningDistance" : 250.0
+    "adaptivePruningDistance" : 250
   },
   "transitFeeds" : [ {
     "type" : "gtfs",
