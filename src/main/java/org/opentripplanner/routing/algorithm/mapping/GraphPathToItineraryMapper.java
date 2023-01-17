@@ -170,7 +170,7 @@ public class GraphPathToItineraryMapper {
       var rentalChange =
         isRentalPickUp(backState) ||
         isRentalStationDropOff(backState) ||
-        isFloatingRentalDropoff(forwardState);
+        isFloatingRentalDropoff(backState);
       var parkingChange = backState.isVehicleParked() != forwardState.isVehicleParked();
       var carPickupChange = backState.getCarPickupState() != forwardState.getCarPickupState();
 
