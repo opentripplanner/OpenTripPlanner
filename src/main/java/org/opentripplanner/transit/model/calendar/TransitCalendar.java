@@ -1,65 +1,39 @@
 package org.opentripplanner.transit.model.calendar;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 
 /**
- *
+ * This calendar contains timetables for each day and pattern. The switch from one day to another
+ * is an arbitrary time during the day. Note that the service day length might differ from the
+ * normal 24h. It can be 23h or 25h due to adjusting the time for daylight savings or 23:59:59 or
+ * 24:00:01 when adjusting for leap seconds.
  */
 public class TransitCalendar {
 
-  private final ZoneId zoneId;
-  private final LocalDate start;
-  private final LocalDate end;
-  private final Duration offset;
-  private final ZonedDateTime[] startOfDays;
-  private final int[] dayLengthSeconds;
+  /** Info about the calendar days */
+  private final CalendarDays daysInfo;
+  private final PatternsForDays patterns = null;
 
-  TransitCalendar(TransitCalendarBuilder builder) {
-    this.zoneId = Objects.requireNonNull(builder.zoneId());
-    this.start = Objects.requireNonNull(builder.periodStart());
-    this.end = Objects.requireNonNull(builder.periodEnd());
-    this.offset = Objects.requireNonNull(builder.offset());
-    this.startOfDays = Objects.requireNonNull(builder.startOfDays());
-    this.dayLengthSeconds = Objects.requireNonNull(builder.offsetNextDaySeconds());
+  public TransitCalendar(CalendarDays daysInfo) {
+    this.daysInfo = daysInfo;
   }
 
-  public static TransitCalendarBuilder of() {
-    return new TransitCalendarBuilder();
+  /**
+   * The time witch the fist service day start, for example 2022-01-31T04:00:00+01:00 Europe/Paris.
+   * It is encouraged to use a time early in the morning where the number of running trips and
+   * travelers are at a minimum. For example 04:00 in the morning is normally a good time to divide
+   * up the timetables.
+   */
+  public ZonedDateTime getStartTime() {
+    return daysInfo.time(0, 0);
   }
 
-  public ZoneId zoneId() {
-    return zoneId;
+  TripScheduleSearchOnDays timetables(int patternIndex, int currentDay) {
+    // TODO RTM
+    return null;
   }
 
-  public LocalDate start() {
-    return start;
-  }
-
-  public LocalDate end() {
-    return end;
-  }
-
-  public Duration offset() {
-    return offset;
-  }
-
-  public ZonedDateTime time(int day, int time) {
-    return startOfDays[day].plusSeconds(time);
-  }
-
-  public TransitTime time(ZonedDateTime time) {
-    int days = (int) ChronoUnit.DAYS.between(startOfDays[0], time);
-    int seconds = (int) ChronoUnit.SECONDS.between(startOfDays[days], time);
-
-    return new TransitTime.Builder(this).withDay(days).withTime(seconds).build();
-  }
-
-  public int dayLengthSeconds(int day) {
-    return dayLengthSeconds[day];
+  int numberOfDays() {
+    return daysInfo.numberOfDays();
   }
 }

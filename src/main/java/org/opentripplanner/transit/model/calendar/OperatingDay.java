@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.calendar;
 
-
 import java.time.ZonedDateTime;
 import org.opentripplanner.framework.time.DurationUtils;
 
@@ -15,6 +14,7 @@ import org.opentripplanner.framework.time.DurationUtils;
  *    transit period.
  */
 public class OperatingDay {
+
   private final int dayIndex;
   private final ZonedDateTime startTime;
   private final int lengthSeconds;
@@ -27,13 +27,29 @@ public class OperatingDay {
 
   // TODO RTM
 
+  public int dayIndex() {
+    return dayIndex;
+  }
+
+  public ZonedDateTime startTime() {
+    return startTime;
+  }
+
+  public int lengthSeconds() {
+    return lengthSeconds;
+  }
+
   @Override
   public String toString() {
     // TODO RTM - Return "OperationDay{#5 2022-01-17 04:30 24h)"
-    return "OperationDay{" +
-      "#" + dayIndex +
+    return (
+      "OperationDay{" +
+      "#" +
+      dayIndex +
       // " " + TimeUtils.dateAndTimeToStrCompact(startTime) +
-      " " + DurationUtils.durationToStr(lengthSeconds) +
-      '}';
+      " " +
+      DurationUtils.durationToStr(lengthSeconds) +
+      '}'
+    );
   }
 }

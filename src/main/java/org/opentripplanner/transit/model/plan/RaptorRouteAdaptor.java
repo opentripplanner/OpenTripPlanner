@@ -6,10 +6,13 @@ import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
-import org.opentripplanner.transit.model.calendar.TimetableCalendar;
+import org.opentripplanner.transit.model.calendar.TripScheduleSearchOnDays;
 import org.opentripplanner.transit.model.trip.TripOnDate;
 
-public record RaptorRouteAdaptor(RaptorTripPattern routingPattern, TimetableCalendar timetables)
+public record RaptorRouteAdaptor(
+  RaptorTripPattern routingPattern,
+  TripScheduleSearchOnDays timetables
+)
   implements
     RaptorRoute<TripOnDate>, RaptorTimeTable<TripOnDate>, RaptorTripScheduleSearch<TripOnDate> {
   /* implement RaptorRoute */

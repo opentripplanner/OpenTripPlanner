@@ -8,21 +8,29 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 
-public class TransitCalendarBuilder {
+public class CalendarDaysBuilder {
 
   public static final int SUPPORTED_YEARS = 10;
   private ZoneId zoneId = ZoneId.of("Z");
+
   private LocalDate start;
   private LocalDate end;
-  private Duration offset = Duration.ZERO;
-  private ZonedDateTime[] startOfDays;
+  private Duration timeOffset;
+  private OperatingDay[] operatingDays;
   private int[] offsetNextDaySeconds;
+
+  CalendarDaysBuilder(ZoneId zoneId, LocalDate start, LocalDate end, Duration timeOffset) {
+    this.zoneId = zoneId;
+    this.start = start;
+    this.end = end;
+    this.timeOffset = timeOffset;
+  }
 
   ZoneId zoneId() {
     return zoneId;
   }
 
-  public TransitCalendarBuilder withZoneId(ZoneId zoneId) {
+  public CalendarDaysBuilder withZoneId(ZoneId zoneId) {
     this.zoneId = zoneId;
     return this;
   }
@@ -31,7 +39,7 @@ public class TransitCalendarBuilder {
     return start;
   }
 
-  public TransitCalendarBuilder withPeriodStart(LocalDate transitPeriodStart) {
+  public CalendarDaysBuilder withPeriodStart(LocalDate transitPeriodStart) {
     this.start = transitPeriodStart;
     return this;
   }
@@ -40,22 +48,22 @@ public class TransitCalendarBuilder {
     return end;
   }
 
-  public TransitCalendarBuilder withPeriodEnd(LocalDate transitPeriodEnd) {
+  public CalendarDaysBuilder withPeriodEnd(LocalDate transitPeriodEnd) {
     this.end = transitPeriodEnd;
     return this;
   }
 
-  Duration offset() {
-    return offset;
+  Duration timeOffset() {
+    return timeOffset;
   }
 
-  public TransitCalendarBuilder withOffset(Duration offset) {
-    this.offset = offset;
+  public CalendarDaysBuilder withOffset(Duration timeOffset) {
+    this.timeOffset = timeOffset;
     return this;
   }
 
-  ZonedDateTime[] startOfDays() {
-    return startOfDays;
+  OperatingDay[] operatingDays() {
+    return operatingDays;
   }
 
   public int[] offsetNextDaySeconds() {
@@ -80,7 +88,9 @@ public class TransitCalendarBuilder {
       time = time.plusDays(1);
       lengths.add(between(prev, time));
     }
-    this.startOfDays = list.toArray(new ZonedDateTime[0]);
+
+    // TODO RTM -
+    //this.startOfDays = list.toArray(new ZonedDateTime[0]);
     this.offsetNextDaySeconds = lengths.stream().mapToInt(it -> it).toArray();
 
     System.out.println("Time: " + (System.currentTimeMillis() - t0) + "ms");
@@ -101,15 +111,15 @@ public class TransitCalendarBuilder {
 
   @Nonnull
   private ZonedDateTime toStartOfServiceDay(LocalDate date) {
-    return date.atStartOfDay(zoneId).plus(offset);
+    return date.atStartOfDay(zoneId).plus(timeOffset);
   }
 
   private int between(ZonedDateTime t0, ZonedDateTime t1) {
     return (int) Duration.between(t0, t1).toSeconds();
   }
 
-  TransitCalendar build() {
+  CalendarDays build() {
     calculateDerivedVariables();
-    return new TransitCalendar(this);
+    return new CalendarDays(this);
   }
 }

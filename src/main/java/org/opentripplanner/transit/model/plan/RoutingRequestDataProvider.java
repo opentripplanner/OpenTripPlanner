@@ -16,7 +16,7 @@ import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.transit.model.api.TransitRoutingRequest;
-import org.opentripplanner.transit.model.calendar.ServiceCalendar;
+import org.opentripplanner.transit.model.calendar.TransitCalendar;
 import org.opentripplanner.transit.model.transfers.StreetTransfers;
 import org.opentripplanner.transit.model.trip.TripOnDate;
 import org.opentripplanner.transit.model.trip.TripService;
@@ -27,7 +27,7 @@ import org.opentripplanner.transit.model.trip.TripService;
 public class RoutingRequestDataProvider implements RaptorTransitDataProvider<TripOnDate> {
 
   private final TransitRoutingRequest request;
-  private final ServiceCalendar serviceCalendar;
+  private final TransitCalendar transitCalendar;
   private final TransitLayer transitLayer;
   private final TripService tripService;
   private final StreetTransfers transfersFromStop;
@@ -37,7 +37,7 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
 
   public RoutingRequestDataProvider(
     TransitRoutingRequest request,
-    ServiceCalendar serviceCalendar,
+    TransitCalendar transitCalendar,
     TransitLayer transitLayer,
     TripService tripService,
     StreetTransfers transfersFromStop,
@@ -45,7 +45,7 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
     BitSet filteredPatternIndexes
   ) {
     this.request = request;
-    this.serviceCalendar = serviceCalendar;
+    this.transitCalendar = transitCalendar;
     this.transitLayer = transitLayer;
     this.tripService = tripService;
     this.transfersFromStop = transfersFromStop;
