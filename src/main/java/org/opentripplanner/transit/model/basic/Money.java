@@ -5,6 +5,9 @@ import java.util.Currency;
 import java.util.Locale;
 
 /**
+ * TODO RTM - This has nothing to do with the transit model, move somewhere else
+ *          - No entity in the model have a reference to this.
+ *
  * @param currency The currency of the money.
  * @param cents    The actual currency value in decimal fixed-point, with the default number of
  *                 fraction digits from currency after the decimal point.

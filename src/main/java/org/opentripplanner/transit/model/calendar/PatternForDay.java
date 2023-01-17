@@ -9,6 +9,8 @@ public class PatternForDay {
   private final RoutingTripPattern pattern;
   private final Timetable timetable;
 
+  // TODO RTM  - Add next/prev
+
   public PatternForDay(OperatingDay day, RoutingTripPattern pattern, Timetable timetable) {
     this.day = day;
     this.pattern = pattern;

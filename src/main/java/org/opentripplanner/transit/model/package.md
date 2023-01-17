@@ -1,8 +1,68 @@
-## Transit Model Design
+# Transit Model
 
-TODO RTM - Add framework class diagram
+DRAFT! THIS DOCUMENTATION IS NOT COMPLETE AND MIGHT BE OUT OF DATE COMPARED WITH THE CODE, AND 
+VICE VERSA. 
 
-### Services and its context
+ - The draft design will help us implement the new transit model, but it is too much work to keep 
+   it "up to date". The audience is the developers actively working on refactoring the model.
+ - We will use this doc as an "analyses and design" workbook. 
+ - We will go over and make a "none draft" when it is time for review.
+
+
+![OTP Model Overview](OTPModelOverview.png)
+
+(THIS IS WORK IN PROGRESS! The packages are probably almost ok, but the dependencies are not...)
+
+
+## Notation
+
+UML Diagrams are used to illustrate the model. Colors are used to emphasise relationships, 
+similarities or just visual grouping. For class diagrams we use a modified version of 
+[Object Modeling in Color](https://en.wikipedia.org/wiki/Object_Modeling_in_Color).
+
+![UML Modeling in color](model-in-color.png)
+
+The colors indicate:
+
+- Importance - For example green is more important than Blue.
+- Complexity  - Red and Orange are usually more complex than blue and green. This can help focus on the difficult parts(design, test, document, change management) .
+- Outside role(Purple). Play a role outside the model, for example in Raptor. Exist only to serve an outside party.
+- Lifecycle
+   - Blue(descriptions) - live forever
+   - Green(entities…) - live for a long time, but may change over time
+   - Read(Moment/Interval/Event) Live until the next realtime update…
+   - Orange - live in the scope of a request - a very short time
+- Dependencies - Long lived types should not reference short-lived types:
+   - Yellow → Orange → Red → Green → Blue
+   - Not relevant for Purple
+
+
+## Components
+
+This is the top level package structure
+
+ - [framework](framework/package.md) - framework to support the transit model 
+ - basic - Value objects used across multiple packages.  
+ - organization
+ - site - StopLocation, RegularStop and Station +++ 
+ - organization - Authority, Operator and booking info
+ - network - Route
+ - trip - Trip and TripOnDate
+ - transfers - Regular and constrained transfer information
+ - calendar - Operating days and patterns on day
+ - timetable - Trip times for one operating day and trip schedule search
+ - trip schedule??? To avoid circular dependencies we might need to join trip and timetable
+ - plan - Support trip planning by implementing Raptor SPI. This is the main entry point. 
+
+## Plan query
+The plan query is number ONE reason why OTP exist, and the primary design goal of the transit model
+is to support the plan query to be as efficient "as possible".
+
+
+TODO RTM - Add an object diagram witch show the main types involved in a Raptor trip plan query.
+
+
+## Services and its context
 
 The `TransitService` is the main entry point for accessing all transit model objects. It may have 
 nested services or provide read-only access to key model classes. For changing the model a 
@@ -17,62 +77,39 @@ are made active by calling the `commit()` on the context. Before the `commit()` 
 visible by e.g. the routing. [TODO Diagram]
 
 
-### Transit Entities
+## Support for real-time updates
 
-All transit entities must have an ID. Transit entities ar "root" level are considered _aggregate
-roots_.
+### RT-Notes
+ - The real time information will be part of the TransitModel, not a separate Snapshot. So a trip
+   will have both scheduled and realtime data. The RealTime updaters will copy parts of the model,
+   change it and post it back tho the service, which apply the changes in a thread-safe way.
+ - The data needed by for the routing will be put in a data structure optimized for routing. The 
+   entities will not hold this data as fields, but be views of the data in the optimized model. 
+   Fields/attributes not needed for trip routing will be part of the TransitModel objects.
 
+### Design
+This is a very early suggestion on how we want this to look - it is not based on a realistic 
+use-case. The next step is to describe a couple RT updater use-cases - do a design for these and
+test the design.
 
-#### @Nonnull and @Nullable entity fields
+```Java
+TransitModelEditor ctx = transitService().editTransitModel();
 
-All fields getters(except primitive types) should be annotated with `@Nullable` or `@Nonnull`. None 
-null field should be enforced in the Entity constructor by using `Objects.requireNonNull`, 
-`Objects.requireNonNullElse` or `ObjectUtils.ifNotNull`. We should enforce this for all fields 
-required in both GTFS and in the Nordic NeTEx Profile. For enumeration types using a special value
-like `UNKNOWN` is preferred over making the field optional.
+// To modify a trip we get the builder, change it, and call save() 
+ctx.trip(id).withPrivateCode("CBP").save();
 
+// A more common case would be to perform a change to a trip schedule on a given date
+// We would like something like this. Here a combination of command and entity builders are used        
+ctx.on(date).changePattern(patternMatcher).removeStop(stopId).save();
+ctx.on(date).cancelTrip(tripMatcher).save();
+ctx.on(date).updateTrip(matchId(tripId)).arrivalTime(stopId, arrTime).depatureTime(stopId, depTime).save();
 
-#### sameAs(), equals() and hashCode()
+// Revert an earlier update by going back to the planed version and apply new changes
+// - for a given trip on date  
+ctx.on(date).trip(id).revertToPlanned().withDelay(5m).save();
+// - for all data for an agency
+ctx.on(date).agency(id).revertToPlanned().trip(id).withDelay(5m).save();
 
-`equals()` and `hashCode` uses type and `id` only, while `sameAs` is all fields including
-`id`. The `id` is used for looking up entities in indexes and for references between entities, 
-while `sameAs()` is used for modification detection.
-
-
-#### logName() and toString()
-
-We want a sensible toString() method implementation for all classes in the transit model. The
-toString is used for testing, logging and debugging, and should not be used for any domain feature
-or exposed on the APIs.
-
-Note! The `toString()` should not include nested entities, this may lead to extensive logging and
-cyclic references.
-
-For all entities the `toString()` is implemented in `AbstractTransitEntity` in the following format:
-
+// To update the model and make the changes visible to other threads
+ctx.commit();
 ```
-SIMPLE_CLASS_NAME{ID LOG_NAME?}
-```
-
-The `LOG_NAME` is optional. An entity can implement `LogInfo` to provide extra information in the
-`toString()` method. This is useful for including human recognizable information. The `LOG_NAME`
-does not need to identify the entity uniquely.
-
-
-### Value Objects
-
-A value object is something whose equality is not based on identity(`id`). In theory enum classes 
-is also value objects, but for simplicity we do not include them in this discussion.      
-
-For value objects `equals()` and `sameAs()` should be equivalent. 
-
-The `toString` should include all fields, unless this is too much, then only include enough 
-information to identify the value object within the context it exists. 
-
-Values object can **not** reference entities, but may reference nested value objects - avoid 
-cyclic references.
-
-
-### References
-
-1. [Domain Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design)
