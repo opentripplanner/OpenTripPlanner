@@ -1381,10 +1381,17 @@ type Leg {
     Future legs with same origin and destination stops or stations
     """
     nextLegs(
-    """The number of alternative legs searched. If fewer than the requested number are found, then only the found legs are returned"""
-    numberOfLegs: Int!,
-     """Transportation modes for which all stops in the parent station are used as origin stops. For modes not listed, only the exact origin stop of the leg is considered"""
-     modesWithParentStation: [Mode]): [Leg]
+        """
+        The number of alternative legs searched. If fewer than the requested number are found,
+        then only the found legs are returned.
+        """
+        numberOfLegs: Int!
+
+        """
+        Transportation modes for which all stops in the parent station are used as possible origin stops
+        for the next legs. For modes not listed, only the exact origin stop of the leg is considered.
+        """
+        modesWithParentStation: [Mode!]): [Leg!]
 }
 
 """A span of time."""
