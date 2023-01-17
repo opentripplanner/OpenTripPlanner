@@ -228,11 +228,19 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
     return environment -> {
       if (environment.getSource() instanceof ScheduledTransitLeg originalLeg) {
         int numberOfLegs = environment.getArgument("numberOfLegs");
-        List<String> modesWithParentStation = environment.getArgumentOrDefault(
-          "modesWithParentStation",
+        List<String> originModesWithParentStation = environment.getArgumentOrDefault(
+          "originModesWithParentStation",
           List.of()
         );
-        boolean limitToExactOriginStop = !modesWithParentStation.contains(
+        List<String> destinationModesWithParentStation = environment.getArgumentOrDefault(
+          "destinationModesWithParentStation",
+          List.of()
+        );
+        boolean limitToExactOriginStop = !originModesWithParentStation.contains(
+          originalLeg.getMode().name()
+        );
+
+        boolean limitToExactDestinationStop = !destinationModesWithParentStation.contains(
           originalLeg.getMode().name()
         );
 
@@ -244,7 +252,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
             false,
             AlternativeLegsFilter.NO_FILTER,
             limitToExactOriginStop,
-            false
+            limitToExactDestinationStop
           )
           .stream()
           .map(Leg.class::cast)

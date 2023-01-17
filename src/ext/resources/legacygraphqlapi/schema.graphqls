@@ -1391,7 +1391,13 @@ type Leg {
         Transportation modes for which all stops in the parent station are used as possible origin stops
         for the next legs. For modes not listed, only the exact origin stop of the leg is considered.
         """
-        modesWithParentStation: [Mode!]): [Leg!]
+        originModesWithParentStation: [Mode!]
+
+        """
+        Transportation modes for which all stops in the parent station are used as possible destination stops
+        for the next legs. For modes not listed, only the exact origin stop of the leg is considered.
+        """
+        destinationModesWithParentStation: [Mode!]): [Leg!]
 }
 
 """A span of time."""
