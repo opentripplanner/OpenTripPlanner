@@ -24,7 +24,7 @@ public class IslandPruningConfig {
     );
   }
 
-  /** Create a ISlandPruningConfig from a JSON configuration node. */
+  /** Create a IslandPruningConfig from a JSON configuration node. */
   public static IslandPruningConfig fromSubConfig(NodeAdapter config) {
     IslandPruningConfig islandPruning = new IslandPruningConfig();
 
