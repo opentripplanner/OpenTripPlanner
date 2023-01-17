@@ -15,12 +15,12 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.RentalExtension;
-import org.opentripplanner.street.model.vertex.RentalExtension.GeofencingZoneExtension;
-import org.opentripplanner.street.model.vertex.RentalExtension.NoExtension;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TraversalExtension;
+import org.opentripplanner.street.model.vertex.TraversalExtension.GeofencingZoneExtension;
+import org.opentripplanner.street.model.vertex.TraversalExtension.NoRestriction;
 
-class GeofencingEdgeUpdaterTest {
+class GeofencingVertexUpdaterTest {
 
   StreetVertex insideFrognerPark1 = intersectionVertex(59.928667, 10.699322);
   StreetVertex insideFrognerPark2 = intersectionVertex(59.9245634, 10.703902);
@@ -32,7 +32,7 @@ class GeofencingEdgeUpdaterTest {
   StreetEdge insideFrognerPark = streetEdge(insideFrognerPark1, insideFrognerPark2);
   StreetEdge halfInHalfOutFrognerPark = streetEdge(insideFrognerPark2, outsideFrognerPark1);
   StreetEdge businessBorder = streetEdge(insideBusinessZone, outsideBusinessZone);
-  final GeofencingEdgeUpdater updater = new GeofencingEdgeUpdater(ignored ->
+  final GeofencingVertexUpdater updater = new GeofencingVertexUpdater(ignored ->
     List.of(insideFrognerPark, halfInHalfOutFrognerPark, businessBorder)
   );
   StreetEdge outsideFrognerPark = streetEdge(outsideFrognerPark1, outsideFrognerPark2);
@@ -68,7 +68,7 @@ class GeofencingEdgeUpdaterTest {
 
   @Test
   void insideZone() {
-    assertInstanceOf(NoExtension.class, insideFrognerPark.getFromVertex().traversalExtension());
+    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().traversalExtension());
 
     updater.applyGeofencingZones(List.of(zone, businessArea));
 
@@ -83,7 +83,7 @@ class GeofencingEdgeUpdaterTest {
 
   @Test
   void halfInHalfOutZone() {
-    assertInstanceOf(NoExtension.class, insideFrognerPark.getFromVertex().traversalExtension());
+    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().traversalExtension());
 
     updater.applyGeofencingZones(List.of(zone, businessArea));
 
@@ -98,7 +98,7 @@ class GeofencingEdgeUpdaterTest {
 
   @Test
   void outsideZone() {
-    assertInstanceOf(NoExtension.class, insideFrognerPark.getFromVertex().traversalExtension());
+    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().traversalExtension());
     updater.applyGeofencingZones(List.of(zone, businessArea));
     assertInstanceOf(
       GeofencingZoneExtension.class,
@@ -108,14 +108,14 @@ class GeofencingEdgeUpdaterTest {
 
   @Test
   void businessAreaBorder() {
-    assertInstanceOf(NoExtension.class, insideFrognerPark.getFromVertex().traversalExtension());
+    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().traversalExtension());
     var updated = updater.applyGeofencingZones(List.of(zone, businessArea));
 
     assertEquals(3, updated.size());
 
-    var ext = (RentalExtension.BusinessAreaBorder) businessBorder
+    var ext = (TraversalExtension.BusinessAreaBorder) businessBorder
       .getFromVertex()
       .traversalExtension();
-    assertInstanceOf(RentalExtension.BusinessAreaBorder.class, ext);
+    assertInstanceOf(TraversalExtension.BusinessAreaBorder.class, ext);
   }
 }

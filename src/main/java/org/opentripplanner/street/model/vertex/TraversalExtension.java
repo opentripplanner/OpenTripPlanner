@@ -9,27 +9,45 @@ import org.opentripplanner.street.search.state.State;
 /**
  * An extension which defines rules for how rental vehicles may or may not traverse a vertex.
  */
-public sealed interface RentalExtension {
+public sealed interface TraversalExtension {
   /**
    * The static default instance which doesn't have any restrictions at all.
    */
-  public static final RentalExtension NO_RESTRICTIONS = new NoExtension();
+  public static final TraversalExtension NO_RESTRICTION = new NoRestriction();
 
+  /**
+   * If the current state is banned from traversing the location.
+   */
   boolean traversalBanned(State state);
 
+  /**
+   * If the current state is allowed to drop its free-floating vehicle.
+   */
   boolean dropOffBanned(State state);
 
-  Set<DebugInfo> debug();
+  /**
+   * Return the types of restrictions in this extension for debugging purposes.
+   */
+  Set<RestrictionType> debugTypes();
 
-  default RentalExtension add(RentalExtension other) {
+  /**
+   * Add another extension to this one and returning the combined one.
+   */
+  default TraversalExtension add(TraversalExtension other) {
     return Composite.of(this, other);
   }
 
-  default RentalExtension remove(RentalExtension toRemove) {
-    return NO_RESTRICTIONS;
+  /**
+   * Remove the extension from this one
+   */
+  default TraversalExtension remove(TraversalExtension toRemove) {
+    return NO_RESTRICTION;
   }
 
-  final class NoExtension implements RentalExtension {
+  /**
+   * No restriction on traversal which is the default.
+   */
+  final class NoRestriction implements TraversalExtension {
 
     @Override
     public boolean traversalBanned(State state) {
@@ -42,17 +60,20 @@ public sealed interface RentalExtension {
     }
 
     @Override
-    public Set<DebugInfo> debug() {
+    public Set<RestrictionType> debugTypes() {
       return Set.of();
     }
 
     @Override
-    public RentalExtension add(RentalExtension other) {
+    public TraversalExtension add(TraversalExtension other) {
       return other;
     }
   }
 
-  final class GeofencingZoneExtension implements RentalExtension {
+  /**
+   * Traversal is restricted by the properties of the geofencing zone.
+   */
+  final class GeofencingZoneExtension implements TraversalExtension {
 
     private final GeofencingZone zone;
 
@@ -87,13 +108,13 @@ public sealed interface RentalExtension {
     }
 
     @Override
-    public Set<DebugInfo> debug() {
-      var set = new HashSet<DebugInfo>();
+    public Set<RestrictionType> debugTypes() {
+      var set = new HashSet<RestrictionType>();
       if (zone.traversalBanned()) {
-        set.add(DebugInfo.NO_TRAVERSAL);
+        set.add(RestrictionType.NO_TRAVERSAL);
       }
       if (zone.dropOffBanned()) {
-        set.add(DebugInfo.NO_DROP_OFF);
+        set.add(RestrictionType.NO_DROP_OFF);
       }
       return Set.copyOf(set);
     }
@@ -104,7 +125,10 @@ public sealed interface RentalExtension {
     }
   }
 
-  final class BusinessAreaBorder implements RentalExtension {
+  /**
+   * Traversal is banned since this location is the border of a business area.
+   */
+  final class BusinessAreaBorder implements TraversalExtension {
 
     private final String network;
 
@@ -123,18 +147,21 @@ public sealed interface RentalExtension {
     }
 
     @Override
-    public Set<DebugInfo> debug() {
-      return Set.of(DebugInfo.BUSINESS_AREA_BORDER);
+    public Set<RestrictionType> debugTypes() {
+      return Set.of(RestrictionType.BUSINESS_AREA_BORDER);
     }
   }
 
-  final class Composite implements RentalExtension {
+  /**
+   * Combines multiple restrictions into one.
+   */
+  final class Composite implements TraversalExtension {
 
-    private final RentalExtension[] exts;
+    private final TraversalExtension[] exts;
 
-    private Composite(RentalExtension... exts) {
+    private Composite(TraversalExtension... exts) {
       var set = new HashSet<>(Arrays.asList(exts));
-      this.exts = set.toArray(RentalExtension[]::new);
+      this.exts = set.toArray(TraversalExtension[]::new);
     }
 
     @Override
@@ -158,34 +185,34 @@ public sealed interface RentalExtension {
     }
 
     @Override
-    public Set<DebugInfo> debug() {
-      var set = new HashSet<DebugInfo>();
+    public Set<RestrictionType> debugTypes() {
+      var set = new HashSet<RestrictionType>();
       for (var e : exts) {
-        set.addAll(e.debug());
+        set.addAll(e.debugTypes());
       }
       return Set.copyOf(set);
     }
 
     @Override
-    public RentalExtension add(RentalExtension other) {
+    public TraversalExtension add(TraversalExtension other) {
       return Composite.of(this, other);
     }
 
-    private static RentalExtension of(RentalExtension... exts) {
+    private static TraversalExtension of(TraversalExtension... exts) {
       var set = new HashSet<>(Arrays.asList(exts));
       if (set.size() == 1) {
         return exts[0];
       } else {
-        return new Composite(set.toArray(RentalExtension[]::new));
+        return new Composite(set.toArray(TraversalExtension[]::new));
       }
     }
 
     @Override
-    public RentalExtension remove(RentalExtension toRemove) {
+    public TraversalExtension remove(TraversalExtension toRemove) {
       var newExts = Arrays
         .stream(exts)
         .filter(e -> !e.equals(toRemove))
-        .toArray(RentalExtension[]::new);
+        .toArray(TraversalExtension[]::new);
       if (newExts.length == 0) {
         return null;
       } else {
@@ -194,7 +221,7 @@ public sealed interface RentalExtension {
     }
   }
 
-  enum DebugInfo {
+  enum RestrictionType {
     NO_TRAVERSAL,
     NO_DROP_OFF,
     BUSINESS_AREA_BORDER,

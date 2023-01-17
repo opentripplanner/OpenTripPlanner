@@ -28,9 +28,9 @@ import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
-import org.opentripplanner.street.model.vertex.RentalExtension;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TraversalExtension;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.state.State;
@@ -496,7 +496,7 @@ public class StreetEdge
   /**
    * This method is not thread-safe.
    */
-  public void removeTraversalExtension(RentalExtension ext) {
+  public void removeTraversalExtension(TraversalExtension ext) {
     fromv.removeTraversalExtension(ext);
     tov.removeTraversalExtension(ext);
   }
@@ -677,7 +677,7 @@ public class StreetEdge
   /**
    * This method is not thread-safe!
    */
-  public void addTraversalExtension(RentalExtension ext) {
+  public void addTraversalExtension(TraversalExtension ext) {
     fromv.addTraversalExtension(ext);
     tov.addTraversalExtension(ext);
   }

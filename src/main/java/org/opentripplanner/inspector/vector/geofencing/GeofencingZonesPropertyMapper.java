@@ -1,8 +1,8 @@
 package org.opentripplanner.inspector.vector.geofencing;
 
-import static org.opentripplanner.street.model.vertex.RentalExtension.DebugInfo.BUSINESS_AREA_BORDER;
-import static org.opentripplanner.street.model.vertex.RentalExtension.DebugInfo.NO_DROP_OFF;
-import static org.opentripplanner.street.model.vertex.RentalExtension.DebugInfo.NO_TRAVERSAL;
+import static org.opentripplanner.street.model.vertex.TraversalExtension.RestrictionType.BUSINESS_AREA_BORDER;
+import static org.opentripplanner.street.model.vertex.TraversalExtension.RestrictionType.NO_DROP_OFF;
+import static org.opentripplanner.street.model.vertex.TraversalExtension.RestrictionType.NO_TRAVERSAL;
 
 import java.util.Collection;
 import java.util.List;
@@ -23,7 +23,7 @@ public class GeofencingZonesPropertyMapper extends PropertyMapper<Vertex> {
     // once you have several networks on the same edge it breaks down for that you would
     // really need several layers
     // still, for a quick visualization it is useful
-    var debug = ext.debug();
+    var debug = ext.debugTypes();
     if (debug.contains(BUSINESS_AREA_BORDER)) {
       return List.of(new KeyValue("type", "business-area-border"));
     } else if (debug.contains(NO_TRAVERSAL)) {

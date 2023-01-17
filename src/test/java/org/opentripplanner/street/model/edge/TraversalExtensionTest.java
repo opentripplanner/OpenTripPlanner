@@ -16,16 +16,16 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
-import org.opentripplanner.street.model.vertex.RentalExtension;
-import org.opentripplanner.street.model.vertex.RentalExtension.BusinessAreaBorder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TraversalExtension;
+import org.opentripplanner.street.model.vertex.TraversalExtension.BusinessAreaBorder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-class RentalExtensionTest {
+class TraversalExtensionTest {
 
   String network = "tier-oslo";
   StreetVertex V1 = intersectionVertex("V1", 0, 0);
@@ -47,7 +47,7 @@ class RentalExtensionTest {
   public void dontEnterGeofencingZoneOnFoot() {
     var edge = streetEdge(V1, V2);
     edge.addTraversalExtension(
-      new RentalExtension.GeofencingZoneExtension(
+      new TraversalExtension.GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, true)
       )
     );
@@ -66,7 +66,7 @@ class RentalExtensionTest {
     var editor = new StateEditor(edge1.getFromVertex(), req);
     editor.beginFloatingVehicleRenting(RentalVehicleType.FormFactor.SCOOTER, network, false);
     restrictedEdge.addTraversalExtension(
-      new RentalExtension.GeofencingZoneExtension(
+      new TraversalExtension.GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
       )
     );
@@ -92,7 +92,7 @@ class RentalExtensionTest {
   public void dontFinishInNoDropOffZone() {
     var edge = streetEdge(V1, V2);
     edge.addTraversalExtension(
-      new RentalExtension.GeofencingZoneExtension(
+      new TraversalExtension.GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
       )
     );
