@@ -71,8 +71,8 @@ class RentalExtensionTest {
       )
     );
 
-    var isRenting = edge1.traverse(editor.makeState());
-    var continueOnFoot = restrictedEdge.traverse(isRenting);
+    var continueOnFoot = edge1.traverse(editor.makeState());
+
     assertEquals(HAVE_RENTED, continueOnFoot.getVehicleRentalState());
     assertEquals(WALK, continueOnFoot.getBackMode());
 
@@ -81,7 +81,9 @@ class RentalExtensionTest {
     assertEquals(BICYCLE, continueRenting.getBackMode());
     assertTrue(continueRenting.isInsideNoRentalDropOffArea());
 
-    var leftNoDropOff = edge2.traverse(continueRenting);
+    var insideZone = restrictedEdge.traverse(continueRenting);
+
+    var leftNoDropOff = edge2.traverse(insideZone);
     assertFalse(leftNoDropOff.isInsideNoRentalDropOffArea());
     assertEquals(RENTING_FLOATING, continueRenting.getVehicleRentalState());
   }
