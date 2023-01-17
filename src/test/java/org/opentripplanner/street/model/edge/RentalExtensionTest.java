@@ -4,10 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.street.model._data.StreetModelForTest.V1;
-import static org.opentripplanner.street.model._data.StreetModelForTest.V2;
-import static org.opentripplanner.street.model._data.StreetModelForTest.V3;
-import static org.opentripplanner.street.model._data.StreetModelForTest.V4;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
 import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
@@ -21,6 +18,7 @@ import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.street.model.vertex.RentalExtension;
 import org.opentripplanner.street.model.vertex.RentalExtension.BusinessAreaBorder;
+import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -30,6 +28,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 class RentalExtensionTest {
 
   String network = "tier-oslo";
+  StreetVertex V1 = intersectionVertex("V1", 0, 0);
+  StreetVertex V2 = intersectionVertex("V2", 1, 1);
+  StreetVertex V3 = intersectionVertex("V3", 2, 2);
+  StreetVertex V4 = intersectionVertex("V4", 3, 3);
 
   @Test
   public void leaveBusinessAreaOnFoot() {
