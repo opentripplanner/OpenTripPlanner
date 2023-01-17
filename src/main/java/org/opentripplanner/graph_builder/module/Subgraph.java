@@ -52,7 +52,8 @@ class Subgraph {
     return stopsVertexSet.iterator();
   }
 
-  private double minDist(Vertex v, double searchRadius) {
+  // find minimal distance from a given vertex to vertices of this subgraph
+  double vertexDistanceFromSubgraph(Vertex v, double searchRadius) {
     double d1 = streetVertexSet
       .stream()
       .map(x -> SphericalDistanceLibrary.distance(x.getCoordinate(), v.getCoordinate()))
@@ -91,7 +92,7 @@ class Subgraph {
       .getVerticesForEnvelope(envelope)
       .stream()
       .filter(vx -> contains(vx) == false)
-      .map(vx -> minDist(vx, searchRadius))
+      .map(vx -> vertexDistanceFromSubgraph(vx, searchRadius))
       .min(Double::compareTo)
       .orElse(searchRadius);
   }
