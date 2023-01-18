@@ -91,6 +91,11 @@ public final class ReverseTransitCalculator<T extends RaptorTripSchedule>
   }
 
   @Override
+  public int minIterationDepatureTime() {
+    return latestArrivalTime;
+  }
+
+  @Override
   public boolean oneIterationOnly() {
     return searchWindowInSeconds <= iterationStep;
   }

@@ -43,16 +43,29 @@ public class PathConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Create a new {@link DestinationArrivalPaths} each time it is invoked. The given {@code
-   * includeCost} decide if the cost should be included in the pareto set criteria or not.
+   * Create a new {@link DestinationArrivalPaths}. The generalized cost is included in the pareto
+   * set criteria and will be generated for each leg and a total for the path.
    */
-  public DestinationArrivalPaths<T> createDestArrivalPaths(boolean includeCost) {
+  public DestinationArrivalPaths<T> createDestArrivalPathsWithGeneralizedCost() {
+    return createDestArrivalPaths(true);
+  }
+
+  /**
+   * Create a new {@link DestinationArrivalPaths} without generalized-cost.
+   */
+  public DestinationArrivalPaths<T> createDestArrivalPathsWithoutGeneralizedCost() {
+    return createDestArrivalPaths(false);
+  }
+
+  /* private members */
+
+  private DestinationArrivalPaths<T> createDestArrivalPaths(boolean includeCost) {
     return new DestinationArrivalPaths<>(
       paretoComparator(includeCost),
       ctx.calculator(),
-      ctx.costCalculator(),
+      includeCost ? ctx.costCalculator() : null,
       ctx.slackProvider(),
-      createPathMapper(),
+      createPathMapper(includeCost),
       ctx.debugFactory(),
       ctx.stopNameResolver(),
       ctx.lifeCycle()
@@ -96,10 +109,10 @@ public class PathConfig<T extends RaptorTripSchedule> {
     return comparatorStandard();
   }
 
-  private PathMapper<T> createPathMapper() {
+  private PathMapper<T> createPathMapper(boolean includeCost) {
     return createPathMapper(
       ctx.transit().transferConstraintsSearch(),
-      ctx.costCalculator(),
+      includeCost ? ctx.costCalculator() : null,
       ctx.stopNameResolver(),
       ctx.lifeCycle(),
       ctx.searchDirection(),

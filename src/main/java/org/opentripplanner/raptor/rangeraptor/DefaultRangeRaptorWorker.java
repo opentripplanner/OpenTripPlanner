@@ -83,7 +83,6 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
 
   private final boolean enableTransferConstraints;
 
-  // TODO: this is meaningful only for time-based strategies
   private int iterationDepartureTime;
 
   public DefaultRangeRaptorWorker(

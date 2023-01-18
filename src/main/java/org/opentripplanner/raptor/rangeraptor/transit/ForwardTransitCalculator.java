@@ -86,6 +86,11 @@ public final class ForwardTransitCalculator<T extends RaptorTripSchedule>
   }
 
   @Override
+  public int minIterationDepatureTime() {
+    return earliestDepartureTime;
+  }
+
+  @Override
   public boolean oneIterationOnly() {
     return searchWindowInSeconds <= iterationStep;
   }

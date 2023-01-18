@@ -54,14 +54,15 @@ public class SearchContext<T extends RaptorTripSchedule> {
   protected final RaptorTransitDataProvider<T> transit;
 
   private final TransitCalculator<T> calculator;
-  private final CostCalculator<T> costCalculator;
   private final RaptorTuningParameters tuningParameters;
   private final RoundTracker roundTracker;
   private final DebugHandlerFactory<T> debugFactory;
   private final EgressPaths egressPaths;
   private final AccessPaths accessPaths;
-
   private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
+
+  /** Lazy initialized */
+  private CostCalculator<T> costCalculator = null;
 
   public SearchContext(
     RaptorRequest<T> request,
@@ -76,10 +77,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     // Note that it is the "new" request that is passed in.
     this.calculator = createCalculator(this.request, tuningParameters);
-    this.costCalculator =
-      request.profile().is(RaptorProfile.MULTI_CRITERIA)
-        ? transit.multiCriteriaCostCalculator()
-        : null;
     this.roundTracker =
       new RoundTracker(
         nRounds(),
@@ -146,6 +143,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
   @Nullable
   public CostCalculator<T> costCalculator() {
+    if (costCalculator == null) {
+      this.costCalculator = transit.multiCriteriaCostCalculator();
+    }
     return costCalculator;
   }
 

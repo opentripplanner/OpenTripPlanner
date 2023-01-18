@@ -1,13 +1,12 @@
 package org.opentripplanner.raptor.rangeraptor.standard.configure;
 
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
-import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicSearch;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -30,7 +29,6 @@ import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArriv
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArrivalsState;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.path.EgressArrivalToPathAdapter;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
-import org.opentripplanner.raptor.spi.CostCalculator;
 
 /**
  * The responsibility of this class is to wire different standard range raptor worker configurations
@@ -52,23 +50,6 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   public StdRangeRaptorConfig(SearchContext<T> context) {
     this.ctx = context;
     this.pathConfig = new PathConfig<>(context);
-  }
-
-  /**
-   * Create a heuristic search using the provided callback to create the worker. The callback is
-   * necessary because the heuristics MUST be created before the worker, if not the heuristic can
-   * not be added to the worker lifecycle and fails.
-   */
-  public HeuristicSearch<T> createHeuristicSearch(
-    BiFunction<RaptorWorkerState<T>, RoutingStrategy<T>, RaptorWorker<T>> createWorker,
-    CostCalculator<T> costCalculator
-  ) {
-    StdRangeRaptorWorkerState<T> state = createState();
-    Heuristics heuristics = createHeuristicsAdapter(costCalculator);
-    return new HeuristicSearch<>(
-      createWorker.apply(state, createWorkerStrategy(state)),
-      heuristics
-    );
   }
 
   public RaptorWorker<T> createSearch(
@@ -113,15 +94,15 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     throw new IllegalArgumentException(ctx.profile().toString());
   }
 
-  private Heuristics createHeuristicsAdapter(CostCalculator<T> costCalculator) {
-    Objects.requireNonNull(bestNumberOfTransfers);
+  public Heuristics createHeuristics(RaptorWorkerResult<T> results) {
     return new HeuristicsAdapter(
-      bestTimes(),
-      this.bestNumberOfTransfers,
+      ctx.nStops(),
       ctx.egressPaths(),
       ctx.calculator(),
-      costCalculator,
-      ctx.lifeCycle()
+      ctx.costCalculator(),
+      results.extractBestOverallArrivals(),
+      results.extractBestTransitArrivals(),
+      results.extractBestNumberOfTransfers()
     );
   }
 
@@ -215,7 +196,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private DestinationArrivalPaths<T> destinationArrivalPaths() {
-    DestinationArrivalPaths<T> destinationArrivalPaths = pathConfig.createDestArrivalPaths(false);
+    var destinationArrivalPaths = pathConfig.createDestArrivalPathsWithoutGeneralizedCost();
 
     // Add egressArrivals to stops and bind them to the destination arrival paths. The
     // adapter notify the destination on each new egress stop arrival.

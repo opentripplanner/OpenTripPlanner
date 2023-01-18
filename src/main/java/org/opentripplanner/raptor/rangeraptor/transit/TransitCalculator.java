@@ -97,6 +97,13 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
   IntIterator rangeRaptorMinutes();
 
   /**
+   * For a forward search this is the earliest-departure-time. For example this can be used to
+   * calculate an upper bound for the duration given an arrival time at the destination. For a
+   * reverse search this is the latest-time-arrival-time.
+   */
+  int minIterationDepatureTime();
+
+  /**
    * Return TRUE if the Range Raptor should perform only ONE iteration. This is defined happens if
    * the search window is less than or equals to the iteration step duration.
    */

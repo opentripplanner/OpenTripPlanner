@@ -8,15 +8,14 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
-import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicSearch;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
-import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
 /**
@@ -63,14 +62,21 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       .createWorker(heuristics, (s, w) -> createWorker(context, s, w));
   }
 
-  public HeuristicSearch<T> createHeuristicSearch(
+  public RaptorWorker<T> createHeuristicSearch(
     RaptorTransitDataProvider<T> transitData,
-    CostCalculator<T> costCalculator,
     RaptorRequest<T> request
   ) {
     SearchContext<T> context = context(transitData, request);
-    return new StdRangeRaptorConfig<>(context)
-      .createHeuristicSearch((s, w) -> createWorker(context, s, w), costCalculator);
+    return new StdRangeRaptorConfig<>(context).createSearch((s, w) -> createWorker(context, s, w));
+  }
+
+  public Heuristics createHeuristic(
+    RaptorTransitDataProvider<T> transitData,
+    RaptorRequest<T> request,
+    RaptorWorkerResult<T> results
+  ) {
+    var context = context(transitData, request);
+    return new StdRangeRaptorConfig<>(context).createHeuristics(results);
   }
 
   public boolean isMultiThreaded() {
