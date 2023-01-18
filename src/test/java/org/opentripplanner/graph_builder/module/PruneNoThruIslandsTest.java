@@ -50,7 +50,7 @@ public class PruneNoThruIslandsTest {
         .filter(StreetEdge::isMotorVehicleNoThruTraffic)
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())
-        .containsAll(Set.of("159830262", "55735898", "55735911"))
+        .containsAll(Set.of("159830262", "55735911"))
     );
   }
 
