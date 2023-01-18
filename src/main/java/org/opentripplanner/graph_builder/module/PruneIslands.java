@@ -54,10 +54,13 @@ public class PruneIslands implements GraphBuilderModule {
   private final TransitModel transitModel;
   private final DataImportIssueStore issueStore;
   private final StreetLinkerModule streetLinkerModule;
-  private int pruningThresholdIslandWithoutStops;
-  private int pruningThresholdIslandWithStops;
+  private int pruningThresholdWithoutStops;
+  private int pruningThresholdWithStops;
   private int adaptivePruningDistance;
   private double adaptivePruningFactor;
+
+  private VertexLinker vertexLinker;
+  private StreetIndex streetIndex;
 
   public PruneIslands(
     Graph graph,
@@ -75,43 +78,20 @@ public class PruneIslands implements GraphBuilderModule {
   public void buildGraph() {
     LOG.info("Pruning islands and areas isolated by nothru edges in street network");
     LOG.info(
-      "Threshold with stops {} without stops {}, adaptive coeff {} and distance {}",
-      pruningThresholdIslandWithStops,
-      pruningThresholdIslandWithoutStops,
+      "Threshold with stops {}, without stops {}, adaptive coeff {} and distance {}",
+      pruningThresholdWithStops,
+      pruningThresholdWithoutStops,
       adaptivePruningFactor,
       adaptivePruningDistance
     );
 
-    var vertexLinker = graph.getLinkerSafe(transitModel.getStopModel());
-    StreetIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
+    this.vertexLinker = graph.getLinkerSafe(transitModel.getStopModel());
+    this.streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
 
-    pruneIslands(
-      graph,
-      vertexLinker,
-      streetIndex,
-      pruningThresholdIslandWithoutStops,
-      pruningThresholdIslandWithStops,
-      issueStore,
-      TraverseMode.BICYCLE
-    );
-    pruneIslands(
-      graph,
-      vertexLinker,
-      streetIndex,
-      pruningThresholdIslandWithoutStops,
-      pruningThresholdIslandWithStops,
-      issueStore,
-      TraverseMode.WALK
-    );
-    pruneIslands(
-      graph,
-      vertexLinker,
-      streetIndex,
-      pruningThresholdIslandWithoutStops,
-      pruningThresholdIslandWithStops,
-      issueStore,
-      TraverseMode.CAR
-    );
+    pruneIslands(TraverseMode.BICYCLE);
+    pruneIslands(TraverseMode.WALK);
+    pruneIslands(TraverseMode.CAR);
+
     // reconnect stops that got disconnected
     if (streetLinkerModule != null) {
       LOG.info("Reconnecting stops");
@@ -125,7 +105,6 @@ public class PruneIslands implements GraphBuilderModule {
       }
       LOG.info("{} stops remain isolated", isolated);
     }
-
     // clean up pruned street vertices
     int removed = 0;
     List<Vertex> toRemove = new LinkedList<>();
@@ -148,14 +127,14 @@ public class PruneIslands implements GraphBuilderModule {
    * island without stops and with less than this number of street vertices will be pruned
    */
   public void setPruningThresholdIslandWithoutStops(int pruningThresholdIslandWithoutStops) {
-    this.pruningThresholdIslandWithoutStops = pruningThresholdIslandWithoutStops;
+    this.pruningThresholdWithoutStops = pruningThresholdIslandWithoutStops;
   }
 
   /**
    * island with stops and with less than this number of street vertices will be pruned
    */
   public void setPruningThresholdIslandWithStops(int pruningThresholdIslandWithStops) {
-    this.pruningThresholdIslandWithStops = pruningThresholdIslandWithStops;
+    this.pruningThresholdWithStops = pruningThresholdIslandWithStops;
   }
 
   /**
@@ -166,7 +145,7 @@ public class PruneIslands implements GraphBuilderModule {
   }
 
   /**
-   * coefficient how much larger islands (compared to max sizes defined above) get pruned if they are close enough
+   * coefficient how much larger islands (compared to threshold values defined above) get pruned if they are close enough
    */
   public void setAdaptivePruningFactor(double adaptivePruningFactor) {
     this.adaptivePruningFactor = adaptivePruningFactor;
@@ -181,15 +160,7 @@ public class PruneIslands implements GraphBuilderModule {
           to noThruTraffic state. Remove traversal mode specific access from unreachable edges. Remove unconnected edges.
      */
 
-  private void pruneIslands(
-    Graph graph,
-    VertexLinker vertexLinker,
-    StreetIndex streetIndex,
-    int maxIslandSize,
-    int islandWithStopMaxSize,
-    DataImportIssueStore issueStore,
-    TraverseMode traverseMode
-  ) {
+  private void pruneIslands(TraverseMode traverseMode) {
     LOG.debug("nothru pruning");
     Map<Vertex, Subgraph> subgraphs = new HashMap<>();
     Map<Vertex, Subgraph> extgraphs = new HashMap<>();
@@ -199,34 +170,23 @@ public class PruneIslands implements GraphBuilderModule {
     int count;
 
     /* establish vertex neighbourhood without currently relevant noThruTrafficEdges */
-    collectNeighbourVertices(graph, neighborsForVertex, traverseMode, false);
+    collectNeighbourVertices(neighborsForVertex, traverseMode, false);
 
     /* associate each connected vertex with a subgraph */
-    count = collectSubGraphs(graph, neighborsForVertex, subgraphs, null, null);
-    LOG.info("Islands without {} noThruTraffic edges: {}", traverseMode, count);
+    count = collectSubGraphs(neighborsForVertex, subgraphs, null, null);
+    LOG.info("Islands when {} noThruTraffic is considered: {}", traverseMode, count);
 
     /* Expand vertex neighbourhood with relevant noThruTrafficEdges
-           Note that we can reuse the original neighbour map here
-           and simply process a smaller set of noThruTrafficEdges */
-    collectNeighbourVertices(graph, neighborsForVertex, traverseMode, true);
+       Note that we can reuse the original neighbour map here
+       and simply process a smaller set of noThruTrafficEdges */
+    collectNeighbourVertices(neighborsForVertex, traverseMode, true);
 
     /* Next: generate subgraphs without considering access limitations */
-    count = collectSubGraphs(graph, neighborsForVertex, extgraphs, null, islands);
-    LOG.info("Islands with {} noThruTraffic edges: {}", traverseMode, count);
+    count = collectSubGraphs(neighborsForVertex, extgraphs, null, islands);
+    LOG.info("Islands when {} noThruTraffic is ignored: {}", traverseMode, count);
 
     /* collect unreachable edges to a map */
-    processIslands(
-      graph,
-      vertexLinker,
-      streetIndex,
-      islands,
-      isolated,
-      true,
-      maxIslandSize,
-      islandWithStopMaxSize,
-      issueStore,
-      traverseMode
-    );
+    processIslands(islands, isolated, true, traverseMode);
 
     extgraphs = new HashMap<>(); // let old map go
     islands = new ArrayList<>(); // reset this too
@@ -234,41 +194,23 @@ public class PruneIslands implements GraphBuilderModule {
     /* Recompute expanded subgraphs by accepting noThruTraffic edges in graph expansion.
        However, expansion is not allowed to jump from an original island to another one
      */
-    collectSubGraphs(graph, neighborsForVertex, extgraphs, subgraphs, islands);
+    collectSubGraphs(neighborsForVertex, extgraphs, subgraphs, islands);
 
     /* Next round: generate purely noThruTraffic islands if such ones exist */
-    count = collectSubGraphs(graph, neighborsForVertex, extgraphs, null, islands);
+    count = collectSubGraphs(neighborsForVertex, extgraphs, null, islands);
 
     LOG.info("{} noThruTraffic island count: {}", traverseMode, count);
 
     LOG.info("Total {} sub graphs found", islands.size());
 
-    count =
-      processIslands(
-        graph,
-        vertexLinker,
-        streetIndex,
-        islands,
-        isolated,
-        false,
-        maxIslandSize,
-        islandWithStopMaxSize,
-        issueStore,
-        traverseMode
-      );
+    count = processIslands(islands, isolated, false, traverseMode);
     LOG.info("Modified {} islands", count);
   }
 
   private int processIslands(
-    Graph graph,
-    VertexLinker vertexLinker,
-    StreetIndex streetIndex,
     ArrayList<Subgraph> islands,
     Map<Edge, Boolean> isolated,
     boolean markIsolated,
-    int maxIslandSize,
-    int islandWithStopMaxSize,
-    DataImportIssueStore issueStore,
     TraverseMode traverseMode
   ) {
     Map<String, Integer> stats = new HashMap<>();
@@ -312,23 +254,14 @@ public class PruneIslands implements GraphBuilderModule {
           }
         }
         // do not remove real islands which have only ferry stops
-        if (!onlyFerry && island.streetSize() < islandWithStopMaxSize * adaptivePruningFactor) {
+        if (!onlyFerry && island.streetSize() < pruningThresholdWithStops * adaptivePruningFactor) {
           double sizeCoeff = (adaptivePruningFactor > 1.0)
             ? island.distanceFromOtherGraph(streetIndex, adaptivePruningDistance) /
             adaptivePruningDistance
             : 1.0;
 
-          if (island.streetSize() * sizeCoeff < islandWithStopMaxSize) {
-            restrictOrRemove(
-              graph,
-              vertexLinker,
-              island,
-              isolated,
-              stats,
-              markIsolated,
-              traverseMode,
-              issueStore
-            );
+          if (island.streetSize() * sizeCoeff < pruningThresholdWithStops) {
+            restrictOrRemove(island, isolated, stats, markIsolated, traverseMode);
             changed = true;
             islandsWithStopsChanged++;
             count++;
@@ -336,22 +269,13 @@ public class PruneIslands implements GraphBuilderModule {
         }
       } else {
         //for islands without stops
-        if (island.streetSize() < maxIslandSize * adaptivePruningFactor) {
+        if (island.streetSize() < pruningThresholdWithoutStops * adaptivePruningFactor) {
           double sizeCoeff = (adaptivePruningFactor > 1.0)
             ? island.distanceFromOtherGraph(streetIndex, adaptivePruningDistance) /
             adaptivePruningDistance
             : 1.0;
-          if (island.streetSize() * sizeCoeff < maxIslandSize) {
-            restrictOrRemove(
-              graph,
-              vertexLinker,
-              island,
-              isolated,
-              stats,
-              markIsolated,
-              traverseMode,
-              issueStore
-            );
+          if (island.streetSize() * sizeCoeff < pruningThresholdWithoutStops) {
+            restrictOrRemove(island, isolated, stats, markIsolated, traverseMode);
             changed = true;
             count++;
           }
@@ -382,7 +306,6 @@ public class PruneIslands implements GraphBuilderModule {
   }
 
   private void collectNeighbourVertices(
-    Graph graph,
     Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
     TraverseMode traverseMode,
     boolean shouldMatchNoThruType
@@ -446,7 +369,6 @@ public class PruneIslands implements GraphBuilderModule {
   }
 
   private int collectSubGraphs(
-    Graph graph,
     Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
     Map<Vertex, Subgraph> newgraphs, // put new subgraphs here
     Map<Vertex, Subgraph> subgraphs, // optional isolation map from a previous round
@@ -484,14 +406,11 @@ public class PruneIslands implements GraphBuilderModule {
   }
 
   private void restrictOrRemove(
-    Graph graph,
-    VertexLinker vertexLinker,
     Subgraph island,
     Map<Edge, Boolean> isolated,
     Map<String, Integer> stats,
     boolean markIsolated,
-    TraverseMode traverseMode,
-    DataImportIssueStore issueStore
+    TraverseMode traverseMode
   ) {
     int nothru = 0, removed = 0, restricted = 0;
     //iterate over the street vertex of the subgraph
