@@ -546,8 +546,11 @@ class NorwayMapper implements OsmTagMapper {
     );
 
     /*
-     * Automobile speeds in Norway. General speed limit is 80kph unless signs says otherwise
-     *
+     * Automobile speeds in Norway.
+     * The national speed limit is 80 km/h in rural areas and 50 km/h i urban areas.
+     * Normally the speed limit is signed explicit, and the national speed limits don't apply.
+     * Design speed for new motorways are 110 km/h, and 90 km/h for motorroads.
+     * Legal speed limit for pedestrian and living streets is walking pace.
      */
 
     props.setCarSpeed(
@@ -555,10 +558,7 @@ class NorwayMapper implements OsmTagMapper {
       30.56f // 110 km/t
     );
     props.setCarSpeed(
-      new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("highway", "trunk", "trunk_link", "primary", "primary_link"),
-        new Condition.Equals("motorroad", "yes")
-      ),
+      new ExactMatchSpecifier(new Condition.Equals("motorroad", "yes"), isTrunkOrPrimary),
       25.f // 90 km/t
     );
     props.setCarSpeed(
@@ -573,7 +573,9 @@ class NorwayMapper implements OsmTagMapper {
           "secondary_link",
           "tertiary",
           "tertiary_link",
-          "unclassified"
+          "unclassified",
+          "road",
+          "busway"
         )
       ),
       22.22f // 80 km/t
@@ -591,25 +593,30 @@ class NorwayMapper implements OsmTagMapper {
           "secondary_link",
           "tertiary",
           "tertiary_link",
-          "unclassified"
+          "unclassified",
+          "road",
+          "busway"
         )
       ),
       13.89f // 50 km/t
     );
-    props.setCarSpeed("highway=living_street", 1.94f); // 7 km/t
-    props.setCarSpeed("highway=pedestrian", 1.94f); // 7 km/t
 
     props.setCarSpeed("highway=residential", 13.89f); // 50 km/t
     props.setCarSpeed("highway=service", 13.89f); // 50 km/t
-    props.setCarSpeed("highway=track", 8.33f); // 30 km/t
-    props.setCarSpeed("highway=road", 13.89f); // 50 km/t
 
-    props.defaultSpeed = 22.22f; // 80kph
+    props.setCarSpeed("highway=service;service=driveway", 8.33f); // 30 km/t
+    props.setCarSpeed("highway=service;service=parking_aisle", 8.33f);
+    props.setCarSpeed("highway=track", 8.33f);
+
+    props.setCarSpeed("highway=living_street", 1.94f); // 7 km/t
+    props.setCarSpeed("highway=pedestrian", 1.94f); // 7 km/t
+
+    props.defaultSpeed = 22.22f; // 80 km/t
 
     new DefaultMapper().populateNotesAndNames(props);
 
     props.setSlopeOverride(new BestMatchSpecifier("bridge=*"), true);
-    props.setSlopeOverride(new BestMatchSpecifier("embankment=*"), false);
+    props.setSlopeOverride(new BestMatchSpecifier("cutting=*"), true);
     props.setSlopeOverride(new BestMatchSpecifier("tunnel=*"), true);
     props.setSlopeOverride(new BestMatchSpecifier("location=underground"), true);
     props.setSlopeOverride(new BestMatchSpecifier("indoor=yes"), true);
