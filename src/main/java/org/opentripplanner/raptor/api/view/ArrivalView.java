@@ -82,6 +82,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   /**
    * The previous stop arrival state or {@code null} if first arrival (access stop arrival).
    */
+  @Nullable
   ArrivalView<T> previous();
 
   /**
