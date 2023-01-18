@@ -62,7 +62,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
   private ParetoComparator<RaptorPath<T>> paretoComparator(boolean includeCost) {
     double relaxedCost = ctx.searchParams().relaxCostAtDestination();
     boolean includeRelaxedCost = includeCost && relaxedCost > 0.0;
-    boolean includeTimetable = ctx.searchParams().timetableEnabled();
+    boolean includeTimetable = ctx.searchParams().timetable();
     boolean preferLateArrival = ctx.searchParams().preferLateArrival();
 
     if (includeTimetable && includeRelaxedCost) {

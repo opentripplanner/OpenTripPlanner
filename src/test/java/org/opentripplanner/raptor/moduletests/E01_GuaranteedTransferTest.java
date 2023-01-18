@@ -59,12 +59,12 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
     requestBuilder
       .searchParams()
-      .constrainedTransfersEnabled(true)
+      .constrainedTransfers(true)
       .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
       .addEgressPaths(TestAccessEgress.walk(STOP_C, D30s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
-      .timetableEnabled(true);
+      .timetable(true);
 
     // Make sure the slack have values which prevent the normal from happening transfer.
     // The test scenario have zero seconds to transfer, so any slack will do.

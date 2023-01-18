@@ -95,4 +95,35 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
    * massively in unit-testing.
    */
   String toString(RaptorStopNameResolver stopNameTranslator);
+
+  /**
+   * Sort paths in order:
+   * <ol>
+   *   <li>Earliest arrival time first,
+   *   <li>Then latest departure time
+   *   <li>Then lowest cost
+   *   <li>Then lowest number of transfers
+   * </ol>
+   */
+  @Override
+  default int compareTo(RaptorPath<T> other) {
+    int c = endTime() - other.endTime();
+    if (c != 0) {
+      return c;
+    }
+    c = other.startTime() - startTime();
+    if (c != 0) {
+      return c;
+    }
+    c = generalizedCost() - other.generalizedCost();
+    if (c != 0) {
+      return c;
+    }
+    c = numberOfTransfers() - other.numberOfTransfers();
+    return c;
+  }
+
+  default boolean isUnknownPath() {
+    return false;
+  }
 }

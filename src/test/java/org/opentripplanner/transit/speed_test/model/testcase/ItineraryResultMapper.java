@@ -3,8 +3,8 @@ package org.opentripplanner.transit.speed_test.model.testcase;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,6 +14,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.model.plan.UnknownTransitPathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -93,6 +94,8 @@ class ItineraryResultMapper {
           leg.getStartTime().get(ChronoField.SECOND_OF_DAY),
           leg.getEndTime().get(ChronoField.SECOND_OF_DAY)
         );
+      } else if (leg instanceof UnknownTransitPathLeg d) {
+        buf.append(d.description());
       }
     }
     return buf.toString();
@@ -117,7 +120,7 @@ class ItineraryResultMapper {
   private Result map(Itinerary itinerary) {
     List<String> agencies = new ArrayList<>();
     List<String> routes = new ArrayList<>();
-    Set<TransitMode> modes = new HashSet<>();
+    Set<TransitMode> modes = EnumSet.noneOf(TransitMode.class);
     List<String> stops = new ArrayList<>();
 
     for (Leg it : itinerary.getLegs()) {
@@ -145,7 +148,7 @@ class ItineraryResultMapper {
       itinerary.startTime().get(ChronoField.SECOND_OF_DAY),
       itinerary.endTime().get(ChronoField.SECOND_OF_DAY),
       agencies,
-      modes,
+      List.copyOf(modes),
       routes,
       stops,
       details(itinerary)

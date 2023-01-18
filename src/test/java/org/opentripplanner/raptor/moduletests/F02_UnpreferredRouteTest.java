@@ -63,7 +63,7 @@ public class F02_UnpreferredRouteTest implements RaptorTestConstants {
       .addEgressPaths(TestAccessEgress.walk(STOP_B, D20s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
-      .timetableEnabled(true);
+      .timetable(true);
 
     requestBuilder.profile(RaptorProfile.MULTI_CRITERIA);
 
