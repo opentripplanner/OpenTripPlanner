@@ -239,7 +239,6 @@ public class PruneIslands implements GraphBuilderModule {
       if (island == largest) {
         continue;
       }
-      boolean changed = false;
       if (island.stopSize() > 0) {
         //for islands with stops
         islandsWithStops++;
@@ -261,10 +260,10 @@ public class PruneIslands implements GraphBuilderModule {
             : 1.0;
 
           if (island.streetSize() * sizeCoeff < pruningThresholdWithStops) {
-            restrictOrRemove(island, isolated, stats, markIsolated, traverseMode);
-            changed = true;
-            islandsWithStopsChanged++;
-            count++;
+            if (restrictOrRemove(island, isolated, stats, markIsolated, traverseMode)) {
+              islandsWithStopsChanged++;
+              count++;
+            }
           }
         }
       } else {
@@ -275,9 +274,9 @@ public class PruneIslands implements GraphBuilderModule {
             adaptivePruningDistance
             : 1.0;
           if (island.streetSize() * sizeCoeff < pruningThresholdWithoutStops) {
-            restrictOrRemove(island, isolated, stats, markIsolated, traverseMode);
-            changed = true;
-            count++;
+            if (restrictOrRemove(island, isolated, stats, markIsolated, traverseMode)) {
+              count++;
+            }
           }
         }
       }
@@ -405,7 +404,7 @@ public class PruneIslands implements GraphBuilderModule {
     return count;
   }
 
-  private void restrictOrRemove(
+  private boolean restrictOrRemove(
     Subgraph island,
     Map<Edge, Boolean> isolated,
     Map<String, Integer> stats,
@@ -413,6 +412,7 @@ public class PruneIslands implements GraphBuilderModule {
     TraverseMode traverseMode
   ) {
     int nothru = 0, removed = 0, restricted = 0;
+    Vertex sample = null;
     //iterate over the street vertex of the subgraph
     for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {
       Vertex v = vIter.next();
@@ -425,36 +425,63 @@ public class PruneIslands implements GraphBuilderModule {
           } else {
             StreetEdge pse = (StreetEdge) e;
             if (!isolated.containsKey(e)) {
+              boolean changed = false;
+
               // not a true island edge but has limited access
               // so convert to noThruTraffic
               if (traverseMode == TraverseMode.CAR) {
-                pse.setMotorVehicleNoThruTraffic(true);
+                if (!pse.isMotorVehicleNoThruTraffic()) {
+                  pse.setMotorVehicleNoThruTraffic(true);
+                  changed = true;
+                }
               } else if (traverseMode == TraverseMode.BICYCLE) {
-                pse.setBicycleNoThruTraffic(true);
+                if (!pse.isBicycleNoThruTraffic()) {
+                  pse.setBicycleNoThruTraffic(true);
+                  changed = true;
+                }
               } else if (traverseMode == TraverseMode.WALK) {
-                pse.setWalkNoThruTraffic(true);
+                if (!pse.isWalkNoThruTraffic()) {
+                  pse.setWalkNoThruTraffic(true);
+                  changed = true;
+                }
               }
-              stats.put("noThru", stats.get("noThru") + 1);
-              nothru++;
+              if (changed) {
+                stats.put("noThru", stats.get("noThru") + 1);
+                sample = v;
+                nothru++;
+              }
             } else {
               StreetTraversalPermission permission = pse.getPermission();
+              boolean changed = false;
               if (traverseMode == TraverseMode.CAR) {
-                permission = permission.remove(StreetTraversalPermission.CAR);
+                if (permission.allows(StreetTraversalPermission.CAR)) {
+                  permission = permission.remove(StreetTraversalPermission.CAR);
+                  changed = true;
+                }
               } else if (traverseMode == TraverseMode.BICYCLE) {
-                permission = permission.remove(StreetTraversalPermission.BICYCLE);
+                if (permission.allows(StreetTraversalPermission.BICYCLE)) {
+                  permission = permission.remove(StreetTraversalPermission.BICYCLE);
+                  changed = true;
+                }
               } else if (traverseMode == TraverseMode.WALK) {
-                permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+                if (permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
+                  permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+                  changed = true;
+                }
               }
-              if (permission == StreetTraversalPermission.NONE) {
-                // currently we must update spatial index manually, graph.removeEdge does not do that
-                vertexLinker.removePermanentEdgeFromIndex(pse);
-                graph.removeEdge(pse);
-                stats.put("removed", stats.get("removed") + 1);
-                removed++;
-              } else {
-                pse.setPermission(permission);
-                stats.put("restricted", stats.get("restricted") + 1);
-                restricted++;
+              if (changed) {
+                sample = v;
+                if (permission == StreetTraversalPermission.NONE) {
+                  // currently we must update spatial index manually, graph.removeEdge does not do that
+                  vertexLinker.removePermanentEdgeFromIndex(pse);
+                  graph.removeEdge(pse);
+                  stats.put("removed", stats.get("removed") + 1);
+                  removed++;
+                } else {
+                  pse.setPermission(permission);
+                  stats.put("restricted", stats.get("restricted") + 1);
+                  restricted++;
+                }
               }
             }
           }
@@ -462,7 +489,7 @@ public class PruneIslands implements GraphBuilderModule {
       }
     }
     if (markIsolated) {
-      return;
+      return false;
     }
 
     for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {
@@ -472,6 +499,9 @@ public class PruneIslands implements GraphBuilderModule {
       }
     }
 
+    if (sample == null) {
+      return false;
+    }
     if (traverseMode == TraverseMode.WALK) {
       // note: do not unlink stop if only CAR mode is pruned
       // maybe this needs more logic for flex routing cases
@@ -491,7 +521,7 @@ public class PruneIslands implements GraphBuilderModule {
         // issue about stops that got unlinked in pruning
         issueStore.add(
           new PrunedStopIsland(
-            island.getRepresentativeVertex(),
+            sample,
             island.streetSize(),
             island.stopSize(),
             nothru,
@@ -504,7 +534,7 @@ public class PruneIslands implements GraphBuilderModule {
     }
     issueStore.add(
       new GraphIsland(
-        island.getRepresentativeVertex(),
+        sample,
         island.streetSize(),
         island.stopSize(),
         nothru,
@@ -513,6 +543,7 @@ public class PruneIslands implements GraphBuilderModule {
         traverseMode.name()
       )
     );
+    return true;
   }
 
   private Subgraph computeConnectedSubgraph(
