@@ -70,7 +70,7 @@ public class DurationUtils {
   }
 
   public static String durationToStr(Duration duration) {
-    return durationToStr((int) duration.toSeconds());
+    return duration == null ? "" : durationToStr((int) duration.toSeconds());
   }
 
   public static String durationToStr(int timeSeconds, int notSetValue) {

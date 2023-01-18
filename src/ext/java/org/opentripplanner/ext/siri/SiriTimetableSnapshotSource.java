@@ -8,6 +8,7 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DAT
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
+import static org.opentripplanner.model.UpdateSuccess.WarningType.NOT_MONITORED;
 
 import com.google.common.base.Preconditions;
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.UpdateError;
+import org.opentripplanner.model.UpdateSuccess;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -43,7 +45,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
-import org.opentripplanner.updater.trip.UpdateResult;
+import org.opentripplanner.updater.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.DatedVehicleJourneyRef;
@@ -263,7 +265,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     // Acquire lock on buffer
     bufferLock.lock();
 
-    List<Result<?, UpdateError>> results = new ArrayList<>();
+    List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
     try {
       if (fullDataset) {
@@ -295,13 +297,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return UpdateResult.ofResults(results);
   }
 
-  private List<Result<?, UpdateError>> apply(
+  private List<Result<UpdateSuccess, UpdateError>> apply(
     EstimatedTimetableDeliveryStructure etDelivery,
     TransitModel transitModel,
     String feedId,
     SiriFuzzyTripMatcher fuzzyTripMatcher
   ) {
-    List<Result<?, UpdateError>> results = new ArrayList<>();
+    List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
     List<EstimatedVersionFrameStructure> estimatedJourneyVersions = etDelivery.getEstimatedJourneyVersionFrames();
     if (estimatedJourneyVersions != null) {
       //Handle deliveries
@@ -312,7 +314,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           if (isReplacementDeparture(journey, feedId)) {
             // Added trip
             try {
-              Result<?, UpdateError> res = handleAddedTrip(transitModel, feedId, journey);
+              Result<UpdateSuccess, UpdateError> res = handleAddedTrip(
+                transitModel,
+                feedId,
+                journey
+              );
               results.add(res);
             } catch (Throwable t) {
               // Since this is work in progress - catch everything to continue processing updates
@@ -326,15 +332,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           } else {
             // Updated trip
             var result = handleModifiedTrip(transitModel, fuzzyTripMatcher, feedId, journey);
-            result.ifSuccess(ignored -> results.add(Result.success()));
+            // need to put it in a new instance so the type is correct
+            result.ifSuccess(value -> results.add(Result.success(value)));
             result.ifFailure(failures -> {
-              failures.stream().map(Result::failure).forEach(results::add);
-
-              if (journey.isMonitored() != null && !journey.isMonitored()) {
-                results.add(
-                  Result.success(UpdateError.noTripId(UpdateError.UpdateErrorType.NOT_MONITORED))
-                );
-              }
+              List<Result<UpdateSuccess, UpdateError>> f = failures
+                .stream()
+                .map(Result::<UpdateSuccess, UpdateError>failure)
+                .toList();
+              results.addAll(f);
             });
           }
         }
@@ -501,7 +506,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return tripPattern.getScheduledTimetable();
   }
 
-  private Result<?, UpdateError> handleAddedTrip(
+  private Result<UpdateSuccess, UpdateError> handleAddedTrip(
     TransitModel transitModel,
     String feedId,
     EstimatedVehicleJourney estimatedVehicleJourney
@@ -574,7 +579,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     if (tripResult.isFailure()) {
-      return tripResult;
+      // need to create a new result so the success type is correct
+      return tripResult.toFailureResult();
     }
     Trip trip = tripResult.successValue();
 
@@ -866,7 +872,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       : null;
   }
 
-  private Result<?, List<UpdateError>> handleModifiedTrip(
+  private Result<UpdateSuccess, List<UpdateError>> handleModifiedTrip(
     TransitModel transitModel,
     SiriFuzzyTripMatcher fuzzyTripMatcher,
     String feedId,
@@ -879,7 +885,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         estimatedVehicleJourney.isCancellation() != null &&
         !estimatedVehicleJourney.isCancellation()
       ) {
-        return Result.success();
+        return Result.success(UpdateSuccess.ofWarnings(NOT_MONITORED));
       }
     }
 
@@ -901,8 +907,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
+    final Result<UpdateSuccess, List<UpdateError>> successNoWarnings = Result.success(
+      UpdateSuccess.noWarnings()
+    );
     if (serviceDate == null) {
-      return Result.success();
+      return successNoWarnings;
     }
 
     Set<TripTimes> times = new HashSet<>();
@@ -1058,7 +1067,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     if (errors.isEmpty()) {
-      return Result.success();
+      return successNoWarnings;
     } else {
       return Result.failure(errors);
     }
@@ -1112,7 +1121,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Add a (new) trip to the transitModel and the buffer
    */
-  private Result<?, UpdateError> addTripToGraphAndBuffer(
+  private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(
     final String feedId,
     final TransitModel transitModel,
     final Trip trip,

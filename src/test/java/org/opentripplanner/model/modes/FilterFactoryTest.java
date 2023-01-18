@@ -56,7 +56,7 @@ class FilterFactoryTest {
     var result = (AllowMainModesFilter) AllowTransitModeFilter.of(modes);
 
     for (TransitMode mode : TransitMode.values()) {
-      assertEquals(mode != TransitMode.AIRPLANE, result.allows(mode, SubMode.UNKNOWN));
+      assertEquals(mode != TransitMode.AIRPLANE, result.match(mode, SubMode.UNKNOWN));
     }
   }
 
@@ -80,9 +80,9 @@ class FilterFactoryTest {
 
     var result = AllowTransitModeFilter.of(modes);
 
-    assertTrue(result.allows(TransitMode.BUS, LOCAL_BUS));
-    assertTrue(result.allows(TransitMode.BUS, NIGHT_BUS));
-    assertFalse(result.allows(TransitMode.BUS, SubMode.UNKNOWN));
+    assertTrue(result.match(TransitMode.BUS, LOCAL_BUS));
+    assertTrue(result.match(TransitMode.BUS, NIGHT_BUS));
+    assertFalse(result.match(TransitMode.BUS, SubMode.UNKNOWN));
   }
 
   @Test
@@ -96,8 +96,8 @@ class FilterFactoryTest {
 
     var result = (AllowMainAndSubModesFilter) AllowTransitModeFilter.of(modes);
 
-    assertTrue(result.allows(TransitMode.BUS, LOCAL_BUS));
-    assertFalse(result.allows(TransitMode.TRAM, LOCAL_BUS));
-    assertFalse(result.allows(TransitMode.BUS, SubMode.UNKNOWN));
+    assertTrue(result.match(TransitMode.BUS, LOCAL_BUS));
+    assertFalse(result.match(TransitMode.TRAM, LOCAL_BUS));
+    assertFalse(result.match(TransitMode.BUS, SubMode.UNKNOWN));
   }
 }

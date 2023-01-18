@@ -46,6 +46,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Migration to Jakarta EE 9 [#4698](https://github.com/opentripplanner/OpenTripPlanner/pull/4698)
 - Upgrade dependencies to take newest GTFS Flex spec into account [#4693](https://github.com/opentripplanner/OpenTripPlanner/pull/4693)
 - Configuration of additional HTTP headers for GTFS-RT updaters [#4684](https://github.com/opentripplanner/OpenTripPlanner/pull/4684)
+- Configure Renovate [#4704](https://github.com/opentripplanner/OpenTripPlanner/pull/4704)
+- GTFS-RT extension to add completely new routes [#4667](https://github.com/opentripplanner/OpenTripPlanner/pull/4667)
+- New filter API [#4657](https://github.com/opentripplanner/OpenTripPlanner/pull/4657)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

@@ -71,7 +71,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void alight(final int stopIndex, final int stopPos, final int alightSlack) {
+  public void alight(int stopIndex, int stopPos, int alightSlack) {
     if (onTripIndex != UNBOUNDED_TRIP_INDEX) {
       final int stopArrivalTime = calculator.stopArrivalTime(onTrip, stopPos, alightSlack);
       state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStop, onTripBoardTime, onTrip);

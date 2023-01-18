@@ -55,7 +55,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
       .searchParams()
       .earliestDepartureTime(T00_10)
       .searchWindow(Duration.ofMinutes(30))
-      .timetableEnabled(true);
+      .timetable(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }

@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.framework;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.annotation.Nonnull;
 
 /**
@@ -23,6 +24,32 @@ public abstract sealed class Result<T, E> {
 
   public static <E> Result<Void, E> success() {
     return new Success<>(null);
+  }
+
+  /**
+   * If this instance is a success then the mapper transforms its value. If this instance is a
+   * failure then a new failed instance with the correct success type is returned.
+   *
+   * @param <N> The success type of the new Result instance.
+   */
+  public <N> Result<N, E> mapSuccess(Function<T, N> mapper) {
+    if (isSuccess()) {
+      return Result.success(mapper.apply(successValue()));
+    } else {
+      return Result.failure(failureValue());
+    }
+  }
+
+  /**
+   * Creates a new instance of this class with a new success type. This is useful if you know
+   * that it is a failure and want to return it in a method without having to cast the success type.
+   * <p>
+   * If this instance is not a failure an exception is thrown.
+   *
+   * @param <N> The success type of the new Result instance.
+   */
+  public <N> Result<N, E> toFailureResult() {
+    return Result.failure(failureValue());
   }
 
   /**

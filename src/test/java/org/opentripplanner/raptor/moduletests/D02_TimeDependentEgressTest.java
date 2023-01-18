@@ -53,11 +53,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
     );
     requestBuilder.searchParams().addAccessPaths(TestAccessEgress.walk(STOP_A, D0s));
 
-    requestBuilder
-      .searchParams()
-      .earliestDepartureTime(T00_10)
-      .searchWindow(D15m)
-      .timetableEnabled(true);
+    requestBuilder.searchParams().earliestDepartureTime(T00_10).searchWindow(D15m).timetable(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }

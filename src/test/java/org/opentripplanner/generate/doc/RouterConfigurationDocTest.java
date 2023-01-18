@@ -13,6 +13,7 @@ import static org.opentripplanner.generate.doc.framework.TemplateUtil.replacePar
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
@@ -22,6 +23,7 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 @OnlyIfDocsExist
+@Tag("docs")
 public class RouterConfigurationDocTest {
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "RouterConfiguration.md");
@@ -46,7 +48,7 @@ public class RouterConfigurationDocTest {
    */
   @Test
   public void updateBuildConfigurationDoc() {
-    NodeAdapter node = readBuildConfig();
+    NodeAdapter node = readRouterConfig();
 
     // Read and close inout file (same as output file)
     String doc = readFile(TEMPLATE);
@@ -61,7 +63,7 @@ public class RouterConfigurationDocTest {
     assertFileEquals(original, OUT_FILE);
   }
 
-  private NodeAdapter readBuildConfig() {
+  private NodeAdapter readRouterConfig() {
     var json = jsonNodeFromResource(CONFIG_PATH);
     var conf = new RouterConfig(json, CONFIG_PATH, true);
     return conf.asNodeAdapter();

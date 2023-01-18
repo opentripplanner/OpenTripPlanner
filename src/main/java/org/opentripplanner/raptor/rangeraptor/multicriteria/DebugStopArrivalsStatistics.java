@@ -18,7 +18,9 @@ class DebugStopArrivalsStatistics {
   }
 
   void debugStatInfo(StopArrivalParetoSet<?>[] stops) {
-    if (!debugLogger.isEnabled()) return;
+    if (!debugLogger.isEnabled()) {
+      return;
+    }
 
     long total = 0;
     long arrayLen = 0;
