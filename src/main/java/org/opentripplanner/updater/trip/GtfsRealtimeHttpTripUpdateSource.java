@@ -1,9 +1,11 @@
 package org.opentripplanner.updater.trip;
 
+import com.google.protobuf.ExtensionRegistry;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import de.mfdz.MfdzRealtimeExtensions;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -33,11 +35,13 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
    * previous updates should be disregarded
    */
   private boolean fullDataset = true;
+  private ExtensionRegistry registry = ExtensionRegistry.newInstance();
 
   public GtfsRealtimeHttpTripUpdateSource(Parameters config) {
     this.feedId = config.getFeedId();
     this.url = config.getUrl();
     this.headers = MapUtils.combine(config.headers(), DEFAULT_HEADERS);
+    MfdzRealtimeExtensions.registerAllExtensions(registry);
   }
 
   @Override
@@ -47,10 +51,10 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     List<TripUpdate> updates = null;
     fullDataset = true;
     try {
-      InputStream is = HttpUtils.getData(URI.create(url), this.headers);
+      InputStream is = HttpUtils.openInputStream(URI.create(url), this.headers);
       if (is != null) {
         // Decode message
-        feedMessage = FeedMessage.parseFrom(is);
+        feedMessage = FeedMessage.parseFrom(is, registry);
         feedEntityList = feedMessage.getEntityList();
 
         // Change fullDataset value if this is an incremental update

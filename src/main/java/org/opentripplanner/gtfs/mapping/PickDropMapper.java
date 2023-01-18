@@ -6,7 +6,7 @@ import org.opentripplanner.model.PickDrop;
 
 public class PickDropMapper {
 
-  static PickDrop map(int gtfsCode) {
+  public static PickDrop map(int gtfsCode) {
     return switch (gtfsCode) {
       case 0 -> PickDrop.SCHEDULED;
       case 1 -> PickDrop.NONE;

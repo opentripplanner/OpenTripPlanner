@@ -18,6 +18,19 @@ running OTP in a container.
 The API will be at the endpoint `http://localhost:8080/otp/actuators` and follows the Spring Boot
 actuator API standard.
 
+### Configuration
+
+To enable this you need to add the feature `ActuatorAPI`.
+
+```json
+// otp-config.json
+{
+  "otpFeatures" : {
+    "ActuatorAPI": true
+  }
+}
+```
+
 ### Endpoints
 
 #### /health
@@ -32,6 +45,3 @@ Prometheus metrics are returned using Micrometer. The default JVM and jersey met
 Also, GraphQL timing metrics are exported under `graphql.timer.query` and `graphql.timer.resolver`,
 if the GraphQL endpoints are enabled.
 
-### Configuration
-
-To enable this you need to add the feature `ActuatorAPI`.
