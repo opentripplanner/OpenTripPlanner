@@ -24,8 +24,10 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
  * Land Use Sketch Planning Using Interactive Accessibility Methods on Combined Schedule and
  * Headway-Based Networks.” Transportation Research Record 2653 (2017). doi:10.3141/2653-06.
  * <p>
- * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,”
- * January 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
+ * <a href="http://research.microsoft.com/pubs/156567/raptor_alenex.pdf">
+ *   Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing”,
+ *   January 1, 2012.
+ * </a>.
  * <p>
  * This version supports the following features:
  * <ul>
@@ -56,7 +58,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
    * <p/>
    * This also allow us to try out different strategies for storing the result in memory. For a long
    * time we had a state which stored all data as int arrays in addition to the current
-   * object-oriented approach. There were no performance differences(=> GC is not the bottle neck),
+   * object-oriented approach. There were no performance differences(=> GC is not the bottleneck),
    * so we dropped the integer array implementation.
    */
   private final RaptorWorkerState<T> state;
@@ -117,12 +119,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
    * For each iteration (minute), calculate the minimum travel time to each transit stop in
    * seconds.
    * <p/>
-   * Run the scheduled search, round 0 is the street search
-   * <p/>
-   * We are using the Range-RAPTOR extension described in Delling, Daniel, Thomas Pajor, and Renato
-   * Werneck. “Round-Based Public Transit Routing,” January 1, 2012.
-   * http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
-   *
+   * Run the scheduled search, round 0 is the street search.
    */
   @Override
   public RaptorWorkerResult<T> route() {
