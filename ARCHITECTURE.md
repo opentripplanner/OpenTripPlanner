@@ -16,7 +16,14 @@ Be sure to also read the [developer documentation](docs/Developers-Guide.md).
 ## Modules/Components
 
 Below is a list of documented components in OTP. Not every component is documented at a high level,
-but this is a start and we would like to expand this list in the future.
+but this is a start, and we would like to expand this list in the future.
+
+
+### [OTP Transit Model](src/main/java/org/opentripplanner/transit/model/package.md)
+
+Sometimes also referred to as the internal transit model. This is OTPs internal model witch is a
+unified model of GTFS and Transmodel(NeTEx) relevant for OTP. The model is optimized for transit 
+routing.
 
 ### [OTP Configuration design](src/main/java/org/opentripplanner/standalone/config/package.md)
 
