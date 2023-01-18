@@ -228,13 +228,12 @@ public class TimetableSnapshot {
       FeedScopedId tripId = updatedTripTimes.getTrip().getId();
       TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
       realtimeAddedTripPattern.put(tripIdAndServiceDate, pattern);
+
+      // To make these trip patterns visible for departureRow searches.
+      addPatternToIndex(pattern);
     }
 
-    // To make these trip patterns visible for departureRow searches.
-    addPatternToIndex(pattern);
-
     // The time tables are finished during the commit
-
     return Result.success();
   }
 

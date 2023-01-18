@@ -2,11 +2,8 @@ package org.opentripplanner.gtfs;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -18,10 +15,8 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -34,21 +29,21 @@ import org.slf4j.LoggerFactory;
 public class GenerateTripPatternsOperation {
 
   private static final Logger LOG = LoggerFactory.getLogger(GenerateTripPatternsOperation.class);
-
-  private final Map<String, Integer> tripPatternIdCounters = new HashMap<>();
-
   private final OtpTransitServiceBuilder transitDaoBuilder;
   private final DataImportIssueStore issueStore;
   private final Deduplicator deduplicator;
   private final Set<FeedScopedId> calendarServiceIds;
   private GeometryProcessor geometryProcessor;
 
-  private final Multimap<StopPattern, TripPattern> tripPatterns;
+  private final TripPatternCache tripPatternCache;
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
 
   private int tripCount = 0;
   private int freqCount = 0;
   private int scheduledCount = 0;
+
+  // RT might prefix pattern with another suffix
+  private static final String DEFAULT_PATTERN_ID_SUFFIX = "";
 
   public GenerateTripPatternsOperation(
     OtpTransitServiceBuilder builder,
@@ -62,7 +57,8 @@ public class GenerateTripPatternsOperation {
     this.deduplicator = deduplicator;
     this.calendarServiceIds = calendarServiceIds;
     this.geometryProcessor = geometryProcessor;
-    this.tripPatterns = transitDaoBuilder.getTripPatterns();
+    this.tripPatternCache =
+      new TripPatternCache(DEFAULT_PATTERN_ID_SUFFIX, transitDaoBuilder.getTripPatterns());
   }
 
   public void run() {
@@ -125,11 +121,10 @@ public class GenerateTripPatternsOperation {
       return;
     }
 
-    // Get the existing TripPattern for this filtered StopPattern, or create one.
+    // Get the existing TripPattern for this filtered StopPattern, if exists
+    // Or create one
     StopPattern stopPattern = new StopPattern(stopTimes);
-
-    Direction direction = trip.getDirection();
-    TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip, direction);
+    TripPattern tripPattern = getOrCreateTripPattern(stopPattern, trip);
 
     // Create a TripTimes object for this list of stoptimes, which form one trip.
     TripTimes tripTimes = new TripTimes(trip, stopTimes, deduplicator);
@@ -149,49 +144,23 @@ public class GenerateTripPatternsOperation {
     }
   }
 
-  private TripPattern findOrCreateTripPattern(
-    StopPattern stopPattern,
-    Trip trip,
-    Direction direction
-  ) {
-    Route route = trip.getRoute();
-    for (TripPattern tripPattern : tripPatterns.get(stopPattern)) {
-      if (
-        tripPattern.getRoute().equals(route) &&
-        tripPattern.getDirection().equals(direction) &&
-        tripPattern.getMode().equals(trip.getMode())
-      ) {
-        return tripPattern;
-      }
+  private TripPattern getOrCreateTripPattern(StopPattern stopPattern, Trip trip) {
+    TripPattern pattern = tripPatternCache.getTripPattern(stopPattern, trip);
+
+    if (pattern == null) {
+      FeedScopedId patternId = tripPatternCache.generateUniqueIdForTripPattern(trip);
+      pattern =
+        TripPattern
+          .of(patternId)
+          .withRoute(trip.getRoute())
+          .withStopPattern(stopPattern)
+          .withMode(trip.getMode())
+          .withHopGeometries(geometryProcessor.createHopGeometries(trip))
+          .build();
+
+      tripPatternCache.add(stopPattern, pattern);
     }
-    FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction);
-    TripPattern tripPattern = TripPattern
-      .of(patternId)
-      .withRoute(route)
-      .withStopPattern(stopPattern)
-      .withMode(trip.getMode())
-      .withHopGeometries(geometryProcessor.createHopGeometries(trip))
-      .build();
-    tripPatterns.put(stopPattern, tripPattern);
-    return tripPattern;
-  }
 
-  /**
-   * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route id,
-   * the direction and an integer. This only works if the Collection of TripPattern includes every
-   * TripPattern for the agency.
-   */
-  private FeedScopedId generateUniqueIdForTripPattern(Route route, Direction direction) {
-    FeedScopedId routeId = route.getId();
-    String directionId = direction == Direction.UNKNOWN ? "" : Integer.toString(direction.gtfsCode);
-    String key = routeId.getId() + ":" + direction;
-
-    // Add 1 to counter and update it
-    int counter = tripPatternIdCounters.getOrDefault(key, 0) + 1;
-    tripPatternIdCounters.put(key, counter);
-
-    String id = String.format("%s:%s:%02d", routeId.getId(), directionId, counter);
-
-    return new FeedScopedId(routeId.getFeedId(), id);
+    return pattern;
   }
 }
