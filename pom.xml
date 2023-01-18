@@ -733,7 +733,7 @@
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>kryo-tools</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <!-- Direct dependency with -jre version, in order to not resolve to the limited -android version -->
         <dependency>
