@@ -75,7 +75,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
    * {@link SearchParams#constrainedTransfers()} is turned on.
    */
   public boolean useConstrainedTransfers() {
-    return profile.spportConstrainedTransfers() && searchParams.constrainedTransfers();
+    return profile.supportsConstrainedTransfers() && searchParams.constrainedTransfers();
   }
 
   /**

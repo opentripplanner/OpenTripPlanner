@@ -12,12 +12,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 /**
  * This class is responsible for holding information about a test result - a single itinerary. The
  * result can be expected or actual, both represented by this class.
- * <p>
- * Implementation details: This is NOT converted into a record, because it is hard to enforce the
- * restrictions on agencies, modes, routes and stops. Second, it is not much simpler/less code.
- * <p>
- * @param testCaseId The status is not final; This allows to update the status when matching
- *                   expected and actual results.
+ *
  * @param agencies Alphabetical distinct list of agencies. A {@code List} is used because the order
  *               is important.
  * @param modes Alphabetical distinct list of modes. A {@code List} is used because the order is

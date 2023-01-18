@@ -37,12 +37,12 @@ public enum RaptorProfile {
    */
   MIN_TRAVEL_DURATION_BEST_TIME("MinTravelDurationBT", false);
 
-  private final boolean supportConstrainedTransfers;
+  private final boolean supportsConstrainedTransfers;
 
   private final String abbreviation;
 
-  RaptorProfile(String abbreviation, boolean supportConstrainedTransfers) {
-    this.supportConstrainedTransfers = supportConstrainedTransfers;
+  RaptorProfile(String abbreviation, boolean supportsConstrainedTransfers) {
+    this.supportsConstrainedTransfers = supportsConstrainedTransfers;
     this.abbreviation = abbreviation;
   }
 
@@ -50,8 +50,8 @@ public enum RaptorProfile {
     return abbreviation;
   }
 
-  public boolean spportConstrainedTransfers() {
-    return supportConstrainedTransfers;
+  public boolean supportsConstrainedTransfers() {
+    return supportsConstrainedTransfers;
   }
 
   public boolean is(RaptorProfile candidate) {
