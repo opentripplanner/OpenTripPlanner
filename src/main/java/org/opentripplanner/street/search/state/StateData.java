@@ -46,6 +46,7 @@ public class StateData implements Cloneable {
   protected boolean enteredNoThroughTrafficArea;
 
   protected boolean insideNoRentalDropOffArea = false;
+  public boolean startedReverseSearchInNoDropOffZone;
 
   /** Private constructor, use static methods to get a set of initial states. */
   private StateData(StreetMode requestMode) {
@@ -138,6 +139,7 @@ public class StateData implements Cloneable {
           }
           var floatingRentalStateData = proto.clone();
           floatingRentalStateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
+          floatingRentalStateData.rentalVehicleFormFactor = FormFactor.SCOOTER;
           floatingRentalStateData.currentMode = TraverseMode.BICYCLE;
           res.add(floatingRentalStateData);
         }

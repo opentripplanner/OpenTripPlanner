@@ -243,6 +243,7 @@ public class StateEditor {
       child.stateData.currentMode = TraverseMode.WALK;
       child.stateData.vehicleRentalNetwork = null;
       child.stateData.rentalVehicleFormFactor = null;
+      child.stateData.insideNoRentalDropOffArea = false;
     } else {
       child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
       child.stateData.currentMode = formFactor.traverseMode;
@@ -296,6 +297,24 @@ public class StateEditor {
     }
   }
 
+  public void dropFloatingVehicle(FormFactor formFactor, String network, boolean reverse) {
+    cloneStateDataAsNeeded();
+    if (reverse) {
+      child.stateData.mayKeepRentedVehicleAtDestination = false;
+      child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
+      child.stateData.currentMode = TraverseMode.BICYCLE;
+      child.stateData.vehicleRentalNetwork = "tieroslo";
+      child.stateData.rentalVehicleFormFactor = FormFactor.SCOOTER;
+    } else {
+      child.stateData.mayKeepRentedVehicleAtDestination = false;
+      child.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
+      child.stateData.currentMode = TraverseMode.WALK;
+      child.stateData.vehicleRentalNetwork = null;
+      child.stateData.rentalVehicleFormFactor = null;
+      child.stateData.backWalkingBike = false;
+    }
+  }
+
   /**
    * This has two effects: marks the vehicle as parked, and switches the current mode. Marking the
    * vehicle parked is important for allowing co-dominance of walking and driving states.
@@ -335,15 +354,6 @@ public class StateEditor {
 
   public State getBackState() {
     return child.getBackState();
-  }
-
-  public void dropFloatingVehicle() {
-    cloneStateDataAsNeeded();
-    child.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
-    child.stateData.currentMode = TraverseMode.WALK;
-    child.stateData.vehicleRentalNetwork = null;
-    child.stateData.rentalVehicleFormFactor = null;
-    child.stateData.backWalkingBike = false;
   }
 
   /* PRIVATE METHODS */

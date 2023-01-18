@@ -56,6 +56,8 @@ public sealed interface RentalRestrictionExtension {
    */
   List<String> networks();
 
+  boolean hasRestrictions();
+
   /**
    * No restriction on traversal which is the default.
    */
@@ -90,6 +92,11 @@ public sealed interface RentalRestrictionExtension {
     public List<String> networks() {
       return List.of();
     }
+
+    @Override
+    public boolean hasRestrictions() {
+      return false;
+    }
   }
 
   /**
@@ -111,7 +118,11 @@ public sealed interface RentalRestrictionExtension {
     public boolean traversalBanned(State state) {
       if (state.isRentingVehicle()) {
         return (
-          zone.traversalBanned() && zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
+          zone.traversalBanned() &&
+          (
+            state.unknownRentalNetwork() ||
+            zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
+          )
         );
       } else {
         return false;
@@ -122,7 +133,11 @@ public sealed interface RentalRestrictionExtension {
     public boolean dropOffBanned(State state) {
       if (state.isRentingVehicle()) {
         return (
-          zone.dropOffBanned() && zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
+          zone.dropOffBanned() &&
+          (
+            state.unknownRentalNetwork() ||
+            zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
+          )
         );
       } else {
         return false;
@@ -152,6 +167,11 @@ public sealed interface RentalRestrictionExtension {
     }
 
     @Override
+    public boolean hasRestrictions() {
+      return true;
+    }
+
+    @Override
     public String toString() {
       return zone.id().toString();
     }
@@ -170,7 +190,11 @@ public sealed interface RentalRestrictionExtension {
 
     @Override
     public boolean traversalBanned(State state) {
-      return state.isRentingVehicle() && network.equals(state.getVehicleRentalNetwork());
+      if (state.getRequest().departAt()) {
+        return state.isRentingVehicle() && network.equals(state.getVehicleRentalNetwork());
+      } else {
+        return state.isRentingVehicle();
+      }
     }
 
     @Override
@@ -186,6 +210,11 @@ public sealed interface RentalRestrictionExtension {
     @Override
     public List<RentalRestrictionExtension> toList() {
       return List.of(this);
+    }
+
+    @Override
+    public boolean hasRestrictions() {
+      return true;
     }
 
     @Override
@@ -272,6 +301,11 @@ public sealed interface RentalRestrictionExtension {
     @Override
     public List<RentalRestrictionExtension> toList() {
       return List.copyOf(Arrays.asList(exts));
+    }
+
+    @Override
+    public boolean hasRestrictions() {
+      return exts.length > 0;
     }
 
     @Override
