@@ -14,8 +14,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  */
 public class TemplateUtil {
 
-  public static final ObjectMapper MAPPER = new ObjectMapper();
-  public static final ObjectWriter PRETTY_PRINTER;
+  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final ObjectWriter PRETTY_PRINTER;
 
   static {
     MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
@@ -59,6 +59,10 @@ public class TemplateUtil {
         .formatted(token, replacement, token);
 
     return doc.replace(replaceToken, replacementText);
+  }
+
+  public static JsonExampleBuilder jsonExampleBuilder(JsonNode node) {
+    return new JsonExampleBuilder(node);
   }
 
   private static String replaceToken(String token) {

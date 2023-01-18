@@ -1,7 +1,6 @@
 package org.opentripplanner.generate.doc.framework;
 
 import static org.opentripplanner.framework.text.MarkdownFormatter.NEW_LINE;
-import static org.opentripplanner.generate.doc.framework.TemplateUtil.MAPPER;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
@@ -112,10 +111,7 @@ public class DocBuilder {
   }
 
   public void addUpdaterExample(String comment, JsonNode node) {
-    var updaters = MAPPER.createArrayNode();
-    updaters.add(node);
-    var root = MAPPER.createObjectNode();
-    root.set("updaters", updaters);
+    var root = TemplateUtil.jsonExampleBuilder(node).wrapInArray().wrapInObject("updaters").build();
     addExample(comment, root);
   }
 

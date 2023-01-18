@@ -6,7 +6,6 @@ import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
-import static org.opentripplanner.generate.doc.framework.TemplateUtil.MAPPER;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
@@ -17,6 +16,7 @@ import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
+import org.opentripplanner.generate.doc.framework.TemplateUtil;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -70,8 +70,7 @@ public class FlexConfigurationDocTest {
   }
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
-    var root = MAPPER.createObjectNode();
-    root.set("flex", node.rawNode());
+    var root = TemplateUtil.jsonExampleBuilder(node.rawNode()).wrapInObject("flex").build();
     buf.header(3, "Example configuration", null).addExample("router-config.json", root);
   }
 }
