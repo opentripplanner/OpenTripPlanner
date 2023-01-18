@@ -100,14 +100,7 @@ public class DocBuilder {
   }
 
   public void addExample(String comment, JsonNode body) {
-    String json = TemplateUtil.prettyPrintJson(body);
-
-    buffer.append("""
-      ```JSON
-      // %s
-      %s
-      ```
-      """.formatted(comment, json));
+    buffer.append(TemplateUtil.jsonExample(body, comment));
   }
 
   public void addUpdaterExample(String comment, JsonNode node) {

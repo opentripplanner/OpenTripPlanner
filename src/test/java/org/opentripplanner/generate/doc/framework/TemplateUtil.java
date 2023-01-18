@@ -70,18 +70,25 @@ public class TemplateUtil {
   }
 
   /**
-   * Create a JSON example for the node. The given source  from the node
+   * Create a JSON example for an arbitrary JSON node.
    */
-  public static String jsonExample(NodeAdapter nodeAdapter, String source) {
+  public static String jsonExample(JsonNode json, String comment) {
     return """
       ```JSON
       // %s
       %s
       ```
       """.formatted(
-        source,
-        prettyPrintJson(nodeAdapter.rawNode())
+        comment,
+        prettyPrintJson(json)
       );
+  }
+
+  /**
+   * Create a JSON example for the node. The given source  from the node
+   */
+  public static String jsonExample(NodeAdapter nodeAdapter, String source) {
+    return jsonExample(nodeAdapter.rawNode(), source);
   }
 
   public static String prettyPrintJson(JsonNode body) {
