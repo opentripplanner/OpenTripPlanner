@@ -10,10 +10,12 @@ import static org.opentripplanner.generate.doc.support.ConfigTypeTable.configTyp
 import static org.opentripplanner.generate.doc.support.OTPFeatureTable.otpFeaturesTable;
 
 import java.io.File;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
 
 @OnlyIfDocsExist
+@Tag("docs")
 public class ConfigurationDocTest {
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "Configuration.md");
