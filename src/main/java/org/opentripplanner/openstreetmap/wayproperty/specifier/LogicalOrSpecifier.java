@@ -21,6 +21,14 @@ public class LogicalOrSpecifier implements OsmSpecifier {
 
   private final List<ExactMatchSpecifier> subSpecs;
 
+  public LogicalOrSpecifier(ExactMatchSpecifier... specifiers) {
+    this.subSpecs = Arrays.asList(specifiers);
+  }
+
+  public LogicalOrSpecifier(Condition... conditions) {
+    this.subSpecs = Arrays.stream(conditions).map(ExactMatchSpecifier::new).toList();
+  }
+
   public LogicalOrSpecifier(String... specs) {
     this.subSpecs = Arrays.stream(specs).map(ExactMatchSpecifier::new).toList();
   }

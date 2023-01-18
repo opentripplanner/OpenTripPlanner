@@ -1,15 +1,14 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
 import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
+import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofWalkSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
-import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE_AND_CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
-import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_CAR;
 
 import java.util.function.BiFunction;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -32,106 +31,98 @@ class NorwayMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    var sidewalk = new Condition.EqualsAnyIn("sidewalk", "yes", "left", "right", "both");
-    var sidewalk_prefix = new Condition.Equals("sidewalk", "yes");
+    var hasSidewalk = new Condition.EqualsAnyIn("sidewalk", "yes", "left", "right", "both");
+    var hasPrefixSidewalk = new Condition.Equals("sidewalk", "yes"); // e.g sidewalk:left=yes
     props.setDefaultWalkSafetyForPermission((permission, speedLimit, way) ->
       switch (permission) {
         case ALL, PEDESTRIAN_AND_CAR -> {
           if (
-            sidewalk.matches(way) ||
-            sidewalk_prefix.matchesLeft(way) ||
-            sidewalk_prefix.matchesRight(way)
+            hasSidewalk.matches(way) ||
+            hasPrefixSidewalk.matchesLeft(way) ||
+            hasPrefixSidewalk.matchesRight(way)
           ) {
             yield 1.1;
           }
-          // ~30 km/h or under
-          else if (speedLimit <= 8.4f) {
-            yield 1.4;
-          }
-          // ~50 km/h or under
-          else if (speedLimit <= 13.9f) {
-            yield 1.6;
-          }
-          // ~80 km/h or under
-          else if (speedLimit <= 22.3f) {
-            yield 1.9;
-          }
-          // over 80 km/h
-          else {
+          // 90 km/h or over
+          else if (speedLimit >= 25f) {
             yield 3.;
           }
+          // ~60 km/h or over
+          else if (speedLimit >= 16.6f) {
+            yield 1.9;
+          }
+          // ~40 km/h or over
+          else if (speedLimit >= 11.1f) {
+            yield 1.6;
+          }
+          // 30 km/h or lower
+          else {
+            yield 1.45;
+          }
         }
-        case PEDESTRIAN_AND_BICYCLE -> 1.1;
+        case PEDESTRIAN_AND_BICYCLE -> 1.15;
         case PEDESTRIAN -> 1.;
         // these don't include walking
         case BICYCLE_AND_CAR, BICYCLE, CAR, NONE -> 3.;
       }
     );
 
-    var very_high_traffic = 10.;
-    var high_traffic = 3.75;
-    var medium_high_traffic = 3.43;
-    var medium_traffic = 2.5;
-    var medium_low_traffic = 2.37;
-    var low_traffic = 1.83;
-    var very_low_traffic = 1.57;
+    var cycleSafetyVeryHighTraffic = 10.;
+    var cycleSafetyHighTraffic = 3.75;
+    var cycleSafetyMediumHighTraffic = 3.43;
+    var cycleSafetyMediumTraffic = 2.5;
+    var cycleSafetyMediumLowTraffic = 2.37;
+    var cycleSafetyLowTraffic = 1.83;
+    var cycleSafetyVeryLowTraffic = 1.57;
 
-    var cycle_lane_medium_traffic = 1.27;
-    var cycle_lane_low_traffic = 1.10;
-
-    var dedicated_footway = 1.42;
-    var mixed_cycleway = 1.12;
-    var dedicated_cycleway = 1.05;
-    var dual_lane_or_oneway_cycleway = 1;
-
-    var trunkOrPrimary = new Condition.EqualsAnyIn(
+    var isTrunkOrPrimary = new Condition.EqualsAnyIn(
       "highway",
       "trunk",
       "trunk_link",
       "primary",
       "primary_link"
     );
-    var secondaryHighway = new Condition.EqualsAnyIn("highway", "secondary", "secondary_link");
-    var tertiaryHighway = new Condition.EqualsAnyIn("highway", "tertiary", "tertiary_link");
+    var isSecondaryHighway = new Condition.EqualsAnyIn("highway", "secondary", "secondary_link");
+    var isTertiaryHighway = new Condition.EqualsAnyIn("highway", "tertiary", "tertiary_link");
 
     BiFunction<Float, OSMWithTags, Double> cycleSafetyHighway = (speedLimit, way) -> {
       // 90 km/h or over
       if (speedLimit >= 25f) {
-        return very_high_traffic;
+        return cycleSafetyVeryHighTraffic;
       }
       // ~70 km/h or over
       else if (speedLimit >= 19.4f) {
-        if (trunkOrPrimary.matches(way)) {
-          return high_traffic;
-        } else return medium_high_traffic;
+        if (isTrunkOrPrimary.matches(way)) {
+          return cycleSafetyHighTraffic;
+        } else return cycleSafetyMediumHighTraffic;
       }
       // between ~60 km/h and ~40 km/
       else if (speedLimit >= 11.1f) {
-        if (trunkOrPrimary.matches(way)) {
-          // 60 km/h or 50 to 40
-          return speedLimit >= 16.6f ? medium_high_traffic : medium_traffic;
-        } else if (secondaryHighway.matches(way)) {
-          // ~60 km/h or 50 to 40
-          return speedLimit >= 16.6f ? medium_traffic : medium_low_traffic;
-        } else if (tertiaryHighway.matches(way)) {
-          // ~60 to 50 km/h or 40
-          return speedLimit >= 13.8f ? medium_low_traffic : low_traffic;
+        if (isTrunkOrPrimary.matches(way)) {
+          // 60 km/h or 50 to 40 km/h
+          return speedLimit >= 16.6f ? cycleSafetyMediumHighTraffic : cycleSafetyMediumTraffic;
+        } else if (isSecondaryHighway.matches(way)) {
+          // ~60 km/h or 50 to 40 km/h
+          return speedLimit >= 16.6f ? cycleSafetyMediumTraffic : cycleSafetyMediumLowTraffic;
+        } else if (isTertiaryHighway.matches(way)) {
+          // ~60 to 50 km/h or 40 km/h
+          return speedLimit >= 13.8f ? cycleSafetyMediumLowTraffic : cycleSafetyLowTraffic;
         }
       }
-      // ~30 km/h or lower, or lower road class than unclassified
+      // 30 km/h or lower, or lower road class than unclassified
       if (
         this.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)
-      ) return very_low_traffic; else return low_traffic;
+      ) return cycleSafetyVeryLowTraffic; else return cycleSafetyLowTraffic;
     };
 
     props.setDefaultBicycleSafetyForPermission((permission, speedLimit, way) ->
       switch (permission) {
         case ALL -> cycleSafetyHighway.apply(speedLimit, way);
-        case BICYCLE_AND_CAR -> very_high_traffic;
-        case PEDESTRIAN_AND_BICYCLE -> mixed_cycleway;
-        case BICYCLE -> dedicated_cycleway;
+        case BICYCLE_AND_CAR -> cycleSafetyVeryHighTraffic;
+        case PEDESTRIAN_AND_BICYCLE -> 1.12;
+        case BICYCLE -> 1.05;
         // these don't include cycling
-        case PEDESTRIAN_AND_CAR, PEDESTRIAN, CAR, NONE -> very_high_traffic;
+        case PEDESTRIAN_AND_CAR, PEDESTRIAN, CAR, NONE -> cycleSafetyVeryHighTraffic;
       }
     );
 
@@ -142,7 +133,7 @@ class NorwayMapper implements OsmTagMapper {
 
     // Walking and cycling illegal on "Motortrafikkvei"
     props.setProperties(
-      new ExactMatchSpecifier(trunkOrPrimary, new Condition.Equals("motorroad", "yes")),
+      new ExactMatchSpecifier(isTrunkOrPrimary, new Condition.Equals("motorroad", "yes")),
       withModes(CAR)
     );
 
@@ -166,6 +157,19 @@ class NorwayMapper implements OsmTagMapper {
     );
 
     /* bicycle infrastructure */
+
+    var isClassifiedHighway = new Condition.EqualsAnyIn(
+      "highway",
+      "trunk",
+      "trunk_link",
+      "primary",
+      "primary_link",
+      "secondary",
+      "secondary_link",
+      "tertiary",
+      "tertiary_link"
+    );
+
     props.setProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("cycleway", "track"),
@@ -184,44 +188,21 @@ class NorwayMapper implements OsmTagMapper {
           "living_street"
         )
       ),
-      withModes(ALL).bicycleSafety(dual_lane_or_oneway_cycleway)
+      withModes(ALL).bicycleSafety(1.1)
     );
 
     props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.Equals("cycleway", "lane"),
-        new Condition.EqualsAnyIn(
-          "highway",
-          "trunk",
-          "trunk_link",
-          "primary",
-          "primary_link",
-          "secondary",
-          "secondary_link",
-          "tertiary",
-          "tertiary_link"
-        )
-      ),
-      withModes(ALL).bicycleSafety(cycle_lane_medium_traffic)
+      new ExactMatchSpecifier(new Condition.Equals("cycleway", "lane"), isClassifiedHighway),
+      withModes(ALL).bicycleSafety(1.27)
     );
 
     props.setProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("cycleway", "lane"),
         new Condition.LessThan("maxspeed", 50),
-        new Condition.EqualsAnyIn(
-          "highway",
-          "trunk",
-          "trunk_link",
-          "primary",
-          "primary_link",
-          "secondary",
-          "secondary_link",
-          "tertiary",
-          "tertiary_link"
-        )
+        isClassifiedHighway
       ),
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
+      withModes(ALL).bicycleSafety(1.1)
     );
 
     props.setProperties(
@@ -229,7 +210,7 @@ class NorwayMapper implements OsmTagMapper {
         new Condition.Equals("cycleway", "lane"),
         new Condition.EqualsAnyIn("highway", "unclassified", "residential")
       ),
-      withModes(ALL).bicycleSafety(cycle_lane_low_traffic)
+      withModes(ALL).bicycleSafety(1.1)
     );
 
     props.setMixinProperties(
@@ -253,148 +234,207 @@ class NorwayMapper implements OsmTagMapper {
       ofBicycleSafety(1, 1.15)
     );
 
+    var isClassifiedOrUnclassifiedHighway = new Condition.EqualsAnyIn(
+      "highway",
+      "trunk",
+      "trunk_link",
+      "primary",
+      "primary_link",
+      "secondary",
+      "secondary_link",
+      "tertiary",
+      "tertiary_link",
+      "unclassified"
+    );
+
     // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn(
-          "highway",
-          "trunk",
-          "trunk_link",
-          "primary",
-          "primary_link",
-          "secondary",
-          "secondary_link",
-          "tertiary",
-          "tertiary_link",
-          "unclassified"
-        ),
-        new Condition.Equals("foot", "no")
+        new Condition.Equals("foot", "no"),
+        isClassifiedOrUnclassifiedHighway
       ),
-      withModes(BICYCLE_AND_CAR).bicycleSafety(very_high_traffic)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(cycleSafetyVeryHighTraffic)
     );
 
-    // Discourage cycling on trunk road tunnels
+    // Discourage cycling and walking in road tunnels
     props.setMixinProperties(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn(
-          "highway",
-          "trunk",
-          "trunk_link",
-          "primary",
-          "primary_link",
-          "secondary",
-          "secondary_link",
-          "tertiary",
-          "tertiary_link",
-          "unclassified"
-        ),
-        new Condition.Equals("tunnel", "yes")
+        new Condition.Equals("tunnel", "yes"),
+        isClassifiedOrUnclassifiedHighway
       ),
-      ofBicycleSafety(1.2)
+      ofBicycleSafety(2.).ofWalkSafety(2.)
+    );
+
+    // Discourage walking in on a bridge and other ways without a verge without a sidewalk
+    props.setMixinProperties(
+      new LogicalOrSpecifier(
+        new ExactMatchSpecifier(
+          new Condition.Equals("bridge", "yes"),
+          new Condition.EqualsAnyInOrAbsent("sidewalk", "no", "separate"),
+          isClassifiedOrUnclassifiedHighway
+        ),
+        new ExactMatchSpecifier(
+          new Condition.Equals("verge", "no"),
+          new Condition.EqualsAnyInOrAbsent("sidewalk", "no", "separate"),
+          isClassifiedOrUnclassifiedHighway
+        )
+      ),
+      ofWalkSafety(2.)
+    );
+
+    // Discourage walking in roundabouts
+    props.setMixinProperties(
+      new ExactMatchSpecifier(
+        new Condition.Equals("junction", "roundabout"),
+        new Condition.EqualsAnyInOrAbsent("sidewalk", "no", "separate")
+      ),
+      ofWalkSafety(2.)
     );
 
     // Cycling around reversing cars on a parking lot feels unsafe
     props.setProperties(
       "highway=service;service=parking_aisle",
-      withModes(ALL).bicycleSafety(medium_traffic)
+      withModes(ALL).bicycleSafety(cycleSafetyMediumTraffic)
     );
     props.setProperties(
       "highway=service;service=drive-through",
-      withModes(ALL).bicycleSafety(medium_traffic)
+      withModes(ALL).bicycleSafety(cycleSafetyMediumTraffic)
     );
 
-    /* Pedestrian, living and cyclestreet */
-    props.setProperties("highway=living_street", withModes(ALL).bicycleSafety(low_traffic));
+    /* Pedestrian, living street and busway */
+    props.setProperties(
+      "highway=living_street",
+      withModes(ALL).bicycleSafety(cycleSafetyLowTraffic)
+    );
     props.setProperties("highway=pedestrian", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.2));
-
     props.setProperties(
-      "highway=footway",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dedicated_footway)
-    );
-    // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
-    props.setProperties(
-      "highway=footway;motor_vehicle=destination",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
-
-    props.setProperties(
-      "highway=footway;footway=sidewalk",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.93)
+      "highway=busway",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(cycleSafetyMediumLowTraffic).walkSafety(1.9)
     );
     props.setProperties(
-      "highway=footway;footway=crossing",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.33)
-    );
-    props.setProperties(
-      "highway=cycleway;cycleway=crossing",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.33)
+      new ExactMatchSpecifier(
+        new Condition.Equals("highway", "service"),
+        new Condition.EqualsAnyIn("bus", "yes", "designated")
+      ),
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(cycleSafetyMediumLowTraffic).walkSafety(1.9)
     );
 
-    props.setProperties(
-      "highway=cycleway",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dedicated_cycleway)
-    );
+    /* Footway and cycleway */
+    var footway = withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.42).walkSafety(1.);
+    var cycleway = withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.05).walkSafety(1.4);
+    var cyclewayWithSidewalk = withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.05).walkSafety(1.);
+    var twoLaneOrOnewayCycleway = withModes(PEDESTRIAN_AND_BICYCLE)
+      .bicycleSafety(1.)
+      .walkSafety(1.4);
+    var twoLaneOrOnewayCyclewayWithSidewalk = withModes(PEDESTRIAN_AND_BICYCLE)
+      .bicycleSafety(1.)
+      .walkSafety(1.);
+    var combinedFootAndCycleway = withModes(PEDESTRIAN_AND_BICYCLE);
+
+    props.setProperties("highway=footway", footway);
+    props.setProperties("highway=cycleway", cycleway);
     props.setProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("highway", "cycleway"),
         new Condition.GreaterThan("lanes", 1)
       ),
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dual_lane_or_oneway_cycleway)
+      twoLaneOrOnewayCycleway
+    );
+    props.setProperties("highway=cycleway;oneway=yes", twoLaneOrOnewayCycleway);
+    props.setProperties(
+      new ExactMatchSpecifier(new Condition.Equals("highway", "cycleway"), hasSidewalk),
+      cyclewayWithSidewalk
     );
     props.setProperties(
-      "highway=cycleway;oneway=yes",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
-    // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
-    props.setProperties(
-      "highway=cycleway;motor_vehicle=destination",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
-    );
-
-    // segregated=no takes' precedence if there is no "segregated" key. There is no penalty for a tag mismatch
-    props.setProperties(
-      "highway=cycleway;foot=designated;segregated=no",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(mixed_cycleway)
+      new ExactMatchSpecifier(
+        new Condition.Equals("highway", "cycleway"),
+        new Condition.GreaterThan("lanes", 1),
+        hasSidewalk
+      ),
+      twoLaneOrOnewayCyclewayWithSidewalk
     );
     props.setProperties(
-      "highway=cycleway;foot=designated;segregated=yes",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dedicated_cycleway)
+      new ExactMatchSpecifier(
+        new Condition.Equals("highway", "cycleway"),
+        new Condition.Equals("oneway", "yes"),
+        hasSidewalk
+      ),
+      twoLaneOrOnewayCyclewayWithSidewalk
     );
-    props.setProperties(
-      "highway=cycleway;foot=designated;segregated=yes;lanes=2",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dual_lane_or_oneway_cycleway)
-    );
+    props.setProperties("highway=cycleway;foot=designated;segregated=no", combinedFootAndCycleway);
     props.setProperties(
       "highway=path;foot=designated;bicycle=designated;segregated=no",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(mixed_cycleway)
+      combinedFootAndCycleway
     );
+    props.setProperties("highway=cycleway;foot=designated;segregated=yes", cyclewayWithSidewalk);
     props.setProperties(
       "highway=path;foot=designated;bicycle=designated;segregated=yes",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(dedicated_cycleway)
+      cyclewayWithSidewalk
+    );
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.Equals("highway", "cycleway"),
+        new Condition.Equals("foot", "designated"),
+        new Condition.Equals("segregated", "yes"),
+        new Condition.GreaterThan("lanes", 1)
+      ),
+      twoLaneOrOnewayCyclewayWithSidewalk
     );
     // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
     props.setProperties(
       "highway=cycleway;foot=designated;segregated=*;motor_vehicle=destination",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(cycleSafetyVeryLowTraffic)
     );
     props.setProperties(
       "highway=path;foot=designated;bicycle=designated;segregated=*;motor_vehicle=destination",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(very_low_traffic)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(cycleSafetyVeryLowTraffic)
     );
-
-    //relation properties are copied over to ways
-    props.setMixinProperties(
-      new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
-      ofBicycleSafety(0.85)
+    props.setProperties(
+      "highway=footway;footway=sidewalk",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.93).walkSafety(1.1)
+    );
+    props.setProperties(
+      "highway=footway;footway=crossing",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.33).walkSafety(1.35)
+    );
+    props.setProperties(
+      "highway=cycleway;cycleway=crossing",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.33).walkSafety(1.35)
     );
 
     props.setProperties(
-      "highway=busway",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(low_traffic)
+      "highway=track",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1).walkSafety(1.3)
     );
-    props.setProperties("highway=track", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1));
-    props.setProperties("highway=bridleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1));
-    props.setProperties("highway=path", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.5));
+
+    props.setProperties(
+      "highway=track;tracktype=grade1",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.57).walkSafety(1.1)
+    );
+    props.setProperties(
+      "highway=track;tracktype=grade2",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.83).walkSafety(1.5)
+    );
+    props.setProperties(
+      "highway=track;tracktype=grade3",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.5).walkSafety(1.65)
+    );
+    props.setProperties(
+      "highway=track;tracktype=grade4",
+      withModes(PEDESTRIAN).bicycleSafety(2.5).walkSafety(1.8)
+    );
+    props.setProperties(
+      "highway=track;tracktype=grade5",
+      withModes(PEDESTRIAN).bicycleSafety(2.5).walkSafety(1.8)
+    );
+    props.setProperties(
+      "highway=bridleway",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1).walkSafety(1.5)
+    );
+    props.setProperties(
+      "highway=path",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.5).walkSafety(1.8)
+    );
     props.setProperties("highway=steps", withModes(PEDESTRIAN));
     props.setProperties("highway=corridor", withModes(PEDESTRIAN));
     props.setProperties("highway=footway;indoor=yes", withModes(PEDESTRIAN));
@@ -448,28 +488,55 @@ class NorwayMapper implements OsmTagMapper {
     props.setProperties("highway=path;sac_scale=demanding_alpine_hiking", withModes(NONE));
     props.setProperties("highway=path;sac_scale=difficult_alpine_hiking", withModes(NONE));
 
-    // paved but unfavorable
+    // Not expected to be paved
+    props.setProperties(
+      new ExactMatchSpecifier(
+        new Condition.EqualsAnyIn(
+          "surface",
+          "asfalt",
+          "concrete",
+          "sett",
+          "paving_stones",
+          "grass_paver",
+          "paved",
+          "wood",
+          "metal_grid",
+          "metal"
+        ),
+        new Condition.Absent("trackgrade"),
+        new Condition.EqualsAnyIn("highway", "path", "bridleway", "track")
+      ),
+      withModes(PEDESTRIAN_AND_BICYCLE)
+    );
+
+    // Paved but unfavorable for bicycles
     props.setMixinProperties("surface=grass_paver", ofBicycleSafety(1.2));
     props.setMixinProperties("surface=sett", ofBicycleSafety(1.2));
     props.setMixinProperties("surface=cobblestone", ofBicycleSafety(1.2));
-    props.setMixinProperties("surface=unhewn_cobblestone", ofBicycleSafety(1.5));
-    // Can be slick if wet, but otherwise not unfavorable to bikes
+    props.setMixinProperties("surface=unhewn_cobblestone", ofBicycleSafety(2));
+    // Slick if wet
     props.setMixinProperties("surface=metal_grid", ofBicycleSafety(1.2));
     props.setMixinProperties("surface=metal", ofBicycleSafety(1.2));
 
-    // unpaved
-    props.setMixinProperties("surface=unpaved", ofBicycleSafety(1.2));
-    props.setMixinProperties("surface=compacted", ofBicycleSafety(1.2));
-    props.setMixinProperties("surface=fine_gravel", ofBicycleSafety(1.3));
-    props.setMixinProperties("surface=pebblestone", ofBicycleSafety(1.3));
-    props.setMixinProperties("surface=gravel", ofBicycleSafety(1.3));
-    props.setMixinProperties("surface=woodchip", ofBicycleSafety(1.5));
-    props.setMixinProperties("surface=ground", ofBicycleSafety(1.5));
-    props.setMixinProperties("surface=dirt", ofBicycleSafety(1.5));
-    props.setMixinProperties("surface=earth", ofBicycleSafety(1.5));
-    props.setMixinProperties("surface=grass", ofBicycleSafety(1.5));
-    props.setMixinProperties("surface=mud", ofBicycleSafety(2));
-    props.setMixinProperties("surface=sand", ofBicycleSafety(2));
+    // Unpaved
+    props.setMixinProperties("surface=unpaved", ofBicycleSafety(1.2).walkSafety(1.2));
+    props.setMixinProperties("surface=compacted", ofBicycleSafety(1.2).walkSafety(1.2));
+    props.setMixinProperties("surface=fine_gravel", ofBicycleSafety(1.3).walkSafety(1.2));
+    props.setMixinProperties("surface=pebblestone", ofBicycleSafety(1.3).walkSafety(1.2));
+    props.setMixinProperties("surface=gravel", ofBicycleSafety(1.3).walkSafety(1.2));
+    props.setMixinProperties("surface=woodchip", ofBicycleSafety(1.5).walkSafety(1.2));
+    props.setMixinProperties("surface=ground", ofBicycleSafety(1.5).walkSafety(1.5));
+    props.setMixinProperties("surface=dirt", ofBicycleSafety(1.5).walkSafety(1.5));
+    props.setMixinProperties("surface=earth", ofBicycleSafety(1.5).walkSafety(1.5));
+    props.setMixinProperties("surface=grass", ofBicycleSafety(1.5).walkSafety(1.2));
+    props.setMixinProperties("surface=mud", ofBicycleSafety(2).walkSafety(2));
+    props.setMixinProperties("surface=sand", ofBicycleSafety(2).walkSafety(1.2));
+
+    //relation properties are copied over to ways
+    props.setMixinProperties(
+      new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
+      ofBicycleSafety(0.85)
+    );
 
     props.setMixinProperties(
       new ExactMatchSpecifier(
