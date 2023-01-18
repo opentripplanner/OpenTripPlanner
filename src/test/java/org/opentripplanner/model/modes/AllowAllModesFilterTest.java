@@ -13,7 +13,7 @@ class AllowAllModesFilterTest {
 
   @Test
   void allows() {
-    assertTrue(subject.allows(TransitMode.BUS, SubMode.UNKNOWN));
+    assertTrue(subject.match(TransitMode.BUS, SubMode.UNKNOWN));
   }
 
   @Test

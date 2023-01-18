@@ -4,6 +4,7 @@ import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLPlanner;
@@ -227,6 +228,19 @@ public class TripQuery {
             "Parameters for indicating the only authorities, lines or quays to be used in the trip patterns"
           )
           .type(JourneyWhiteListed.INPUT_TYPE)
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name("filters")
+          .description(
+            "A list of filters for which trips should be included. " +
+            "A trip will be included if it matches with at least one filter. " +
+            "An empty list of filters means that all trips should be included. " +
+            "If a search include this parameter, \"whiteListed\", \"banned\" & \"modes.transportModes\" filters will be ignored."
+          )
+          .type(new GraphQLList(new GraphQLNonNull(FilterInputType.INPUT_TYPE)))
           .build()
       )
       .argument(
