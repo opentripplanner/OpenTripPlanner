@@ -2,7 +2,9 @@ package org.opentripplanner.street.model.vertex;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.street.search.state.State;
 
@@ -45,6 +47,11 @@ public sealed interface TraversalExtension {
   }
 
   /**
+   * Return all extensions contained in this one as a list.
+   */
+  List<TraversalExtension> toList();
+
+  /**
    * No restriction on traversal which is the default.
    */
   final class NoRestriction implements TraversalExtension {
@@ -67,6 +74,11 @@ public sealed interface TraversalExtension {
     @Override
     public TraversalExtension add(TraversalExtension other) {
       return other;
+    }
+
+    @Override
+    public List<TraversalExtension> toList() {
+      return List.of();
     }
   }
 
@@ -120,6 +132,11 @@ public sealed interface TraversalExtension {
     }
 
     @Override
+    public List<TraversalExtension> toList() {
+      return List.of(this);
+    }
+
+    @Override
     public String toString() {
       return zone.id().toString();
     }
@@ -150,6 +167,11 @@ public sealed interface TraversalExtension {
     public Set<RestrictionType> debugTypes() {
       return Set.of(RestrictionType.BUSINESS_AREA_BORDER);
     }
+
+    @Override
+    public List<TraversalExtension> toList() {
+      return List.of(this);
+    }
   }
 
   /**
@@ -160,6 +182,13 @@ public sealed interface TraversalExtension {
     private final TraversalExtension[] exts;
 
     private Composite(TraversalExtension... exts) {
+      for (var i : exts) {
+        if (i instanceof Composite) {
+          throw new IllegalArgumentException(
+            "Composite extension cannot be nested into one another."
+          );
+        }
+      }
       var set = new HashSet<>(Arrays.asList(exts));
       this.exts = set.toArray(TraversalExtension[]::new);
     }
@@ -199,9 +228,9 @@ public sealed interface TraversalExtension {
     }
 
     private static TraversalExtension of(TraversalExtension... exts) {
-      var set = new HashSet<>(Arrays.asList(exts));
+      var set = Arrays.stream(exts).flatMap(e -> e.toList().stream()).collect(Collectors.toSet());
       if (set.size() == 1) {
-        return exts[0];
+        return List.copyOf(set).get(0);
       } else {
         return new Composite(set.toArray(TraversalExtension[]::new));
       }
@@ -218,6 +247,11 @@ public sealed interface TraversalExtension {
       } else {
         return Composite.of(newExts);
       }
+    }
+
+    @Override
+    public List<TraversalExtension> toList() {
+      return List.copyOf(Arrays.asList(exts));
     }
   }
 

@@ -2,7 +2,9 @@ package org.opentripplanner.street.model.edge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
@@ -11,7 +13,9 @@ import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.street.search.state.VehicleRentalState.HAVE_RENTED;
 import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
 
+import java.util.Set;
 import javax.annotation.Nonnull;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
@@ -120,9 +124,9 @@ class TraversalExtensionTest {
   @Test
   public void removeExtensions() {
     var edge = streetEdge(V1, V2);
-    final BusinessAreaBorder a = new BusinessAreaBorder("a");
-    final BusinessAreaBorder b = new BusinessAreaBorder("b");
-    final BusinessAreaBorder c = new BusinessAreaBorder("c");
+    var a = new BusinessAreaBorder("a");
+    var b = new BusinessAreaBorder("b");
+    var c = new BusinessAreaBorder("c");
 
     edge.addTraversalExtension(a);
 
@@ -163,5 +167,57 @@ class TraversalExtensionTest {
     var editor = new StateEditor(V1, req);
     editor.beginFloatingVehicleRenting(RentalVehicleType.FormFactor.SCOOTER, network, false);
     return editor.makeState();
+  }
+
+  @Nested
+  class Composition {
+
+    TraversalExtension a = new BusinessAreaBorder("a");
+    TraversalExtension b = new BusinessAreaBorder("b");
+    TraversalExtension c = new TraversalExtension.GeofencingZoneExtension(
+      new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
+    );
+
+    @Test
+    void addToBase() {
+      var newA = TraversalExtension.NO_RESTRICTION.add(a);
+      assertSame(a, newA);
+      assertEquals(1, newA.toList().size());
+    }
+
+    @Test
+    void addToItself() {
+      var unchanged = a.add(a);
+      assertSame(a, unchanged);
+    }
+
+    @Test
+    void add() {
+      var composite = a.add(b);
+      assertInstanceOf(TraversalExtension.Composite.class, composite);
+    }
+
+    @Test
+    void differentType() {
+      var composite = a.add(c);
+      assertInstanceOf(TraversalExtension.Composite.class, composite);
+    }
+
+    @Test
+    void composite() {
+      var composite = a.add(b);
+      assertInstanceOf(TraversalExtension.Composite.class, composite);
+      var newComposite = composite.add(c);
+      assertInstanceOf(TraversalExtension.Composite.class, newComposite);
+
+      var c1 = (TraversalExtension.Composite) newComposite;
+      var exts = c1.toList();
+      assertEquals(3, exts.size());
+
+      var c2 = (TraversalExtension.Composite) c1.add(a);
+      assertEquals(3, c2.toList().size());
+      // convert to sets so the order doesn't matter
+      assertEquals(Set.of(a, b, c), Set.copyOf(c2.toList()));
+    }
   }
 }
