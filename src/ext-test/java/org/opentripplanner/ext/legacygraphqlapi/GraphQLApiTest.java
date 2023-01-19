@@ -9,18 +9,59 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.configure.ConstructApplicationModule;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.test.support.PrettyPrinter;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitModel;
 
 @Execution(ExecutionMode.CONCURRENT)
 class GraphQLApiTest {
 
-  static OtpServerRequestContext context = new TestServerRequestContext();
+  static final OtpServerRequestContext context;
+  static final Graph graph = new Graph();
+
+  static {
+    graph
+      .getVehicleParkingService()
+      .updateVehicleParking(
+        List.of(
+          VehicleParking
+            .builder()
+            .id(TransitModelForTest.id("parking-1"))
+            .name(NonLocalizedString.ofNullable("parking"))
+            .build()
+        ),
+        List.of()
+      );
+    var transitModel = new TransitModel();
+    transitModel.index();
+    transitModel.getTransitModelIndex().addRoutes(TransitModelForTest.route("123").build());
+    var transitService = new DefaultTransitService(transitModel);
+    var module = new ConstructApplicationModule();
+    context =
+      module.providesServerContext(
+        RouterConfig.DEFAULT,
+        RaptorConfig.defaultConfigForTest(),
+        graph,
+        transitService,
+        null,
+        null
+      );
+  }
+
   static LegacyGraphQLAPI resource = new LegacyGraphQLAPI(context, "ignored");
 
   @FilePatternSource(pattern = "src/ext-test/resources/legacygraphqlapi/queries/*.graphql")
