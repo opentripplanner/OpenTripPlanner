@@ -31,11 +31,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
@@ -345,15 +343,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     UpdateResult updateResult
   ) {
     ResultLogger.logUpdateResult(feedId, "trip-updates", updates, updateResult);
-    var errorIndex = updateResult.failures();
-
-    errorIndex
-      .keySet()
-      .forEach(key -> {
-        var value = errorIndex.get(key);
-        var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
-        LOG.error("[feedId: {}] {} failures of type {}: {}", feedId, value.size(), key, tripIds);
-      });
 
     if (!failuresByRelationship.isEmpty()) {
       LOG.info("[feedId: {}] Failures by scheduleRelationship {}", feedId, failuresByRelationship);

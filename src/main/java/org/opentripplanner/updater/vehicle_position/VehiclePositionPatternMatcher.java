@@ -28,6 +28,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.UpdateError;
+import org.opentripplanner.model.UpdateSuccess;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
@@ -38,7 +39,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.ResultLogger;
-import org.opentripplanner.updater.trip.UpdateResult;
+import org.opentripplanner.updater.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,8 +127,13 @@ public class VehiclePositionPatternMatcher {
       );
     }
 
+    // need to convert the sucess to the correct type.
+    var results = matchResults
+      .stream()
+      .map(e -> e.mapSuccess(ignored -> UpdateSuccess.noWarnings()))
+      .toList();
     // needs to be put into a new list so the types are correct
-    var updateResult = UpdateResult.ofResults(new ArrayList<>(matchResults));
+    var updateResult = UpdateResult.ofResults(new ArrayList<>(results));
     ResultLogger.logUpdateResult(
       feedId,
       "vehicle-positions",

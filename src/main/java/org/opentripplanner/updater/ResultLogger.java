@@ -3,7 +3,6 @@ package org.opentripplanner.updater;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.updater.trip.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
