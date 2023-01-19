@@ -11,7 +11,7 @@ import org.opentripplanner.raptor.api.response.StopArrivals;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class HeuristicSearch<T extends RaptorTripSchedule> implements Worker<T> {
+public class HeuristicSearch<T extends RaptorTripSchedule> {
 
   private final Worker<T> worker;
   private final Heuristics heuristics;
@@ -25,17 +25,14 @@ public class HeuristicSearch<T extends RaptorTripSchedule> implements Worker<T> 
     return heuristics;
   }
 
-  @Override
   public void route() {
     worker.route();
   }
 
-  @Override
   public Collection<RaptorPath<T>> paths() {
     return worker.paths();
   }
 
-  @Override
   public StopArrivals stopArrivals() {
     return worker.stopArrivals();
   }
