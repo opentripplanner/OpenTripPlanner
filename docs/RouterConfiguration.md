@@ -560,7 +560,8 @@ Http headers.
       "sourceType" : "gbfs",
       "language" : "en",
       "frequencySec" : 60,
-      "allowKeepingRentedBicycleAtDestination" : true,
+      "allowKeepingRentedBicycleAtDestination" : false,
+      "geofencingZones" : false,
       "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
       "headers" : {
         "Auth" : "<any-token>",

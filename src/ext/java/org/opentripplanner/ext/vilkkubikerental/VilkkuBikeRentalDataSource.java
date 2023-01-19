@@ -9,10 +9,13 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GenericXmlDataSource;
+import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VilkkuBikeRentalDataSource extends GenericXmlDataSource<VehicleRentalPlace> {
+public class VilkkuBikeRentalDataSource
+  extends GenericXmlDataSource<VehicleRentalPlace>
+  implements VehicleRentalDatasource {
 
   private static final Logger LOG = LoggerFactory.getLogger(VilkkuBikeRentalDataSource.class);
   public static final String DEFAULT_FEED_NAME = "vilkku";

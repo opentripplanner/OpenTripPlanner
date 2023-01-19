@@ -110,7 +110,7 @@ public class SameEdgeAdjuster {
   }
 
   /**
-   * Creates a PartialStreetEdge along the input StreetEdge iff its direction makes this possible.
+   * Creates a PartialStreetEdge along the input StreetEdge if its direction makes this possible.
    */
   private static void makePartialEdgeAlong(
     StreetEdge streetEdge,

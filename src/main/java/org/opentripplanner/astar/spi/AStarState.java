@@ -30,4 +30,6 @@ public interface AStarState<
   void initBackEdge(Edge originBackEdge);
 
   AStarRequest getRequest();
+
+  boolean isInsideNoRentalDropOffArea();
 }

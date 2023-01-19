@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,26 +10,30 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
 import org.opentripplanner.street.model.edge.VehicleRentalEdge;
+import org.opentripplanner.street.model.vertex.TraversalExtension;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.UpdaterConstructionException;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,17 +44,22 @@ import org.slf4j.LoggerFactory;
 public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
-  private final DataSource<VehicleRentalPlace> source;
+  private final VehicleRentalDatasource source;
   private WriteToGraphCallback saveResultOnGraph;
+
+  private Map<StreetEdge, TraversalExtension> latestModifiedEdges = Map.of();
+  private Set<GeofencingZone> latestAppliedGeofencingZones = Set.of();
   Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
   Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
-  private VertexLinker linker;
+  private final VertexLinker linker;
 
-  private VehicleRentalService service;
+  private final VehicleRentalService service;
+
+  private boolean isPrimed = false;
 
   public VehicleRentalUpdater(
     VehicleRentalUpdaterParameters parameters,
-    DataSource<VehicleRentalPlace> source,
+    VehicleRentalDatasource source,
     VertexLinker vertexLinker,
     VehicleRentalService vehicleRentalStationService
   ) throws IllegalArgumentException {
@@ -89,6 +99,11 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   }
 
   @Override
+  public boolean isPrimed() {
+    return isPrimed;
+  }
+
+  @Override
   public String toString() {
     return ToStringBuilder.of(VehicleRentalUpdater.class).addObj("source", source).toString();
   }
@@ -106,10 +121,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       return;
     }
     List<VehicleRentalPlace> stations = source.getUpdates();
+    var geofencingZones = source.getGeofencingZones();
 
     // Create graph writer runnable to apply these stations to the graph
     VehicleRentalGraphWriterRunnable graphWriterRunnable = new VehicleRentalGraphWriterRunnable(
-      stations
+      stations,
+      geofencingZones
     );
     saveResultOnGraph.execute(graphWriterRunnable);
   }
@@ -117,9 +134,14 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {
 
     private final List<VehicleRentalPlace> stations;
+    private final Set<GeofencingZone> geofencingZones;
 
-    public VehicleRentalGraphWriterRunnable(List<VehicleRentalPlace> stations) {
+    public VehicleRentalGraphWriterRunnable(
+      List<VehicleRentalPlace> stations,
+      List<GeofencingZone> geofencingZones
+    ) {
       this.stations = stations;
+      this.geofencingZones = Set.copyOf(geofencingZones);
     }
 
     @Override
@@ -177,6 +199,29 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         tempEdgesByStation.get(station).disposeEdges();
         tempEdgesByStation.remove(station);
       }
+
+      // this check relies on the generated equals for the record which also recursively checks that
+      // the JTS geometries are equal
+      if (!geofencingZones.isEmpty() && !geofencingZones.equals(latestAppliedGeofencingZones)) {
+        LOG.info("Computing geofencing zones");
+        var start = System.currentTimeMillis();
+
+        latestModifiedEdges.forEach(StreetEdge::removeTraversalExtension);
+
+        var updater = new GeofencingVertexUpdater(graph.getStreetIndex()::getEdgesForEnvelope);
+        latestModifiedEdges = updater.applyGeofencingZones(geofencingZones);
+        latestAppliedGeofencingZones = geofencingZones;
+
+        var end = System.currentTimeMillis();
+        var millis = Duration.ofMillis(end - start);
+        LOG.info(
+          "Geofencing zones computation took {}. Added extension to {} edges.",
+          TimeUtils.durationToStrCompact(millis),
+          latestModifiedEdges.size()
+        );
+      }
+
+      isPrimed = true;
     }
   }
 }

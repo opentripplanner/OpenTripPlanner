@@ -39,7 +39,8 @@
       "frequencySec": 90,
       "network": "BIRD",
       "sourceType": "gbfs",
-      "url": "https://mds.bird.co/gbfs/v2/public/portland"
+      "url": "https://mds.bird.co/gbfs/v2/public/portland.gbfs",
+      "geofencingZones": "true"
     },
     {
       "type": "vehicle-rental",

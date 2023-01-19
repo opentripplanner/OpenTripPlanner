@@ -39,6 +39,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   private transient Edge[] incoming = new Edge[0];
 
   private transient Edge[] outgoing = new Edge[0];
+  private TraversalExtension traversalExtension = TraversalExtension.NO_RESTRICTION;
 
   /* CONSTRUCTORS */
 
@@ -196,6 +197,26 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
       result.add((StreetEdge) out);
     }
     return result;
+  }
+
+  public boolean traversalBanned(State currentState) {
+    return traversalExtension.traversalBanned(currentState);
+  }
+
+  public void addTraversalExtension(TraversalExtension ext) {
+    traversalExtension = traversalExtension.add(ext);
+  }
+
+  public TraversalExtension traversalExtension() {
+    return traversalExtension;
+  }
+
+  public boolean dropOffBanned(State currentState) {
+    return traversalExtension.dropOffBanned(currentState);
+  }
+
+  public void removeTraversalExtension(TraversalExtension ext) {
+    traversalExtension.remove(ext);
   }
 
   /**

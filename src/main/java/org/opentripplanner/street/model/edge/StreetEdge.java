@@ -30,6 +30,7 @@ import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TraversalExtension;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.state.State;
@@ -384,30 +385,49 @@ public class StreetEdge
   }
 
   @Override
-  public State traverse(State s0) {
+  public State traverse(State currentState) {
     final StateEditor editor;
 
+    if (tov.traversalBanned(currentState)) {
+      editor = doTraverse(currentState, TraverseMode.WALK, false);
+      if (editor != null) {
+        editor.dropFloatingVehicle();
+      }
+    }
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
-    if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
+    else if (currentState.getNonTransitMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
-        editor = doTraverse(s0, TraverseMode.BICYCLE, false);
+        editor = doTraverse(currentState, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
-        editor = doTraverse(s0, TraverseMode.WALK, true);
+        editor = doTraverse(currentState, TraverseMode.WALK, true);
       } else {
         return null;
       }
-    } else if (canTraverse(s0.getNonTransitMode())) {
-      editor = doTraverse(s0, s0.getNonTransitMode(), false);
+    } else if (canTraverse(currentState.getNonTransitMode())) {
+      editor = doTraverse(currentState, currentState.getNonTransitMode(), false);
     } else {
       editor = null;
     }
 
     State state = editor != null ? editor.makeState() : null;
 
-    if (canPickupAndDrive(s0) && canTraverse(TraverseMode.CAR)) {
-      StateEditor inCar = doTraverse(s0, TraverseMode.CAR, false);
+    // we are transitioning into a no-drop-off zone therefore we add a second state for dropping
+    // off the vehicle and walking
+    if (!fromv.dropOffBanned(currentState) && tov.dropOffBanned(currentState)) {
+      StateEditor afterTraversal = doTraverse(currentState, TraverseMode.WALK, false);
+      if (afterTraversal != null) {
+        afterTraversal.dropFloatingVehicle();
+        afterTraversal.leaveNoRentalDropOffArea();
+        var forkState = afterTraversal.makeState();
+        forkState.addToExistingResultChain(state);
+        return forkState;
+      }
+    }
+
+    if (canPickupAndDrive(currentState) && canTraverse(TraverseMode.CAR)) {
+      StateEditor inCar = doTraverse(currentState, TraverseMode.CAR, false);
       if (inCar != null) {
-        driveAfterPickup(s0, inCar);
+        driveAfterPickup(currentState, inCar);
         State forkState = inCar.makeState();
         if (forkState != null) {
           // Return both the original WALK state, along with the new IN_CAR state
@@ -418,13 +438,13 @@ public class StreetEdge
     }
 
     if (
-      canDropOffAfterDriving(s0) &&
+      canDropOffAfterDriving(currentState) &&
       !getPermission().allows(TraverseMode.CAR) &&
       canTraverse(TraverseMode.WALK)
     ) {
-      StateEditor dropOff = doTraverse(s0, TraverseMode.WALK, false);
+      StateEditor dropOff = doTraverse(currentState, TraverseMode.WALK, false);
       if (dropOff != null) {
-        dropOffAfterDriving(s0, dropOff);
+        dropOffAfterDriving(currentState, dropOff);
         // Only the walk state is returned, since traversing by car was not possible
         return dropOff.makeState();
       }
@@ -471,6 +491,14 @@ public class StreetEdge
     return hasElevationExtension()
       ? elevationExtension.getEffectiveWalkDistance()
       : getDistanceMeters();
+  }
+
+  /**
+   * This method is not thread-safe.
+   */
+  public void removeTraversalExtension(TraversalExtension ext) {
+    fromv.removeTraversalExtension(ext);
+    tov.removeTraversalExtension(ext);
   }
 
   private void setGeometry(LineString geometry) {
@@ -644,6 +672,14 @@ public class StreetEdge
 
   public void setCostExtension(StreetEdgeCostExtension costExtension) {
     this.costExtension = costExtension;
+  }
+
+  /**
+   * This method is not thread-safe!
+   */
+  public void addTraversalExtension(TraversalExtension ext) {
+    fromv.addTraversalExtension(ext);
+    tov.addTraversalExtension(ext);
   }
 
   /**
@@ -895,6 +931,7 @@ public class StreetEdge
     splitEdge.setLink(isLink());
     splitEdge.setCarSpeed(getCarSpeed());
     splitEdge.setElevationExtensionUsingParent(this, fromDistance, toDistance);
+    splitEdge.addTraversalExtension(fromv.traversalExtension());
   }
 
   protected void setElevationExtensionUsingParent(
@@ -970,8 +1007,12 @@ public class StreetEdge
    * return a StateEditor rather than a State so that we can make parking/mode switch modifications
    * for kiss-and-ride.
    */
-  private StateEditor doTraverse(State s0, TraverseMode traverseMode, boolean walkingBike) {
-    Edge backEdge = s0.getBackEdge();
+  private StateEditor doTraverse(
+    State currentState,
+    TraverseMode traverseMode,
+    boolean walkingBike
+  ) {
+    Edge backEdge = currentState.getBackEdge();
     if (backEdge != null) {
       // No illegal U-turns.
       // NOTE(flamholz): we check both directions because both edges get a chance to decide
@@ -984,13 +1025,19 @@ public class StreetEdge
       }
     }
 
-    var s1 = createEditor(s0, this, traverseMode, walkingBike);
+    var editor = createEditor(currentState, this, traverseMode, walkingBike);
 
-    if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, s1)) {
+    if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, currentState, editor)) {
       return null;
     }
 
-    final RoutingPreferences preferences = s0.getPreferences();
+    if (tov.dropOffBanned(currentState)) {
+      editor.enterNoRentalDropOffArea();
+    } else if (currentState.isInsideNoRentalDropOffArea() && !tov.dropOffBanned(currentState)) {
+      editor.leaveNoRentalDropOffArea();
+    }
+
+    final RoutingPreferences preferences = currentState.getPreferences();
 
     // Automobiles have variable speeds depending on the edge type
     double speed = calculateSpeed(preferences, traverseMode, walkingBike);
@@ -1003,7 +1050,7 @@ public class StreetEdge
           traverseMode,
           speed,
           walkingBike,
-          s0.getRequest().wheelchair()
+          currentState.getRequest().wheelchair()
         );
         default -> otherTraversalCosts(preferences, traverseMode, walkingBike, speed);
       };
@@ -1013,19 +1060,23 @@ public class StreetEdge
 
     /* Compute turn cost. */
     if (backEdge instanceof StreetEdge backPSE) {
-      TraverseMode backMode = s0.getBackMode();
-      final boolean arriveBy = s0.getRequest().arriveBy();
+      TraverseMode backMode = currentState.getBackMode();
+      final boolean arriveBy = currentState.getRequest().arriveBy();
 
       // Apply turn restrictions
       if (
         arriveBy
-          ? !canTurnOnto(backPSE, s0, backMode)
-          : !backPSE.canTurnOnto(this, s0, traverseMode)
+          ? !canTurnOnto(backPSE, currentState, backMode)
+          : !backPSE.canTurnOnto(this, currentState, traverseMode)
       ) {
         return null;
       }
 
-      double backSpeed = backPSE.calculateSpeed(preferences, backMode, s0.isBackWalkingBike());
+      double backSpeed = backPSE.calculateSpeed(
+        preferences,
+        backMode,
+        currentState.isBackWalkingBike()
+      );
       final double turnDuration; // Units are seconds.
 
       /*
@@ -1041,7 +1092,7 @@ public class StreetEdge
        */
       if (arriveBy && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
         turnDuration =
-          s0
+          currentState
             .intersectionTraversalCalculator()
             .computeTraversalDuration(
               traversedVertex,
@@ -1053,7 +1104,7 @@ public class StreetEdge
             );
       } else if (!arriveBy && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
         turnDuration =
-          s0
+          currentState
             .intersectionTraversalCalculator()
             .computeTraversalDuration(
               traversedVertex,
@@ -1070,7 +1121,7 @@ public class StreetEdge
       }
 
       if (!traverseMode.isDriving()) {
-        s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
+        editor.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
       }
 
       time += (int) Math.ceil(turnDuration);
@@ -1078,18 +1129,18 @@ public class StreetEdge
     }
 
     if (!traverseMode.isDriving()) {
-      s1.incrementWalkDistance(getDistanceWithElevation());
+      editor.incrementWalkDistance(getDistanceWithElevation());
     }
 
     if (costExtension != null) {
-      weight += costExtension.calculateExtraCost(s0, length_mm, traverseMode);
+      weight += costExtension.calculateExtraCost(currentState, length_mm, traverseMode);
     }
 
-    s1.incrementTimeInSeconds(time);
+    editor.incrementTimeInSeconds(time);
 
-    s1.incrementWeight(weight);
+    editor.incrementWeight(weight);
 
-    return s1;
+    return editor;
   }
 
   @Nonnull
