@@ -11,10 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import org.opentripplanner.ext.fares.model.FareContainer;
+import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
+import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.transit.model.basic.Money;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -511,15 +516,16 @@ public class OrcaFareServiceImpl extends DefaultFareService {
           // Note: on first leg, discount will be 0 meaning no transfer was applied.
           addFareComponent(
             leg,
+            fare,
             fareType,
             currency,
             legFare - orcaFareDiscount,
-            orcaFareDiscount != 0
+            orcaFareDiscount
           );
           orcaFareDiscount = legFare;
         } else {
           // Ride is free, counts as a transfer if legFare is NOT free
-          addFareComponent(leg, fareType, currency, 0, legFare != 0);
+          addFareComponent(leg, fare, fareType, currency, 0, legFare != 0 ? orcaFareDiscount : 0);
         }
       } else if (usesOrca(fareType) && !inFreeTransferWindow) {
         // If using Orca and outside of the free transfer window, add the cumulative Orca fare (the maximum leg
@@ -545,10 +551,10 @@ public class OrcaFareServiceImpl extends DefaultFareService {
           // window needs to be reset to 0 so that it is not applied after looping through all rides.
           orcaFareDiscount = 0;
         }
-        addFareComponent(leg, fareType, currency, legFare, false);
+        addFareComponent(leg, fare, fareType, currency, legFare, 0);
       } else {
         // If not using Orca, add the agency's default price for this leg.
-        addFareComponent(leg, fareType, currency, legFare, false);
+        addFareComponent(leg, fare, fareType, currency, legFare, 0);
         cost += legFare;
       }
     }
@@ -563,18 +569,31 @@ public class OrcaFareServiceImpl extends DefaultFareService {
    * Adds a fare component to a given ride.
    * @param leg Ride receiving fare component
    * @param fareType Fare type for fare component
-   * @param currency Currency for fare
-   * @param cost Cost of leg fare
-   * @param isTransfer Is this component representing a transfer?
+   * @param totalFare Cost of leg fare after transfer
+   * @param transferDiscount Transfer discount applied or 0 if no transfer was used.
    */
   private static void addFareComponent(
     Leg leg,
+    ItineraryFares itineraryFares,
     FareType fareType,
     Currency currency,
-    float cost,
-    boolean isTransfer
+    float totalFare,
+    float transferDiscount
   ) {
-    //    leg.fareComponents.addFare(fareType, getMoney(currency, cost));
+    var id = new FeedScopedId("orcaFares", "farePayment");
+    var riderCategory = new RiderCategory("orcaFares", getFareCategory(fareType), "");
+    var fareContainer = new FareContainer("orcaFares", usesOrca(fareType) ? "electronic" : "cash");
+    var duration = Duration.ZERO;
+    var money = new Money(currency, (int) (totalFare * 100));
+    var fareProduct = new FareProduct(id, "rideCost", money, duration, riderCategory, fareContainer);
+    itineraryFares.addFareProduct(leg, fareProduct);
+    // If a transfer was used, then also add a transfer fare product.
+    if (transferDiscount > 0) {
+      var transferDiscountMoney = new Money(currency, (int) (transferDiscount * 100));
+      var transferFareProduct =
+        new FareProduct(id, "transfer", transferDiscountMoney, duration, riderCategory, fareContainer);
+      itineraryFares.addFareProduct(leg, transferFareProduct);
+    }
   }
 
   /**
@@ -613,12 +632,21 @@ public class OrcaFareServiceImpl extends DefaultFareService {
   /**
    * Define Orca fare types.
    */
-  private boolean usesOrca(FareType fareType) {
+  private static boolean usesOrca(FareType fareType) {
     return (
       fareType.equals(FareType.electronicSpecial) ||
       fareType.equals(FareType.electronicSenior) ||
       fareType.equals(FareType.electronicRegular) ||
       fareType.equals(FareType.electronicYouth)
     );
+  }
+
+  private static String getFareCategory(FareType fareType) {
+    var splitFareType = fareType.toString().split("electronic");
+    if (splitFareType.length > 0) {
+      return splitFareType[1].toLowerCase();
+    } else {
+      return fareType.toString();
+    }
   }
 }
