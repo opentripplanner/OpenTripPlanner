@@ -14,7 +14,7 @@ public interface DocsTestConstants {
 
   /**
    * This method return {@code true} if the /docs directory is available. If not, a warning is
-   * logged and the method returns {@code false}. This is used by the {@link OnlyIfDocsExist}
+   * logged and the method returns {@code false}. This is used by the {@link GeneratesDocumentation}
    * annotation.
    */
   static boolean docsExistOrWarn() {

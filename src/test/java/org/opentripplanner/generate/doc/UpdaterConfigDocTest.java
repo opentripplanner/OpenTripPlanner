@@ -13,18 +13,16 @@ import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNo
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.Set;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.DocBuilder;
-import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
+import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-@OnlyIfDocsExist
-@Tag("docs")
+@GeneratesDocumentation
 public class UpdaterConfigDocTest {
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "UpdaterConfig.md");
