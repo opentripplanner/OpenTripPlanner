@@ -1391,13 +1391,13 @@ type Leg {
         Transportation modes for which all stops in the parent station are used as possible origin stops
         for the next legs. For modes not listed, only the exact origin stop of the leg is considered.
         """
-        originModesWithParentStation: [Mode!]
+        originModesWithParentStation: [TransitMode!]
 
         """
         Transportation modes for which all stops in the parent station are used as possible destination stops
         for the next legs. For modes not listed, only the exact destination stop of the leg is considered.
         """
-        destinationModesWithParentStation: [Mode!]): [Leg!]
+        destinationModesWithParentStation: [TransitMode!]): [Leg!]
 }
 
 """A span of time."""
@@ -1491,6 +1491,59 @@ enum Mode {
 
     """WALK"""
     WALK
+}
+
+enum TransitMode {
+    """AIRPLANE"""
+    AIRPLANE
+
+    """BICYCLE"""
+    BICYCLE
+
+    """BUS"""
+    BUS
+
+    """CABLE_CAR"""
+    CABLE_CAR
+
+    """CAR"""
+    CAR
+
+    """COACH"""
+    COACH
+
+    """FERRY"""
+    FERRY
+
+    """FUNICULAR"""
+    FUNICULAR
+
+    """GONDOLA"""
+    GONDOLA
+
+    """Only used internally. No use for API users."""
+    LEG_SWITCH
+
+    """RAIL"""
+    RAIL
+
+    """SCOOTER"""
+    SCOOTER
+
+    """SUBWAY"""
+    SUBWAY
+
+    """TRAM"""
+    TRAM
+
+    """"Private car trips shared with others."""
+    CARPOOL
+
+    """A taxi, possibly operated by a public transport agency."""
+    TAXI
+
+    """A special transport mode, which includes all public transport."""
+    TRANSIT
 }
 
 """An object with an ID"""

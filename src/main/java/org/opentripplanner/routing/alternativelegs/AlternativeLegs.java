@@ -57,6 +57,7 @@ public class AlternativeLegs {
     );
   }
 
+
   public static List<ScheduledTransitLeg> getAlternativeLegs(
     Leg leg,
     Integer numberLegs,

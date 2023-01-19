@@ -5,10 +5,12 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.LocalDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
@@ -227,22 +229,27 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   public DataFetcher<Iterable<Leg>> nextLegs() {
     return environment -> {
       if (environment.getSource() instanceof ScheduledTransitLeg originalLeg) {
-        int numberOfLegs = environment.getArgument("numberOfLegs");
-        List<String> originModesWithParentStation = environment.getArgumentOrDefault(
-          "originModesWithParentStation",
-          List.of()
-        );
-        List<String> destinationModesWithParentStation = environment.getArgumentOrDefault(
-          "destinationModesWithParentStation",
-          List.of()
-        );
-        boolean limitToExactOriginStop = !originModesWithParentStation.contains(
-          originalLeg.getMode().name()
-        );
 
-        boolean limitToExactDestinationStop = !destinationModesWithParentStation.contains(
-          originalLeg.getMode().name()
-        );
+        var args = new LegacyGraphQLTypes.LegacyGraphQLLegNextLegsArgs(
+        environment.getArguments());
+
+
+        int numberOfLegs = args.getLegacyGraphQLNumberOfLegs();
+
+
+        var originModesWithParentStation = args.getLegacyGraphQLOriginModesWithParentStation();
+        var destinationModesWithParentStation = args.getLegacyGraphQLDestinationModesWithParentStation();
+
+
+        boolean limitToExactOriginStop = originModesWithParentStation == null ||
+          !(StreamSupport.stream(originModesWithParentStation.spliterator(), false)
+          .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString).toList()
+          .contains(originalLeg.getMode().name()));
+
+        boolean limitToExactDestinationStop = destinationModesWithParentStation == null ||
+          !(StreamSupport.stream(destinationModesWithParentStation.spliterator(), false)
+            .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString).toList()
+            .contains(originalLeg.getMode().name()));
 
         var res = AlternativeLegs
           .getAlternativeLegs(
