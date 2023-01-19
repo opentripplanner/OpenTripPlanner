@@ -19,7 +19,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.report.DataImportIssuesToHTML;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
-import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
+import org.opentripplanner.graph_builder.module.PruneIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -133,23 +133,27 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static PruneNoThruIslands providePruneNoThruIslands(
+  static PruneIslands providePruneIslands(
     BuildConfig config,
     Graph graph,
     TransitModel transitModel,
     DataImportIssueStore issueStore
   ) {
-    PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(
+    PruneIslands pruneIslands = new PruneIslands(
       graph,
       transitModel,
       issueStore,
       new StreetLinkerModule(graph, transitModel, issueStore, config.areaVisibility)
     );
-    pruneNoThruIslands.setPruningThresholdIslandWithoutStops(
-      config.pruningThresholdIslandWithoutStops
+    pruneIslands.setPruningThresholdIslandWithoutStops(
+      config.islandPruning.pruningThresholdIslandWithoutStops
     );
-    pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-    return pruneNoThruIslands;
+    pruneIslands.setPruningThresholdIslandWithStops(
+      config.islandPruning.pruningThresholdIslandWithStops
+    );
+    pruneIslands.setAdaptivePruningFactor(config.islandPruning.adaptivePruningFactor);
+    pruneIslands.setAdaptivePruningDistance(config.islandPruning.adaptivePruningDistance);
+    return pruneIslands;
   }
 
   @Provides
