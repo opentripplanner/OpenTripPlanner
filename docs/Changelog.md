@@ -50,6 +50,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - GTFS-RT extension to add completely new routes [#4667](https://github.com/opentripplanner/OpenTripPlanner/pull/4667)
 - New filter API [#4657](https://github.com/opentripplanner/OpenTripPlanner/pull/4657)
 - Adaptive street graph island pruning [#4688](https://github.com/opentripplanner/OpenTripPlanner/pull/4688)
+- Change tab to spaces [#4733](https://github.com/opentripplanner/OpenTripPlanner/pull/4733)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
