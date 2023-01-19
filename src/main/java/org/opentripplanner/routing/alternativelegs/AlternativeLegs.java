@@ -57,7 +57,19 @@ public class AlternativeLegs {
     );
   }
 
-
+  /**
+   * Searches for alternatives to a given leg prior to or later than the departure of the given leg
+   * @param leg The original leg to which alternatives are searched
+   * @param numberLegs The number of alternative legs requested. If fewer legs are found, only the found legs are returned.
+   * @param transitService The transit service used for the search
+   * @param searchBackward Boolean indicating whether the alternative legs should depart earlier or later than the original leg
+   *                       True if earlier, false if later.
+   * @param filter AlternativeLegsFilter indicating which properties of the original leg should not change in the alternative legs
+   * @param exactOriginStop Boolean indicating whether the exact departure stop of the original leg is used as departure stop for the alternatives.
+   *                        If false, all stops belonging to the same parent station is used.
+   * @param exactDestinationStop Boolean indicating whether the exact destination stop of the original leg is used as departure stop for the alternatives.
+   *    *                        If false, all stops belonging to the same parent station is used.
+   */
   public static List<ScheduledTransitLeg> getAlternativeLegs(
     Leg leg,
     Integer numberLegs,

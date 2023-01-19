@@ -229,27 +229,32 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   public DataFetcher<Iterable<Leg>> nextLegs() {
     return environment -> {
       if (environment.getSource() instanceof ScheduledTransitLeg originalLeg) {
-
-        var args = new LegacyGraphQLTypes.LegacyGraphQLLegNextLegsArgs(
-        environment.getArguments());
-
+        var args = new LegacyGraphQLTypes.LegacyGraphQLLegNextLegsArgs(environment.getArguments());
 
         int numberOfLegs = args.getLegacyGraphQLNumberOfLegs();
-
 
         var originModesWithParentStation = args.getLegacyGraphQLOriginModesWithParentStation();
         var destinationModesWithParentStation = args.getLegacyGraphQLDestinationModesWithParentStation();
 
+        boolean limitToExactOriginStop =
+          originModesWithParentStation == null ||
+          !(
+            StreamSupport
+              .stream(originModesWithParentStation.spliterator(), false)
+              .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString)
+              .toList()
+              .contains(originalLeg.getMode().name())
+          );
 
-        boolean limitToExactOriginStop = originModesWithParentStation == null ||
-          !(StreamSupport.stream(originModesWithParentStation.spliterator(), false)
-          .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString).toList()
-          .contains(originalLeg.getMode().name()));
-
-        boolean limitToExactDestinationStop = destinationModesWithParentStation == null ||
-          !(StreamSupport.stream(destinationModesWithParentStation.spliterator(), false)
-            .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString).toList()
-            .contains(originalLeg.getMode().name()));
+        boolean limitToExactDestinationStop =
+          destinationModesWithParentStation == null ||
+          !(
+            StreamSupport
+              .stream(destinationModesWithParentStation.spliterator(), false)
+              .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString)
+              .toList()
+              .contains(originalLeg.getMode().name())
+          );
 
         var res = AlternativeLegs
           .getAlternativeLegs(
