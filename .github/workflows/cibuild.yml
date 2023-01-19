@@ -69,11 +69,12 @@ jobs:
 
       - uses: actions/checkout@v3.1.0
         # this is necessary so that the correct credentials are put into the git configuration
-        # and we can push the compiled HTML docs
+        # when we push to dev-2.x and push the HTML to the git repo
         if: github.repository_owner == 'opentripplanner'
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
       - uses: actions/checkout@v3.1.0
+        # for a simple PR where we don't push, we don't need any credentials
         if: github.repository_owner != 'opentripplanner'
 
       - name: Install Python dependencies
