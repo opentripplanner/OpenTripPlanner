@@ -56,9 +56,8 @@ jobs:
         run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierCheck -P deployGitHub
 
   docs:
-    if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
+    if: github.repository_owner == 'opentripplanner'
     runs-on: ubuntu-latest
-    needs: build
     env:
       REMOTE: docs
       LOCAL_BRANCH: local-pages
@@ -79,7 +78,10 @@ jobs:
 
       - name: Install Python dependencies
         run: pip install -r docs/requirements.txt
+      - name: Build documentation
+        run: mkdocs build
       - name: Deploy docs to Github pages
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
         run: |
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
