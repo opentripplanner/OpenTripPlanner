@@ -12,23 +12,19 @@ import java.util.Map;
 
 public class TestHeaders implements HttpHeaders {
 
-  private static final RuntimeException NOT_IMPLEMENTED = new IllegalStateException(
-    "Not implemented yet!"
-  );
-
   @Override
   public List<String> getRequestHeader(String s) {
-    throw NOT_IMPLEMENTED;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public String getHeaderString(String s) {
-    throw NOT_IMPLEMENTED;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public MultivaluedMap<String, String> getRequestHeaders() {
-    throw NOT_IMPLEMENTED;
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -43,7 +39,7 @@ public class TestHeaders implements HttpHeaders {
 
   @Override
   public MediaType getMediaType() {
-    throw NOT_IMPLEMENTED;
+    throw new UnsupportedOperationException();
   }
 
   @Override
