@@ -5,7 +5,7 @@ true geographic islands are usually disconnected from the main graph. The street
 within the island or continuing from a ferry stop on it works as expected. Even a tiny street network connected to a ferry stop improves
 routing to an island a lot, because coordinate based itinerary searches find something to project onto.
 
-![](images/badprojection.png)\
+![](images/badprojection.png)  
 *Removing a small subgraph from an island causes poor routing. A ferry stop on the island links directly to mainland.*
 
 Disconnected part can also represent a strictly forbidden area, such as connections within an industrial unit, roads of a military base or another
@@ -17,7 +17,7 @@ In most cases, connectivity problems are caused by incorrect modeling of OSM dat
 and the problem cannot be solved  by simply fixing OSM data as soon as errors  get detected. The OSM street network in Finland contains
 over 10 000 detected walk connectivity issues. An algorithmic solution is needed to address a problem of such magnitude.
 
-![](images/osmislands.png)\
+![](images/osmislands.png)  
 *A typical error: bus platforms are not connected to the street network at all*
 
 A simple and efficient solution is to detect harmful disconnected parts and remove them from the street graph. Routing then uses the properly connected
@@ -25,7 +25,7 @@ part of the graph and finds itineraries. As a side effect, the start point of an
 which usually is good enough. Transfers may include strange teleportation and unexpected walking, as public transit stops may link to somewhat remote streets,
 but at least transfers will work.
 
-![](images/stopislandproblem.png)\
+![](images/stopislandproblem.png)  
 *A disconnected railway platform breaks routing. Traveler is guided to take a round trip around the country although there is one hour direct train connection.*
 
 
@@ -37,7 +37,7 @@ However, sometimes OSM contributors try to block the traffic by tagging only ent
 prevents access to the interior part of the network, because OTP interprets it as pass through traffic. Pruning handles such problems by converting streets behind an access restriction
 to have the same access properties.
 
-![](images/nothruisland.png)\
+![](images/nothruisland.png)  
 *Some regular (gray colored) streets are blocked behind access restricted (red colored) connections. Walk routing to them fails because it would be considered as pass through traffic.
 The image on the right shows that pruning added walk nothrough restricition to those streets, and routing works again.*
 
@@ -66,15 +66,15 @@ Unknown mode is accepted for island status, because ferry lines often operate on
 
 ## Some examples
 
-![](images/trueisland.png)\
+![](images/trueisland.png)  
 *A disconnected small graph should be preserved, if it is located on a real island.*
 
-![](images/stopisland.png)\
+![](images/stopisland.png)  
 *A street section has tags which prevent traversal on it, and OTP has removed it from the graph. Some isolated streets remain left, and a public transit stop gets linked to them. Routing cannot use the stop unless traveler
 is leaving from or going to the small isolated sub graph. Isolated streets cannot be reached by walking either. After pruning, the stop is projected to the main graph. Transfers at the stop work fine.
 Itineraries can guide traveler quite close to the removed streets.*
 
-![](images/stationisland.png)\
+![](images/stationisland.png)  
 *The platform structure of a bus station is disconnected from the other graph. Most bus traffic of a medium size city becomes unusable.
 Despite of the complexity of the sub graph (54 edges and 21 stops), it must be removed in pruning, so that stops get linked to reachable and well connected streets.*
 
