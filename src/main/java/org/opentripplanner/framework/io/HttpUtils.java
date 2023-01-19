@@ -60,10 +60,6 @@ public class HttpUtils {
     return getData(uri, DEFAULT_TIMEOUT, requestHeaderValues);
   }
 
-  public static List<Header> getHeaders(URI uri) {
-    return getHeaders(uri, DEFAULT_TIMEOUT, null);
-  }
-
   public static List<Header> getHeaders(
     URI uri,
     Duration timeout,

@@ -492,133 +492,152 @@ Http headers.
   "transmodelApi" : {
     "hideFeedId" : true
   },
-  "vectorTileLayers" : [ {
-    "name" : "stops",
-    "type" : "Stop",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 14,
-    "cacheMaxSeconds" : 600
-  }, {
-    "name" : "stations",
-    "type" : "Station",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 12,
-    "cacheMaxSeconds" : 600
-  }, {
-    "name" : "rentalPlaces",
-    "type" : "VehicleRental",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 14,
-    "cacheMaxSeconds" : 60,
-    "expansionFactor" : 0.25
-  }, {
-    "name" : "rentalVehicle",
-    "type" : "VehicleRentalVehicle",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 14,
-    "cacheMaxSeconds" : 60
-  }, {
-    "name" : "rentalStation",
-    "type" : "VehicleRentalStation",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 14,
-    "cacheMaxSeconds" : 600
-  }, {
-    "name" : "vehicleParking",
-    "type" : "VehicleParking",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 14,
-    "cacheMaxSeconds" : 60,
-    "expansionFactor" : 0.25
-  } ],
-  "updaters" : [ {
-    "type" : "real-time-alerts",
-    "frequencySec" : 30,
-    "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
-    "feedId" : "TriMet",
-    "headers" : {
-      "Some-Header" : "A-Value"
-    }
-  }, {
-    "type" : "vehicle-rental",
-    "network" : "socialbicycles_coast",
-    "sourceType" : "gbfs",
-    "language" : "en",
-    "frequencySec" : 60,
-    "allowKeepingRentedBicycleAtDestination" : true,
-    "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
-    "headers" : {
-      "Auth" : "<any-token>",
-      "<key>" : "<value>"
-    }
-  }, {
-    "type" : "vehicle-parking",
-    "sourceType" : "hsl-park",
-    "feedId" : "hslpark",
-    "timeZone" : "Europe/Helsinki",
-    "facilitiesFrequencySec" : 3600,
-    "facilitiesUrl" : "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
-    "utilizationsFrequencySec" : 600,
-    "utilizationsUrl" : "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
-    "hubsUrl" : "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
-  }, {
-    "type" : "vehicle-parking",
-    "sourceType" : "park-api",
-    "feedId" : "parkapi",
-    "timeZone" : "Europe/Berlin",
-    "frequencySec" : 600,
-    "url" : "https://foo.bar",
-    "headers" : {
-      "Cache-Control" : "max-age=604800"
+  "vectorTileLayers" : [
+    {
+      "name" : "stops",
+      "type" : "Stop",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 14,
+      "cacheMaxSeconds" : 600
     },
-    "tags" : [ "source:parkapi" ]
-  }, {
-    "type" : "vehicle-parking",
-    "feedId" : "bikely",
-    "sourceType" : "bikely",
-    "url" : "https://api.safebikely.com/api/v1/s/locations",
-    "headers" : {
-      "X-Bikely-Token" : "${BIKELY_TOKEN}",
-      "Authorization" : "${BIKELY_AUTHORIZATION}"
+    {
+      "name" : "stations",
+      "type" : "Station",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 12,
+      "cacheMaxSeconds" : 600
+    },
+    {
+      "name" : "rentalPlaces",
+      "type" : "VehicleRental",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 14,
+      "cacheMaxSeconds" : 60,
+      "expansionFactor" : 0.25
+    },
+    {
+      "name" : "rentalVehicle",
+      "type" : "VehicleRentalVehicle",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 14,
+      "cacheMaxSeconds" : 60
+    },
+    {
+      "name" : "rentalStation",
+      "type" : "VehicleRentalStation",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 14,
+      "cacheMaxSeconds" : 600
+    },
+    {
+      "name" : "vehicleParking",
+      "type" : "VehicleParking",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 14,
+      "cacheMaxSeconds" : 60,
+      "expansionFactor" : 0.25
     }
-  }, {
-    "type" : "stop-time-updater",
-    "frequencySec" : 60,
-    "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
-    "url" : "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-    "feedId" : "TriMet",
-    "headers" : {
-      "Authorization" : "A-Token"
+  ],
+  "updaters" : [
+    {
+      "type" : "real-time-alerts",
+      "frequencySec" : 30,
+      "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
+      "feedId" : "TriMet",
+      "headers" : {
+        "Some-Header" : "A-Value"
+      }
+    },
+    {
+      "type" : "vehicle-rental",
+      "network" : "socialbicycles_coast",
+      "sourceType" : "gbfs",
+      "language" : "en",
+      "frequencySec" : 60,
+      "allowKeepingRentedBicycleAtDestination" : true,
+      "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
+      "headers" : {
+        "Auth" : "<any-token>",
+        "<key>" : "<value>"
+      }
+    },
+    {
+      "type" : "vehicle-parking",
+      "sourceType" : "hsl-park",
+      "feedId" : "hslpark",
+      "timeZone" : "Europe/Helsinki",
+      "facilitiesFrequencySec" : 3600,
+      "facilitiesUrl" : "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
+      "utilizationsFrequencySec" : 600,
+      "utilizationsUrl" : "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
+      "hubsUrl" : "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
+    },
+    {
+      "type" : "vehicle-parking",
+      "sourceType" : "park-api",
+      "feedId" : "parkapi",
+      "timeZone" : "Europe/Berlin",
+      "frequencySec" : 600,
+      "url" : "https://foo.bar",
+      "headers" : {
+        "Cache-Control" : "max-age=604800"
+      },
+      "tags" : [
+        "source:parkapi"
+      ]
+    },
+    {
+      "type" : "vehicle-parking",
+      "feedId" : "bikely",
+      "sourceType" : "bikely",
+      "url" : "https://api.safebikely.com/api/v1/s/locations",
+      "headers" : {
+        "X-Bikely-Token" : "${BIKELY_TOKEN}",
+        "Authorization" : "${BIKELY_AUTHORIZATION}"
+      }
+    },
+    {
+      "type" : "stop-time-updater",
+      "frequencySec" : 60,
+      "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
+      "url" : "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
+      "feedId" : "TriMet",
+      "headers" : {
+        "Authorization" : "A-Token"
+      }
+    },
+    {
+      "type" : "vehicle-positions",
+      "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
+      "feedId" : "1",
+      "frequencySec" : 60,
+      "headers" : {
+        "Header-Name" : "Header-Value"
+      }
+    },
+    {
+      "type" : "websocket-gtfs-rt-updater"
+    },
+    {
+      "type" : "siri-azure-sx-updater",
+      "topic" : "some_topic",
+      "servicebus-url" : "service_bus_url",
+      "feedId" : "feed_id",
+      "customMidnight" : 4,
+      "history" : {
+        "url" : "endpoint_url",
+        "fromDateTime" : "-P1D",
+        "toDateTime" : "P1D",
+        "timeout" : 300000
+      }
     }
-  }, {
-    "type" : "vehicle-positions",
-    "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
-    "feedId" : "1",
-    "frequencySec" : 60,
-    "headers" : {
-      "Header-Name" : "Header-Value"
-    }
-  }, {
-    "type" : "websocket-gtfs-rt-updater"
-  }, {
-    "type" : "siri-azure-sx-updater",
-    "topic" : "some_topic",
-    "servicebus-url" : "service_bus_url",
-    "feedId" : "feed_id",
-    "customMidnight" : 4,
-    "history" : {
-      "url" : "endpoint_url",
-      "fromDateTime" : "-P1D",
-      "toDateTime" : "P1D",
-      "timeout" : 300000
-    }
-  } ]
+  ]
 }
 ```
 

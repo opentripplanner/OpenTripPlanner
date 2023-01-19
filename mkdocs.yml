@@ -57,6 +57,7 @@ nav:
         - "Route Request": 'RouteRequest.md'
         - "Realtime Updaters" : 'UpdaterConfig.md'
         - "Routing Modes" : "RoutingModes.md"
+        - "Street graph pruning": 'IslandPruning.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'

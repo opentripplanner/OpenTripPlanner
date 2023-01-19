@@ -2,13 +2,7 @@ package org.opentripplanner.generate.doc.framework;
 
 import static org.opentripplanner.framework.text.MarkdownFormatter.NEW_LINE;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.text.MarkdownFormatter;
@@ -19,16 +13,6 @@ import org.opentripplanner.standalone.config.framework.json.EnumMapper;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class DocBuilder {
-
-  public static final ObjectWriter PRETTY_PRINTER;
-
-  static {
-    var mapper = new ObjectMapper();
-    mapper.enable(SerializationFeature.INDENT_OUTPUT);
-    var pp = new DefaultPrettyPrinter();
-    pp.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
-    PRETTY_PRINTER = mapper.writer(pp);
-  }
 
   private final StringBuilder buffer = new StringBuilder();
 
@@ -115,39 +99,13 @@ public class DocBuilder {
     return endParagraph();
   }
 
-  public void addExample(String comment, String body) {
-    buffer.append(
-      """
-      ```JSON
-      // %s
-      {
-        %s
-      }
-      ```
-      """.formatted(
-          comment,
-          body.indent(2)
-        )
-    );
-  }
-
   public void addExample(String comment, JsonNode body) {
-    String json = prettyPrintJson(body);
-
-    buffer.append("""
-      ```JSON
-      // %s
-      %s
-      ```
-      """.formatted(comment, json));
+    buffer.append(TemplateUtil.jsonExample(body, comment));
   }
 
-  private static String prettyPrintJson(JsonNode body) {
-    try {
-      return PRETTY_PRINTER.writeValueAsString(body);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
+  public void addUpdaterExample(String comment, JsonNode node) {
+    var root = TemplateUtil.jsonExampleBuilder(node).wrapInArray().wrapInObject("updaters").build();
+    addExample(comment, root);
   }
 
   /**

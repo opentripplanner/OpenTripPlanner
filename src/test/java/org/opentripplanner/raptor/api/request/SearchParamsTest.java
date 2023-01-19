@@ -59,7 +59,7 @@ public class SearchParamsTest {
     p.addAccessPaths(TestAccessEgress.walk(1, 30));
     p.addEgressPaths(TestAccessEgress.walk(2, 20));
 
-    p.timetableEnabled(true);
+    p.timetable(true);
     p.preferLateArrival(true);
 
     assertParamNotValid(

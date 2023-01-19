@@ -24,7 +24,7 @@ public class DurationUtilsTest {
   private final int I15h37m = durationSec(15, 37, 0);
 
   @Test
-  public void durationToStr() {
+  public void durationToStrFromSeconds() {
     assertEquals("9h36m55s", DurationUtils.durationToStr(I9h36m55s));
     assertEquals("13h33m57s", DurationUtils.durationToStr(I13h33m57s));
     assertEquals("9h31m", DurationUtils.durationToStr(I9h31m));
@@ -43,10 +43,11 @@ public class DurationUtilsTest {
   }
 
   @Test
-  public void testDurationToStr() {
+  public void durationToStrFromDurationType() {
     assertEquals("9h36m55s", DurationUtils.durationToStr(Duration.ofSeconds(I9h36m55s)));
     assertEquals("9h31m", DurationUtils.durationToStr(Duration.ofSeconds(I9h31m)));
     assertEquals("9s", DurationUtils.durationToStr(D9s));
+    assertEquals("", DurationUtils.durationToStr(null));
   }
 
   @Test

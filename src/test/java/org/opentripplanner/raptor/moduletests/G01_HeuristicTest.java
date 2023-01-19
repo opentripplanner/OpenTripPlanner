@@ -79,7 +79,7 @@ public class G01_HeuristicTest implements RaptorTestConstants {
       .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
       .addEgressPaths(TestAccessEgress.walk(STOP_D, D20s))
       .earliestDepartureTime(T00_00)
-      .timetableEnabled(true);
+      .timetable(true);
 
     requestBuilder.profile(RaptorProfile.MULTI_CRITERIA);
 
@@ -101,7 +101,7 @@ public class G01_HeuristicTest implements RaptorTestConstants {
 
   @Test
   public void withConstrainedTransfers() {
-    requestBuilder.searchParams().constrainedTransfersEnabled(true);
+    requestBuilder.searchParams().constrainedTransfers(true);
 
     var request = requestBuilder.build();
 

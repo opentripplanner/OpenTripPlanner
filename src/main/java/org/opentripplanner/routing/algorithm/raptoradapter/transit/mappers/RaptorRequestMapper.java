@@ -9,7 +9,6 @@ import java.util.Collection;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.Optimization;
-import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.SearchParams;
@@ -119,13 +118,9 @@ public class RaptorRequestMapper {
     builder.searchDirection(preferences.transit().raptor().searchDirection());
 
     builder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
-
-    builder
       .searchParams()
-      .timetableEnabled(request.timetableView())
-      .constrainedTransfersEnabled(OTPFeature.TransferConstraints.isOn())
+      .timetable(request.timetableView())
+      .constrainedTransfers(OTPFeature.TransferConstraints.isOn())
       .addAccessPaths(accessPaths)
       .addEgressPaths(egressPaths);
 

@@ -31,6 +31,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
@@ -238,6 +239,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     OtpServerRequestContext serverContext
   ) {
     RouteRequest request = new RouteRequest();
+    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
     Instant dateTime = LocalDateTime
       .of(2021, Month.DECEMBER, 16, 12, 0)
       .atZone(ZoneIds.NEW_YORK)

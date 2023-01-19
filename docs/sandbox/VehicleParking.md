@@ -80,7 +80,7 @@ Used for converting abstract opening hours into concrete points in time.
 ```JSON
 // router-config.json
 {
-    "updaters": [
+  "updaters" : [
     {
       "type" : "vehicle-parking",
       "sourceType" : "hsl-park",
@@ -93,7 +93,6 @@ Used for converting abstract opening hours into concrete points in time.
       "hubsUrl" : "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
     }
   ]
-
 }
 ```
 
@@ -165,7 +164,7 @@ Tags to add to the parking lots.
 ```JSON
 // router-config.json
 {
-    "updaters": [
+  "updaters" : [
     {
       "type" : "vehicle-parking",
       "sourceType" : "park-api",
@@ -176,10 +175,11 @@ Tags to add to the parking lots.
       "headers" : {
         "Cache-Control" : "max-age=604800"
       },
-      "tags" : [ "source:parkapi" ]
+      "tags" : [
+        "source:parkapi"
+      ]
     }
   ]
-
 }
 ```
 
@@ -233,7 +233,7 @@ HTTP headers to add.
 ```JSON
 // router-config.json
 {
-    "updaters": [
+  "updaters" : [
     {
       "type" : "vehicle-parking",
       "feedId" : "bikely",
@@ -245,7 +245,6 @@ HTTP headers to add.
       }
     }
   ]
-
 }
 ```
 

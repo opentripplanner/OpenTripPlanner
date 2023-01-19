@@ -139,7 +139,12 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     }
 
     @Override
-    public boolean tripTimesPredicate(TripTimes tripTimes) {
+    public boolean tripTimesPredicate(TripTimes tripTimes, boolean withFilters) {
+      return false;
+    }
+
+    @Override
+    public boolean hasSubModeFilters() {
       return false;
     }
 

@@ -74,10 +74,6 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    if (request.journey().transit().modes().isEmpty()) {
-      return new TransitRouterResult(List.of(), null);
-    }
-
     if (!serverContext.transitService().transitFeedCovers(request.dateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
@@ -119,7 +115,7 @@ public class TransitRouter {
 
     Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
 
-    if (OTPFeature.OptimizeTransfers.isOn()) {
+    if (OTPFeature.OptimizeTransfers.isOn() && !transitResponse.containsUnknownPaths()) {
       paths =
         TransferOptimizationServiceConfigurator
           .createOptimizeTransferService(
