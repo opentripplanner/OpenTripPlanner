@@ -188,7 +188,7 @@ public class GeometryUtils {
   }
 
   /**
-   * Splits a line string into a number of partition with the same number of coordinates.
+   * Splits a line string into a number of partitions with the same number of coordinates.
    * <p>
    * The last coordinate of partition n will also be the first coordinate of partition n+1 so all
    * partitions together will represent the original line string without gaps.
