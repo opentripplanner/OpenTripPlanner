@@ -5,9 +5,12 @@
 # Replaces upstream CI actions with digitransit setup
 # Pushes the result (upstream + local modifications) to digitransit OTP dev-2.x branch
 # To apply this script, you need to set up upstream opentripplanner as remote (say a remote called otp)
+# IMPORTANT: make sure that digitransit origin is the default repository:
+#     git config checkout.defaultRemote origin
 # First fetch the upstream: git fetch otp
 # Then run ./merge_upstream.sh otp/dev-2.x
 # The result is that updated dev-2.x is pushed to our fork and gets deployed to development.
+# You can test the merge as follows:   ./merge_upstream.sh --dryRun otp/dev-2.x
 
 #set -euo pipefail
 
