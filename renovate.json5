@@ -25,6 +25,23 @@
         "io.github.origin-energy:java-snapshot-testing-junit5"
       ],
       "enabled": false
+    },
+    {
+      // https://github.com/graphql-java-kickstart/renovate-config/blob/main/default.json
+      "description": "GraphQL Java (ignoring snapshot builds)",
+      "matchPackagePrefixes": [
+        "com.graphql-java:"
+      ],
+      "allowedVersions": "/^[0-9]+\\.[0-9]+(\\.[0-9]+)?$/"
+    },
+    {
+      "description": "mkdocs-material updates very often but we don't need every new version",
+      "matchPackageNames": [
+        "mkdocs-material"
+      ],
+      "extends": [
+        "schedule:quarterly"
+      ]
     }
   ]
 }
