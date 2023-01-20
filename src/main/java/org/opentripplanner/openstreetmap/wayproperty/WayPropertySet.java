@@ -9,11 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
@@ -34,16 +33,6 @@ import org.slf4j.LoggerFactory;
  * number of exact, partial, and wildcard tag matches. See OSMSpecifier for more details on the matching process.
  */
 public class WayPropertySet {
-
-  @FunctionalInterface
-  public interface TriFunction<A, B, C, R> {
-    R apply(A a, B b, C c);
-
-    default <V> TriFunction<A, B, C, V> andThen(Function<? super R, ? extends V> after) {
-      Objects.requireNonNull(after);
-      return (A a, B b, C c) -> after.apply(apply(a, b, c));
-    }
-  }
 
   private static final Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 

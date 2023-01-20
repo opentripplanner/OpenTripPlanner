@@ -7,9 +7,9 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
-import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet.TriFunction;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
