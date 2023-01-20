@@ -3,16 +3,18 @@ package org.opentripplanner.api.common;
 import static org.opentripplanner.api.common.LocationStringParser.fromOldStyleString;
 import static org.opentripplanner.api.common.RequestToPreferencesMapper.setIfNotNull;
 
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MultivaluedMap;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
+import java.util.stream.Collectors;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
@@ -22,8 +24,11 @@ import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -739,18 +744,63 @@ public abstract class RoutingResource {
 
       {
         var transit = journey.transit();
+        var filterBuilder = TransitFilterRequest.of();
         // Filter Agencies
         setIfNotNull(preferredAgencies, transit::setPreferredAgenciesFromString);
         setIfNotNull(unpreferredAgencies, transit::setUnpreferredAgenciesFromString);
-        setIfNotNull(bannedAgencies, transit::setBannedAgenciesFromSting);
-        setIfNotNull(whiteListedAgencies, transit::setWhiteListedAgenciesFromSting);
+
         // Filter Routes
         setIfNotNull(preferredRoutes, transit::setPreferredRoutesFromString);
         setIfNotNull(unpreferredRoutes, transit::setUnpreferredRoutesFromString);
-        setIfNotNull(bannedRoutes, transit::setBannedRoutesFromString);
-        setIfNotNull(whiteListedRoutes, transit::setWhiteListedRoutesFromString);
+
         // Filter Trips
-        setIfNotNull(bannedTrips, transit::setBannedTripsFromString);
+        setIfNotNull(bannedTrips, journey.transit()::setBannedTripsFromString);
+
+        // Excluded entities
+        setIfNotNull(
+          bannedAgencies,
+          s -> filterBuilder.addNot(SelectRequest.of().withAgenciesFromString(s).build())
+        );
+
+        setIfNotNull(
+          bannedRoutes,
+          s -> filterBuilder.addNot(SelectRequest.of().withRoutesFromString(s).build())
+        );
+
+        // Included entities
+        var selectors = new ArrayList<SelectRequest.Builder>();
+
+        setIfNotNull(
+          whiteListedAgencies,
+          s -> selectors.add(SelectRequest.of().withAgenciesFromString(s))
+        );
+
+        setIfNotNull(
+          whiteListedRoutes,
+          s -> selectors.add(SelectRequest.of().withRoutesFromString(s))
+        );
+
+        // Create modes
+        var tModes = modes
+          .getTransitModes()
+          .stream()
+          .map(MainAndSubMode::new)
+          .collect(Collectors.toList());
+        if (tModes.isEmpty()) {
+          tModes = MainAndSubMode.all();
+        }
+
+        // Add modes filter to all existing selectors
+        // If no selectors specified, create new one
+        if (!selectors.isEmpty()) {
+          for (var selector : selectors) {
+            filterBuilder.addSelect(selector.withTransportModes(tModes).build());
+          }
+        } else {
+          filterBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
+        }
+
+        transit.filters().add(filterBuilder.build());
       }
       {
         var debugRaptor = journey.transit().raptorDebugging();

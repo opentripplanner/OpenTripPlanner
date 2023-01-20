@@ -1,9 +1,9 @@
 package org.opentripplanner.api.resource;
 
+import jakarta.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import javax.ws.rs.core.UriInfo;
 import org.opentripplanner.api.model.ApiTripPlan;
 import org.opentripplanner.api.model.ApiTripSearchMetadata;
 import org.opentripplanner.api.model.error.PlannerError;

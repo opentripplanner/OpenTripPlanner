@@ -1,5 +1,7 @@
 package org.opentripplanner.framework.io;
 
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -8,8 +10,6 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.UriInfo;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -58,10 +58,6 @@ public class HttpUtils {
   public static InputStream getData(URI uri, Map<String, String> requestHeaderValues)
     throws IOException {
     return getData(uri, DEFAULT_TIMEOUT, requestHeaderValues);
-  }
-
-  public static List<Header> getHeaders(URI uri) {
-    return getHeaders(uri, DEFAULT_TIMEOUT, null);
   }
 
   public static List<Header> getHeaders(

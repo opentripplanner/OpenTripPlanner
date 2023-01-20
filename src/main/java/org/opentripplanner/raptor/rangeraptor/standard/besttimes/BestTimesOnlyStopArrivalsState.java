@@ -1,10 +1,12 @@
 package org.opentripplanner.raptor.rangeraptor.standard.besttimes;
 
+import java.util.Collection;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.TransitArrival;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.TransitArrival;
 
 /**
  * The responsibility of this class is to calculate the best arrival times at every stop. This class
@@ -24,13 +26,16 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule>
 
   private final BestTimes bestTimes;
   private final SimpleBestNumberOfTransfers bestNumberOfTransfers;
+  private final UnknownPathFactory<T> unknownPathFactory;
 
   public BestTimesOnlyStopArrivalsState(
     BestTimes bestTimes,
-    SimpleBestNumberOfTransfers bestNumberOfTransfers
+    SimpleBestNumberOfTransfers bestNumberOfTransfers,
+    UnknownPathFactory<T> unknownPathFactory
   ) {
     this.bestTimes = bestTimes;
     this.bestNumberOfTransfers = bestNumberOfTransfers;
+    this.unknownPathFactory = unknownPathFactory;
   }
 
   @Override
@@ -81,6 +86,11 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule>
       "configuration. For example the BestTimesOnlyStopArrivalsState can not be used " +
       "with constrained transfers."
     );
+  }
+
+  @Override
+  public Collection<RaptorPath<T>> extractPaths() {
+    return unknownPathFactory.extractPaths();
   }
 
   @Override

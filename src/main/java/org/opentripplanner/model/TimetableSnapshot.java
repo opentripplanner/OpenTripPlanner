@@ -178,7 +178,7 @@ public class TimetableSnapshot {
    * @param serviceDate      service day for which this update is valid
    * @return whether the update was actually applied
    */
-  public Result<?, UpdateError> update(
+  public Result<UpdateSuccess, UpdateError> update(
     TripPattern pattern,
     TripTimes updatedTripTimes,
     LocalDate serviceDate
@@ -235,7 +235,7 @@ public class TimetableSnapshot {
 
     // The time tables are finished during the commit
 
-    return Result.success();
+    return Result.success(UpdateSuccess.noWarnings());
   }
 
   /**

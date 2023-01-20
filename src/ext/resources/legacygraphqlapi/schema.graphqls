@@ -1,3 +1,13 @@
+"""
+Use an asynchronous data fetcher on a separate thread for this field.
+
+This is useful when adding several queries in the same HTTP request, for example by using a batch: Those
+fields annotated with this directive run in parallel.
+
+This is only worth it when the execution is long running, i.e. more than ~50 milliseconds, so this doesn't happen by default.
+"""
+directive @async on FIELD_DEFINITION
+
 schema {
     query: QueryType
 }
@@ -2026,7 +2036,7 @@ type QueryType {
         after: String
         first: Int
         last: Int
-    ): placeAtDistanceConnection
+    ): placeAtDistanceConnection @async
 
     """
     Get a single departure row based on its ID (ID format is `FeedId:StopId:PatternId`)
@@ -2705,7 +2715,7 @@ type QueryType {
         If the value is set to be 0, safety is ignored. Default is 1.0.
         """
         walkSafetyFactor: Float
-    ): Plan
+    ): Plan @async
 }
 
 enum RealtimeState {

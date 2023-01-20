@@ -29,7 +29,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   private final int bestMatchScore;
 
   public ExactMatchSpecifier(String spec) {
-    this(OsmSpecifier.parseEqualsTests(spec, ";"));
+    this(OsmSpecifier.parseConditions(spec, ";"));
   }
 
   public ExactMatchSpecifier(Condition... conditions) {
@@ -39,7 +39,6 @@ public class ExactMatchSpecifier implements OsmSpecifier {
 
   @Override
   public Scores matchScores(OSMWithTags way) {
-
     return new Scores(
       allForwardTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE,
       allBackwardTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE
@@ -56,15 +55,15 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   }
 
   public boolean allTagsMatch(OSMWithTags way) {
-    return conditions.stream().allMatch(o -> o.matches(way));
+    return conditions.stream().allMatch(o -> o.isMatch(way));
   }
 
   public boolean allBackwardTagsMatch(OSMWithTags way) {
-    return conditions.stream().allMatch(c -> c.matchesBackward(way));
+    return conditions.stream().allMatch(c -> c.isBackwardMatch(way));
   }
 
   public boolean allForwardTagsMatch(OSMWithTags way) {
-    return conditions.stream().allMatch(c -> c.matchesForward(way));
+    return conditions.stream().allMatch(c -> c.isForwardMatch(way));
   }
 
   public static ExactMatchSpecifier exact(String spec) {

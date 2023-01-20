@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.TransferPathView;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 final class Transfer<T extends RaptorTripSchedule>
   extends StopArrivalViewAdapter<T>

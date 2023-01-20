@@ -36,11 +36,11 @@ class AllowMainAndSubModesFilterTest {
 
   @Test
   void allows() {
-    assertTrue(subject.allows(TransitMode.BUS, SUBMODE_LOCAL));
-    assertTrue(subject.allows(TransitMode.BUS, SUBMODE_REGIONAL));
-    assertTrue(subject.allows(TransitMode.BUS, SUBMODE_EXPRESS));
-    assertFalse(subject.allows(TransitMode.BUS, SUBMODE_NIGHT));
-    assertFalse(subject.allows(TransitMode.BUS, SubMode.of("other")));
+    assertTrue(subject.match(TransitMode.BUS, SUBMODE_LOCAL));
+    assertTrue(subject.match(TransitMode.BUS, SUBMODE_REGIONAL));
+    assertTrue(subject.match(TransitMode.BUS, SUBMODE_EXPRESS));
+    assertFalse(subject.match(TransitMode.BUS, SUBMODE_NIGHT));
+    assertFalse(subject.match(TransitMode.BUS, SubMode.of("other")));
   }
 
   @Test

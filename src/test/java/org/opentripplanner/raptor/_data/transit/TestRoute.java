@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
-import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
 
@@ -48,11 +48,11 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     return pattern;
   }
 
-  public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsForwardSearch() {
+  public RaptorConstrainedBoardingSearch<TestTripSchedule> transferConstraintsForwardSearch() {
     return transferConstraintsForwardSearch;
   }
 
-  public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsReverseSearch() {
+  public RaptorConstrainedBoardingSearch<TestTripSchedule> transferConstraintsReverseSearch() {
     return transferConstraintsReverseSearch;
   }
 

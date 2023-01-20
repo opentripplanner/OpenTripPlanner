@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -11,8 +13,6 @@ import org.opentripplanner.raptor.rangeraptor.standard.internalapi.ArrivedAtDest
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
-import org.opentripplanner.raptor.spi.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The responsibility of this class is to listen for egress stop arrivals and forward these as

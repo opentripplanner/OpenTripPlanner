@@ -146,7 +146,7 @@ public class Timetable implements Serializable {
    * @param updateServiceDate             service date of trip update
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag
-   * @return {@link Result<TripTimesPatch, UpdateError>} contains either a new copy of updated
+   * @return {@link Result<TripTimesPatch,  UpdateError >} contains either a new copy of updated
    * TripTimes after TripUpdate has been applied on TripTimes of trip with the id specified in the
    * trip descriptor of the TripUpdate and a list of stop indices that have been skipped with the
    * realtime update; or an error if something went wrong

@@ -1,6 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.standard.configure;
 
+import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicSearch;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
@@ -17,6 +20,7 @@ import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimesOnlyStopArrivalsState;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.SimpleArrivedAtDestinationCheck;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.SimpleBestNumberOfTransfers;
+import org.opentripplanner.raptor.rangeraptor.standard.besttimes.UnknownPathFactory;
 import org.opentripplanner.raptor.rangeraptor.standard.debug.DebugStopArrivalsState;
 import org.opentripplanner.raptor.rangeraptor.standard.heuristics.HeuristicsAdapter;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
@@ -27,7 +31,6 @@ import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArriv
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.path.EgressArrivalToPathAdapter;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.raptor.spi.CostCalculator;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The responsibility of this class is to wire different standard range raptor worker configurations
@@ -94,16 +97,24 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     switch (ctx.profile()) {
       case STANDARD:
       case BEST_TIME:
-        return new ArrivalTimeRoutingStrategy<>(ctx.calculator(), state);
+        return new ArrivalTimeRoutingStrategy<>(
+          state,
+          ctx.createTimeBasedBoardingSupport(),
+          ctx.calculator()
+        );
       case MIN_TRAVEL_DURATION:
       case MIN_TRAVEL_DURATION_BEST_TIME:
-        return new MinTravelDurationRoutingStrategy<>(ctx.calculator(), state);
+        return new MinTravelDurationRoutingStrategy<>(
+          state,
+          ctx.createTimeBasedBoardingSupport(),
+          ctx.calculator()
+        );
     }
     throw new IllegalArgumentException(ctx.profile().toString());
   }
 
   private Heuristics createHeuristicsAdapter(CostCalculator<T> costCalculator) {
-    assertNotNull(bestNumberOfTransfers);
+    Objects.requireNonNull(bestNumberOfTransfers);
     return new HeuristicsAdapter(
       bestTimes(),
       this.bestNumberOfTransfers,
@@ -124,19 +135,27 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private BestTimesOnlyStopArrivalsState<T> bestTimeStopArrivalsState() {
-    return new BestTimesOnlyStopArrivalsState<>(bestTimes(), simpleBestNumberOfTransfers());
+    return new BestTimesOnlyStopArrivalsState<>(
+      bestTimes(),
+      simpleBestNumberOfTransfers(),
+      new UnknownPathFactory<>(
+        bestTimes(),
+        simpleBestNumberOfTransfers(),
+        ctx.calculator(),
+        ctx.lifeCycle(),
+        ctx.egressPaths()
+      )
+    );
   }
 
   /**
    * Return instance if created by heuristics or null if not needed.
    */
   private SimpleBestNumberOfTransfers simpleBestNumberOfTransfers() {
-    SimpleBestNumberOfTransfers value = new SimpleBestNumberOfTransfers(
-      ctx.nStops(),
-      ctx.roundProvider()
+    return withBestNumberOfTransfers(
+      SimpleBestNumberOfTransfers.class,
+      () -> new SimpleBestNumberOfTransfers(ctx.nStops(), ctx.roundProvider())
     );
-    setBestNumberOfTransfers(value);
-    return value;
   }
 
   /**
@@ -165,20 +184,29 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private StdStopArrivals<T> stopArrivals() {
-    if (arrivals == null) {
-      arrivals = new StdStopArrivals<>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider());
-      setBestNumberOfTransfers(arrivals);
-    }
-    return arrivals;
+    //noinspection unchecked
+    return withBestNumberOfTransfers(
+      StdStopArrivals.class,
+      () -> new StdStopArrivals<T>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider())
+    );
   }
 
-  private void setBestNumberOfTransfers(BestNumberOfTransfers bestNumberOfTransfers) {
-    assertSetValueIsNull(
-      "bestNumberOfTransfers",
-      this.bestNumberOfTransfers,
-      bestNumberOfTransfers
-    );
-    this.bestNumberOfTransfers = bestNumberOfTransfers;
+  @SuppressWarnings("unchecked")
+  private <S extends BestNumberOfTransfers> S withBestNumberOfTransfers(
+    Class<S> type,
+    Supplier<S> newValueFactory
+  ) {
+    if (this.bestNumberOfTransfers == null) {
+      this.bestNumberOfTransfers = newValueFactory.get();
+    } else if (this.bestNumberOfTransfers.getClass() != type) {
+      throw new IllegalStateException(
+        "There is more than one type of 'bestNumberOfTransfers': " +
+        type.getSimpleName() +
+        ", " +
+        this.bestNumberOfTransfers.getClass().getSimpleName()
+      );
+    }
+    return (S) this.bestNumberOfTransfers;
   }
 
   private StopsCursor<T> stopsCursor() {
@@ -226,7 +254,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     // Cache best times; request scope
     if (destinationCheck != null) {
       throw new IllegalStateException(
-        "ArrivedAtDestinationCheck is alredy initialized: " +
+        "ArrivedAtDestinationCheck is already initialized: " +
         destinationCheck.getClass().getSimpleName()
       );
     }
@@ -235,24 +263,5 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private SimpleArrivedAtDestinationCheck simpleDestinationCheck() {
     return new SimpleArrivedAtDestinationCheck(ctx.egressStops(), bestTimes());
-  }
-
-  private void assertSetValueIsNull(String name, Object setValue, Object newValue) {
-    if (setValue != null) {
-      throw new IllegalStateException(
-        "There is more than one instance of " +
-        name +
-        ": " +
-        newValue.getClass().getSimpleName() +
-        ", " +
-        setValue.getClass().getSimpleName()
-      );
-    }
-  }
-
-  private void assertNotNull(Object value) {
-    if (value == null) {
-      throw new NullPointerException();
-    }
   }
 }

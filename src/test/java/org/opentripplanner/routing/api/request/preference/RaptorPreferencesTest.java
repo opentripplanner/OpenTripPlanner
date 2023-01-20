@@ -8,12 +8,14 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
-import org.opentripplanner.raptor.spi.SearchDirection;
 
 class RaptorPreferencesTest {
 
@@ -47,17 +49,34 @@ class RaptorPreferencesTest {
   }
 
   @Test
-  void getProfile() {
+  void optimizationAssetEmptySetOfUsesEnumSetNoneOf() {
+    // EnumSet copyOf does not work with empty set, so it needs to be treated as a
+    // special case in the builder, using EnumSet.noneOf
+    var subject = RaptorPreferences.of().withOptimizations(List.of()).build();
+    assertEquals(EnumSet.noneOf(Optimization.class), subject.optimizations());
+  }
+
+  @Test
+  void optimizationAssetDefault() {
+    var subject = RaptorPreferences.of().build();
+    assertEquals(
+      EnumSet.of(Optimization.PARETO_CHECK_AGAINST_DESTINATION),
+      subject.optimizations()
+    );
+  }
+
+  @Test
+  void profile() {
     assertEquals(PROFILE, subject.profile());
   }
 
   @Test
-  void getSearchDirection() {
+  void searchDirection() {
     assertEquals(SEARCH_DIRECTION, subject.searchDirection());
   }
 
   @Test
-  void getTimeLimit() {
+  void timeLimit() {
     assertEquals(TIME_LIMIT, subject.timeLimit());
   }
 

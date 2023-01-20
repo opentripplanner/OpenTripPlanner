@@ -11,7 +11,7 @@ public enum RaptorProfile {
   /**
    * Multi criteria pareto search.
    */
-  MULTI_CRITERIA("Mc"),
+  MULTI_CRITERIA("Mc", true),
 
   /**
    * Used by Range Raptor finding the earliest-arrival-time, the shortest travel duration and the
@@ -19,32 +19,39 @@ public enum RaptorProfile {
    * <p/>
    * Computes result paths.
    */
-  STANDARD("Standard"),
+  STANDARD("Standard", true),
 
   /**
    * Same as {@link #STANDARD}, but no paths are computed/returned.
    */
-  BEST_TIME("StdBestTime"),
+  BEST_TIME("StdBestTime", false),
 
   /**
    * Used by Raptor to find the shortest travel duration ignoring wait-time. It also finds number
    * transfers. This profile can only be used with one Raptor iteration - no {code searchWindow}.
    */
-  MIN_TRAVEL_DURATION("MinTravelDuration"),
+  MIN_TRAVEL_DURATION("MinTravelDuration", true),
 
   /**
    * Same as {@link #MIN_TRAVEL_DURATION}, but no paths are computed/returned.
    */
-  MIN_TRAVEL_DURATION_BEST_TIME("MinTravelDurationBT");
+  MIN_TRAVEL_DURATION_BEST_TIME("MinTravelDurationBT", false);
+
+  private final boolean supportsConstrainedTransfers;
 
   private final String abbreviation;
 
-  RaptorProfile(String abbreviation) {
+  RaptorProfile(String abbreviation, boolean supportsConstrainedTransfers) {
+    this.supportsConstrainedTransfers = supportsConstrainedTransfers;
     this.abbreviation = abbreviation;
   }
 
   public final String abbreviation() {
     return abbreviation;
+  }
+
+  public boolean supportsConstrainedTransfers() {
+    return supportsConstrainedTransfers;
   }
 
   public boolean is(RaptorProfile candidate) {

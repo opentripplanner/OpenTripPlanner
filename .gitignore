@@ -39,6 +39,7 @@ target/
 /graphs
 
 # for local dev only
+/src/test/resources/speedtest/travelSearch-results-*.csv
 src/ext/resources/reportapi/report.csv
 
 streetGraph.obj

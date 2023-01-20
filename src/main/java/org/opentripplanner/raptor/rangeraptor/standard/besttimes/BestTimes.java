@@ -137,7 +137,7 @@ public final class BestTimes {
       .of(BestTimes.class)
       .addIntArraySize("times", times, unreachedTime)
       .addIntArraySize("transitArrivalTimes", transitArrivalTimes, unreachedTime)
-      .addNum("reachedCurrentRound", reachedCurrentRound.size())
+      .addBitSetSize("reachedCurrentRound", reachedCurrentRound)
       .addBitSetSize("reachedByTransitCurrentRound", reachedByTransitCurrentRound)
       .addBitSetSize("reachedLastRound", reachedLastRound)
       .toString();

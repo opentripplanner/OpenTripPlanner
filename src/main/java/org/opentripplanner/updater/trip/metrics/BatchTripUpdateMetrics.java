@@ -9,9 +9,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.updater.trip.UpdateResult;
+import org.opentripplanner.model.UpdateSuccess;
+import org.opentripplanner.updater.UpdateResult;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 /**
@@ -25,7 +27,9 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
   protected static final String METRICS_PREFIX = "batch_trip_updates";
   private final AtomicInteger successfulGauge;
   private final AtomicInteger failureGauge;
+  private final AtomicInteger warningsGauge;
   private final Map<UpdateError.UpdateErrorType, AtomicInteger> failuresByType = new HashMap<>();
+  private final Map<UpdateSuccess.WarningType, AtomicInteger> warningsByType = new HashMap<>();
 
   public BatchTripUpdateMetrics(UrlUpdaterParameters parameters) {
     super(parameters);
@@ -36,12 +40,41 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
       );
     this.failureGauge =
       getGauge("failed", "Trip updates that failed to apply at the most recent update");
+
+    this.warningsGauge =
+      getGauge("warnings", "Number of warnings when successfully applying trip updates");
   }
 
   public void setGauges(UpdateResult result) {
     this.successfulGauge.set(result.successful());
     this.failureGauge.set(result.failed());
+    this.warningsGauge.set(result.warnings().size());
 
+    setFailureTypes(result);
+
+    setWarnings(result);
+  }
+
+  private void setWarnings(UpdateResult result) {
+    // we have to set the warnings from the previous update to zero
+    Set.copyOf(warningsByType.values()).forEach(i -> i.set(0));
+
+    for (var warningType : result.warnings()) {
+      var counter = warningsByType.get(warningType);
+      if (Objects.isNull(counter)) {
+        counter =
+          getGauge(
+            "warning_type",
+            "Warning types of the most recent update",
+            Tag.of("warningType", warningType.name())
+          );
+        warningsByType.put(warningType, counter);
+      }
+      counter.getAndIncrement();
+    }
+  }
+
+  private void setFailureTypes(UpdateResult result) {
     for (var errorType : result.failures().keySet()) {
       var counter = failuresByType.get(errorType);
       if (Objects.isNull(counter)) {

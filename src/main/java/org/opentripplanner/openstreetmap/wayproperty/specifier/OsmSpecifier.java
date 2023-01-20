@@ -10,7 +10,7 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * How the scoring logic is implemented is the responsibility of the implementations.
  */
 public interface OsmSpecifier {
-  static Condition[] parseEqualsTests(String spec, String separator) {
+  static Condition[] parseConditions(String spec, String separator) {
     return Arrays
       .stream(spec.split(separator))
       .filter(p -> !p.isEmpty())

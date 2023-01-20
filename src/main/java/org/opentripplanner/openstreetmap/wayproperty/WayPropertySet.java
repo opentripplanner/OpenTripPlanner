@@ -15,7 +15,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
@@ -124,7 +123,7 @@ public class WayPropertySet {
       if (score.backward() > 0) {
         backwardMixins.add(mixin);
       }
-      if (score.backward() > 0) {
+      if (score.forward() > 0) {
         forwardMixins.add(mixin);
       }
     }
@@ -132,6 +131,7 @@ public class WayPropertySet {
     float forwardSpeed = getCarSpeedForWay(way, false);
     float backSpeed = getCarSpeedForWay(way, true);
     StreetTraversalPermission permission = forwardResult.getPermission();
+    StreetTraversalPermission backwardPermission = backwardResult.getPermission();
 
     WayProperties result = forwardResult
       .mutate()
@@ -141,7 +141,7 @@ public class WayPropertySet {
           : defaultBicycleSafetyForPermission.apply(permission, forwardSpeed, way),
         backwardResult.getBicycleSafetyFeatures() != null
           ? backwardResult.getBicycleSafetyFeatures().back()
-          : defaultBicycleSafetyForPermission.apply(permission, backSpeed, way)
+          : defaultBicycleSafetyForPermission.apply(backwardPermission, backSpeed, way)
       )
       .walkSafety(
         forwardResult.getWalkSafetyFeatures() != null
@@ -149,16 +149,16 @@ public class WayPropertySet {
           : defaultWalkSafetyForPermission.apply(permission, forwardSpeed, way),
         backwardResult.getWalkSafetyFeatures() != null
           ? backwardResult.getWalkSafetyFeatures().back()
-          : defaultWalkSafetyForPermission.apply(permission, backSpeed, way)
+          : defaultWalkSafetyForPermission.apply(backwardPermission, backSpeed, way)
       )
       .build();
 
     /* apply mixins */
     if (backwardMixins.size() > 0) {
-      result = applyMixins(result, backwardMixins, false);
+      result = applyMixins(result, backwardMixins, true);
     }
     if (forwardMixins.size() > 0) {
-      result = applyMixins(result, forwardMixins, true);
+      result = applyMixins(result, forwardMixins, false);
     }
     if (
       (bestBackwardScore == 0 || bestForwardScore == 0) &&
@@ -468,7 +468,7 @@ public class WayPropertySet {
   private WayProperties applyMixins(
     WayProperties result,
     List<MixinProperties> mixins,
-    boolean back
+    boolean backward
   ) {
     SafetyFeatures bicycleSafetyFeatures = result.getBicycleSafetyFeatures();
     double forwardBicycle = bicycleSafetyFeatures.forward();
@@ -477,7 +477,7 @@ public class WayPropertySet {
     double forwardWalk = walkSafetyFeatures.forward();
     double backWalk = walkSafetyFeatures.back();
     for (var mixin : mixins) {
-      if (back) {
+      if (backward) {
         if (mixin.bicycleSafety() != null) {
           backBicycle *= mixin.bicycleSafety().back();
         }

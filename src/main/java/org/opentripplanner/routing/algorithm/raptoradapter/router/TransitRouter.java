@@ -9,7 +9,7 @@ import java.util.concurrent.CompletionException;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
@@ -74,10 +74,6 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    if (request.journey().transit().modes().isEmpty()) {
-      return new TransitRouterResult(List.of(), null);
-    }
-
     if (!serverContext.transitService().transitFeedCovers(request.dateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
@@ -117,9 +113,9 @@ public class TransitRouter {
 
     debugTimingAggregator.finishedRaptorSearch();
 
-    Collection<Path<TripSchedule>> paths = transitResponse.paths();
+    Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
 
-    if (OTPFeature.OptimizeTransfers.isOn()) {
+    if (OTPFeature.OptimizeTransfers.isOn() && !transitResponse.containsUnknownPaths()) {
       paths =
         TransferOptimizationServiceConfigurator
           .createOptimizeTransferService(
@@ -128,7 +124,6 @@ public class TransitRouter {
             serverContext.transitService().getTransferService(),
             requestTransitDataProvider,
             transitLayer.getStopBoardAlightCosts(),
-            raptorRequest,
             request.preferences().transfer().optimization()
           )
           .optimize(transitResponse.paths());
@@ -136,7 +131,7 @@ public class TransitRouter {
 
     // Create itineraries
 
-    RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper(
+    RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper<>(
       serverContext.graph(),
       serverContext.transitService(),
       transitLayer,
