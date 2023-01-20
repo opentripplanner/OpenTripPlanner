@@ -10,7 +10,7 @@ import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPL
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceJsonExample;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;

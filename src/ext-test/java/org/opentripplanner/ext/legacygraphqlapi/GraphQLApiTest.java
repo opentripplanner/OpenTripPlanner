@@ -20,9 +20,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.standalone.configure.ConstructApplicationModule;
 import org.opentripplanner.test.support.FilePatternSource;
-import org.opentripplanner.test.support.PrettyPrinter;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -81,7 +81,7 @@ class GraphQLApiTest {
     if (!expectationFile.toFile().exists()) {
       Files.writeString(
         expectationFile,
-        PrettyPrinter.json(actualJson),
+        JsonSupport.prettyPrint(actualJson),
         StandardOpenOption.CREATE_NEW
       );
       fail(

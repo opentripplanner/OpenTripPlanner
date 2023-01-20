@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 
 import java.util.Collection;
 import java.util.HashMap;
