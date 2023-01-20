@@ -1497,17 +1497,11 @@ enum TransitMode {
     """AIRPLANE"""
     AIRPLANE
 
-    """BICYCLE"""
-    BICYCLE
-
     """BUS"""
     BUS
 
     """CABLE_CAR"""
     CABLE_CAR
-
-    """CAR"""
-    CAR
 
     """COACH"""
     COACH
@@ -1521,14 +1515,8 @@ enum TransitMode {
     """GONDOLA"""
     GONDOLA
 
-    """Only used internally. No use for API users."""
-    LEG_SWITCH
-
     """RAIL"""
     RAIL
-
-    """SCOOTER"""
-    SCOOTER
 
     """SUBWAY"""
     SUBWAY
@@ -1541,9 +1529,6 @@ enum TransitMode {
 
     """A taxi, possibly operated by a public transport agency."""
     TAXI
-
-    """A special transport mode, which includes all public transport."""
-    TRANSIT
 }
 
 """An object with an ID"""
