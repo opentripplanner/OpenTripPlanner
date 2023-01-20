@@ -18,6 +18,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -87,15 +88,14 @@ public class SiriAlertsUpdateHandler {
               sxElement.getProgress().equals(WorkflowStatusEnumeration.CLOSED)
             );
 
-          String situationNumber;
-          if (sxElement.getSituationNumber() != null) {
-            situationNumber = sxElement.getSituationNumber().getValue();
-          } else {
-            situationNumber = null;
+          if (sxElement.getSituationNumber() == null) {
+            continue;
           }
+          String situationNumber = sxElement.getSituationNumber().getValue();
+          FeedScopedId id = new FeedScopedId(feedId, situationNumber);
 
           if (expireSituation) {
-            alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
+            alerts.removeIf(transitAlert -> transitAlert.getId().equals(id));
             expiredCounter++;
           } else {
             TransitAlert alert = null;
@@ -110,17 +110,7 @@ public class SiriAlertsUpdateHandler {
               );
             }
             if (alert != null) {
-              alert.setId(situationNumber);
-              if (alert.getEntities().isEmpty()) {
-                LOG.info(
-                  "No match found for Alert - setting Unknown entity for situation with situationNumber {}",
-                  situationNumber
-                );
-                alert.addEntity(
-                  new EntitySelector.Unknown("Alert had no entities that could be handled")
-                );
-              }
-              alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
+              alerts.removeIf(transitAlert -> transitAlert.getId().equals(id));
               alerts.add(alert);
             }
           }
@@ -157,12 +147,12 @@ public class SiriAlertsUpdateHandler {
   }
 
   private TransitAlert handleAlert(PtSituationElement situation) {
-    TransitAlert alert = createAlertWithTexts(situation);
+    TransitAlertBuilder alert = createAlertWithTexts(situation);
 
     if (
-      (alert.alertHeaderText == null || alert.alertHeaderText.toString().isEmpty()) &&
-      (alert.alertDescriptionText == null || alert.alertDescriptionText.toString().isEmpty()) &&
-      (alert.alertDetailText == null || alert.alertDetailText.toString().isEmpty())
+      (alert.headerText() == null || alert.headerText().toString().isEmpty()) &&
+      (alert.descriptionText() == null || alert.descriptionText().toString().isEmpty()) &&
+      (alert.detailText() == null || alert.detailText().toString().isEmpty())
     ) {
       LOG.debug(
         "Empty Alert - ignoring situationNumber: {}",
@@ -191,10 +181,10 @@ public class SiriAlertsUpdateHandler {
       periods.add(new TimePeriod(0, TimePeriod.OPEN_ENDED));
     }
 
-    alert.setTimePeriods(periods);
+    alert.addTimePeriods(periods);
 
     if (situation.getPriority() != null) {
-      alert.priority = situation.getPriority().intValue();
+      alert.withPriority(situation.getPriority().intValue());
     }
 
     AffectsScopeStructure affectsStructure = situation.getAffects();
@@ -281,8 +271,7 @@ public class SiriAlertsUpdateHandler {
                       .getStopPoints()
                       .getAffectedStopPointsAndLinkProjectionToNextStopPoints();
                     for (Serializable serializable : stopPointsList) {
-                      if (serializable instanceof AffectedStopPointStructure) {
-                        AffectedStopPointStructure stopPointStructure = (AffectedStopPointStructure) serializable;
+                      if (serializable instanceof AffectedStopPointStructure stopPointStructure) {
                         affectedStops.add(stopPointStructure);
                       }
                     }
@@ -337,8 +326,7 @@ public class SiriAlertsUpdateHandler {
                   .getStopPoints()
                   .getAffectedStopPointsAndLinkProjectionToNextStopPoints();
                 for (Serializable serializable : stopPointsList) {
-                  if (serializable instanceof AffectedStopPointStructure) {
-                    AffectedStopPointStructure stopPointStructure = (AffectedStopPointStructure) serializable;
+                  if (serializable instanceof AffectedStopPointStructure stopPointStructure) {
                     affectedStops.add(stopPointStructure);
                   }
                 }
@@ -448,16 +436,25 @@ public class SiriAlertsUpdateHandler {
       }
     }
 
-    alert.alertType = situation.getReportType();
-
-    alert.severity = SiriSeverityMapper.getAlertSeverityForSiriSeverity(situation.getSeverity());
-
-    if (situation.getParticipantRef() != null) {
-      String codespace = situation.getParticipantRef().getValue();
-      alert.setFeedId(codespace + ":Authority:" + codespace); //TODO - SIRI: Should probably not assume this codespace -> authority rule
+    if (alert.entities().isEmpty()) {
+      LOG.info(
+        "No match found for Alert - setting Unknown entity for situation with situationNumber {}",
+        situation.getSituationNumber()
+      );
+      alert.addEntity(new EntitySelector.Unknown("Alert had no entities that could be handled"));
     }
 
-    return alert;
+    alert.withType(situation.getReportType());
+
+    alert.withSeverity(SiriSeverityMapper.getAlertSeverityForSiriSeverity(situation.getSeverity()));
+
+    // TODO: Add field for codespace
+    //    if (situation.getParticipantRef() != null) {
+    //      String codespace = situation.getParticipantRef().getValue();
+    //      alert.setFeedId(codespace + ":Authority:" + codespace); //TODO - SIRI: Should probably not assume this codespace -> authority rule
+    //    }
+
+    return alert.build();
   }
 
   private static FeedScopedId getStop(
@@ -501,17 +498,15 @@ public class SiriAlertsUpdateHandler {
   /*
    * Creates alert from PtSituation with all textual content
    */
-  private TransitAlert createAlertWithTexts(PtSituationElement situation) {
-    TransitAlert alert = new TransitAlert();
-
-    alert.alertDescriptionText = getTranslatedString(situation.getDescriptions());
-    alert.alertDetailText = getTranslatedString(situation.getDetails());
-    alert.alertAdviceText = getTranslatedString(situation.getAdvices());
-    alert.alertHeaderText = getTranslatedString(situation.getSummaries());
-    alert.alertUrl = getInfoLinkAsString(situation.getInfoLinks());
-    alert.setAlertUrlList(getInfoLinks(situation.getInfoLinks()));
-
-    return alert;
+  private TransitAlertBuilder createAlertWithTexts(PtSituationElement situation) {
+    return TransitAlert
+      .of(new FeedScopedId(feedId, situation.getSituationNumber().getValue()))
+      .withDescriptionText(getTranslatedString(situation.getDescriptions()))
+      .withDetailText(getTranslatedString(situation.getDetails()))
+      .withAdviceText(getTranslatedString(situation.getAdvices()))
+      .withHeaderText(getTranslatedString(situation.getSummaries()))
+      .withUrl(getInfoLinkAsString(situation.getInfoLinks()))
+      .addSiriUrls(getInfoLinks(situation.getInfoLinks()));
   }
 
   /*

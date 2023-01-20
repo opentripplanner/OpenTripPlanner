@@ -19,7 +19,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.stop.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.TranslatedString;
+import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.service.TransitService;
@@ -50,7 +52,7 @@ public class PtSituationElementType {
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(environment ->
-            relay.toGlobalId(NAME, ((TransitAlert) environment.getSource()).getId())
+            relay.toGlobalId(NAME, ((TransitAlert) environment.getSource()).getId().getId())
           )
           .build()
       )
@@ -64,7 +66,7 @@ public class PtSituationElementType {
             GqlUtil
               .getTransitService(environment)
               .getAgencyForId(
-                ((TransitAlert) environment.getSource()).getEntities()
+                ((TransitAlert) environment.getSource()).entities()
                   .stream()
                   .filter(EntitySelector.Agency.class::isInstance)
                   .map(EntitySelector.Agency.class::cast)
@@ -82,7 +84,7 @@ public class PtSituationElementType {
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).getEntities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Route.class::isInstance)
               .map(EntitySelector.Route.class::cast)
@@ -99,7 +101,7 @@ public class PtSituationElementType {
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).getEntities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Trip.class::isInstance)
               .map(EntitySelector.Trip.class::cast)
@@ -116,7 +118,7 @@ public class PtSituationElementType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).getEntities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Stop.class::isInstance)
               .map(EntitySelector.Stop.class::cast)
@@ -134,7 +136,7 @@ public class PtSituationElementType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopPlaceType))))
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).getEntities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Stop.class::isInstance)
               .map(EntitySelector.Stop.class::cast)
@@ -164,11 +166,11 @@ public class PtSituationElementType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Summary of situation in all different translations available")
           .dataFetcher(environment -> {
-            TransitAlert alert = environment.getSource();
-            if (alert.alertHeaderText instanceof TranslatedString) {
-              return ((TranslatedString) alert.alertHeaderText).getTranslations();
-            } else if (alert.alertHeaderText != null) {
-              return List.of(new AbstractMap.SimpleEntry<>(null, alert.alertHeaderText.toString()));
+            I18NString headerText = environment.<TransitAlert>getSource().headerText();
+            if (headerText instanceof TranslatedString translatedString) {
+              return translatedString.getTranslations();
+            } else if (headerText != null) {
+              return List.of(new AbstractMap.SimpleEntry<>(null, headerText.toString()));
             } else {
               return emptyList();
             }
@@ -182,13 +184,11 @@ public class PtSituationElementType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Description of situation in all different translations available")
           .dataFetcher(environment -> {
-            TransitAlert alert = environment.getSource();
-            if (alert.alertDescriptionText instanceof TranslatedString) {
-              return ((TranslatedString) alert.alertDescriptionText).getTranslations();
-            } else if (alert.alertDescriptionText != null) {
-              return List.of(
-                new AbstractMap.SimpleEntry<>(null, alert.alertDescriptionText.toString())
-              );
+            I18NString descriptionText = environment.<TransitAlert>getSource().descriptionText();
+            if (descriptionText instanceof TranslatedString translatedString) {
+              return translatedString.getTranslations();
+            } else if (descriptionText != null) {
+              return List.of(new AbstractMap.SimpleEntry<>(null, descriptionText.toString()));
             } else {
               return emptyList();
             }
@@ -202,11 +202,11 @@ public class PtSituationElementType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Advice of situation in all different translations available")
           .dataFetcher(environment -> {
-            TransitAlert alert = environment.getSource();
-            if (alert.alertAdviceText instanceof TranslatedString) {
-              return ((TranslatedString) alert.alertAdviceText).getTranslations();
-            } else if (alert.alertAdviceText != null) {
-              return List.of(new AbstractMap.SimpleEntry<>(null, alert.alertAdviceText.toString()));
+            I18NString adviceText = environment.<TransitAlert>getSource().adviceText();
+            if (adviceText instanceof TranslatedString translatedString) {
+              return translatedString.getTranslations();
+            } else if (adviceText != null) {
+              return List.of(new AbstractMap.SimpleEntry<>(null, adviceText.toString()));
             } else {
               return emptyList();
             }
@@ -220,9 +220,9 @@ public class PtSituationElementType {
           .type(new GraphQLList(new GraphQLNonNull(infoLinkType)))
           .description("Optional links to more information.")
           .dataFetcher(environment -> {
-            TransitAlert alert = environment.getSource();
-            if (!alert.getAlertUrlList().isEmpty()) {
-              return alert.getAlertUrlList();
+            List<AlertUrl> siriUrls = environment.<TransitAlert>getSource().siriUrls();
+            if (!siriUrls.isEmpty()) {
+              return siriUrls;
             }
             return null;
           })
@@ -252,7 +252,7 @@ public class PtSituationElementType {
           .name("reportType")
           .type(EnumTypes.REPORT_TYPE)
           .description("ReportType of this situation")
-          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).alertType)
+          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).type())
           .build()
       )
       .field(
@@ -271,7 +271,7 @@ public class PtSituationElementType {
           .type(EnumTypes.SEVERITY)
           .description("Severity of this situation ")
           .dataFetcher(environment ->
-            getTransmodelSeverity(((TransitAlert) environment.getSource()).severity)
+            getTransmodelSeverity(((TransitAlert) environment.getSource()).severity())
           )
           .build()
       )
@@ -281,7 +281,7 @@ public class PtSituationElementType {
           .name("priority")
           .type(Scalars.GraphQLInt)
           .description("Priority of this situation ")
-          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).priority)
+          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).priority())
           .build()
       )
       .field(
@@ -295,7 +295,7 @@ public class PtSituationElementType {
             GqlUtil
               .getTransitService(environment)
               .getAgencyForId(
-                ((TransitAlert) environment.getSource()).getEntities()
+                ((TransitAlert) environment.getSource()).entities()
                   .stream()
                   .filter(EntitySelector.Agency.class::isInstance)
                   .map(EntitySelector.Agency.class::cast)

@@ -1505,7 +1505,8 @@ public class TransmodelGraphQLSchema {
               alerts =
                 alerts
                   .stream()
-                  .filter(alert -> authorities.contains(alert.getFeedId()))
+                  // TODO: We need to store the reporting authority in a field
+                  .filter(alert -> authorities.contains(alert.getId().getFeedId()))
                   .collect(Collectors.toSet());
             }
             if ((environment.getArgument("severities") instanceof List)) {
@@ -1513,7 +1514,7 @@ public class TransmodelGraphQLSchema {
               alerts =
                 alerts
                   .stream()
-                  .filter(alert -> severities.contains(getTransmodelSeverity(alert.severity)))
+                  .filter(alert -> severities.contains(getTransmodelSeverity(alert.severity())))
                   .collect(Collectors.toSet());
             }
             return alerts;

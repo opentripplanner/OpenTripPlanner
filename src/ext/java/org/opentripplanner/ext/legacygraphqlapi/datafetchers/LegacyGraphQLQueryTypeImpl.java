@@ -137,17 +137,18 @@ public class LegacyGraphQLQueryTypeImpl
         .stream()
         .filter(alert ->
           args.getLegacyGraphQLFeeds() == null ||
-          ((List<String>) args.getLegacyGraphQLFeeds()).contains(alert.getFeedId())
+          ((List<String>) args.getLegacyGraphQLFeeds()).contains(alert.getId().getFeedId())
         )
         .filter(alert ->
-          severities == null || severities.contains(getLegacyGraphQLSeverity(alert.severity))
+          severities == null || severities.contains(getLegacyGraphQLSeverity(alert.severity()))
         )
-        .filter(alert -> effects == null || effects.contains(getLegacyGraphQLEffect(alert.effect)))
-        .filter(alert -> causes == null || causes.contains(getLegacyGraphQLCause(alert.cause)))
+        .filter(alert -> effects == null || effects.contains(getLegacyGraphQLEffect(alert.effect()))
+        )
+        .filter(alert -> causes == null || causes.contains(getLegacyGraphQLCause(alert.cause())))
         .filter(alert ->
           args.getLegacyGraphQLRoute() == null ||
           alert
-            .getEntities()
+            .entities()
             .stream()
             .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
             .map(EntitySelector.Route.class::cast)
@@ -158,7 +159,7 @@ public class LegacyGraphQLQueryTypeImpl
         .filter(alert ->
           args.getLegacyGraphQLStop() == null ||
           alert
-            .getEntities()
+            .entities()
             .stream()
             .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
             .map(EntitySelector.Stop.class::cast)
