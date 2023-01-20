@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.alertpatch;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -30,6 +31,9 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   private final AlertEffect effect;
   //null means unknown
   private final Integer priority;
+  private final ZonedDateTime creationTime;
+  private final ZonedDateTime updatedTime;
+  private final String siriCodespace;
   private final Set<EntitySelector> entities;
   private final List<TimePeriod> timePeriods;
 
@@ -46,6 +50,9 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     this.cause = builder.cause();
     this.effect = builder.effect();
     this.priority = builder.priority();
+    this.creationTime = builder.creationTime();
+    this.updatedTime = builder.updatedTime();
+    this.siriCodespace = builder.siriCodespace();
     this.entities = Set.copyOf(builder.entities());
     this.timePeriods = List.copyOf(builder.timePeriods());
   }
@@ -105,6 +112,18 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
 
   public Integer priority() {
     return priority;
+  }
+
+  public ZonedDateTime creationTime() {
+    return creationTime;
+  }
+
+  public ZonedDateTime updatedTime() {
+    return updatedTime;
+  }
+
+  public String siriCodespace() {
+    return siriCodespace;
   }
 
   public Set<EntitySelector> entities() {
@@ -174,6 +193,9 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       Objects.equals(cause, other.cause) &&
       Objects.equals(effect, other.effect) &&
       Objects.equals(priority, other.priority) &&
+      Objects.equals(creationTime, other.creationTime) &&
+      Objects.equals(updatedTime, other.updatedTime) &&
+      Objects.equals(siriCodespace, other.siriCodespace) &&
       Objects.equals(entities, other.entities) &&
       Objects.equals(timePeriods, other.timePeriods)
     );

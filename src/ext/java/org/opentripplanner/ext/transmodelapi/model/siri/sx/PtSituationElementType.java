@@ -11,6 +11,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +41,7 @@ public class PtSituationElementType {
     GraphQLOutputType multilingualStringType,
     GraphQLObjectType validityPeriodType,
     GraphQLObjectType infoLinkType,
+    GqlUtil gqlUtil,
     Relay relay
   ) {
     return GraphQLObjectType
@@ -261,7 +263,7 @@ public class PtSituationElementType {
           .name("situationNumber")
           .type(Scalars.GraphQLString)
           .description("Operator's internal id for this situation")
-          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).getId())
+          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).getId().getId())
           .build()
       )
       .field(
@@ -287,23 +289,61 @@ public class PtSituationElementType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
+          .name("creationTime")
+          .type(gqlUtil.dateTimeScalar)
+          .description("Timestamp for when the situation was created.")
+          .dataFetcher(environment -> {
+            final ZonedDateTime creationTime = environment.<TransitAlert>getSource().creationTime();
+            return creationTime == null ? null : creationTime.toInstant().toEpochMilli();
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("versionedAtTime")
+          .type(gqlUtil.dateTimeScalar)
+          .description("Timestamp when the situation element was updated.")
+          .dataFetcher(environment -> {
+            final ZonedDateTime updatedTime = environment.<TransitAlert>getSource().updatedTime();
+            return updatedTime == null ? null : updatedTime.toInstant().toEpochMilli();
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("participant")
+          .type(Scalars.GraphQLString)
+          .description("Codespace of the data source.")
+          .dataFetcher(environment -> environment.<TransitAlert>getSource().siriCodespace())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
           .name("reportAuthority")
           .type(authorityType)
-          .description("Authority that reported this situation")
-          .deprecate("Not yet officially supported. May be removed or renamed.")
-          .dataFetcher(environment ->
-            GqlUtil
-              .getTransitService(environment)
-              .getAgencyForId(
-                ((TransitAlert) environment.getSource()).entities()
-                  .stream()
-                  .filter(EntitySelector.Agency.class::isInstance)
-                  .map(EntitySelector.Agency.class::cast)
-                  .findAny()
-                  .map(EntitySelector.Agency::agencyId)
-                  .orElse(null)
-              )
+          .description(
+            "Authority that reported this situation. Always returns the first agency in the codespace"
           )
+          .deprecate("Not yet officially supported. May be removed or renamed.")
+          .dataFetcher(environment -> {
+            TransitAlert alert = environment.getSource();
+            String feedId = alert.getId().getFeedId();
+            String codespace = alert.siriCodespace();
+            if (codespace == null) {
+              return null;
+            }
+            return GqlUtil
+              .getTransitService(environment)
+              .getAgencies()
+              .stream()
+              .filter(agency -> agency.getId().getFeedId().equals(feedId))
+              .filter(agency -> agency.getId().getId().startsWith(codespace))
+              .findFirst()
+              .orElse(null);
+          })
           .build()
       )
       .build();

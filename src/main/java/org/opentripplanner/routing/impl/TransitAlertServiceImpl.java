@@ -48,7 +48,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public TransitAlert getAlertById(String id) {
+  public TransitAlert getAlertById(FeedScopedId id) {
     return alerts
       .values()
       .stream()

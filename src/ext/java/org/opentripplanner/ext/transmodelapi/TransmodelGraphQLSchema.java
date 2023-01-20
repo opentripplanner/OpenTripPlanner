@@ -31,10 +31,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
@@ -127,8 +130,8 @@ public class TransmodelGraphQLSchema {
     this.routing = new DefaultRouteRequestType(defaultRequest);
   }
 
-  public static GraphQLSchema create(RouteRequest defaultRequest, GqlUtil qglUtil) {
-    return new TransmodelGraphQLSchema(defaultRequest, qglUtil).create();
+  public static GraphQLSchema create(RouteRequest defaultRequest, GqlUtil gqlUtil) {
+    return new TransmodelGraphQLSchema(defaultRequest, gqlUtil).create();
   }
 
   public GraphQLObjectType createPlanType(
@@ -285,6 +288,7 @@ public class TransmodelGraphQLSchema {
       multilingualStringType,
       validityPeriodType,
       infoLinkType,
+      gqlUtil,
       relay
     );
     GraphQLOutputType journeyPatternType = JourneyPatternType.create(
@@ -1484,6 +1488,17 @@ public class TransmodelGraphQLSchema {
               .newArgument()
               .name("authorities")
               .description("Filter by reporting authorities.")
+              .deprecate(
+                "Use codespaces instead. This only uses the codespace of the given authority."
+              )
+              .type(new GraphQLList(Scalars.GraphQLString))
+              .build()
+          )
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("codespaces")
+              .description("Filter by reporting source.")
               .type(new GraphQLList(Scalars.GraphQLString))
               .build()
           )
@@ -1500,16 +1515,32 @@ public class TransmodelGraphQLSchema {
               .getTransitService(environment)
               .getTransitAlertService()
               .getAllAlerts();
-            if ((environment.getArgument("authorities") instanceof List)) {
+
+            Set<String> codespaces = new HashSet<>();
+
+            if (environment.getArgument("authorities") instanceof List) {
               List<String> authorities = environment.getArgument("authorities");
+              authorities
+                .stream()
+                .map(authority -> authority.split(":")[0])
+                .filter(Objects::nonNull)
+                .filter(Predicate.not(String::isBlank))
+                .forEach(codespaces::add);
+            }
+
+            if (environment.getArgument("codespaces") instanceof List) {
+              codespaces.addAll((environment.getArgument("codespaces")));
+            }
+
+            if (!codespaces.isEmpty()) {
               alerts =
                 alerts
                   .stream()
-                  // TODO: We need to store the reporting authority in a field
-                  .filter(alert -> authorities.contains(alert.getId().getFeedId()))
+                  .filter(alert -> codespaces.contains(alert.siriCodespace()))
                   .collect(Collectors.toSet());
             }
-            if ((environment.getArgument("severities") instanceof List)) {
+
+            if (environment.getArgument("severities") instanceof List) {
               List<String> severities = environment.getArgument("severities");
               alerts =
                 alerts
@@ -1536,10 +1567,14 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
+            String situationNumber = environment.getArgument("situationNumber");
+            if (situationNumber.isBlank()) {
+              return null;
+            }
             return GqlUtil
               .getTransitService(environment)
               .getTransitAlertService()
-              .getAlertById(environment.getArgument("situationNumber"));
+              .getAlertById(TransitIdMapper.mapIDToDomain(situationNumber));
           })
           .build()
       )

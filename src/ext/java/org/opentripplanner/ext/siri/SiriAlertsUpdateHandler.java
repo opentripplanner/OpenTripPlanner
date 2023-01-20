@@ -161,6 +161,13 @@ public class SiriAlertsUpdateHandler {
       return null;
     }
 
+    if (situation.getCreationTime() != null) {
+      alert.withCreationTime(situation.getCreationTime());
+    }
+    if (situation.getVersionedAtTime() != null) {
+      alert.withUpdatedTime(situation.getVersionedAtTime());
+    }
+
     ArrayList<TimePeriod> periods = new ArrayList<>();
     if (situation.getValidityPeriods().size() > 0) {
       for (HalfOpenTimestampOutputRangeStructure activePeriod : situation.getValidityPeriods()) {
@@ -439,7 +446,7 @@ public class SiriAlertsUpdateHandler {
     if (alert.entities().isEmpty()) {
       LOG.info(
         "No match found for Alert - setting Unknown entity for situation with situationNumber {}",
-        situation.getSituationNumber()
+        alert.getId()
       );
       alert.addEntity(new EntitySelector.Unknown("Alert had no entities that could be handled"));
     }
@@ -448,11 +455,9 @@ public class SiriAlertsUpdateHandler {
 
     alert.withSeverity(SiriSeverityMapper.getAlertSeverityForSiriSeverity(situation.getSeverity()));
 
-    // TODO: Add field for codespace
-    //    if (situation.getParticipantRef() != null) {
-    //      String codespace = situation.getParticipantRef().getValue();
-    //      alert.setFeedId(codespace + ":Authority:" + codespace); //TODO - SIRI: Should probably not assume this codespace -> authority rule
-    //    }
+    if (situation.getParticipantRef() != null) {
+      alert.withSiriCodespace(situation.getParticipantRef().getValue());
+    }
 
     return alert.build();
   }

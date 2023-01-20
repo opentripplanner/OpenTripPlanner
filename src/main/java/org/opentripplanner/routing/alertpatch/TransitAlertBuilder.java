@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.alertpatch;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -23,6 +24,9 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
   private AlertEffect effect;
   //null means unknown
   private Integer priority;
+  private ZonedDateTime creationTime;
+  private ZonedDateTime updatedTime;
+  private String siriCodespace;
   private final Set<EntitySelector> entities = new HashSet<>();
   private final List<TimePeriod> timePeriods = new ArrayList<>();
 
@@ -43,6 +47,9 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
     this.cause = original.cause();
     this.effect = original.effect();
     this.priority = original.priority();
+    this.creationTime = original.creationTime();
+    this.updatedTime = original.updatedTime();
+    this.siriCodespace = original.siriCodespace();
     this.entities.addAll(original.entities());
     this.timePeriods.addAll(original.timePeriods());
   }
@@ -148,6 +155,33 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
 
   public TransitAlertBuilder withPriority(Integer priority) {
     this.priority = priority;
+    return this;
+  }
+
+  public ZonedDateTime creationTime() {
+    return creationTime;
+  }
+
+  public TransitAlertBuilder withCreationTime(ZonedDateTime creationTime) {
+    this.creationTime = creationTime;
+    return this;
+  }
+
+  public ZonedDateTime updatedTime() {
+    return updatedTime;
+  }
+
+  public TransitAlertBuilder withUpdatedTime(ZonedDateTime updatedTime) {
+    this.updatedTime = updatedTime;
+    return this;
+  }
+
+  public String siriCodespace() {
+    return siriCodespace;
+  }
+
+  public TransitAlertBuilder withSiriCodespace(String siriCodespace) {
+    this.siriCodespace = siriCodespace;
     return this;
   }
 
