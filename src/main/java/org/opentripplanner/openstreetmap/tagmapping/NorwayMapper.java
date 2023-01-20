@@ -504,7 +504,7 @@ class NorwayMapper implements OsmTagMapper {
       new ExactMatchSpecifier(
         new Condition.Absent("tracktype"),
         new Condition.EqualsAnyInOrAbsent("surface", "unpaved"),
-        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service")
+        new Condition.EqualsAnyIn("highway", "track", "bridleway")
       ),
       ofBicycleSafety(1.8).walkSafety(1.6)
     );
@@ -512,7 +512,7 @@ class NorwayMapper implements OsmTagMapper {
       new ExactMatchSpecifier(
         new Condition.Equals("tracktype", "grade2"),
         new Condition.EqualsAnyInOrAbsent("surface", "unpaved"),
-        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service")
+        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service", "unclassified")
       ),
       ofBicycleSafety(1.4).walkSafety(1.4)
     );
@@ -520,7 +520,7 @@ class NorwayMapper implements OsmTagMapper {
       new ExactMatchSpecifier(
         new Condition.Equals("tracktype", "grade3"),
         new Condition.EqualsAnyInOrAbsent("surface", "unpaved"),
-        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service")
+        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service", "unclassified")
       ),
       ofBicycleSafety(1.8).walkSafety(1.6)
     );
@@ -528,7 +528,7 @@ class NorwayMapper implements OsmTagMapper {
       new ExactMatchSpecifier(
         new Condition.Equals("tracktype", "grade4"),
         new Condition.EqualsAnyInOrAbsent("surface", "unpaved"),
-        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service")
+        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service", "unclassified")
       ),
       ofBicycleSafety(2.3).walkSafety(1.8)
     );
@@ -536,7 +536,7 @@ class NorwayMapper implements OsmTagMapper {
       new ExactMatchSpecifier(
         new Condition.Equals("tracktype", "grade5"),
         new Condition.EqualsAnyInOrAbsent("surface", "unpaved"),
-        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service")
+        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service", "unclassified")
       ),
       ofBicycleSafety(2.3).walkSafety(2.4)
     );
