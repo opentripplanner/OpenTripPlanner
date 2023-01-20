@@ -11,11 +11,10 @@
 This section covers all options that can be set in the *router-config.json* in the 
 [updaters](RouterConfiguration.md) section.
 
-Real-time data are those that are added to OTP not during the graph build phase but during runtime.
+Real-time data are those that are not added to OTP during the graph build phase but during runtime.
 
 Real-time data sources are configured in the `updaters` section is an array of JSON objects, each
-of which has a `type` field and other configuration fields specific to that type. Common to all
-updater entries that connect to a network resource is the `url` field.
+of which has a `type` field and other configuration fields specific to that type. 
 
 ## GTFS-Realtime
 
