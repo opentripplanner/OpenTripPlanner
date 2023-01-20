@@ -188,27 +188,27 @@ public class GeometryUtils {
   }
 
   /**
-   * Splits a line string into a number of partitions with the same number of coordinates.
+   * Splits a line string into a number of segments with the same number of coordinates.
    * <p>
-   * The last coordinate of partition n will also be the first coordinate of partition n+1 so all
+   * The last coordinate of segment n will also be the first coordinate of segment n+1 so all
    * partitions together will represent the original line string without gaps.
    *
-   * @param segmentSize How many coordinates should be in each partition.
+   * @param segmentSize How many coordinates should be in each segment.
    */
   public static List<LineString> partitionLineString(LineString input, int segmentSize) {
-    var partitions = Lists.partition(Arrays.asList(input.getCoordinates()), segmentSize);
+    var segments = Lists.partition(Arrays.asList(input.getCoordinates()), segmentSize);
     var ret = new ArrayList<LineString>();
-    for (int i = 0; i < partitions.size() - 1; i++) {
-      var partition = new ArrayList<>(partitions.get(i));
-      // also add the first coordinate from the next partition
-      partition.add(partitions.get(i + 1).get(0));
+    for (int i = 0; i < segments.size() - 1; i++) {
+      var segment = new ArrayList<>(segments.get(i));
+      // also add the first coordinate from the next segment
+      segment.add(segments.get(i + 1).get(0));
 
-      var ls = gf.createLineString(partition.toArray(new Coordinate[0]));
+      var ls = gf.createLineString(segment.toArray(new Coordinate[0]));
       ret.add(ls);
     }
-    var lastPartition = partitions.get(partitions.size() - 1);
-    if (lastPartition.size() > 1) {
-      var lastLinestring = gf.createLineString(lastPartition.toArray(new Coordinate[0]));
+    var lastSegment = segments.get(segments.size() - 1);
+    if (lastSegment.size() > 1) {
+      var lastLinestring = gf.createLineString(lastSegment.toArray(new Coordinate[0]));
       ret.add(lastLinestring);
     }
 
