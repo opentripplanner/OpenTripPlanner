@@ -125,7 +125,7 @@ public class VehicleRentalSourceFactory {
         This feature is somewhat experimental and therefore turned off by default for the following reasons:
         
         - It delays start up of OTP. How long is dependent on the complexity of the zones. For example in Oslo it takes 6 seconds to compute while Portland takes 25 seconds.
-        - It's easy for a malformed or unintended geofencing zone to make routing impossible. If you encounter such a case, please file a bug.
+        - It's easy for a malformed or unintended geofencing zone to make routing impossible. If you encounter such a case, please file a bug report.
         """
       )
       .asBoolean(false);
