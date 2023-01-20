@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.datastore.OtpDataStore;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -26,6 +25,7 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -76,10 +76,6 @@ public class SpeedTest {
     this.config = config;
     this.transitModel = transitModel;
 
-    var features = new OtpConfigLoader(opts.rootDir()).loadOtpConfig();
-    OTPFeature.enableFeatures(features.otpFeatures);
-    OTPFeature.logFeatureSetup();
-
     this.tcIO =
       new CsvFileSupport(
         opts.rootDir(),
@@ -124,8 +120,8 @@ public class SpeedTest {
       OtpStartupInfo.logInfo();
       // Given the following setup
       SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
-
       var config = SpeedTestConfig.config(opts.rootDir());
+      loadOtpFeatures(opts);
       var model = loadGraph(opts.rootDir(), config.graph);
       var transitModel = model.transitModel();
       var buildConfig = model.buildConfig();
@@ -303,6 +299,10 @@ public class SpeedTest {
 
   private TestCases currentTestCases() {
     return lastSampleResult.get(profile);
+  }
+
+  private static void loadOtpFeatures(SpeedTestCmdLineOpts opts) {
+    ConfigModel.initializeOtpFeatures(new OtpConfigLoader(opts.rootDir()).loadOtpConfig());
   }
 
   /**
