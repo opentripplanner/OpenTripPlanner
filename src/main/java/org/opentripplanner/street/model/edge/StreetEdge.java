@@ -388,6 +388,8 @@ public class StreetEdge
   public State traverse(State currentState) {
     final StateEditor editor;
 
+    // if the traversal is banned for the current state because of a GBFS geofencing zone
+    // we drop the vehicle and continue walking
     if (tov.traversalBanned(currentState)) {
       editor = doTraverse(currentState, TraverseMode.WALK, false);
       if (editor != null) {

@@ -182,8 +182,8 @@ public sealed interface TraversalExtension {
     private final TraversalExtension[] exts;
 
     private Composite(TraversalExtension... exts) {
-      for (var i : exts) {
-        if (i instanceof Composite) {
+      for (var ext : exts) {
+        if (ext instanceof Composite) {
           throw new IllegalArgumentException(
             "Composite extension cannot be nested into one another."
           );
