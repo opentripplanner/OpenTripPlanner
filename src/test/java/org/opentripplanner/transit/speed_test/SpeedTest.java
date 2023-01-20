@@ -7,7 +7,6 @@ import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetu
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.URI;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -115,6 +114,10 @@ public class SpeedTest {
     timer.setUp(opts.groupResultsByCategory());
   }
 
+  public TestStatus status() {
+    return status;
+  }
+
   public static void main(String[] args) {
     try {
       OtpStartupInfo.logInfo();
@@ -148,23 +151,6 @@ public class SpeedTest {
     }
   }
 
-  private static LoadModel loadGraph(File baseDir, URI path) {
-    File file = path == null
-      ? OtpDataStore.graphFile(baseDir)
-      : path.isAbsolute() ? new File(path) : new File(baseDir, path.getPath());
-    SerializedGraphObject serializedGraphObject = SerializedGraphObject.load(file);
-    Graph graph = serializedGraphObject.graph;
-
-    if (graph == null) {
-      throw new IllegalStateException();
-    }
-
-    TransitModel transitModel = serializedGraphObject.transitModel;
-    transitModel.index();
-    graph.index(transitModel.getStopModel());
-    return new LoadModel(graph, transitModel, serializedGraphObject.buildConfig);
-  }
-
   public void runTest() {
     final int nSamples = opts.numberOfTestsSamplesToRun();
     System.err.println("Run Speed Test [" + nSamples + " samples]");
@@ -180,10 +166,6 @@ public class SpeedTest {
     printProfileStatistics();
     saveTestCasesToResultFile();
     System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
-  }
-
-  public TestStatus status() {
-    return status;
   }
 
   /**
@@ -243,9 +225,45 @@ public class SpeedTest {
   }
 
   private RoutingResponse performRouting(TestCase testCase) {
-    var speedTestRequest = new SpeedTestRequest(testCase, opts, config, profile, getTimeZoneId());
+    var speedTestRequest = new SpeedTestRequest(
+      testCase,
+      opts,
+      config,
+      profile,
+      transitModel.getTimeZone()
+    );
     var routingRequest = speedTestRequest.toRouteRequest();
     return serverContext.routingService().route(routingRequest);
+  }
+
+  /* setup helper methods */
+
+  private static void loadOtpFeatures(SpeedTestCmdLineOpts opts) {
+    ConfigModel.initializeOtpFeatures(new OtpConfigLoader(opts.rootDir()).loadOtpConfig());
+  }
+
+  private static LoadModel loadGraph(File baseDir, URI path) {
+    File file = path == null
+      ? OtpDataStore.graphFile(baseDir)
+      : path.isAbsolute() ? new File(path) : new File(baseDir, path.getPath());
+    SerializedGraphObject serializedGraphObject = SerializedGraphObject.load(file);
+    Graph graph = serializedGraphObject.graph;
+
+    if (graph == null) {
+      throw new IllegalStateException();
+    }
+
+    TransitModel transitModel = serializedGraphObject.transitModel;
+    transitModel.index();
+    graph.index(transitModel.getStopModel());
+    return new LoadModel(graph, transitModel, serializedGraphObject.buildConfig);
+  }
+
+  private void initProfileStatistics() {
+    for (SpeedTestProfile key : opts.profiles()) {
+      workerResults.put(key, new ArrayList<>());
+      totalResults.put(key, new ArrayList<>());
+    }
   }
 
   private TestCases createTestCases() {
@@ -259,27 +277,18 @@ public class SpeedTest {
       .build();
   }
 
-  private void initProfileStatistics() {
-    for (SpeedTestProfile key : opts.profiles()) {
-      workerResults.put(key, new ArrayList<>());
-      totalResults.put(key, new ArrayList<>());
-    }
-  }
-
-  private void printProfileStatistics() {
-    ResultPrinter.printProfileResults("Worker: ", opts.profiles(), workerResults);
-    ResultPrinter.printProfileResults("Total:  ", opts.profiles(), totalResults);
-  }
-
-  private ZoneId getTimeZoneId() {
-    return transitModel.getTimeZone();
-  }
-
   private void forceGCToAvoidGCLater() {
     WeakReference<?> ref = new WeakReference<>(new Object());
     while (ref.get() != null) {
       System.gc();
     }
+  }
+
+  /* report helper methods */
+
+  private void printProfileStatistics() {
+    ResultPrinter.printProfileResults("Worker: ", opts.profiles(), workerResults);
+    ResultPrinter.printProfileResults("Total:  ", opts.profiles(), totalResults);
   }
 
   /**
@@ -288,21 +297,13 @@ public class SpeedTest {
    * deleted, and the result to be copied to the expected-result by a mistake.
    */
   private void saveTestCasesToResultFile() {
-    var testCases = currentTestCases();
-    if (testCases.isFiltered()) {
+    var currentTestCases = lastSampleResult.get(profile);
+    if (currentTestCases.isFiltered()) {
       return;
     }
     for (var p : opts.profiles()) {
-      tcIO.writeResultsToFile(p, testCases);
+      tcIO.writeResultsToFile(p, currentTestCases);
     }
-  }
-
-  private TestCases currentTestCases() {
-    return lastSampleResult.get(profile);
-  }
-
-  private static void loadOtpFeatures(SpeedTestCmdLineOpts opts) {
-    ConfigModel.initializeOtpFeatures(new OtpConfigLoader(opts.rootDir()).loadOtpConfig());
   }
 
   /**
@@ -325,8 +326,6 @@ public class SpeedTest {
     timer.finishUp();
   }
 
-  record LoadModel(Graph graph, TransitModel transitModel, BuildConfig buildConfig) {}
-
   /**
    * Trim itineraries down to requested size ({@link SpeedTestCmdLineOpts#numOfItineraries()}).
    * This is also done by the itinerary filter, but if the itinerary filter is not run/in debug
@@ -340,4 +339,8 @@ public class SpeedTest {
     }
     return stream.limit(opts.numOfItineraries()).toList();
   }
+
+  /* inline classes */
+
+  record LoadModel(Graph graph, TransitModel transitModel, BuildConfig buildConfig) {}
 }
