@@ -14,6 +14,7 @@ theme:
     name: material
     features:
         - toc.integrate
+        - content.code.copy
     palette:
         primary: blue
         accent: blue

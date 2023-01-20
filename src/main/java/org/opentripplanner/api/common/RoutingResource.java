@@ -800,7 +800,7 @@ public abstract class RoutingResource {
           filterBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
         }
 
-        transit.filters().add(filterBuilder.build());
+        transit.setFilters(List.of(filterBuilder.build()));
       }
       {
         var debugRaptor = journey.transit().raptorDebugging();

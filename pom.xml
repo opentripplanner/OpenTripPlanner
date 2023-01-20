@@ -58,7 +58,7 @@
     <properties>
         <otp.serialization.version.id>81</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>28.0</geotools.version>
+        <geotools.version>28.1</geotools.version>
         <google.dagger.version>2.44.2</google.dagger.version>
         <jackson.version>2.14.1</jackson.version>
         <jersey.version>3.1.0</jersey.version>
@@ -553,7 +553,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>24.4.0</version>
+                <version>26.4.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -719,7 +719,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.11.0</version>
+            <version>5.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
