@@ -29,7 +29,7 @@
       "feedId": "TriMet"
     },
     {
-      "type": "bike-rental",
+      "type": "vehicle-rental",
       "frequencySec": 92,
       "sourceType": "gbfs",
       "url": "https://gbfs.biketownpdx.com/gbfs"
