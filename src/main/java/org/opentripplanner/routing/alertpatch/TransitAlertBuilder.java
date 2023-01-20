@@ -198,6 +198,11 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
     return this;
   }
 
+  public TransitAlertBuilder addEntites(List<EntitySelector> entitySelectors) {
+    entities.addAll(entitySelectors);
+    return this;
+  }
+
   public Collection<TimePeriod> timePeriods() {
     return timePeriods;
   }
