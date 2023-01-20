@@ -1,23 +1,25 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.join;
+import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig;
 
 /**
  * FEATURE UNDER TEST
@@ -34,7 +36,7 @@ public class B02_EgressTest implements RaptorTestConstants {
   );
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     data.withRoute(
       route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G)
         .withTimetable(schedule("0:10, 0:14, 0:18, 0:20, 0:24, 0:28"))
@@ -55,46 +57,33 @@ public class B02_EgressTest implements RaptorTestConstants {
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  @Test
-  public void standard() {
-    requestBuilder.profile(STANDARD);
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    // expect: one path with the latest departure time.
-    assertEquals(
-      "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx]",
-      PathUtils.pathsToString(response)
-    );
-  }
-
-  @Test
-  public void standardReverse() {
-    requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    // expect: one path with the latest departure time, same as found in the forward search.
-    assertEquals(
-      "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx]",
-      PathUtils.pathsToString(response)
-    );
-  }
-
-  @Test
-  public void multiCriteria() {
-    requestBuilder.profile(MULTI_CRITERIA).searchParams();
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    // expect: All pareto optimal paths
-    assertEquals(
-      join(
+  static List<RaptorModuleTestCase> testCases() {
+    return RaptorModuleTestCase
+      .of()
+      .add(
+        standard().not(TC_STANDARD_REV_ONE),
+        "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx]"
+      )
+      .add(
+        // When we run one iteration the egress "alighting" last is used as long as it
+        // arrives at the origin at the same time. In this case the "worst" path is kept.
+        TC_STANDARD_REV_ONE,
+        "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s 0tx]"
+      )
+      .add(
+        RaptorModuleTestConfig.multiCriteria(),
         "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx $2080]",
         "Walk 20s ~ B ~ BUS R1 0:10 0:24 ~ F ~ Walk 4m [0:09:40 0:28 18m20s 0tx $1960]",
         "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s 0tx $1722]"
-      ),
-      PathUtils.pathsToString(response)
-    );
+      )
+      .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource("testCases")
+  void testRaptor(RaptorModuleTestCase testCase) {
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 }
