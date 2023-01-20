@@ -37,9 +37,9 @@ class NorwayMapper implements OsmTagMapper {
       switch (permission) {
         case ALL, PEDESTRIAN_AND_CAR -> {
           if (
-            hasSidewalk.matches(way) ||
-            hasPrefixSidewalk.matchesLeft(way) ||
-            hasPrefixSidewalk.matchesRight(way)
+            hasSidewalk.isMatch(way) ||
+            hasPrefixSidewalk.isLeftMatch(way) ||
+            hasPrefixSidewalk.isRightMatch(way)
           ) {
             yield 1.1;
           }
@@ -132,19 +132,19 @@ class NorwayMapper implements OsmTagMapper {
       }
       // ~70 km/h or over
       else if (speedLimit >= 19.4f) {
-        if (isTrunkOrPrimary.matches(way)) {
+        if (isTrunkOrPrimary.isMatch(way)) {
           return cycleSafetyHighTraffic;
         } else return cycleSafetyMediumHighTraffic;
       }
       // between ~60 km/h and ~40 km/
       else if (speedLimit >= 11.1f) {
-        if (isTrunkOrPrimary.matches(way)) {
+        if (isTrunkOrPrimary.isMatch(way)) {
           // 60 km/h or 50 to 40 km/h
           return speedLimit >= 16.6f ? cycleSafetyMediumHighTraffic : cycleSafetyMediumTraffic;
-        } else if (isSecondaryHighway.matches(way)) {
+        } else if (isSecondaryHighway.isMatch(way)) {
           // ~60 km/h or 50 to 40 km/h
           return speedLimit >= 16.6f ? cycleSafetyMediumTraffic : cycleSafetyMediumLowTraffic;
-        } else if (isTertiaryHighway.matches(way)) {
+        } else if (isTertiaryHighway.isMatch(way)) {
           // ~60 to 50 km/h or 40 km/h
           return speedLimit >= 13.8f ? cycleSafetyMediumLowTraffic : cycleSafetyLowTraffic;
         }
