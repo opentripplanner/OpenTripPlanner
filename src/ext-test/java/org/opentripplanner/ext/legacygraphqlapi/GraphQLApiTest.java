@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -32,6 +33,7 @@ class GraphQLApiTest {
 
   static final OtpServerRequestContext context;
   static final Graph graph = new Graph();
+  static final LegacyGraphQLAPI resource;
 
   static {
     graph
@@ -60,9 +62,8 @@ class GraphQLApiTest {
         null,
         null
       );
+    resource = new LegacyGraphQLAPI(context, "ignored");
   }
-
-  static LegacyGraphQLAPI resource = new LegacyGraphQLAPI(context, "ignored");
 
   @FilePatternSource(pattern = "src/ext-test/resources/legacygraphqlapi/queries/*.graphql")
   @ParameterizedTest(name = "Check GraphQL query in {0}")
@@ -72,11 +73,7 @@ class GraphQLApiTest {
     var actualJson = extracted(response);
     assertEquals(200, response.getStatus());
 
-    var expectationFile = path
-      .getParent()
-      .getParent()
-      .resolve("expectations")
-      .resolve(path.getFileName().toString().replace(".graphql", ".json"));
+    Path expectationFile = getPath(path);
 
     if (!expectationFile.toFile().exists()) {
       Files.writeString(
@@ -91,6 +88,19 @@ class GraphQLApiTest {
 
     var expectedJson = Files.readString(expectationFile);
     assertEqualJson(expectedJson, actualJson);
+  }
+
+  /**
+   * Locate 'expectations' relative to the given query input file. The 'expectations' and 'queries'
+   * subdirectories are expected to be in the same directory.
+   */
+  @Nonnull
+  private static Path getPath(Path path) {
+    return path
+      .getParent()
+      .getParent()
+      .resolve("expectations")
+      .resolve(path.getFileName().toString().replace(".graphql", ".json"));
   }
 
   private static String extracted(Response response) {
