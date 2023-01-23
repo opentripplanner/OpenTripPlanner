@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
@@ -275,7 +274,7 @@ public abstract class RoutingResource {
    *   <a href="http://docs.opentripplanner.org/en/latest/Configuration/#routing-modes">Routing modes</a>.
    */
   @QueryParam("mode")
-  protected QualifiedModeSet modes = new QualifiedModeSet("TRANSIT,WALK");
+  protected QualifiedModeSet modes;
 
   /**
    * The minimum time, in seconds, between successive trips on different vehicles. This is designed
@@ -780,12 +779,11 @@ public abstract class RoutingResource {
           s -> selectors.add(SelectRequest.of().withRoutesFromString(s))
         );
 
-        // Create modes
-        var tModes = modes
-          .getTransitModes()
-          .stream()
-          .map(MainAndSubMode::new)
-          .collect(Collectors.toList());
+        var tModes = MainAndSubMode.all();
+        if (modes != null) {
+          // Create modes
+          tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
+        }
         if (tModes.isEmpty()) {
           tModes = MainAndSubMode.all();
         }
