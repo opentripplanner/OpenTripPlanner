@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
-import static org.opentripplanner.raptor.spi.SearchDirection.REVERSE;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,7 +90,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
   @Test
   public void multiCriteriaWithTimetable() {
-    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetableEnabled(true);
+    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetable(true);
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -118,7 +118,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
    */
   @Test
   public void multiCriteriaWithoutTimetable() {
-    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetableEnabled(false);
+    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetable(false);
 
     var response = raptorService.route(requestBuilder.build(), data);
 

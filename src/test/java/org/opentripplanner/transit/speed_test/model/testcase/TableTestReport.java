@@ -56,16 +56,16 @@ public class TableTestReport {
     Result result = e.element();
     table.addRow(
       e.status(TestStatus.OK.label, TestStatus.FAILED.label, TestStatus.WARN.label),
-      result.nTransfers,
+      result.nTransfers(),
       result.durationAsStr(),
-      result.cost,
-      TimeUtils.timeToStrLong(result.startTime),
-      TimeUtils.timeToStrLong(result.endTime),
-      toStr(result.modes),
-      toStr(result.agencies),
-      toStr(result.routes),
-      toStr(result.stops),
-      result.details
+      result.cost(),
+      TimeUtils.timeToStrLong(result.startTime()),
+      TimeUtils.timeToStrLong(result.endTime()),
+      toStr(result.modes()),
+      toStr(result.agencies()),
+      toStr(result.routes()),
+      toStr(result.stops()),
+      result.details()
     );
   }
 

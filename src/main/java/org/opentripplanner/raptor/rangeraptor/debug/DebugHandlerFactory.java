@@ -2,13 +2,13 @@ package org.opentripplanner.raptor.rangeraptor.debug;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.DebugRequest;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.DebugHandler;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 
 /**
@@ -24,7 +24,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 public class DebugHandlerFactory<T extends RaptorTripSchedule> {
 
   private final DebugHandler<ArrivalView<?>> stopHandler;
-  private final DebugHandler<Path<?>> pathHandler;
+  private final DebugHandler<RaptorPath<?>> pathHandler;
   private final DebugHandler<PatternRideView<?>> patternRideHandler;
   private final DebugLogger logger;
 
@@ -79,12 +79,12 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
   /* path */
 
   @Nullable
-  public ParetoSetDebugHandlerAdapter<Path<?>> paretoSetDebugPathListener() {
+  public ParetoSetDebugHandlerAdapter<RaptorPath<?>> paretoSetDebugPathListener() {
     return pathHandler == null ? null : new ParetoSetDebugHandlerAdapter<>(pathHandler);
   }
 
   @Nullable
-  public DebugHandler<Path<?>> debugPathArrival() {
+  public DebugHandler<RaptorPath<?>> debugPathArrival() {
     return pathHandler;
   }
 

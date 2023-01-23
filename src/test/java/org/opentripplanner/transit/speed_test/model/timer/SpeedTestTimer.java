@@ -27,6 +27,8 @@ import org.opentripplanner.routing.api.request.RoutingTag;
 
 public class SpeedTestTimer {
 
+  private static final int NOT_AVAILABLE = -1;
+
   private static final NamingConvention NAMING_CONVENTION = createNamingConvention();
   private static final long NANOS_TO_MILLIS = 1000000;
 
@@ -131,9 +133,14 @@ public class SpeedTestTimer {
     }
   }
 
+  /**
+   * Calculate the total time mean for the given timer. If the timer is not
+   * found {@link #NOT_AVAILABLE} is returned. This can be the case in unit tests,
+   * where not all parts of the code is run.
+   */
   public int totalTimerMean(String timerName) {
     long count = getTotalTimers(timerName).mapToLong(Timer::count).sum();
-    return (int) (testTotalTimeMs(timerName) / count);
+    return count == 0 ? NOT_AVAILABLE : (int) (testTotalTimeMs(timerName) / count);
   }
 
   public int testTotalTimeMs(String timerName) {

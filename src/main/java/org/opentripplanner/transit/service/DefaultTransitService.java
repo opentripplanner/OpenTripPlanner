@@ -2,6 +2,7 @@ package org.opentripplanner.transit.service;
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import jakarta.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -9,8 +10,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -76,6 +77,11 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<Agency> getAgencies() {
     return this.transitModel.getAgencies();
+  }
+
+  @Override
+  public Optional<Agency> findAgencyById(FeedScopedId id) {
+    return this.transitModel.findAgencyById(id);
   }
 
   @Override

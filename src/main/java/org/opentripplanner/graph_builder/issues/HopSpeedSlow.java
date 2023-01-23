@@ -28,4 +28,9 @@ public class HopSpeedSlow implements DataImportIssue {
     double kph = metersPerSecond * 3.6;
     return String.format(FMT, kph, distance, trip.getRoute().getId(), trip.getId(), seq);
   }
+
+  @Override
+  public int getPriority() {
+    return (int) metersPerSecond;
+  }
 }

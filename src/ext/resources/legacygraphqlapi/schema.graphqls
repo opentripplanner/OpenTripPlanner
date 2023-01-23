@@ -1,3 +1,13 @@
+"""
+Use an asynchronous data fetcher on a separate thread for this field.
+
+This is useful when adding several queries in the same HTTP request, for example by using a batch: Those
+fields annotated with this directive run in parallel.
+
+This is only worth it when the execution is long running, i.e. more than ~50 milliseconds, so this doesn't happen by default.
+"""
+directive @async on FIELD_DEFINITION
+
 schema {
     query: QueryType
 }
@@ -1376,6 +1386,28 @@ type Leg {
     dropOffBookingInfo: BookingInfo
 
     pickupBookingInfo: BookingInfo
+
+    """
+    Future legs with same origin and destination stops or stations
+    """
+    nextLegs(
+        """
+        The number of alternative legs searched. If fewer than the requested number are found,
+        then only the found legs are returned.
+        """
+        numberOfLegs: Int!
+
+        """
+        Transportation modes for which all stops in the parent station are used as possible origin stops
+        for the next legs. For modes not listed, only the exact origin stop of the leg is considered.
+        """
+        originModesWithParentStation: [TransitMode!]
+
+        """
+        Transportation modes for which all stops in the parent station are used as possible destination stops
+        for the next legs. For modes not listed, only the exact destination stop of the leg is considered.
+        """
+        destinationModesWithParentStation: [TransitMode!]): [Leg!]
 }
 
 """A span of time."""
@@ -1469,6 +1501,44 @@ enum Mode {
 
     """WALK"""
     WALK
+}
+
+enum TransitMode {
+    """AIRPLANE"""
+    AIRPLANE
+
+    """BUS"""
+    BUS
+
+    """CABLE_CAR"""
+    CABLE_CAR
+
+    """COACH"""
+    COACH
+
+    """FERRY"""
+    FERRY
+
+    """FUNICULAR"""
+    FUNICULAR
+
+    """GONDOLA"""
+    GONDOLA
+
+    """RAIL"""
+    RAIL
+
+    """SUBWAY"""
+    SUBWAY
+
+    """TRAM"""
+    TRAM
+
+    """"Private car trips shared with others."""
+    CARPOOL
+
+    """A taxi, possibly operated by a public transport agency."""
+    TAXI
 }
 
 """An object with an ID"""
@@ -2026,7 +2096,7 @@ type QueryType {
         after: String
         first: Int
         last: Int
-    ): placeAtDistanceConnection
+    ): placeAtDistanceConnection @async
 
     """
     Get a single departure row based on its ID (ID format is `FeedId:StopId:PatternId`)
@@ -2705,7 +2775,7 @@ type QueryType {
         If the value is set to be 0, safety is ignored. Default is 1.0.
         """
         walkSafetyFactor: Float
-    ): Plan
+    ): Plan @async
 }
 
 enum RealtimeState {

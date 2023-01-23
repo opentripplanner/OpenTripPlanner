@@ -30,7 +30,7 @@ public interface WorkerLifeCycle {
   void onRouteSearch(Consumer<Boolean> routeSearchWithDirectionSubscriber);
 
   /**
-   * Subscribe to 'setup iteration' events by register a int consumer. Every time an iteration start
+   * Subscribe to 'setup iteration' events by register an int consumer. Every time an iteration start
    * the listener(the input parameter) is notified with the {@code iterationDepartureTime} passed in
    * as an argument.
    *

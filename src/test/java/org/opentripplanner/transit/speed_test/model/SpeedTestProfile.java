@@ -3,66 +3,66 @@ package org.opentripplanner.transit.speed_test.model;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
-import org.opentripplanner.raptor.spi.SearchDirection;
 
 public enum SpeedTestProfile {
   standard(
-    "rr",
+    "sr",
     "Standard Range Raptor, super fast [ transfers, arrival time, travel time ].",
     RaptorProfile.STANDARD,
     SearchDirection.FORWARD
   ),
-  std_reverse(
-    "rrr",
+  standard_reverse(
+    "srr",
     "Reverse Standard Range Raptor",
     RaptorProfile.STANDARD,
     SearchDirection.REVERSE
   ),
   best_time(
     "bt",
-    "Best Time Range Raptor, super fast. Arrival time only, no path.",
+    "Best Time Range Raptor, super fast. Arrival times only, no path.",
     RaptorProfile.BEST_TIME,
     SearchDirection.FORWARD
   ),
-  std_best_time_reverse(
+  best_time_reverse(
     "btr",
     "Reverse Best Time Range Raptor",
     RaptorProfile.BEST_TIME,
     SearchDirection.REVERSE
   ),
-  min_travel_duration_std(
-    "td",
+  min_travel_duration(
+    "sd",
     "Standard Range Raptor without waiting time.",
     RaptorProfile.MIN_TRAVEL_DURATION,
     SearchDirection.FORWARD
   ),
-  min_travel_duration_std_reverse(
-    "tdr",
+  min_travel_duration_reverse(
+    "sdr",
     "Reverse Standard Range Raptor without waiting time.",
     RaptorProfile.MIN_TRAVEL_DURATION,
     SearchDirection.REVERSE
   ),
   min_travel_duration_best_time(
-    "tb",
+    "bd",
     "Best Time Range Raptor without waiting time.",
     RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME,
     SearchDirection.FORWARD
   ),
   min_travel_duration_best_time_reverse(
-    "tbr",
+    "bdr",
     "Reverse Best Time Range Raptor without waiting time.",
     RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME,
     SearchDirection.REVERSE
   ),
-  mc_range_raptor(
+  multi_criteria(
     "mc",
     "Multi-Criteria Range Raptor [ transfers, arrival time, travel time, cost ].",
     RaptorProfile.MULTI_CRITERIA,
     SearchDirection.FORWARD
   ),
-  mc_destination(
+  multi_criteria_destination(
     "md",
     "Multi-Criteria Range Raptor with destination pruning.",
     RaptorProfile.MULTI_CRITERIA,
@@ -99,6 +99,10 @@ public enum SpeedTestProfile {
 
   public static List<String> options() {
     return Arrays.stream(values()).map(SpeedTestProfile::description).collect(Collectors.toList());
+  }
+
+  public String shortName() {
+    return shortName;
   }
 
   public RaptorProfile raptorProfile() {

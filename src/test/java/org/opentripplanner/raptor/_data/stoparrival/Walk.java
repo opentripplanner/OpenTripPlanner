@@ -2,9 +2,9 @@ package org.opentripplanner.raptor._data.stoparrival;
 
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.TransferPathView;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
 
 public class Walk extends AbstractStopArrival {
 

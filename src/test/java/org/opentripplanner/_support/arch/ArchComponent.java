@@ -21,7 +21,11 @@ public interface ArchComponent {
   /**
    * All Java packages in {@code java.*} and {@code javax.*}
    */
-  Module JAVA_PACKAGES = Module.of(Package.of("java.."), Package.of("javax.(*).."));
+  Module JAVA_PACKAGES = Module.of(
+    Package.of("java.."),
+    Package.of("javax.(*).."),
+    Package.of("jakarta.(*)..")
+  );
   Module LOG_FRAMEWORK = Module.of(Package.of(LOG_FRAMEWORK_NAME));
 
   Collection<Package> packages();

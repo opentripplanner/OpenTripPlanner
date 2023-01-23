@@ -1,18 +1,16 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.core.RouteMatcher;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
@@ -31,29 +29,13 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
 
   private final boolean includePlannedCancellations;
 
-  private final AllowTransitModeFilter transitModeFilter;
-
-  private final Set<FeedScopedId> bannedRoutes;
+  private final List<TransitFilter> filters;
 
   private final Set<FeedScopedId> bannedTrips;
 
-  public RouteRequestTransitDataProviderFilter(
-    boolean requireBikesAllowed,
-    boolean wheelchairEnabled,
-    WheelchairPreferences wheelchairPreferences,
-    boolean includePlannedCancellations,
-    Collection<MainAndSubMode> allowedTransitModes,
-    Collection<FeedScopedId> bannedRoutes,
-    Collection<FeedScopedId> bannedTrips
-  ) {
-    this.requireBikesAllowed = requireBikesAllowed;
-    this.wheelchairEnabled = wheelchairEnabled;
-    this.wheelchairPreferences = wheelchairPreferences;
-    this.includePlannedCancellations = includePlannedCancellations;
-    this.bannedRoutes = Set.copyOf(bannedRoutes);
-    this.bannedTrips = Set.copyOf(bannedTrips);
-    this.transitModeFilter = AllowTransitModeFilter.of(allowedTransitModes);
-  }
+  private final Set<FeedScopedId> bannedRoutes;
+
+  private final boolean hasSubModeFilters;
 
   public RouteRequestTransitDataProviderFilter(
     RouteRequest request,
@@ -64,16 +46,35 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       request.wheelchair(),
       request.preferences().wheelchair(),
       request.preferences().transit().includePlannedCancellations(),
-      request.journey().transit().modes(),
-      bannedRoutes(
-        request.journey().transit().bannedAgencies(),
-        request.journey().transit().bannedRoutes(),
-        request.journey().transit().whiteListedAgencies(),
-        request.journey().transit().whiteListedRoutes(),
-        transitService.getAllRoutes()
-      ),
-      request.journey().transit().bannedTrips()
+      Set.copyOf(request.journey().transit().bannedTrips()),
+      bannedRoutes(request.journey().transit().filters(), transitService.getAllRoutes()),
+      request.journey().transit().filters()
     );
+  }
+
+  // This constructor is used only for testing
+  public RouteRequestTransitDataProviderFilter(
+    boolean requireBikesAllowed,
+    boolean wheelchairEnabled,
+    WheelchairPreferences wheelchairPreferences,
+    boolean includePlannedCancellations,
+    Set<FeedScopedId> bannedTrips,
+    Set<FeedScopedId> bannedRoutes,
+    List<TransitFilter> filters
+  ) {
+    this.requireBikesAllowed = requireBikesAllowed;
+    this.wheelchairEnabled = wheelchairEnabled;
+    this.wheelchairPreferences = wheelchairPreferences;
+    this.includePlannedCancellations = includePlannedCancellations;
+    this.bannedRoutes = Set.copyOf(bannedRoutes);
+    this.bannedTrips = bannedTrips;
+    this.filters = filters;
+    this.hasSubModeFilters = filters.stream().anyMatch(TransitFilter::isSubModePredicate);
+  }
+
+  @Override
+  public boolean hasSubModeFilters() {
+    return hasSubModeFilters;
   }
 
   public static BikeAccess bikeAccessForTrip(Trip trip) {
@@ -90,15 +91,8 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
   }
 
   @Override
-  public boolean tripTimesPredicate(TripTimes tripTimes) {
+  public boolean tripTimesPredicate(TripTimes tripTimes, boolean withFilters) {
     final Trip trip = tripTimes.getTrip();
-    if (!transitModeFilter.allows(trip.getMode(), trip.getNetexSubMode())) {
-      return false;
-    }
-
-    if (!bannedTrips.isEmpty() && bannedTrips.contains(trip.getId())) {
-      return false;
-    }
 
     if (requireBikesAllowed) {
       if (bikeAccessForTrip(trip) != BikeAccess.ALLOWED) {
@@ -122,6 +116,21 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       }
     }
 
+    if (bannedTrips.contains(trip.getId())) {
+      return false;
+    }
+
+    // TODO: 2022-12-13 filters: this is expensive
+    //  we only have to do it if we have submodes in the filters
+    //  in the future we will make sure that we have separate routing trip pattern for each submode
+    //  then we do not have to do that at all and it should increase performance a lot
+    // trip has to match with at least one predicate in order to be included in search
+    if (withFilters) {
+      // we only have to this if we have submode specific filter
+      //  since that's the only thing that is trip specific
+      return filters.stream().anyMatch(f -> f.matchTripTimes(tripTimes));
+    }
+
     return true;
   }
 
@@ -140,87 +149,18 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     return boardingPossible;
   }
 
-  public static List<FeedScopedId> bannedRoutes(
-    Collection<FeedScopedId> bannedAgenciesCollection,
-    RouteMatcher bannedRoutes,
-    Collection<FeedScopedId> whiteListedAgenciesCollection,
-    RouteMatcher whiteListedRoutes,
+  public static Set<FeedScopedId> bannedRoutes(
+    List<TransitFilter> filters,
     Collection<Route> routes
   ) {
-    if (
-      bannedRoutes.isEmpty() &&
-      bannedAgenciesCollection.isEmpty() &&
-      whiteListedRoutes.isEmpty() &&
-      whiteListedAgenciesCollection.isEmpty()
-    ) {
-      return List.of();
-    }
-
-    Set<FeedScopedId> bannedAgencies = Set.copyOf(bannedAgenciesCollection);
-    Set<FeedScopedId> whiteListedAgencies = Set.copyOf(whiteListedAgenciesCollection);
-
-    List<FeedScopedId> ret = new ArrayList<>();
+    Set<FeedScopedId> ret = new HashSet<>();
     for (Route route : routes) {
-      if (
-        routeIsBanned(bannedAgencies, bannedRoutes, whiteListedAgencies, whiteListedRoutes, route)
-      ) {
+      // Route have to match with at least predicate in order to be included in search
+      if (filters.stream().noneMatch(f -> f.matchRoute(route))) {
         ret.add(route.getId());
       }
     }
     return ret;
-  }
-
-  /**
-   * Checks if the route is banned. Also, if whitelisting is used, the route (or its agency) has to
-   * be whitelisted in order to not count as banned.
-   *
-   * @return True if the route is banned
-   */
-  private static boolean routeIsBanned(
-    Set<FeedScopedId> bannedAgencies,
-    RouteMatcher bannedRoutes,
-    Set<FeedScopedId> whiteListedAgencies,
-    RouteMatcher whiteListedRoutes,
-    Route route
-  ) {
-    /* check if agency is banned for this plan */
-    if (!bannedAgencies.isEmpty()) {
-      if (bannedAgencies.contains(route.getAgency().getId())) {
-        return true;
-      }
-    }
-
-    /* check if route banned for this plan */
-    if (!bannedRoutes.isEmpty()) {
-      if (bannedRoutes.matches(route)) {
-        return true;
-      }
-    }
-
-    boolean whiteListed = false;
-    boolean whiteListInUse = false;
-
-    /* check if agency is whitelisted for this plan */
-    if (!whiteListedAgencies.isEmpty()) {
-      whiteListInUse = true;
-      if (whiteListedAgencies.contains(route.getAgency().getId())) {
-        whiteListed = true;
-      }
-    }
-
-    /* check if route is whitelisted for this plan */
-    if (!whiteListedRoutes.isEmpty()) {
-      whiteListInUse = true;
-      if (whiteListedRoutes.matches(route)) {
-        whiteListed = true;
-      }
-    }
-
-    if (whiteListInUse && !whiteListed) {
-      return true;
-    }
-
-    return false;
   }
 
   private boolean routeIsNotBanned(TripPatternForDate tripPatternForDate) {

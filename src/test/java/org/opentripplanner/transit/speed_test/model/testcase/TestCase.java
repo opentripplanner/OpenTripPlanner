@@ -3,6 +3,7 @@ package org.opentripplanner.transit.speed_test.model.testcase;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 
 /**
  * Hold all information about a test case and its results.
@@ -10,8 +11,20 @@ import org.opentripplanner.model.plan.Itinerary;
 public record TestCase(TestCaseDefinition definition, TestCaseResults results) {
   public static final int NOT_SET = -1;
 
+  public TestCase(
+    TestCaseDefinition definition,
+    ExpectedResults expectedResults,
+    boolean skipCost
+  ) {
+    this(definition, new TestCaseResults(definition.id(), skipCost, expectedResults));
+  }
+
   public String id() {
     return definition.id();
+  }
+
+  public TestStatus status() {
+    return results.status();
   }
 
   /**
@@ -30,8 +43,13 @@ public record TestCase(TestCaseDefinition definition, TestCaseResults results) {
   /**
    * Verify the result by matching it with the {@code expectedResult} from the csv file.
    */
-  public void assertResult(Collection<Itinerary> itineraries, int transitTimeMs, int totalTimeMs) {
-    results.matchItineraries(itineraries);
+  public void assertResult(
+    SpeedTestProfile profile,
+    Collection<Itinerary> itineraries,
+    int transitTimeMs,
+    int totalTimeMs
+  ) {
+    results.matchItineraries(profile, itineraries);
     results.addTimes(transitTimeMs, totalTimeMs);
 
     if (results.failed()) {

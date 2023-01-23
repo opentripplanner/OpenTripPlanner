@@ -1,7 +1,7 @@
 package org.opentripplanner.api.common;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.function.Consumer;
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;

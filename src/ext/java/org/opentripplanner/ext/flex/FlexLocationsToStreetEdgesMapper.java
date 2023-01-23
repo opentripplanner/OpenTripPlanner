@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.flex;
 
+import jakarta.inject.Inject;
 import java.util.HashSet;
-import javax.inject.Inject;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.logging.ProgressTracker;

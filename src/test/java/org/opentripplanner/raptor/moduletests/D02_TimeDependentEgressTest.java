@@ -53,11 +53,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
     );
     requestBuilder.searchParams().addAccessPaths(TestAccessEgress.walk(STOP_A, D0s));
 
-    requestBuilder
-      .searchParams()
-      .earliestDepartureTime(T00_10)
-      .searchWindow(D15m)
-      .timetableEnabled(true);
+    requestBuilder.searchParams().earliestDepartureTime(T00_10).searchWindow(D15m).timetable(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
@@ -270,6 +266,17 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
       "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:32+1d 12m 0tx $1440]",
       runSearch()
     );
+  }
+
+  @Test
+  public void closed() {
+    requestBuilder
+      .profile(RaptorProfile.MULTI_CRITERIA)
+      .searchParams()
+      .searchWindow(D25h)
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_01, T00_00));
+
+    assertEquals("", runSearch());
   }
 
   private String runSearch() {

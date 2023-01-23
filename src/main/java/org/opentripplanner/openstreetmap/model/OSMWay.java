@@ -92,7 +92,8 @@ public class OSMWay extends OSMWithTags {
    * Returns true if bikes can only go in the reverse direction.
    */
   public boolean isOneWayReverseBicycle() {
-    return "-1".equals(getTag("oneway:bicycle"));
+    String oneWayBicycle = getTag("oneway:bicycle");
+    return "-1".equals(oneWayBicycle) || isTagFalse("bicycle:forward");
   }
 
   /**

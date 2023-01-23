@@ -47,7 +47,7 @@ public class RaptorRequestTransferCache {
     return new CacheLoader<>() {
       @Override
       @Nonnull
-      public RaptorTransferIndex load(@javax.annotation.Nonnull CacheKey cacheKey) {
+      public RaptorTransferIndex load(@Nonnull CacheKey cacheKey) {
         return RaptorTransferIndex.create(cacheKey.transfersByStopIndex, cacheKey.request);
       }
     };

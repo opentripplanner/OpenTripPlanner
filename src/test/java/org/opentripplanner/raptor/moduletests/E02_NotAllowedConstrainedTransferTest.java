@@ -12,11 +12,11 @@ import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.raptor.spi.SearchDirection;
 
 /**
  * FEATURE UNDER TEST
@@ -69,12 +69,12 @@ public class E02_NotAllowedConstrainedTransferTest implements RaptorTestConstant
 
     requestBuilder
       .searchParams()
-      .constrainedTransfersEnabled(true)
+      .constrainedTransfers(true)
       .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
       .addEgressPaths(TestAccessEgress.walk(STOP_C, D30s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
-      .timetableEnabled(true);
+      .timetable(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }

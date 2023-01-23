@@ -1,14 +1,14 @@
 package org.opentripplanner.api.resource;
 
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriInfo;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.RoutingResource;
@@ -121,7 +121,7 @@ public class PlannerResource extends RoutingResource {
       sb.append(' ');
       sb.append(LocalDateTime.ofInstant(request.dateTime(), ZoneId.systemDefault()));
       sb.append(' ');
-      sb.append(request.journey().modes());
+      sb.append(request.journey().transit().filters());
       sb.append(' ');
       sb.append(request.from().lat);
       sb.append(' ');
