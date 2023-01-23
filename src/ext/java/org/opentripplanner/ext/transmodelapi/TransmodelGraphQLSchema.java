@@ -73,6 +73,7 @@ import org.opentripplanner.ext.transmodelapi.model.plan.TripPatternType;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripQuery;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripType;
 import org.opentripplanner.ext.transmodelapi.model.siri.et.EstimatedCallType;
+import org.opentripplanner.ext.transmodelapi.model.siri.sx.AffectsType;
 import org.opentripplanner.ext.transmodelapi.model.siri.sx.PtSituationElementType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeParkType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeRentalStationType;
@@ -278,6 +279,15 @@ public class TransmodelGraphQLSchema {
     );
     GraphQLOutputType interchangeType = InterchangeType.create(lineType, ServiceJourneyType.REF);
 
+    GraphQLOutputType affectsType = AffectsType.create(
+      quayType,
+      stopPlaceType,
+      lineType,
+      ServiceJourneyType.REF,
+      DatedServiceJourneyType.REF,
+      gqlUtil
+    );
+
     // Timetable
     GraphQLNamedOutputType ptSituationElementType = PtSituationElementType.create(
       authorityType,
@@ -288,6 +298,7 @@ public class TransmodelGraphQLSchema {
       multilingualStringType,
       validityPeriodType,
       infoLinkType,
+      affectsType,
       gqlUtil,
       relay
     );

@@ -41,6 +41,7 @@ public class PtSituationElementType {
     GraphQLOutputType multilingualStringType,
     GraphQLObjectType validityPeriodType,
     GraphQLObjectType infoLinkType,
+    GraphQLOutputType affectsType,
     GqlUtil gqlUtil,
     Relay relay
   ) {
@@ -64,6 +65,7 @@ public class PtSituationElementType {
           .name("authority")
           .type(authorityType)
           .description("Get affected authority for this situation element")
+          .deprecate("Use affects instead")
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
@@ -84,6 +86,7 @@ public class PtSituationElementType {
           .newFieldDefinition()
           .name("lines")
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
+          .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
             return ((TransitAlert) environment.getSource()).entities()
@@ -101,6 +104,7 @@ public class PtSituationElementType {
           .newFieldDefinition()
           .name("serviceJourneys")
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
+          .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
             return ((TransitAlert) environment.getSource()).entities()
@@ -118,6 +122,7 @@ public class PtSituationElementType {
           .newFieldDefinition()
           .name("quays")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
+          .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
             return ((TransitAlert) environment.getSource()).entities()
@@ -136,6 +141,7 @@ public class PtSituationElementType {
           .newFieldDefinition()
           .name("stopPlaces")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopPlaceType))))
+          .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
             return ((TransitAlert) environment.getSource()).entities()
@@ -155,12 +161,15 @@ public class PtSituationElementType {
           })
           .build()
       )
-      //                .field(GraphQLFieldDefinition.newFieldDefinition()
-      //                        .name("journeyPatterns")
-      //                        .description("Get all journey patterns for this situation element")
-      //                        .type(new GraphQLNonNull(new GraphQLList(journeyPatternType)))
-      //                        .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getTripPatterns())
-      //                        .build())
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("affects")
+          .description("Get all affected entities for the situation")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(affectsType))))
+          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).entities())
+          .build()
+      )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
