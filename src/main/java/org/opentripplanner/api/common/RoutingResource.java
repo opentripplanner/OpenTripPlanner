@@ -275,7 +275,7 @@ public abstract class RoutingResource {
    *   <a href="http://docs.opentripplanner.org/en/latest/Configuration/#routing-modes">Routing modes</a>.
    */
   @QueryParam("mode")
-  protected QualifiedModeSet modes;
+  protected QualifiedModeSet modes = new QualifiedModeSet("TRANSIT,WALK");
 
   /**
    * The minimum time, in seconds, between successive trips on different vehicles. This is designed
