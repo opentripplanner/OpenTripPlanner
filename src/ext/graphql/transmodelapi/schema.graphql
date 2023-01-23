@@ -723,6 +723,8 @@ type QueryType {
     ignoreRealtimeUpdates: Boolean = false,
     "When true, service journeys cancelled in scheduled route data will be included during this search."
     includePlannedCancellations: Boolean = false,
+    "When true, service journeys cancelled by real-time updates will be included during this search."
+    includeRealtimeCancellations: Boolean = false,
     "Configure the itinerary-filter-chain. NOTE! THESE PARAMETERS ARE USED FOR SERVER-SIDE TUNING AND IS AVAILABLE HERE FOR TESTING ONLY."
     itineraryFilters: ItineraryFilters,
     "The preferable language to use for text targeted the end user. Note! The data quality is limited, only stop and quay names are translates, and not in all places of the API."

@@ -71,7 +71,7 @@ public class TripPatternForDateMapper {
       if (!serviceCodesRunning.contains(tripTimes.getServiceCode())) {
         continue;
       }
-      if (tripTimes.isCanceledOrDeleted()) {
+      if (tripTimes.isDeleted()) {
         continue;
       }
 
