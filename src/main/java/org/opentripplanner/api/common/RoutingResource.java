@@ -779,13 +779,12 @@ public abstract class RoutingResource {
           s -> selectors.add(SelectRequest.of().withRoutesFromString(s))
         );
 
-        var tModes = MainAndSubMode.all();
-        if (modes != null) {
+        List<MainAndSubMode> tModes;
+        if (modes == null) {
+          tModes = MainAndSubMode.all();
+        } else {
           // Create modes
           tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
-        }
-        if (tModes.isEmpty()) {
-          tModes = MainAndSubMode.all();
         }
 
         // Add modes filter to all existing selectors
