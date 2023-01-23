@@ -35,7 +35,6 @@ public class OperatingDay {
     return startTime;
   }
 
-
   public ZonedDateTime toTime(int time) {
     return startTime.plusSeconds(time);
   }

@@ -4,7 +4,6 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParameters;
 import org.opentripplanner.transit.model.trip.TripOnDate;
 
-
 /**
  * TODO RTM - This has nothing to do with the transit model, move somewhere else
  */

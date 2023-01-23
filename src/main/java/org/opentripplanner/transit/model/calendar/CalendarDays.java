@@ -34,14 +34,13 @@ public class CalendarDays {
   private final ZoneId zoneId;
   private final LocalDate start;
   private final LocalDate end;
-  private final Duration timeOffset;
   private final OperatingDay[] operatingDays;
 
   CalendarDays(CalendarDaysBuilder builder) {
     this.zoneId = Objects.requireNonNull(builder.zoneId());
     this.start = Objects.requireNonNull(builder.periodStart());
     this.end = Objects.requireNonNull(builder.periodEnd());
-    this.timeOffset = Objects.requireNonNull(builder.timeOffset());
+    Duration timeOffset = Objects.requireNonNull(builder.timeOffset());
     this.operatingDays = Objects.requireNonNull(builder.operatingDays());
   }
 
@@ -67,5 +66,9 @@ public class CalendarDays {
 
   public int numberOfDays() {
     return operatingDays.length;
+  }
+
+  public int dayLengthSeconds(int dayIndex) {
+    return operatingDays[dayIndex].lengthSeconds();
   }
 }

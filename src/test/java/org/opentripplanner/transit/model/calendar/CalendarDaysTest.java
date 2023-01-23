@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.model.calendar;
 
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
@@ -7,6 +9,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,7 +32,7 @@ class CalendarDaysTest {
   public static final int OCT_30 = 302;
   public static final int DEC_31 = 364;
 
-  private static List<Arguments> testCases = List.of(
+  private static final List<Arguments> testCases = List.of(
     // "Time Zero" is 04:00  1. Jan 2022
     tc("2022-01-01T04:00:00+01:00[Europe/Oslo]", JAN_1, T_ZERO),
     // Offset 07:00 (+04:00) = 11:00
@@ -48,10 +51,9 @@ class CalendarDaysTest {
     tc("2022-12-31T04:00:00+01:00[Europe/Oslo]", DEC_31, T_ZERO)
   );
 
-  //private final CalendarDays subject;
+  private final CalendarDays subject;
 
   public CalendarDaysTest() {
-    /*
     subject =
       CalendarDays
         .of()
@@ -60,38 +62,31 @@ class CalendarDaysTest {
         .withOffset(Duration.ofHours(4))
         .withZoneId(TIME_ZONE)
         .build();
-     */
   }
 
   @Test
-  @Disabled
-  public void dayLengthSeconds() {
-    /*
-      TODO RTM - Fix
-
+  void dayLengthSeconds() {
     // 24 expected for 1. Jan 2022
-    assertEquals(D24h, subject.dayLengthSeconds(JAN_1));
+    Assertions.assertEquals(D24h, subject.dayLengthSeconds(JAN_1));
 
     // Day before DST adjustment (winter time)
-    assertEquals(D23h, subject.dayLengthSeconds(MAR_26));
+    Assertions.assertEquals(D23h, subject.dayLengthSeconds(MAR_26));
 
     // Day of DST adjustment (to summer time)
-    assertEquals(D24h, subject.dayLengthSeconds(MAR_27));
+    Assertions.assertEquals(D24h, subject.dayLengthSeconds(MAR_27));
 
     // Day before DST adjustment (summer time)
-    assertEquals(D25h, subject.dayLengthSeconds(OCT_29));
+    Assertions.assertEquals(D25h, subject.dayLengthSeconds(OCT_29));
 
     // Day of DST adjustment (to winter time)
-    assertEquals(D24h, subject.dayLengthSeconds(OCT_30));
+    Assertions.assertEquals(D24h, subject.dayLengthSeconds(OCT_30));
 
     // Last day of calendar defined
-    assertEquals(D24h, subject.dayLengthSeconds(DEC_31));
-     */
+    Assertions.assertEquals(D24h, subject.dayLengthSeconds(DEC_31));
   }
 
   @Test
-  @Disabled
-  public void assertMaxSizeForCalendar() {
+  void assertLessThanMaxSizeForCalendar() {
     CalendarDays
       .of()
       .withPeriodStart(LocalDate.of(2000, Month.JANUARY, 1))
@@ -99,14 +94,26 @@ class CalendarDaysTest {
       .build();
   }
 
+  @Test
+  void assertMoreThanMaxSizeForCalendar() {
+    Assertions.assertThrows(
+      IllegalStateException.class,
+      () ->
+        CalendarDays
+          .of()
+          .withPeriodStart(LocalDate.of(2000, Month.JANUARY, 1))
+          .withPeriodEnd(LocalDate.of(2011, Month.JANUARY, 10))
+          .build()
+    );
+  }
+
   static final Stream<Arguments> tcToZonedDateTime = testCases.stream();
 
-  @Disabled
   @ParameterizedTest(name = "Verify finding transit day and time from zoned date time.")
   @VariableSource("tcToZonedDateTime")
-  public void timeForDayAndOffset(String text, ZonedDateTime time, int day, int seconds) {
+  void timeForDayAndOffset(String text, ZonedDateTime time, int day, int seconds) {
     // "Time Zero" is 04:00  1. Jan 2022
-    //assertEquals(text, subject.time(day, seconds).format(ISO_DATE_TIME));
+    Assertions.assertEquals(text, subject.time(day, seconds).format(ISO_DATE_TIME));
   }
 
   static final Stream<Arguments> tcParseTime = testCases.stream();
@@ -114,7 +121,7 @@ class CalendarDaysTest {
   @Disabled
   @ParameterizedTest(name = "Verify finding transit day and time from zoned date time.")
   @VariableSource("tcParseTime")
-  public void transitTime(String text, ZonedDateTime time, Integer day, Integer seconds) {
+  void transitTime(String text, ZonedDateTime time, Integer day, Integer seconds) {
     /*
       TODO RTM - Fix
 

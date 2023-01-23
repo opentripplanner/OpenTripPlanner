@@ -92,6 +92,10 @@ public class CalendarDaysBuilder {
     // TODO RTM -
     //this.startOfDays = list.toArray(new ZonedDateTime[0]);
     this.offsetNextDaySeconds = lengths.stream().mapToInt(it -> it).toArray();
+    this.operatingDays = new OperatingDay[list.size()];
+    for (int i = 0; i < list.size(); i++) {
+      this.operatingDays[i] = new OperatingDay(i, list.get(i), lengths.get(i));
+    }
 
     System.out.println("Time: " + (System.currentTimeMillis() - t0) + "ms");
   }
