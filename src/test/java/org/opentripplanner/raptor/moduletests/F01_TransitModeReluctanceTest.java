@@ -5,9 +5,7 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 
-import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,7 +19,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig;
 
 /**
@@ -67,24 +64,6 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  static List<RaptorModuleTestCase> testCasesPreferR1() {
-    return RaptorModuleTestCase.of().add(multiCriteria(), expected("R1", 799)).build();
-  }
-
-  @ParameterizedTest
-  @MethodSource("testCasesPreferR1")
-  void testPreferR1(RaptorModuleTestCase testCase) {
-    // Give R1 a slightly smaller(0.01 less then R2) transit reluctance factor
-    data.mcCostParamsBuilder().transitReluctanceFactors(new double[] { 0.99, 1.0 });
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
-  }
-
-  static List<RaptorModuleTestCase> testCasesPreferR2() {
-    return RaptorModuleTestCase.of().add(multiCriteria(), expected("R2", 789)).build();
-  }
-
   static Stream<Arguments> testCases() {
     return RaptorModuleTestConfig
       .multiCriteria()
@@ -92,27 +71,30 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
       .stream()
       .flatMap(config ->
         Stream.of(
-          Arguments.of(PREFER_R1, config, "R1", 799),
-          Arguments.of(PREFER_R2, config, "R2", 789)
+          Arguments.of(
+            PREFER_R1,
+            config,
+            "Walk 30s ~ A ~ BUS R1 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s 0tx $799]"
+          ),
+          Arguments.of(
+            PREFER_R2,
+            config,
+            "Walk 30s ~ A ~ BUS R2 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s 0tx $789]"
+          )
         )
       );
   }
 
-  @ParameterizedTest(name = "Transit reluctance {0} should prefer {2} and give cost {3}")
+  @ParameterizedTest(name = "Transit reluctance [R1, R2]: {0}, profile: {1}")
   @MethodSource("testCases")
-  void testPreferR2(
+  void testTransitReluctance(
     double[] transitReluctance,
     RaptorModuleTestConfig testConfig,
-    String expRoute,
-    int expCost
+    String expected
   ) {
     data.mcCostParamsBuilder().transitReluctanceFactors(transitReluctance);
     var request = testConfig.apply(requestBuilder).build();
     var response = raptorService.route(request, data);
-    assertEquals(expected(expRoute, expCost), pathsToString(response));
-  }
-
-  private static String expected(String route, int cost) {
-    return String.format(EXPECTED, route, cost);
+    assertEquals(expected, pathsToString(response));
   }
 }

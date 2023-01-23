@@ -6,6 +6,7 @@ import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig;
 
 /**
  * FEATURE UNDER TEST
@@ -123,11 +123,11 @@ public class A04_BoardingTest implements RaptorTestConstants {
       // A test on the standard profile is included to demonstrate that the
       // min-travel-duration and the standard give different results. The L2
       // boarding stop is different.
-      .add(RaptorModuleTestConfig.standard().forwardOnly(), EXP_PATH_BEST_ARRIVAL_TIME)
+      .add(standard().forwardOnly(), EXP_PATH_BEST_ARRIVAL_TIME)
       // A reverse test on the standard profile is included to demonstrate
       // that the min-travel-duration and the standard give different results
       // when searching in reverse. The L2 alight stop is different.
-      .add(RaptorModuleTestConfig.standard().reverseOnly(), EXP_PATH_BEST_ARRIVAL_TIME_REVERSE)
+      .add(standard().reverseOnly(), EXP_PATH_BEST_ARRIVAL_TIME_REVERSE)
       .add(minDuration(), EXP_PATH_MIN_TRAVEL_DURATION)
       .add(multiCriteria(), EXP_PATH_MC)
       .build();

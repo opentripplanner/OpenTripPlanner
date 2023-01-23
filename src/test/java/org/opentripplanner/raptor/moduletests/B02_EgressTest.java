@@ -5,6 +5,7 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
 import java.util.List;
@@ -19,7 +20,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig;
 
 /**
  * FEATURE UNDER TEST
@@ -71,7 +71,7 @@ public class B02_EgressTest implements RaptorTestConstants {
         "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s 0tx]"
       )
       .add(
-        RaptorModuleTestConfig.multiCriteria(),
+        multiCriteria(),
         "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx $2080]",
         "Walk 20s ~ B ~ BUS R1 0:10 0:24 ~ F ~ Walk 4m [0:09:40 0:28 18m20s 0tx $1960]",
         "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s 0tx $1722]"
