@@ -60,7 +60,7 @@ public class NorwayMapperTest {
     return argumentsList.stream();
   }
 
-  static Stream<Arguments> createBicycleSafetyWitoutExplisitMaxspeed() {
+  static Stream<Arguments> createBicycleSafetyWithoutExplicitMaxspeed() {
     Double[] expectedBicycleSafety = { 3.75, 3.75, 3.43, 3.43, 3.43, 1.83 };
     ArrayList<Arguments> argumentsList = new ArrayList<>();
     for (int i = 0; i < expectedHighways.length; i++) {
@@ -91,7 +91,7 @@ public class NorwayMapperTest {
   }
 
   static Stream<Arguments> expectedBicycleSafetyForMaxspeedCases = createExpectedBicycleSafetyForMaxspeedCases();
-  static Stream<Arguments> expectedBicycleSafetyWitoutExplisitMaxspeed = createBicycleSafetyWitoutExplisitMaxspeed();
+  static Stream<Arguments> expectedBicycleSafetyWithoutExplicitMaxspeed = createBicycleSafetyWithoutExplicitMaxspeed();
   static Stream<Arguments> linkRoadLikeMainCases = createLinkRoadLikeMainCases();
 
   @ParameterizedTest(name = "{0} should have a score of {1}")
@@ -103,7 +103,7 @@ public class NorwayMapperTest {
   }
 
   @ParameterizedTest
-  @VariableSource("expectedBicycleSafetyWitoutExplisitMaxspeed")
+  @VariableSource("expectedBicycleSafetyWithoutExplicitMaxspeed")
   public void testBicycleSafetyWithoutMaxspeed(OSMWithTags way, Double expected) {
     var result = wps.getDataForWay(way).getBicycleSafetyFeatures();
     var expectedSafetyFeatures = new SafetyFeatures(expected, expected);
