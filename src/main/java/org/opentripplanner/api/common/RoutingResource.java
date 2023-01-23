@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
@@ -780,14 +779,12 @@ public abstract class RoutingResource {
           s -> selectors.add(SelectRequest.of().withRoutesFromString(s))
         );
 
-        // Create modes
-        var tModes = modes
-          .getTransitModes()
-          .stream()
-          .map(MainAndSubMode::new)
-          .collect(Collectors.toList());
-        if (tModes.isEmpty()) {
+        List<MainAndSubMode> tModes;
+        if (modes == null) {
           tModes = MainAndSubMode.all();
+        } else {
+          // Create modes
+          tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
         }
 
         // Add modes filter to all existing selectors
