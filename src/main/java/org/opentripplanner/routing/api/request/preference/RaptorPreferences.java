@@ -53,13 +53,11 @@ public final class RaptorPreferences implements Serializable {
     this.timeLimit = builder.timeLimit;
 
     this.relaxGeneralizedCostAtDestination =
-      builder.relaxGeneralizedCostAtDestination == null
-        ? null
-        : Units.reluctance(
-          builder.relaxGeneralizedCostAtDestination,
-          MIN_RELAX_COST_AT_DESTINATION,
-          MAX_RELAX_COST_AT_DESTINATION
-        );
+      Units.normalizedOptionalFactor(
+        builder.relaxGeneralizedCostAtDestination,
+        MIN_RELAX_COST_AT_DESTINATION,
+        MAX_RELAX_COST_AT_DESTINATION
+      );
   }
 
   public static Builder of() {

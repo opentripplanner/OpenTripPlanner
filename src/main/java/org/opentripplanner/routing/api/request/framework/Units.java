@@ -43,17 +43,21 @@ public class Units {
    * Unit: Human cost per second of actual time (scalar)
    */
   public static double reluctance(double value) {
-    return reluctance(value, 0.0, Double.MAX_VALUE);
+    return normalizedFactor(value, 0.0, Double.MAX_VALUE);
   }
 
   /**
-   * Reluctance of factor between {@param minValue} and {@param maxValue}.
-   * Number of decimals used are: 2 for absolute value less than 2.0, 1 for absolute value less than
-   * 10.0, and zero for absolute values above 10.0.
+   * Normalized factor in given range between {@param minValue} and {@param maxValue}.
+   * Number of decimals used are:
+   * <ul>
+   *   <li>2 decimals for absolute value less than 2. Example: -1.99 and 0.01</li>
+   *   <li>1 decimal for absolute value less than 10. Example: 2.0 and 9.9</li>
+   *   <li>zero decimals for absolute values above 10.  Example: -10 and 10</li>
+   * </ul>
    * <p>
-   * Unit: Human cost per second of actual time (scalar)
+   * Unit: scalar
    */
-  public static double reluctance(double value, double minValue, double maxValue) {
+  public static double normalizedFactor(double value, double minValue, double maxValue) {
     if (value < minValue) {
       throw new IllegalArgumentException("Min limit(" + minValue + ") exceeded: " + value);
     }
@@ -71,10 +75,10 @@ public class Units {
 
   /**
    * If given input value is {@code null}, then return {@code null}, if not
-   * verify value, see {@link #reluctance(double, double, double)}.
+   * verify value, see {@link #normalizedFactor(double, double, double)}.
    */
-  public static Double reluctanceOptional(Double value, double minValue, double maxValue) {
-    return (value == null) ? null : reluctance(value, minValue, maxValue);
+  public static Double normalizedOptionalFactor(Double value, double minValue, double maxValue) {
+    return (value == null) ? null : normalizedFactor(value, minValue, maxValue);
   }
 
   /**
