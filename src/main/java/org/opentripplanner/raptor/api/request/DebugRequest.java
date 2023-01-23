@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 
@@ -48,7 +48,7 @@ public record DebugRequest(
   int debugPathFromStopIndex,
   Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener,
   Consumer<DebugEvent<PatternRideView<?>>> patternRideDebugListener,
-  Consumer<DebugEvent<Path<?>>> pathFilteringListener,
+  Consumer<DebugEvent<RaptorPath<?>>> pathFilteringListener,
   DebugLogger logger
 ) {
   private static final DebugRequest DEFAULT_DEBUG_REQUEST = new DebugRequest(

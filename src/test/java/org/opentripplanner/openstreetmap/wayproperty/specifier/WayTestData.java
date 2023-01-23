@@ -113,6 +113,13 @@ public class WayTestData {
     return way;
   }
 
+  public static OSMWithTags cyclewayBoth() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "residential");
+    way.addTag("cycleway:both", "lane");
+    return way;
+  }
+
   public static OSMWithTags footwaySidewalk() {
     var way = new OSMWithTags();
     way.addTag("footway", "sidewalk");
@@ -160,13 +167,6 @@ public class WayTestData {
     return way;
   }
 
-  public static OSMWithTags flattenedCobblestones() {
-    var way = new OSMWithTags();
-    way.addTag("highway", "residential");
-    way.addTag("surface", "cobblestones:flattened");
-    return way;
-  }
-
   public static OSMWithTags cobblestones() {
     var way = new OSMWithTags();
     way.addTag("highway", "residential");
@@ -179,6 +179,33 @@ public class WayTestData {
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("cycleway:right", "track");
+    return way;
+  }
+
+  public static OSMWithTags tramsForward() {
+    // https://www.openstreetmap.org/way/108037345
+    var way = new OSMWithTags();
+    way.addTag("highway", "tertiary");
+    way.addTag("embedded_rails:forward", "tram");
+    return way;
+  }
+
+  public static OSMWithTags veryBadSmoothness() {
+    // https://www.openstreetmap.org/way/11402648
+    var way = new OSMWithTags();
+    way.addTag("highway", "footway");
+    way.addTag("surface", "sett");
+    way.addTag("smoothness", "very_bad");
+    return way;
+  }
+
+  public static OSMWithTags excellentSmoothness() {
+    // https://www.openstreetmap.org/way/437167371
+    var way = new OSMWithTags();
+    way.addTag("highway", "cycleway");
+    way.addTag("segregated", "no");
+    way.addTag("surface", "asphalt");
+    way.addTag("smoothness", "excellent");
     return way;
   }
 }

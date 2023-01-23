@@ -6,7 +6,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 class AllowAllModesFilter implements AllowTransitModeFilter {
 
   @Override
-  public boolean allows(TransitMode transitMode, SubMode netexSubMode) {
+  public boolean match(TransitMode transitMode, SubMode netexSubMode) {
     return true;
   }
 

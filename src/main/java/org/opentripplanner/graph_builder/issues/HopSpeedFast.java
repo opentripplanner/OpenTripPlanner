@@ -28,4 +28,9 @@ public class HopSpeedFast implements DataImportIssue {
     int kph = (int) (3.6 * metersPerSecond); // convert meters per second to kph
     return String.format(FMT, kph, distance, trip.getRoute().getId(), trip.getId(), seq);
   }
+
+  @Override
+  public int getPriority() {
+    return (int) metersPerSecond;
+  }
 }

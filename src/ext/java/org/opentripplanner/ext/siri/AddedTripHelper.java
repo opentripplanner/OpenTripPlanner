@@ -18,14 +18,10 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
 public class AddedTripHelper {
-
-  private static final Logger LOG = LoggerFactory.getLogger(AddedTripHelper.class);
 
   /**
    * Method to create a Route. Commonly used to create a route if a realtime message

@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParameters;
@@ -23,6 +24,11 @@ public class VehiclePositionsUpdaterConfig {
       .since(V2_2)
       .summary("The URL of GTFS-RT protobuf HTTP resource to download the positions from.")
       .asUri();
-    return new VehiclePositionsUpdaterParameters(updaterRef, feedId, url, frequencySec);
+    var headers = c
+      .of("headers")
+      .since(V2_3)
+      .summary("Extra headers to add to the HTTP request fetching the data.")
+      .asStringMap();
+    return new VehiclePositionsUpdaterParameters(updaterRef, feedId, url, frequencySec, headers);
   }
 }

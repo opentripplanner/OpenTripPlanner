@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import java.util.Collection;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.StopArrivals;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The worker performs the travel search. There are multiple implementations, even some that do not
@@ -22,7 +22,7 @@ public interface Worker<T extends RaptorTripSchedule> {
    * Return all paths found. An empty set is returned if no paths are found or the algorithm does
    * not collect paths.
    */
-  Collection<Path<T>> paths();
+  Collection<RaptorPath<T>> paths();
 
   /**
    * Return best over-all-arrival-times, best transit-arrival-times, and lowest number of

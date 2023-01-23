@@ -1,14 +1,14 @@
 package org.opentripplanner.raptor.rangeraptor.path;
 
-import org.opentripplanner.raptor.api.path.Path;
-import org.opentripplanner.raptor.api.path.PathBuilder;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.PathBuilder;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Build a path from a destination arrival - this maps between the domain of routing to the domain
@@ -49,7 +49,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
   }
 
   @Override
-  public Path<T> mapToPath(final DestinationArrival<T> destinationArrival) {
+  public RaptorPath<T> mapToPath(final DestinationArrival<T> destinationArrival) {
     var pathBuilder = PathBuilder.tailPathBuilder(
       transferConstraintsSearch,
       slackProvider,

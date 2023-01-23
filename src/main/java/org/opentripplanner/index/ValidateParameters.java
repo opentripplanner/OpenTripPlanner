@@ -1,8 +1,8 @@
 package org.opentripplanner.index;
 
+import jakarta.ws.rs.BadRequestException;
 import java.util.HashSet;
 import java.util.Set;
-import javax.ws.rs.BadRequestException;
 
 class ValidateParameters {
 

@@ -10,10 +10,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.SearchParams;
-import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
@@ -158,7 +158,10 @@ public final class RaptorPreferences implements Serializable {
     }
 
     public Builder withOptimizations(Collection<Optimization> optimizations) {
-      this.optimizations = EnumSet.copyOf(optimizations);
+      this.optimizations =
+        optimizations.isEmpty()
+          ? EnumSet.noneOf(Optimization.class)
+          : EnumSet.copyOf(optimizations);
       return this;
     }
 

@@ -7,11 +7,11 @@ import static org.opentripplanner.datastore.api.FileType.OSM;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import jakarta.inject.Inject;
 import java.io.File;
 import java.net.URI;
 import java.util.EnumSet;
 import java.util.Set;
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;

@@ -14,10 +14,10 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
@@ -59,7 +59,7 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
       .searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
-      .constrainedTransfersEnabled(true);
+      .constrainedTransfers(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }

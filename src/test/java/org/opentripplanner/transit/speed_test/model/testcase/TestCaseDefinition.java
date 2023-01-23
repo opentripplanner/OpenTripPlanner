@@ -1,7 +1,9 @@
 package org.opentripplanner.transit.speed_test.model.testcase;
 
+import java.time.Duration;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
 
@@ -10,7 +12,7 @@ public record TestCaseDefinition(
   String description,
   int departureTime,
   int arrivalTime,
-  int window,
+  Duration window,
   GenericLocation fromPlace,
   GenericLocation toPlace,
   /**
@@ -27,11 +29,11 @@ public record TestCaseDefinition(
       id,
       fromPlace.label,
       toPlace.label,
-      fromPlace.getCoordinate(),
-      toPlace.getCoordinate(),
+      coordinateString(fromPlace),
+      coordinateString(toPlace),
       TimeUtils.timeToStrCompact(departureTime, TestCase.NOT_SET),
       TimeUtils.timeToStrCompact(arrivalTime, TestCase.NOT_SET),
-      DurationUtils.durationToStr(window, TestCase.NOT_SET)
+      DurationUtils.durationToStr(window)
     );
   }
 
@@ -48,5 +50,9 @@ public record TestCaseDefinition(
   }
   public boolean arrivalTimeSet() {
     return arrivalTime != TestCase.NOT_SET;
+  }
+
+  private String coordinateString(GenericLocation location) {
+    return ValueObjectToStringBuilder.of().addCoordinate(location.lat, location.lng).toString();
   }
 }
