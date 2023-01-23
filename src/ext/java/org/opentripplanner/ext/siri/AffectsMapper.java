@@ -124,6 +124,14 @@ public class AffectsMapper {
               );
           }
 
+          if (tripIds.isEmpty()) {
+            selectors.add(
+              new EntitySelector.Unknown(
+                "Alert affects unknown vehicle journey %s".formatted(vehicleJourneyRef.getValue())
+              )
+            );
+          }
+
           for (FeedScopedId tripId : tripIds) {
             if (!affectedStops.isEmpty()) {
               for (AffectedStopPointStructure affectedStop : affectedStops) {
@@ -187,6 +195,12 @@ public class AffectsMapper {
           } else {
             selectors.add(new EntitySelector.Trip(tripId, serviceDate));
           }
+        } else {
+          selectors.add(
+            new EntitySelector.Unknown(
+              "Alert affects unknown framed vehicle journey %s".formatted(datedVehicleJourneyRef)
+            )
+          );
         }
       }
     }
