@@ -292,6 +292,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               serviceDate
             );
             case CANCELED -> handleCanceledTrip(tripId, serviceDate);
+            case DELETED -> handleCanceledTrip(tripId, serviceDate);
             case REPLACEMENT -> validateAndHandleModifiedTrip(
               tripUpdate,
               tripDescriptor,
