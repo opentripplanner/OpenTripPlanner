@@ -69,7 +69,10 @@ public class ViaTripType {
     return GraphQLObjectType
       .newObject()
       .name("ViaTrip")
-      .description("Description of a travel between three or more places.")
+      .description(
+        "Description of a trip via one or more intermediate locations. " +
+        "For example from A, via B, then C to D."
+      )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()

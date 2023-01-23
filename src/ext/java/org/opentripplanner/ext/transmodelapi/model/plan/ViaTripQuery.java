@@ -26,8 +26,7 @@ public class ViaTripQuery {
       .newFieldDefinition()
       .name("viaTrip")
       .description(
-        "Input type for executing a travel search for a trip between three or more locations. " +
-        "Returns trip patterns describing suggested alternatives for the trip."
+        "Via trip search. Find trip patterns traveling via one or more intermediate (via) locations."
       )
       .deprecate("This API is under development, expect the contract to change")
       .type(new GraphQLNonNull(viaTripType))
@@ -101,14 +100,14 @@ public class ViaTripQuery {
         GraphQLArgument
           .newArgument()
           .name("to")
-          .description("The end location")
+          .description("The destination location")
           .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
           .build()
       )
       .argument(
         GraphQLArgument
           .newArgument()
-          .name("locations")
+          .name("via")
           .description("The locations needed to be visited along the route.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(viaLocationInputType))))
       )
@@ -118,9 +117,9 @@ public class ViaTripQuery {
           .name("segments")
           .description(
             "The requests for the individual segments of the search. The first segment is from " +
-            "the start location to the first entry in the locations list and the last is from " +
-            "the last entry in the locations list to the end location. Note that the list must " +
-            "have length of exactly one greater than the locations field."
+            "the start location(`from`) to the first entry in the `via` locations list and the " +
+            "last is from the last entry in the `via` locations list to the end location(`to`). " +
+            "Note that the list must have length of exactly one greater than the `via` field."
           )
           .type(new GraphQLList(new GraphQLNonNull(viaSegmentInputType)))
       )
@@ -129,12 +128,10 @@ public class ViaTripQuery {
           .newArgument()
           .name("numTripPatterns")
           .description(
-            "The maximum number of trip patterns per part of the search to return. Note! This " +
-            "reduces the number of trip patterns AFTER the OTP travel search is done in a " +
-            "post-filtering process. There is little performance gain in reducing the number of " +
-            "trip patterns returned. The post-filtering will reduce the number of trip-patterns " +
-            "down to this size. It does not make the search faster, as it did in OTP1. See also " +
-            "the trip meta-data on how to implement paging."
+            "The maximum number of trip patterns segment to return. Note! This reduces the number " +
+            "of trip patterns AFTER the OTP travel search is done in a post-filtering process. " +
+            "There is little/no performance gain in reducing the number of trip patterns returned. " +
+            "See also the trip meta-data on how to implement paging."
           )
           .defaultValueProgrammatic(routing.request.numItineraries())
           .type(Scalars.GraphQLInt)
@@ -146,7 +143,7 @@ public class ViaTripQuery {
           .name("wheelchairAccessible")
           .description(
             "Whether the trip must be wheelchair accessible. Supported for the street part to " +
-            "the search, not implemented for the transit jet."
+            "the search, not implemented for the transit yet."
           )
           .type(Scalars.GraphQLBoolean)
           .defaultValueProgrammatic(routing.request.wheelchair())

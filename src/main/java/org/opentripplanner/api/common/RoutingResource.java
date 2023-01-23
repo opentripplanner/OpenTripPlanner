@@ -159,7 +159,7 @@ public abstract class RoutingResource {
    * Whether the trip must be wheelchair accessible.
    *
    * @deprecated TODO OTP2 Regression. Not currently working in OTP2. This is not implemented
-   * in Raptor jet.
+   * in Raptor yet.
    */
   @Deprecated
   @QueryParam("wheelchair")

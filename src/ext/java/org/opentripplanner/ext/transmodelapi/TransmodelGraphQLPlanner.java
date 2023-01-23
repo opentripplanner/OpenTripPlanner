@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.opentripplanner.ext.transmodelapi.mapping.TripRequestMapper;
+import org.opentripplanner.ext.transmodelapi.mapping.ViaRequestMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.plan.ViaPlanResponse;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
@@ -57,7 +58,7 @@ public class TransmodelGraphQLPlanner {
     OtpServerRequestContext serverContext = ctx.getServerContext();
     RouteViaRequest request = null;
     try {
-      request = TripRequestMapper.createRouteViaRequest(environment);
+      request = ViaRequestMapper.createRouteViaRequest(environment);
       ViaRoutingResponse res = ctx.getRoutingService().route(request);
       response = ViaPlanResponse.of(res);
     } catch (Exception e) {
