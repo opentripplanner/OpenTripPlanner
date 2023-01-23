@@ -1124,7 +1124,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     if (datedServiceJourneyId == null) {
-      return;
+      if (estimatedVehicleJourney.getFramedVehicleJourneyRef() != null) {
+        var tripOnDate = entityResolver.resolveTripOnServiceDate(
+          estimatedVehicleJourney.getFramedVehicleJourneyRef()
+        );
+        if (tripOnDate == null) {
+          return;
+        }
+        datedServiceJourneyId = tripOnDate.getId();
+      }
     }
 
     List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();

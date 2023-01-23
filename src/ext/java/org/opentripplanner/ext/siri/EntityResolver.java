@@ -78,7 +78,7 @@ public class EntityResolver {
     if (datedServiceJourneyId != null) {
       return resolveTripOnServiceDate(datedServiceJourneyId);
     }
-    return null;
+    return resolveTripOnServiceDate(estimatedVehicleJourney.getFramedVehicleJourneyRef());
   }
 
   public TripOnServiceDate resolveTripOnServiceDate(String datedServiceJourneyId) {
