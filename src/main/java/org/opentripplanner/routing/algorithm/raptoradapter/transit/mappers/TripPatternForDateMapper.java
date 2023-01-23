@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +71,7 @@ public class TripPatternForDateMapper {
       if (!serviceCodesRunning.contains(tripTimes.getServiceCode())) {
         continue;
       }
-      if (tripTimes.getRealTimeState() == RealTimeState.CANCELED) {
+      if (tripTimes.isCanceledOrDeleted()) {
         continue;
       }
 

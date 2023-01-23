@@ -169,7 +169,7 @@ public class TripTimeOnDate {
   public boolean isCanceledEffectively() {
     return (
       isCancelledStop() ||
-      tripTimes.isCanceled() ||
+      tripTimes.isCanceledOrDeleted() ||
       tripTimes.getTrip().getNetexAlteration().isCanceledOrReplaced()
     );
   }
@@ -213,13 +213,13 @@ public class TripTimeOnDate {
   }
 
   public PickDrop getPickupType() {
-    return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
+    return tripTimes.isCanceledOrDeleted() || tripTimes.isCancelledStop(stopIndex)
       ? PickDrop.CANCELLED
       : tripPattern.getBoardType(stopIndex);
   }
 
   public PickDrop getDropoffType() {
-    return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
+    return tripTimes.isCanceledOrDeleted() || tripTimes.isCancelledStop(stopIndex)
       ? PickDrop.CANCELLED
       : tripPattern.getAlightType(stopIndex);
   }

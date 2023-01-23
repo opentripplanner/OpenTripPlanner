@@ -31,4 +31,9 @@ public enum RealTimeState {
    * trip pattern of the scheduled trip.
    */
   MODIFIED,
+
+  /**
+   * The trip has been canceled, and should not be visible to the end user
+   */
+  DELETED,
 }

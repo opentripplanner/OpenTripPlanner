@@ -357,7 +357,7 @@ public class TimetableSnapshotSourceTest {
         originalTripIndexScheduled
       );
       assertFalse(
-        originalTripTimesScheduled.isCanceled(),
+        originalTripTimesScheduled.isCanceledOrDeleted(),
         "Original trip times should not be canceled in scheduled time table"
       );
       assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
@@ -371,10 +371,10 @@ public class TimetableSnapshotSourceTest {
         originalTripIndexForToday
       );
       assertTrue(
-        originalTripTimesForToday.isCanceled(),
-        "Original trip times should be canceled in time table for service date"
+        originalTripTimesForToday.isDeleted(),
+        "Original trip times should be deleted in time table for service date"
       );
-      assertEquals(RealTimeState.CANCELED, originalTripTimesForToday.getRealTimeState());
+      assertEquals(RealTimeState.DELETED, originalTripTimesForToday.getRealTimeState());
     }
 
     // New trip pattern
@@ -525,7 +525,7 @@ public class TimetableSnapshotSourceTest {
         originalTripIndexScheduled
       );
       assertFalse(
-        originalTripTimesScheduled.isCanceled(),
+        originalTripTimesScheduled.isCanceledOrDeleted(),
         "Original trip times should not be canceled in scheduled time table"
       );
       assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
@@ -610,7 +610,7 @@ public class TimetableSnapshotSourceTest {
           originalTripIndexScheduled
         );
         assertFalse(
-          originalTripTimesScheduled.isCanceled(),
+          originalTripTimesScheduled.isCanceledOrDeleted(),
           "Original trip times should not be canceled in scheduled time table"
         );
         assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
@@ -623,8 +623,12 @@ public class TimetableSnapshotSourceTest {
         final TripTimes originalTripTimesForToday = originalTimetableForToday.getTripTimes(
           originalTripIndexForToday
         );
-        // original trip should be canceled
-        assertEquals(RealTimeState.CANCELED, originalTripTimesForToday.getRealTimeState());
+        assertTrue(
+          originalTripTimesForToday.isDeleted(),
+          "Original trip times should be deleted in time table for service date"
+        );
+        // original trip should be deleted
+        assertEquals(RealTimeState.DELETED, originalTripTimesForToday.getRealTimeState());
       }
 
       // New trip pattern
@@ -731,8 +735,12 @@ public class TimetableSnapshotSourceTest {
         final TripTimes originalTripTimesForToday = originalTimetableForToday.getTripTimes(
           originalTripIndexForToday
         );
+        assertTrue(
+          originalTripTimesForToday.isDeleted(),
+          "Original trip times should be deleted in time table for service date"
+        );
         // original trip should be canceled
-        assertEquals(RealTimeState.CANCELED, originalTripTimesForToday.getRealTimeState());
+        assertEquals(RealTimeState.DELETED, originalTripTimesForToday.getRealTimeState());
       }
 
       // New trip pattern

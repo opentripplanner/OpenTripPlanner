@@ -295,6 +295,10 @@ public class StopTimesHelper {
   }
 
   public static boolean skipByTripCancellation(TripTimes tripTimes, boolean includeCancellations) {
+    if (tripTimes.isDeleted()) {
+      return true;
+    }
+
     return (
       (tripTimes.isCanceled() || tripTimes.getTrip().getNetexAlteration().isCanceledOrReplaced()) &&
       !includeCancellations
