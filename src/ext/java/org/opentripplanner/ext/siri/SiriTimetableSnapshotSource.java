@@ -1027,7 +1027,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           // remove the previously created trip
           removePreviousRealtimeUpdate(trip, serviceDate);
 
-          if (!tripTimes.isCanceledOrDeleted()) {
+          if (!tripTimes.isDeleted()) {
             // Calculate modified stop-pattern
             var modifiedStops = createModifiedStops(
               pattern,
