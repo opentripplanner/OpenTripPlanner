@@ -5,6 +5,8 @@ import static org.opentripplanner.raptor.api.request.RaptorRequest.assertPropert
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
@@ -36,7 +38,10 @@ public class SearchParams {
   private final boolean preferLateArrival;
   private final int numberOfAdditionalTransfers;
   private final int maxNumberOfTransfers;
-  private final double relaxCostAtDestination;
+
+  @Nullable
+  private final Double relaxCostAtDestination;
+
   private final boolean timetable;
   private final boolean constrainedTransfers;
   private final Collection<RaptorAccessEgress> accessPaths;
@@ -53,7 +58,7 @@ public class SearchParams {
     preferLateArrival = false;
     numberOfAdditionalTransfers = 5;
     maxNumberOfTransfers = NOT_SET;
-    relaxCostAtDestination = NOT_SET;
+    relaxCostAtDestination = null;
     timetable = false;
     constrainedTransfers = false;
     accessPaths = List.of();
@@ -176,21 +181,18 @@ public class SearchParams {
    * Whether to accept non-optimal trips if they are close enough - if and only if they represent an
    * optimal path for their given iteration. In other words this slack only relaxes the pareto
    * comparison at the destination.
-   * <p/>
+   * <p>
    * Let {@code c} be the existing minimum pareto optimal cost to beat. Then a trip with cost
    * {@code c'} is accepted if the following is true:
    * <pre>
    * c' < Math.round(c * relaxCostAtDestination)
    * </pre>
-   * If the value is less than 0.0 a normal '<' comparison is performed.
-   * <p/>
-   * TODO - When setting this above 1.0, we get some unwanted results. We should have a filter to remove those
-   * TODO - results. See issue https://github.com/entur/r5/issues/28
-   * <p/>
-   * The default value is -1.0 (disabled)
+   * If the value is less than 1.0 a normal '<' comparison is performed.
+   * <p>
+   * The default is not set.
    */
-  public double relaxCostAtDestination() {
-    return relaxCostAtDestination;
+  public Optional<Double> relaxCostAtDestination() {
+    return Optional.ofNullable(relaxCostAtDestination);
   }
 
   /**
@@ -264,9 +266,10 @@ public class SearchParams {
       latestArrivalTime,
       searchWindowInSeconds,
       preferLateArrival,
+      numberOfAdditionalTransfers,
+      relaxCostAtDestination,
       accessPaths,
-      egressPaths,
-      numberOfAdditionalTransfers
+      egressPaths
     );
   }
 
@@ -285,6 +288,7 @@ public class SearchParams {
       searchWindowInSeconds == that.searchWindowInSeconds &&
       preferLateArrival == that.preferLateArrival &&
       numberOfAdditionalTransfers == that.numberOfAdditionalTransfers &&
+      Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination) &&
       accessPaths.equals(that.accessPaths) &&
       egressPaths.equals(that.egressPaths)
     );
@@ -299,6 +303,7 @@ public class SearchParams {
       .addDurationSec("searchWindow", searchWindowInSeconds)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
+      .addNum("relaxCostAtDestination", relaxCostAtDestination)
       .addCollection("accessPaths", accessPaths, 5)
       .addCollection("egressPaths", egressPaths, 5)
       .toString();

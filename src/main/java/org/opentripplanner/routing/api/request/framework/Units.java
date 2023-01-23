@@ -70,6 +70,14 @@ public class Units {
   }
 
   /**
+   * If given input value is {@code null}, then return {@code null}, if not
+   * verify value, see {@link #reluctance(double, double, double)}.
+   */
+  public static Double reluctanceOptional(Double value, double minValue, double maxValue) {
+    return (value == null) ? null : reluctance(value, minValue, maxValue);
+  }
+
+  /**
    * Amount of time/slack/duration in seconds - A constant amount of time.
    */
   public static int duration(int seconds) {

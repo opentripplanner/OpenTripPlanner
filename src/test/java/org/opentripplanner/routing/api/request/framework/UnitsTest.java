@@ -24,6 +24,12 @@ class UnitsTest {
   }
 
   @Test
+  void reluctanceWithMinMax() {
+    assertEquals(0.0, Units.reluctance(0.0, 0.0, 8.0));
+    assertThrows(IllegalArgumentException.class, () -> Units.reluctance(0.999, 1.0, 8.0));
+  }
+
+  @Test
   void duration() {
     assertEquals(0, Units.duration(0));
     assertEquals(10_000, Units.duration(10_000));
