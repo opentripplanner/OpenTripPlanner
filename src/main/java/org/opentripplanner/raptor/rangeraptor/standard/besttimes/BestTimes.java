@@ -111,7 +111,7 @@ public final class BestTimes {
    */
   public boolean updateBestTransitArrivalTime(int stop, int time) {
     if (isBestTransitArrivalTime(stop, time)) {
-      setBestTime(stop, time);
+      setBestTransitTime(stop, time);
       return true;
     }
     return false;
@@ -194,7 +194,7 @@ public final class BestTimes {
     return calculator.isBefore(time, transitArrivalTimes[stop]);
   }
 
-  private void setBestTime(int stop, int time) {
+  private void setBestTransitTime(int stop, int time) {
     transitArrivalTimes[stop] = time;
     reachedByTransitCurrentRound.set(stop);
   }
