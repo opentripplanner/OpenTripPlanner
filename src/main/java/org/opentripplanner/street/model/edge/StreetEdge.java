@@ -28,9 +28,9 @@ import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.TraversalExtension;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.state.State;
@@ -498,9 +498,9 @@ public class StreetEdge
   /**
    * This method is not thread-safe.
    */
-  public void removeTraversalExtension(TraversalExtension ext) {
-    fromv.removeTraversalExtension(ext);
-    tov.removeTraversalExtension(ext);
+  public void removeRentalExtension(RentalRestrictionExtension ext) {
+    fromv.removeRentalRestriction(ext);
+    tov.removeRentalRestriction(ext);
   }
 
   private void setGeometry(LineString geometry) {
@@ -679,9 +679,9 @@ public class StreetEdge
   /**
    * This method is not thread-safe!
    */
-  public void addTraversalExtension(TraversalExtension ext) {
-    fromv.addTraversalExtension(ext);
-    tov.addTraversalExtension(ext);
+  public void addRentalRestriction(RentalRestrictionExtension ext) {
+    fromv.addRentalRestriction(ext);
+    tov.addRentalRestriction(ext);
   }
 
   /**
@@ -933,7 +933,7 @@ public class StreetEdge
     splitEdge.setLink(isLink());
     splitEdge.setCarSpeed(getCarSpeed());
     splitEdge.setElevationExtensionUsingParent(this, fromDistance, toDistance);
-    splitEdge.addTraversalExtension(fromv.traversalExtension());
+    splitEdge.addRentalRestriction(fromv.rentalRestrictions());
   }
 
   protected void setElevationExtensionUsingParent(

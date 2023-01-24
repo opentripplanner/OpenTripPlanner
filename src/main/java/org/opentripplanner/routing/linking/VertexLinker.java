@@ -438,7 +438,7 @@ public class VertexLinker {
         );
     }
 
-    v.addTraversalExtension(originalEdge.getFromVertex().traversalExtension());
+    v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices

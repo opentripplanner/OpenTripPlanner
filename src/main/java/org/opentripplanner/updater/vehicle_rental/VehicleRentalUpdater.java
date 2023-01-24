@@ -23,7 +23,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
 import org.opentripplanner.street.model.edge.VehicleRentalEdge;
-import org.opentripplanner.street.model.vertex.TraversalExtension;
+import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
@@ -47,7 +47,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   private final VehicleRentalDatasource source;
   private WriteToGraphCallback saveResultOnGraph;
 
-  private Map<StreetEdge, TraversalExtension> latestModifiedEdges = Map.of();
+  private Map<StreetEdge, RentalRestrictionExtension> latestModifiedEdges = Map.of();
   private Set<GeofencingZone> latestAppliedGeofencingZones = Set.of();
   Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
   Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
@@ -206,7 +206,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         LOG.info("Computing geofencing zones");
         var start = System.currentTimeMillis();
 
-        latestModifiedEdges.forEach(StreetEdge::removeTraversalExtension);
+        latestModifiedEdges.forEach(StreetEdge::removeRentalExtension);
 
         var updater = new GeofencingVertexUpdater(graph.getStreetIndex()::getEdgesForEnvelope);
         latestModifiedEdges = updater.applyGeofencingZones(geofencingZones);

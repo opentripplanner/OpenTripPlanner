@@ -16,9 +16,9 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.TraversalExtension;
-import org.opentripplanner.street.model.vertex.TraversalExtension.BusinessAreaBorder;
-import org.opentripplanner.street.model.vertex.TraversalExtension.GeofencingZoneExtension;
+import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
+import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.BusinessAreaBorder;
+import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.GeofencingZoneExtension;
 
 /**
  * Even though the data is kept on the vertex this updater operates mostly on edges which then
@@ -41,9 +41,9 @@ class GeofencingVertexUpdater {
 
   /**
    * Applies the restrictions described in the geofencing zones to eges by adding
-   * {@link TraversalExtension} to them.
+   * {@link RentalRestrictionExtension} to them.
    */
-  Map<StreetEdge, TraversalExtension> applyGeofencingZones(
+  Map<StreetEdge, RentalRestrictionExtension> applyGeofencingZones(
     Collection<GeofencingZone> geofencingZones
   ) {
     var restrictedZones = geofencingZones.stream().filter(GeofencingZone::hasRestriction).toList();
@@ -98,11 +98,11 @@ class GeofencingVertexUpdater {
     return env;
   }
 
-  private Map<StreetEdge, TraversalExtension> addExtensionToIntersectingStreetEdges(
+  private Map<StreetEdge, RentalRestrictionExtension> addExtensionToIntersectingStreetEdges(
     List<GeofencingZone> zones,
-    Function<GeofencingZone, TraversalExtension> createExtension
+    Function<GeofencingZone, RentalRestrictionExtension> createExtension
   ) {
-    var edgesUpdated = new HashMap<StreetEdge, TraversalExtension>();
+    var edgesUpdated = new HashMap<StreetEdge, RentalRestrictionExtension>();
     for (GeofencingZone zone : zones) {
       var geom = zone.geometry();
       var ext = createExtension.apply(zone);
@@ -111,11 +111,11 @@ class GeofencingVertexUpdater {
     return edgesUpdated;
   }
 
-  private Map<StreetEdge, TraversalExtension> applyExtension(
+  private Map<StreetEdge, RentalRestrictionExtension> applyExtension(
     Geometry geom,
-    TraversalExtension ext
+    RentalRestrictionExtension ext
   ) {
-    var edgesUpdated = new HashMap<StreetEdge, TraversalExtension>();
+    var edgesUpdated = new HashMap<StreetEdge, RentalRestrictionExtension>();
     Set<Edge> candidates;
     // for business areas we only care about the borders so we compute the boundary of the
     // (multi) polygon. this can either be a MultiLineString or a LineString
@@ -129,7 +129,7 @@ class GeofencingVertexUpdater {
     }
     for (var e : candidates) {
       if (e instanceof StreetEdge streetEdge && streetEdge.getGeometry().intersects(geom)) {
-        streetEdge.addTraversalExtension(ext);
+        streetEdge.addRentalRestriction(ext);
         edgesUpdated.put(streetEdge, ext);
       }
     }

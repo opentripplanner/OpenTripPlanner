@@ -11,11 +11,11 @@ import org.opentripplanner.street.search.state.State;
 /**
  * An extension which defines rules for how rental vehicles may or may not traverse a vertex.
  */
-public sealed interface TraversalExtension {
+public sealed interface RentalRestrictionExtension {
   /**
    * The static default instance which doesn't have any restrictions at all.
    */
-  public static final TraversalExtension NO_RESTRICTION = new NoRestriction();
+  public static final RentalRestrictionExtension NO_RESTRICTION = new NoRestriction();
 
   /**
    * If the current state is banned from traversing the location.
@@ -35,26 +35,26 @@ public sealed interface TraversalExtension {
   /**
    * Add another extension to this one and returning the combined one.
    */
-  default TraversalExtension add(TraversalExtension other) {
+  default RentalRestrictionExtension add(RentalRestrictionExtension other) {
     return Composite.of(this, other);
   }
 
   /**
    * Remove the extension from this one
    */
-  default TraversalExtension remove(TraversalExtension toRemove) {
+  default RentalRestrictionExtension remove(RentalRestrictionExtension toRemove) {
     return NO_RESTRICTION;
   }
 
   /**
    * Return all extensions contained in this one as a list.
    */
-  List<TraversalExtension> toList();
+  List<RentalRestrictionExtension> toList();
 
   /**
    * No restriction on traversal which is the default.
    */
-  final class NoRestriction implements TraversalExtension {
+  final class NoRestriction implements RentalRestrictionExtension {
 
     @Override
     public boolean traversalBanned(State state) {
@@ -72,12 +72,12 @@ public sealed interface TraversalExtension {
     }
 
     @Override
-    public TraversalExtension add(TraversalExtension other) {
+    public RentalRestrictionExtension add(RentalRestrictionExtension other) {
       return other;
     }
 
     @Override
-    public List<TraversalExtension> toList() {
+    public List<RentalRestrictionExtension> toList() {
       return List.of();
     }
   }
@@ -85,7 +85,7 @@ public sealed interface TraversalExtension {
   /**
    * Traversal is restricted by the properties of the geofencing zone.
    */
-  final class GeofencingZoneExtension implements TraversalExtension {
+  final class GeofencingZoneExtension implements RentalRestrictionExtension {
 
     private final GeofencingZone zone;
 
@@ -132,7 +132,7 @@ public sealed interface TraversalExtension {
     }
 
     @Override
-    public List<TraversalExtension> toList() {
+    public List<RentalRestrictionExtension> toList() {
       return List.of(this);
     }
 
@@ -145,7 +145,7 @@ public sealed interface TraversalExtension {
   /**
    * Traversal is banned since this location is the border of a business area.
    */
-  final class BusinessAreaBorder implements TraversalExtension {
+  final class BusinessAreaBorder implements RentalRestrictionExtension {
 
     private final String network;
 
@@ -169,7 +169,7 @@ public sealed interface TraversalExtension {
     }
 
     @Override
-    public List<TraversalExtension> toList() {
+    public List<RentalRestrictionExtension> toList() {
       return List.of(this);
     }
   }
@@ -177,11 +177,11 @@ public sealed interface TraversalExtension {
   /**
    * Combines multiple restrictions into one.
    */
-  final class Composite implements TraversalExtension {
+  final class Composite implements RentalRestrictionExtension {
 
-    private final TraversalExtension[] exts;
+    private final RentalRestrictionExtension[] exts;
 
-    private Composite(TraversalExtension... exts) {
+    private Composite(RentalRestrictionExtension... exts) {
       for (var ext : exts) {
         if (ext instanceof Composite) {
           throw new IllegalArgumentException(
@@ -190,7 +190,7 @@ public sealed interface TraversalExtension {
         }
       }
       var set = new HashSet<>(Arrays.asList(exts));
-      this.exts = set.toArray(TraversalExtension[]::new);
+      this.exts = set.toArray(RentalRestrictionExtension[]::new);
     }
 
     @Override
@@ -223,25 +223,25 @@ public sealed interface TraversalExtension {
     }
 
     @Override
-    public TraversalExtension add(TraversalExtension other) {
+    public RentalRestrictionExtension add(RentalRestrictionExtension other) {
       return Composite.of(this, other);
     }
 
-    private static TraversalExtension of(TraversalExtension... exts) {
+    private static RentalRestrictionExtension of(RentalRestrictionExtension... exts) {
       var set = Arrays.stream(exts).flatMap(e -> e.toList().stream()).collect(Collectors.toSet());
       if (set.size() == 1) {
         return List.copyOf(set).get(0);
       } else {
-        return new Composite(set.toArray(TraversalExtension[]::new));
+        return new Composite(set.toArray(RentalRestrictionExtension[]::new));
       }
     }
 
     @Override
-    public TraversalExtension remove(TraversalExtension toRemove) {
+    public RentalRestrictionExtension remove(RentalRestrictionExtension toRemove) {
       var newExts = Arrays
         .stream(exts)
         .filter(e -> !e.equals(toRemove))
-        .toArray(TraversalExtension[]::new);
+        .toArray(RentalRestrictionExtension[]::new);
       if (newExts.length == 0) {
         return null;
       } else {
@@ -250,7 +250,7 @@ public sealed interface TraversalExtension {
     }
 
     @Override
-    public List<TraversalExtension> toList() {
+    public List<RentalRestrictionExtension> toList() {
       return List.copyOf(Arrays.asList(exts));
     }
   }

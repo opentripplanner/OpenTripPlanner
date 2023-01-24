@@ -20,16 +20,16 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
+import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.BusinessAreaBorder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.TraversalExtension;
-import org.opentripplanner.street.model.vertex.TraversalExtension.BusinessAreaBorder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-class TraversalExtensionTest {
+class RentalRestrictionExtensionTest {
 
   String network = "tier-oslo";
   StreetVertex V1 = intersectionVertex("V1", 0, 0);
@@ -40,7 +40,7 @@ class TraversalExtensionTest {
   @Test
   public void leaveBusinessAreaOnFoot() {
     var edge = streetEdge(V1, V2);
-    edge.addTraversalExtension(new BusinessAreaBorder(network));
+    edge.addRentalRestriction(new BusinessAreaBorder(network));
     State result = traverse(edge);
     assertEquals(HAVE_RENTED, result.getVehicleRentalState());
     assertEquals(TraverseMode.WALK, result.getBackMode());
@@ -50,8 +50,8 @@ class TraversalExtensionTest {
   @Test
   public void dontEnterGeofencingZoneOnFoot() {
     var edge = streetEdge(V1, V2);
-    edge.addTraversalExtension(
-      new TraversalExtension.GeofencingZoneExtension(
+    edge.addRentalRestriction(
+      new RentalRestrictionExtension.GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, true)
       )
     );
@@ -69,8 +69,8 @@ class TraversalExtensionTest {
     var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
     var editor = new StateEditor(edge1.getFromVertex(), req);
     editor.beginFloatingVehicleRenting(RentalVehicleType.FormFactor.SCOOTER, network, false);
-    restrictedEdge.addTraversalExtension(
-      new TraversalExtension.GeofencingZoneExtension(
+    restrictedEdge.addRentalRestriction(
+      new RentalRestrictionExtension.GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
       )
     );
@@ -95,8 +95,8 @@ class TraversalExtensionTest {
   @Test
   public void dontFinishInNoDropOffZone() {
     var edge = streetEdge(V1, V2);
-    edge.addTraversalExtension(
-      new TraversalExtension.GeofencingZoneExtension(
+    edge.addRentalRestriction(
+      new RentalRestrictionExtension.GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
       )
     );
@@ -114,8 +114,8 @@ class TraversalExtensionTest {
   @Test
   public void addTwoExtensions() {
     var edge = streetEdge(V1, V2);
-    edge.addTraversalExtension(new BusinessAreaBorder("a"));
-    edge.addTraversalExtension(new BusinessAreaBorder("b"));
+    edge.addRentalRestriction(new BusinessAreaBorder("a"));
+    edge.addRentalRestriction(new BusinessAreaBorder("b"));
 
     assertTrue(edge.fromv.traversalBanned(state("a")));
     assertTrue(edge.fromv.traversalBanned(state("b")));
@@ -128,27 +128,27 @@ class TraversalExtensionTest {
     var b = new BusinessAreaBorder("b");
     var c = new BusinessAreaBorder("c");
 
-    edge.addTraversalExtension(a);
+    edge.addRentalRestriction(a);
 
-    assertTrue(edge.fromv.traversalExtension().traversalBanned(state("a")));
+    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(state("a")));
 
-    edge.addTraversalExtension(b);
-    edge.addTraversalExtension(c);
+    edge.addRentalRestriction(b);
+    edge.addRentalRestriction(c);
 
-    edge.removeTraversalExtension(a);
+    edge.removeRentalExtension(a);
 
-    assertTrue(edge.fromv.traversalExtension().traversalBanned(state("b")));
-    assertTrue(edge.fromv.traversalExtension().traversalBanned(state("c")));
+    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(state("b")));
+    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(state("c")));
 
-    edge.removeTraversalExtension(b);
+    edge.removeRentalExtension(b);
 
-    assertTrue(edge.fromv.traversalExtension().traversalBanned(state("c")));
+    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(state("c")));
   }
 
   @Test
   public void checkNetwork() {
     var edge = streetEdge(V1, V2);
-    edge.addTraversalExtension(new BusinessAreaBorder("a"));
+    edge.addRentalRestriction(new BusinessAreaBorder("a"));
 
     var state = traverse(edge);
 
@@ -172,15 +172,15 @@ class TraversalExtensionTest {
   @Nested
   class Composition {
 
-    TraversalExtension a = new BusinessAreaBorder("a");
-    TraversalExtension b = new BusinessAreaBorder("b");
-    TraversalExtension c = new TraversalExtension.GeofencingZoneExtension(
+    RentalRestrictionExtension a = new BusinessAreaBorder("a");
+    RentalRestrictionExtension b = new BusinessAreaBorder("b");
+    RentalRestrictionExtension c = new RentalRestrictionExtension.GeofencingZoneExtension(
       new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
     );
 
     @Test
     void addToBase() {
-      var newA = TraversalExtension.NO_RESTRICTION.add(a);
+      var newA = RentalRestrictionExtension.NO_RESTRICTION.add(a);
       assertSame(a, newA);
       assertEquals(1, newA.toList().size());
     }
@@ -194,27 +194,27 @@ class TraversalExtensionTest {
     @Test
     void add() {
       var composite = a.add(b);
-      assertInstanceOf(TraversalExtension.Composite.class, composite);
+      assertInstanceOf(RentalRestrictionExtension.Composite.class, composite);
     }
 
     @Test
     void differentType() {
       var composite = a.add(c);
-      assertInstanceOf(TraversalExtension.Composite.class, composite);
+      assertInstanceOf(RentalRestrictionExtension.Composite.class, composite);
     }
 
     @Test
     void composite() {
       var composite = a.add(b);
-      assertInstanceOf(TraversalExtension.Composite.class, composite);
+      assertInstanceOf(RentalRestrictionExtension.Composite.class, composite);
       var newComposite = composite.add(c);
-      assertInstanceOf(TraversalExtension.Composite.class, newComposite);
+      assertInstanceOf(RentalRestrictionExtension.Composite.class, newComposite);
 
-      var c1 = (TraversalExtension.Composite) newComposite;
+      var c1 = (RentalRestrictionExtension.Composite) newComposite;
       var exts = c1.toList();
       assertEquals(3, exts.size());
 
-      var c2 = (TraversalExtension.Composite) c1.add(a);
+      var c2 = (RentalRestrictionExtension.Composite) c1.add(a);
       assertEquals(3, c2.toList().size());
       // convert to sets so the order doesn't matter
       assertEquals(Set.of(a, b, c), Set.copyOf(c2.toList()));

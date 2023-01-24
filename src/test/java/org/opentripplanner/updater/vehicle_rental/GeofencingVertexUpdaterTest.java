@@ -15,10 +15,10 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
+import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.GeofencingZoneExtension;
+import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.NoRestriction;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.TraversalExtension;
-import org.opentripplanner.street.model.vertex.TraversalExtension.GeofencingZoneExtension;
-import org.opentripplanner.street.model.vertex.TraversalExtension.NoRestriction;
 
 class GeofencingVertexUpdaterTest {
 
@@ -68,11 +68,11 @@ class GeofencingVertexUpdaterTest {
 
   @Test
   void insideZone() {
-    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().traversalExtension());
+    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().rentalRestrictions());
 
     updater.applyGeofencingZones(List.of(zone, businessArea));
 
-    var ext = insideFrognerPark.getFromVertex().traversalExtension();
+    var ext = insideFrognerPark.getFromVertex().rentalRestrictions();
 
     assertInstanceOf(GeofencingZoneExtension.class, ext);
 
@@ -83,11 +83,11 @@ class GeofencingVertexUpdaterTest {
 
   @Test
   void halfInHalfOutZone() {
-    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().traversalExtension());
+    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().rentalRestrictions());
 
     updater.applyGeofencingZones(List.of(zone, businessArea));
 
-    var ext = insideFrognerPark.getFromVertex().traversalExtension();
+    var ext = insideFrognerPark.getFromVertex().rentalRestrictions();
 
     assertInstanceOf(GeofencingZoneExtension.class, ext);
 
@@ -98,24 +98,24 @@ class GeofencingVertexUpdaterTest {
 
   @Test
   void outsideZone() {
-    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().traversalExtension());
+    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().rentalRestrictions());
     updater.applyGeofencingZones(List.of(zone, businessArea));
     assertInstanceOf(
       GeofencingZoneExtension.class,
-      insideFrognerPark.getFromVertex().traversalExtension()
+      insideFrognerPark.getFromVertex().rentalRestrictions()
     );
   }
 
   @Test
   void businessAreaBorder() {
-    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().traversalExtension());
+    assertInstanceOf(NoRestriction.class, insideFrognerPark.getFromVertex().rentalRestrictions());
     var updated = updater.applyGeofencingZones(List.of(zone, businessArea));
 
     assertEquals(3, updated.size());
 
-    var ext = (TraversalExtension.BusinessAreaBorder) businessBorder
+    var ext = (RentalRestrictionExtension.BusinessAreaBorder) businessBorder
       .getFromVertex()
-      .traversalExtension();
-    assertInstanceOf(TraversalExtension.BusinessAreaBorder.class, ext);
+      .rentalRestrictions();
+    assertInstanceOf(RentalRestrictionExtension.BusinessAreaBorder.class, ext);
   }
 }

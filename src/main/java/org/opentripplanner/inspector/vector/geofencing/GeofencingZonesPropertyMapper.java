@@ -1,8 +1,8 @@
 package org.opentripplanner.inspector.vector.geofencing;
 
-import static org.opentripplanner.street.model.vertex.TraversalExtension.RestrictionType.BUSINESS_AREA_BORDER;
-import static org.opentripplanner.street.model.vertex.TraversalExtension.RestrictionType.NO_DROP_OFF;
-import static org.opentripplanner.street.model.vertex.TraversalExtension.RestrictionType.NO_TRAVERSAL;
+import static org.opentripplanner.street.model.vertex.RentalRestrictionExtension.RestrictionType.BUSINESS_AREA_BORDER;
+import static org.opentripplanner.street.model.vertex.RentalRestrictionExtension.RestrictionType.NO_DROP_OFF;
+import static org.opentripplanner.street.model.vertex.RentalRestrictionExtension.RestrictionType.NO_TRAVERSAL;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +17,7 @@ public class GeofencingZonesPropertyMapper extends PropertyMapper<Vertex> {
 
   @Override
   protected Collection<KeyValue> map(Vertex input) {
-    var ext = input.traversalExtension();
+    var ext = input.rentalRestrictions();
 
     // this logic does a best effort attempt at a simple mapping
     // once you have several networks on the same edge it breaks down for that you would
