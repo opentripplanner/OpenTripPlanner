@@ -651,7 +651,7 @@ public abstract class RoutingResource {
 
   /**
    * Whether non-optimal transit paths at the destination should be returned.
-   * If the value is less than 0.0 a normal '<' comparison is performed.
+   * This is optional. Use values between 1.0 and 2.0. For example to relax 10% use 1.1.
    * Values greater than 2.0 are not supported, due to performance reasons.
    * {@link SearchParams#relaxCostAtDestination()}
    */
