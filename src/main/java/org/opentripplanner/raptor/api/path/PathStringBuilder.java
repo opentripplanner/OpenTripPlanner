@@ -16,24 +16,15 @@ public class PathStringBuilder {
 
   private final RaptorStopNameResolver stopNameResolver;
   private final StringBuilder buf = new StringBuilder();
-  private final boolean padDuration;
   private boolean elementAdded = false;
   private boolean sepAdded = false;
-
-  public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver) {
-    this(stopNameResolver, false);
-  }
 
   /**
    * @param stopNameResolver Used to translate stopIndexes to stopNames, if {@code null} the index
    *                         is used in the result string.
-   * @param padDuration      This can be set to {@code true} for padding the duration output. This
-   *                         would be used in cases were several similar paths are listed. If the
-   *                         legs are similar, the path elements is more likely to be aligned.
    */
-  public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver, boolean padDuration) {
+  public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver) {
     this.stopNameResolver = RaptorStopNameResolver.nullSafe(stopNameResolver);
-    this.padDuration = padDuration;
   }
 
   public PathStringBuilder sep() {
@@ -128,7 +119,7 @@ public class PathStringBuilder {
 
   public PathStringBuilder duration(int duration) {
     String durationStr = DurationUtils.durationToStr(duration);
-    return space().append(padDuration ? String.format("%5s", durationStr) : durationStr);
+    return space().append(durationStr);
   }
 
   public PathStringBuilder time(int from, int to) {

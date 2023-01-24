@@ -38,11 +38,6 @@ public class PathStringBuilderTest {
   }
 
   @Test
-  public void walkWithDurationPadded() {
-    assertEquals("Walk   17s", new PathStringBuilder(STOP_NAME_RESOLVER, true).walk(17).toString());
-  }
-
-  @Test
   public void transit() {
     assertEquals("BUS 10:46:05 10:55", subject.transit(MODE, T_10_46_05, T_10_55).toString());
   }

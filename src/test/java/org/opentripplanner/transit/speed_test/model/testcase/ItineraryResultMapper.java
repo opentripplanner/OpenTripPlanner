@@ -73,7 +73,7 @@ class ItineraryResultMapper {
   }
 
   public static String details(Itinerary itin) {
-    PathStringBuilder buf = new PathStringBuilder(Integer::toString, true);
+    PathStringBuilder buf = new PathStringBuilder(Integer::toString);
 
     for (Leg leg : itin.getLegs()) {
       Optional
