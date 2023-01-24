@@ -7,12 +7,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonAssertions {
 
-  private static final ObjectMapper mapper = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
+  /**
+   * Take two JSON documents and reformat them before comparing {@code actual} with {@code expected}.
+   */
   public static void assertEqualJson(String expected, String actual) {
     try {
-      var act = mapper.readTree(actual);
-      var exp = mapper.readTree(expected);
+      var act = MAPPER.readTree(actual);
+      var exp = MAPPER.readTree(expected);
       assertEquals(act.toPrettyString(), exp.toPrettyString());
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
