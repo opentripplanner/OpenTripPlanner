@@ -1,0 +1,15 @@
+{
+  "data" : {
+    "routes" : [
+      {
+        "longName" : null,
+        "shortName" : "R123",
+        "gtfsId" : "F:123",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        }
+      }
+    ]
+  }
+}
