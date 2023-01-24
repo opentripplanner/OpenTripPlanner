@@ -21,6 +21,7 @@ interactive_otp_main.json
 /otp-ui
 Dockerfile
 .java-version
+o_o_standalone_config_IncludeFileDirectiveTest_part.json
 
 # Directories
 .idea/
