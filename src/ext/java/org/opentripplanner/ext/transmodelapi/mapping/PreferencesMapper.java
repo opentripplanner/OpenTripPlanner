@@ -73,8 +73,7 @@ class PreferencesMapper {
       callWith.argument("includePlannedCancellations", tr::setIncludePlannedCancellations);
       callWith.argument(
         "relaxTransitSearchGeneralizedCostAtDestination",
-        (Double value) ->
-          tr.withRaptor(it -> it.withRelaxTransitSearchGeneralizedCostAtDestination(value))
+        (Double value) -> tr.withRaptor(it -> it.withRelaxGeneralizedCostAtDestination(value))
       );
     });
     preferences.withItineraryFilter(itineraryFilter -> {

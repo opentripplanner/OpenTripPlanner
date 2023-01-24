@@ -463,18 +463,21 @@ public class TripQuery {
           .name("relaxTransitSearchGeneralizedCostAtDestination")
           .description(
             """
-            Whether non-optimal transit paths at the destination should be returned.
-            Let c be the existing minimum pareto optimal generalized-cost to beat. Then a trip with
-            cost c' is accepted if the following is true:
-            `c' < Math.round(c * relaxTransitSearchGeneralizedCostAtDestination)`.
-            
-            If the value is less than 0.0 a normal '<' comparison is performed.
-            Values greater than 2.0 are not supported, due to performance reasons.
-            """
+              Whether non-optimal transit paths at the destination should be returned. Let c be the
+              existing minimum pareto optimal generalized-cost to beat. Then a trip with cost c' is
+              accepted if the following is true:
+              
+              `c' < Math.round(c * relaxTransitSearchGeneralizedCostAtDestination)`
+                          
+              The parameter is optional. If not set, a normal comparison is performed.
+              
+              Values less than 1.0 is not allowed, and values greater than 2.0 are not
+              supported, due to performance reasons.
+              """
           )
           .type(Scalars.GraphQLFloat)
-          .defaultValue(
-            preferences.transit().raptor().relaxTransitSearchGeneralizedCostAtDestination()
+          .defaultValueProgrammatic(
+            preferences.transit().raptor().relaxGeneralizedCostAtDestination().orElse(null)
           )
           .build()
       )

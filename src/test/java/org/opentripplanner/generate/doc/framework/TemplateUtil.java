@@ -1,28 +1,13 @@
 package org.opentripplanner.generate.doc.framework;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
  * Replace a text in a file wrapped using HTML comments
  */
 public class TemplateUtil {
-
-  private static final ObjectMapper MAPPER = new ObjectMapper();
-  private static final ObjectWriter PRETTY_PRINTER;
-
-  static {
-    MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
-    var pp = new DefaultPrettyPrinter();
-    pp.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
-    PRETTY_PRINTER = MAPPER.writer(pp);
-  }
 
   private static final String PARAMETERS_TABLE = "PARAMETERS-TABLE";
   private static final String PARAMETERS_DETAILS = "PARAMETERS-DETAILS";
@@ -80,7 +65,7 @@ public class TemplateUtil {
       ```
       """.formatted(
         comment,
-        prettyPrintJson(json)
+        JsonSupport.prettyPrint(json)
       );
   }
 
@@ -89,13 +74,5 @@ public class TemplateUtil {
    */
   public static String jsonExample(NodeAdapter nodeAdapter, String source) {
     return jsonExample(nodeAdapter.rawNode(), source);
-  }
-
-  public static String prettyPrintJson(JsonNode body) {
-    try {
-      return PRETTY_PRINTER.writeValueAsString(body);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
   }
 }
