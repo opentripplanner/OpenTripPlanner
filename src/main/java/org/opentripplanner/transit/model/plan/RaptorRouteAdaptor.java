@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.model.plan;
 
+import javax.annotation.Nonnull;
+import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
@@ -7,7 +9,9 @@ import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.model.calendar.TripScheduleSearchOnDays;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.trip.TripOnDate;
+import org.opentripplanner.transit.model.trip.timetable.DefaultTimetable;
 
 public record RaptorRouteAdaptor(
   RaptorTripPattern routingPattern,
@@ -51,11 +55,59 @@ public record RaptorRouteAdaptor(
 
   @Override
   public RaptorTripScheduleSearch<TripOnDate> tripSearch(SearchDirection direction) {
-    //    return switch (direction) {
-    //      case FORWARD -> new DepartureTripSearch(timetables,)
-    //      case REVERSE ->
-    //    };
-    return null;
+    // TODO RTM
+
+    return new RaptorTripScheduleSearch<TripOnDate>() {
+      @Override
+      public RaptorBoardOrAlightEvent<TripOnDate> search(
+        int earliestBoardTime,
+        int stopPositionInPattern,
+        int tripIndexLimit
+      ) {
+        return new RaptorBoardOrAlightEvent<TripOnDate>() {
+          @Override
+          public int tripIndex() {
+            return 0;
+          }
+
+          @Override
+          public TripOnDate trip() {
+            DefaultTimetable timetable = DefaultTimetable.create(
+              new int[][] { { 60, 180, 300 } },
+              new int[][] { { 60, 180, 300 } },
+              new Deduplicator()
+            );
+            return new TripOnDate(0, timetable);
+          }
+
+          @Override
+          public int stopPositionInPattern() {
+            return 0;
+          }
+
+          @Override
+          public int time() {
+            return 0;
+          }
+
+          @Override
+          public int earliestBoardTime() {
+            return 0;
+          }
+
+          @Nonnull
+          @Override
+          public RaptorTransferConstraint transferConstraint() {
+            return RaptorTransferConstraint.REGULAR_TRANSFER;
+          }
+
+          @Override
+          public boolean empty() {
+            return false;
+          }
+        };
+      }
+    };
   }
 
   /* implement RaptorTripScheduleSearch<> */

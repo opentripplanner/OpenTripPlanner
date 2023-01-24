@@ -18,7 +18,7 @@ public class RoutingTripPattern implements RaptorTripPattern {
   private final int slackIndex;
   private final String debugInfo;
 
-  RoutingTripPattern(
+  public RoutingTripPattern(
     int[] stopsIndexes,
     BitSet boarding,
     BitSet alighting,

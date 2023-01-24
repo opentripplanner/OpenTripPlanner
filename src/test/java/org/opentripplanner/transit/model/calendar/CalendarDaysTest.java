@@ -116,28 +116,6 @@ class CalendarDaysTest {
     Assertions.assertEquals(text, subject.time(day, seconds).format(ISO_DATE_TIME));
   }
 
-  static final Stream<Arguments> tcParseTime = testCases.stream();
-
-  @Disabled
-  @ParameterizedTest(name = "Verify finding transit day and time from zoned date time.")
-  @VariableSource("tcParseTime")
-  void transitTime(String text, ZonedDateTime time, Integer day, Integer seconds) {
-    /*
-      TODO RTM - Fix
-
-    var v = subject.time(time);
-
-    if (v.day() == day) {
-      assertEquals(v.timeSec(), seconds, text);
-    } else if (seconds > D24h) {
-      assertEquals(v.day(), day + 1, text);
-      assertEquals(v.timeSec() + D24h, seconds, text);
-    } else {
-      fail();
-    }
-    */
-  }
-
   static Arguments tc(String text, int day, int seconds) {
     return Arguments.of(text, ZonedDateTime.parse(text), day, seconds);
   }

@@ -122,7 +122,7 @@ public class CalendarDaysBuilder {
     return (int) Duration.between(t0, t1).toSeconds();
   }
 
-  CalendarDays build() {
+  public CalendarDays build() {
     calculateDerivedVariables();
     return new CalendarDays(this);
   }

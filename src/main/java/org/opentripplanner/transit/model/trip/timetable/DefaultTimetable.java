@@ -29,7 +29,7 @@ public class DefaultTimetable implements Timetable {
     this.alightSearch = AlightTimeSearch.createSearch(numOfTrips());
     this.hashCode = TimetableIntUtils.matrixHashCode(nTrips, nStops, boardTimes, alightTimes);
     this.maxTripDurationInDays =
-      calculateMaxTripDurationInDays(alightTimes, index(0, nStops - 1), alightTimes.length);
+      calculateMaxTripDurationInDays(alightTimes, nStops * (nTrips - 1), alightTimes.length);
   }
 
   public static DefaultTimetable create(
@@ -64,7 +64,7 @@ public class DefaultTimetable implements Timetable {
 
   @Override
   public int maxTripDurationInDays() {
-    return 0;
+    return maxTripDurationInDays;
   }
 
   @Override

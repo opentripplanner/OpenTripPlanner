@@ -27,7 +27,7 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
   private final int slackIndex;
   private final int transitReluctanceFactorIndex;
 
-  RoutingTripPattern(TripPattern pattern, TripPatternBuilder builder) {
+  public RoutingTripPattern(TripPattern pattern, TripPatternBuilder builder) {
     this.pattern = pattern;
     this.stopIndexes = pattern.getStops().stream().mapToInt(StopLocation::getIndex).toArray();
     this.index = INDEX_COUNTER.getAndIncrement();
