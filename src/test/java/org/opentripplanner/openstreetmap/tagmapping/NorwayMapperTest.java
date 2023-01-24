@@ -4,15 +4,15 @@ import static java.lang.Double.NaN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
-import java.util.stream.Stream;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.SafetyFeatures;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.test.support.VariableSource;
 
 public class NorwayMapperTest {
 
@@ -34,7 +34,7 @@ public class NorwayMapperTest {
     "residential",
   };
 
-  static Stream<Arguments> createExpectedBicycleSafetyForMaxspeedCases() {
+  static List<Arguments> createExpectedBicycleSafetyForMaxspeedCases() {
     Double[][] expectedBicycleSafetyMatrix = {
       { 10., 3.75, 3.75, 3.43, 2.5, 2.5, 1.83 },
       { 10., 3.75, 3.75, 3.43, 2.5, 2.5, 1.83 },
@@ -57,10 +57,10 @@ public class NorwayMapperTest {
         }
       }
     }
-    return argumentsList.stream();
+    return argumentsList;
   }
 
-  static Stream<Arguments> createBicycleSafetyWithoutExplicitMaxspeed() {
+  static List<Arguments> createBicycleSafetyWithoutExplicitMaxspeed() {
     Double[] expectedBicycleSafety = { 3.75, 3.75, 3.43, 3.43, 3.43, 1.83 };
     ArrayList<Arguments> argumentsList = new ArrayList<>();
     for (int i = 0; i < expectedHighways.length; i++) {
@@ -70,10 +70,10 @@ public class NorwayMapperTest {
       way.addTag("highway", highway);
       argumentsList.add(Arguments.of(way, expectedSafety));
     }
-    return argumentsList.stream();
+    return argumentsList;
   }
 
-  static Stream<Arguments> createLinkRoadLikeMainCases() {
+  static List<Arguments> createLinkRoadLikeMainCases() {
     ArrayList<Arguments> argumentsList = new ArrayList<>();
     for (var i = 0; i < 4; i++) {
       var highway = expectedHighways[i];
@@ -87,15 +87,11 @@ public class NorwayMapperTest {
         argumentsList.add(Arguments.of(mainRoad, linkRoad));
       }
     }
-    return argumentsList.stream();
+    return argumentsList;
   }
 
-  static Stream<Arguments> expectedBicycleSafetyForMaxspeedCases = createExpectedBicycleSafetyForMaxspeedCases();
-  static Stream<Arguments> expectedBicycleSafetyWithoutExplicitMaxspeed = createBicycleSafetyWithoutExplicitMaxspeed();
-  static Stream<Arguments> linkRoadLikeMainCases = createLinkRoadLikeMainCases();
-
   @ParameterizedTest(name = "{0} should have a score of {1}")
-  @VariableSource("expectedBicycleSafetyForMaxspeedCases")
+  @MethodSource("createExpectedBicycleSafetyForMaxspeedCases")
   public void testBicycleSafetyForMaxspeed(OSMWithTags way, Double expected) {
     var result = wps.getDataForWay(way).getBicycleSafetyFeatures();
     var expectedSafetyFeatures = new SafetyFeatures(expected, expected);
@@ -103,7 +99,7 @@ public class NorwayMapperTest {
   }
 
   @ParameterizedTest
-  @VariableSource("expectedBicycleSafetyWithoutExplicitMaxspeed")
+  @MethodSource("createBicycleSafetyWithoutExplicitMaxspeed")
   public void testBicycleSafetyWithoutMaxspeed(OSMWithTags way, Double expected) {
     var result = wps.getDataForWay(way).getBicycleSafetyFeatures();
     var expectedSafetyFeatures = new SafetyFeatures(expected, expected);
@@ -111,7 +107,7 @@ public class NorwayMapperTest {
   }
 
   @ParameterizedTest
-  @VariableSource("linkRoadLikeMainCases")
+  @MethodSource("createLinkRoadLikeMainCases")
   public void testBicycleSafetyLikeLinkRoad(OSMWithTags mainRoad, OSMWithTags linkRoad) {
     var resultMain = wps.getDataForWay(mainRoad).getBicycleSafetyFeatures();
     var resultLink = wps.getDataForWay(linkRoad).getBicycleSafetyFeatures();
