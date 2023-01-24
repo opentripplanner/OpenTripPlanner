@@ -154,6 +154,17 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return bus(tripId, startTime, endTime, TRIP_FROM_STOP_INDEX, TRIP_TO_STOP_INDEX, to, null);
   }
 
+  public TestItineraryBuilder bus(
+    int tripId,
+    int startTime,
+    int endTime,
+    int fromStopIndex,
+    int toStopIndex,
+    Place to
+  ) {
+    return bus(tripId, startTime, endTime, fromStopIndex, toStopIndex, to, null);
+  }
+
   public TestItineraryBuilder bus(Route route, int tripId, int startTime, int endTime, Place to) {
     return transit(
       route,
@@ -381,6 +392,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     }
 
     leg.setDistanceMeters(speed(leg.getMode()) * (end - start));
+    leg.setDirectDistanceMeters(5000);
 
     legs.add(leg);
     cost += legCost;

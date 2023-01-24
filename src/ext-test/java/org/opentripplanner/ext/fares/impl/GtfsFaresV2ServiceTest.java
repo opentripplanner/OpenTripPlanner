@@ -121,13 +121,22 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
-      new FareLegRule(LEG_GROUP1, null, null, null, null, null, null,single),
+      new FareLegRule(LEG_GROUP1, null, null, null, null, null, null, single),
       new FareLegRule(LEG_GROUP1, null, null, OUTER_ZONE, null, null, null, singleToOuter),
       new FareLegRule(LEG_GROUP1, null, OUTER_ZONE, null, null, null, null, singleFromOuter),
       new FareLegRule(LEG_GROUP1, null, null, null, null, null, null, dayPass),
       new FareLegRule(LEG_GROUP1, expressNetwork, null, null, null, null, null, expressPass),
       new FareLegRule(LEG_GROUP1, localNetwork, null, null, null, null, null, localPass),
-      new FareLegRule(LEG_GROUP1, null, INNER_ZONE, OUTER_ZONE, null, null, null, innerToOuterZoneSingle),
+      new FareLegRule(
+        LEG_GROUP1,
+        null,
+        INNER_ZONE,
+        OUTER_ZONE,
+        null,
+        null,
+        null,
+        innerToOuterZoneSingle
+      ),
       new FareLegRule("another-leg-group", null, null, null, null, null, null, monthlyPass)
     ),
     List.of(),
@@ -243,8 +252,17 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
     GtfsFaresV2Service service = new GtfsFaresV2Service(
       List.of(
-        new FareLegRule(LEG_GROUP2, null, INNER_ZONE, INNER_ZONE, null, null, null, freeTransferFromInnerToOuter),
-        new FareLegRule(LEG_GROUP3, null, OUTER_ZONE, OUTER_ZONE, null, null, null,single),
+        new FareLegRule(
+          LEG_GROUP2,
+          null,
+          INNER_ZONE,
+          INNER_ZONE,
+          null,
+          null,
+          null,
+          freeTransferFromInnerToOuter
+        ),
+        new FareLegRule(LEG_GROUP3, null, OUTER_ZONE, OUTER_ZONE, null, null, null, single),
         new FareLegRule(LEG_GROUP4, null, null, null, null, null, null, freeTransferSingle),
         new FareLegRule(LEG_GROUP5, null, INNER_ZONE, OUTER_ZONE, null, null, null, singleToOuter)
       ),
@@ -276,6 +294,103 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .build();
       var result = service.getProducts(i1);
       assertEquals(Set.of(freeTransferFromInnerToOuter), result.itineraryProducts());
+    }
+  }
+
+  @Nested
+  class Distance {
+
+    FareProduct threeStopProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "three-stop-product"),
+      "three-stop-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+
+    FareProduct fiveStopProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "five-stop-product"),
+      "five-stop-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+    FareProduct twelveStopProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "twelve-stop-product"),
+      "twelve-stop-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+
+    FareProduct tenKmProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "ten-km-product"),
+      "ten-km-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+    FareProduct threeKmProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "three-km-product"),
+      "three-km-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+    FareProduct twoKmProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "two-km-product"),
+      "two-km-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+
+    List<FareLegRule> rules = List.of(
+      new FareLegRule(null, null, null, null, 0.0, 3.0, 0, threeStopProduct),
+      new FareLegRule(null, null, null, null, 5d, 10d, 0, fiveStopProduct),
+      new FareLegRule(null, null, null, null, 12d, 20d, 0, twelveStopProduct),
+      new FareLegRule(null, null, null, null, 7000d, 10000d, 1, tenKmProduct),
+      new FareLegRule(null, null, null, null, 3000d, 6000d, 1, threeKmProduct),
+      new FareLegRule(null, null, null, null, null, 2000d, 1, twoKmProduct)
+    );
+
+    @Test
+    void stops() {
+      var i1 = newItinerary(A, 0).bus(ID, 0, 50, 1, 20, C).build();
+      var result = service.getProducts(i1);
+      var faresV2Service = new GtfsFaresV2Service(
+        rules,
+        List.of(),
+        Multimaps.forMap(
+          Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
+        )
+      );
+      assertEquals(
+        faresV2Service.getProducts(i1).itineraryProducts(),
+        Set.of(twelveStopProduct, threeKmProduct)
+      );
+    }
+
+    @Test
+    void directDistance() {
+      var i1 = newItinerary(A, 0).bus(ID, 0, 50, C).build();
+      var faresV2Service = new GtfsFaresV2Service(
+        rules,
+        List.of(),
+        Multimaps.forMap(
+          Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
+        )
+      );
+      assertEquals(
+        faresV2Service.getProducts(i1).itineraryProducts(),
+        Set.of(threeStopProduct, threeKmProduct)
+      );
     }
   }
 }

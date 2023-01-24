@@ -100,7 +100,12 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
     setDistanceMeters(getDistanceFromCoordinates(transitLegCoordinates));
-    setDirectDistanceMeters(getDirectDistance(transitLegCoordinates.get(0), transitLegCoordinates.get(transitLegCoordinates.size() -1)));
+    setDirectDistanceMeters(
+      getDirectDistance(
+        transitLegCoordinates.get(0),
+        transitLegCoordinates.get(transitLegCoordinates.size() - 1)
+      )
+    );
   }
 
   public ZoneId getZoneId() {
