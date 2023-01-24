@@ -8,7 +8,6 @@ import java.util.Map;
 import org.opentripplanner.ext.transmodelapi.mapping.TripRequestMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.ViaRequestMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
-import org.opentripplanner.ext.transmodelapi.model.plan.ViaPlanResponse;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
@@ -52,22 +51,27 @@ public class TransmodelGraphQLPlanner {
       .build();
   }
 
-  public DataFetcherResult<ViaPlanResponse> planVia(DataFetchingEnvironment environment) {
-    ViaPlanResponse response;
+  public DataFetcherResult<ViaRoutingResponse> planVia(DataFetchingEnvironment environment) {
+    ViaRoutingResponse response;
     TransmodelRequestContext ctx = environment.getContext();
-    OtpServerRequestContext serverContext = ctx.getServerContext();
     RouteViaRequest request = null;
     try {
       request = ViaRequestMapper.createRouteViaRequest(environment);
-      ViaRoutingResponse res = ctx.getRoutingService().route(request);
-      response = ViaPlanResponse.of(res);
+      response = ctx.getRoutingService().route(request);
     } catch (Exception e) {
       LOG.error("System error: " + e.getMessage(), e);
-      response = ViaPlanResponse.failed(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
+      response =
+        new ViaRoutingResponse(
+          Map.of(),
+          List.of(),
+          List.of(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null))
+        );
     }
-    Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
+
+    Locale defaultLocale = ctx.getServerContext().defaultLocale();
+    Locale locale = request == null ? defaultLocale : request.locale();
     return DataFetcherResult
-      .<ViaPlanResponse>newResult()
+      .<ViaRoutingResponse>newResult()
       .data(response)
       .localContext(Map.of("locale", locale))
       .build();

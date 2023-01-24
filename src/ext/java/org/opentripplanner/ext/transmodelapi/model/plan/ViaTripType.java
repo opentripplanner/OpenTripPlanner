@@ -10,6 +10,7 @@ import graphql.schema.GraphQLOutputType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 
 public class ViaTripType {
 
@@ -83,7 +84,7 @@ public class ViaTripType {
             "locations list to the end location."
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(viaTripPatternSegment))))
-          .dataFetcher(env -> ((ViaPlanResponse) env.getSource()).viaJourneys())
+          .dataFetcher(env -> ((ViaRoutingResponse) env.getSource()).getItineraries())
           .build()
       )
       .field(
@@ -96,7 +97,7 @@ public class ViaTripType {
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(viaTripPatternCombinations))))
           .dataFetcher(env ->
-            ((ViaPlanResponse) env.getSource()).viaJourneyConnections()
+            ((ViaRoutingResponse) env.getSource()).createConnections()
               .stream()
               .flatMap(ViaTripPatternPair::map)
               .toList()
@@ -109,7 +110,7 @@ public class ViaTripType {
           .name("routingErrors")
           .description("A list of routing errors, and fields which caused them")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(routingErrorType))))
-          .dataFetcher(env -> ((ViaPlanResponse) env.getSource()).routingErrors())
+          .dataFetcher(env -> ((ViaRoutingResponse) env.getSource()).routingErrors())
           .build()
       )
       .build();
@@ -117,7 +118,7 @@ public class ViaTripType {
 
   private record ViaTripPatternPair(int from, int to) {
     /**
-     * Convert a list supplied by {@link ViaPlanResponse#viaJourneyConnections()} to a stream of
+     * Convert a list supplied by {@link ViaRoutingResponse#createConnections()} to a stream of
      * {@link ViaTripPatternPair}s
      */
     private static Stream<ViaTripPatternPair> map(List<List<Integer>> connections) {
