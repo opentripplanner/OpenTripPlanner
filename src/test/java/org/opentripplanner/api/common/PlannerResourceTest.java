@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.configure.ConstructApplicationModule;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -58,12 +59,14 @@ class PlannerResourceTest {
     resource.modes = new QualifiedModeSet("BICYCLE_RENT");
     resource.serverContext = context();
 
+    var noTransitFilter = TransitFilterRequest
+      .of()
+      .addNot(SelectRequest.of().withTransportModes(MainAndSubMode.all()).build())
+      .build();
+
     MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>(new HashMap<>());
     var req = resource.buildRequest(queryParams);
-    assertEquals(
-      List.of(TransitFilterRequest.of().addSelect(SelectRequest.of().build()).build()).toString(),
-      req.journey().transit().filters().toString()
-    );
+    assertEquals(List.of(noTransitFilter).toString(), req.journey().transit().filters().toString());
     assertEquals(
       RequestModes
         .of()
