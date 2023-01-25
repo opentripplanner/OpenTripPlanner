@@ -2,7 +2,6 @@ package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;

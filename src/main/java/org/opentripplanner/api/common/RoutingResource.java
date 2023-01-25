@@ -793,10 +793,10 @@ public abstract class RoutingResource {
           for (var selector : selectors) {
             filterBuilder.addSelect(selector.withTransportModes(tModes).build());
           }
-        } else if (!tModes.isEmpty()) {
-          filterBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
-        } else {
+        } else if (tModes.isEmpty()) {
           filterBuilder.addNot(SelectRequest.of().withTransportModes(MainAndSubMode.all()).build());
+        } else {
+          filterBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
         }
 
         transit.setFilters(List.of(filterBuilder.build()));
