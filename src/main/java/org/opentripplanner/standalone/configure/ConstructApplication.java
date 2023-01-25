@@ -15,6 +15,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -138,7 +139,12 @@ public class ConstructApplication {
     creatTransitLayerForRaptor(transitModel(), routerConfig().transitTuningConfig());
 
     /* Create updater modules from JSON config. */
-    UpdaterConfigurator.configure(graph(), transitModel(), routerConfig().updaterConfig());
+    UpdaterConfigurator.configure(
+      graph(),
+      vehiclePositionService(),
+      transitModel(),
+      routerConfig().updaterConfig()
+    );
 
     initEllipsoidToGeoidDifference();
 
@@ -191,6 +197,10 @@ public class ConstructApplication {
 
   public TransitModel transitModel() {
     return factory.transitModel();
+  }
+
+  public VehiclePositionService vehiclePositionService() {
+    return factory.vehiclePositionService();
   }
 
   public Graph graph() {

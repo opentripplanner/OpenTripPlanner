@@ -1,14 +1,19 @@
-package org.opentripplanner.routing.services;
+package org.opentripplanner.service.vehiclepositions.internal;
 
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
 import org.opentripplanner.transit.model.network.TripPattern;
 
-public class RealtimeVehiclePositionService {
+public class DefaultVehiclePositionService implements VehiclePositionService {
 
   private final Map<TripPattern, List<RealtimeVehiclePosition>> positions = new ConcurrentHashMap<>();
+
+  @Inject
+  public DefaultVehiclePositionService() {}
 
   /**
    * For the given pattern set all realtime vehicle positions.
@@ -18,6 +23,7 @@ public class RealtimeVehiclePositionService {
    * This means that if there are two updaters providing positions for the same pattern they
    * overwrite each other.
    */
+  @Override
   public void setVehiclePositions(TripPattern pattern, List<RealtimeVehiclePosition> updates) {
     positions.put(pattern, List.copyOf(updates));
   }
@@ -28,6 +34,7 @@ public class RealtimeVehiclePositionService {
    * This is useful to clear old vehicles for which there are no more updates and we assume that
    * they have stopped their trip.
    */
+  @Override
   public void clearVehiclePositions(TripPattern pattern) {
     positions.remove(pattern);
   }
@@ -35,6 +42,7 @@ public class RealtimeVehiclePositionService {
   /**
    * Get the vehicle positions for a certain trip.
    */
+  @Override
   public List<RealtimeVehiclePosition> getVehiclePositions(TripPattern pattern) {
     // the list is made immutable during insertion, so we can safely return them
     return positions.getOrDefault(pattern, List.of());

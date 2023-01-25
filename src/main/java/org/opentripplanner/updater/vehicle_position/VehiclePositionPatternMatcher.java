@@ -29,9 +29,9 @@ import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.model.UpdateSuccess;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
-import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
+import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -52,7 +52,7 @@ public class VehiclePositionPatternMatcher {
   private static final Logger LOG = LoggerFactory.getLogger(VehiclePositionPatternMatcher.class);
 
   private final String feedId;
-  private final RealtimeVehiclePositionService service;
+  private final VehiclePositionService service;
   private final ZoneId timeZoneId;
 
   private final Function<FeedScopedId, Trip> getTripForId;
@@ -66,7 +66,7 @@ public class VehiclePositionPatternMatcher {
     Function<FeedScopedId, Trip> getTripForId,
     Function<Trip, TripPattern> getStaticPattern,
     BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
-    RealtimeVehiclePositionService service,
+    VehiclePositionService service,
     ZoneId timeZoneId
   ) {
     this.feedId = feedId;

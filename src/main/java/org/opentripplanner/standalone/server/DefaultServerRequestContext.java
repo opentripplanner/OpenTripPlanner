@@ -14,6 +14,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
@@ -41,6 +42,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final FlexConfig flexConfig;
   private final TraverseVisitor traverseVisitor;
   private final WorldEnvelopeService worldEnvelopeService;
+  private final VehiclePositionService vehiclePositionService;
 
   /**
    * Make sure all mutable components are copied/cloned before calling this constructor.
@@ -57,6 +59,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     TileRendererManager tileRendererManager,
     VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
     WorldEnvelopeService worldEnvelopeService,
+    VehiclePositionService vehiclePositionService,
     FlexConfig flexConfig,
     TraverseVisitor traverseVisitor
   ) {
@@ -73,6 +76,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.traverseVisitor = traverseVisitor;
     this.routeRequestDefaults = routeRequestDefaults;
     this.worldEnvelopeService = worldEnvelopeService;
+    this.vehiclePositionService = vehiclePositionService;
   }
 
   /**
@@ -88,6 +92,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     MeterRegistry meterRegistry,
     VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
     WorldEnvelopeService worldEnvelopeService,
+    VehiclePositionService vehiclePositionService,
     FlexConfig flexConfig,
     @Nullable TraverseVisitor traverseVisitor,
     @Nullable String requestLogFile
@@ -104,6 +109,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       new TileRendererManager(graph, routeRequestDefaults.preferences()),
       vectorTileLayers,
       worldEnvelopeService,
+      vehiclePositionService,
       flexConfig,
       traverseVisitor
     );
@@ -149,6 +155,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public WorldEnvelopeService worldEnvelopeService() {
     return worldEnvelopeService;
+  }
+
+  @Override
+  public VehiclePositionService vehiclePositionService() {
+    return vehiclePositionService;
   }
 
   @Override
