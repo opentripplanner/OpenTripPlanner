@@ -62,9 +62,9 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30 + TRANSFER_SLACK,
       calculateEgressDepartureTime(T00_30, FLEX_1x_8m, slackProvider, calculator)
     );
-    // Transfers slack should NOT be added if the flex egress arrive by walking
+    // Transfers slack should be added if the flex egress arrive by walking
     assertEquals(
-      T00_30,
+      T00_30 + TRANSFER_SLACK,
       calculateEgressDepartureTime(T00_30, FLEX_AND_WALK_1x_8m, slackProvider, calculator)
     );
     // No time-shift expected if egress is within opening hours
@@ -126,9 +126,9 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30 - TRANSFER_SLACK,
       calculateEgressDepartureTime(T00_30, FLEX_1x_8m, slackProvider, calculator)
     );
-    // Transfers slack should NOT be added if the flex egress arrive by walking
+    // Transfers slack should be subtracted(reverse search) if the flex egress arrive by walking
     assertEquals(
-      T00_30,
+      T00_30 - TRANSFER_SLACK,
       calculateEgressDepartureTime(T00_30, FLEX_AND_WALK_1x_8m, slackProvider, calculator)
     );
     // No time-shift expected if egress is within opening hours
