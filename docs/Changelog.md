@@ -53,6 +53,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Change tab to spaces [#4733](https://github.com/opentripplanner/OpenTripPlanner/pull/4733)
 - Refactor of wayproperty.specifier.Condition [#4696](https://github.com/opentripplanner/OpenTripPlanner/pull/4696)
 - Cleanup usage of SIRI DatedServiceJourneyId vs. ServiceJourneyId [#4699](https://github.com/opentripplanner/OpenTripPlanner/pull/4699)
+- Add validation on NeTEx flexible area import [#4765](https://github.com/opentripplanner/OpenTripPlanner/pull/4765)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
