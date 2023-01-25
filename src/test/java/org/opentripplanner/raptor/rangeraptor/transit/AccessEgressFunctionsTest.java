@@ -166,7 +166,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
 
     // If egress is are closed (opening hours) then -1 should be returned
     assertEquals(
-      -1,
+      SearchParams.TIME_NOT_SET,
       calculateEgressDepartureTime(
         T00_30,
         TestAccessEgress.walk(STOP, D8m).openingHours(5, 4),

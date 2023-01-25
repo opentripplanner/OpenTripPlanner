@@ -191,7 +191,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
       return requestedArrivalTime;
     }
     if (isClosed()) {
-      return -1;
+      return SearchParams.TIME_NOT_SET;
     }
 
     // opening & closing is relative to the departure
