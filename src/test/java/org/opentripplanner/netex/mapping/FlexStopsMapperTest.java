@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -24,12 +26,12 @@ import org.rutebanken.netex.model.KeyListStructure;
 import org.rutebanken.netex.model.KeyValueStructure;
 import org.rutebanken.netex.model.MultilingualString;
 
-public class FlexStopsMapperTest {
+class FlexStopsMapperTest {
 
-  public static final String FLEXIBLE_STOP_PLACE_ID = "RUT:FlexibleStopPlace:1";
-  public static final String FLEXIBLE_STOP_PLACE_NAME = "Sauda-HentMeg";
-  public static final String FLEXIBLE_AREA_ID = "RUT:FlexibleArea:1";
-  public static final Collection<Double> areaPosList = new ArrayList<>(
+  static final String FLEXIBLE_STOP_PLACE_ID = "RUT:FlexibleStopPlace:1";
+  static final String FLEXIBLE_STOP_PLACE_NAME = "Sauda-HentMeg";
+  static final String FLEXIBLE_AREA_ID = "RUT:FlexibleArea:1";
+  static final Collection<Double> AREA_POS_LIST = new ArrayList<>(
     Arrays.asList(
       59.62575084033623,
       6.3023991052849,
@@ -82,11 +84,26 @@ public class FlexStopsMapperTest {
     )
   );
 
-  @Test
-  public void mapAreaStop() {
-    FlexStopsMapper flexStopsMapper = new FlexStopsMapper(ID_FACTORY, List.of());
+  static final Collection<Double> INVALID_AREA_POS_LIST = new ArrayList<>(
+    Arrays.asList(
+      59.62575084033623,
+      6.3023991052849,
+      59.62883380609349,
+      6.289718020117876,
+      59.6346950024935,
+      6.293494451572027
+    )
+  );
 
-    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace();
+  @Test
+  void mapAreaStop() {
+    FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
+      ID_FACTORY,
+      List.of(),
+      DataImportIssueStore.NOOP
+    );
+
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
 
     AreaStop areaStop = (AreaStop) flexStopsMapper.map(flexibleStopPlace);
 
@@ -94,11 +111,26 @@ public class FlexStopsMapperTest {
   }
 
   @Test
-  public void mapGroupStop() {
+  void mapInvalidAreaStop() {
+    FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
+      ID_FACTORY,
+      List.of(),
+      DataImportIssueStore.NOOP
+    );
+
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(INVALID_AREA_POS_LIST);
+
+    AreaStop areaStop = (AreaStop) flexStopsMapper.map(flexibleStopPlace);
+
+    assertNull(areaStop);
+  }
+
+  @Test
+  void mapGroupStop() {
     RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
     RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
-    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace();
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
     flexibleStopPlace.setKeyList(
       new KeyListStructure()
         .withKeyValue(
@@ -108,7 +140,11 @@ public class FlexStopsMapperTest {
         )
     );
 
-    FlexStopsMapper subject = new FlexStopsMapper(ID_FACTORY, List.of(stop1, stop2));
+    FlexStopsMapper subject = new FlexStopsMapper(
+      ID_FACTORY,
+      List.of(stop1, stop2),
+      DataImportIssueStore.NOOP
+    );
 
     GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
 
@@ -118,7 +154,7 @@ public class FlexStopsMapperTest {
     assertNotNull(groupStop);
   }
 
-  private FlexibleStopPlace getFlexibleStopPlace() {
+  private FlexibleStopPlace getFlexibleStopPlace(Collection<Double> areaPosList) {
     return new FlexibleStopPlace()
       .withId(FLEXIBLE_STOP_PLACE_ID)
       .withName(new MultilingualString().withValue(FLEXIBLE_STOP_PLACE_NAME))
