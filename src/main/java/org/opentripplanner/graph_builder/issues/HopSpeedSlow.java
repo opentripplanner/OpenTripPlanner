@@ -31,6 +31,6 @@ public class HopSpeedSlow implements DataImportIssue {
 
   @Override
   public int getPriority() {
-    return (int) metersPerSecond;
+    return (int) metersPerSecond * -100;
   }
 }
