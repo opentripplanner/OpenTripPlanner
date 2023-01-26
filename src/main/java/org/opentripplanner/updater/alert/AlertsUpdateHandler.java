@@ -20,6 +20,7 @@ import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -74,11 +75,15 @@ public class AlertsUpdateHandler {
   }
 
   private TransitAlert mapAlert(String id, GtfsRealtime.Alert alert) {
-    TransitAlert alertText = new TransitAlert();
-    alertText.setId(id);
-    alertText.alertDescriptionText = deBuffer(alert.getDescriptionText());
-    alertText.alertHeaderText = deBuffer(alert.getHeaderText());
-    alertText.alertUrl = deBuffer(alert.getUrl());
+    TransitAlertBuilder alertBuilder = TransitAlert
+      .of(new FeedScopedId(feedId, id))
+      .withDescriptionText(deBuffer(alert.getDescriptionText()))
+      .withHeaderText(deBuffer(alert.getHeaderText()))
+      .withUrl(deBuffer(alert.getUrl()))
+      .withSeverity(getAlertSeverityForGtfsRtSeverity(alert.getSeverityLevel()))
+      .withCause(getAlertCauseForGtfsRtCause(alert.getCause()))
+      .withEffect(getAlertEffectForGtfsRtEffect(alert.getEffect()));
+
     ArrayList<TimePeriod> periods = new ArrayList<>();
     if (alert.getActivePeriodCount() > 0) {
       for (TimeRange activePeriod : alert.getActivePeriodList()) {
@@ -91,8 +96,8 @@ public class AlertsUpdateHandler {
       // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
       periods.add(new TimePeriod(0, TimePeriod.OPEN_ENDED));
     }
-    alertText.setTimePeriods(periods);
-    alertText.setFeedId(feedId);
+    alertBuilder.addTimePeriods(periods);
+
     for (GtfsRealtime.EntitySelector informed : alert.getInformedEntityList()) {
       if (fuzzyTripMatcher != null && informed.hasTrip()) {
         TripDescriptor trip = fuzzyTripMatcher.match(feedId, informed.getTrip());
@@ -130,59 +135,57 @@ public class AlertsUpdateHandler {
 
       if (tripId != null) {
         if (stopId != null) {
-          alertText.addEntity(
+          alertBuilder.addEntity(
             new EntitySelector.StopAndTrip(
               new FeedScopedId(feedId, stopId),
               new FeedScopedId(feedId, tripId)
             )
           );
         } else {
-          alertText.addEntity(new EntitySelector.Trip(new FeedScopedId(feedId, tripId)));
+          alertBuilder.addEntity(new EntitySelector.Trip(new FeedScopedId(feedId, tripId)));
         }
       } else if (routeId != null) {
         if (stopId != null) {
-          alertText.addEntity(
+          alertBuilder.addEntity(
             new EntitySelector.StopAndRoute(
               new FeedScopedId(feedId, stopId),
               new FeedScopedId(feedId, routeId)
             )
           );
         } else if (directionId != MISSING_INT_FIELD_VALUE) {
-          alertText.addEntity(
+          alertBuilder.addEntity(
             new EntitySelector.DirectionAndRoute(
               new FeedScopedId(feedId, routeId),
               directionMapper.map(directionId)
             )
           );
         } else {
-          alertText.addEntity(new EntitySelector.Route(new FeedScopedId(feedId, routeId)));
+          alertBuilder.addEntity(new EntitySelector.Route(new FeedScopedId(feedId, routeId)));
         }
       } else if (stopId != null) {
-        alertText.addEntity(new EntitySelector.Stop(new FeedScopedId(feedId, stopId)));
+        alertBuilder.addEntity(new EntitySelector.Stop(new FeedScopedId(feedId, stopId)));
       } else if (agencyId != null) {
         FeedScopedId feedScopedAgencyId = new FeedScopedId(feedId, agencyId);
         if (routeType != MISSING_INT_FIELD_VALUE) {
-          alertText.addEntity(new EntitySelector.RouteTypeAndAgency(feedScopedAgencyId, routeType));
+          alertBuilder.addEntity(
+            new EntitySelector.RouteTypeAndAgency(feedScopedAgencyId, routeType)
+          );
         } else {
-          alertText.addEntity(new EntitySelector.Agency(feedScopedAgencyId));
+          alertBuilder.addEntity(new EntitySelector.Agency(feedScopedAgencyId));
         }
       } else if (routeType != MISSING_INT_FIELD_VALUE) {
-        alertText.addEntity(new EntitySelector.RouteType(feedId, routeType));
+        alertBuilder.addEntity(new EntitySelector.RouteType(feedId, routeType));
       } else {
         String description = "Entity selector: " + informed;
-        alertText.addEntity(new EntitySelector.Unknown(description));
+        alertBuilder.addEntity(new EntitySelector.Unknown(description));
       }
     }
 
-    if (alertText.getEntities().isEmpty()) {
-      alertText.addEntity(new EntitySelector.Unknown("Alert had no entities"));
+    if (!alertBuilder.hasEntities()) {
+      alertBuilder.addEntity(new EntitySelector.Unknown("Alert had no entities"));
     }
 
-    alertText.severity = getAlertSeverityForGtfsRtSeverity(alert.getSeverityLevel());
-    alertText.cause = getAlertCauseForGtfsRtCause(alert.getCause());
-    alertText.effect = getAlertEffectForGtfsRtEffect(alert.getEffect());
-
-    return alertText;
+    return alertBuilder.build();
   }
 
   /**
