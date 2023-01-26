@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.request;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
@@ -28,6 +29,8 @@ public class TransitRequest implements Cloneable, Serializable {
 
   private List<FeedScopedId> unpreferredRoutes = List.of();
   private DebugRaptor raptorDebugging = new DebugRaptor();
+
+  private boolean enabled = true;
 
   public void setBannedTripsFromString(String ids) {
     if (!ids.isEmpty()) {
@@ -154,5 +157,21 @@ public class TransitRequest implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * Completely disabling transit routing, for example when you're only interested in bike routes.
+   * <p>
+   * This shortcuts the {@link TransitRouter} so that it returns immediately.
+   */
+  public void disableTransitRouting() {
+    enabled = true;
+  }
+
+  /**
+   * Returns whether it is requested to run the transit search for this request.
+   */
+  public boolean enabled() {
+    return enabled;
   }
 }

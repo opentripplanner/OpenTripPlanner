@@ -799,7 +799,11 @@ public abstract class RoutingResource {
           filterBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
         }
 
-        transit.setFilters(List.of(filterBuilder.build()));
+        if (!tModes.isEmpty()) {
+          transit.setFilters(List.of(filterBuilder.build()));
+        } else {
+          transit.disableTransitRouting();
+        }
       }
       {
         var debugRaptor = journey.transit().raptorDebugging();
