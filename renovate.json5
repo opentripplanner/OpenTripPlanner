@@ -21,8 +21,10 @@
         "com.azure.resourcemanager:azure-resourcemanager-servicebus",
         "com.azure:azure-core",
         "com.azure:azure-messaging-servicebus",
-        // need code changes
-        "io.github.origin-energy:java-snapshot-testing-junit5"
+        // need code changes, don't want to upgrade
+        "io.github.origin-energy:java-snapshot-testing-junit5",
+        "commons-cli:commons-cli",
+        "org.processing:core"
       ],
       "enabled": false
     },
