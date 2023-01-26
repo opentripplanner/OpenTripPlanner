@@ -36,8 +36,8 @@ public class ViaRequestMapper {
         )
         .toList();
 
-    List<JourneyRequest> requests = environment.containsArgument("requests")
-      ? ((List<Map<String, Object>>) environment.getArgument("requests")).stream()
+    List<JourneyRequest> requests = environment.containsArgument("segments")
+      ? ((List<Map<String, Object>>) environment.getArgument("segments")).stream()
         .map(viaRequest -> {
           JourneyRequest journey = request.journey().clone();
           if (viaRequest.containsKey("modes")) {
