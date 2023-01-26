@@ -643,7 +643,7 @@ public class OrcaFareServiceImpl extends DefaultFareService {
 
   private static String getFareCategory(FareType fareType) {
     var splitFareType = fareType.toString().split("electronic");
-    if (splitFareType.length > 0) {
+    if (splitFareType.length > 1) {
       return splitFareType[1].toLowerCase();
     } else {
       return fareType.toString();
