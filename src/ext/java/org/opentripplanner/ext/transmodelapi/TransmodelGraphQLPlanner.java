@@ -269,6 +269,12 @@ public class TransmodelGraphQLPlanner {
       callWith.argument("modes.transportModes", transportModes::set);
 
       if (transportModes.get() != null) {
+        // Disable transit if transit modes is defined and empty
+        if (transportModes.get().isEmpty()) {
+          request.journey().transit().disable();
+          return;
+        }
+
         for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
           if (modeWithSubmodes.containsKey("transportMode")) {
             var mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
