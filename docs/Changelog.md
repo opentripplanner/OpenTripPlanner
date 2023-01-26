@@ -55,6 +55,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Cleanup usage of SIRI DatedServiceJourneyId vs. ServiceJourneyId [#4699](https://github.com/opentripplanner/OpenTripPlanner/pull/4699)
 - Add validation on NeTEx flexible area import [#4765](https://github.com/opentripplanner/OpenTripPlanner/pull/4765)
 - Do not return a leg from a leg reference, if trip does not exist on date [#4758](https://github.com/opentripplanner/OpenTripPlanner/pull/4758)
+- Expose more data from SIRI-SX messages in the Transmodel API [#4755](https://github.com/opentripplanner/OpenTripPlanner/pull/4755)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
