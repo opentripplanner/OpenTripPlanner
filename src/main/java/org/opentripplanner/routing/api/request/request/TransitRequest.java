@@ -30,8 +30,6 @@ public class TransitRequest implements Cloneable, Serializable {
   private List<FeedScopedId> unpreferredRoutes = List.of();
   private DebugRaptor raptorDebugging = new DebugRaptor();
 
-  private boolean enabled = true;
-
   public void setBannedTripsFromString(String ids) {
     if (!ids.isEmpty()) {
       this.bannedTrips = FeedScopedId.parseListOfIds(ids);
