@@ -2,25 +2,22 @@ package org.opentripplanner.api.common;
 
 import static graphql.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.HashMap;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.api.resource.PlannerResource;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
-import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.configure.ConstructApplicationModule;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -59,14 +56,9 @@ class PlannerResourceTest {
     resource.modes = new QualifiedModeSet("BICYCLE_RENT");
     resource.serverContext = context();
 
-    var noTransitFilter = TransitFilterRequest
-      .of()
-      .addNot(SelectRequest.of().withTransportModes(MainAndSubMode.all()).build())
-      .build();
-
     MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>(new HashMap<>());
     var req = resource.buildRequest(queryParams);
-    assertEquals(List.of(noTransitFilter).toString(), req.journey().transit().filters().toString());
+    assertFalse(req.journey().transit().enabled());
     assertEquals(
       RequestModes
         .of()
