@@ -4,19 +4,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.model.SearchDirection;
-import org.opentripplanner.raptor.api.request.Optimization;
-import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 
 /**
@@ -57,6 +59,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
     data.withGuaranteedTransfer(tripA, STOP_B, tripB, STOP_B);
     data.mcCostParamsBuilder().transferCost(100);
 
+    // NOTE! No search-window is set.
     requestBuilder
       .searchParams()
       .constrainedTransfers(true)
@@ -73,45 +76,19 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  @Test
-  public void standardOneIteration() {
-    var request = requestBuilder
-      .profile(RaptorProfile.STANDARD)
-      .searchParams()
-      .searchOneIterationOnly()
+  static List<RaptorModuleTestCase> testCases() {
+    return RaptorModuleTestCase
+      .of()
+      .add(standard(), EXP_PATH_NO_COST)
+      .add(multiCriteria(), EXP_PATH_WITH_COST)
       .build();
-    var response = raptorService.route(request, data);
-    assertEquals(EXP_PATH_NO_COST, pathsToString(response));
   }
 
-  @Test
-  public void standardDynamicSearchWindow() {
-    var request = requestBuilder.profile(RaptorProfile.STANDARD).build();
+  @ParameterizedTest
+  @MethodSource("testCases")
+  void testRaptor(RaptorModuleTestCase testCase) {
+    var request = testCase.withConfig(requestBuilder);
     var response = raptorService.route(request, data);
-    assertEquals(EXP_PATH_NO_COST, pathsToString(response));
-  }
-
-  @Test
-  public void standardReverseOneIteration() {
-    var request = requestBuilder
-      .searchDirection(SearchDirection.REVERSE)
-      .profile(RaptorProfile.STANDARD)
-      .searchParams()
-      .searchOneIterationOnly()
-      .build();
-
-    var response = raptorService.route(request, data);
-
-    assertEquals(EXP_PATH_NO_COST, pathsToString(response));
-  }
-
-  @Test
-  public void multiCriteria() {
-    requestBuilder.optimizations().add(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
-    var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
-
-    var response = raptorService.route(request, data);
-
-    assertEquals(EXP_PATH_WITH_COST, pathsToString(response));
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 }

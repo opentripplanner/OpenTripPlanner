@@ -1,23 +1,25 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /**
  * FEATURE UNDER TEST
@@ -72,7 +74,14 @@ public class A04_BoardingTest implements RaptorTestConstants {
     "~ Walk 1m [0:13 0:41 28m 2tx";
 
   /** Expect the optimal path to be found. */
-  private final String EXP_PATH_MIN_TRAVEL_DURATION = OPTIMAL_PATH + "]";
+  private static final String EXP_PATH_MIN_TRAVEL_DURATION = OPTIMAL_PATH + "]";
+
+  /**
+   * The multi-criteria search should find the best alternative, because it looks at the
+   * arrival-time, generalized-cost, and departure-time(travel-time). In this case the same path as
+   * the min-travel-duration will find.
+   */
+  private static final String EXP_PATH_MC = OPTIMAL_PATH + " $3600]";
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -80,15 +89,8 @@ public class A04_BoardingTest implements RaptorTestConstants {
     RaptorConfig.defaultConfigForTest()
   );
 
-  /**
-   * The multi-criteria search should find the best alternative, because it looks at the
-   * arrival-time, generalized-cost, and departure-time(travel-time). In this case the same path as
-   * the min-travel-duration will find.
-   */
-  private final String EXP_PATH_MC = OPTIMAL_PATH + " $3600]";
-
   @BeforeEach
-  public void setup() {
+  void setup() {
     // There is three possible paths before boarding trip L2
     data.withRoute(route("L1_1", STOP_A, STOP_B).withTimetable(schedule("0:10 0:18")));
     data.withRoute(route("L1_2", STOP_A, STOP_C).withTimetable(schedule("0:14 0:18")));
@@ -115,47 +117,27 @@ public class A04_BoardingTest implements RaptorTestConstants {
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  /**
-   * A test on the standard profile is included to demonstrate that the min-travel-duration and the
-   * standard give different results. The L2 boarding stop is different.
-   */
-  @Test
-  public void standard() {
-    requestBuilder.profile(STANDARD);
-    var response = raptorService.route(requestBuilder.build(), data);
-    assertEquals(EXP_PATH_BEST_ARRIVAL_TIME, PathUtils.pathsToString(response));
+  static List<RaptorModuleTestCase> testCases() {
+    return RaptorModuleTestCase
+      .of()
+      // A test on the standard profile is included to demonstrate that the
+      // min-travel-duration and the standard give different results. The L2
+      // boarding stop is different.
+      .add(standard().forwardOnly(), EXP_PATH_BEST_ARRIVAL_TIME)
+      // A reverse test on the standard profile is included to demonstrate
+      // that the min-travel-duration and the standard give different results
+      // when searching in reverse. The L2 alight stop is different.
+      .add(standard().reverseOnly(), EXP_PATH_BEST_ARRIVAL_TIME_REVERSE)
+      .add(minDuration(), EXP_PATH_MIN_TRAVEL_DURATION)
+      .add(multiCriteria(), EXP_PATH_MC)
+      .build();
   }
 
-  @Test
-  public void minTravelDuration() {
-    requestBuilder.profile(MIN_TRAVEL_DURATION);
-    var response = raptorService.route(requestBuilder.build(), data);
-    assertEquals(EXP_PATH_MIN_TRAVEL_DURATION, PathUtils.pathsToString(response));
-  }
-
-  /**
-   * A reverse test on the standard profile is included to demonstrate that the min-travel-duration
-   * and the standard give different results when searching in reverse. The L2 alight stop is
-   * different.
-   */
-  @Test
-  public void standardReverse() {
-    requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-    var response = raptorService.route(requestBuilder.build(), data);
-    assertEquals(EXP_PATH_BEST_ARRIVAL_TIME_REVERSE, PathUtils.pathsToString(response));
-  }
-
-  @Test
-  public void minTravelDurationReverse() {
-    requestBuilder.profile(MIN_TRAVEL_DURATION).searchDirection(REVERSE);
-    var response = raptorService.route(requestBuilder.build(), data);
-    assertEquals(EXP_PATH_MIN_TRAVEL_DURATION, PathUtils.pathsToString(response));
-  }
-
-  @Test
-  public void multiCriteria() {
-    requestBuilder.profile(MULTI_CRITERIA);
-    var response = raptorService.route(requestBuilder.build(), data);
-    assertEquals(EXP_PATH_MC, PathUtils.pathsToString(response));
+  @ParameterizedTest
+  @MethodSource("testCases")
+  void testRaptor(RaptorModuleTestCase testCase) {
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 }
