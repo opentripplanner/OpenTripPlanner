@@ -5,6 +5,8 @@ import static org.opentripplanner.raptor.api.request.RaptorRequest.assertPropert
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
@@ -23,8 +25,8 @@ public class SearchParams {
    * cases/system happens when DST is adjusted.
    * <p>
    * We do not use {@link Integer#MIN_VALUE} because this could potentially lead to overflow
-   * situations which would be very hard to debug. Add -1 to MIN_VALUE and you get a positive number
-   * - not an exception.
+   * situations which would be very hard to debug. Add -1 to MIN_VALUE and you get a positive
+   * number - not an exception.
    */
   public static final int TIME_NOT_SET = -9_999_999;
 
@@ -36,9 +38,12 @@ public class SearchParams {
   private final boolean preferLateArrival;
   private final int numberOfAdditionalTransfers;
   private final int maxNumberOfTransfers;
-  private final double relaxCostAtDestination;
-  private final boolean timetableEnabled;
-  private final boolean constrainedTransfersEnabled;
+
+  @Nullable
+  private final Double relaxCostAtDestination;
+
+  private final boolean timetable;
+  private final boolean constrainedTransfers;
   private final Collection<RaptorAccessEgress> accessPaths;
   private final Collection<RaptorAccessEgress> egressPaths;
   private final boolean allowEmptyEgressPaths;
@@ -53,9 +58,9 @@ public class SearchParams {
     preferLateArrival = false;
     numberOfAdditionalTransfers = 5;
     maxNumberOfTransfers = NOT_SET;
-    relaxCostAtDestination = NOT_SET;
-    timetableEnabled = false;
-    constrainedTransfersEnabled = false;
+    relaxCostAtDestination = null;
+    timetable = false;
+    constrainedTransfers = false;
     accessPaths = List.of();
     egressPaths = List.of();
     allowEmptyEgressPaths = false;
@@ -69,8 +74,8 @@ public class SearchParams {
     this.numberOfAdditionalTransfers = builder.numberOfAdditionalTransfers();
     this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
     this.relaxCostAtDestination = builder.relaxCostAtDestination();
-    this.timetableEnabled = builder.timetableEnabled();
-    this.constrainedTransfersEnabled = builder.constrainedTransfersEnabled();
+    this.timetable = builder.timetable();
+    this.constrainedTransfers = builder.constrainedTransfers();
     this.accessPaths = List.copyOf(builder.accessPaths());
     this.egressPaths = List.copyOf(builder.egressPaths());
     this.allowEmptyEgressPaths = builder.allowEmptyEgressPaths();
@@ -141,7 +146,7 @@ public class SearchParams {
 
   /**
    * Keep the latest departures arriving before the given latest-arrival-time(LAT). LAT is required
-   * if this parameter is set. This parameter is not allowed if the {@link #timetableEnabled} is
+   * if this parameter is set. This parameter is not allowed if the {@link #timetable} is
    * enabled.
    */
   public boolean preferLateArrival() {
@@ -176,45 +181,43 @@ public class SearchParams {
    * Whether to accept non-optimal trips if they are close enough - if and only if they represent an
    * optimal path for their given iteration. In other words this slack only relaxes the pareto
    * comparison at the destination.
-   * <p/>
+   * <p>
    * Let {@code c} be the existing minimum pareto optimal cost to beat. Then a trip with cost
    * {@code c'} is accepted if the following is true:
    * <pre>
    * c' < Math.round(c * relaxCostAtDestination)
    * </pre>
-   * If the value is less than 0.0 a normal '<' comparison is performed.
-   * <p/>
-   * TODO - When setting this above 1.0, we get some unwanted results. We should have a filter to remove those
-   * TODO - results. See issue https://github.com/entur/r5/issues/28
-   * <p/>
-   * The default value is -1.0 (disabled)
+   * If the value is less than 1.0 a normal '<' comparison is performed.
+   * <p>
+   * The default is not set.
    */
-  public double relaxCostAtDestination() {
-    return relaxCostAtDestination;
+  public Optional<Double> relaxCostAtDestination() {
+    return Optional.ofNullable(relaxCostAtDestination);
   }
 
   /**
-   * Time table allow a Journey to be included in the result if it depart from the origin AFTER
-   * another Journey, even if the first departure have lower cost, number of transfers, and shorter
-   * travel time. For two Journeys that depart at the same time only the best one will be included
-   * (both if they are mutually dominating each other).
+   * The timetable flag allow a Journey to be included in the result if it departs from the origin
+   * AFTER another Journey, even if the first departure have lower cost, number of transfers, and
+   * shorter travel time. For two Journeys that depart at the same time only the best one will be
+   * included (both if they are mutually dominating each other).
    * <p/>
    * Setting this parameter to "TRUE" will increase the number of paths returned. The performance
    * impact is small since the check only affect the pareto check at the destination.
    * <p/>
    * The default value is FALSE.
    */
-  public boolean timetableEnabled() {
-    return timetableEnabled;
+  public boolean timetable() {
+    return timetable;
   }
 
   /**
-   * If enabled guaranteed transfers are used during routing, if not they are ignored. Some of the
-   * profiles do not support guaranteed transfers, for these profiles this flag is ignored.
-   * Transfers are supported for all profiles returning paths.
+   * If requested, constrained transfers(guaranteed, stay-seated ..) are used during routing, if
+   * not they are ignored. Some profiles do not support constrained transfers, for these profiles
+   * constrained transfers are NOT used - the 'constrainedTransfers' flag is ignored. Constrained
+   * transfers are supported for all profiles returning paths.
    */
-  public boolean constrainedTransfersEnabled() {
-    return constrainedTransfersEnabled;
+  public boolean constrainedTransfers() {
+    return constrainedTransfers;
   }
 
   /**
@@ -249,7 +252,7 @@ public class SearchParams {
   /**
    * Get the maximum duration of any access or egress path in seconds.
    */
-  public int getAccessEgressMaxDurationSeconds() {
+  public int accessEgressMaxDurationSeconds() {
     return Math.max(
       accessPaths.stream().mapToInt(RaptorAccessEgress::durationInSeconds).max().orElse(0),
       egressPaths.stream().mapToInt(RaptorAccessEgress::durationInSeconds).max().orElse(0)
@@ -263,9 +266,10 @@ public class SearchParams {
       latestArrivalTime,
       searchWindowInSeconds,
       preferLateArrival,
+      numberOfAdditionalTransfers,
+      relaxCostAtDestination,
       accessPaths,
-      egressPaths,
-      numberOfAdditionalTransfers
+      egressPaths
     );
   }
 
@@ -284,6 +288,7 @@ public class SearchParams {
       searchWindowInSeconds == that.searchWindowInSeconds &&
       preferLateArrival == that.preferLateArrival &&
       numberOfAdditionalTransfers == that.numberOfAdditionalTransfers &&
+      Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination) &&
       accessPaths.equals(that.accessPaths) &&
       egressPaths.equals(that.egressPaths)
     );
@@ -298,6 +303,7 @@ public class SearchParams {
       .addDurationSec("searchWindow", searchWindowInSeconds)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
+      .addNum("relaxCostAtDestination", relaxCostAtDestination)
       .addCollection("accessPaths", accessPaths, 5)
       .addCollection("egressPaths", egressPaths, 5)
       .toString();
@@ -324,7 +330,7 @@ public class SearchParams {
       "The 'latestArrivalTime' is required when 'departAsLateAsPossible' is set."
     );
     assertProperty(
-      !(preferLateArrival && timetableEnabled),
+      !(preferLateArrival && timetable),
       "The 'departAsLateAsPossible' is not allowed together with 'timetableEnabled'."
     );
   }

@@ -40,6 +40,8 @@ public class SpeedTestConfig {
   public final RouteRequest request;
   public final FlexConfig flexConfig;
 
+  public final boolean ignoreStreetResults;
+
   public SpeedTestConfig(JsonNode node) {
     this(new NodeAdapter(node, FILE_NAME));
   }
@@ -53,14 +55,13 @@ public class SpeedTestConfig {
     flexConfig = new FlexConfig(adapter, "flex");
     request = mapRouteRequest(adapter.of("routingDefaults").asObject());
     updatersConfig = new UpdatersConfig(adapter);
+    ignoreStreetResults = adapter.of("ignoreStreetResults").asBoolean(false);
     adapter.logAllUnusedParameters(LOG::warn);
   }
 
   public static SpeedTestConfig config(File dir) {
     var json = ConfigFileLoader.of().withConfigDir(dir).loadFromFile(FILE_NAME);
-    SpeedTestConfig config = new SpeedTestConfig(json);
-    LOG.info("SpeedTest config loaded: {}", config);
-    return config;
+    return new SpeedTestConfig(json);
   }
 
   @Override

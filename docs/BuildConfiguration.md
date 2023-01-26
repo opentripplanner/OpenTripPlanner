@@ -31,8 +31,6 @@ Sections follow that describe particular settings in more depth.
 | [graph](#graph)                                                          |    `uri`    | URI to the graph object file for reading and writing.                                                                                                          | *Optional* |                                   |  2.0  |
 | [gsCredentials](#gsCredentials)                                          |   `string`  | Local file system path to Google Cloud Platform service accounts credentials file.                                                                             | *Optional* |                                   |  2.0  |
 | [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)  |  `boolean`  | Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.                                              | *Optional* | `false`                           |  2.0  |
-| [islandWithStopsMaxSize](#islandWithStopsMaxSize)                        |  `integer`  | When a graph island with stops in it should be pruned.                                                                                                         | *Optional* | `5`                               |  2.1  |
-| [islandWithoutStopsMaxSize](#islandWithoutStopsMaxSize)                  |  `integer`  | When a graph island without stops should be pruned.                                                                                                            | *Optional* | `40`                              |  2.1  |
 | matchBusRoutesToStreets                                                  |  `boolean`  | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking.                                                                    | *Optional* | `false`                           |  1.5  |
 | maxAreaNodes                                                             |  `integer`  | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                                  | *Optional* | `500`                             |  2.1  |
 | [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                |  `integer`  | When to split the import report.                                                                                                                               | *Optional* | `1000`                            |  2.0  |
@@ -66,6 +64,11 @@ Sections follow that describe particular settings in more depth.
 |    maxInterlineDistance                                                  |  `integer`  | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.                                                  | *Optional* | `200`                             |  2.3  |
 |    removeRepeatedStops                                                   |  `boolean`  | Should consecutive identical stops be merged into one stop time entry.                                                                                         | *Optional* | `true`                            |  2.3  |
 |    [stationTransferPreference](#gd_stationTransferPreference)            |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                                                                 | *Optional* | `"allowed"`                       |  2.3  |
+| islandPruning                                                            |   `object`  | Settings for fixing street graph connectivity errors                                                                                                           | *Optional* |                                   |  2.3  |
+|    [adaptivePruningDistance](#islandPruning_adaptivePruningDistance)     |  `integer`  | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250`                             |  2.3  |
+|    [adaptivePruningFactor](#islandPruning_adaptivePruningFactor)         |   `double`  | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `50.0`                            |  2.3  |
+|    [islandWithStopsMaxSize](#islandPruning_islandWithStopsMaxSize)       |  `integer`  | When a graph island with stops in it should be pruned.                                                                                                         | *Optional* | `2`                               |  2.3  |
+|    [islandWithoutStopsMaxSize](#islandPruning_islandWithoutStopsMaxSize) |  `integer`  | When a graph island without stops should be pruned.                                                                                                            | *Optional* | `10`                              |  2.3  |
 | [localFileNamePatterns](#localFileNamePatterns)                          |   `object`  | Patterns for matching OTP file types in the base directory                                                                                                     | *Optional* |                                   |  2.0  |
 |    [dem](#lfp_dem)                                                       |   `regexp`  | Pattern for matching elevation DEM files.                                                                                                                      | *Optional* | `"(?i)\.tiff?$"`                  |  2.0  |
 |    [gtfs](#lfp_gtfs)                                                     |   `regexp`  | Patterns for matching GTFS zip-files or directories.                                                                                                           | *Optional* | `"(?i)gtfs"`                      |  2.0  |
@@ -504,28 +507,6 @@ NOTE: if this is set to true for graph building, make sure to not set the value 
 all of the elevation values in the street edges.
 
 
-<h3 id="islandWithStopsMaxSize">islandWithStopsMaxSize</h3>
-
-**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `5`   
-**Path:** / 
-
-When a graph island with stops in it should be pruned.
-
-This field indicates the pruning threshold for islands with stops. Any such island under this
-size will be pruned.
-
-
-<h3 id="islandWithoutStopsMaxSize">islandWithoutStopsMaxSize</h3>
-
-**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`   
-**Path:** / 
-
-When a graph island without stops should be pruned.
-
-This field indicates the pruning threshold for islands without stops. Any such island under
-this size will be pruned.
-
-
 <h3 id="maxDataImportIssuesPerFile">maxDataImportIssuesPerFile</h3>
 
 **Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1000`   
@@ -785,6 +766,49 @@ Should there be some preference or aversion for transfers at stops that are part
 
 This parameter sets the generic level of preference. What is the actual cost can be changed
 with the `stopTransferCost` parameter in the router configuration.
+
+
+<h3 id="islandPruning_adaptivePruningDistance">adaptivePruningDistance</h3>
+
+**Since version:** `2.3` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `250`   
+**Path:** /islandPruning 
+
+Search distance for analyzing islands in pruning.
+
+The distance after which disconnected sub graph is considered as real island in pruning heuristics.
+
+
+<h3 id="islandPruning_adaptivePruningFactor">adaptivePruningFactor</h3>
+
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `50.0`   
+**Path:** /islandPruning 
+
+Defines how much pruning thresholds grow maximally by distance.
+
+Expands the pruning thresholds as the distance of an island from the rest of the graph gets smaller.
+Even fairly large disconnected sub graphs should be removed if they are badly entangled with other graph.
+
+
+<h3 id="islandPruning_islandWithStopsMaxSize">islandWithStopsMaxSize</h3>
+
+**Since version:** `2.3` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2`   
+**Path:** /islandPruning 
+
+When a graph island with stops in it should be pruned.
+
+This field indicates the pruning threshold for islands with stops. Any such island under this
+edge count will be pruned.
+
+
+<h3 id="islandPruning_islandWithoutStopsMaxSize">islandWithoutStopsMaxSize</h3>
+
+**Since version:** `2.3` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10`   
+**Path:** /islandPruning 
+
+When a graph island without stops should be pruned.
+
+This field indicates the pruning threshold for islands without stops. Any such island under
+this edge count will be pruned.
 
 
 <h3 id="localFileNamePatterns">localFileNamePatterns</h3>
@@ -1095,25 +1119,32 @@ case where this is not the case.
     "timeZone" : "Europe/Rome",
     "osmTagMapping" : "default"
   },
-  "osm" : [ {
-    "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",
-    "timeZone" : "Europe/Oslo",
-    "osmTagMapping" : "norway"
-  } ],
+  "osm" : [
+    {
+      "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",
+      "timeZone" : "Europe/Oslo",
+      "osmTagMapping" : "norway"
+    }
+  ],
   "demDefaults" : {
     "elevationUnitMultiplier" : 1.0
   },
-  "dem" : [ {
-    "source" : "gs://my-bucket/otp-work-dir/norway.dem.tiff",
-    "elevationUnitMultiplier" : 2.5
-  } ],
+  "dem" : [
+    {
+      "source" : "gs://my-bucket/otp-work-dir/norway.dem.tiff",
+      "elevationUnitMultiplier" : 2.5
+    }
+  ],
   "netexDefaults" : {
     "feedId" : "EN",
     "sharedFilePattern" : "_stops.xml",
     "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
     "groupFilePattern" : "(\\w{3})_.*\\.xml",
     "ignoreFilePattern" : "(temp|tmp)",
-    "ferryIdsNotAllowedForBicycle" : [ "RUT:B107", "RUT:B209" ]
+    "ferryIdsNotAllowedForBicycle" : [
+      "RUT:B107",
+      "RUT:B209"
+    ]
   },
   "gtfsDefaults" : {
     "stationTransferPreference" : "recommended",
@@ -1122,27 +1153,39 @@ case where this is not the case.
     "blockBasedInterlining" : true,
     "maxInterlineDistance" : 200
   },
-  "transitFeeds" : [ {
-    "type" : "gtfs",
-    "feedId" : "SE",
-    "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/sweeden-gtfs.obj"
-  }, {
-    "type" : "netex",
-    "feedId" : "NO",
-    "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/norway-netex.obj",
-    "sharedFilePattern" : "_stops.xml",
-    "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
-    "groupFilePattern" : "(\\w{3})_.*\\.xml",
-    "ignoreFilePattern" : "(temp|tmp)"
-  } ],
-  "transferRequests" : [ {
-    "modes" : "WALK"
-  }, {
-    "modes" : "WALK",
-    "wheelchairAccessibility" : {
-      "enabled" : true
+  "islandPruning" : {
+    "islandWithStopsMaxSize" : 2,
+    "islandWithoutStopsMaxSize" : 10,
+    "adaptivePruningFactor" : 50.0,
+    "adaptivePruningDistance" : 250
+  },
+  "transitFeeds" : [
+    {
+      "type" : "gtfs",
+      "feedId" : "SE",
+      "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/sweeden-gtfs.obj"
+    },
+    {
+      "type" : "netex",
+      "feedId" : "NO",
+      "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/norway-netex.obj",
+      "sharedFilePattern" : "_stops.xml",
+      "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
+      "groupFilePattern" : "(\\w{3})_.*\\.xml",
+      "ignoreFilePattern" : "(temp|tmp)"
     }
-  } ]
+  ],
+  "transferRequests" : [
+    {
+      "modes" : "WALK"
+    },
+    {
+      "modes" : "WALK",
+      "wheelchairAccessibility" : {
+        "enabled" : true
+      }
+    }
+  ]
 }
 ```
 

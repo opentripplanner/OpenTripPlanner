@@ -129,7 +129,7 @@ public class ConfigFileLoader {
       String configString = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
       JsonNode node = stringToJsonNode(configString, file.toString());
       LOG.info("Load JSON configuration file '{}'", file.getPath());
-      LOG.info("Summarizing '{}': {}", file.getPath(), toRedactedString(node));
+      LOG.info("Summarizing '{}': {}", file.getName(), toRedactedString(node));
       return node;
     } catch (FileNotFoundException ex) {
       LOG.info("File '{}' is not present. Using default configuration.", file);

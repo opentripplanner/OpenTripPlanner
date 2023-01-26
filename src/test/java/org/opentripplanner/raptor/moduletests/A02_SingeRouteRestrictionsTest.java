@@ -5,19 +5,22 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.model.SearchDirection;
-import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /**
  * FEATURE UNDER TEST
@@ -52,7 +55,7 @@ public class A02_SingeRouteRestrictionsTest implements RaptorTestConstants {
    *
    */
   @BeforeEach
-  public void setup() {
+  void setup() {
     TestTripPattern pattern = pattern("R1", STOP_B, STOP_C, STOP_D);
     pattern.restrictions("BW BA AW");
     data.withRoute(route(pattern).withTimetable(schedule("00:01, 00:03, 00:05")));
@@ -62,47 +65,27 @@ public class A02_SingeRouteRestrictionsTest implements RaptorTestConstants {
       .addEgressPaths(TestAccessEgress.walk(STOP_D, D20s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
-      .timetableEnabled(true);
+      .timetable(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  @Test
-  public void standard() {
-    var request = requestBuilder.profile(RaptorProfile.STANDARD).build();
-
-    var response = raptorService.route(request, data);
-
-    assertEquals(
-      "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx]",
-      pathsToString(response)
-    );
-  }
-
-  @Test
-  public void standardReverse() {
-    var request = requestBuilder
-      .searchDirection(SearchDirection.REVERSE)
-      .profile(RaptorProfile.STANDARD)
+  static List<RaptorModuleTestCase> testCases() {
+    return RaptorModuleTestCase
+      .of()
+      .add(standard(), "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx]")
+      .add(
+        multiCriteria(),
+        "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx $940]"
+      )
       .build();
-
-    var response = raptorService.route(request, data);
-
-    assertEquals(
-      "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx]",
-      pathsToString(response)
-    );
   }
 
-  @Test
-  public void multiCriteria() {
-    var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
-
+  @ParameterizedTest
+  @MethodSource("testCases")
+  void testRaptor(RaptorModuleTestCase testCase) {
+    var request = testCase.withConfig(requestBuilder);
     var response = raptorService.route(request, data);
-
-    assertEquals(
-      "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx $940]",
-      pathsToString(response)
-    );
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 }

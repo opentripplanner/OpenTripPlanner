@@ -13,14 +13,12 @@ public class RequestModesBuilder {
   private StreetMode egressMode;
   private StreetMode directMode;
   private StreetMode transferMode;
-  private List<MainAndSubMode> transitModes;
 
   RequestModesBuilder(RequestModes origin) {
     this.accessMode = origin.accessMode;
     this.egressMode = origin.egressMode;
     this.directMode = origin.directMode;
     this.transferMode = origin.transferMode;
-    this.transitModes = new ArrayList<>(origin.transitModes);
   }
 
   public StreetMode accessMode() {
@@ -64,30 +62,6 @@ public class RequestModesBuilder {
       .withEgressMode(streetMode)
       .withDirectMode(streetMode)
       .withTransferMode(streetMode);
-  }
-
-  public List<MainAndSubMode> transitModes() {
-    return transitModes;
-  }
-
-  public RequestModesBuilder withTransitMode(TransitMode mainMode) {
-    this.transitModes.add(new MainAndSubMode(mainMode, null));
-    return this;
-  }
-
-  public RequestModesBuilder withTransitMode(TransitMode mainMode, String subMode) {
-    this.transitModes.add(new MainAndSubMode(mainMode, SubMode.of(subMode)));
-    return this;
-  }
-
-  public RequestModesBuilder clearTransitModes() {
-    this.transitModes.clear();
-    return this;
-  }
-
-  public RequestModesBuilder withTransitModes(Collection<MainAndSubMode> transitModes) {
-    this.transitModes = new ArrayList<>(transitModes);
-    return this;
   }
 
   public RequestModes build() {

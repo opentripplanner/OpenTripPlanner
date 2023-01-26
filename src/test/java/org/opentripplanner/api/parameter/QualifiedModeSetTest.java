@@ -21,10 +21,8 @@ import static org.opentripplanner.transit.model.basic.TransitMode.TROLLEYBUS;
 
 import jakarta.ws.rs.BadRequestException;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class QualifiedModeSetTest {
@@ -45,7 +43,6 @@ public class QualifiedModeSetTest {
         .withEgressMode(WALK)
         .withDirectMode(WALK)
         .withTransferMode(WALK)
-        .clearTransitModes()
         .build(),
       modeSet.getRequestModes()
     );
@@ -55,20 +52,14 @@ public class QualifiedModeSetTest {
   public void multipleWalks() {
     QualifiedModeSet modeSet = new QualifiedModeSet(new String[] { "WALK", "WALK", "WALK" });
     assertEquals(Set.of(new QualifiedMode("WALK")), modeSet.qModes);
-    assertEquals(
-      RequestModes.of().withAllStreetModes(WALK).clearTransitModes().build(),
-      modeSet.getRequestModes()
-    );
+    assertEquals(RequestModes.of().withAllStreetModes(WALK).build(), modeSet.getRequestModes());
   }
 
   @Test
   public void singleWalkAndBicycle() {
     QualifiedModeSet modeSet = new QualifiedModeSet("WALK,BICYCLE");
     assertEquals(Set.of(new QualifiedMode("WALK"), new QualifiedMode("BICYCLE")), modeSet.qModes);
-    assertEquals(
-      RequestModes.of().withAllStreetModes(BIKE).clearTransitModes().build(),
-      modeSet.getRequestModes()
-    );
+    assertEquals(RequestModes.of().withAllStreetModes(BIKE).build(), modeSet.getRequestModes());
   }
 
   @Test
@@ -79,7 +70,7 @@ public class QualifiedModeSetTest {
       modeSet.qModes
     );
     assertEquals(
-      RequestModes.of().withAllStreetModes(BIKE_RENTAL).clearTransitModes().build(),
+      RequestModes.of().withAllStreetModes(BIKE_RENTAL).build(),
       modeSet.getRequestModes()
     );
   }
@@ -98,7 +89,6 @@ public class QualifiedModeSetTest {
         .withEgressMode(WALK)
         .withDirectMode(BIKE_TO_PARK)
         .withTransferMode(WALK)
-        .clearTransitModes()
         .build(),
       modeSet.getRequestModes()
     );
@@ -115,7 +105,6 @@ public class QualifiedModeSetTest {
         .withEgressMode(BIKE)
         .withDirectMode(BIKE)
         .withTransferMode(BIKE)
-        .clearTransitModes()
         .build(),
       modeSet.getRequestModes()
     );
@@ -147,7 +136,6 @@ public class QualifiedModeSetTest {
         .withEgressMode(FLEXIBLE)
         .withDirectMode(FLEXIBLE)
         .withTransferMode(WALK)
-        .clearTransitModes()
         .build(),
       modeSet.getRequestModes()
     );
@@ -167,7 +155,6 @@ public class QualifiedModeSetTest {
         .withEgressMode(FLEXIBLE)
         .withDirectMode(BIKE_TO_PARK)
         .withTransferMode(WALK)
-        .clearTransitModes()
         .build(),
       modeSet.getRequestModes()
     );
@@ -193,11 +180,8 @@ public class QualifiedModeSetTest {
       MONORAIL,
       TransitMode.TAXI
     );
-    var mainModes = modeSet
-      .getRequestModes()
-      .transitModes.stream()
-      .map(MainAndSubMode::mainMode)
-      .collect(Collectors.toSet());
+
+    var mainModes = Set.copyOf(modeSet.getTransitModes());
 
     assertEquals(mainModes, expected);
   }
@@ -222,11 +206,8 @@ public class QualifiedModeSetTest {
       MONORAIL,
       TransitMode.TAXI
     );
-    var mainModes = modeSet
-      .getRequestModes()
-      .transitModes.stream()
-      .map(MainAndSubMode::mainMode)
-      .collect(Collectors.toSet());
+
+    var mainModes = Set.copyOf(modeSet.getTransitModes());
 
     assertEquals(mainModes, expected);
   }

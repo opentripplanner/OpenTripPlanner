@@ -30,6 +30,7 @@ import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
+import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -298,13 +299,9 @@ public class WalkableAreaBuilder {
       // FIXME: temporary hard limit on size of
       // areas to prevent way explosion
       if (polygon.getNumPoints() > maxAreaNodes) {
-        issueStore.add(
-          new AreaTooComplicated(
-            group.getSomeOSMObject().getId(),
-            visibilityNodes.size(),
-            maxAreaNodes
-          )
-        );
+        OSMWithTags osm = group.getSomeOSMObject();
+        String id = (osm instanceof OSMWay) ? "way/" + osm.getId() : "relation/" + osm.getId();
+        issueStore.add(new AreaTooComplicated(id, visibilityNodes.size(), maxAreaNodes));
         continue;
       }
 

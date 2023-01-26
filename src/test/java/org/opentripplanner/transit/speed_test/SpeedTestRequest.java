@@ -9,6 +9,9 @@ import java.time.ZoneId;
 import java.util.List;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RoutingTag;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.speed_test.model.testcase.TestCase;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
@@ -53,14 +56,29 @@ public class SpeedTestRequest {
       request.setArriveBy(true);
     }
 
-    if (input.window() != TestCase.NOT_SET) {
-      request.setSearchWindow(Duration.ofSeconds(input.window()));
+    if (input.window() != null) {
+      request.setSearchWindow(input.window());
     }
 
     request.setFrom(input.fromPlace());
     request.setTo(input.toPlace());
-    request.setNumItineraries(opts.numOfItineraries());
-    request.journey().setModes(input.modes());
+
+    // Filter the results inside the SpeedTest, not in the itineraries filter,
+    // when ignoring street results. This will use the default witch is 50.
+    if (!config.ignoreStreetResults) {
+      request.setNumItineraries(opts.numOfItineraries());
+    }
+    request.journey().setModes(input.modes().getRequestModes());
+
+    var tModes = input.modes().getTransitModes().stream().map(MainAndSubMode::new).toList();
+    if (tModes.isEmpty()) {
+      request.journey().transit().disable();
+    } else {
+      var builder = TransitFilterRequest
+        .of()
+        .addSelect(SelectRequest.of().withTransportModes(tModes).build());
+      request.journey().transit().setFilters(List.of(builder.build()));
+    }
 
     if (profile.raptorProfile().isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
       request.setSearchWindow(Duration.ZERO);

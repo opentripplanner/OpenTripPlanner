@@ -15,7 +15,7 @@ import org.opentripplanner.graph_builder.issue.report.DataImportIssuesToHTML;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GraphCoherencyCheckerModule;
 import org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule;
-import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
+import org.opentripplanner.graph_builder.module.PruneIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.graph_builder.module.TripPatternNamer;
@@ -43,7 +43,7 @@ public interface GraphBuilderFactory {
   BusRouteStreetMatcher busRouteStreetMatcher();
   OsmBoardingLocationsModule osmBoardingLocationsModule();
   StreetLinkerModule streetLinkerModule();
-  PruneNoThruIslands pruneNoThruIslands();
+  PruneIslands pruneIslands();
   List<ElevationModule> elevationModules();
   FlexLocationsToStreetEdgesMapper flexLocationsToStreetEdgesMapper();
   DirectTransferGenerator directTransferGenerator();

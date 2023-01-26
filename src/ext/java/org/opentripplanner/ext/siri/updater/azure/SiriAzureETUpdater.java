@@ -23,7 +23,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.trip.UpdateResult;
+import org.opentripplanner.updater.UpdateResult;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
@@ -122,6 +122,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         snapshotSource.applyEstimatedTimetable(
           transitModel,
           fuzzyTripMatcher(),
+          entityResolver(),
           feedId,
           false,
           updates
@@ -146,6 +147,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         var result = snapshotSource.applyEstimatedTimetable(
           transitModel,
           fuzzyTripMatcher(),
+          entityResolver(),
           feedId,
           false,
           updates

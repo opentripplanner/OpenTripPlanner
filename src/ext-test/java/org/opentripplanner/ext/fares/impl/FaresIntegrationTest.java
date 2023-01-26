@@ -17,6 +17,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.graph.Graph;
@@ -237,6 +238,7 @@ public class FaresIntegrationTest {
     OtpServerRequestContext serverContext
   ) {
     RouteRequest request = new RouteRequest();
+    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
     request.setDateTime(time);
     request.setFrom(from);
     request.setTo(to);

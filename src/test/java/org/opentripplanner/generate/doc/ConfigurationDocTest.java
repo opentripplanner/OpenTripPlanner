@@ -11,9 +11,9 @@ import static org.opentripplanner.generate.doc.support.OTPFeatureTable.otpFeatur
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
+import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 
-@OnlyIfDocsExist
+@GeneratesDocumentation
 public class ConfigurationDocTest {
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "Configuration.md");

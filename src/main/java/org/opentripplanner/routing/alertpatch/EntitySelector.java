@@ -5,7 +5,7 @@ import java.util.Set;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Direction;
 
-public interface EntitySelector {
+public sealed interface EntitySelector {
   EntityKey key();
 
   default boolean matches(EntitySelector other) {

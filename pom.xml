@@ -56,20 +56,20 @@
 
 
     <properties>
-        <otp.serialization.version.id>81</otp.serialization.version.id>
+        <otp.serialization.version.id>82</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>27.1</geotools.version>
+        <geotools.version>28.1</geotools.version>
         <google.dagger.version>2.44.2</google.dagger.version>
-        <jackson.version>2.14.0</jackson.version>
-        <jersey.version>3.0.9</jersey.version>
-        <junit.version>5.9.1</junit.version>
-        <micrometer.version>1.10.2</micrometer.version>
-        <netcdf4.version>5.5.2</netcdf4.version>
+        <jackson.version>2.14.1</jackson.version>
+        <jersey.version>3.1.0</jersey.version>
+        <junit.version>5.9.2</junit.version>
+        <micrometer.version>1.10.3</micrometer.version>
+        <netcdf4.version>5.5.3</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
         <logback.version>1.4.5</logback.version>
         <lucene.version>9.4.2</lucene.version>
         <graphql.version>20.0</graphql.version>
-        <slf4j.version>2.0.5</slf4j.version>
+        <slf4j.version>2.0.6</slf4j.version>
         <netex-java-model.version>2.0.14</netex-java-model.version>
         <siri-java-model.version>1.21</siri-java-model.version>
         <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
@@ -139,7 +139,7 @@
             <extension>
                 <groupId>kr.motd.maven</groupId>
                 <artifactId>os-maven-plugin</artifactId>
-                <version>1.6.2</version>
+                <version>1.7.1</version>
             </extension>
         </extensions>
         <plugins>
@@ -256,13 +256,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.12.1</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M7</version>
+                <version>3.0.0-M8</version>
                 <configuration>
                     <!-- we have to fork the JVM during tests so that the argLine is passed along -->
                     <forkCount>3</forkCount>
@@ -560,7 +560,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>24.1.2</version>
+                <version>26.4.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -695,13 +695,13 @@
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>siri-protobuf-mapper</artifactId>
-            <version>0.8</version>
+            <version>0.10</version>
         </dependency>
 
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>2.2.6</version>
+            <version>3.0.0</version>
         </dependency>
 
         <!-- TESTING -->
@@ -720,13 +720,13 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.8.0</version>
+            <version>5.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -740,7 +740,13 @@
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>kryo-tools</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
+        </dependency>
+        <!-- kryo serializers for Guava types !-->
+        <dependency>
+            <groupId>de.javakaffee</groupId>
+            <artifactId>kryo-serializers</artifactId>
+            <version>0.45</version>
         </dependency>
         <!-- Direct dependency with -jre version, in order to not resolve to the limited -android version -->
         <dependency>
@@ -1012,7 +1018,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -1029,7 +1035,7 @@
                         <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.12</version>
+                        <version>1.6.13</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>

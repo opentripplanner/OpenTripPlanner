@@ -10,6 +10,7 @@ import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.speed_test.model.testcase.TestCase;
 import org.opentripplanner.transit.speed_test.model.testcase.TestCaseFailedException;
+import org.opentripplanner.transit.speed_test.model.testcase.TestCases;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 
 /**
@@ -60,13 +61,14 @@ class ResultPrinter {
 
   static void logSingleTestResult(
     SpeedTestProfile profile,
-    List<TestCase> testCases,
+    TestCases testCases,
     int sample,
     int nSamples,
-    int nSuccess,
     SpeedTestTimer timer
   ) {
-    int tcSize = testCases.size();
+    int nTestCases = testCases.numberOfTestCases();
+    int nTestCasesSuccess = testCases.numberOfTestCasesWithSuccess();
+
     String totalTimeSec = msToSecondsStr(testCases.stream().mapToInt(TestCase::totalTimeMs).sum());
     var summary = Table
       .of()
@@ -87,15 +89,15 @@ class ResultPrinter {
       logLine("Number of paths", "[%s]", summary.get(1)) +
       logLine("Transit times(ms)", "[%s]", summary.get(2)) +
       logLine("Total times(ms)", "[%s]", summary.get(3)) +
-      logLine("Successful searches", "%d / %d", nSuccess, tcSize) +
+      logLine("Successful searches", "%d / %d", nTestCasesSuccess, nTestCases) +
       logLine(nSamples > 1, "Sample", "%d / %d", sample, nSamples) +
       logLine("Time total", "%s", totalTimeSec) +
       logLine(
-        nSuccess != tcSize,
+        nTestCasesSuccess != nTestCases,
         "!!! UNEXPECTED RESULTS",
         "%d OF %d FAILED. SEE LOG ABOVE FOR ERRORS !!!",
-        tcSize - nSuccess,
-        tcSize
+        nTestCases - nTestCasesSuccess,
+        nTestCases
       )
     );
   }
@@ -126,7 +128,7 @@ class ResultPrinter {
     boolean printItineraries,
     String errorDetails
   ) {
-    if (printItineraries || !tc.success()) {
+    if (printItineraries || tc.status().notOk()) {
       System.err.printf(
         "TC %-4s %-7s  %4d ms  %-66s %s %n",
         tc.id(),

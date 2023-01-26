@@ -40,7 +40,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<Agency> agency() {
     return environment ->
       getSource(environment)
-        .getEntities()
+        .entities()
         .stream()
         .filter(EntitySelector.Agency.class::isInstance)
         .findAny()
@@ -53,26 +53,26 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> alertCause() {
-    return environment -> getLegacyGraphQLCause(getSource(environment).cause);
+    return environment -> getLegacyGraphQLCause(getSource(environment).cause());
   }
 
   @Override
   public DataFetcher<String> alertDescriptionText() {
     return environment ->
-      getSource(environment).alertDescriptionText.toString(environment.getLocale());
+      getSource(environment).descriptionText().toString(environment.getLocale());
   }
 
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations() {
     return environment -> {
-      var text = getSource(environment).alertDescriptionText;
+      var text = getSource(environment).descriptionText();
       return getTranslations(text);
     };
   }
 
   @Override
   public DataFetcher<String> alertEffect() {
-    return environment -> getLegacyGraphQLEffect(getSource(environment).effect);
+    return environment -> getLegacyGraphQLEffect(getSource(environment).effect());
   }
 
   @Override
@@ -80,38 +80,38 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
     return environment -> {
       TransitAlert alert = getSource(environment);
       return Objects.hash(
-        alert.alertDescriptionText,
-        alert.alertHeaderText,
-        alert.alertUrl,
-        alert.cause,
-        alert.effect,
-        alert.severity
+        alert.descriptionText(),
+        alert.headerText(),
+        alert.url(),
+        alert.cause(),
+        alert.effect(),
+        alert.severity()
       );
     };
   }
 
   @Override
   public DataFetcher<String> alertHeaderText() {
-    return environment -> getSource(environment).alertHeaderText.toString(environment.getLocale());
+    return environment -> getSource(environment).headerText().toString(environment.getLocale());
   }
 
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertHeaderTextTranslations() {
     return environment -> {
-      var text = getSource(environment).alertHeaderText;
+      var text = getSource(environment).headerText();
       return getTranslations(text);
     };
   }
 
   @Override
   public DataFetcher<String> alertSeverityLevel() {
-    return environment -> getLegacyGraphQLSeverity(getSource(environment).severity);
+    return environment -> getLegacyGraphQLSeverity(getSource(environment).severity());
   }
 
   @Override
   public DataFetcher<String> alertUrl() {
     return environment -> {
-      var alertUrl = getSource(environment).alertUrl;
+      var alertUrl = getSource(environment).url();
       return alertUrl == null ? null : alertUrl.toString(environment.getLocale());
     };
   }
@@ -119,7 +119,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertUrlTranslations() {
     return environment -> {
-      var url = getSource(environment).alertUrl;
+      var url = getSource(environment).url();
       return getTranslations(url);
     };
   }
@@ -150,7 +150,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<Iterable<Object>> entities() {
     return environment ->
       getSource(environment)
-        .getEntities()
+        .entities()
         .stream()
         .map(entitySelector -> {
           if (entitySelector instanceof EntitySelector.Stop) {
@@ -266,12 +266,13 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> feed() {
-    return environment -> getSource(environment).getFeedId();
+    return environment -> getSource(environment).getId().getFeedId();
   }
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment -> new Relay.ResolvedGlobalId("Alert", getSource(environment).getId());
+    return environment ->
+      new Relay.ResolvedGlobalId("Alert", getSource(environment).getId().toString());
   }
 
   // This is deprecated
@@ -284,7 +285,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<Route> route() {
     return environment ->
       getSource(environment)
-        .getEntities()
+        .entities()
         .stream()
         .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
         .findAny()
@@ -299,7 +300,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<Object> stop() {
     return environment ->
       getSource(environment)
-        .getEntities()
+        .entities()
         .stream()
         .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
         .findAny()
@@ -314,7 +315,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<Trip> trip() {
     return environment ->
       getSource(environment)
-        .getEntities()
+        .entities()
         .stream()
         .filter(entitySelector -> entitySelector instanceof EntitySelector.Trip)
         .findAny()

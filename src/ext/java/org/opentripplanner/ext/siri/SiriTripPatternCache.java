@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -15,7 +16,6 @@ import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +35,14 @@ public class SiriTripPatternCache {
   private final Map<TripServiceDateKey, TripPattern> updatedTripPatternsForTripCache = new HashMap<>();
 
   private final SiriTripPatternIdGenerator tripPatternIdGenerator;
+  private final Function<Trip, TripPattern> getPatternForTrip;
 
-  public SiriTripPatternCache(SiriTripPatternIdGenerator tripPatternIdGenerator) {
+  public SiriTripPatternCache(
+    SiriTripPatternIdGenerator tripPatternIdGenerator,
+    Function<Trip, TripPattern> getPatternForTrip
+  ) {
     this.tripPatternIdGenerator = tripPatternIdGenerator;
+    this.getPatternForTrip = getPatternForTrip;
   }
 
   /**
@@ -47,13 +52,11 @@ public class SiriTripPatternCache {
    * @param stopPattern stop pattern to retrieve/create trip pattern
    * @param trip        Trip containing route of new trip pattern in case a new trip pattern will be
    *                    created
-   * @param transitModel       transitModel to add vertices and edges in case a new trip pattern will be created
    * @return cached or newly created trip pattern
    */
   public synchronized TripPattern getOrCreateTripPattern(
     @Nonnull final StopPattern stopPattern,
     @Nonnull final Trip trip,
-    @Nonnull final TransitModel transitModel,
     @Nonnull LocalDate serviceDate
   ) {
     // Check cache for trip pattern
@@ -71,10 +74,7 @@ public class SiriTripPatternCache {
 
       // TODO - SIRI: Add pattern to transitModel index?
 
-      TripPattern originalTripPattern = transitModel
-        .getTransitModelIndex()
-        .getPatternForTrip()
-        .get(trip);
+      TripPattern originalTripPattern = getPatternForTrip.apply(trip);
 
       tripPatternBuilder.withCreatedByRealtimeUpdater(true);
       tripPatternBuilder.withOriginalTripPattern(originalTripPattern);

@@ -24,8 +24,8 @@ class AllowMainModesFilterTest {
 
   @Test
   void allows() {
-    assertTrue(subject.allows(TransitMode.BUS, SubMode.UNKNOWN));
-    assertFalse(subject.allows(TransitMode.RAIL, SubMode.UNKNOWN));
+    assertTrue(subject.match(TransitMode.BUS, SubMode.UNKNOWN));
+    assertFalse(subject.match(TransitMode.RAIL, SubMode.UNKNOWN));
   }
 
   @Test

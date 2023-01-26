@@ -1,0 +1,42 @@
+syntax = "proto2";
+
+import "gtfs-realtime.proto";
+
+option java_package = "de.mfdz";
+package transit_realtime;
+
+message TripDescriptorExtension {
+  optional string route_url = 1;
+  optional string agency_id = 2;
+  optional string route_long_name = 3;
+  optional uint32 route_type = 4;
+}
+
+extend TripDescriptor {
+  // https://groups.google.com/d/msgid/gtfs-realtime/255580b2-1fce-4605-a854-3e18f24fcab7n%40googlegroups.com
+  optional TripDescriptorExtension trip_descriptor = 1013;
+}
+
+message StopTimePropertiesExtension {
+  enum DropOffPickupType {
+    // Regularly scheduled pickup/dropoff.
+    REGULAR = 0;
+
+    // No pickup/dropoff available
+    NONE = 1;
+
+    // Must phone agency to arrange pickup/dropoff.
+    PHONE_AGENCY = 2;
+
+    // Must coordinate with driver to arrange pickup/dropoff.
+    COORDINATE_WITH_DRIVER = 3;
+  }
+
+  optional DropOffPickupType pickup_type = 1;
+  optional DropOffPickupType dropoff_type = 2;
+}
+
+extend TripUpdate.StopTimeUpdate.StopTimeProperties {
+  // https://groups.google.com/d/msgid/gtfs-realtime/255580b2-1fce-4605-a854-3e18f24fcab7n%40googlegroups.com
+  optional StopTimePropertiesExtension stop_time_properties = 1013;
+}

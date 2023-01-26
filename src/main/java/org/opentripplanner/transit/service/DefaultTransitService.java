@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -76,6 +77,11 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<Agency> getAgencies() {
     return this.transitModel.getAgencies();
+  }
+
+  @Override
+  public Optional<Agency> findAgencyById(FeedScopedId id) {
+    return this.transitModel.findAgencyById(id);
   }
 
   @Override

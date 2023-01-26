@@ -61,4 +61,9 @@ public class TransferRoutingDistanceTooLong implements DataImportIssue {
       directDistance
     );
   }
+
+  @Override
+  public int getPriority() {
+    return (int) (ratio * 1000);
+  }
 }
