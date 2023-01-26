@@ -299,9 +299,9 @@ public class WalkableAreaBuilder {
       // FIXME: temporary hard limit on size of
       // areas to prevent way explosion
       if (polygon.getNumPoints() > maxAreaNodes) {
-        OSMWithTags osm = group.getSomeOSMObject();
-        String id = (osm instanceof OSMWay) ? "way/" + osm.getId() : "relation/" + osm.getId();
-        issueStore.add(new AreaTooComplicated(id, visibilityNodes.size(), maxAreaNodes));
+        issueStore.add(
+          new AreaTooComplicated(group.getSomeOSMObject(), visibilityNodes.size(), maxAreaNodes)
+        );
         continue;
       }
 
