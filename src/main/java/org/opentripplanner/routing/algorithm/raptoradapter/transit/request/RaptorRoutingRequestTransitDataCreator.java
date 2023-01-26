@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import static org.opentripplanner.util.time.ServiceDateUtils.secondsSinceStartOfTime;
+import static org.opentripplanner.framework.time.ServiceDateUtils.secondsSinceStartOfTime;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TObjectIntMap;
@@ -14,11 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +168,8 @@ class RaptorRoutingRequestTransitDataCreator {
     // and any previous day, while on subsequent search days we only want to add the
     // TripPatternForDate objects that start on that particular day. This is to prevent duplicates.
     // This was previously a stream, but was unrolled for improved performance.
-    Predicate<TripTimes> tripTimesPredicate = filter::tripTimesPredicate;
+    Predicate<TripTimes> tripTimesPredicate = tripTimes ->
+      filter.tripTimesPredicate(tripTimes, filter.hasSubModeFilters());
     Collection<TripPatternForDate> tripPatternsForDate = transitLayer.getTripPatternsForDate(date);
     List<TripPatternForDate> result = new ArrayList<>(tripPatternsForDate.size());
     for (TripPatternForDate p : tripPatternsForDate) {

@@ -3,13 +3,14 @@ package org.opentripplanner.updater.trip;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.UpdateResult;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.BatchTripUpdateMetrics;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

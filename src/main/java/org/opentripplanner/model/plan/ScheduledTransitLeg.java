@@ -13,7 +13,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.legreference.LegReference;
@@ -21,7 +26,6 @@ import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
@@ -31,10 +35,6 @@ import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.util.geometry.GeometryUtils;
-import org.opentripplanner.util.lang.DoubleUtils;
-import org.opentripplanner.util.lang.ToStringBuilder;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a

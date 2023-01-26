@@ -1,7 +1,7 @@
 package org.opentripplanner.api.mapping;
 
 import java.time.LocalDate;
-import org.opentripplanner.util.time.ServiceDateUtils;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 
 public class LocalDateMapper {
 

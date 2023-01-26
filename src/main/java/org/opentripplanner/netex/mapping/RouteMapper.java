@@ -1,16 +1,16 @@
 package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.Multimap;
+import jakarta.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.netex.mapping.support.MainAndSubMode;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -82,7 +82,7 @@ class RouteMapper {
     builder.withLongName(longName);
     builder.withShortName(line.getPublicCode());
 
-    MainAndSubMode mode;
+    NetexMainAndSubMode mode;
     try {
       mode = transportModeMapper.map(line.getTransportMode(), line.getTransportSubmode());
     } catch (TransportModeMapper.UnsupportedModeException e) {

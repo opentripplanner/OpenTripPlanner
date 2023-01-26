@@ -36,8 +36,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                   | *Optional* |               |  2.1  |
 | [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
 | [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |   na  |
-| flex                                                                                      |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |   na  |
-|    [maxTransferDurationSeconds](#flex_maxTransferDurationSeconds)                         |       `integer`       | How long should you be allowed to walk from a flex vehicle to a transit one.                      | *Optional* | `300`         |  2.1  |
+| [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |  2.1  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
 | [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                   | *Optional* |               |   na  |
@@ -57,7 +56,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                     | *Optional* |               |   na  |
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                           | *Optional* | `false`       |   na  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                       | *Optional* |               |   na  |
-| [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                        | *Optional* |               |   na  |
+| [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                        | *Optional* |               |  1.5  |
 | [vectorTileLayers](sandbox/MapboxVectorTilesApi.md)                                       |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                               | *Optional* |               |  2.0  |
 | vehicleRentalServiceDirectory                                                             |        `object`       | Configuration for the vehicle rental service directory.                                           | *Optional* |               |  2.0  |
 |    language                                                                               |        `string`       | Language code.                                                                                    | *Optional* |               |   na  |
@@ -77,7 +76,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 
 <h3 id="configVersion">configVersion</h3>
 
-**Since version:** `2.1` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.1` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Deployment version of the *router-config.json*.
@@ -95,7 +94,7 @@ Be aware that OTP uses the config embedded in the loaded graph if no new config 
 
 <h3 id="requestLogFile">requestLogFile</h3>
 
-**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 The path of the log file for the requests.
@@ -127,7 +126,7 @@ number of transit vehicles used in that itinerary.
 
 <h3 id="streetRoutingTimeout">streetRoutingTimeout</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"`  \
+**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"`   
 **Path:** / 
 
 The maximum time a street routing request is allowed to take before returning a timeout.
@@ -144,18 +143,9 @@ search-window.
 The search aborts after this duration and any paths found are returned to the client.
 
 
-<h3 id="flex_maxTransferDurationSeconds">maxTransferDurationSeconds</h3>
-
-**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `300`  \
-**Path:** /flex 
-
-How long should you be allowed to walk from a flex vehicle to a transit one.
-
-How long should a passenger be allowed to walk after getting out of a flex vehicle and transferring to a flex or transit one. This was mainly introduced to improve performance which is also the reason for not using the existing value with the same name: fixed schedule transfers are computed during the graph build but flex ones are calculated at request time and are more sensitive to slowdown. A lower value means that the routing is faster.
-
 <h3 id="transit">transit</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Configuration for transit searches with RAPTOR.
@@ -167,7 +157,7 @@ request and the actual routing request.
 
 <h3 id="transit_iterationDepartureStepInSeconds">iterationDepartureStepInSeconds</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `60`  \
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `60`   
 **Path:** /transit 
 
 Step for departure times between each RangeRaptor iterations.
@@ -180,7 +170,7 @@ but you might get a slack of 60 seconds somewhere in the result.
 
 <h3 id="transit_maxNumberOfTransfers">maxNumberOfTransfers</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `12`  \
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `12`   
 **Path:** /transit 
 
 This parameter is used to allocate enough memory space for Raptor.
@@ -192,7 +182,7 @@ transfers is very little so it is better to set it too high than to low.
 
 <h3 id="transit_scheduledTripBinarySearchThreshold">scheduledTripBinarySearchThreshold</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `50`  \
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `50`   
 **Path:** /transit 
 
 This threshold is used to determine when to perform a binary trip schedule search.
@@ -205,7 +195,7 @@ few percents.
 
 <h3 id="transit_searchThreadPoolSize">searchThreadPoolSize</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`  \
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`   
 **Path:** /transit 
 
 Split a travel search in smaller jobs and run them in parallel to improve performance.
@@ -217,7 +207,7 @@ no extra threads are started and the search is done in one thread.
 
 <h3 id="transit_transferCacheMaxSize">transferCacheMaxSize</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `25`  \
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `25`   
 **Path:** /transit 
 
 The maximum number of distinct transfers parameters to cache pre-calculated transfers for.
@@ -226,7 +216,7 @@ The maximum number of distinct transfers parameters to cache pre-calculated tran
 
 <h3 id="transit_dynamicSearchWindow">dynamicSearchWindow</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
 **Path:** /transit 
 
 The dynamic search window coefficients used to calculate the EDT, LAT and SW.
@@ -264,7 +254,7 @@ In addition there is an upper bound on the calculation of the search window:
 
 <h3 id="transit_dynamicSearchWindow_maxWinTimeMinutes">maxWinTimeMinutes</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `180`  \
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `180`   
 **Path:** /transit/dynamicSearchWindow 
 
 Upper limit for the search-window calculation.
@@ -280,7 +270,7 @@ The default is 3 hours. The unit is minutes.
 
 <h3 id="transit_dynamicSearchWindow_minTransitTimeCoefficient">minTransitTimeCoefficient</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`  \
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`   
 **Path:** /transit/dynamicSearchWindow 
 
 The coefficient to multiply with `minTransitTime`.
@@ -289,7 +279,7 @@ Use a value between `0.0` and `3.0`. Using `0.0` will eliminate the `minTransitT
 
 <h3 id="transit_dynamicSearchWindow_minWaitTimeCoefficient">minWaitTimeCoefficient</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`  \
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`   
 **Path:** /transit/dynamicSearchWindow 
 
 The coefficient to multiply with `minWaitTime`.
@@ -298,7 +288,7 @@ Use a value between `0.0` and `1.0`. Using `0.0` will eliminate the `minWaitTime
 
 <h3 id="transit_dynamicSearchWindow_minWinTimeMinutes">minWinTimeMinutes</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`  \
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`   
 **Path:** /transit/dynamicSearchWindow 
 
 The constant minimum number of minutes for a raptor-search-window. 
@@ -307,7 +297,7 @@ Use a value between 20 and 180 minutes in a normal deployment.
 
 <h3 id="transit_dynamicSearchWindow_stepMinutes">stepMinutes</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10`  \
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10`   
 **Path:** /transit/dynamicSearchWindow 
 
 Used to set the steps the search-window is rounded to.
@@ -323,7 +313,7 @@ coefficient.
 
 <h3 id="transit_pagingSearchWindowAdjustments">pagingSearchWindowAdjustments</h3>
 
-**Since version:** `na` ∙ **Type:** `duration[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `na` ∙ **Type:** `duration[]` ∙ **Cardinality:** `Optional`   
 **Path:** /transit 
 
 The provided array of durations is used to increase the search-window for the next/previous page.
@@ -337,8 +327,8 @@ for more info."
 
 <h3 id="transit_stopTransferCost">stopTransferCost</h3>
 
-**Since version:** `na` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`  \
-**Path:** /transit  \
+**Since version:** `na` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
+**Path:** /transit   
 **Enum keys:** `discouraged` | `allowed` | `recommended` | `preferred`
 
 Use this to set a stop transfer cost for the given transfer priority
@@ -364,7 +354,7 @@ Use values in a range from `0` to `100 000`. **All key/value pairs are required 
 
 <h3 id="transmodelApi_hideFeedId">hideFeedId</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** /transmodelApi 
 
 Hide the FeedId in all API output, and add it to input.
@@ -373,14 +363,14 @@ Only turn this feature on if you have unique ids across all feeds, without the f
 
 <h3 id="transmodelApi_tracingHeaderTags">tracingHeaderTags</h3>
 
-**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** /transmodelApi 
 
 Used to group requests when monitoring OTP.
 
 <h3 id="vehicleRentalServiceDirectory_headers">headers</h3>
 
-**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /vehicleRentalServiceDirectory 
 
 Http headers.
@@ -408,6 +398,7 @@ Http headers.
     "walkReluctance" : 4.0,
     "bikeReluctance" : 5.0,
     "bikeWalkingReluctance" : 10.0,
+    "bikeStairsReluctance" : 150.0,
     "carReluctance" : 10.0,
     "stairsReluctance" : 1.65,
     "turnReluctance" : 1.0,
@@ -439,9 +430,13 @@ Http headers.
       "BIKE_RENTAL" : "20m"
     },
     "itineraryFilters" : {
-      "transitGeneralizedCostLimit" : "3600 + 2.5 x",
+      "transitGeneralizedCostLimit" : {
+        "costLimitFunction" : "900 + 1.5 x",
+        "intervalRelaxFactor" : 0.4
+      },
       "bikeRentalDistanceRatio" : 0.3,
-      "accessibilityScore" : true
+      "accessibilityScore" : true,
+      "minBikeParkingDistance" : 300
     },
     "carDecelerationSpeed" : 2.9,
     "carAccelerationSpeed" : 2.9,
@@ -468,7 +463,10 @@ Http headers.
     }
   },
   "flex" : {
-    "maxTransferDurationSeconds" : 240
+    "maxTransferDuration" : "5m",
+    "maxFlexTripDuration" : "45m",
+    "maxAccessWalkDuration" : "15m",
+    "maxEgressWalkDuration" : "15m"
   },
   "transit" : {
     "maxNumberOfTransfers" : 12,
@@ -497,124 +495,152 @@ Http headers.
   "transmodelApi" : {
     "hideFeedId" : true
   },
-  "vectorTileLayers" : [ {
-    "name" : "stops",
-    "type" : "Stop",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 14,
-    "cacheMaxSeconds" : 600
-  }, {
-    "name" : "stations",
-    "type" : "Station",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 12,
-    "cacheMaxSeconds" : 600
-  }, {
-    "name" : "rentalPlaces",
-    "type" : "VehicleRental",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 14,
-    "cacheMaxSeconds" : 60,
-    "expansionFactor" : 0.25
-  }, {
-    "name" : "rentalVehicle",
-    "type" : "VehicleRentalVehicle",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 14,
-    "cacheMaxSeconds" : 60
-  }, {
-    "name" : "rentalStation",
-    "type" : "VehicleRentalStation",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 14,
-    "cacheMaxSeconds" : 600
-  }, {
-    "name" : "vehicleParking",
-    "type" : "VehicleParking",
-    "mapper" : "Digitransit",
-    "maxZoom" : 20,
-    "minZoom" : 14,
-    "cacheMaxSeconds" : 60,
-    "expansionFactor" : 0.25
-  } ],
-  "updaters" : [ {
-    "type" : "real-time-alerts",
-    "frequencySec" : 30,
-    "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
-    "feedId" : "TriMet"
-  }, {
-    "type" : "vehicle-rental",
-    "network" : "socialbicycles_coast",
-    "sourceType" : "gbfs",
-    "language" : "en",
-    "frequencySec" : 60,
-    "allowKeepingRentedBicycleAtDestination" : true,
-    "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
-    "headers" : {
-      "Auth" : "<any-token>",
-      "<key>" : "<value>"
-    }
-  }, {
-    "type" : "vehicle-parking",
-    "sourceType" : "hsl-park",
-    "feedId" : "hslpark",
-    "timeZone" : "Europe/Helsinki",
-    "facilitiesFrequencySec" : 3600,
-    "facilitiesUrl" : "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
-    "utilizationsFrequencySec" : 600,
-    "utilizationsUrl" : "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
-    "hubsUrl" : "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
-  }, {
-    "type" : "vehicle-parking",
-    "sourceType" : "park-api",
-    "feedId" : "parkapi",
-    "timeZone" : "Europe/Berlin",
-    "frequencySec" : 600,
-    "url" : "https://foo.bar",
-    "headers" : {
-      "Cache-Control" : "max-age=604800"
+  "vectorTileLayers" : [
+    {
+      "name" : "stops",
+      "type" : "Stop",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 14,
+      "cacheMaxSeconds" : 600
     },
-    "tags" : [ "source:parkapi" ]
-  }, {
-    "type" : "vehicle-parking",
-    "feedId" : "bikely",
-    "sourceType" : "bikely",
-    "url" : "https://api.safebikely.com/api/v1/s/locations",
-    "headers" : {
-      "X-Bikely-Token" : "${BIKELY_TOKEN}",
-      "Authorization" : "${BIKELY_AUTHORIZATION}"
+    {
+      "name" : "stations",
+      "type" : "Station",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 12,
+      "cacheMaxSeconds" : 600
+    },
+    {
+      "name" : "rentalPlaces",
+      "type" : "VehicleRental",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 14,
+      "cacheMaxSeconds" : 60,
+      "expansionFactor" : 0.25
+    },
+    {
+      "name" : "rentalVehicle",
+      "type" : "VehicleRentalVehicle",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 14,
+      "cacheMaxSeconds" : 60
+    },
+    {
+      "name" : "rentalStation",
+      "type" : "VehicleRentalStation",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 14,
+      "cacheMaxSeconds" : 600
+    },
+    {
+      "name" : "vehicleParking",
+      "type" : "VehicleParking",
+      "mapper" : "Digitransit",
+      "maxZoom" : 20,
+      "minZoom" : 14,
+      "cacheMaxSeconds" : 60,
+      "expansionFactor" : 0.25
     }
-  }, {
-    "type" : "stop-time-updater",
-    "frequencySec" : 60,
-    "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
-    "url" : "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
-    "feedId" : "TriMet"
-  }, {
-    "type" : "vehicle-positions",
-    "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
-    "feedId" : "1",
-    "frequencySec" : 60
-  }, {
-    "type" : "websocket-gtfs-rt-updater"
-  }, {
-    "type" : "siri-azure-sx-updater",
-    "topic" : "some_topic",
-    "servicebus-url" : "service_bus_url",
-    "feedId" : "feed_id",
-    "customMidnight" : 4,
-    "history" : {
-      "url" : "endpoint_url",
-      "fromDateTime" : "-P1D",
-      "toDateTime" : "P1D",
-      "timeout" : 300000
+  ],
+  "updaters" : [
+    {
+      "type" : "real-time-alerts",
+      "frequencySec" : 30,
+      "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
+      "feedId" : "TriMet",
+      "headers" : {
+        "Some-Header" : "A-Value"
+      }
+    },
+    {
+      "type" : "vehicle-rental",
+      "network" : "socialbicycles_coast",
+      "sourceType" : "gbfs",
+      "language" : "en",
+      "frequencySec" : 60,
+      "allowKeepingRentedBicycleAtDestination" : true,
+      "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
+      "headers" : {
+        "Auth" : "<any-token>",
+        "<key>" : "<value>"
+      }
+    },
+    {
+      "type" : "vehicle-parking",
+      "sourceType" : "hsl-park",
+      "feedId" : "hslpark",
+      "timeZone" : "Europe/Helsinki",
+      "facilitiesFrequencySec" : 3600,
+      "facilitiesUrl" : "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
+      "utilizationsFrequencySec" : 600,
+      "utilizationsUrl" : "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
+      "hubsUrl" : "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
+    },
+    {
+      "type" : "vehicle-parking",
+      "sourceType" : "park-api",
+      "feedId" : "parkapi",
+      "timeZone" : "Europe/Berlin",
+      "frequencySec" : 600,
+      "url" : "https://foo.bar",
+      "headers" : {
+        "Cache-Control" : "max-age=604800"
+      },
+      "tags" : [
+        "source:parkapi"
+      ]
+    },
+    {
+      "type" : "vehicle-parking",
+      "feedId" : "bikely",
+      "sourceType" : "bikely",
+      "url" : "https://api.safebikely.com/api/v1/s/locations",
+      "headers" : {
+        "X-Bikely-Token" : "${BIKELY_TOKEN}",
+        "Authorization" : "${BIKELY_AUTHORIZATION}"
+      }
+    },
+    {
+      "type" : "stop-time-updater",
+      "frequencySec" : 60,
+      "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
+      "url" : "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
+      "feedId" : "TriMet",
+      "headers" : {
+        "Authorization" : "A-Token"
+      }
+    },
+    {
+      "type" : "vehicle-positions",
+      "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
+      "feedId" : "1",
+      "frequencySec" : 60,
+      "headers" : {
+        "Header-Name" : "Header-Value"
+      }
+    },
+    {
+      "type" : "websocket-gtfs-rt-updater"
+    },
+    {
+      "type" : "siri-azure-sx-updater",
+      "topic" : "some_topic",
+      "servicebus-url" : "service_bus_url",
+      "feedId" : "feed_id",
+      "customMidnight" : 4,
+      "history" : {
+        "url" : "endpoint_url",
+        "fromDateTime" : "-P1D",
+        "toDateTime" : "P1D",
+        "timeout" : 300000
+      }
     }
-  } ]
+  ]
 }
 ```
 

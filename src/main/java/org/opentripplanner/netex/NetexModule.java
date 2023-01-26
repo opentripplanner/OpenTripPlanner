@@ -2,7 +2,8 @@ package org.opentripplanner.netex;
 
 import java.util.List;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
@@ -14,7 +15,6 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OTPFeature;
 
 /**
  * This module is used for importing the NeTEx CEN Technical Standard for exchanging Public

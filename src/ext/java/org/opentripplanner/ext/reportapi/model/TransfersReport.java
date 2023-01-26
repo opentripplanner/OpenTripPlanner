@@ -1,11 +1,13 @@
 package org.opentripplanner.ext.reportapi.model;
 
-import static org.opentripplanner.util.time.DurationUtils.durationToStr;
+import static org.opentripplanner.framework.time.DurationUtils.durationToStr;
 
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.RouteStationTransferPoint;
 import org.opentripplanner.model.transfer.RouteStopTransferPoint;
@@ -14,8 +16,6 @@ import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TripTransferPoint;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.Station;

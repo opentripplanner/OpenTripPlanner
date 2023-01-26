@@ -1,6 +1,6 @@
 # Changelog
 
-The changelog list most feature changes between each release. The list is automatically created
+The changelog lists most feature changes between each release. The list is automatically created
 based on merged pull requests. Search GitHub issues and pull requests for smaller issues.
 
 ## 2.3.0 (in progress)
@@ -21,6 +21,39 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Initial implementation of via search [#4554](https://github.com/opentripplanner/OpenTripPlanner/pull/4554)
 - Use material design theme for documentation, auto-deploy to Github Pages [#4575](https://github.com/opentripplanner/OpenTripPlanner/pull/4575)
 - Add stationTransferPreference option for GTFS feeds [#4599](https://github.com/opentripplanner/OpenTripPlanner/pull/4599)
+- Fix osmDefaults so they are used if something is not set in source [#4635](https://github.com/opentripplanner/OpenTripPlanner/pull/4635)
+- Add demDefaults [#4637](https://github.com/opentripplanner/OpenTripPlanner/pull/4637)
+- Add carpool and taxi modes [#4641](https://github.com/opentripplanner/OpenTripPlanner/pull/4641)
+- Add vector tile and layer in debug client for AreaStops [#4565](https://github.com/opentripplanner/OpenTripPlanner/pull/4565)
+- Prevent bicycles from using stairs [#4614](https://github.com/opentripplanner/OpenTripPlanner/pull/4614)
+- Bugfix for interchanges that start and end from the same stop [#4597](https://github.com/opentripplanner/OpenTripPlanner/pull/4597)
+- Add option to define gtfsDefaults and move some parameters from root to gtfs config [#4624](https://github.com/opentripplanner/OpenTripPlanner/pull/4624)
+- fix: forBoarding and forAlighting on cancelled calls in transmodel api [#4639](https://github.com/opentripplanner/OpenTripPlanner/pull/4639)
+- Add test for keeping Transmodel GraphQL schema in sync [#4658](https://github.com/opentripplanner/OpenTripPlanner/pull/4658)
+- Make maxFlexTripDuration configurable [#4642](https://github.com/opentripplanner/OpenTripPlanner/pull/4642)
+- Extract separate conditions for , ,  during OSM tag mapping, add Portland tag mapping [#4593](https://github.com/opentripplanner/OpenTripPlanner/pull/4593)
+- Better fallback in shape geometry processing [#4617](https://github.com/opentripplanner/OpenTripPlanner/pull/4617)
+- Cleanup org.opentripplanner.openstreetmap package structure [#4661](https://github.com/opentripplanner/OpenTripPlanner/pull/4661)
+- Fix batch queries in legacy graphql API [#4663](https://github.com/opentripplanner/OpenTripPlanner/pull/4663)
+- Add filter for minimum bike parking distance [#4626](https://github.com/opentripplanner/OpenTripPlanner/pull/4626)
+- Add limits for flex access/egress walking [#4655](https://github.com/opentripplanner/OpenTripPlanner/pull/4655)
+- Make Prometheus endpoint take Accept header into account [#4674](https://github.com/opentripplanner/OpenTripPlanner/pull/4674)
+- Add entrances to parking lots that are unconnected in OSM [#4666](https://github.com/opentripplanner/OpenTripPlanner/pull/4666)
+- Include crossing=traffic_signals and use it for walking/cycling penalty on crossings [#4574](https://github.com/opentripplanner/OpenTripPlanner/pull/4574)
+- Improve support for replaced departure in siri [#4620](https://github.com/opentripplanner/OpenTripPlanner/pull/4620)
+- Replace surface=cobblestone:flattened with surface=set as a mixin spec in default OsmTagMapper [#4683](https://github.com/opentripplanner/OpenTripPlanner/pull/4683)
+- Remove NYC fare service [#4694](https://github.com/opentripplanner/OpenTripPlanner/pull/4694)
+- Migration to Jakarta EE 9 [#4698](https://github.com/opentripplanner/OpenTripPlanner/pull/4698)
+- Upgrade dependencies to take newest GTFS Flex spec into account [#4693](https://github.com/opentripplanner/OpenTripPlanner/pull/4693)
+- Configuration of additional HTTP headers for GTFS-RT updaters [#4684](https://github.com/opentripplanner/OpenTripPlanner/pull/4684)
+- Configure Renovate [#4704](https://github.com/opentripplanner/OpenTripPlanner/pull/4704)
+- GTFS-RT extension to add completely new routes [#4667](https://github.com/opentripplanner/OpenTripPlanner/pull/4667)
+- New filter API [#4657](https://github.com/opentripplanner/OpenTripPlanner/pull/4657)
+- Adaptive street graph island pruning [#4688](https://github.com/opentripplanner/OpenTripPlanner/pull/4688)
+- Change tab to spaces [#4733](https://github.com/opentripplanner/OpenTripPlanner/pull/4733)
+- Refactor of wayproperty.specifier.Condition [#4696](https://github.com/opentripplanner/OpenTripPlanner/pull/4696)
+- Cleanup usage of SIRI DatedServiceJourneyId vs. ServiceJourneyId [#4699](https://github.com/opentripplanner/OpenTripPlanner/pull/4699)
+- Add validation on NeTEx flexible area import [#4765](https://github.com/opentripplanner/OpenTripPlanner/pull/4765)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

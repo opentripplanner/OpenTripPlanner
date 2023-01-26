@@ -1,14 +1,14 @@
 package org.opentripplanner.graph_builder.issues;
 
-import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class BogusShapeGeometryCaught implements DataImportIssue {
 
   public static final String FMT =
-    "Shape geometry for shape_id %s cannot be used with stop " +
-    "times %s and %s; using straight-line path instead";
+    "Shape_dist_traveled for shape_id %s is in conflict with stop " +
+    "times %s and %s; shape_dist_traveled will not be used";
 
   final FeedScopedId shapeId;
   final StopTime stA;

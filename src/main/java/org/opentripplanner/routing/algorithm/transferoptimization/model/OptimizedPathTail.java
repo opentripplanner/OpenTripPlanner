@@ -1,19 +1,19 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
+import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.spi.BoardAndAlightTime;
+import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.PathBuilder;
+import org.opentripplanner.raptor.spi.PathBuilderLeg;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimized;
-import org.opentripplanner.transit.raptor.api.path.PathBuilder;
-import org.opentripplanner.transit.raptor.api.path.PathBuilderLeg;
-import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**
  * This class is used to decorate a {@link TransitPathLeg} with information about transfers
@@ -48,7 +48,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     super(null, slackProvider, costCalculator, stopNameResolver);
     this.waitTimeCostCalculator = waitTimeCostCalculator;
     this.stopPriorityCostCalculator =
-      (stopBoardAlightCosts != null || extraStopBoardAlightCostsFactor > 0.01)
+      (stopBoardAlightCosts != null && extraStopBoardAlightCostsFactor > 0.01)
         ? new StopPriorityCostCalculator(extraStopBoardAlightCostsFactor, stopBoardAlightCosts)
         : null;
   }

@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.Multimap;
+import jakarta.xml.bind.JAXBElement;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collection;
@@ -9,8 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import javax.xml.bind.JAXBElement;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -358,7 +358,8 @@ public class NetexMapper {
 
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       idFactory,
-      transitBuilder.getStops().values()
+      transitBuilder.getStops().values(),
+      issueStore
     );
 
     for (FlexibleStopPlace flexibleStopPlace : flexibleStopPlaces) {

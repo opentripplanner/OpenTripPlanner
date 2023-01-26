@@ -3,11 +3,9 @@ package org.opentripplanner.model.projectinfo;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.UNKNOWN;
 
 import java.io.Serializable;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 public class VersionControlInfo implements Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   public final String commit;
   public final String branch;

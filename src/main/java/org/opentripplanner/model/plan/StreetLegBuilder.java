@@ -5,9 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.street.model.note.StreetNote;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class StreetLegBuilder {
@@ -20,7 +19,7 @@ public class StreetLegBuilder {
   private double distanceMeters;
   private int generalizedCost;
   private LineString geometry;
-  private List<P2<Double>> elevation;
+  private ElevationProfile elevationProfile;
   private List<WalkStep> walkSteps;
   private FeedScopedId pathwayId;
   private Boolean walkingBike;
@@ -41,7 +40,7 @@ public class StreetLegBuilder {
       .withDistanceMeters(leg.getDistanceMeters())
       .withGeneralizedCost(leg.getGeneralizedCost())
       .withGeometry(leg.getLegGeometry())
-      .withElevation(leg.getRawLegElevation())
+      .withElevationProfile(leg.getElevationProfile())
       .withWalkSteps(leg.getWalkSteps())
       .withPathwayId(leg.getPathwayId())
       .withWalkingBike(leg.getWalkingBike())
@@ -87,8 +86,8 @@ public class StreetLegBuilder {
     return geometry;
   }
 
-  public List<P2<Double>> getElevation() {
-    return elevation;
+  public ElevationProfile getElevationProfile() {
+    return elevationProfile;
   }
 
   public List<WalkStep> getWalkSteps() {
@@ -159,8 +158,8 @@ public class StreetLegBuilder {
     return this;
   }
 
-  public StreetLegBuilder withElevation(List<P2<Double>> elevation) {
-    this.elevation = elevation;
+  public StreetLegBuilder withElevationProfile(ElevationProfile elevationProfile) {
+    this.elevationProfile = elevationProfile;
     return this;
   }
 

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;

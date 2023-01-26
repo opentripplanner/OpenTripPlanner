@@ -21,38 +21,38 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.index.strtree.STRtree;
-import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
-import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitEntityLink;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
-import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
-import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
-import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
-import org.opentripplanner.routing.vertextype.ExitVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
-import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
-import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
-import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.util.geometry.GeometryUtils;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
+import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
+import org.opentripplanner.street.model.edge.FreeEdge;
+import org.opentripplanner.street.model.edge.PathwayEdge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
+import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
+import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
+import org.opentripplanner.street.model.edge.VehicleParkingEdge;
+import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
+import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
+import org.opentripplanner.street.model.vertex.ExitVertex;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
+import org.opentripplanner.street.model.vertex.StreetLocation;
+import org.opentripplanner.street.model.vertex.TemporaryVertex;
+import org.opentripplanner.street.model.vertex.TransitBoardingAreaVertex;
+import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
+import org.opentripplanner.street.model.vertex.TransitPathwayNodeVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
 import processing.core.PApplet;
 import processing.core.PFont;
 
@@ -64,7 +64,6 @@ import processing.core.PFont;
 public class ShowGraph extends PApplet implements MouseWheelListener {
 
   private static final int FRAME_RATE = 30;
-  private static final long serialVersionUID = -8336165356756970127L;
   private static final boolean VIDEO = false;
   private static final String VIDEO_PATH = "/home/syncopate/pathimage/";
   private static final DecimalFormat latFormatter = new DecimalFormat("00.0000°N ; 00.0000°S");
@@ -602,7 +601,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     );
   }
 
-  private void drawGraphPath(GraphPath gp) {
+  private void drawGraphPath(GraphPath<State, Edge, Vertex> gp) {
     // draw edges in different colors according to mode
     for (State s : gp.states) {
       TraverseMode mode = s.getBackMode();
@@ -785,7 +784,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       if (
         drawStreetVertices &&
         (
-          (v instanceof IntersectionVertex && ((IntersectionVertex) v).trafficLight) ||
+          (v instanceof IntersectionVertex && ((IntersectionVertex) v).hasCyclingTrafficLight()) ||
           (
             v instanceof ElevatorOnboardVertex ||
             v instanceof ElevatorOffboardVertex ||
@@ -796,7 +795,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
           )
         )
       ) {
-        if (v instanceof IntersectionVertex && ((IntersectionVertex) v).trafficLight) {
+        if (v instanceof IntersectionVertex && ((IntersectionVertex) v).hasCyclingTrafficLight()) {
           fill(120, 60, 60); // Make traffic lights red dots
           drawVertex(v, 5);
         }

@@ -6,42 +6,44 @@ import org.opentripplanner._support.arch.Package;
 public interface OtpArchitectureModules {
   /* Third party libs*/
 
+  Package DAGGER = Package.of("dagger..");
+  Package GEO_JSON = Package.of("org.geojson..");
+  Package GEO_TOOLS = Package.of("org.geotools..");
   Package GNU_TROVE = Package.of("gnu.trove.(*)..");
+  Package GOOGLE_COLLECTIONS = Package.of("com.google.common.collect");
   Package JACKSON_ANNOTATIONS = Package.of("com.fasterxml.jackson.annotation");
   Package JTS_GEOM = Package.of("org.locationtech.jts.(*)..");
+  Package OPEN_GIS = Package.of("org.opengis..");
 
   /* OTP Modules */
 
   Package OTP_ROOT = Package.of("org.opentripplanner");
+  Package DATASTORE = OTP_ROOT.subPackage("datastore");
   Package FRAMEWORK = OTP_ROOT.subPackage("framework");
-  Package FRAMEWORK_TEXT = FRAMEWORK.subPackage("text");
-  Package UTIL = OTP_ROOT.subPackage("util");
-  Package GEO_UTIL = OTP_ROOT.subPackage("common.geometry");
-
+  Module GEO_UTILS = Module.of(JTS_GEOM, FRAMEWORK.subPackage("geometry"));
   Package RAPTOR_ADAPTER = OTP_ROOT
     .subPackage("routing")
     .subPackage("algorithm")
     .subPackage("raptoradapter");
   Package RAPTOR_ADAPTER_API = RAPTOR_ADAPTER.subPackage("api");
-
-  /**
-   * This is a bag of TRUE util classes - no dependencies to other OTP classes of frameworks.
-   * The {@link #UTIL} packages needs cleanup, it contains model, framework and API classes.
-   * The strategy is therefore to move the true util classes into sub packages, and then later
-   * to move the reminding classes to the places they belong.
-   */
-  Module UTILS = Module.of(
-    UTIL.subPackage("lang"),
-    UTIL.subPackage("logging"),
-    UTIL.subPackage("resources"),
-    UTIL.subPackage("time"),
-    UTIL.subPackage("geometry")
-  );
-
   Package TRANSIT = OTP_ROOT.subPackage("transit");
   Package TRANSIT_MODEL = TRANSIT.subPackage("model");
 
   /* The Raptor module */
-  Package RAPTOR_SERVICE = TRANSIT.subPackage("raptor");
-  Package RAPTOR_API = RAPTOR_SERVICE.subPackage("api.(*)..");
+  Package RAPTOR_ROOT = OTP_ROOT.subPackage("raptor");
+  Package RAPTOR_API = RAPTOR_ROOT.subPackage("api..");
+
+  /**
+   * This is a bag of TRUE util classes - no dependencies to other OTP classes or frameworks
+   * (except true utilities like slf4j).
+   */
+  Module FRAMEWORK_UTILS = Module.of(
+    FRAMEWORK.subPackage("application"),
+    FRAMEWORK.subPackage("i18n"),
+    FRAMEWORK.subPackage("lang"),
+    FRAMEWORK.subPackage("logging"),
+    FRAMEWORK.subPackage("text"),
+    FRAMEWORK.subPackage("time"),
+    FRAMEWORK.subPackage("tostring")
+  );
 }

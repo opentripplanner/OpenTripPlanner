@@ -1,14 +1,12 @@
 package org.opentripplanner.ext.dataoverlay.configuration;
 
 import java.io.Serializable;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * This class describes the variables for the incoming .nc data file
  */
 public class IndexVariable implements Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   private final String name;
   private final String displayName;

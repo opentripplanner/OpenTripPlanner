@@ -1,21 +1,21 @@
 package org.opentripplanner.api.resource;
 
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import javax.imageio.ImageIO;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import org.geotools.geometry.Envelope2D;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
-import org.opentripplanner.common.geometry.MapTile;
-import org.opentripplanner.common.geometry.WebMercatorTile;
-import org.opentripplanner.inspector.TileRenderer;
+import org.opentripplanner.inspector.raster.MapTile;
+import org.opentripplanner.inspector.raster.TileRenderer;
+import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
@@ -36,7 +36,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
  * given layer.
  *
  * @author laurent
- * @see org.opentripplanner.inspector.TileRendererManager
+ * @see TileRendererManager
  * @see TileRenderer
  */
 @Path("/routers/{ignoreRouterId}/inspector")
@@ -66,7 +66,7 @@ public class GraphInspectorTileResource {
     @PathParam("ext") String ext
   ) throws Exception {
     // Re-use analyst
-    Envelope2D env = WebMercatorTile.tile2Envelope(x, y, z);
+    Envelope env = WebMercatorTile.tile2Envelope(x, y, z);
     MapTile mapTile = new MapTile(env, 256, 256);
 
     OtpServerRequestContext serverContext = this.serverContext;

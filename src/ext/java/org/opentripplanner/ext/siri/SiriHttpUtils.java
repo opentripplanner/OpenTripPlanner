@@ -13,7 +13,7 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.opentripplanner.util.HttpUtils;
+import org.opentripplanner.framework.io.HttpUtils;
 
 public class SiriHttpUtils extends HttpUtils {
 

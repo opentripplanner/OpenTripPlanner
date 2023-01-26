@@ -17,9 +17,11 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
+import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
+import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -57,7 +59,8 @@ public class GraphSerializationTest {
   @Test
   public void testRoundTripSerializationForGTFSGraph() throws Exception {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
-    testRoundTrip(model.graph(), model.transitModel());
+    var weRepo = new DefaultWorldEnvelopeRepository();
+    testRoundTrip(model.graph(), model.transitModel(), weRepo);
   }
 
   /**
@@ -66,7 +69,8 @@ public class GraphSerializationTest {
   @Test
   public void testRoundTripSerializationForNetexGraph() throws Exception {
     TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
-    testRoundTrip(model.graph(), model.transitModel());
+    var worldEnvelopeRepository = new DefaultWorldEnvelopeRepository();
+    testRoundTrip(model.graph(), model.transitModel(), worldEnvelopeRepository);
   }
 
   // Ideally we'd also test comparing two separate but identical complex graphs, built separately from the same inputs.
@@ -161,13 +165,17 @@ public class GraphSerializationTest {
    * Tests that saving a Graph to disk and reloading it results in a separate but semantically
    * identical Graph.
    */
-  private void testRoundTrip(Graph originalGraph, TransitModel originalTransitModel)
-    throws Exception {
+  private void testRoundTrip(
+    Graph originalGraph,
+    TransitModel originalTransitModel,
+    WorldEnvelopeRepository worldEnvelopeRepository
+  ) throws Exception {
     // Now round-trip the graph through serialization.
     File tempFile = TempFile.createTempFile("graph", "pdx");
     SerializedGraphObject serializedObj = new SerializedGraphObject(
       originalGraph,
       originalTransitModel,
+      worldEnvelopeRepository,
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT
     );

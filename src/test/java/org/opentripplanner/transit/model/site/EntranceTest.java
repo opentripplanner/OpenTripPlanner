@@ -7,11 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 class EntranceTest {
 
@@ -57,8 +57,8 @@ class EntranceTest {
     assertEquals(DESCRIPTION, copy.getDescription());
     assertEquals(CODE, copy.getCode());
     assertTrue(COORDINATE.sameLocation(copy.getCoordinate()));
-    assertEquals(LEVEL.getName(), copy.getLevelName());
-    assertEquals(LEVEL.getIndex(), copy.getLevelIndex());
+    assertEquals(LEVEL.name(), copy.getLevelName());
+    assertEquals(LEVEL.index(), copy.getLevelIndex());
     assertEquals(WHEELCHAIR_ACCESSIBILITY, copy.getWheelchairAccessibility());
   }
 

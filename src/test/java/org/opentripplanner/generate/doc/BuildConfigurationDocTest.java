@@ -9,21 +9,22 @@ import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPL
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceJsonExample;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
+import org.opentripplanner.framework.application.OtpFileNames;
+import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-@OnlyIfDocsExist
+@GeneratesDocumentation
 public class BuildConfigurationDocTest {
 
-  private static final String CONFIG_JSON = "build-config.json";
+  private static final String CONFIG_JSON = OtpFileNames.BUILD_CONFIG_FILENAME;
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "BuildConfiguration.md");
   private static final File OUT_FILE = new File(DOCS_ROOT, "BuildConfiguration.md");
 

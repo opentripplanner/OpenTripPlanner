@@ -12,13 +12,13 @@ import org.entur.gbfs.v2_2.station_status.GBFSStation;
 import org.entur.gbfs.v2_2.station_status.GBFSStationStatus;
 import org.entur.gbfs.v2_2.system_information.GBFSSystemInformation;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
-import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +48,9 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
   private GbfsFeedLoader loader;
 
   public GbfsVehicleRentalDataSource(GbfsVehicleRentalDataSourceParameters parameters) {
-    url = parameters.getUrl();
+    url = parameters.url();
     language = parameters.language();
-    httpHeaders = parameters.getHttpHeaders();
+    httpHeaders = parameters.httpHeaders();
     allowKeepingRentedVehicleAtDestination = parameters.allowKeepingRentedVehicleAtDestination();
     network = parameters.network();
   }

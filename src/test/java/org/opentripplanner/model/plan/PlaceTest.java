@@ -11,16 +11,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.SimpleVertex;
+import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class PlaceTest {
 

@@ -15,6 +15,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.filter.ExcludeAllTransitFilter;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -25,10 +27,14 @@ import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
+import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -85,14 +91,16 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.of().clearTransitModes().build(),
+      RequestModes.of().build(),
+      List.of(ExcludeAllTransitFilter.of()),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.of().clearTransitModes().build(),
+      RequestModes.of().build(),
+      List.of(ExcludeAllTransitFilter.of()),
       true
     );
   }
@@ -108,14 +116,16 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.of().clearTransitModes().build(),
+      RequestModes.of().build(),
+      List.of(ExcludeAllTransitFilter.of()),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.of().clearTransitModes().build(),
+      RequestModes.of().build(),
+      List.of(ExcludeAllTransitFilter.of()),
       true
     );
   }
@@ -133,14 +143,16 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.of().withDirectMode(CAR).clearTransitModes().build(),
+      RequestModes.of().withDirectMode(CAR).build(),
+      List.of(ExcludeAllTransitFilter.of()),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.of().withDirectMode(CAR).clearTransitModes().build(),
+      RequestModes.of().withDirectMode(CAR).build(),
+      List.of(ExcludeAllTransitFilter.of()),
       true
     );
   }
@@ -156,6 +168,7 @@ public class TestIntermediatePlaces {
       toLocation,
       intermediateLocations,
       RequestModes.defaultRequestModes(),
+      List.of(AllowAllTransitFilter.of()),
       false
     );
     handleRequest(
@@ -163,6 +176,7 @@ public class TestIntermediatePlaces {
       toLocation,
       intermediateLocations,
       RequestModes.defaultRequestModes(),
+      List.of(AllowAllTransitFilter.of()),
       true
     );
   }
@@ -178,6 +192,7 @@ public class TestIntermediatePlaces {
       toLocation,
       intermediateLocations,
       RequestModes.of().withDirectMode(NOT_SET).build(),
+      List.of(AllowAllTransitFilter.of()),
       false
     );
     handleRequest(
@@ -185,6 +200,7 @@ public class TestIntermediatePlaces {
       toLocation,
       intermediateLocations,
       RequestModes.of().withDirectMode(NOT_SET).build(),
+      List.of(AllowAllTransitFilter.of()),
       true
     );
   }
@@ -200,6 +216,7 @@ public class TestIntermediatePlaces {
       toLocation,
       intermediateLocations,
       RequestModes.defaultRequestModes(),
+      List.of(AllowAllTransitFilter.of()),
       false
     );
     handleRequest(
@@ -207,6 +224,7 @@ public class TestIntermediatePlaces {
       toLocation,
       intermediateLocations,
       RequestModes.defaultRequestModes(),
+      List.of(AllowAllTransitFilter.of()),
       true
     );
   }
@@ -224,6 +242,7 @@ public class TestIntermediatePlaces {
       toLocation,
       intermediateLocations,
       RequestModes.defaultRequestModes(),
+      List.of(AllowAllTransitFilter.of()),
       false
     );
     handleRequest(
@@ -231,6 +250,7 @@ public class TestIntermediatePlaces {
       toLocation,
       intermediateLocations,
       RequestModes.defaultRequestModes(),
+      List.of(AllowAllTransitFilter.of()),
       true
     );
   }
@@ -240,10 +260,12 @@ public class TestIntermediatePlaces {
     GenericLocation to,
     GenericLocation[] via,
     RequestModes modes,
+    List<TransitFilter> filters,
     boolean arriveBy
   ) {
     RouteRequest request = new RouteRequest();
     request.journey().setModes(modes);
+    request.journey().transit().setFilters(filters);
     request.setDateTime("2016-04-20", "13:00", timeZone);
     request.setArriveBy(arriveBy);
     request.setFrom(from);
@@ -260,7 +282,10 @@ public class TestIntermediatePlaces {
         request.journey().egress().mode()
       )
     ) {
-      List<GraphPath> paths = graphPathFinder.graphPathFinderEntryPoint(request, temporaryVertices);
+      List<GraphPath<State, Edge, Vertex>> paths = graphPathFinder.graphPathFinderEntryPoint(
+        request,
+        temporaryVertices
+      );
 
       assertNotNull(paths);
       assertFalse(paths.isEmpty());
@@ -274,7 +299,9 @@ public class TestIntermediatePlaces {
         assertTrue(via.length < itinerary.getLegs().size());
         validateLegsTemporally(request, itinerary);
         validateLegsSpatially(plan, itinerary);
-        if (!modes.transitModes.isEmpty()) {
+
+        // technically this is not 100% right but should work of a test
+        if (!filters.contains(ExcludeAllTransitFilter.of())) {
           assertTrue(itinerary.getTransitDuration().toSeconds() > 0);
         }
       }

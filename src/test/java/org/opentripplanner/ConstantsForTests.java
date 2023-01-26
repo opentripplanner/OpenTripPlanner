@@ -1,7 +1,5 @@
 package org.opentripplanner;
 
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
-
 import com.csvreader.CsvReader;
 import java.io.File;
 import java.io.IOException;
@@ -14,33 +12,33 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
-import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
+import org.opentripplanner.street.model.edge.VehicleRentalEdge;
+import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
@@ -74,6 +72,8 @@ public class ConstantsForTests {
   public static final String FARE_COMPONENT_GTFS =
     "src/test/resources/gtfs/farecomponents.gtfs.zip";
 
+  public static final String SHAPE_DIST_GTFS = "src/test/resources/gtfs/shape_dist_traveled/";
+
   private static final String NETEX_DIR = "src/test/resources/netex";
 
   private static final String NETEX_FILENAME = "netex_minimal.zip";
@@ -95,6 +95,7 @@ public class ConstantsForTests {
     "src/test/resources/germany/herrenberg-minimal.osm.pbf";
   public static final String ISLAND_PRUNE_OSM =
     "src/test/resources/germany/herrenberg-island-prune-nothru.osm.pbf";
+  public static final String ADAPTIVE_PRUNE_OSM = "src/test/resources/isoiiluoto.pbf";
 
   private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
     new File(NETEX_DIR, NETEX_FILENAME),
@@ -115,10 +116,12 @@ public class ConstantsForTests {
   }
 
   public static NetexBundle createMinimalNetexBundle() {
-    return NetexConfigure.netexBundleForTest(
-      createNetexBuilderParameters(),
-      new File(ConstantsForTests.NETEX_DIR, ConstantsForTests.NETEX_FILENAME)
-    );
+    var buildConfig = createNetexBuilderParameters();
+    var netexZipFile = new File(NETEX_DIR, NETEX_FILENAME);
+
+    var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
+    var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
+    return new NetexConfigure(buildConfig).netexBundle(configuredDataSource);
   }
 
   /**
@@ -138,8 +141,7 @@ public class ConstantsForTests {
           Set.of(),
           // Need to use a mutable set here, since it is used
           graph,
-          noopIssueStore(),
-          new DefaultMapper(),
+          DataImportIssueStore.NOOP,
           false
         );
         osmModule.staticBikeParkAndRide = true;
@@ -188,8 +190,7 @@ public class ConstantsForTests {
         List.of(osmProvider),
         Set.of(),
         graph,
-        noopIssueStore(),
-        new DefaultMapper(),
+        DataImportIssueStore.NOOP,
         false
       );
       osmModule.buildGraph();
@@ -247,8 +248,7 @@ public class ConstantsForTests {
           List.of(osmProvider),
           Set.of(),
           graph,
-          noopIssueStore(),
-          new DefaultMapper(),
+          DataImportIssueStore.NOOP,
           false
         );
         osmModule.buildGraph();
@@ -263,7 +263,7 @@ public class ConstantsForTests {
         var sources = List.of(new ConfiguredDataSource<>(NETEX_MINIMAL_DATA_SOURCE, netexConfig));
 
         new NetexConfigure(buildConfig)
-          .createNetexModule(sources, transitModel, graph, noopIssueStore())
+          .createNetexModule(sources, transitModel, graph, DataImportIssueStore.NOOP)
           .buildGraph();
       }
       // Link transit stops to streets
@@ -309,12 +309,9 @@ public class ConstantsForTests {
       List.of(bundle),
       transitModel,
       graph,
-      noopIssueStore(),
+      DataImportIssueStore.NOOP,
       ServiceDateInterval.unbounded(),
-      fareServiceFactory,
-      false,
-      true,
-      300
+      fareServiceFactory
     );
 
     module.buildGraph();

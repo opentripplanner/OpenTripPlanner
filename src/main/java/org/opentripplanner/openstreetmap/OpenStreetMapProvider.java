@@ -9,16 +9,14 @@ import org.openstreetmap.osmosis.osmbinary.file.BlockInputStream;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
-import org.opentripplanner.openstreetmap.model.OSMProvider;
-import org.opentripplanner.util.lang.ToStringBuilder;
-import org.opentripplanner.util.logging.ProgressTracker;
+import org.opentripplanner.framework.application.OtpFileNames;
+import org.opentripplanner.framework.logging.ProgressTracker;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.openstreetmap.api.OSMProvider;
+import org.opentripplanner.openstreetmap.spi.OSMDatabase;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
+import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,33 +42,18 @@ public class OpenStreetMapProvider implements OSMProvider {
 
   /** For tests */
   public OpenStreetMapProvider(File file, boolean cacheDataInMem) {
-    this(new FileDataSource(file, FileType.OSM), cacheDataInMem);
-  }
-
-  public OpenStreetMapProvider(FileDataSource fileDataSource, boolean cacheDataInMem) {
-    this(
-      new ConfiguredDataSource<>(
-        fileDataSource,
-        new OsmExtractParametersBuilder().withSource(fileDataSource.uri()).build()
-      ),
-      new OsmDefaultParameters(),
-      cacheDataInMem
-    );
+    this(new FileDataSource(file, FileType.OSM), OsmTagMapperSource.DEFAULT, null, cacheDataInMem);
   }
 
   public OpenStreetMapProvider(
-    ConfiguredDataSource<OsmExtractParameters> osmExtractConfigConfiguredDataSource,
-    OsmDefaultParameters defaultParameters,
+    DataSource dataSource,
+    OsmTagMapperSource tagMapperSource,
+    ZoneId zoneId,
     boolean cacheDataInMem
   ) {
-    this.source = osmExtractConfigConfiguredDataSource.dataSource();
-    this.zoneId =
-      osmExtractConfigConfiguredDataSource.config().timeZone().orElse(defaultParameters.timeZone);
-    this.osmTagMapper =
-      osmExtractConfigConfiguredDataSource
-        .config()
-        .osmTagMapper()
-        .orElse(defaultParameters.osmOsmTagMapper);
+    this.source = dataSource;
+    this.zoneId = zoneId;
+    this.osmTagMapper = tagMapperSource.getInstance();
     this.wayPropertySet = new WayPropertySet();
     osmTagMapper.populateProperties(wayPropertySet);
     this.cacheDataInMem = cacheDataInMem;
@@ -149,8 +132,10 @@ public class OpenStreetMapProvider implements OSMProvider {
       if (!hasWarnedAboutMissingTimeZone) {
         hasWarnedAboutMissingTimeZone = true;
         LOG.warn(
-          "Missing time zone for OSM source {} - time-restricted entities will not be created, please configure it in the build-config.json",
-          source.uri()
+          "Missing time zone for OSM source {} - time-restricted entities will " +
+          "not be created, please configure it in the {}",
+          source.uri(),
+          OtpFileNames.BUILD_CONFIG_FILENAME
         );
       }
     }

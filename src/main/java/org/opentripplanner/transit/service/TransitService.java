@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -50,6 +49,7 @@ public interface TransitService {
   Collection<String> getFeedIds();
 
   Collection<Agency> getAgencies();
+  Optional<Agency> findAgencyById(FeedScopedId id);
 
   FeedInfo getFeedInfo(String feedId);
 
@@ -181,13 +181,13 @@ public interface TransitService {
 
   ZonedDateTime getTransitServiceStarts();
 
-  Optional<Coordinate> getCenter();
-
   TransferService getTransferService();
 
   boolean transitFeedCovers(Instant dateTime);
 
   Collection<RegularStop> findRegularStop(Envelope envelope);
+
+  Collection<AreaStop> findAreaStops(Envelope envelope);
 
   GraphUpdaterStatus getUpdaterStatus();
 }

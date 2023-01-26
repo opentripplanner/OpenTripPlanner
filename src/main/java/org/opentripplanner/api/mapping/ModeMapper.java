@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class ModeMapper {
@@ -63,6 +63,8 @@ public class ModeMapper {
       case TRAM -> "TRAM";
       case TROLLEYBUS -> "TROLLEYBUS";
       case MONORAIL -> "MONORAIL";
+      case CARPOOL -> "CARPOOL";
+      case TAXI -> "TAXI";
     };
   }
 }

@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.issues;
 
-import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class InterliningTeleport implements DataImportIssue {
@@ -21,5 +21,10 @@ public class InterliningTeleport implements DataImportIssue {
   @Override
   public String getMessage() {
     return String.format(FMT, prevTrip, blockId, distance);
+  }
+
+  @Override
+  public int getPriority() {
+    return 10000000 - distance;
   }
 }

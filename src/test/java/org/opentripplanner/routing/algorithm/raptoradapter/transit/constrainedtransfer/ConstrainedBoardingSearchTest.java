@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STATION_B;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.RouteStationTransferPoint;
 import org.opentripplanner.model.transfer.RouteStopTransferPoint;
@@ -23,6 +23,7 @@ import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TripTransferPoint;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestRouteData;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -31,8 +32,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.util.OTPFeature;
 
 public class ConstrainedBoardingSearchTest {
 
@@ -444,16 +443,16 @@ public class ConstrainedBoardingSearchTest {
     int targetStopPos,
     int expectedTripIndex,
     TransferConstraint expectedConstraint,
-    RaptorTripScheduleBoardOrAlightEvent<TripSchedule> boarding
+    RaptorBoardOrAlightEvent<TripSchedule> boarding
   ) {
     if (expectedConstraint != null) {
       assertNotNull(boarding);
-      assertEquals(expectedConstraint, boarding.getTransferConstraint());
-      assertEquals(stopIndex, boarding.getBoardStopIndex());
-      assertEquals(targetStopPos, boarding.getStopPositionInPattern());
-      assertEquals(expectedTripIndex, boarding.getTripIndex());
+      assertEquals(expectedConstraint, boarding.transferConstraint());
+      assertEquals(stopIndex, boarding.boardStopIndex());
+      assertEquals(targetStopPos, boarding.stopPositionInPattern());
+      assertEquals(expectedTripIndex, boarding.tripIndex());
     } else {
-      assertNull(boarding);
+      assertTrue(boarding.empty());
     }
   }
 

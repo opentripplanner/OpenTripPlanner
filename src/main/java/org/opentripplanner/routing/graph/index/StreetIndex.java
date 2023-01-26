@@ -10,34 +10,34 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.P2;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.SplitLineString;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.LocalizedString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
-import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.Scope;
 import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.LocalizedString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
+import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.util.geometry.GeometryUtils;
-import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -270,10 +270,10 @@ public class StreetIndex {
     StreetVertex fromv = (StreetVertex) street.getFromVertex();
     LineString geometry = street.getGeometry();
 
-    P2<LineString> geometries = getGeometry(street, nearestPoint);
+    SplitLineString geometries = getGeometry(street, nearestPoint);
 
     double totalGeomLength = geometry.getLength();
-    double lengthRatioIn = geometries.first.getLength() / totalGeomLength;
+    double lengthRatioIn = geometries.beginning().getLength() / totalGeomLength;
 
     double lengthIn = street.getDistanceMeters() * lengthRatioIn;
     double lengthOut = street.getDistanceMeters() * (1 - lengthRatioIn);
@@ -283,7 +283,7 @@ public class StreetIndex {
         street,
         fromv,
         base,
-        geometries.first,
+        geometries.beginning(),
         name,
         lengthIn
       );
@@ -298,7 +298,7 @@ public class StreetIndex {
         street,
         base,
         tov,
-        geometries.second,
+        geometries.ending(),
         name,
         lengthOut
       );
@@ -311,7 +311,7 @@ public class StreetIndex {
     }
   }
 
-  private static P2<LineString> getGeometry(StreetEdge e, Coordinate nearestPoint) {
+  private static SplitLineString getGeometry(StreetEdge e, Coordinate nearestPoint) {
     LineString geometry = e.getGeometry();
     return GeometryUtils.splitGeometryAtPoint(geometry, nearestPoint);
   }

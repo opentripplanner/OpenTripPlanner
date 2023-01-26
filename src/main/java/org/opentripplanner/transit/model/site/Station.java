@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
-import static org.opentripplanner.util.geometry.GeometryUtils.getGeometryFactory;
+import static org.opentripplanner.framework.geometry.GeometryUtils.getGeometryFactory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.ZoneId;
@@ -15,8 +15,8 @@ import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;

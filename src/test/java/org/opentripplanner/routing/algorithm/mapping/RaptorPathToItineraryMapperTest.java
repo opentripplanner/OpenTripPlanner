@@ -4,12 +4,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.raptor._data.api.TestPathBuilder;
+import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor._data.transit.TestRoute;
+import org.opentripplanner.raptor._data.transit.TestTransitData;
+import org.opentripplanner.raptor._data.transit.TestTripPattern;
+import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -21,18 +32,8 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
-import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.transit.raptor._data.transit.TestRoute;
-import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
-import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.TestUtils;
-import org.opentripplanner.util.time.TimeUtils;
 
 public class RaptorPathToItineraryMapperTest {
 
@@ -61,7 +62,7 @@ public class RaptorPathToItineraryMapperTest {
     // Arrange
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
-    Path<TestTripSchedule> path = getTestTripSchedulePath(getTestTripSchedule())
+    RaptorPath<TestTripSchedule> path = getTestTripSchedulePath(getTestTripSchedule())
       .egress(
         TestAccessEgress.zeroDurationAccess(2, RaptorCostConverter.toRaptorCost(LAST_LEG_COST))
       );
@@ -108,12 +109,15 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private RaptorPathToItineraryMapper<TestTripSchedule> getRaptorPathToItineraryMapper() {
-    Instant dateTime = TestUtils.dateInstant("Europe/Stockholm", 2022, 10, 10, 12, 0, 0);
+    Instant dateTime = LocalDateTime
+      .of(2022, Month.OCTOBER, 10, 12, 0, 0)
+      .atZone(ZoneIds.STOCKHOLM)
+      .toInstant();
     return new RaptorPathToItineraryMapper<TestTripSchedule>(
       new Graph(),
       new DefaultTransitService(new TransitModel()),
       null,
-      dateTime.atZone(ZoneId.of("CET")),
+      dateTime.atZone(ZoneIds.CET),
       new RouteRequest()
     );
   }

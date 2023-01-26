@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import org.onebusaway.gtfs.model.Transfer;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.IgnoredGtfsTransfer;
 import org.opentripplanner.graph_builder.issues.InvalidGtfsTransfer;
 import org.opentripplanner.model.StopTime;
@@ -236,7 +236,12 @@ class TransferMapper {
     if (trip != null) {
       // A trip may visit the same stop twice, but we ignore that and only add the first stop
       // we find. Pattern that start and end at the same stop is supported.
-      int stopPositionInPattern = stopPosition(trip, stop, station, boardTrip);
+      int stopPositionInPattern;
+      if (boardTrip) {
+        stopPositionInPattern = boardStopPosition(trip, stop, station);
+      } else {
+        stopPositionInPattern = alightStopPosition(trip, stop, station);
+      }
       return stopPositionInPattern < 0 ? null : new TripTransferPoint(trip, stopPositionInPattern);
     } else if (route != null) {
       if (stop != null) {
@@ -253,24 +258,36 @@ class TransferMapper {
     throw new IllegalStateException("Should not get here!");
   }
 
-  private int stopPosition(Trip trip, RegularStop stop, Station station, boolean boardTrip) {
+  private int boardStopPosition(Trip trip, RegularStop stop, Station station) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
 
-    // We can board at the first stop, but not alight.
-    final int firstStopPos = boardTrip ? 0 : 1;
-    // We can alight at the last stop, but not board, the lastStopPos is exclusive
-    final int lastStopPos = stopTimes.size() - (boardTrip ? 1 : 0);
-
     Predicate<StopLocation> stopMatches = station != null
-      ? s -> (s instanceof RegularStop && ((RegularStop) s).getParentStation() == station)
+      ? s -> ((s instanceof RegularStop regStop) && regStop.getParentStation() == station)
       : s -> s == stop;
 
-    for (int i = firstStopPos; i < lastStopPos; i++) {
+    for (int i = 0; i < stopTimes.size() - 1; i++) {
       StopTime stopTime = stopTimes.get(i);
-      if (boardTrip && stopTime.getPickupType().isNotRoutable()) {
+      if (stopTime.getPickupType().isNotRoutable()) {
         continue;
       }
-      if (!boardTrip && stopTime.getDropOffType().isNotRoutable()) {
+
+      if (stopMatches.test(stopTime.getStop())) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private int alightStopPosition(Trip trip, RegularStop stop, Station station) {
+    List<StopTime> stopTimes = stopTimesByTrip.get(trip);
+
+    Predicate<StopLocation> stopMatches = station != null
+      ? s -> ((s instanceof RegularStop regStop) && regStop.getParentStation() == station)
+      : s -> s == stop;
+
+    for (int i = stopTimes.size() - 1; i > 0; i--) {
+      StopTime stopTime = stopTimes.get(i);
+      if (stopTime.getDropOffType().isNotRoutable()) {
         continue;
       }
 

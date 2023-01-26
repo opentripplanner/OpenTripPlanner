@@ -6,10 +6,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.common.model.T2;
-import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.note.StreetNote;
+import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
+import org.opentripplanner.street.model.note.StreetNoteMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,21 +22,19 @@ import org.slf4j.LoggerFactory;
  */
 public class StaticStreetNotesSource implements StreetNotesSource, Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private static final Logger LOG = LoggerFactory.getLogger(StaticStreetNotesSource.class);
 
   /**
    * Notes for street edges. No need to synchronize access to the map as they will not be concurrent
    * write access (no notes for temporary edges, we use notes from parent).
    */
-  private final SetMultimap<Edge, MatcherAndStreetNote> notesForEdge = HashMultimap.<Edge, MatcherAndStreetNote>create();
+  private final SetMultimap<Edge, StreetNoteAndMatcher> notesForEdge = HashMultimap.<Edge, StreetNoteAndMatcher>create();
 
   /**
    * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
    * are identical).
    */
-  private final transient Map<T2<NoteMatcher, StreetNote>, MatcherAndStreetNote> uniqueMatchers = new HashMap<>();
+  private final transient Map<StreetNoteAndMatcher, StreetNoteAndMatcher> uniqueMatchers = new HashMap<>();
 
   StaticStreetNotesSource() {}
 
@@ -45,19 +44,19 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
    * @return The set of notes or null if empty.
    */
   @Override
-  public Set<MatcherAndStreetNote> getNotes(Edge edge) {
+  public Set<StreetNoteAndMatcher> getNotes(Edge edge) {
     /* If the edge is temporary, we look for notes in it's parent edge. */
     if (edge instanceof TemporaryPartialStreetEdge) {
       edge = ((TemporaryPartialStreetEdge) edge).getParentEdge();
     }
-    Set<MatcherAndStreetNote> maas = notesForEdge.get(edge);
+    Set<StreetNoteAndMatcher> maas = notesForEdge.get(edge);
     if (maas == null || maas.isEmpty()) {
       return null;
     }
     return maas;
   }
 
-  void addNote(Edge edge, StreetNote note, NoteMatcher matcher) {
+  void addNote(Edge edge, StreetNote note, StreetNoteMatcher matcher) {
     if (LOG.isDebugEnabled()) LOG.debug(
       "Adding note {} to {} with matcher {}",
       note,
@@ -81,14 +80,12 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
    * we use the default Object.equals() for matchers, as they are mostly already singleton
    * instances.
    */
-  private MatcherAndStreetNote buildMatcherAndAlert(NoteMatcher noteMatcher, StreetNote note) {
-    T2<NoteMatcher, StreetNote> key = new T2<>(noteMatcher, note);
-    MatcherAndStreetNote interned = uniqueMatchers.get(key);
-    if (interned != null) {
-      return interned;
-    }
-    MatcherAndStreetNote ret = new MatcherAndStreetNote(noteMatcher, note);
-    uniqueMatchers.put(key, ret);
-    return ret;
+  private StreetNoteAndMatcher buildMatcherAndAlert(
+    StreetNoteMatcher noteMatcher,
+    StreetNote note
+  ) {
+    var candidate = new StreetNoteAndMatcher(note, noteMatcher);
+    var interned = uniqueMatchers.putIfAbsent(candidate, candidate);
+    return interned == null ? candidate : interned;
   }
 }

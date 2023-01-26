@@ -3,16 +3,15 @@ package org.opentripplanner.routing.vehicle_rental;
 import static java.util.Locale.ROOT;
 
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.collection.SetUtils;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
-import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.lang.SetUtils;
 
 /**
  * Implements the {@link VehicleRentalPlace} class which contains Javadoc.

@@ -3,29 +3,29 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.path.EgressPathLeg;
+import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.spi.BoardAndAlightTime;
+import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
-import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
-import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.util.time.TimeUtils;
 
 public class TransitPathLegSelectorTest implements RaptorTestConstants {
 
-  private static final RaptorSlackProvider SLACK_PROVIDER = defaultSlackProvider(
+  private static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
     TRANSFER_SLACK,
     BOARD_SLACK,
     ALIGHT_SLACK
@@ -133,6 +133,15 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     int toTime = TRIP.arrival(TRIP.findArrivalStopPosition(Integer.MAX_VALUE, egressStop));
     var times = BoardAndAlightTime.create(TRIP, STOP_A, T10_00, egressStop, toTime);
     int cost = 100 * (T10_40 - T10_00);
-    return new TransitPathLeg<>(TRIP, times, null, cost, egress);
+    return new TransitPathLeg<>(
+      TRIP,
+      T10_00,
+      toTime,
+      TRIP.findDepartureStopPosition(T10_00, STOP_A),
+      TRIP.findArrivalStopPosition(toTime, egressStop),
+      null,
+      cost,
+      egress
+    );
   }
 }

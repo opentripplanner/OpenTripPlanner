@@ -16,9 +16,10 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
@@ -30,7 +31,6 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +111,11 @@ public class GeometryProcessor {
   private LineString[] createGeometry(FeedScopedId shapeId, List<StopTime> stopTimes) {
     if (hasShapeDist(shapeId, stopTimes)) {
       // this trip has shape_dist in stop_times
-      return getHopGeometriesViaShapeDistTravelled(stopTimes, shapeId);
+      LineString[] geometries = getHopGeometriesViaShapeDistTravelled(stopTimes, shapeId);
+      if (geometries != null) {
+        return geometries;
+      }
+      // else proceed to method below which uses shape without distance information
     }
 
     LineString shapeLineString = getLineStringForShapeId(shapeId);
@@ -288,6 +292,9 @@ public class GeometryProcessor {
       st0 = stopTimes.get(i);
       StopTime st1 = stopTimes.get(i + 1);
       geoms[i] = getHopGeometryViaShapeDistTraveled(shapeId, st0, st1);
+      if (geoms[i] == null) {
+        return null;
+      }
     }
     return geoms;
   }
@@ -357,7 +364,8 @@ public class GeometryProcessor {
       if (equals(startIndex, endIndex)) {
         //bogus shape_dist_traveled
         issueStore.add(new BogusShapeDistanceTraveled(st1));
-        return createSimpleGeometry(st0.getStop(), st1.getStop());
+        // return null to indicate failure. Another approach which does not need shape_dist_traveled will be used.
+        return null;
       }
       LineString line = getLineStringForShapeId(shapeId);
       LocationIndexedLine lol = new LocationIndexedLine(line);
@@ -445,8 +453,7 @@ public class GeometryProcessor {
 
       if (!isValid(geometry, st0.getStop(), st1.getStop())) {
         issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
-        //fall back to trivial geometry
-        geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
+        return null;
       }
       geometriesByShapeSegmentKey.put(key, geometry);
     }

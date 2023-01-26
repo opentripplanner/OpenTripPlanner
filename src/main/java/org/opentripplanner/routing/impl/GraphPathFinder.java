@@ -7,16 +7,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
-import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,18 +52,21 @@ public class GraphPathFinder {
   private static final Logger LOG = LoggerFactory.getLogger(GraphPathFinder.class);
 
   @Nullable
-  private final TraverseVisitor traverseVisitor;
+  private final TraverseVisitor<State, Edge> traverseVisitor;
 
   private final Duration streetRoutingTimeout;
 
   private final DataOverlayContext dataOverlayContext;
 
-  public GraphPathFinder(@Nullable TraverseVisitor traverseVisitor, Duration streetRoutingTimeout) {
+  public GraphPathFinder(
+    @Nullable TraverseVisitor<State, Edge> traverseVisitor,
+    Duration streetRoutingTimeout
+  ) {
     this(traverseVisitor, streetRoutingTimeout, null);
   }
 
   public GraphPathFinder(
-    @Nullable TraverseVisitor traverseVisitor,
+    @Nullable TraverseVisitor<State, Edge> traverseVisitor,
     Duration streetRoutingTimeout,
     @Nullable DataOverlayContext dataOverlayContext
   ) {
@@ -71,15 +79,23 @@ public class GraphPathFinder {
    * This no longer does "trip banning" to find multiple itineraries. It just searches once trying
    * to find a non-transit path.
    */
-  public List<GraphPath> getPaths(RouteRequest request, Set<Vertex> from, Set<Vertex> to) {
+  public List<GraphPath<State, Edge, Vertex>> getPaths(
+    RouteRequest request,
+    Set<Vertex> from,
+    Set<Vertex> to
+  ) {
     StreetPreferences preferences = request.preferences().street();
 
-    AStarBuilder aStar = AStarBuilder
-      .oneToOneMaxDuration(
-        preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
+    StreetSearchBuilder aStar = StreetSearchBuilder
+      .of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setSkipEdgeStrategy(
+        new DurationSkipEdgeStrategy(
+          preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
+        )
       )
       // FORCING the dominance function to weight only
-      .setDominanceFunction(new DominanceFunction.MinimumWeight())
+      .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)
       .setStreetRequest(request.journey().direct())
       .setFrom(from)
@@ -98,7 +114,7 @@ public class GraphPathFinder {
     long searchBeginTime = System.currentTimeMillis();
     LOG.debug("BEGIN SEARCH");
 
-    List<GraphPath> paths = aStar.getPathsToTarget();
+    List<GraphPath<State, Edge, Vertex>> paths = aStar.getPathsToTarget();
 
     LOG.debug("we have {} paths", paths.size());
     LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
@@ -109,7 +125,7 @@ public class GraphPathFinder {
   /**
    * Try to find N paths through the Graph
    */
-  public List<GraphPath> graphPathFinderEntryPoint(
+  public List<GraphPath<State, Edge, Vertex>> graphPathFinderEntryPoint(
     RouteRequest request,
     TemporaryVerticesContainer vertexContainer
   ) {
@@ -120,21 +136,21 @@ public class GraphPathFinder {
     );
   }
 
-  public List<GraphPath> graphPathFinderEntryPoint(
+  public List<GraphPath<State, Edge, Vertex>> graphPathFinderEntryPoint(
     RouteRequest request,
     Set<Vertex> from,
     Set<Vertex> to
   ) {
     Instant reqTime = request.dateTime().truncatedTo(ChronoUnit.SECONDS);
 
-    List<GraphPath> paths = getPaths(request, from, to);
+    List<GraphPath<State, Edge, Vertex>> paths = getPaths(request, from, to);
 
     // Detect and report that most obnoxious of bugs: path reversal asymmetry.
     // Removing paths might result in an empty list, so do this check before the empty list check.
     if (paths != null) {
-      Iterator<GraphPath> gpi = paths.iterator();
+      Iterator<GraphPath<State, Edge, Vertex>> gpi = paths.iterator();
       while (gpi.hasNext()) {
-        GraphPath graphPath = gpi.next();
+        GraphPath<State, Edge, Vertex> graphPath = gpi.next();
         // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
         if (request.arriveBy()) {
           if (graphPath.states.getLast().getTime().isAfter(reqTime)) {

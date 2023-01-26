@@ -1,21 +1,32 @@
 package org.opentripplanner.model.plan;
 
 import static java.time.ZoneOffset.UTC;
-import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
-import static org.opentripplanner.routing.core.TraverseMode.CAR;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
+import static org.opentripplanner.street.search.TraverseMode.CAR;
+import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
+import gnu.trove.set.hash.TIntHashSet;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.ext.flex.FlexServiceDate;
+import org.opentripplanner.ext.flex.FlexibleTransitLeg;
+import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
+import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
+import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
+import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.graph.SimpleConcreteVertex;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -26,7 +37,6 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * This is a helper class to allow unit-testing on Itineraries. The builder does not necessarily
@@ -163,6 +173,63 @@ public class TestItineraryBuilder implements PlanTestConstants {
     Place to
   ) {
     return bus(tripId, startTime, endTime, fromStopIndex, toStopIndex, to, null);
+  }
+
+  public TestItineraryBuilder flex(int start, int end, Place to) {
+    if (lastPlace == null) {
+      throw new IllegalStateException("Trip from place is unknown!");
+    }
+    int legCost = 0;
+    StopTime fromStopTime = new StopTime();
+    fromStopTime.setStop(lastPlace.stop);
+
+    StopTime toStopTime = new StopTime();
+    toStopTime.setStop(to.stop);
+
+    Trip trip = trip(1, route("flex").build());
+
+    var flexTrip = UnscheduledTrip
+      .of(id("flex-1"))
+      .withStopTimes(List.of(fromStopTime, toStopTime))
+      .withTrip(trip)
+      .build();
+
+    var template = new FlexAccessTemplate(
+      null,
+      flexTrip,
+      0,
+      1,
+      null,
+      new FlexServiceDate(LocalDate.now(), 0, new TIntHashSet()),
+      new DirectFlexPathCalculator(),
+      FlexConfig.DEFAULT
+    );
+
+    var edge = new FlexTripEdge(
+      new SimpleConcreteVertex(
+        null,
+        "v1",
+        lastPlace.coordinate.latitude(),
+        lastPlace.coordinate.longitude()
+      ),
+      new SimpleConcreteVertex(null, "v2", to.coordinate.latitude(), to.coordinate.longitude()),
+      lastPlace.stop,
+      to.stop,
+      flexTrip,
+      template,
+      new DirectFlexPathCalculator()
+    );
+
+    FlexibleTransitLeg leg = new FlexibleTransitLeg(edge, newTime(start), newTime(end), legCost);
+
+    legs.add(leg);
+    cost += legCost;
+
+    // Setup for adding another leg
+    lastEndTime = end;
+    lastPlace = to;
+
+    return this;
   }
 
   public TestItineraryBuilder bus(Route route, int tripId, int startTime, int endTime, Place to) {

@@ -25,6 +25,7 @@ config:
     Polyline: String
     GeoJson: org.locationtech.jts.geom.Geometry
   mappers:
+    AbsoluteDirection: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection#LegacyGraphQLAbsoluteDirection
     Agency: org.opentripplanner.transit.model.organization.Agency#Agency
     RouteType: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel#LegacyGraphQLRouteTypeModel
     Alert: org.opentripplanner.routing.alertpatch.TransitAlert#TransitAlert
@@ -46,7 +47,7 @@ config:
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
-    elevationProfileComponent: org.opentripplanner.common.model.P2#P2<Double>
+    elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step
     fare: java.util.Map#Map<String, Object>
     fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
     Feed: String
@@ -55,6 +56,7 @@ config:
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
     Mode: String
+    TransitMode: String
     PageInfo: Object
     Pattern: org.opentripplanner.transit.model.network.TripPattern#TripPattern
     PickupDropoffType: String
@@ -64,6 +66,7 @@ config:
     placeAtDistanceEdge: graphql.relay.Edge#Edge<PlaceAtDistance>
     Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     RealtimeState: String
+    RelativeDirection: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection#LegacyGraphQLRelativeDirection
     Route: org.opentripplanner.transit.model.network.Route#Route
     RoutingError: org.opentripplanner.routing.api.response.RoutingError#RoutingError
     RoutingErrorCode: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode#LegacyGraphQLRoutingErrorCode
@@ -92,3 +95,4 @@ config:
     FormFactor: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor
     PropulsionType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType
     RentalVehicleType: org.opentripplanner.routing.vehicle_rental.RentalVehicleType#RentalVehicleType
+    OpeningHours: org.opentripplanner.model.calendar.openinghours.OHCalendar#OHCalendar

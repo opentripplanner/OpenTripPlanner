@@ -2,9 +2,9 @@ package org.opentripplanner.updater.street_note;
 
 import java.util.Date;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.street.model.note.StreetNote;
 
 /**
  * Example implementation of a WFS based street note updater, which can be used to retrieve

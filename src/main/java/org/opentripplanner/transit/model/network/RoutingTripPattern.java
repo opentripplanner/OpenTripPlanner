@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.network;
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -80,7 +81,7 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
   }
 
   /**
-   * See {@link org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern#stopIndex(int)}
+   * See {@link RaptorTripPattern#stopIndex(int)}
    */
   public int stopIndex(int stopPositionInPattern) {
     return stopIndexes[stopPositionInPattern];

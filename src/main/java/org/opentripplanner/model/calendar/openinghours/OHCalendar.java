@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 public class OHCalendar implements Serializable {
 
@@ -74,5 +74,9 @@ public class OHCalendar implements Serializable {
       .addObj("zoneId", zoneId)
       .addCol("openingHours", openingHours)
       .toString();
+  }
+
+  public List<OpeningHours> openingHours() {
+    return openingHours;
   }
 }

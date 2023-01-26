@@ -1,18 +1,18 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.LocalizedString;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.LocalizedString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A Place is where a journey starts or ends, or a transit stop along the way.

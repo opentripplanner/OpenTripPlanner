@@ -1,5 +1,6 @@
 package org.opentripplanner.generate.doc;
 
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
@@ -7,25 +8,25 @@ import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.DocBuilder;
-import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
+import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-@OnlyIfDocsExist
+@GeneratesDocumentation
 public class VehicleParkingDocTest {
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "VehicleParking.md");
   private static final File OUT_FILE = new File(DOCS_ROOT + "/sandbox", "VehicleParking.md");
 
-  private static final String ROUTER_CONFIG_FILENAME = "standalone/config/router-config.json";
+  private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 
   @Test
@@ -50,8 +51,8 @@ public class VehicleParkingDocTest {
   }
 
   private NodeAdapter readVehicleUpdaters() {
-    var json = jsonNodeFromResource(ROUTER_CONFIG_FILENAME);
-    var conf = new RouterConfig(json, ROUTER_CONFIG_FILENAME, false);
+    var json = jsonNodeFromResource(ROUTER_CONFIG_PATH);
+    var conf = new RouterConfig(json, ROUTER_CONFIG_PATH, false);
     return conf.asNodeAdapter().child("updaters");
   }
 
@@ -81,15 +82,6 @@ public class VehicleParkingDocTest {
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
     buf.addSection("##### Example configuration");
-    buf.addExample(
-      "router-config.json",
-      """
-      "updaters": [
-        %s
-      ]
-      """.formatted(
-          node.toPrettyString().indent(node.level()).trim()
-        )
-    );
+    buf.addUpdaterExample(ROUTER_CONFIG_FILENAME, node.rawNode());
   }
 }

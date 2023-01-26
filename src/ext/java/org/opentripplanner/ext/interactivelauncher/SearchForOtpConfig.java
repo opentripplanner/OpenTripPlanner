@@ -1,13 +1,12 @@
 package org.opentripplanner.ext.interactivelauncher;
 
-import static org.opentripplanner.standalone.config.OtpConfigLoader.isConfigFile;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.framework.application.OtpFileNames;
 
 /**
  * Search for directories containing OTP configuration files. The search is recursive and searches
@@ -55,7 +54,7 @@ class SearchForOtpConfig {
     }
 
     for (File f : files) {
-      if (isConfigFile(f.getName())) {
+      if (OtpFileNames.isConfigFile(f.getName())) {
         return true;
       }
     }

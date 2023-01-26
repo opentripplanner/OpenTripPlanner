@@ -17,5 +17,9 @@ public interface AllowTransitModeFilter extends Serializable {
   /**
    * Check if this filter allows the provided TransitMode
    */
-  boolean allows(TransitMode transitMode, SubMode netexSubMode);
+  boolean match(TransitMode transitMode, SubMode netexSubMode);
+
+  public default boolean isSubMode() {
+    return false;
+  }
 }

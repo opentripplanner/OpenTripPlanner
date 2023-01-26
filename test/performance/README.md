@@ -12,7 +12,7 @@ After the graph is built, copy it into `./test/performance/${location}` and exec
 command to run the speed test:
 
 ```
-mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${location} -p md -n 4 -i 3 -0"
+mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${location} -p md -n 4 -i 3 -0"
 ```
 
 The results will be displayed on the console.
@@ -87,3 +87,11 @@ Data used:
 - Switzerland GTFS national data
 
 [build-config](switzerland/build-config.json)
+
+### Washington State
+
+This data set tests a lot of overlapping flex routes in and around Seattle in Washington State.
+
+[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=flex&var-location=washington-state&var-branch=dev-2.x&from=1669892798000&to=now)
+
+[build-config](washington-state/build-config.json)

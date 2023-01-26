@@ -1,7 +1,8 @@
 package org.opentripplanner.routing.services.notes;
 
 import java.util.Set;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 
 /**
  * A source of notes for edges.
@@ -9,5 +10,5 @@ import org.opentripplanner.routing.graph.Edge;
  * @author laurent
  */
 public interface StreetNotesSource {
-  Set<MatcherAndStreetNote> getNotes(Edge edge);
+  Set<StreetNoteAndMatcher> getNotes(Edge edge);
 }

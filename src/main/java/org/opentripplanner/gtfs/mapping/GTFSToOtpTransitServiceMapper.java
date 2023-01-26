@@ -10,14 +10,14 @@ import java.util.Collection;
 import java.util.function.Function;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.ext.fares.model.FareRulesData;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
-import org.opentripplanner.util.OTPFeature;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.

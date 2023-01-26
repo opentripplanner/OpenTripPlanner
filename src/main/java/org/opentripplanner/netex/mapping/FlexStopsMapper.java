@@ -5,15 +5,17 @@ import java.util.Optional;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.GroupStopBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.util.geometry.GeometryUtils;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.KeyValueStructure;
@@ -35,13 +37,20 @@ class FlexStopsMapper {
   private final FeedScopedIdFactory idFactory;
   private final HashGridSpatialIndex<RegularStop> stopsSpatialIndex;
 
-  FlexStopsMapper(FeedScopedIdFactory idFactory, Collection<RegularStop> stops) {
+  private final DataImportIssueStore issueStore;
+
+  FlexStopsMapper(
+    FeedScopedIdFactory idFactory,
+    Collection<RegularStop> stops,
+    DataImportIssueStore issueStore
+  ) {
     this.idFactory = idFactory;
     this.stopsSpatialIndex = new HashGridSpatialIndex<>();
     for (RegularStop stop : stops) {
       Envelope env = new Envelope(stop.getCoordinate().asJtsCoordinate());
       this.stopsSpatialIndex.insert(env, stop);
     }
+    this.issueStore = issueStore;
   }
 
   /**
@@ -54,6 +63,13 @@ class FlexStopsMapper {
       .getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea()
       .get(0);
     if (!(area instanceof FlexibleArea)) {
+      issueStore.add(
+        Issue.issue(
+          "UnsupportedFlexibleStopPlaceAreaType",
+          "FlexibleStopPlace %s contains an unsupported area.",
+          flexibleStopPlace.getId()
+        )
+      );
       LOG.warn(
         "FlexibleStopPlace {} not mapped. Hail and ride areas are not currently supported.",
         flexibleStopPlace.getId()
@@ -87,10 +103,14 @@ class FlexStopsMapper {
    */
   AreaStop mapFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
     var name = new NonLocalizedString(flexibleStopPlace.getName().getValue());
+    Geometry geometry = mapGeometry(area);
+    if (geometry == null) {
+      return null;
+    }
     return AreaStop
       .of(idFactory.createId(flexibleStopPlace.getId()))
       .withName(name)
-      .withGeometry(OpenGisMapper.mapGeometry(area.getPolygon()))
+      .withGeometry(geometry)
       .build();
   }
 
@@ -102,8 +122,10 @@ class FlexStopsMapper {
       .of(idFactory.createId(flexibleStopPlace.getId()))
       .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()));
 
-    Geometry geometry = OpenGisMapper.mapGeometry(area.getPolygon());
-
+    Geometry geometry = mapGeometry(area);
+    if (geometry == null) {
+      return null;
+    }
     for (RegularStop stop : stopsSpatialIndex.query(geometry.getEnvelopeInternal())) {
       Point p = GeometryUtils
         .getGeometryFactory()
@@ -114,5 +136,21 @@ class FlexStopsMapper {
     }
 
     return result.build();
+  }
+
+  private Geometry mapGeometry(FlexibleArea area) {
+    try {
+      return OpenGisMapper.mapGeometry(area.getPolygon());
+    } catch (Exception e) {
+      issueStore.add(
+        Issue.issue(
+          "InvalidFlexAreaGeometry",
+          "FlexibleArea %s has an invalid geometry.",
+          area.getId()
+        )
+      );
+      LOG.warn("FlexibleArea {}  has an invalid geometry", area.getId(), e);
+      return null;
+    }
   }
 }

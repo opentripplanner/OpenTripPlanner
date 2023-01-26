@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.issues;
 
-import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class HopSpeedFast implements DataImportIssue {
@@ -27,5 +27,10 @@ public class HopSpeedFast implements DataImportIssue {
   public String getMessage() {
     int kph = (int) (3.6 * metersPerSecond); // convert meters per second to kph
     return String.format(FMT, kph, distance, trip.getRoute().getId(), trip.getId(), seq);
+  }
+
+  @Override
+  public int getPriority() {
+    return (int) metersPerSecond;
   }
 }

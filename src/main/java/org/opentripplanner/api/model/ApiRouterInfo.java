@@ -2,20 +2,18 @@ package org.opentripplanner.api.model;
 
 import java.util.Date;
 import java.util.List;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.ModeMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.TravelOption;
-import org.opentripplanner.util.TravelOptionsMaker;
-import org.opentripplanner.util.WorldEnvelope;
 
+@SuppressWarnings("unused")
 public class ApiRouterInfo {
 
+  /** Keep ref to domain object, but avoid exposing it */
   private final WorldEnvelope envelope;
   public final boolean hasBikePark;
   public final boolean hasCarPark;
@@ -26,14 +24,17 @@ public class ApiRouterInfo {
   public long transitServiceStarts;
   public long transitServiceEnds;
   public List<String> transitModes;
-  public double centerLatitude;
-  public double centerLongitude;
   public boolean hasParkRide;
   public boolean hasBikeSharing;
-  public List<TravelOption> travelOptions;
+  public List<ApiTravelOption> travelOptions;
 
   /** TODO: Do not pass in the graph here, do this in a mapper instead. */
-  public ApiRouterInfo(String routerId, Graph graph, TransitService transitService) {
+  public ApiRouterInfo(
+    String routerId,
+    Graph graph,
+    TransitService transitService,
+    WorldEnvelope envelope
+  ) {
     VehicleRentalService vehicleRentalService = graph.getVehicleRentalService();
     VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
 
@@ -43,14 +44,13 @@ public class ApiRouterInfo {
     this.transitServiceStarts = transitService.getTransitServiceStarts().toEpochSecond();
     this.transitServiceEnds = transitService.getTransitServiceEnds().toEpochSecond();
     this.transitModes = ModeMapper.mapToApi(transitService.getTransitModes());
-    this.envelope = graph.getEnvelope();
+    this.envelope = envelope;
     this.hasBikeSharing = mapHasBikeSharing(vehicleRentalService);
     this.hasBikePark = mapHasBikePark(vehicleParkingService);
     this.hasCarPark = mapHasCarPark(vehicleParkingService);
     this.hasParkRide = this.hasCarPark;
     this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
-    this.travelOptions = TravelOptionsMaker.makeOptions(graph, transitService);
-    transitService.getCenter().ifPresentOrElse(this::setCenter, this::calculateCenter);
+    this.travelOptions = ApiTravelOptionsMaker.makeOptions(graph, transitService);
   }
 
   public boolean mapHasBikeSharing(VehicleRentalService service) {
@@ -83,43 +83,27 @@ public class ApiRouterInfo {
     return service.getVehicleParkings().findAny().isPresent();
   }
 
-  /**
-   * Set center coordinate from transit center in {@link TransitModel#calculateTransitCenter()} if transit
-   * is used.
-   * <p>
-   * It is first called when OSM is loaded. Then after transit data is loaded. So that center is set
-   * in all combinations of street and transit loading.
-   */
-  public void setCenter(Coordinate center) {
-    //Transit data was loaded and center was calculated with calculateTransitCenter
-    centerLongitude = center.x;
-    centerLatitude = center.y;
-  }
-
-  /**
-   * Set center coordinate from mean coordinates of bounding box.
-   *
-   * @see #setCenter(Coordinate)
-   */
-  public void calculateCenter() {
-    // Does not work around 180th parallel.
-    centerLatitude = (getUpperRightLatitude() + getLowerLeftLatitude()) / 2;
-    centerLongitude = (getUpperRightLongitude() + getLowerLeftLongitude()) / 2;
-  }
-
   public double getLowerLeftLatitude() {
-    return envelope.getLowerLeftLatitude();
+    return envelope.lowerLeft().latitude();
   }
 
   public double getLowerLeftLongitude() {
-    return envelope.getLowerLeftLongitude();
+    return envelope.lowerLeft().longitude();
   }
 
   public double getUpperRightLatitude() {
-    return envelope.getUpperRightLatitude();
+    return envelope.upperRight().latitude();
   }
 
   public double getUpperRightLongitude() {
-    return envelope.getUpperRightLongitude();
+    return envelope.upperRight().longitude();
+  }
+
+  public double getCenterLatitude() {
+    return envelope.center().latitude();
+  }
+
+  public double getCenterLongitude() {
+    return envelope.center().longitude();
   }
 }

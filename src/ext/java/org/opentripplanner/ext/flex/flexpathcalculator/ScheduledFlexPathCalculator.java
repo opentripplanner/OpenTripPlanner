@@ -1,7 +1,8 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.raptor.api.request.SearchParams;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * Calculate the driving times based on the scheduled timetable for the route.
@@ -34,7 +35,16 @@ public class ScheduledFlexPathCalculator implements FlexPathCalculator {
       toStopIndex,
       0
     );
+
+    if (departureTime == SearchParams.TIME_NOT_SET) {
+      return null;
+    }
+
     int arrivalTime = trip.latestArrivalTime(Integer.MAX_VALUE, fromStopIndex, toStopIndex, 0);
+
+    if (arrivalTime == SearchParams.TIME_NOT_SET) {
+      return null;
+    }
 
     if (departureTime >= arrivalTime) {
       return null;

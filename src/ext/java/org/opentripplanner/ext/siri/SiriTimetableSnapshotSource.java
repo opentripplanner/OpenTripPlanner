@@ -1,16 +1,14 @@
 package org.opentripplanner.ext.siri;
 
-import static org.opentripplanner.ext.siri.SiriTransportModeMapper.mapTransitMainMode;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
 import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
-import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
+import static org.opentripplanner.model.UpdateSuccess.WarningType.NOT_MONITORED;
 
 import com.google.common.base.Preconditions;
 import java.time.LocalDate;
@@ -23,22 +21,22 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
-import org.opentripplanner.common.model.T2;
+import java.util.function.Function;
+import javax.annotation.Nullable;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.UpdateError;
+import org.opentripplanner.model.UpdateSuccess;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -49,26 +47,19 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
-import org.opentripplanner.updater.trip.UpdateResult;
-import org.opentripplanner.util.time.ServiceDateUtils;
-import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.RailSubmodeEnumeration;
+import org.opentripplanner.updater.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
-import uk.org.siri.siri20.DatedVehicleJourneyRef;
-import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
 import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.EstimatedVersionFrameStructure;
-import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
 import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityCancellationStructure;
 import uk.org.siri.siri20.VehicleActivityStructure;
-import uk.org.siri.siri20.VehicleModesEnumeration;
+import uk.org.siri.siri20.VehicleJourneyRef;
 import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
 
 /**
@@ -100,9 +91,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
    * messages.
    */
-  private final SiriTripPatternCache tripPatternCache = new SiriTripPatternCache(
-    tripPatternIdGenerator
-  );
+  private final SiriTripPatternCache tripPatternCache;
   private final ZoneId timeZone;
 
   private final TransitService transitService;
@@ -136,6 +125,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
     this.maxSnapshotFrequency = parameters.maxSnapshotFrequencyMs();
     this.purgeExpiredData = parameters.purgeExpiredData();
+    this.tripPatternCache =
+      new SiriTripPatternCache(tripPatternIdGenerator, transitService::getPatternForTrip);
 
     transitModel.initTimetableSnapshotProvider(this);
   }
@@ -175,11 +166,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public void applyVehicleMonitoring(
-    final TransitModel transitModel,
-    final SiriFuzzyTripMatcher fuzzyTripMatcher,
-    final String feedId,
-    final boolean fullDataset,
-    final List<VehicleMonitoringDeliveryStructure> updates
+    TransitModel transitModel,
+    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
+    EntityResolver entityResolver,
+    String feedId,
+    boolean fullDataset,
+    List<VehicleMonitoringDeliveryStructure> updates
   ) {
     if (updates == null) {
       LOG.warn("updates is null");
@@ -196,7 +188,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       for (VehicleMonitoringDeliveryStructure vmDelivery : updates) {
-        LocalDate serviceDate = LocalDate.now(transitService.getTimeZone());
+        LocalDate serviceDate = LocalDate.now(timeZone);
 
         List<VehicleActivityStructure> activities = vmDelivery.getVehicleActivities();
         if (activities != null) {
@@ -210,7 +202,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               fuzzyTripMatcher,
               activity,
               serviceDate,
-              feedId
+              entityResolver
             );
             if (handled) {
               handledCounter++;
@@ -261,11 +253,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public UpdateResult applyEstimatedTimetable(
-    final TransitModel transitModel,
-    final SiriFuzzyTripMatcher fuzzyTripMatcher,
-    final String feedId,
-    final boolean fullDataset,
-    final List<EstimatedTimetableDeliveryStructure> updates
+    TransitModel transitModel,
+    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
+    EntityResolver entityResolver,
+    String feedId,
+    boolean fullDataset,
+    List<EstimatedTimetableDeliveryStructure> updates
   ) {
     if (updates == null) {
       LOG.warn("updates is null");
@@ -275,7 +268,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     // Acquire lock on buffer
     bufferLock.lock();
 
-    List<Result<?, UpdateError>> results = new ArrayList<>();
+    List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
     try {
       if (fullDataset) {
@@ -284,7 +277,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       for (EstimatedTimetableDeliveryStructure etDelivery : updates) {
-        var res = apply(etDelivery, transitModel, feedId, fuzzyTripMatcher);
+        var res = apply(etDelivery, transitModel, fuzzyTripMatcher, entityResolver);
         results.addAll(res);
       }
 
@@ -307,13 +300,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return UpdateResult.ofResults(results);
   }
 
-  private List<Result<?, UpdateError>> apply(
+  private List<Result<UpdateSuccess, UpdateError>> apply(
     EstimatedTimetableDeliveryStructure etDelivery,
     TransitModel transitModel,
-    String feedId,
-    SiriFuzzyTripMatcher fuzzyTripMatcher
+    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
+    EntityResolver entityResolver
   ) {
-    List<Result<?, UpdateError>> results = new ArrayList<>();
+    List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
     List<EstimatedVersionFrameStructure> estimatedJourneyVersions = etDelivery.getEstimatedJourneyVersionFrames();
     if (estimatedJourneyVersions != null) {
       //Handle deliveries
@@ -321,10 +314,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         List<EstimatedVehicleJourney> journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
         LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
         for (EstimatedVehicleJourney journey : journeys) {
-          if (journey.isExtraJourney() != null && journey.isExtraJourney()) {
+          if (isReplacementDeparture(journey, entityResolver)) {
             // Added trip
             try {
-              Result<?, UpdateError> res = handleAddedTrip(transitModel, feedId, journey);
+              Result<UpdateSuccess, UpdateError> res = handleAddedTrip(
+                transitModel,
+                journey,
+                entityResolver
+              );
               results.add(res);
             } catch (Throwable t) {
               // Since this is work in progress - catch everything to continue processing updates
@@ -337,22 +334,43 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             }
           } else {
             // Updated trip
-            var result = handleModifiedTrip(transitModel, fuzzyTripMatcher, feedId, journey);
-            result.ifSuccess(ignored -> results.add(Result.success()));
+            var result = handleModifiedTrip(
+              fuzzyTripMatcher,
+              entityResolver,
+              journey,
+              transitModel::getStopLocationById,
+              transitModel.getDeduplicator()
+            );
+            // need to put it in a new instance so the type is correct
+            result.ifSuccess(value -> results.add(Result.success(value)));
             result.ifFailure(failures -> {
-              failures.stream().map(Result::failure).forEach(results::add);
-
-              if (journey.isMonitored() != null && !journey.isMonitored()) {
-                results.add(
-                  Result.success(UpdateError.noTripId(UpdateError.UpdateErrorType.NOT_MONITORED))
-                );
-              }
+              List<Result<UpdateSuccess, UpdateError>> f = failures
+                .stream()
+                .map(Result::<UpdateSuccess, UpdateError>failure)
+                .toList();
+              results.addAll(f);
             });
           }
         }
       }
     }
     return results;
+  }
+
+  /**
+   * Check if VehicleJourney is a replacement departure according to SIRI-ET requirements.
+   */
+  private boolean isReplacementDeparture(
+    EstimatedVehicleJourney vehicleJourney,
+    EntityResolver entityResolver
+  ) {
+    // Replacement departure only if ExtraJourney is true
+    if (!Optional.ofNullable(vehicleJourney.isExtraJourney()).orElse(false)) {
+      return false;
+    }
+
+    // If Trip exists by DatedServiceJourney then this is not replacement departure
+    return entityResolver.resolveTripOnServiceDate(vehicleJourney) != null;
   }
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
@@ -376,7 +394,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     SiriFuzzyTripMatcher fuzzyTripMatcher,
     VehicleActivityStructure activity,
     LocalDate serviceDate,
-    String feedId
+    EntityResolver entityResolver
   ) {
     if (activity.getValidUntilTime().isBefore(ZonedDateTime.now())) {
       //Activity has expired
@@ -399,9 +417,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    Set<Trip> trips = fuzzyTripMatcher.match(monitoredVehicleJourney, feedId);
+    Trip trip = entityResolver.resolveTrip(monitoredVehicleJourney);
+    if (trip == null) {
+      trip = fuzzyTripMatcher.match(monitoredVehicleJourney, entityResolver);
+    }
 
-    if (trips == null || trips.isEmpty()) {
+    if (trip == null) {
       if (keepLogging) {
         String lineRef =
           (
@@ -433,14 +454,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    //Find the trip that best corresponds to MonitoredVehicleJourney
-    Trip trip = getTripForJourney(trips, monitoredVehicleJourney);
-
-    if (trip == null) {
-      return false;
-    }
-
-    final Set<TripPattern> patterns = getPatternsForTrip(trips, monitoredVehicleJourney);
+    final Set<TripPattern> patterns = getPatternsForTrip(Set.of(trip), monitoredVehicleJourney);
 
     if (patterns == null) {
       return false;
@@ -493,20 +507,16 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return tripPattern.getScheduledTimetable();
   }
 
-  private Result<?, UpdateError> handleAddedTrip(
+  private Result<UpdateSuccess, UpdateError> handleAddedTrip(
     TransitModel transitModel,
-    String feedId,
-    EstimatedVehicleJourney estimatedVehicleJourney
+    EstimatedVehicleJourney estimatedVehicleJourney,
+    EntityResolver entityResolver
   ) {
     // Verifying values required in SIRI Profile
 
     // Added ServiceJourneyId
     String newServiceJourneyRef = estimatedVehicleJourney.getEstimatedVehicleJourneyCode();
     Objects.requireNonNull(newServiceJourneyRef, "EstimatedVehicleJourneyCode is required");
-
-    // Replaced/duplicated ServiceJourneyId
-    //        VehicleJourneyRef existingServiceJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef();
-    //        Objects.requireNonNull(existingServiceJourneyRef, "VehicleJourneyRef is required");
 
     // LineRef of added trip
     Objects.requireNonNull(estimatedVehicleJourney.getLineRef(), "LineRef is required");
@@ -516,14 +526,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Objects.requireNonNull(estimatedVehicleJourney.getOperatorRef(), "OperatorRef is required");
     String operatorRef = estimatedVehicleJourney.getOperatorRef().getValue();
 
-    //Required in SIRI, but currently not in use by OTP
-    //        Objects.requireNonNull(estimatedVehicleJourney.getRouteRef(), "RouteRef is required");
-    //        String routeRef = estimatedVehicleJourney.getRouteRef().getValue();
-
-    //        Objects.requireNonNull(estimatedVehicleJourney.getGroupOfLinesRef(), "GroupOfLinesRef is required");
-    //        String groupOfLines = estimatedVehicleJourney.getGroupOfLinesRef().getValue();
-
-    //        Objects.requireNonNull(estimatedVehicleJourney.getExternalLineRef(), "ExternalLineRef is required");
     String externalLineRef;
     if (estimatedVehicleJourney.getExternalLineRef() != null) {
       externalLineRef = estimatedVehicleJourney.getExternalLineRef().getValue();
@@ -531,186 +533,101 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       externalLineRef = lineRef;
     }
 
-    Operator operator = transitModel
-      .getTransitModelIndex()
-      .getOperatorForId()
-      .get(new FeedScopedId(feedId, operatorRef));
-    //        Objects.requireNonNull(operator, "Operator " + operatorRef + " is unknown");
+    Operator operator = entityResolver.resolveOperator(operatorRef);
+    FeedScopedId tripId = entityResolver.resolveId(newServiceJourneyRef);
+    Route replacedRoute = entityResolver.resolveRoute(externalLineRef);
+    Route route = entityResolver.resolveRoute(lineRef);
 
-    FeedScopedId tripId = new FeedScopedId(feedId, newServiceJourneyRef);
-
-    Route replacedRoute = externalLineRef != null
-      ? transitModel.getTransitModelIndex().getRouteForId(new FeedScopedId(feedId, externalLineRef))
-      : null;
-
-    FeedScopedId routeId = new FeedScopedId(feedId, lineRef);
-    Route route = transitModel.getTransitModelIndex().getRouteForId(routeId);
-
-    T2<TransitMode, String> transitMode = getTransitMode(
+    Mode transitMode = AddedTripHelper.getTransitMode(
       estimatedVehicleJourney.getVehicleModes(),
       replacedRoute
     );
 
-    if (route == null) { // Route is unknown - create new
-      var routeBuilder = Route.of(routeId);
-      routeBuilder.withMode(transitMode.first);
-      routeBuilder.withNetexSubmode(transitMode.second);
-      routeBuilder.withOperator(operator);
-
-      // TODO - SIRI: Is there a better way to find authority/Agency?
-      // Finding first Route with same Operator, and using same Authority
-      Agency agency = transitModel
-        .getTransitModelIndex()
-        .getAllRoutes()
-        .stream()
-        .filter(route1 ->
-          route1 != null && route1.getOperator() != null && route1.getOperator().equals(operator)
-        )
-        .findFirst()
-        .map(Route::getAgency)
-        // If not found, copy from replaced route
-        .orElseGet(() -> replacedRoute.getAgency());
-      routeBuilder.withAgency(agency);
-
-      if (
-        estimatedVehicleJourney.getPublishedLineNames() != null &&
-        !estimatedVehicleJourney.getPublishedLineNames().isEmpty()
-      ) {
-        routeBuilder.withShortName(
-          "" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue()
+    if (route == null) {
+      route =
+        AddedTripHelper.getRoute(
+          transitModel.getTransitModelIndex().getAllRoutes(),
+          estimatedVehicleJourney.getPublishedLineNames(),
+          operator,
+          replacedRoute,
+          entityResolver.resolveId(lineRef),
+          transitMode
         );
-      }
-      route = routeBuilder.build();
-      LOG.info("Adding route {} to transitModel.", routeId);
+      LOG.info("Adding route {} to transitModel.", route);
       transitModel.getTransitModelIndex().addRoutes(route);
     }
 
-    var tripBuilder = Trip.of(tripId);
-    tripBuilder.withRoute(route);
-
-    // Explicitly set TransitMode on Trip - in case it differs from Route
-    tripBuilder.withMode(transitMode.first);
-    tripBuilder.withNetexSubmode(transitMode.second);
-
     LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
-
     if (serviceDate == null) {
-      return UpdateError.result(tripId, NO_START_DATE);
+      return Result.failure(new UpdateError(tripId, NO_START_DATE));
     }
-
     FeedScopedId calServiceId = transitModel.getOrCreateServiceIdForDate(serviceDate);
 
-    if (calServiceId == null) {
-      return UpdateError.result(tripId, NO_START_DATE);
+    var tripResult = AddedTripHelper.getTrip(
+      tripId,
+      route,
+      operator,
+      transitMode,
+      estimatedVehicleJourney.getDestinationNames(),
+      calServiceId
+    );
+
+    if (tripResult.isFailure()) {
+      // need to create a new result so the success type is correct
+      return tripResult.toFailureResult();
     }
-
-    tripBuilder.withServiceId(calServiceId);
-
-    // Use destinationName as default headsign - if provided
-    if (
-      estimatedVehicleJourney.getDestinationNames() != null &&
-      !estimatedVehicleJourney.getDestinationNames().isEmpty()
-    ) {
-      NonLocalizedString str = new NonLocalizedString(
-        "" + estimatedVehicleJourney.getDestinationNames().get(0).getValue()
-      );
-      tripBuilder.withHeadsign(str);
-    }
-
-    tripBuilder.withOperator(operator);
-
-    // TODO - SIRI: Populate these?
-    tripBuilder.withShapeId(null); // Replacement-trip has different shape
-    //        trip.setTripPrivateCode(null);
-    //        trip.setTripPublicCode(null);
-    tripBuilder.withGtfsBlockId(null);
-    tripBuilder.withShortName(null);
-    //        trip.setKeyValues(null);
-
-    var trip = tripBuilder.build();
+    Trip trip = tripResult.successValue();
 
     List<StopLocation> addedStops = new ArrayList<>();
     List<StopTime> aimedStopTimes = new ArrayList<>();
+    List<EstimatedCall> estimatedCalls;
+    List<RecordedCall> recordedCalls;
 
-    // TODO - SIRI: Handle RecordedCalls. Finding departureTime++ from first stop will fail when
-    //              trip passes midnight, and the first stops are RecordedCalls.
+    if (
+      estimatedVehicleJourney.getRecordedCalls() != null &&
+      estimatedVehicleJourney.getRecordedCalls().getRecordedCalls() != null
+    ) {
+      recordedCalls = estimatedVehicleJourney.getRecordedCalls().getRecordedCalls();
+    } else {
+      recordedCalls = List.of();
+    }
 
-    ZonedDateTime departureTime = null;
+    if (
+      estimatedVehicleJourney.getEstimatedCalls() != null &&
+      estimatedVehicleJourney.getEstimatedCalls().getEstimatedCalls() != null
+    ) {
+      estimatedCalls = estimatedVehicleJourney.getEstimatedCalls().getEstimatedCalls();
+    } else {
+      estimatedCalls = List.of();
+    }
 
-    List<EstimatedCall> estimatedCalls = estimatedVehicleJourney
-      .getEstimatedCalls()
-      .getEstimatedCalls();
-    for (int i = 0; i < estimatedCalls.size(); i++) {
-      EstimatedCall estimatedCall = estimatedCalls.get(i);
+    int numStops = recordedCalls.size() + estimatedCalls.size();
 
-      var stop = transitService.getRegularStop(
-        new FeedScopedId(feedId, estimatedCall.getStopPointRef().getValue())
+    ZonedDateTime departureDate = serviceDate.atStartOfDay(timeZone);
+
+    int stopSequence = 0;
+    stopSequence =
+      handleRecordedCalls(
+        trip,
+        addedStops,
+        aimedStopTimes,
+        recordedCalls,
+        numStops,
+        departureDate,
+        stopSequence,
+        entityResolver
       );
 
-      StopTime stopTime = new StopTime();
-      stopTime.setStop(stop);
-      stopTime.setStopSequence(i);
-      stopTime.setTrip(trip);
-
-      ZonedDateTime aimedArrivalTime = estimatedCall.getAimedArrivalTime();
-      ZonedDateTime aimedDepartureTime = estimatedCall.getAimedDepartureTime();
-
-      if (departureTime == null) {
-        departureTime = aimedDepartureTime;
-      }
-
-      if (aimedArrivalTime != null) {
-        stopTime.setArrivalTime(calculateSecondsSinceMidnight(departureTime, aimedArrivalTime));
-      }
-      if (aimedDepartureTime != null) {
-        stopTime.setDepartureTime(calculateSecondsSinceMidnight(departureTime, aimedDepartureTime));
-      }
-
-      if (
-        estimatedCall.getArrivalBoardingActivity() == ArrivalBoardingActivityEnumeration.ALIGHTING
-      ) {
-        stopTime.setDropOffType(SCHEDULED);
-      } else {
-        stopTime.setDropOffType(NONE);
-      }
-
-      if (
-        estimatedCall.getDepartureBoardingActivity() ==
-        DepartureBoardingActivityEnumeration.BOARDING
-      ) {
-        stopTime.setPickupType(SCHEDULED);
-      } else {
-        stopTime.setPickupType(NONE);
-      }
-
-      if (
-        estimatedCall.getDestinationDisplaies() != null &&
-        !estimatedCall.getDestinationDisplaies().isEmpty()
-      ) {
-        NaturalLanguageStringStructure destinationDisplay = estimatedCall
-          .getDestinationDisplaies()
-          .get(0);
-        stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay.getValue()));
-      } else if (tripBuilder.getHeadsign() == null) {
-        // Fallback to empty string
-        stopTime.setStopHeadsign(new NonLocalizedString(""));
-      }
-
-      if (i == 0) {
-        // Fake arrival on first stop
-        stopTime.setArrivalTime(stopTime.getDepartureTime());
-      } else if (i == (estimatedCalls.size() - 1)) {
-        // Fake departure from last stop
-        stopTime.setDepartureTime(stopTime.getArrivalTime());
-      }
-
-      if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
-        stopTime.cancel();
-      }
-
-      addedStops.add(stop);
-      aimedStopTimes.add(stopTime);
-    }
+    handleEstimatedCalls(
+      trip,
+      addedStops,
+      aimedStopTimes,
+      estimatedCalls,
+      numStops,
+      departureDate,
+      stopSequence,
+      entityResolver
+    );
 
     StopPattern stopPattern = new StopPattern(aimedStopTimes);
 
@@ -719,7 +636,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     // TODO: We always create a new TripPattern to be able to modify its scheduled timetable
     TripPattern pattern = TripPattern
       .of(id)
-      .withRoute(tripBuilder.getRoute())
+      .withRoute(trip.getRoute())
       .withMode(trip.getMode())
       .withStopPattern(stopPattern)
       .build();
@@ -732,40 +649,31 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         estimatedVehicleJourney.isPredictionInaccurate()
       );
 
-    // If added trip is updated with realtime - loop through and add delays
-    for (int i = 0; i < estimatedCalls.size(); i++) {
-      EstimatedCall estimatedCall = estimatedCalls.get(i);
-      ZonedDateTime expectedArrival = estimatedCall.getExpectedArrivalTime();
-      ZonedDateTime expectedDeparture = estimatedCall.getExpectedDepartureTime();
-
-      int aimedArrivalTime = aimedStopTimes.get(i).getArrivalTime();
-      int aimedDepartureTime = aimedStopTimes.get(i).getDepartureTime();
-
-      if (expectedArrival != null) {
-        int expectedArrivalTime = calculateSecondsSinceMidnight(departureTime, expectedArrival);
-        tripTimes.updateArrivalDelay(i, expectedArrivalTime - aimedArrivalTime);
-      }
-      if (expectedDeparture != null) {
-        int expectedDepartureTime = calculateSecondsSinceMidnight(departureTime, expectedDeparture);
-        tripTimes.updateDepartureDelay(i, expectedDepartureTime - aimedDepartureTime);
-      }
-
-      boolean isCallPredictionInaccurate =
-        estimatedCall.isPredictionInaccurate() != null && estimatedCall.isPredictionInaccurate();
-
-      if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
-        tripTimes.setCancelled(i);
-      } else if (isJourneyPredictionInaccurate | isCallPredictionInaccurate) {
-        tripTimes.setPredictionInaccurate(i);
-      }
-
-      if (i == 0) {
-        // Fake arrival on first stop
-        tripTimes.updateArrivalTime(i, tripTimes.getDepartureTime(i));
-      } else if (i == (estimatedCalls.size() - 1)) {
-        // Fake departure from last stop
-        tripTimes.updateDepartureTime(i, tripTimes.getArrivalTime(i));
-      }
+    // Loop through calls again and apply updates
+    stopSequence = 0;
+    for (var recordedCall : recordedCalls) {
+      TimetableHelper.applyUpdates(
+        departureDate,
+        aimedStopTimes,
+        tripTimes,
+        stopSequence,
+        isJourneyPredictionInaccurate,
+        recordedCall,
+        estimatedVehicleJourney.getOccupancy()
+      );
+      stopSequence++;
+    }
+    for (var estimatedCall : estimatedCalls) {
+      TimetableHelper.applyUpdates(
+        departureDate,
+        aimedStopTimes,
+        tripTimes,
+        stopSequence,
+        isJourneyPredictionInaccurate,
+        estimatedCall,
+        estimatedVehicleJourney.getOccupancy()
+      );
+      stopSequence++;
     }
 
     // Adding trip to index necessary to include values in graphql-queries
@@ -785,6 +693,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     pattern.add(tripTimes);
 
+    /* Validate */
     tripTimes
       .validateNonIncreasingTimes()
       .ifFailure(error -> {
@@ -797,61 +706,157 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         );
       });
 
+    /* commit */
     return addTripToGraphAndBuffer(
-      feedId,
-      transitModel,
       trip,
       aimedStopTimes,
       addedStops,
       tripTimes,
       serviceDate,
-      estimatedVehicleJourney
+      estimatedVehicleJourney,
+      entityResolver
     );
   }
 
-  /**
-   * Resolves TransitMode from SIRI VehicleMode
-   */
-  private T2<TransitMode, String> getTransitMode(
-    List<VehicleModesEnumeration> vehicleModes,
-    Route replacedRoute
+  private void handleEstimatedCalls(
+    Trip trip,
+    List<StopLocation> addedStops,
+    List<StopTime> aimedStopTimes,
+    List<EstimatedCall> estimatedCalls,
+    int numStops,
+    ZonedDateTime departureDate,
+    int stopSequence,
+    EntityResolver entityResolver
   ) {
-    TransitMode transitMode = mapTransitMainMode(vehicleModes);
+    for (EstimatedCall estimatedCall : estimatedCalls) {
+      var stop = entityResolver.resolveQuay(estimatedCall.getStopPointRef().getValue());
 
-    String transitSubMode = resolveTransitSubMode(transitMode, replacedRoute);
+      // Update destination display
+      String destinationDisplay = AddedTripHelper.getFirstNameFromList(
+        estimatedCall.getDestinationDisplaies()
+      );
 
-    return new T2<>(transitMode, transitSubMode);
-  }
+      StopTime stopTime = createStopTime(
+        trip,
+        numStops,
+        departureDate,
+        stopSequence,
+        estimatedCall.getAimedArrivalTime(),
+        estimatedCall.getAimedDepartureTime(),
+        stop,
+        destinationDisplay
+      );
 
-  /**
-   * Resolves submode based on added trips's mode and replacedRoute's mode
-   *
-   * @param transitMode   Mode of the added trip
-   * @param replacedRoute Route that is being replaced
-   * @return String-representation of submode
-   */
-  private String resolveTransitSubMode(TransitMode transitMode, Route replacedRoute) {
-    if (replacedRoute != null) {
-      TransitMode replacedRouteMode = replacedRoute.getMode();
+      // Update pickup / dropof
+      var pickUpType = TimetableHelper.mapPickUpType(
+        stopTime.getPickupType(),
+        estimatedCall.getDepartureBoardingActivity()
+      );
+      pickUpType.ifPresent(stopTime::setPickupType);
 
-      if (replacedRouteMode == TransitMode.RAIL) {
-        if (transitMode.equals(TransitMode.RAIL)) {
-          // Replacement-route is also RAIL
-          return RailSubmodeEnumeration.REPLACEMENT_RAIL_SERVICE.value();
-        } else if (transitMode.equals(TransitMode.BUS)) {
-          // Replacement-route is BUS
-          return BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value();
-        }
-      }
+      var dropOffType = TimetableHelper.mapDropOffType(
+        stopTime.getDropOffType(),
+        estimatedCall.getArrivalBoardingActivity()
+      );
+      dropOffType.ifPresent(stopTime::setDropOffType);
+
+      addedStops.add(stop);
+      aimedStopTimes.add(stopTime);
+      stopSequence++;
     }
-    return null;
   }
 
-  private Result<?, List<UpdateError>> handleModifiedTrip(
-    TransitModel transitModel,
-    SiriFuzzyTripMatcher fuzzyTripMatcher,
-    String feedId,
-    EstimatedVehicleJourney estimatedVehicleJourney
+  private StopTime createStopTime(
+    Trip trip,
+    int numStops,
+    ZonedDateTime departureDate,
+    int stopSequence,
+    ZonedDateTime aimedArrivalTime,
+    ZonedDateTime aimedDepartureTime,
+    StopLocation stop,
+    String destinationDisplay
+  ) {
+    TimeForStop arrivalAndDepartureTime = getArrivalAndDepartureTime(
+      numStops,
+      departureDate,
+      stopSequence,
+      aimedArrivalTime,
+      aimedDepartureTime
+    );
+
+    return AddedTripHelper.createStopTime(
+      trip,
+      stopSequence,
+      stop,
+      arrivalAndDepartureTime.arrivalTime(),
+      arrivalAndDepartureTime.departureTime(),
+      destinationDisplay
+    );
+  }
+
+  private int handleRecordedCalls(
+    Trip trip,
+    List<StopLocation> addedStops,
+    List<StopTime> aimedStopTimes,
+    List<RecordedCall> recordedCalls,
+    int numStops,
+    ZonedDateTime departureDate,
+    int stopSequence,
+    EntityResolver entityResolver
+  ) {
+    for (RecordedCall recordedCall : recordedCalls) {
+      var stop = entityResolver.resolveQuay(recordedCall.getStopPointRef().getValue());
+      StopTime stopTime = createStopTime(
+        trip,
+        numStops,
+        departureDate,
+        stopSequence,
+        recordedCall.getAimedArrivalTime(),
+        recordedCall.getAimedDepartureTime(),
+        stop,
+        "" // Destination display not present on recorded call
+      );
+
+      addedStops.add(stop);
+      aimedStopTimes.add(stopTime);
+      stopSequence++;
+    }
+    return stopSequence;
+  }
+
+  private TimeForStop getArrivalAndDepartureTime(
+    int numStops,
+    ZonedDateTime departureDate,
+    int i,
+    ZonedDateTime aimedArrivalTime,
+    ZonedDateTime aimedDepartureTime
+  ) {
+    if (aimedArrivalTime == null) {
+      aimedArrivalTime = aimedDepartureTime;
+    } else if (aimedDepartureTime == null) {
+      aimedDepartureTime = aimedArrivalTime;
+    }
+
+    var aimedDepartureTimeSeconds = calculateSecondsSinceMidnight(
+      departureDate,
+      aimedDepartureTime
+    );
+    var aimedArrivalTimeSeconds = calculateSecondsSinceMidnight(departureDate, aimedArrivalTime);
+
+    return AddedTripHelper.getTimeForStop(
+      aimedArrivalTimeSeconds,
+      aimedDepartureTimeSeconds,
+      i,
+      numStops
+    );
+  }
+
+  private Result<UpdateSuccess, List<UpdateError>> handleModifiedTrip(
+    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
+    EntityResolver entityResolver,
+    EstimatedVehicleJourney estimatedVehicleJourney,
+    Function<FeedScopedId, StopLocation> getStopLocationById,
+    Deduplicator deduplicator
   ) {
     //Check if EstimatedVehicleJourney is reported as NOT monitored
     if (estimatedVehicleJourney.isMonitored() != null && !estimatedVehicleJourney.isMonitored()) {
@@ -860,7 +865,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         estimatedVehicleJourney.isCancellation() != null &&
         !estimatedVehicleJourney.isCancellation()
       ) {
-        return Result.success();
+        return Result.success(UpdateSuccess.ofWarnings(NOT_MONITORED));
       }
     }
 
@@ -882,18 +887,17 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
+    final Result<UpdateSuccess, List<UpdateError>> successNoWarnings = Result.success(
+      UpdateSuccess.noWarnings()
+    );
     if (serviceDate == null) {
-      return Result.success();
+      return successNoWarnings;
     }
 
     Set<TripTimes> times = new HashSet<>();
     Set<TripPattern> patterns = new HashSet<>();
 
-    Trip tripMatchedByServiceJourneyId = SiriFuzzyTripMatcher.findTripByDatedVehicleJourneyRef(
-      estimatedVehicleJourney,
-      feedId,
-      transitService
-    );
+    Trip tripMatchedByServiceJourneyId = entityResolver.resolveTrip(estimatedVehicleJourney);
 
     if (tripMatchedByServiceJourneyId != null) {
       /*
@@ -907,9 +911,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           currentTimetable,
           estimatedVehicleJourney,
           tripMatchedByServiceJourneyId.getId(),
-          transitModel::getStopLocationById,
+          getStopLocationById,
           timeZone,
-          transitModel.getDeduplicator()
+          deduplicator
         );
         if (updateResult.isSuccess()) {
           times.add(updateResult.successValue());
@@ -924,7 +928,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
     } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
-      Set<Trip> trips = fuzzyTripMatcher.match(estimatedVehicleJourney, feedId);
+      Set<Trip> trips = fuzzyTripMatcher.match(
+        estimatedVehicleJourney,
+        entityResolver,
+        this::getCurrentTimetable
+      );
 
       if (trips == null || trips.isEmpty()) {
         LOG.debug(
@@ -937,21 +945,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         return Result.failure(List.of(new UpdateError(null, NO_FUZZY_TRIP_MATCH)));
       }
 
-      //Find the trips that best corresponds to EstimatedVehicleJourney
-      Set<Trip> matchingTrips = getTripForJourney(trips, estimatedVehicleJourney);
-
-      if (matchingTrips == null || matchingTrips.isEmpty()) {
-        LOG.debug(
-          "Found no matching trip for SIRI ET (serviceDate, departureTime). [operator={}, vehicleModes={}, lineRef={}, vehicleJourneyRef={}]",
-          operatorRef,
-          vehicleModes,
-          lineRef,
-          vehicleRef
-        );
-        return Result.failure(List.of(new UpdateError(null, NO_FUZZY_TRIP_MATCH)));
-      }
-
-      for (Trip matchingTrip : matchingTrips) {
+      for (Trip matchingTrip : trips) {
         TripPattern pattern = getPatternForTrip(matchingTrip, estimatedVehicleJourney);
         if (pattern != null) {
           Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
@@ -959,9 +953,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             currentTimetable,
             estimatedVehicleJourney,
             matchingTrip.getId(),
-            transitModel::getStopLocationById,
+            getStopLocationById,
             timeZone,
-            transitModel.getDeduplicator()
+            deduplicator
           );
           updateResult.ifSuccess(tripTimes -> {
             patterns.add(pattern);
@@ -1004,13 +998,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             var modifiedStops = createModifiedStops(
               pattern,
               estimatedVehicleJourney,
-              transitModel::getStopLocationById
+              getStopLocationById
             );
             List<StopTime> modifiedStopTimes = createModifiedStopTimes(
               pattern,
               tripTimes,
               estimatedVehicleJourney,
-              transitModel::getStopLocationById
+              getStopLocationById
             );
 
             if (modifiedStops != null && modifiedStops.isEmpty()) {
@@ -1018,14 +1012,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             } else {
               // Add new trip
               addTripToGraphAndBuffer(
-                feedId,
-                transitModel,
                 trip,
                 modifiedStopTimes,
                 modifiedStops,
                 tripTimes,
                 serviceDate,
-                estimatedVehicleJourney
+                estimatedVehicleJourney,
+                entityResolver
               )
                 .ifFailure(errors::add);
             }
@@ -1039,7 +1032,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     if (errors.isEmpty()) {
-      return Result.success();
+      return successNoWarnings;
     } else {
       return Result.failure(errors);
     }
@@ -1075,33 +1068,24 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private int calculateSecondsSinceMidnight(ZonedDateTime dateTime) {
-    return ServiceDateUtils.secondsSinceStartOfService(
-      dateTime,
-      dateTime,
-      transitService.getTimeZone()
-    );
+    return ServiceDateUtils.secondsSinceStartOfService(dateTime, dateTime, timeZone);
   }
 
   private int calculateSecondsSinceMidnight(ZonedDateTime startOfService, ZonedDateTime dateTime) {
-    return ServiceDateUtils.secondsSinceStartOfService(
-      startOfService,
-      dateTime,
-      transitService.getTimeZone()
-    );
+    return ServiceDateUtils.secondsSinceStartOfService(startOfService, dateTime, timeZone);
   }
 
   /**
    * Add a (new) trip to the transitModel and the buffer
    */
-  private Result<?, UpdateError> addTripToGraphAndBuffer(
-    final String feedId,
-    final TransitModel transitModel,
+  private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(
     final Trip trip,
     final List<StopTime> stopTimes,
     final List<StopLocation> stops,
     TripTimes updatedTripTimes,
     final LocalDate serviceDate,
-    EstimatedVehicleJourney estimatedVehicleJourney
+    EstimatedVehicleJourney estimatedVehicleJourney,
+    EntityResolver entityResolver
   ) {
     // Preconditions
     Objects.requireNonNull(stops);
@@ -1117,7 +1101,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
       stopPattern,
       trip,
-      transitModel,
       serviceDate
     );
 
@@ -1125,7 +1108,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     var result = buffer.update(pattern, updatedTripTimes, serviceDate);
 
     // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
-    addTripOnServiceDateToBuffer(trip, serviceDate, estimatedVehicleJourney, feedId);
+    addTripOnServiceDateToBuffer(trip, serviceDate, estimatedVehicleJourney, entityResolver);
 
     return result;
   }
@@ -1134,27 +1117,53 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Trip trip,
     LocalDate serviceDate,
     EstimatedVehicleJourney estimatedVehicleJourney,
-    String feedId
+    EntityResolver entityResolver
   ) {
-    // Fallback to FramedVehicleJourneyRef if DatedVehicleJourneyRef is not set
-    Supplier<Optional<String>> getFramedVehicleJourney = () ->
-      Optional
-        .ofNullable(estimatedVehicleJourney.getFramedVehicleJourneyRef())
-        .map(FramedVehicleJourneyRefStructure::getDatedVehicleJourneyRef);
+    var datedServiceJourneyId = entityResolver.resolveDatedServiceJourneyId(
+      estimatedVehicleJourney
+    );
 
-    Optional
-      .ofNullable(estimatedVehicleJourney.getDatedVehicleJourneyRef())
-      .map(DatedVehicleJourneyRef::getValue)
-      .or(getFramedVehicleJourney)
-      .ifPresent(datedServiceJourneyId ->
-        buffer.addLastAddedTripOnServiceDate(
-          TripOnServiceDate
-            .of(new FeedScopedId(feedId, datedServiceJourneyId))
-            .withTrip(trip)
-            .withServiceDate(serviceDate)
-            .build()
-        )
+    if (datedServiceJourneyId == null) {
+      if (estimatedVehicleJourney.getFramedVehicleJourneyRef() != null) {
+        var tripOnDate = entityResolver.resolveTripOnServiceDate(
+          estimatedVehicleJourney.getFramedVehicleJourneyRef()
+        );
+        if (tripOnDate == null) {
+          return;
+        }
+        datedServiceJourneyId = tripOnDate.getId();
+      }
+    }
+
+    List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
+
+    // VehicleJourneyRef is the reference to the serviceJourney being replaced.
+    VehicleJourneyRef vehicleJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef();
+    if (vehicleJourneyRef != null) {
+      var replacedDatedServiceJourney = entityResolver.resolveTripOnServiceDate(
+        vehicleJourneyRef.getValue()
       );
+      if (replacedDatedServiceJourney != null) {
+        listOfReplacedVehicleJourneys.add(replacedDatedServiceJourney);
+      }
+    }
+
+    // Add additional replaced service journeys if present.
+    estimatedVehicleJourney
+      .getAdditionalVehicleJourneyReves()
+      .stream()
+      .map(entityResolver::resolveTripOnServiceDate)
+      .filter(Objects::nonNull)
+      .forEach(listOfReplacedVehicleJourneys::add);
+
+    buffer.addLastAddedTripOnServiceDate(
+      TripOnServiceDate
+        .of(datedServiceJourneyId)
+        .withTrip(trip)
+        .withReplacementFor(listOfReplacedVehicleJourneys)
+        .withServiceDate(serviceDate)
+        .build()
+    );
   }
 
   /**
@@ -1235,7 +1244,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     ZonedDateTime date = monitoredVehicleJourney.getOriginAimedDepartureTime();
     if (date == null) {
       //If no date is set - assume Realtime-data is reported for 'today'.
-      date = ZonedDateTime.now(transitService.getTimeZone());
+      date = ZonedDateTime.now(timeZone);
     }
     LocalDate realTimeReportedServiceDate = date.toLocalDate();
 
@@ -1388,148 +1397,5 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     return null;
-  }
-
-  /**
-   * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
-   */
-  private Trip getTripForJourney(
-    Set<Trip> trips,
-    MonitoredVehicleJourneyStructure monitoredVehicleJourney
-  ) {
-    ZonedDateTime date = monitoredVehicleJourney.getOriginAimedDepartureTime();
-    if (date == null) {
-      //If no date is set - assume Realtime-data is reported for 'today'.
-      date = ZonedDateTime.now();
-    }
-    LocalDate serviceDate = date.toLocalDate();
-
-    List<Trip> results = new ArrayList<>();
-    for (Trip trip : trips) {
-      Set<LocalDate> serviceDatesForServiceId = transitService
-        .getCalendarService()
-        .getServiceDatesForServiceId(trip.getServiceId());
-
-      for (LocalDate next : serviceDatesForServiceId) {
-        if (next.equals(serviceDate)) {
-          results.add(trip);
-        }
-      }
-    }
-
-    if (results.size() == 1) {
-      return results.get(0);
-    } else if (results.size() > 1) {
-      // Multiple possible matches - check if lineRef/routeId matches
-      if (
-        monitoredVehicleJourney.getLineRef() != null &&
-        monitoredVehicleJourney.getLineRef().getValue() != null
-      ) {
-        String lineRef = monitoredVehicleJourney.getLineRef().getValue();
-        for (Trip trip : results) {
-          if (lineRef.equals(trip.getRoute().getId().getId())) {
-            // Return first trip where the lineRef matches routeId
-            return trip;
-          }
-        }
-      }
-
-      // Line does not match any routeId - return first result.
-      return results.get(0);
-    }
-
-    return null;
-  }
-
-  /**
-   * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
-   */
-  private Set<Trip> getTripForJourney(Set<Trip> trips, EstimatedVehicleJourney journey) {
-    List<RecordedCall> recordedCalls =
-      (
-        journey.getRecordedCalls() != null
-          ? journey.getRecordedCalls().getRecordedCalls()
-          : new ArrayList<>()
-      );
-    List<EstimatedCall> estimatedCalls =
-      (
-        journey.getEstimatedCalls() != null ? journey.getEstimatedCalls().getEstimatedCalls() : null
-      );
-
-    ZonedDateTime date;
-    int stopNumber = 1;
-    String firstStopId;
-    if (recordedCalls != null && !recordedCalls.isEmpty()) {
-      RecordedCall recordedCall = recordedCalls.get(0);
-      date = recordedCall.getAimedDepartureTime();
-      firstStopId = recordedCall.getStopPointRef().getValue();
-    } else if (estimatedCalls != null && !estimatedCalls.isEmpty()) {
-      EstimatedCall estimatedCall = estimatedCalls.get(0);
-      if (estimatedCall.getOrder() != null) {
-        stopNumber = estimatedCall.getOrder().intValue();
-      } else if (estimatedCall.getVisitNumber() != null) {
-        stopNumber = estimatedCall.getVisitNumber().intValue();
-      }
-      firstStopId = estimatedCall.getStopPointRef().getValue();
-      date = estimatedCall.getAimedDepartureTime();
-    } else {
-      return null;
-    }
-
-    if (date == null) {
-      //If no date is set - assume Realtime-data is reported for 'today'.
-      date = ZonedDateTime.now(transitService.getTimeZone());
-    }
-    LocalDate serviceDate = date.toLocalDate();
-
-    int departureInSecondsSinceMidnight = calculateSecondsSinceMidnight(date);
-    Set<Trip> result = new HashSet<>();
-    for (Trip trip : trips) {
-      Set<LocalDate> serviceDatesForServiceId = transitService
-        .getCalendarService()
-        .getServiceDatesForServiceId(trip.getServiceId());
-      if (serviceDatesForServiceId.contains(serviceDate)) {
-        TripPattern pattern = transitService.getPatternForTrip(trip);
-
-        if (stopNumber < pattern.numberOfStops()) {
-          boolean firstReportedStopIsFound = false;
-          var stop = pattern.getStop(stopNumber - 1);
-          if (firstStopId.equals(stop.getId().getId())) {
-            firstReportedStopIsFound = true;
-          } else {
-            if (stop.isPartOfStation()) {
-              var alternativeStop = transitService.getRegularStop(
-                new FeedScopedId(stop.getId().getFeedId(), firstStopId)
-              );
-              if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
-                firstReportedStopIsFound = true;
-              }
-            }
-          }
-          if (firstReportedStopIsFound) {
-            for (TripTimes times : getCurrentTimetable(pattern, serviceDate).getTripTimes()) {
-              if (
-                times.getScheduledDepartureTime(stopNumber - 1) == departureInSecondsSinceMidnight
-              ) {
-                if (
-                  transitService
-                    .getCalendarService()
-                    .getServiceDatesForServiceId(times.getTrip().getServiceId())
-                    .contains(serviceDate)
-                ) {
-                  result.add(times.getTrip());
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (result.size() >= 1) {
-      return result;
-    } else {
-      return null;
-    }
   }
 }

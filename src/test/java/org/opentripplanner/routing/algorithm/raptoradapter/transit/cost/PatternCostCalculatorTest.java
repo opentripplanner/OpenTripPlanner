@@ -3,10 +3,10 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import static graphql.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.UNPREFERRED_ROUTE_RELUCTANCE;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.agency;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
-import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -14,6 +14,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner.raptor._data.transit.TestTransitData;
+import org.opentripplanner.raptor._data.transit.TestTripPattern;
+import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
@@ -23,11 +28,6 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
-import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
 public class PatternCostCalculatorTest {
 

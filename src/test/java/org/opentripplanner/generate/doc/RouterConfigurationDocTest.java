@@ -1,5 +1,6 @@
 package org.opentripplanner.generate.doc;
 
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
@@ -9,31 +10,30 @@ import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPL
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceJsonExample;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
+import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-@OnlyIfDocsExist
+@GeneratesDocumentation
 public class RouterConfigurationDocTest {
-
-  private static final String CONFIG_JSON = "router-config.json";
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "RouterConfiguration.md");
   private static final File OUT_FILE = new File(DOCS_ROOT, "RouterConfiguration.md");
 
-  private static final String CONFIG_PATH = "standalone/config/" + CONFIG_JSON;
+  private static final String CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final SkipNodes SKIP_NODES = SkipNodes
     .of()
-    .add("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
+    .add("flex", "sandbox/Flex.md")
     .add("routingDefaults", "RouteRequest.md")
     .add("updaters", "UpdaterConfig.md")
+    .add("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
     .build();
 
   /**
@@ -46,7 +46,7 @@ public class RouterConfigurationDocTest {
    */
   @Test
   public void updateBuildConfigurationDoc() {
-    NodeAdapter node = readBuildConfig();
+    NodeAdapter node = readRouterConfig();
 
     // Read and close inout file (same as output file)
     String doc = readFile(TEMPLATE);
@@ -54,14 +54,14 @@ public class RouterConfigurationDocTest {
 
     doc = replaceParametersTable(doc, getParameterSummaryTable(node));
     doc = replaceParametersDetails(doc, getParameterDetailsTable(node));
-    doc = replaceJsonExample(doc, node, CONFIG_JSON);
+    doc = replaceJsonExample(doc, node, ROUTER_CONFIG_FILENAME);
 
     writeFile(OUT_FILE, doc);
 
     assertFileEquals(original, OUT_FILE);
   }
 
-  private NodeAdapter readBuildConfig() {
+  private NodeAdapter readRouterConfig() {
     var json = jsonNodeFromResource(CONFIG_PATH);
     var conf = new RouterConfig(json, CONFIG_PATH, true);
     return conf.asNodeAdapter();

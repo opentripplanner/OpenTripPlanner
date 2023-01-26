@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 class AllowMainAndSubModesFilter implements AllowTransitModeFilter {
 
@@ -28,7 +28,12 @@ class AllowMainAndSubModesFilter implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean allows(TransitMode transitMode, SubMode subMode) {
+  public boolean isSubMode() {
+    return true;
+  }
+
+  @Override
+  public boolean match(TransitMode transitMode, SubMode subMode) {
     return mainMode == transitMode && includesSubMode(subMode);
   }
 

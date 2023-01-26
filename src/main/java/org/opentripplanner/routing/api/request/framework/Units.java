@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.api.request.framework;
 
-import org.opentripplanner.util.lang.DoubleUtils;
+import static java.lang.Math.abs;
+
+import org.opentripplanner.framework.lang.DoubleUtils;
 
 /**
  * This utility can be used to perform sanity checks on common number types. It will also normalize
@@ -41,16 +43,42 @@ public class Units {
    * Unit: Human cost per second of actual time (scalar)
    */
   public static double reluctance(double value) {
-    if (value < 0.0) {
-      throw new IllegalArgumentException("Negative reluctance not expected: " + value);
+    return normalizedFactor(value, 0.0, Double.MAX_VALUE);
+  }
+
+  /**
+   * Normalized factor in given range between {@param minValue} and {@param maxValue}.
+   * Number of decimals used are:
+   * <ul>
+   *   <li>2 decimals for absolute value less than 2. Example: -1.99 and 0.01</li>
+   *   <li>1 decimal for absolute value less than 10. Example: 2.0 and 9.9</li>
+   *   <li>zero decimals for absolute values above 10.  Example: -10 and 10</li>
+   * </ul>
+   * <p>
+   * Unit: scalar
+   */
+  public static double normalizedFactor(double value, double minValue, double maxValue) {
+    if (value < minValue) {
+      throw new IllegalArgumentException("Min limit(" + minValue + ") exceeded: " + value);
     }
-    if (value < 2.0) {
+    if (value > maxValue) {
+      throw new IllegalArgumentException("Max limit(" + maxValue + ") exceeded: " + value);
+    }
+    if (abs(value) < 2.0) {
       return DoubleUtils.roundTo2Decimals(value);
     }
-    if (value < 10.0) {
+    if (abs(value) < 10.0) {
       return DoubleUtils.roundTo1Decimal(value);
     }
     return DoubleUtils.roundToZeroDecimals(value);
+  }
+
+  /**
+   * If given input value is {@code null}, then return {@code null}, if not
+   * verify value, see {@link #normalizedFactor(double, double, double)}.
+   */
+  public static Double normalizedOptionalFactor(Double value, double minValue, double maxValue) {
+    return (value == null) ? null : normalizedFactor(value, minValue, maxValue);
   }
 
   /**

@@ -5,18 +5,18 @@ import static org.opentripplanner.routing.algorithm.transferoptimization.service
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
+import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy;
-import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 
 class OptimizedPathTailTest implements RaptorTestConstants {
 
-  private final Path<TestTripSchedule> orgPath = BasicPathTestCase.basicTripAsPath();
+  private final RaptorPath<TestTripSchedule> orgPath = BasicPathTestCase.basicTripAsPath();
 
-  private final Path<TestTripSchedule> flexPath = BasicPathTestCase.flexTripAsPath();
+  private final RaptorPath<TestTripSchedule> flexPath = BasicPathTestCase.flexTripAsPath();
 
   private final TransitPathLeg<TestTripSchedule> t1 = orgPath.accessLeg().nextTransitLeg();
 

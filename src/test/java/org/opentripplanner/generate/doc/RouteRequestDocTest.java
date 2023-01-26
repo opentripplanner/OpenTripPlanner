@@ -1,5 +1,6 @@
 package org.opentripplanner.generate.doc;
 
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
@@ -8,23 +9,23 @@ import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
+import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-@OnlyIfDocsExist
+@GeneratesDocumentation
 public class RouteRequestDocTest {
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "RouteRequest.md");
   private static final File OUT_FILE = new File(DOCS_ROOT, "RouteRequest.md");
-  private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
+  private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final SkipNodes SKIP_NODES = SkipNodes
     .of()
     .add("modes", "RoutingModes.md")
@@ -56,8 +57,8 @@ public class RouteRequestDocTest {
   }
 
   private NodeAdapter readBuildConfig() {
-    var json = jsonNodeFromResource(BUILD_CONFIG_FILENAME);
-    var conf = new RouterConfig(json, BUILD_CONFIG_FILENAME, false);
+    var json = jsonNodeFromResource(ROUTER_CONFIG_PATH);
+    var conf = new RouterConfig(json, ROUTER_CONFIG_PATH, false);
     return conf.asNodeAdapter().child("routingDefaults");
   }
 

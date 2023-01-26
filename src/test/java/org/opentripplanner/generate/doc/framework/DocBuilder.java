@@ -2,6 +2,7 @@ package org.opentripplanner.generate.doc.framework;
 
 import static org.opentripplanner.framework.text.MarkdownFormatter.NEW_LINE;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.text.MarkdownFormatter;
@@ -98,20 +99,13 @@ public class DocBuilder {
     return endParagraph();
   }
 
-  public void addExample(String comment, String body) {
-    buffer.append(
-      """
-      ```JSON
-      // %s
-      {
-        %s
-      }
-      ```
-      """.formatted(
-          comment,
-          body.indent(2)
-        )
-    );
+  public void addExample(String comment, JsonNode body) {
+    buffer.append(TemplateUtil.jsonExample(body, comment));
+  }
+
+  public void addUpdaterExample(String comment, JsonNode node) {
+    var root = TemplateUtil.jsonExampleBuilder(node).wrapInArray().wrapInObject("updaters").build();
+    addExample(comment, root);
   }
 
   /**

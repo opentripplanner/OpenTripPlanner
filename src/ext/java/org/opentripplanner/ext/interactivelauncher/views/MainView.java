@@ -12,9 +12,11 @@ import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
 import java.awt.Insets;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import org.opentripplanner.ext.interactivelauncher.Model;
 
-public class MainView extends JFrame {
+public class MainView {
 
   /** Margins between components (IN) */
   private static final int M_IN = 10;
@@ -112,21 +114,24 @@ public class MainView extends JFrame {
     0
   );
 
+  private final JFrame mainFrame = new JFrame("Setup and Run OTP Main");
+
   private final DataSourcesView dataSourcesView;
   private final OptionsView optionsView;
-  private final StatusBar statusBarTxt = new StatusBar();
-
   private final Runnable otpStarter;
   private final Model model;
 
   public MainView(Runnable otpStarter, Model model) throws HeadlessException {
-    super("Setup and Run OTP Main");
+    var innerPanel = new JPanel();
+    var statusBarTxt = new StatusBar();
+
     this.otpStarter = otpStarter;
     this.model = model;
 
+    mainFrame.setContentPane(new JScrollPane(innerPanel));
     GridBagLayout layout = new GridBagLayout();
-    getContentPane().setLayout(layout);
-    getContentPane().setBackground(BACKGROUND);
+    innerPanel.setLayout(layout);
+    innerPanel.setBackground(BACKGROUND);
 
     var sourceDirectoryView = new SearchDirectoryView(
       model.getRootDirectory(),
@@ -136,11 +141,11 @@ public class MainView extends JFrame {
     this.optionsView = new OptionsView(model);
     StartOtpButtonView startOtpButtonView = new StartOtpButtonView();
 
-    add(sourceDirectoryView.panel(), CONFIG_SOURCE_DIR_PANEL_CONSTRAINTS);
-    add(dataSourcesView.panel(), CONFIG_DIRS_PANEL_CONSTRAINTS);
-    add(optionsView.panel(), OPTIONS_PANEL_CONSTRAINTS);
-    add(startOtpButtonView.panel(), START_OTP_BUTTON_PANEL_CONSTRAINTS);
-    add(statusBarTxt, STATUS_BAR_CONSTRAINTS);
+    innerPanel.add(sourceDirectoryView.panel(), CONFIG_SOURCE_DIR_PANEL_CONSTRAINTS);
+    innerPanel.add(dataSourcesView.panel(), CONFIG_DIRS_PANEL_CONSTRAINTS);
+    innerPanel.add(optionsView.panel(), OPTIONS_PANEL_CONSTRAINTS);
+    innerPanel.add(startOtpButtonView.panel(), START_OTP_BUTTON_PANEL_CONSTRAINTS);
+    innerPanel.add(statusBarTxt, STATUS_BAR_CONSTRAINTS);
 
     // Setup action listeners
     startOtpButtonView.addActionListener(e -> startOtp());
@@ -159,23 +164,23 @@ public class MainView extends JFrame {
   public void onRootDirChanged(String newRootDir) {
     model.setRootDirectory(newRootDir);
     dataSourcesView.onRootDirChange();
-    pack();
-    repaint();
+    mainFrame.pack();
+    mainFrame.repaint();
   }
 
   public void start() {
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     optionsView.initState();
 
-    pack();
-    setLocationRelativeTo(null);
-    setVisible(true);
+    mainFrame.pack();
+    mainFrame.setLocationRelativeTo(null);
+    mainFrame.setVisible(true);
   }
 
   private void startOtp() {
-    setVisible(false);
-    dispose();
+    mainFrame.setVisible(false);
+    mainFrame.dispose();
     otpStarter.run();
   }
 }

@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.BOOLEAN;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
@@ -23,8 +23,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.OtpAppException;
 
 public class NodeAdapterTest {
 
@@ -288,7 +289,7 @@ public class NodeAdapterTest {
   public void asDateOrRelativePeriod() {
     // Given
     var subject = newNodeAdapterForTest("{ 'a' : '2020-02-28', 'b' : '-P3Y' }");
-    var utc = ZoneId.of("UTC");
+    var utc = ZoneIds.UTC;
 
     // Then
     assertEquals(LocalDate.of(2020, 2, 28), subject.of("a").asDateOrRelativePeriod(null, utc));
@@ -450,7 +451,7 @@ public class NodeAdapterTest {
 
     assertThrows(OtpAppException.class, () -> subject.of("key4").asZoneId(null));
 
-    assertEquals(ZoneId.of("UTC"), subject.of("missing-key").asZoneId(ZoneId.of("UTC")));
+    assertEquals(ZoneIds.UTC, subject.of("missing-key").asZoneId(ZoneIds.UTC));
   }
 
   @Test

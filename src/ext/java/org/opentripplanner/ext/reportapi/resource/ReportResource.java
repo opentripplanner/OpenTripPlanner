@@ -1,23 +1,23 @@
 package org.opentripplanner.ext.reportapi.resource;
 
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import org.opentripplanner.common.model.CachedValue;
 import org.opentripplanner.ext.reportapi.model.BicycleSafetyReport;
+import org.opentripplanner.ext.reportapi.model.CachedValue;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder.GraphStats;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -50,8 +50,7 @@ public class ReportResource {
   @Path("/bicycle-safety.html")
   @Produces(MediaType.TEXT_HTML)
   public Response getBicycleSafetyPage() {
-    var is = getClass().getResourceAsStream("/reportapi/report.html");
-    try {
+    try (var is = getClass().getResourceAsStream("/reportapi/report.html")) {
       return Response.ok(new String(is.readAllBytes(), StandardCharsets.UTF_8)).build();
     } catch (IOException e) {
       return Response.serverError().build();
@@ -64,7 +63,7 @@ public class ReportResource {
   public Response getBicycleSafetyAsCsv(
     @DefaultValue("default") @QueryParam("osmWayPropertySet") String osmWayPropertySet
   ) {
-    var source = OsmTagMapper.Source.valueOf(osmWayPropertySet);
+    var source = OsmTagMapperSource.valueOf(osmWayPropertySet);
     return Response
       .ok(BicycleSafetyReport.makeCsv(source))
       .header(

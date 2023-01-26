@@ -1,11 +1,11 @@
 package org.opentripplanner.netex.loader.parser;
 
+import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.Quay;

@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
+import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
+import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 /**
  * Searches for a concrete trip time for a frequency based pattern. The {@link FrequencyEntry}s are
@@ -22,7 +22,7 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule>
   }
 
   @Override
-  public RaptorTripScheduleBoardOrAlightEvent<T> search(
+  public RaptorBoardOrAlightEvent<T> search(
     int earliestBoardTime,
     int stopPositionInPattern,
     int tripIndexLimit
@@ -50,6 +50,7 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule>
             patternForDates,
             tripTimes,
             stopPositionInPattern,
+            earliestBoardTime,
             departureTime - headway,
             headway,
             offset,
@@ -58,6 +59,6 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule>
         }
       }
     }
-    return null;
+    return RaptorBoardOrAlightEvent.empty(earliestBoardTime);
   }
 }

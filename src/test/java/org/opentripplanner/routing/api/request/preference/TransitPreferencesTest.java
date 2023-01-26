@@ -9,10 +9,10 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 import java.time.Duration;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 
 class TransitPreferencesTest {
 

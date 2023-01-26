@@ -13,8 +13,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public final class ServiceCalendar implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private FeedScopedId serviceId;
 
   private int monday;

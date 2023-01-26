@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.config.routerconfig;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.BIKE_RENTAL;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.MQTT_GTFS_RT_UPDATER;
@@ -91,10 +91,14 @@ public class UpdatersConfig implements UpdatersParameters {
 
     rootAdapter
       .of("updaters")
-      .since(NA)
+      .since(V1_5)
       .summary("Configuration for the updaters that import various types of data into OTP.")
       .asObjects(it -> {
-        Type type = it.of("type").since(NA).summary("The type of the updater.").asEnum(Type.class);
+        Type type = it
+          .of("type")
+          .since(V1_5)
+          .summary("The type of the updater.")
+          .asEnum(Type.class);
         var config = type.parseConfig(it);
         configList.put(type, config);
         // We do not care what we return here

@@ -4,6 +4,7 @@ import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLPlanner;
@@ -232,6 +233,19 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
+          .name("filters")
+          .description(
+            "A list of filters for which trips should be included. " +
+            "A trip will be included if it matches with at least one filter. " +
+            "An empty list of filters means that all trips should be included. " +
+            "If a search include this parameter, \"whiteListed\", \"banned\" & \"modes.transportModes\" filters will be ignored."
+          )
+          .type(new GraphQLList(new GraphQLNonNull(FilterInputType.INPUT_TYPE)))
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
           .name("walkSpeed")
           .description("The maximum walk speed along streets, in meters per second.")
           .type(Scalars.GraphQLFloat)
@@ -423,6 +437,19 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
+          .name("maximumAdditionalTransfers")
+          .description(
+            "Maximum number of additional transfers compared to the best number of transfers " +
+            "allowed. Note! The best way to reduce the number of transfers is to set the " +
+            "`transferPenalty` parameter."
+          )
+          .type(Scalars.GraphQLInt)
+          .defaultValue(preferences.transfer().maxAdditionalTransfers())
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
           .name("debugItineraryFilter")
           .description(
             "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries " +
@@ -430,6 +457,30 @@ public class TripQuery {
           )
           .type(Scalars.GraphQLBoolean)
           .defaultValue(preferences.itineraryFilter().debug())
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name("relaxTransitSearchGeneralizedCostAtDestination")
+          .description(
+            """
+              Whether non-optimal transit paths at the destination should be returned. Let c be the
+              existing minimum pareto optimal generalized-cost to beat. Then a trip with cost c' is
+              accepted if the following is true:
+              
+              `c' < Math.round(c * relaxTransitSearchGeneralizedCostAtDestination)`
+                          
+              The parameter is optional. If not set, a normal comparison is performed.
+              
+              Values less than 1.0 is not allowed, and values greater than 2.0 are not
+              supported, due to performance reasons.
+              """
+          )
+          .type(Scalars.GraphQLFloat)
+          .defaultValueProgrammatic(
+            preferences.transit().raptor().relaxGeneralizedCostAtDestination().orElse(null)
+          )
           .build()
       )
       .argument(

@@ -3,26 +3,31 @@ package org.opentripplanner.api.common;
 import static org.opentripplanner.api.common.LocationStringParser.fromOldStyleString;
 import static org.opentripplanner.api.common.RequestToPreferencesMapper.setIfNotNull;
 
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MultivaluedMap;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -471,19 +476,24 @@ public abstract class RoutingResource {
    * <p>
    * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
    *
-   * @deprecated TODO OTP2 Regression. A maxTransfers should be set in the router config, not
-   * here. Instead the client should be able to pass in a parameter for
-   * the max number of additional/extra transfers relative to the best
-   * trip (with the fewest possible transfers) within constraint of the
-   * other search parameters.
-   * This might be to complicated to explain to the customer, so we
-   * might stick to the old limit, but that have side-effects that you
-   * might not find any trips on a day where a critical part of the
-   * trip is not available, because of some real-time disruption.
+   * @deprecated Use {@link #maxAdditionalTransfers} instead to pass in the max number of
+   * additional/extra transfers relative to the best trip (with the fewest possible transfers)
+   * within constraint of the other search parameters. This might be too complicated to explain to
+   * the customer, so you might stick to the old limit, but that has side-effects where you might
+   * not find any trips on a day when a critical part of the trip is not available, because of some
+   * real-time disruption.
    */
   @Deprecated
   @QueryParam("maxTransfers")
   protected Integer maxTransfers;
+
+  /**
+   * The maximum number of additional transfers in addition to the result with the least number of transfers.
+   * <p>
+   * Consider using the {@link #transferPenalty} instead of this parameter.
+   */
+  @QueryParam("maxAdditionalTransfers")
+  protected Integer maxAdditionalTransfers;
 
   /**
    * If true, goal direction is turned off and a full path tree is built (specify only once)
@@ -615,11 +625,38 @@ public abstract class RoutingResource {
   @QueryParam("debugItineraryFilter")
   protected Boolean debugItineraryFilter;
 
+  @QueryParam("groupSimilarityKeepOne")
+  Double groupSimilarityKeepOne;
+
+  @QueryParam("groupSimilarityKeepThree")
+  Double groupSimilarityKeepThree;
+
+  @QueryParam("groupedOtherThanSameLegsMaxCostMultiplier")
+  Double groupedOtherThanSameLegsMaxCostMultiplier;
+
+  @QueryParam("transitGeneralizedCostLimitFunction")
+  String transitGeneralizedCostLimitFunction;
+
+  @QueryParam("transitGeneralizedCostLimitIntervalRelaxFactor")
+  Double transitGeneralizedCostLimitIntervalRelaxFactor;
+
+  @QueryParam("nonTransitGeneralizedCostLimitFunction")
+  String nonTransitGeneralizedCostLimitFunction;
+
   @QueryParam("geoidElevation")
   protected Boolean geoidElevation;
 
   @QueryParam("useVehicleParkingAvailabilityInformation")
   protected Boolean useVehicleParkingAvailabilityInformation;
+
+  /**
+   * Whether non-optimal transit paths at the destination should be returned.
+   * This is optional. Use values between 1.0 and 2.0. For example to relax 10% use 1.1.
+   * Values greater than 2.0 are not supported, due to performance reasons.
+   * {@link SearchParams#relaxCostAtDestination()}
+   */
+  @QueryParam("relaxTransitSearchGeneralizedCostAtDestination")
+  protected Double relaxTransitSearchGeneralizedCostAtDestination;
 
   @QueryParam("debugRaptorStops")
   private String debugRaptorStops;
@@ -706,18 +743,61 @@ public abstract class RoutingResource {
 
       {
         var transit = journey.transit();
+        var filterBuilder = TransitFilterRequest.of();
         // Filter Agencies
         setIfNotNull(preferredAgencies, transit::setPreferredAgenciesFromString);
         setIfNotNull(unpreferredAgencies, transit::setUnpreferredAgenciesFromString);
-        setIfNotNull(bannedAgencies, transit::setBannedAgenciesFromSting);
-        setIfNotNull(whiteListedAgencies, transit::setWhiteListedAgenciesFromSting);
+
         // Filter Routes
         setIfNotNull(preferredRoutes, transit::setPreferredRoutesFromString);
         setIfNotNull(unpreferredRoutes, transit::setUnpreferredRoutesFromString);
-        setIfNotNull(bannedRoutes, transit::setBannedRoutesFromString);
-        setIfNotNull(whiteListedRoutes, transit::setWhiteListedRoutesFromString);
+
         // Filter Trips
-        setIfNotNull(bannedTrips, transit::setBannedTripsFromString);
+        setIfNotNull(bannedTrips, journey.transit()::setBannedTripsFromString);
+
+        // Excluded entities
+        setIfNotNull(
+          bannedAgencies,
+          s -> filterBuilder.addNot(SelectRequest.of().withAgenciesFromString(s).build())
+        );
+
+        setIfNotNull(
+          bannedRoutes,
+          s -> filterBuilder.addNot(SelectRequest.of().withRoutesFromString(s).build())
+        );
+
+        // Included entities
+        var selectors = new ArrayList<SelectRequest.Builder>();
+
+        setIfNotNull(
+          whiteListedAgencies,
+          s -> selectors.add(SelectRequest.of().withAgenciesFromString(s))
+        );
+
+        setIfNotNull(
+          whiteListedRoutes,
+          s -> selectors.add(SelectRequest.of().withRoutesFromString(s))
+        );
+
+        List<MainAndSubMode> tModes;
+        if (modes == null) {
+          tModes = MainAndSubMode.all();
+        } else {
+          // Create modes
+          tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
+        }
+
+        // Add modes filter to all existing selectors
+        // If no selectors specified, create new one
+        if (!selectors.isEmpty()) {
+          for (var selector : selectors) {
+            filterBuilder.addSelect(selector.withTransportModes(tModes).build());
+          }
+        } else {
+          filterBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
+        }
+
+        transit.setFilters(List.of(filterBuilder.build()));
       }
       {
         var debugRaptor = journey.transit().raptorDebugging();

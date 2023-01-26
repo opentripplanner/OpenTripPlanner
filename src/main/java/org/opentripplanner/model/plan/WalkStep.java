@@ -5,13 +5,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.model.VehicleRentalStationInfo;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.util.lang.DoubleUtils;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.note.StreetNote;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
@@ -46,7 +45,7 @@ public class WalkStep {
   private final boolean walkingBike;
 
   private String exit;
-  private List<P2<Double>> elevation;
+  private ElevationProfile elevationProfile;
   private Boolean stayOn = false;
 
   private List<Edge> edges = new ArrayList<>();
@@ -81,26 +80,19 @@ public class WalkStep {
     absoluteDirection = AbsoluteDirection.values()[octant];
   }
 
-  public List<P2<Double>> getRawElevation() {
-    return elevation;
+  public ElevationProfile getElevationProfile() {
+    return elevationProfile;
   }
 
-  /**
-   * The elevation profile as a comma-separated list of x,y values. x is the distance from the start
-   * of the step, y is the elevation at this distance. The values are rounded to two decimals.
-   */
-  public List<P2<Double>> getRoundedElevation() {
-    return StreetLeg.normalizeElevation(elevation);
-  }
-
-  public void addElevation(List<P2<Double>> elevation) {
-    if (elevation == null) {
+  public void addElevation(ElevationProfile other) {
+    if (other == null) {
       return;
     }
-    if (this.elevation == null) {
-      this.elevation = new ArrayList<>();
+    if (elevationProfile == null) {
+      elevationProfile = other;
+    } else {
+      elevationProfile = elevationProfile.add(other);
     }
-    this.elevation.addAll(elevation);
   }
 
   public void addStreetNotes(Collection<StreetNote> streetNotes) {

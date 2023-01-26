@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.BitSet;
 import java.util.Objects;
-import org.opentripplanner.util.time.TimeUtils;
+import org.opentripplanner.framework.time.TimeUtils;
 
 /**
  */
@@ -71,5 +71,17 @@ public class OpeningHours implements Comparable<OpeningHours>, Serializable {
     return (
       days.get(day) && this.startTime <= secondsSinceMidnight && secondsSinceMidnight <= endTime
     );
+  }
+
+  public String periodDescription() {
+    return periodDescription;
+  }
+
+  public long startTime() {
+    return startTime;
+  }
+
+  public long endTime() {
+    return endTime;
   }
 }

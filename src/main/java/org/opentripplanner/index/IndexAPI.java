@@ -1,5 +1,18 @@
 package org.opentripplanner.index;
 
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
@@ -10,19 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.mapping.AgencyMapper;
@@ -50,9 +50,10 @@ import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.api.model.ApiTripTimeShort;
 import org.opentripplanner.api.support.SemanticHash;
+import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -63,9 +64,6 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.model.EncodedPolyline;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
@@ -457,7 +455,7 @@ public class IndexAPI {
   @Path("/trips/{tripId}/geometry")
   public EncodedPolyline getGeometryForTrip(@PathParam("tripId") String tripId) {
     var pattern = tripPatternForTripId(tripId);
-    return PolylineEncoder.encodeGeometry(pattern.getGeometry());
+    return EncodedPolyline.encode(pattern.getGeometry());
   }
 
   /**
@@ -511,7 +509,7 @@ public class IndexAPI {
   @Path("/patterns/{patternId}/geometry")
   public EncodedPolyline getGeometryForPattern(@PathParam("patternId") String patternId) {
     var line = tripPattern(patternId).getGeometry();
-    return PolylineEncoder.encodeGeometry(line);
+    return EncodedPolyline.encode(line);
   }
 
   /**
@@ -626,10 +624,6 @@ public class IndexAPI {
   private TripPattern tripPattern(Trip trip) {
     var pattern = transitService().getPatternForTrip(trip);
     return validateExist("TripPattern", pattern, "trip", trip.getId());
-  }
-
-  private RoutingService routingService() {
-    return serverContext.routingService();
   }
 
   private TransitService transitService() {

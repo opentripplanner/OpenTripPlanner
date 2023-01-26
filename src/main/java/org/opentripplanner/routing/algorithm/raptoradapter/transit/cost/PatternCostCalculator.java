@@ -2,10 +2,10 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
 import javax.annotation.Nonnull;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
 public class PatternCostCalculator<T extends DefaultTripSchedule> implements CostCalculator<T> {
 

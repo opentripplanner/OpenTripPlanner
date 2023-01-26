@@ -10,19 +10,19 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.SimpleVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.SimpleVertex;
+import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 
 public class StreetMatcherTest {
 
@@ -163,8 +163,6 @@ public class StreetMatcherTest {
 
   /* TODO explain why this exists and is "simple" */
   private static class SimpleEdge extends StreetEdge {
-
-    private static final long serialVersionUID = 1L;
 
     public SimpleEdge(StreetVertex v1, StreetVertex v2) {
       super(v1, v2, null, (NonLocalizedString) null, 0, null, false);

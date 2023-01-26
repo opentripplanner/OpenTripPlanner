@@ -7,27 +7,26 @@ import static org.opentripplanner.datastore.api.FileType.OSM;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import jakarta.inject.Inject;
 import java.io.File;
 import java.net.URI;
 import java.util.EnumSet;
 import java.util.Set;
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.api.OtpBaseDirectory;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParametersBuilder;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
-import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
-import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,7 +119,11 @@ public class GraphBuilderDataSources {
       .stream()
       .filter(osmExtractConfig -> uriMatch(osmExtractConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new OsmExtractParametersBuilder().withSource(dataSource.uri()).build());
+      .orElse(
+        new OsmExtractParametersBuilder(buildConfig.osmDefaults)
+          .withSource(dataSource.uri())
+          .build()
+      );
   }
 
   public Iterable<ConfiguredDataSource<DemExtractParameters>> getDemConfiguredDatasource() {
@@ -137,7 +140,11 @@ public class GraphBuilderDataSources {
       .stream()
       .filter(demExtractConfig -> uriMatch(demExtractConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new DemExtractParametersBuilder().withSource(dataSource.uri()).build());
+      .orElse(
+        new DemExtractParametersBuilder(buildConfig.demDefaults)
+          .withSource(dataSource.uri())
+          .build()
+      );
   }
 
   public Iterable<ConfiguredDataSource<GtfsFeedParameters>> getGtfsConfiguredDatasource() {
@@ -154,7 +161,7 @@ public class GraphBuilderDataSources {
       .stream()
       .filter(gtfsFeedConfig -> uriMatch(gtfsFeedConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new GtfsFeedParametersBuilder().withSource(dataSource.uri()).build());
+      .orElse(buildConfig.gtfsDefaults.copyOf().withSource(dataSource.uri()).build());
   }
 
   public Iterable<ConfiguredDataSource<NetexFeedParameters>> getNetexConfiguredDatasource() {

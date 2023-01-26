@@ -23,11 +23,10 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.common.RepeatingTimePeriod;
-import org.opentripplanner.common.TurnRestrictionType;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.collection.MapUtils;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
 import org.opentripplanner.graph_builder.issues.PublicTransportRelationSkipped;
 import org.opentripplanner.graph_builder.issues.TooManyAreasInRelation;
@@ -43,15 +42,15 @@ import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMTag;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.util.MapUtils;
-import org.opentripplanner.util.geometry.GeometryUtils;
+import org.opentripplanner.street.model.RepeatingTimePeriod;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.TurnRestrictionType;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OSMDatabase {
+public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDatabase {
 
   private static final Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
@@ -210,6 +209,7 @@ public class OSMDatabase {
     return waysNodeIds.contains(nodeId);
   }
 
+  @Override
   public void addNode(OSMNode node) {
     if (node.isBikeParking()) {
       bikeParkingNodes.put(node.getId(), node);
@@ -233,6 +233,7 @@ public class OSMDatabase {
     nodesById.put(node.getId(), node);
   }
 
+  @Override
   public void addWay(OSMWay way) {
     /* only add ways once */
     long wayId = way.getId();
@@ -287,6 +288,7 @@ public class OSMDatabase {
     waysById.put(wayId, way);
   }
 
+  @Override
   public void addRelation(OSMRelation relation) {
     if (relationsById.containsKey(relation.getId())) {
       return;
@@ -330,16 +332,12 @@ public class OSMDatabase {
     relationsById.put(relation.getId(), relation);
   }
 
-  /**
-   * Called after the first phase, when all relations are loaded.
-   */
+  @Override
   public void doneFirstPhaseRelations() {
     // nothing to do here
   }
 
-  /**
-   * Called after the second phase, when all ways are loaded.
-   */
+  @Override
   public void doneSecondPhaseWays() {
     // This copies relevant tags to the ways (highway=*) where it doesn't exist, so that
     // the way purging keeps the needed way around.
@@ -355,10 +353,7 @@ public class OSMDatabase {
     markNodesForKeeping(areaWaysById.valueCollection(), areaNodeIds);
   }
 
-  /**
-   * Called after the third and final phase, when all nodes are loaded. After all relations, ways,
-   * and nodes are loaded, handle areas.
-   */
+  @Override
   public void doneThirdPhaseNodes() {
     processMultipolygonRelations();
     processSingleWayAreas();
@@ -403,7 +398,7 @@ public class OSMDatabase {
      * common nodes shared by different ways of different areas we only add them once, otherwise
      * we could end-up looping on creating new intersections.
      */
-    Set<P2<Long>> commonSegments = new HashSet<>();
+    Set<KeyPair> commonSegments = new HashSet<>();
     HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
     for (Area area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
       for (Ring ring : area.outermostRings) {
@@ -644,7 +639,7 @@ public class OSMDatabase {
   }
 
   private void processAreaRingForUnconnectedAreas(
-    Set<P2<Long>> commonSegments,
+    Set<KeyPair> commonSegments,
     HashGridSpatialIndex<RingSegment> spndx,
     Area area,
     Ring ring
@@ -661,8 +656,8 @@ public class OSMDatabase {
         ringSegment.nA.lat,
         ringSegment.nB.lat
       );
-      P2<Long> key1 = new P2<>(ringSegment.nA.getId(), ringSegment.nB.getId());
-      P2<Long> key2 = new P2<>(ringSegment.nB.getId(), ringSegment.nA.getId());
+      var key1 = new KeyPair(ringSegment.nA.getId(), ringSegment.nB.getId());
+      var key2 = new KeyPair(ringSegment.nB.getId(), ringSegment.nA.getId());
       if (!commonSegments.contains(key1) && !commonSegments.contains(key2)) {
         spndx.insert(env, ringSegment);
         commonSegments.add(key1);
@@ -1172,4 +1167,6 @@ public class OSMDatabase {
 
     OSMNode nB;
   }
+
+  private record KeyPair(long id0, long id1) {}
 }

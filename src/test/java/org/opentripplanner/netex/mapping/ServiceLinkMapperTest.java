@@ -3,21 +3,21 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
+import jakarta.xml.bind.JAXBElement;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LineStringType;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.model.T2;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -96,7 +96,7 @@ public class ServiceLinkMapperTest {
 
     EntityById<RegularStop> stopsById = new EntityById<>();
 
-    DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
+    DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
     QuayMapper quayMapper = new QuayMapper(ID_FACTORY, issueStore);
     StopPattern.StopPatternBuilder stopPatternBuilder = StopPattern.create(3);
 
@@ -111,7 +111,7 @@ public class ServiceLinkMapperTest {
         quaysById.get(i),
         parentStation,
         List.of(),
-        new T2<>(TransitMode.BUS, "UNKNOWN"),
+        new NetexMainAndSubMode(TransitMode.BUS, "UNKNOWN"),
         Accessibility.NO_INFORMATION
       );
       stopPatternBuilder.stops[i] = stop;
@@ -134,7 +134,7 @@ public class ServiceLinkMapperTest {
 
     Coordinate[] coordinates = shape.get(0).getCoordinates();
 
-    assertEquals(0, issueStore.getIssues().size());
+    assertEquals(0, issueStore.listIssues().size());
 
     assertEquals(COORDINATES[0], coordinates[0].getY(), 0.000001);
     assertEquals(COORDINATES[1], coordinates[0].getX(), 0.000001);

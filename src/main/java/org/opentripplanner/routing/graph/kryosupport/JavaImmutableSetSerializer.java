@@ -22,7 +22,6 @@ class JavaImmutableSetSerializer extends Serializer<Set> {
 
   private static class ImmSerList implements Serializable {
 
-    private static final long serialVersionUID = 1L;
     private final Object[] array;
 
     private ImmSerList(Object[] array) {

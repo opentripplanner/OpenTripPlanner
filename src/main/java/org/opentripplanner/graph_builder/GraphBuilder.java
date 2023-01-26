@@ -4,20 +4,23 @@ import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 
+import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.framework.lang.OtpNumberFormat;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.report.SummarizeDataImportIssues;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.OtpAppException;
-import org.opentripplanner.util.lang.OtpNumberFormat;
-import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +59,7 @@ public class GraphBuilder implements Runnable {
     GraphBuilderDataSources dataSources,
     Graph graph,
     TransitModel transitModel,
+    WorldEnvelopeRepository worldEnvelopeRepository,
     boolean loadStreetGraph,
     boolean saveStreetGraph
   ) {
@@ -72,6 +76,7 @@ public class GraphBuilder implements Runnable {
       .config(config)
       .graph(graph)
       .transitModel(transitModel)
+      .worldEnvelopeRepository(worldEnvelopeRepository)
       .dataSources(dataSources)
       .timeZoneId(transitModel.getTimeZone())
       .build();
@@ -115,7 +120,7 @@ public class GraphBuilder implements Runnable {
     // existence of stops in islands. If an island has a stop, it actually may be a real island and should
     // not be removed quite as easily
     if ((hasOsm && !saveStreetGraph) || loadStreetGraph) {
-      graphBuilder.addModule(factory.pruneNoThruIslands());
+      graphBuilder.addModule(factory.pruneIslands());
     }
 
     // Load elevation data and apply it to the streets.
@@ -151,6 +156,8 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModuleOptional(factory.dataOverlayFactory());
     }
 
+    graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
+
     return graphBuilder;
   }
 
@@ -168,7 +175,8 @@ public class GraphBuilder implements Runnable {
       load.buildGraph();
     }
 
-    issueStore.summarize();
+    new SummarizeDataImportIssues(issueStore.listIssues()).summarize();
+
     validate();
 
     logGraphBuilderCompleteStatus(startTime, graph, transitModel);

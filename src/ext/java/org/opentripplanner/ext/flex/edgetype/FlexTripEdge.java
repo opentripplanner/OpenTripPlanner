@@ -5,19 +5,16 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FlexTripEdge extends Edge {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FlexTripEdge.class);
   private final FlexTrip trip;
   public StopLocation s1;
   public StopLocation s2;

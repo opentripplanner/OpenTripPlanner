@@ -1,13 +1,14 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +33,12 @@ public class AccessEgressRouter {
     TransitService transitService,
     StreetRequest streetRequest,
     DataOverlayContext dataOverlayContext,
-    boolean fromTarget
+    boolean fromTarget,
+    Duration durationLimit
   ) {
     NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
       transitService,
-      request.preferences().street().maxAccessEgressDuration().valueOf(streetRequest.mode()),
+      durationLimit,
       dataOverlayContext,
       true
     );

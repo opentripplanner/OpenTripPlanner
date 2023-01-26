@@ -6,7 +6,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.raptor.RaptorService;
+import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
@@ -23,14 +27,10 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.raptor.RaptorService;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
 
 public class TransitRouter {
 
@@ -74,10 +74,6 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    if (request.journey().transit().modes().isEmpty()) {
-      return new TransitRouterResult(List.of(), null);
-    }
-
     if (!serverContext.transitService().transitFeedCovers(request.dateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
@@ -117,9 +113,9 @@ public class TransitRouter {
 
     debugTimingAggregator.finishedRaptorSearch();
 
-    Collection<Path<TripSchedule>> paths = transitResponse.paths();
+    Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
 
-    if (OTPFeature.OptimizeTransfers.isOn()) {
+    if (OTPFeature.OptimizeTransfers.isOn() && !transitResponse.containsUnknownPaths()) {
       paths =
         TransferOptimizationServiceConfigurator
           .createOptimizeTransferService(
@@ -128,7 +124,6 @@ public class TransitRouter {
             serverContext.transitService().getTransferService(),
             requestTransitDataProvider,
             transitLayer.getStopBoardAlightCosts(),
-            raptorRequest,
             request.preferences().transfer().optimization()
           )
           .optimize(transitResponse.paths());
@@ -136,7 +131,7 @@ public class TransitRouter {
 
     // Create itineraries
 
-    RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper(
+    RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper<>(
       serverContext.graph(),
       serverContext.transitService(),
       transitLayer,
@@ -218,7 +213,8 @@ public class TransitRouter {
       serverContext.transitService(),
       streetRequest,
       serverContext.dataOverlayContext(accessRequest),
-      isEgress
+      isEgress,
+      accessRequest.preferences().street().maxAccessEgressDuration().valueOf(streetRequest.mode())
     );
 
     var results = new ArrayList<>(accessEgressMapper.mapNearbyStops(nearbyStops, isEgress));
@@ -230,7 +226,7 @@ public class TransitRouter {
         temporaryVertices,
         serverContext,
         additionalSearchDays,
-        serverContext.routerConfig().flexParameters(accessRequest.preferences()),
+        serverContext.flexConfig(),
         serverContext.dataOverlayContext(accessRequest),
         isEgress
       );

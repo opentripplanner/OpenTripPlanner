@@ -3,9 +3,9 @@ package org.opentripplanner.transit.model.site;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 
 /**
@@ -113,13 +113,13 @@ public abstract class StationElement<
   /** Level name for elevator descriptions */
   @Nullable
   public String getLevelName() {
-    return level == null ? null : level.getName();
+    return level == null ? null : level.name();
   }
 
   /** Level index for hop counts in elevators. Is {@code null} if not set. */
   @Nullable
   public Double getLevelIndex() {
-    return level == null ? null : level.getIndex();
+    return level == null ? null : level.index();
   }
 
   /** Parent station for the station element */

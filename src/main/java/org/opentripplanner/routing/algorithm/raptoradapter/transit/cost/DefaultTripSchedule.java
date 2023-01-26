@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public interface DefaultTripSchedule extends RaptorTripSchedule {
   /**

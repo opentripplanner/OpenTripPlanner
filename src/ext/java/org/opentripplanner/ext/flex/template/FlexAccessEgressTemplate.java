@@ -7,22 +7,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
-import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 public abstract class FlexAccessEgressTemplate {
 
@@ -34,7 +34,7 @@ public abstract class FlexAccessEgressTemplate {
   protected final int secondsFromStartOfTime;
   public final LocalDate serviceDate;
   protected final FlexPathCalculator calculator;
-  private final FlexParameters flexParams;
+  private final FlexConfig flexConfig;
 
   /**
    * @param accessEgress  Path from origin to the point of boarding for this flex trip
@@ -53,7 +53,7 @@ public abstract class FlexAccessEgressTemplate {
     StopLocation transferStop,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    FlexParameters flexParams
+    FlexConfig config
   ) {
     this.accessEgress = accessEgress;
     this.trip = trip;
@@ -63,7 +63,7 @@ public abstract class FlexAccessEgressTemplate {
     this.secondsFromStartOfTime = date.secondsFromStartOfTime;
     this.serviceDate = date.serviceDate;
     this.calculator = calculator;
-    this.flexParams = flexParams;
+    this.flexConfig = config;
   }
 
   public StopLocation getTransferStop() {
@@ -72,10 +72,6 @@ public abstract class FlexAccessEgressTemplate {
 
   public StopLocation getAccessEgressStop() {
     return accessEgress.stop;
-  }
-
-  public FlexTrip getFlexTrip() {
-    return trip;
   }
 
   /**
@@ -94,9 +90,13 @@ public abstract class FlexAccessEgressTemplate {
     }
     // transferStop is Location Area/Line
     else {
+      double maxDistanceMeters =
+        flexConfig.maxTransferDuration().getSeconds() *
+        accessEgress.state.getRequest().preferences().walk().speed();
+
       return getTransfersFromTransferStop(transitService)
         .stream()
-        .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= flexParams.maxTransferMeters)
+        .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= maxDistanceMeters)
         .filter(transfer -> getFinalStop(transfer) != null)
         .map(transfer -> {
           List<Edge> edges = getTransferEdges(transfer);
@@ -118,7 +118,7 @@ public abstract class FlexAccessEgressTemplate {
       .addServiceTime("secondsFromStartOfTime", secondsFromStartOfTime)
       .addDate("serviceDate", serviceDate)
       .addObj("calculator", calculator)
-      .addObj("flexParams", flexParams)
+      .addObj("flexConfig", flexConfig)
       .toString();
   }
 

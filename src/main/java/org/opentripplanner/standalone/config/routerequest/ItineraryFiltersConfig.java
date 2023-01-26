@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.routerequest;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
@@ -232,6 +233,18 @@ removed from list.
           )
           .asBoolean(dft.useAccessibilityScore())
       )
+      .withMinBikeParkingDistance(
+        c
+          .of("minBikeParkingDistance")
+          .since(V2_3)
+          .summary(
+            "Filter out bike park+ride results that have fewer meters of cycling than this value."
+          )
+          .description(
+            "Useful if you want to exclude those routes which have only a few meters of cycling before parking the bike and taking public transport."
+          )
+          .asDouble(dft.minBikeParkingDistance())
+      )
       .build();
   }
 
@@ -248,12 +261,25 @@ removed from list.
         node
           .of("costLimitFunction")
           .since(V2_2)
-          .summary("TODO")
+          .summary("The base function used by the filter.")
+          .description(
+            "This function calculates the threshold for the filter, when the itineraries have " +
+            "exactly the same arrival and departure times."
+          )
           .asLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
         node
           .of("intervalRelaxFactor")
           .since(V2_2)
-          .summary("TODO")
+          .summary(
+            "How much the filter should be relaxed for itineraries that do not overlap in time."
+          )
+          .description(
+            """
+            This value is used to increase the filter threshold for itineraries further away in
+            time, compared to those, that have exactly the same arrival and departure times.
+
+            The unit is cost unit per second of time difference."""
+          )
           .asDouble(transitGeneralizedCostLimit.intervalRelaxFactor())
       );
     }

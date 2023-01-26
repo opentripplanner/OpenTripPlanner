@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -28,7 +29,7 @@ import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 
 public class TimetableSnapshotTest {
 
-  private static final ZoneId timeZone = ZoneId.of("GMT");
+  private static final ZoneId timeZone = ZoneIds.GMT;
   private static Map<FeedScopedId, TripPattern> patternIndex;
   static String feedId;
 

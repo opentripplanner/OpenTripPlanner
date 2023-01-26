@@ -12,32 +12,32 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.LocalizedStringFormat;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InvalidVehicleParkingCapacity;
 import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.openstreetmap.OSMOpeningHoursParser;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.LocalizedStringFormat;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.VehicleParkingEdge;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ParkingProcessor {
+class ParkingProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ParkingProcessor.class);
   private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
@@ -246,13 +246,11 @@ public class ParkingProcessor {
       if (!walkAccessibleOut || !carAccessibleIn || !walkAccessibleIn || !carAccessibleOut) {
         // This will prevent the P+R to be useful.
         issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-        return null;
       }
     } else {
       if (!walkAccessibleOut || !walkAccessibleIn) {
         // This will prevent the P+R to be useful.
         issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-        return null;
       }
     }
 
@@ -261,6 +259,10 @@ public class ParkingProcessor {
       creativeName,
       entity
     );
+
+    if (entrances.isEmpty()) {
+      entrances = createArtificialEntrances(group, creativeName, entity, isCarParkAndRide);
+    }
 
     var vehicleParking = createVehicleParkingObjectFromOsmEntity(
       isCarParkAndRide,
@@ -273,6 +275,39 @@ public class ParkingProcessor {
     VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
 
     return vehicleParking;
+  }
+
+  /**
+   * Creates an artificial entrance to a parking facility's centroid.
+   * <p>
+   * This is useful if the facility is not linked to the street network in OSM. Without this method
+   * it would not be usable by the routing algorithm as it's unreachable.
+   */
+  private List<VehicleParking.VehicleParkingEntranceCreator> createArtificialEntrances(
+    AreaGroup group,
+    I18NString vehicleParkingName,
+    OSMWithTags entity,
+    boolean isCarPark
+  ) {
+    LOG.debug(
+      "Creating an artificial entrance for {} as it's not linked to the street network",
+      entity.getOpenStreetMapLink()
+    );
+    return List.of(builder ->
+      builder
+        .entranceId(
+          new FeedScopedId(
+            VEHICLE_PARKING_OSM_FEED_ID,
+            String.format("%s/%d/centroid", entity.getClass().getSimpleName(), entity.getId())
+          )
+        )
+        .name(vehicleParkingName)
+        .coordinate(new WgsCoordinate(group.union.getInteriorPoint()))
+        // setting the vertex to null signals the rest of the build process that this needs to be linked to the street network
+        .vertex(null)
+        .walkAccessible(true)
+        .carAccessible(isCarPark)
+    );
   }
 
   private VehicleParking createVehicleParkingObjectFromOsmEntity(

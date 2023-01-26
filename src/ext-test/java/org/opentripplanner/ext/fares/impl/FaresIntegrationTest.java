@@ -3,6 +3,9 @@ package org.opentripplanner.ext.fares.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.Currency;
 import java.util.List;
@@ -10,9 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.graph.Graph;
@@ -20,7 +25,6 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.TestUtils;
 
 public class FaresIntegrationTest {
 
@@ -36,7 +40,10 @@ public class FaresIntegrationTest {
 
     var serverContext = TestServerContext.createServerContext(graph, transitModel);
 
-    var start = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
+    var start = LocalDateTime
+      .of(2009, Month.AUGUST, 7, 12, 0, 0)
+      .atZone(ZoneIds.LOS_ANGELES)
+      .toInstant();
     var from = GenericLocation.fromStopId("Origin", feedId, "Millbrae Caltrain");
     var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
 
@@ -65,7 +72,10 @@ public class FaresIntegrationTest {
       "8371"
     );
 
-    Instant startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
+    Instant startTime = LocalDateTime
+      .of(2009, 11, 1, 12, 0, 0)
+      .atZone(ZoneId.of("America/Los_Angeles"))
+      .toInstant();
 
     ItineraryFares fare = getFare(from, to, startTime, serverContext);
 
@@ -73,7 +83,8 @@ public class FaresIntegrationTest {
 
     // long trip
 
-    startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 2, 14, 0, 0);
+    startTime =
+      LocalDateTime.of(2009, 11, 2, 14, 0, 0).atZone(ZoneId.of("America/Los_Angeles")).toInstant();
 
     from = GenericLocation.fromStopId("Origin", portlandId, "8389");
     to = GenericLocation.fromStopId("Destination", portlandId, "1252");
@@ -107,7 +118,10 @@ public class FaresIntegrationTest {
 
     Money tenUSD = new Money(USD, 1000);
 
-    var dateTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 0, 0, 0);
+    var dateTime = LocalDateTime
+      .of(2009, 8, 7, 0, 0, 0)
+      .atZone(ZoneId.of("America/Los_Angeles"))
+      .toInstant();
 
     // A -> B, base case
 
@@ -224,6 +238,7 @@ public class FaresIntegrationTest {
     OtpServerRequestContext serverContext
   ) {
     RouteRequest request = new RouteRequest();
+    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
     request.setDateTime(time);
     request.setFrom(from);
     request.setTo(to);

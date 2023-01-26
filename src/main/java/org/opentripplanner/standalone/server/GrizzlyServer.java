@@ -1,9 +1,9 @@
 package org.opentripplanner.standalone.server;
 
+import jakarta.ws.rs.core.Application;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
-import javax.ws.rs.core.Application;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpHandler;
@@ -14,8 +14,8 @@ import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.jersey.server.ContainerFactory;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.config.CommandLineParameters;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;

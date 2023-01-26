@@ -8,15 +8,15 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.StopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
-import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 
 /**
  * This class is responsible for finding all possible transfers between each pair of transit legs
@@ -45,11 +45,10 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
   public TransferGenerator(
     TransferServiceAdaptor<T> transferServiceAdaptor,
-    RaptorSlackProvider slackProvider,
     RaptorTransitDataProvider<T> stdTransfers
   ) {
     this.transferServiceAdaptor = transferServiceAdaptor;
-    this.slackProvider = slackProvider;
+    this.slackProvider = stdTransfers.slackProvider();
     this.stdTransfers = stdTransfers;
   }
 

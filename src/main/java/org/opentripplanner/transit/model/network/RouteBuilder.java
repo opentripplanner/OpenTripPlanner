@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.network;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;

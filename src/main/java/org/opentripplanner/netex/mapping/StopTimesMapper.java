@@ -4,6 +4,7 @@ import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
+import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -11,22 +12,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import javax.xml.bind.JAXBElement;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplay_VersionStructure;
 import org.rutebanken.netex.model.FlexibleLine;
@@ -161,12 +160,6 @@ class StopTimesMapper {
     }
     result.setScheduledStopPointIds(scheduledStopPointIds);
 
-    if (OTPFeature.FlexRouting.isOn()) {
-      // TODO This is a temporary mapping of the UnscheduledTrip format, until we decide on how
-      //      this should be harmonized between GTFS and NeTEx
-      modifyDataForUnscheduledFlexTrip(result);
-    }
-
     return result;
   }
 
@@ -209,8 +202,7 @@ class StopTimesMapper {
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern();
 
     for (PointInLinkSequence_VersionedChildStructure point : points) {
-      if (point instanceof StopPointInJourneyPattern) {
-        StopPointInJourneyPattern stopPoint = (StopPointInJourneyPattern) point;
+      if (point instanceof StopPointInJourneyPattern stopPoint) {
         if (stopPoint.getId().equals(pointInJourneyPatterRef)) {
           return stopPoint;
         }
@@ -232,32 +224,6 @@ class StopTimesMapper {
 
   private static boolean isFalse(Boolean value) {
     return value != null && !value;
-  }
-
-  // TODO This is a temporary mapping of the UnscheduledTrip format, until we decide on how
-  //      this should be harmonized between GTFS and NeTEx
-  private static void modifyDataForUnscheduledFlexTrip(StopTimesMapperResult result) {
-    List<StopTime> stopTimes = result.stopTimes;
-    if (
-      stopTimes.size() == 2 &&
-      stopTimes
-        .stream()
-        .allMatch(s -> s.getStop() instanceof AreaStop || s.getStop() instanceof GroupStop)
-    ) {
-      int departureTime = stopTimes.get(0).getDepartureTime();
-      int arrivalTime = stopTimes.get(1).getArrivalTime();
-
-      for (StopTime stopTime : stopTimes) {
-        if (stopTime.getFlexWindowStart() == StopTime.MISSING_VALUE) {
-          stopTime.clearDepartureTime();
-          stopTime.setFlexWindowStart(departureTime);
-        }
-        if (stopTime.getFlexWindowEnd() == StopTime.MISSING_VALUE) {
-          stopTime.clearArrivalTime();
-          stopTime.setFlexWindowEnd(arrivalTime);
-        }
-      }
-    }
   }
 
   private StopTime mapToStopTime(
@@ -311,8 +277,6 @@ class StopTimesMapper {
     } else {
       return null;
     }
-
-    List<String> vias = null;
 
     if (stopPoint != null) {
       if (isFalse(stopPoint.isForAlighting())) {

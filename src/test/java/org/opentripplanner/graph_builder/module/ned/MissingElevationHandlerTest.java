@@ -10,18 +10,20 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.mockito.Mockito;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetElevationExtension;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.framework.i18n.LocalizedStringFormat;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.transit.model.basic.LocalizedStringFormat;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetElevationExtension;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 class MissingElevationHandlerTest {
 
-  private static final DataImportIssueStore issueStore = Mockito.mock(DataImportIssueStore.class);
+  private static final DefaultDataImportIssueStore issueStore = Mockito.mock(
+    DefaultDataImportIssueStore.class
+  );
 
   private Graph graph;
 

@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 
 class AdditionalSearchDaysTest {
 
@@ -63,9 +63,7 @@ class AdditionalSearchDaysTest {
 
   @Test
   void veryShortWindows() {
-    var time = OffsetDateTime
-      .parse("2022-01-25T00:23:25+01:00")
-      .atZoneSameInstant(ZoneId.of("Europe/Berlin"));
+    var time = OffsetDateTime.parse("2022-01-25T00:23:25+01:00").atZoneSameInstant(ZoneIds.BERLIN);
 
     var days = new AdditionalSearchDays(
       false,
@@ -90,7 +88,7 @@ class AdditionalSearchDaysTest {
   }
 
   private AdditionalSearchDays getDays(String time, boolean arriveBy) {
-    var zonedDateTime = OffsetDateTime.parse(time).atZoneSameInstant(ZoneId.of("Europe/Berlin"));
+    var zonedDateTime = OffsetDateTime.parse(time).atZoneSameInstant(ZoneIds.BERLIN);
     return new AdditionalSearchDays(
       arriveBy,
       zonedDateTime,

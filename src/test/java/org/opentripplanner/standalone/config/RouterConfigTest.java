@@ -3,13 +3,13 @@ package org.opentripplanner.standalone.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeForTest;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeForTest;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.util.OtpAppException;
 
 class RouterConfigTest {
 

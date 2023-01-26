@@ -4,9 +4,9 @@ import io.micrometer.core.instrument.Tag;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import org.opentripplanner.updater.trip.UpdateResult;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.updater.UpdateResult;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
-import org.opentripplanner.util.OTPFeature;
 
 public class TripUpdateMetrics {
 

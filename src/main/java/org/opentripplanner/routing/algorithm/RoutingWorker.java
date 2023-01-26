@@ -11,8 +11,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
+import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
@@ -21,6 +25,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -28,11 +33,6 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,13 +76,12 @@ public class RoutingWorker {
       );
     this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     this.pagingSearchWindowAdjuster =
-      createPagingSearchWindowAdjuster(serverContext.routerConfig());
-    this.additionalSearchDays =
-      createAdditionalSearchDays(
-        serverContext.routerConfig().raptorTuningParameters(),
-        zoneId,
-        request
+      createPagingSearchWindowAdjuster(
+        serverContext.transitTuningParameters(),
+        serverContext.raptorTuningParameters()
       );
+    this.additionalSearchDays =
+      createAdditionalSearchDays(serverContext.raptorTuningParameters(), zoneId, request);
   }
 
   public RoutingResponse route() {
@@ -140,6 +139,7 @@ public class RoutingWorker {
       request.wheelchair(),
       request.preferences().wheelchair().maxSlope(),
       serverContext.graph().getFareService(),
+      minBikeParkingDistance(request),
       serverContext.transitService().getTransitAlertService(),
       serverContext.transitService()::getMultiModalStationForStation
     );
@@ -176,6 +176,19 @@ public class RoutingWorker {
       debugTimingAggregator,
       serverContext.transitService()
     );
+  }
+
+  private static double minBikeParkingDistance(RouteRequest request) {
+    var modes = request.journey().modes();
+    boolean hasBikePark = List
+      .of(modes.accessMode, modes.egressMode)
+      .contains(StreetMode.BIKE_TO_PARK);
+
+    double minBikeParkingDistance = 0;
+    if (hasBikePark) {
+      minBikeParkingDistance = request.preferences().itineraryFilter().minBikeParkingDistance();
+    }
+    return minBikeParkingDistance;
   }
 
   private static AdditionalSearchDays createAdditionalSearchDays(
@@ -307,12 +320,15 @@ public class RoutingWorker {
     return transitSearchTimeZero.toInstant();
   }
 
-  private PagingSearchWindowAdjuster createPagingSearchWindowAdjuster(RouterConfig routerConfig) {
-    var c = routerConfig.raptorTuningParameters().dynamicSearchWindowCoefficients();
+  private PagingSearchWindowAdjuster createPagingSearchWindowAdjuster(
+    TransitTuningParameters transitTuningParameters,
+    RaptorTuningParameters raptorTuningParameters
+  ) {
+    var c = raptorTuningParameters.dynamicSearchWindowCoefficients();
     return new PagingSearchWindowAdjuster(
       c.minWinTimeMinutes(),
       c.maxWinTimeMinutes(),
-      routerConfig.transitTuningParameters().pagingSearchWindowAdjustments()
+      transitTuningParameters.pagingSearchWindowAdjustments()
     );
   }
 }

@@ -1,14 +1,14 @@
 package org.opentripplanner.transit.service;
 
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.framework.collection.CollectionsView;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupOfStations;
@@ -18,7 +18,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
-import org.opentripplanner.util.lang.CollectionsView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,10 +34,6 @@ public class StopModel implements Serializable {
   private final Map<FeedScopedId, GroupOfStations> groupOfStationsById;
   private final Map<FeedScopedId, AreaStop> areaStopById;
   private final Map<FeedScopedId, GroupStop> groupStopById;
-
-  /** The density center of the graph for determining the initial geographic extent in the client. */
-  private final WgsCoordinate stopLocationCenter;
-
   private transient StopModelIndex index;
 
   @Inject
@@ -49,7 +44,6 @@ public class StopModel implements Serializable {
     this.groupOfStationsById = Map.of();
     this.areaStopById = Map.of();
     this.groupStopById = Map.of();
-    this.stopLocationCenter = null;
     this.index = new StopModelIndex(List.of(), List.of(), List.of(), List.of());
   }
 
@@ -60,7 +54,6 @@ public class StopModel implements Serializable {
     this.groupOfStationsById = builder.groupOfStationById().asImmutableMap();
     this.areaStopById = builder.areaStopById().asImmutableMap();
     this.groupStopById = builder.groupStopById().asImmutableMap();
-    this.stopLocationCenter = builder.calculateTransitCenter();
     reindex();
   }
 
@@ -121,10 +114,6 @@ public class StopModel implements Serializable {
 
   public int stopIndexSize() {
     return index.stopIndexSize();
-  }
-
-  public Optional<WgsCoordinate> stopLocationCenter() {
-    return Optional.ofNullable(stopLocationCenter);
   }
 
   /**

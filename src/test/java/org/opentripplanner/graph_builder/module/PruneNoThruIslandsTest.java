@@ -1,7 +1,5 @@
 package org.opentripplanner.graph_builder.module;
 
-import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
-
 import java.io.File;
 import java.util.List;
 import java.util.Set;
@@ -10,13 +8,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -31,7 +29,7 @@ public class PruneNoThruIslandsTest {
   }
 
   @Test
-  public void bicycleNoThruIslandsBecomeNoThru() {
+  public void bicycleIslandsBecomeNoThru() {
     Assertions.assertTrue(
       graph
         .getStreetEdges()
@@ -44,7 +42,7 @@ public class PruneNoThruIslandsTest {
   }
 
   @Test
-  public void carNoThruIslandsBecomeNoThru() {
+  public void carIslandsBecomeNoThru() {
     Assertions.assertTrue(
       graph
         .getStreetEdges()
@@ -52,7 +50,7 @@ public class PruneNoThruIslandsTest {
         .filter(StreetEdge::isMotorVehicleNoThruTraffic)
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())
-        .containsAll(Set.of("159830262", "55735898", "55735911"))
+        .containsAll(Set.of("159830262", "55735911"))
     );
   }
 
@@ -80,8 +78,7 @@ public class PruneNoThruIslandsTest {
         List.of(osmProvider),
         Set.of(),
         graph,
-        noopIssueStore(),
-        new DefaultMapper(),
+        DataImportIssueStore.NOOP,
         false
       );
       osmModule.customNamer =
@@ -106,15 +103,16 @@ public class PruneNoThruIslandsTest {
       graph.index(transitModel.getStopModel());
 
       // Prune floating islands and set noThru where necessary
-      PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(
+      PruneIslands pruneIslands = new PruneIslands(
         graph,
         transitModel,
-        noopIssueStore(),
+        DataImportIssueStore.NOOP,
         null
       );
-      pruneNoThruIslands.setPruningThresholdIslandWithoutStops(40);
-      pruneNoThruIslands.setPruningThresholdIslandWithStops(5);
-      pruneNoThruIslands.buildGraph();
+      pruneIslands.setPruningThresholdIslandWithoutStops(40);
+      pruneIslands.setPruningThresholdIslandWithStops(5);
+      pruneIslands.setAdaptivePruningFactor(1);
+      pruneIslands.buildGraph();
 
       return graph;
     } catch (Exception e) {

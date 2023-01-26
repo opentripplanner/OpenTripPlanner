@@ -2,6 +2,7 @@ package org.opentripplanner.routing.api.request.preference;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
@@ -17,48 +18,51 @@ public final class ItineraryFilterPreferences {
 
   public static final ItineraryFilterPreferences DEFAULT = new ItineraryFilterPreferences();
 
+  private final boolean accessibilityScore;
+  private final double bikeRentalDistanceRatio;
   private final boolean debug;
+  private final boolean filterItinerariesWithSameFirstOrLastTrip;
+  private final double groupedOtherThanSameLegsMaxCostMultiplier;
   private final double groupSimilarityKeepOne;
   private final double groupSimilarityKeepThree;
-  private final double groupedOtherThanSameLegsMaxCostMultiplier;
-  private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
-  private final double bikeRentalDistanceRatio;
-  private final double parkAndRideDurationRatio;
+  private final double minBikeParkingDistance;
   private final DoubleAlgorithmFunction nonTransitGeneralizedCostLimit;
-  private final boolean filterItinerariesWithSameFirstOrLastTrip;
-  private final boolean accessibilityScore;
+  private final double parkAndRideDurationRatio;
   private final boolean removeItinerariesWithSameRoutesAndStops;
+  private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
 
   private ItineraryFilterPreferences() {
+    this.accessibilityScore = false;
+    this.bikeRentalDistanceRatio = 0.0;
     this.debug = false;
+    this.filterItinerariesWithSameFirstOrLastTrip = false;
+    this.groupedOtherThanSameLegsMaxCostMultiplier = 2.0;
     this.groupSimilarityKeepOne = 0.85;
     this.groupSimilarityKeepThree = 0.68;
-    this.groupedOtherThanSameLegsMaxCostMultiplier = 2.0;
-    this.bikeRentalDistanceRatio = 0.0;
+    this.minBikeParkingDistance = 0;
+    this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
     this.parkAndRideDurationRatio = 0.0;
+    this.removeItinerariesWithSameRoutesAndStops = false;
     this.transitGeneralizedCostLimit =
       new TransitGeneralizedCostFilterParams(RequestFunctions.createLinearFunction(900, 1.5), 0.4);
-    this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
-    this.filterItinerariesWithSameFirstOrLastTrip = false;
-    this.accessibilityScore = false;
-    this.removeItinerariesWithSameRoutesAndStops = false;
   }
 
   private ItineraryFilterPreferences(Builder builder) {
-    this.debug = builder.debug;
-    this.groupSimilarityKeepOne = Units.reluctance(builder.groupSimilarityKeepOne);
-    this.groupSimilarityKeepThree = Units.reluctance(builder.groupSimilarityKeepThree);
-    this.groupedOtherThanSameLegsMaxCostMultiplier =
-      Units.reluctance(builder.groupedOtherThanSameLegsMaxCostMultiplier);
-    this.transitGeneralizedCostLimit = Objects.requireNonNull(builder.transitGeneralizedCostLimit);
-    this.nonTransitGeneralizedCostLimit =
-      Objects.requireNonNull(builder.nonTransitGeneralizedCostLimit);
+    this.accessibilityScore = builder.accessibilityScore;
     this.bikeRentalDistanceRatio = Units.ratio(builder.bikeRentalDistanceRatio);
-    this.parkAndRideDurationRatio = Units.ratio(builder.parkAndRideDurationRatio);
+    this.debug = builder.debug;
     this.filterItinerariesWithSameFirstOrLastTrip =
       builder.filterItinerariesWithSameFirstOrLastTrip;
-    this.accessibilityScore = builder.accessibilityScore;
+    this.groupedOtherThanSameLegsMaxCostMultiplier =
+      Units.reluctance(builder.groupedOtherThanSameLegsMaxCostMultiplier);
+    this.groupSimilarityKeepOne = Units.reluctance(builder.groupSimilarityKeepOne);
+    this.groupSimilarityKeepThree = Units.reluctance(builder.groupSimilarityKeepThree);
+    this.minBikeParkingDistance = builder.minBikeParkingDistance;
+    this.nonTransitGeneralizedCostLimit =
+      Objects.requireNonNull(builder.nonTransitGeneralizedCostLimit);
+    this.parkAndRideDurationRatio = Units.ratio(builder.parkAndRideDurationRatio);
     this.removeItinerariesWithSameRoutesAndStops = builder.removeItinerariesWithSameRoutesAndStops;
+    this.transitGeneralizedCostLimit = Objects.requireNonNull(builder.transitGeneralizedCostLimit);
   }
 
   public static Builder of() {
@@ -69,8 +73,24 @@ public final class ItineraryFilterPreferences {
     return new Builder(this);
   }
 
+  public boolean useAccessibilityScore() {
+    return accessibilityScore;
+  }
+
+  public double bikeRentalDistanceRatio() {
+    return bikeRentalDistanceRatio;
+  }
+
   public boolean debug() {
     return debug;
+  }
+
+  public boolean filterItinerariesWithSameFirstOrLastTrip() {
+    return filterItinerariesWithSameFirstOrLastTrip;
+  }
+
+  public double groupedOtherThanSameLegsMaxCostMultiplier() {
+    return groupedOtherThanSameLegsMaxCostMultiplier;
   }
 
   public double groupSimilarityKeepOne() {
@@ -81,59 +101,160 @@ public final class ItineraryFilterPreferences {
     return groupSimilarityKeepThree;
   }
 
-  public double groupedOtherThanSameLegsMaxCostMultiplier() {
-    return groupedOtherThanSameLegsMaxCostMultiplier;
-  }
-
-  public TransitGeneralizedCostFilterParams transitGeneralizedCostLimit() {
-    return transitGeneralizedCostLimit;
-  }
-
-  public double bikeRentalDistanceRatio() {
-    return bikeRentalDistanceRatio;
-  }
-
-  public double parkAndRideDurationRatio() {
-    return parkAndRideDurationRatio;
+  public double minBikeParkingDistance() {
+    return minBikeParkingDistance;
   }
 
   public DoubleAlgorithmFunction nonTransitGeneralizedCostLimit() {
     return nonTransitGeneralizedCostLimit;
   }
 
-  public boolean filterItinerariesWithSameFirstOrLastTrip() {
-    return filterItinerariesWithSameFirstOrLastTrip;
+  public double parkAndRideDurationRatio() {
+    return parkAndRideDurationRatio;
   }
 
   public boolean removeItinerariesWithSameRoutesAndStops() {
     return removeItinerariesWithSameRoutesAndStops;
   }
 
-  public boolean useAccessibilityScore() {
-    return accessibilityScore;
+  public TransitGeneralizedCostFilterParams transitGeneralizedCostLimit() {
+    return transitGeneralizedCostLimit;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(ItineraryFilterPreferences.class)
+      .addBoolIfTrue("accessibilityScore", accessibilityScore)
+      .addNum("bikeRentalDistanceRatio", bikeRentalDistanceRatio, DEFAULT.bikeRentalDistanceRatio)
+      .addBoolIfTrue("debug", debug)
+      .addBoolIfTrue(
+        "filterItinerariesWithSameFirstOrLastTrip",
+        filterItinerariesWithSameFirstOrLastTrip
+      )
+      .addNum(
+        "groupedOtherThanSameLegsMaxCostMultiplier",
+        groupedOtherThanSameLegsMaxCostMultiplier,
+        DEFAULT.groupedOtherThanSameLegsMaxCostMultiplier
+      )
+      .addNum("groupSimilarityKeepOne", groupSimilarityKeepOne, DEFAULT.groupSimilarityKeepOne)
+      .addNum(
+        "groupSimilarityKeepThree",
+        groupSimilarityKeepThree,
+        DEFAULT.groupSimilarityKeepThree
+      )
+      .addNum("minBikeParkingDistance", minBikeParkingDistance, DEFAULT.minBikeParkingDistance)
+      .addObj(
+        "nonTransitGeneralizedCostLimit",
+        nonTransitGeneralizedCostLimit,
+        DEFAULT.nonTransitGeneralizedCostLimit
+      )
+      .addNum(
+        "parkAndRideDurationRatio",
+        parkAndRideDurationRatio,
+        DEFAULT.parkAndRideDurationRatio
+      )
+      .addObj(
+        "transitGeneralizedCostLimit",
+        transitGeneralizedCostLimit,
+        DEFAULT.transitGeneralizedCostLimit
+      )
+      .addBoolIfTrue(
+        "removeItinerariesWithSameRoutesAndStops",
+        removeItinerariesWithSameRoutesAndStops
+      )
+      .toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ItineraryFilterPreferences that = (ItineraryFilterPreferences) o;
+    return (
+      accessibilityScore == that.accessibilityScore &&
+      Double.compare(that.bikeRentalDistanceRatio, bikeRentalDistanceRatio) == 0 &&
+      debug == that.debug &&
+      filterItinerariesWithSameFirstOrLastTrip == that.filterItinerariesWithSameFirstOrLastTrip &&
+      Double.compare(
+        that.groupedOtherThanSameLegsMaxCostMultiplier,
+        groupedOtherThanSameLegsMaxCostMultiplier
+      ) ==
+      0 &&
+      Double.compare(that.groupSimilarityKeepOne, groupSimilarityKeepOne) == 0 &&
+      Double.compare(that.groupSimilarityKeepThree, groupSimilarityKeepThree) == 0 &&
+      Double.compare(that.minBikeParkingDistance, minBikeParkingDistance) == 0 &&
+      Double.compare(that.parkAndRideDurationRatio, parkAndRideDurationRatio) == 0 &&
+      removeItinerariesWithSameRoutesAndStops == that.removeItinerariesWithSameRoutesAndStops &&
+      Objects.equals(nonTransitGeneralizedCostLimit, that.nonTransitGeneralizedCostLimit) &&
+      Objects.equals(transitGeneralizedCostLimit, that.transitGeneralizedCostLimit)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      accessibilityScore,
+      bikeRentalDistanceRatio,
+      debug,
+      filterItinerariesWithSameFirstOrLastTrip,
+      groupedOtherThanSameLegsMaxCostMultiplier,
+      groupSimilarityKeepOne,
+      groupSimilarityKeepThree,
+      minBikeParkingDistance,
+      nonTransitGeneralizedCostLimit,
+      parkAndRideDurationRatio,
+      removeItinerariesWithSameRoutesAndStops,
+      transitGeneralizedCostLimit
+    );
   }
 
   public static class Builder {
 
     private final ItineraryFilterPreferences original;
+    private boolean accessibilityScore;
+    private double bikeRentalDistanceRatio;
     private boolean debug;
+    private boolean filterItinerariesWithSameFirstOrLastTrip;
+    private double groupedOtherThanSameLegsMaxCostMultiplier;
     private double groupSimilarityKeepOne;
     private double groupSimilarityKeepThree;
-    private double groupedOtherThanSameLegsMaxCostMultiplier;
-    private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
-    private double bikeRentalDistanceRatio;
-    private double parkAndRideDurationRatio;
+    public double minBikeParkingDistance;
     private DoubleAlgorithmFunction nonTransitGeneralizedCostLimit;
-    private boolean filterItinerariesWithSameFirstOrLastTrip;
+    private double parkAndRideDurationRatio;
     private boolean removeItinerariesWithSameRoutesAndStops;
-    private boolean accessibilityScore;
+    private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
 
     public ItineraryFilterPreferences original() {
       return original;
     }
 
+    public Builder withAccessibilityScore(boolean accessibilityScore) {
+      this.accessibilityScore = accessibilityScore;
+      return this;
+    }
+
+    public Builder withBikeRentalDistanceRatio(double bikeRentalDistanceRatio) {
+      this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
+      return this;
+    }
+
     public Builder withDebug(boolean debug) {
       this.debug = debug;
+      return this;
+    }
+
+    public Builder withFilterItinerariesWithSameFirstOrLastTrip(
+      boolean filterItinerariesWithSameFirstOrLastTrip
+    ) {
+      this.filterItinerariesWithSameFirstOrLastTrip = filterItinerariesWithSameFirstOrLastTrip;
+      return this;
+    }
+
+    public Builder withGroupedOtherThanSameLegsMaxCostMultiplier(
+      double groupedOtherThanSameLegsMaxCostMultiplier
+    ) {
+      this.groupedOtherThanSameLegsMaxCostMultiplier = groupedOtherThanSameLegsMaxCostMultiplier;
       return this;
     }
 
@@ -147,27 +268,8 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
-    public Builder withGroupedOtherThanSameLegsMaxCostMultiplier(
-      double groupedOtherThanSameLegsMaxCostMultiplier
-    ) {
-      this.groupedOtherThanSameLegsMaxCostMultiplier = groupedOtherThanSameLegsMaxCostMultiplier;
-      return this;
-    }
-
-    public Builder withTransitGeneralizedCostLimit(
-      TransitGeneralizedCostFilterParams transitGeneralizedCostLimit
-    ) {
-      this.transitGeneralizedCostLimit = transitGeneralizedCostLimit;
-      return this;
-    }
-
-    public Builder withBikeRentalDistanceRatio(double bikeRentalDistanceRatio) {
-      this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
-      return this;
-    }
-
-    public Builder withParkAndRideDurationRatio(double parkAndRideDurationRatio) {
-      this.parkAndRideDurationRatio = parkAndRideDurationRatio;
+    public Builder withMinBikeParkingDistance(double distance) {
+      this.minBikeParkingDistance = distance;
       return this;
     }
 
@@ -178,10 +280,8 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
-    public Builder withFilterItinerariesWithSameFirstOrLastTrip(
-      boolean filterItinerariesWithSameFirstOrLastTrip
-    ) {
-      this.filterItinerariesWithSameFirstOrLastTrip = filterItinerariesWithSameFirstOrLastTrip;
+    public Builder withParkAndRideDurationRatio(double parkAndRideDurationRatio) {
+      this.parkAndRideDurationRatio = parkAndRideDurationRatio;
       return this;
     }
 
@@ -192,27 +292,30 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
-    public Builder withAccessibilityScore(boolean accessibilityScore) {
-      this.accessibilityScore = accessibilityScore;
+    public Builder withTransitGeneralizedCostLimit(
+      TransitGeneralizedCostFilterParams transitGeneralizedCostLimit
+    ) {
+      this.transitGeneralizedCostLimit = transitGeneralizedCostLimit;
       return this;
     }
 
     public Builder(ItineraryFilterPreferences original) {
       this.original = original;
-      this.debug = original.debug;
-      this.groupSimilarityKeepOne = original.groupSimilarityKeepOne;
-      this.groupSimilarityKeepThree = original.groupSimilarityKeepThree;
-      this.groupedOtherThanSameLegsMaxCostMultiplier =
-        original.groupedOtherThanSameLegsMaxCostMultiplier;
-      this.transitGeneralizedCostLimit = original.transitGeneralizedCostLimit;
-      this.nonTransitGeneralizedCostLimit = original.nonTransitGeneralizedCostLimit;
+      this.accessibilityScore = original.accessibilityScore;
       this.bikeRentalDistanceRatio = original.bikeRentalDistanceRatio;
-      this.parkAndRideDurationRatio = original.parkAndRideDurationRatio;
+      this.debug = original.debug;
       this.filterItinerariesWithSameFirstOrLastTrip =
         original.filterItinerariesWithSameFirstOrLastTrip;
+      this.groupedOtherThanSameLegsMaxCostMultiplier =
+        original.groupedOtherThanSameLegsMaxCostMultiplier;
+      this.groupSimilarityKeepOne = original.groupSimilarityKeepOne;
+      this.groupSimilarityKeepThree = original.groupSimilarityKeepThree;
+      this.minBikeParkingDistance = original.minBikeParkingDistance;
+      this.nonTransitGeneralizedCostLimit = original.nonTransitGeneralizedCostLimit;
+      this.parkAndRideDurationRatio = original.parkAndRideDurationRatio;
       this.removeItinerariesWithSameRoutesAndStops =
         original.removeItinerariesWithSameRoutesAndStops;
-      this.accessibilityScore = original.accessibilityScore;
+      this.transitGeneralizedCostLimit = original.transitGeneralizedCostLimit;
     }
 
     public Builder apply(Consumer<Builder> body) {

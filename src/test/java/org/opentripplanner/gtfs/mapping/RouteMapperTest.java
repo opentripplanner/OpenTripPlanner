@@ -13,11 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
-import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.organization.Branding;
 
 public class RouteMapperTest {
@@ -53,7 +52,7 @@ public class RouteMapperTest {
   private static final Route ROUTE = new Route();
   private final RouteMapper subject = new RouteMapper(
     new AgencyMapper(TransitModelForTest.FEED_ID),
-    DataImportIssueStore.noopIssueStore(),
+    DataImportIssueStore.NOOP,
     new TranslationHelper()
   );
 
@@ -146,6 +145,20 @@ public class RouteMapperTest {
       List.of(NETWORK_ID),
       result.getGroupsOfRoutes().stream().map(g -> g.getId().getId()).toList()
     );
+  }
+
+  @Test
+  void carpool() {
+    Route input = new Route();
+
+    input.setId(ROUTE_ID);
+    input.setAgency(AGENCY);
+    input.setType(1551);
+    input.setShortName(SHORT_NAME);
+
+    var result = subject.map(input);
+
+    assertEquals(TransitMode.CARPOOL, result.getMode());
   }
 
   /**

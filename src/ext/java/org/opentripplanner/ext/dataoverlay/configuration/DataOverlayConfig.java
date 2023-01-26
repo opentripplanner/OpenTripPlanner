@@ -2,7 +2,7 @@ package org.opentripplanner.ext.dataoverlay.configuration;
 
 import java.io.Serializable;
 import java.util.List;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * POJO class describing expected data-overlay-config.json structure
@@ -10,8 +10,6 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * @author Katja Danilova
  */
 public class DataOverlayConfig implements Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   private final String fileName;
   private final String latitudeVariable;

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
 
 public record DefaultRaptorTransfer(
   int stop,

@@ -3,9 +3,9 @@ package org.opentripplanner.ext.traveltime;
 import java.util.ArrayList;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.traveltime.geometry.AccumulativeMetric;
 import org.opentripplanner.ext.traveltime.geometry.ZSamplePoint;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 
 /**
  * Any given sample is weighted according to the inverse of the squared normalized distance + 1 to

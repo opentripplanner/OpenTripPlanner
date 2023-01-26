@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.api.request.preference;
 
-import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
+import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * The bike preferences contain all speed, reluctance, cost and factor preferences for biking
@@ -29,6 +29,7 @@ public final class BikePreferences implements Serializable {
   private final int switchCost;
   private final int parkTime;
   private final int parkCost;
+  private final double stairsReluctance;
   private final BicycleOptimizeType optimizeType;
   private final TimeSlopeSafetyTriangle optimizeTriangle;
 
@@ -45,6 +46,8 @@ public final class BikePreferences implements Serializable {
     this.parkCost = 120;
     this.optimizeType = BicycleOptimizeType.SAFE;
     this.optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
+    // very high reluctance to carry the bike up/down a flight of stairs
+    this.stairsReluctance = 10;
   }
 
   private BikePreferences(Builder builder) {
@@ -59,6 +62,7 @@ public final class BikePreferences implements Serializable {
     this.parkCost = Units.cost(builder.parkCost);
     this.optimizeType = Objects.requireNonNull(builder.optimizeType);
     this.optimizeTriangle = Objects.requireNonNull(builder.optimizeTriangle);
+    this.stairsReluctance = Units.reluctance(builder.stairsReluctance);
   }
 
   public static BikePreferences.Builder of() {
@@ -140,6 +144,10 @@ public final class BikePreferences implements Serializable {
     return optimizeTriangle;
   }
 
+  public double stairsReluctance() {
+    return stairsReluctance;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -156,7 +164,8 @@ public final class BikePreferences implements Serializable {
       parkTime == that.parkTime &&
       parkCost == that.parkCost &&
       optimizeType == that.optimizeType &&
-      optimizeTriangle.equals(that.optimizeTriangle)
+      optimizeTriangle.equals(that.optimizeTriangle) &&
+      doubleEquals(stairsReluctance, that.stairsReluctance)
     );
   }
 
@@ -173,7 +182,8 @@ public final class BikePreferences implements Serializable {
       parkTime,
       parkCost,
       optimizeType,
-      optimizeTriangle
+      optimizeTriangle,
+      stairsReluctance
     );
   }
 
@@ -211,6 +221,8 @@ public final class BikePreferences implements Serializable {
     private BicycleOptimizeType optimizeType;
     private TimeSlopeSafetyTriangle optimizeTriangle;
 
+    public double stairsReluctance;
+
     public Builder(BikePreferences original) {
       this.original = original;
       this.speed = original.speed;
@@ -224,6 +236,7 @@ public final class BikePreferences implements Serializable {
       this.parkCost = original.parkCost;
       this.optimizeType = original.optimizeType;
       this.optimizeTriangle = original.optimizeTriangle;
+      this.stairsReluctance = original.stairsReluctance;
     }
 
     public BikePreferences original() {
@@ -328,6 +341,11 @@ public final class BikePreferences implements Serializable {
       var builder = TimeSlopeSafetyTriangle.of();
       body.accept(builder);
       this.optimizeTriangle = builder.buildOrDefault(this.optimizeTriangle);
+      return this;
+    }
+
+    public Builder withStairsReluctance(double value) {
+      this.stairsReluctance = value;
       return this;
     }
 

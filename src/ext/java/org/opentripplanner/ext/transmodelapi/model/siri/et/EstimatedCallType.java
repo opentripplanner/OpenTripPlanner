@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.model.siri.et;
 
 import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
-import static org.opentripplanner.model.PickDrop.NONE;
 
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
@@ -15,7 +14,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
@@ -54,7 +52,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("quay")
-          .type(quayType)
+          .type(new GraphQLNonNull(quayType))
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStop())
           .build()
       )
@@ -221,13 +219,9 @@ public class EstimatedCallType {
           .newFieldDefinition()
           .name("forBoarding")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .description(
-            "Whether vehicle may be boarded at quay according to the planned data. " +
-            "If the cancellation flag is set, boarding is not possible, even if this field " +
-            "is set to true."
-          )
+          .description("Whether vehicle may be boarded at quay.")
           .dataFetcher(environment ->
-            ((TripTimeOnDate) environment.getSource()).getPickupType() != NONE
+            ((TripTimeOnDate) environment.getSource()).getPickupType().isRoutable()
           )
           .build()
       )
@@ -236,13 +230,9 @@ public class EstimatedCallType {
           .newFieldDefinition()
           .name("forAlighting")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .description(
-            "Whether vehicle may be alighted at quay according to the planned data. " +
-            "If the cancellation flag is set, alighting is not possible, even if this field " +
-            "is set to true."
-          )
+          .description("Whether vehicle may be alighted at quay.")
           .dataFetcher(environment ->
-            ((TripTimeOnDate) environment.getSource()).getDropoffType() != NONE
+            ((TripTimeOnDate) environment.getSource()).getDropoffType().isRoutable()
           )
           .build()
       )
@@ -278,22 +268,16 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("date")
-          .type(gqlUtil.dateScalar)
+          .type(new GraphQLNonNull(gqlUtil.dateScalar))
           .description("The date the estimated call is valid for.")
-          .dataFetcher(environment ->
-            Optional
-              .of(environment.getSource())
-              .map(TripTimeOnDate.class::cast)
-              .map(TripTimeOnDate::getServiceDay)
-              .orElse(null)
-          )
+          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getServiceDay())
           .build()
       )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourney")
-          .type(serviceJourneyType)
+          .type(new GraphQLNonNull(serviceJourneyType))
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getTrip())
           .build()
       )

@@ -1,8 +1,8 @@
 package org.opentripplanner.model.modes;
 
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 class AllowMainModeFilter implements AllowTransitModeFilter {
 
@@ -17,7 +17,7 @@ class AllowMainModeFilter implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean allows(TransitMode transitMode, SubMode ignore) {
+  public boolean match(TransitMode transitMode, SubMode ignore) {
     return mainMode == transitMode;
   }
 

@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.graph;
 
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
@@ -13,17 +14,13 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.TurnRestriction;
-import org.opentripplanner.common.geometry.CompactElevationProfile;
-import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.framework.geometry.CompactElevationProfile;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
@@ -31,12 +28,13 @@ import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.util.ElevationUtils;
-import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +60,6 @@ public class Graph implements Serializable {
 
   private transient StreetIndex streetIndex;
 
-  //Envelope of all OSM and transit vertices. Calculated during build time
-  private WorldEnvelope envelope = null;
   //ConvexHull of all the graph vertices. Generated at Graph build time.
   private Geometry convexHull = null;
 
@@ -171,32 +167,7 @@ public class Graph implements Serializable {
     if (e != null) {
       streetNotesService.removeStaticNotes(e);
 
-      if (e instanceof StreetEdge) {
-        ((StreetEdge) e).removeAllTurnRestrictions();
-      }
-
-      if (e.fromv != null) {
-        e.fromv
-          .getIncoming()
-          .stream()
-          .filter(StreetEdge.class::isInstance)
-          .map(StreetEdge.class::cast)
-          .forEach(otherEdge -> {
-            for (TurnRestriction turnRestriction : otherEdge.getTurnRestrictions()) {
-              if (turnRestriction.to == e) {
-                otherEdge.removeTurnRestriction(turnRestriction);
-              }
-            }
-          });
-
-        e.fromv.removeOutgoing(e);
-        e.fromv = null;
-      }
-
-      if (e.tov != null) {
-        e.tov.removeIncoming(e);
-        e.tov = null;
-      }
+      e.remove();
     }
   }
 
@@ -346,24 +317,10 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Calculates envelope out of all OSM coordinates
-   * <p>
-   * Transit stops are added to the envelope as they are added to the graph
-   */
-  public void calculateEnvelope() {
-    this.envelope = new WorldEnvelope();
-
-    for (Vertex v : this.getVertices()) {
-      Coordinate c = v.getCoordinate();
-      this.envelope.expandToInclude(c);
-    }
-  }
-
-  /**
    * Calculates convexHull of all the vertices during build time
    */
   public void calculateConvexHull() {
-    convexHull = GraphUtils.makeConvexHull(this);
+    convexHull = GeometryUtils.makeConvexHull(getVertices(), Vertex::getCoordinate);
   }
 
   /**
@@ -373,44 +330,14 @@ public class Graph implements Serializable {
     return convexHull;
   }
 
-  /**
-   * Expands envelope to include given point
-   * <p>
-   * If envelope is empty it creates it (This can happen with a graph without OSM data) Used when
-   * adding stops to OSM envelope
-   *
-   * @param x the value to lower the minimum x to or to raise the maximum x to
-   * @param y the value to lower the minimum y to or to raise the maximum y to
-   */
-  public void expandToInclude(double x, double y) {
-    //Envelope can be empty if graph building is run without OSM data
-    if (this.envelope == null) {
-      calculateEnvelope();
-    }
-    this.envelope.expandToInclude(x, y);
-  }
-
-  public void initEllipsoidToGeoidDifference() {
-    try {
-      WorldEnvelope env = getEnvelope();
-      double lat = (env.getLowerLeftLatitude() + env.getUpperRightLatitude()) / 2;
-      double lon = (env.getLowerLeftLongitude() + env.getUpperRightLongitude()) / 2;
-      this.ellipsoidToGeoidDifference = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
-      LOG.info(
-        "Computed ellipsoid/geoid offset at (" +
-        lat +
-        ", " +
-        lon +
-        ") as " +
-        this.ellipsoidToGeoidDifference
-      );
-    } catch (Exception e) {
-      LOG.error("Error computing ellipsoid/geoid difference");
-    }
-  }
-
-  public WorldEnvelope getEnvelope() {
-    return this.envelope;
+  public void initEllipsoidToGeoidDifference(double value, double lat, double lon) {
+    this.ellipsoidToGeoidDifference = value;
+    LOG.info(
+      "Computed ellipsoid/geoid offset at ({}, {}) as {}",
+      lat,
+      lon,
+      this.ellipsoidToGeoidDifference
+    );
   }
 
   public double getDistanceBetweenElevationSamples() {

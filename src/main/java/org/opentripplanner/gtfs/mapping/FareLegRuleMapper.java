@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Objects;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 public final class FareLegRuleMapper {
 

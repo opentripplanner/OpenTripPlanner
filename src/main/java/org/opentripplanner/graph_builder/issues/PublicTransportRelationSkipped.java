@@ -1,10 +1,12 @@
 package org.opentripplanner.graph_builder.issues;
 
-import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 
 public class PublicTransportRelationSkipped implements DataImportIssue {
 
   public static final String FMT = "Unable to process public transportation relation %s";
+  public static final String HTMLFMT =
+    "Unable to process public transportation relation <a href='http://www.openstreetmap.org/relation/%d'>'%d'</a>";
 
   final long relationId;
 
@@ -15,5 +17,10 @@ public class PublicTransportRelationSkipped implements DataImportIssue {
   @Override
   public String getMessage() {
     return String.format(FMT, relationId);
+  }
+
+  @Override
+  public String getHTMLMessage() {
+    return String.format(HTMLFMT, relationId, relationId);
   }
 }

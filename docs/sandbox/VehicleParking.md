@@ -1,4 +1,4 @@
-# Vehicle Parking Updaters - OTP Sandbox Extension
+# Vehicle Parking Updaters
 
 ## Contact Info
 
@@ -34,7 +34,7 @@ All updaters have the following parameters in common:
 
 | Config Parameter                |     Type    | Summary                                      |  Req./Opt. | Default Value | Since |
 |---------------------------------|:-----------:|----------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_PARKING"        |    `enum`   | The type of the updater.                     | *Required* |               |   na  |
+| type = "VEHICLE_PARKING"        |    `enum`   | The type of the updater.                     | *Required* |               |  1.5  |
 | facilitiesFrequencySec          |  `integer`  | How often the facilities should be updated.  | *Optional* | `3600`        |  2.2  |
 | facilitiesUrl                   |   `string`  | URL of the facilities.                       | *Optional* |               |  2.2  |
 | [feedId](#u__2__feedId)         |   `string`  | The name of the data source.                 | *Optional* |               |  2.2  |
@@ -49,7 +49,7 @@ All updaters have the following parameters in common:
 
 <h4 id="u__2__feedId">feedId</h4>
 
-**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[2] 
 
 The name of the data source.
@@ -58,15 +58,15 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 <h4 id="u__2__sourceType">sourceType</h4>
 
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
-**Path:** /updaters/[2]  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[2]   
 **Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
 
 The source of the vehicle updates.
 
 <h4 id="u__2__timeZone">timeZone</h4>
 
-**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[2] 
 
 The time zone of the feed.
@@ -80,7 +80,7 @@ Used for converting abstract opening hours into concrete points in time.
 ```JSON
 // router-config.json
 {
-    "updaters": [
+  "updaters" : [
     {
       "type" : "vehicle-parking",
       "sourceType" : "hsl-park",
@@ -93,7 +93,6 @@ Used for converting abstract opening hours into concrete points in time.
       "hubsUrl" : "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
     }
   ]
-
 }
 ```
 
@@ -106,7 +105,7 @@ Used for converting abstract opening hours into concrete points in time.
 
 | Config Parameter                |       Type      | Summary                            |  Req./Opt. | Default Value | Since |
 |---------------------------------|:---------------:|------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_PARKING"        |      `enum`     | The type of the updater.           | *Required* |               |   na  |
+| type = "VEHICLE_PARKING"        |      `enum`     | The type of the updater.           | *Required* |               |  1.5  |
 | [feedId](#u__3__feedId)         |     `string`    | The name of the data source.       | *Optional* |               |  2.2  |
 | frequencySec                    |    `integer`    | How often to update the source.    | *Optional* | `60`          |  2.2  |
 | [sourceType](#u__3__sourceType) |      `enum`     | The source of the vehicle updates. | *Required* |               |  2.2  |
@@ -120,7 +119,7 @@ Used for converting abstract opening hours into concrete points in time.
 
 <h4 id="u__3__feedId">feedId</h4>
 
-**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[3] 
 
 The name of the data source.
@@ -129,15 +128,15 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 <h4 id="u__3__sourceType">sourceType</h4>
 
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
-**Path:** /updaters/[3]  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[3]   
 **Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
 
 The source of the vehicle updates.
 
 <h4 id="u__3__timeZone">timeZone</h4>
 
-**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[3] 
 
 The time zone of the feed.
@@ -146,14 +145,14 @@ Used for converting abstract opening hours into concrete points in time.
 
 <h4 id="u__3__headers">headers</h4>
 
-**Since version:** `2.2` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[3] 
 
 HTTP headers to add.
 
 <h4 id="u__3__tags">tags</h4>
 
-**Since version:** `2.2` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[3] 
 
 Tags to add to the parking lots.
@@ -165,7 +164,7 @@ Tags to add to the parking lots.
 ```JSON
 // router-config.json
 {
-    "updaters": [
+  "updaters" : [
     {
       "type" : "vehicle-parking",
       "sourceType" : "park-api",
@@ -176,10 +175,11 @@ Tags to add to the parking lots.
       "headers" : {
         "Cache-Control" : "max-age=604800"
       },
-      "tags" : [ "source:parkapi" ]
+      "tags" : [
+        "source:parkapi"
+      ]
     }
   ]
-
 }
 ```
 
@@ -192,7 +192,7 @@ Tags to add to the parking lots.
 
 | Config Parameter                |       Type      | Summary                            |  Req./Opt. | Default Value | Since |
 |---------------------------------|:---------------:|------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_PARKING"        |      `enum`     | The type of the updater.           | *Required* |               |   na  |
+| type = "VEHICLE_PARKING"        |      `enum`     | The type of the updater.           | *Required* |               |  1.5  |
 | [feedId](#u__4__feedId)         |     `string`    | The name of the data source.       | *Optional* |               |  2.2  |
 | frequencySec                    |    `integer`    | How often to update the source.    | *Optional* | `60`          |  2.3  |
 | [sourceType](#u__4__sourceType) |      `enum`     | The source of the vehicle updates. | *Required* |               |  2.2  |
@@ -204,7 +204,7 @@ Tags to add to the parking lots.
 
 <h4 id="u__4__feedId">feedId</h4>
 
-**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[4] 
 
 The name of the data source.
@@ -213,15 +213,15 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 <h4 id="u__4__sourceType">sourceType</h4>
 
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
-**Path:** /updaters/[4]  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[4]   
 **Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
 
 The source of the vehicle updates.
 
 <h4 id="u__4__headers">headers</h4>
 
-**Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[4] 
 
 HTTP headers to add.
@@ -233,7 +233,7 @@ HTTP headers to add.
 ```JSON
 // router-config.json
 {
-    "updaters": [
+  "updaters" : [
     {
       "type" : "vehicle-parking",
       "feedId" : "bikely",
@@ -245,7 +245,6 @@ HTTP headers to add.
       }
     }
   ]
-
 }
 ```
 

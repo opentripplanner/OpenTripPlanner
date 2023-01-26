@@ -1,5 +1,6 @@
 package org.opentripplanner.generate.doc;
 
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
@@ -7,31 +8,33 @@ import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.DocBuilder;
-import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
+import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-@OnlyIfDocsExist
+@GeneratesDocumentation
 public class UpdaterConfigDocTest {
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "UpdaterConfig.md");
   private static final File OUT_FILE = new File(DOCS_ROOT, "UpdaterConfig.md");
 
-  private static final String ROUTER_CONFIG_FILENAME = "standalone/config/router-config.json";
+  private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final Set<String> SKIP_UPDATERS = Set.of(
     "siri-azure-sx-updater",
     "vehicle-parking"
   );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
+  public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
    * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
@@ -63,8 +66,8 @@ public class UpdaterConfigDocTest {
   }
 
   private NodeAdapter readBuildConfig() {
-    var json = jsonNodeFromResource(ROUTER_CONFIG_FILENAME);
-    var conf = new RouterConfig(json, ROUTER_CONFIG_FILENAME, false);
+    var json = jsonNodeFromResource(ROUTER_CONFIG_PATH);
+    var conf = new RouterConfig(json, ROUTER_CONFIG_PATH, false);
     return conf.asNodeAdapter().child("updaters");
   }
 
@@ -93,15 +96,7 @@ public class UpdaterConfigDocTest {
   }
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
-    buf.addExample(
-      "router-config.json",
-      """
-      "updaters": [
-        %s
-      ]
-      """.formatted(
-          node.toPrettyString().indent(node.level()).trim()
-        )
-    );
+    buf.addSection("##### Example configuration");
+    buf.addUpdaterExample(ROUTER_CONFIG_FILENAME, node.rawNode());
   }
 }

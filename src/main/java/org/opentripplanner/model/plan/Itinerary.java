@@ -8,19 +8,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
+import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.core.ItineraryFares;
-import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
-import org.opentripplanner.util.lang.DoubleUtils;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
  */
 public class Itinerary {
+
+  public static final int UNKNOWN = -1;
 
   /* final primitive properties */
   private final Duration duration;
@@ -35,9 +38,9 @@ public class Itinerary {
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
-  private int generalizedCost = -1;
-  private int waitTimeOptimizedCost = -1;
-  private int transferPriorityCost = -1;
+  private int generalizedCost = UNKNOWN;
+  private int waitTimeOptimizedCost = UNKNOWN;
+  private int transferPriorityCost = UNKNOWN;
   private boolean tooSloped = false;
   private Double maxSlope = null;
   private boolean arrivedAtDestinationWithRentedVehicle = false;
@@ -62,7 +65,7 @@ public class Itinerary {
     this.transitDuration = totals.transitDuration;
     this.nonTransitDuration = totals.nonTransitDuration;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
-    this.waitingDuration = totals.walkingDuration;
+    this.waitingDuration = totals.waitingDuration;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
     this.setElevationGained(totals.totalElevationGained);
@@ -120,7 +123,12 @@ public class Itinerary {
    * Total distance in meters.
    */
   public double distanceMeters() {
-    return getLegs().stream().mapToDouble(Leg::getDistanceMeters).sum();
+    return getLegs()
+      .stream()
+      // An unknown distance is -1
+      .filter(l -> l.getDistanceMeters() > 0)
+      .mapToDouble(Leg::getDistanceMeters)
+      .sum();
   }
 
   /**
@@ -160,11 +168,11 @@ public class Itinerary {
   /**
    * An itinerary can be flagged for removal with a system notice.
    * <p>
-   * For example when tuning or manually testing the itinerary-filter-chain it you can enable {@link
-   * ItineraryFilterPreferences#debug} and instead of
-   * removing itineraries from the result the itineraries will be tagged by the filters instead.
-   * This enables investigating, why an expected itinerary is missing from the result set. It can be
-   * also used by other filters to see the already filtered itineraries.
+   * For example when tuning or manually testing the itinerary-filter-chain it you can enable
+   * {@link ItineraryFilterPreferences#debug()} and instead of removing itineraries from the result
+   * the itineraries will be tagged by the filters instead. This enables investigating, why an
+   * expected itinerary is missing from the result set. It can be also used by other filters to see
+   * the already filtered itineraries.
    */
   public void flagForDeletion(SystemNotice notice) {
     systemNotices.add(notice);
@@ -334,6 +342,10 @@ public class Itinerary {
    */
   public List<Leg> getLegs() {
     return legs;
+  }
+
+  public Stream<StreetLeg> getStreetLegs() {
+    return legs.stream().filter(StreetLeg.class::isInstance).map(StreetLeg.class::cast);
   }
 
   /**

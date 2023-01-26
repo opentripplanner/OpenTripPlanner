@@ -1,8 +1,11 @@
 package org.opentripplanner.transit.service;
 
+import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.set.hash.TIntHashSet;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -14,11 +17,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.lang.ObjectUtils;
+import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.PathTransfer;
@@ -45,8 +51,6 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
-import org.opentripplanner.util.lang.ObjectUtils;
-import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -221,7 +225,7 @@ public class TransitModel implements Serializable {
    * service period {@code null} is returned.
    */
   @Nullable
-  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
+  public FeedScopedId getOrCreateServiceIdForDate(@Nonnull LocalDate serviceDate) {
     // Start of day
     ZonedDateTime time = ServiceDateUtils.asStartOfService(serviceDate, getTimeZone());
 
@@ -324,9 +328,10 @@ public class TransitModel implements Serializable {
       Collection<ZoneId> zones = getAgencyTimeZones();
       if (zones.size() > 1) {
         throw new IllegalStateException(
-          "The graph contains agencies with different time zones: %s. Please configure the one to be used in the build-config.json".formatted(
-              zones
-            )
+          (
+            "The graph contains agencies with different time zones: %s. " +
+            "Please configure the one to be used in the %s"
+          ).formatted(zones, BUILD_CONFIG_FILENAME)
         );
       }
     }
@@ -441,6 +446,10 @@ public class TransitModel implements Serializable {
   /** True if there are active transit services loaded into this Graph. */
   public boolean hasTransit() {
     return hasTransit;
+  }
+
+  public Optional<Agency> findAgencyById(FeedScopedId id) {
+    return agencies.stream().filter(a -> a.getId().equals(id)).findAny();
   }
 
   private void updateHasTransit(boolean hasTransit) {

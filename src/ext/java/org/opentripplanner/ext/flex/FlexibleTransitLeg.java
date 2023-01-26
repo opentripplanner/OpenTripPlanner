@@ -9,6 +9,9 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
@@ -17,15 +20,12 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.util.lang.DoubleUtils;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a

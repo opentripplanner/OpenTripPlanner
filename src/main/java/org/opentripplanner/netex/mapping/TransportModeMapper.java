@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.netex.mapping.support.MainAndSubMode;
+import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
@@ -13,12 +13,12 @@ import org.rutebanken.netex.model.TransportSubmodeStructure;
  */
 class TransportModeMapper {
 
-  public MainAndSubMode map(
+  public NetexMainAndSubMode map(
     AllVehicleModesOfTransportEnumeration netexMode,
     TransportSubmodeStructure submode
   ) throws UnsupportedModeException {
     if (submode == null) {
-      return new MainAndSubMode(mapAllVehicleModesOfTransport(netexMode));
+      return new NetexMainAndSubMode(mapAllVehicleModesOfTransport(netexMode));
     } else {
       return getSubmodeAsString(submode);
     }
@@ -43,25 +43,25 @@ class TransportModeMapper {
     };
   }
 
-  private MainAndSubMode getSubmodeAsString(TransportSubmodeStructure submode) {
+  private NetexMainAndSubMode getSubmodeAsString(TransportSubmodeStructure submode) {
     if (submode.getAirSubmode() != null) {
-      return new MainAndSubMode(TransitMode.AIRPLANE, submode.getAirSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.AIRPLANE, submode.getAirSubmode().value());
     } else if (submode.getBusSubmode() != null) {
-      return new MainAndSubMode(TransitMode.BUS, submode.getBusSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.BUS, submode.getBusSubmode().value());
     } else if (submode.getTelecabinSubmode() != null) {
-      return new MainAndSubMode(TransitMode.GONDOLA, submode.getTelecabinSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.GONDOLA, submode.getTelecabinSubmode().value());
     } else if (submode.getCoachSubmode() != null) {
-      return new MainAndSubMode(TransitMode.COACH, submode.getCoachSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.COACH, submode.getCoachSubmode().value());
     } else if (submode.getFunicularSubmode() != null) {
-      return new MainAndSubMode(TransitMode.FUNICULAR, submode.getFunicularSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.FUNICULAR, submode.getFunicularSubmode().value());
     } else if (submode.getMetroSubmode() != null) {
-      return new MainAndSubMode(TransitMode.SUBWAY, submode.getMetroSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.SUBWAY, submode.getMetroSubmode().value());
     } else if (submode.getRailSubmode() != null) {
-      return new MainAndSubMode(TransitMode.RAIL, submode.getRailSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.RAIL, submode.getRailSubmode().value());
     } else if (submode.getTramSubmode() != null) {
-      return new MainAndSubMode(TransitMode.TRAM, submode.getTramSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.TRAM, submode.getTramSubmode().value());
     } else if (submode.getWaterSubmode() != null) {
-      return new MainAndSubMode(TransitMode.FERRY, submode.getWaterSubmode().value());
+      return new NetexMainAndSubMode(TransitMode.FERRY, submode.getWaterSubmode().value());
     }
     throw new IllegalArgumentException();
   }

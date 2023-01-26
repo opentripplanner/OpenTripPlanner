@@ -3,10 +3,10 @@ package org.opentripplanner.model.modes;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.util.lang.ToStringBuilder;
 
 class AllowMainAndSubModeFilter implements AllowTransitModeFilter {
 
@@ -24,7 +24,12 @@ class AllowMainAndSubModeFilter implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean allows(TransitMode transitMode, SubMode netexSubMode) {
+  public boolean isSubMode() {
+    return true;
+  }
+
+  @Override
+  public boolean match(TransitMode transitMode, SubMode netexSubMode) {
     // SubModes are deduplicated, so it is safe to use "==" here
     return mainMode == transitMode && subMode == netexSubMode;
   }

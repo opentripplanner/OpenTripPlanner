@@ -5,18 +5,22 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.LocalDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
+import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -217,11 +221,56 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
     return environment -> getSource(environment).getWalkingBike();
   }
 
-  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
-  }
-
   private Leg getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
+  }
+
+  @Override
+  public DataFetcher<Iterable<Leg>> nextLegs() {
+    return environment -> {
+      if (environment.getSource() instanceof ScheduledTransitLeg originalLeg) {
+        var args = new LegacyGraphQLTypes.LegacyGraphQLLegNextLegsArgs(environment.getArguments());
+
+        int numberOfLegs = args.getLegacyGraphQLNumberOfLegs();
+
+        var originModesWithParentStation = args.getLegacyGraphQLOriginModesWithParentStation();
+        var destinationModesWithParentStation = args.getLegacyGraphQLDestinationModesWithParentStation();
+
+        boolean limitToExactOriginStop =
+          originModesWithParentStation == null ||
+          !(
+            StreamSupport
+              .stream(originModesWithParentStation.spliterator(), false)
+              .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString)
+              .toList()
+              .contains(originalLeg.getMode().name())
+          );
+
+        boolean limitToExactDestinationStop =
+          destinationModesWithParentStation == null ||
+          !(
+            StreamSupport
+              .stream(destinationModesWithParentStation.spliterator(), false)
+              .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString)
+              .toList()
+              .contains(originalLeg.getMode().name())
+          );
+
+        var res = AlternativeLegs
+          .getAlternativeLegs(
+            environment.getSource(),
+            numberOfLegs,
+            environment.<LegacyGraphQLRequestContext>getContext().getTransitService(),
+            false,
+            AlternativeLegsFilter.NO_FILTER,
+            limitToExactOriginStop,
+            limitToExactDestinationStop
+          )
+          .stream()
+          .map(Leg.class::cast)
+          .toList();
+        return res;
+      } else return null;
+    };
   }
 }

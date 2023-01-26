@@ -44,7 +44,6 @@ public class JourneyRequest implements Cloneable, Serializable {
   }
 
   public void setModes(RequestModes modes) {
-    transit().setModes(modes.transitModes);
     transfer().setMode(modes.transferMode);
     access().setMode(modes.accessMode);
     egress().setMode(modes.egressMode);
@@ -57,7 +56,6 @@ public class JourneyRequest implements Cloneable, Serializable {
       .withAccessMode(access.mode())
       .withTransferMode(transfer.mode())
       .withEgressMode(egress.mode())
-      .withTransitModes(transit.modes())
       .withDirectMode(direct.mode())
       .build();
   }

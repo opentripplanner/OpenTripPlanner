@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.framework;
 
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -13,8 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * Does the same thing as String.intern, but for several different types. Java's String.intern uses

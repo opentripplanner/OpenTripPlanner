@@ -38,7 +38,8 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -47,6 +48,9 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareType;
@@ -62,6 +66,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -72,14 +77,13 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLQueryTypeImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLQueryType {
 
   // TODO: figure out a runtime solution
   private static final DirectionMapper DIRECTION_MAPPER = new DirectionMapper(
-    DataImportIssueStore.noopIssueStore()
+    DataImportIssueStore.NOOP
   );
 
   public static <T> boolean hasArgument(Map<String, T> m, String name) {
@@ -587,7 +591,9 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
-      RouteRequest request = context.getServerContext().defaultRouteRequest();
+      // we need to clone the default request as it is request-scoped and this method
+      // can be used by a batch query, causing several invocations to use the same instance
+      RouteRequest request = context.getServerContext().defaultRouteRequest().clone();
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
@@ -734,30 +740,75 @@ public class LegacyGraphQLQueryTypeImpl
         "unpreferred.agencies",
         request.journey().transit()::setUnpreferredAgenciesFromString
       );
-      callWith.argument("banned.routes", request.journey().transit()::setBannedRoutesFromString);
-      callWith.argument("banned.agencies", request.journey().transit()::setBannedAgenciesFromSting);
-      callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
+
       // callWith.argument("banned.stops", request::setBannedStops);
       // callWith.argument("banned.stopsHard", request::setBannedStopsHard);
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
 
-      if (hasArgument(environment, "transportModes")) {
-        QualifiedModeSet modes = new QualifiedModeSet("WALK");
+      if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
+        var filterRequestBuilder = TransitFilterRequest.of();
 
-        modes.qModes =
-          environment
-            .<List<Map<String, String>>>getArgument("transportModes")
-            .stream()
-            .map(transportMode ->
-              new QualifiedMode(
-                transportMode.get("mode") +
-                (transportMode.get("qualifier") == null ? "" : "_" + transportMode.get("qualifier"))
+        if (hasArgument(environment, "banned.routes")) {
+          callWith.argument(
+            "banned.routes",
+            s ->
+              filterRequestBuilder.addNot(
+                SelectRequest.of().withRoutesFromString((String) s).build()
               )
-            )
-            .collect(Collectors.toSet());
+          );
+        }
 
-        request.journey().setModes(modes.getRequestModes());
+        if (hasArgument(environment, "banned.agencies")) {
+          callWith.argument(
+            "banned.agencies",
+            s ->
+              filterRequestBuilder.addNot(
+                SelectRequest.of().withAgenciesFromString((String) s).build()
+              )
+          );
+        }
+
+        callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
+
+        if (hasArgument(environment, "transportModes")) {
+          QualifiedModeSet modes = new QualifiedModeSet("WALK");
+
+          modes.qModes =
+            environment
+              .<List<Map<String, String>>>getArgument("transportModes")
+              .stream()
+              .map(transportMode ->
+                new QualifiedMode(
+                  transportMode.get("mode") +
+                  (
+                    transportMode.get("qualifier") == null
+                      ? ""
+                      : "_" + transportMode.get("qualifier")
+                  )
+                )
+              )
+              .collect(Collectors.toSet());
+
+          var requestModes = modes.getRequestModes();
+          request.journey().access().setMode(requestModes.accessMode);
+          request.journey().egress().setMode(requestModes.egressMode);
+          request.journey().direct().setMode(requestModes.directMode);
+          request.journey().transfer().setMode(requestModes.transferMode);
+
+          var tModes = modes
+            .getTransitModes()
+            .stream()
+            .map(MainAndSubMode::new)
+            .collect(Collectors.toList());
+          if (tModes.isEmpty()) {
+            tModes = MainAndSubMode.all();
+          }
+
+          filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
+        }
+
+        request.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {

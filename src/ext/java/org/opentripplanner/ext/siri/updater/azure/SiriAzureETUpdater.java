@@ -3,6 +3,7 @@ package org.opentripplanner.ext.siri.updater.azure;
 import com.azure.messaging.servicebus.ServiceBusErrorContext;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import com.google.common.io.CharStreams;
+import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,15 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.trip.UpdateResult;
+import org.opentripplanner.updater.UpdateResult;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
-import org.opentripplanner.util.HttpUtils;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,6 +122,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         snapshotSource.applyEstimatedTimetable(
           transitModel,
           fuzzyTripMatcher(),
+          entityResolver(),
           feedId,
           false,
           updates
@@ -146,6 +147,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         var result = snapshotSource.applyEstimatedTimetable(
           transitModel,
           fuzzyTripMatcher(),
+          entityResolver(),
           feedId,
           false,
           updates
