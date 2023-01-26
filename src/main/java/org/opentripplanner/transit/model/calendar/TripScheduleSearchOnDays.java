@@ -3,9 +3,8 @@ package org.opentripplanner.transit.model.calendar;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.trip.Timetable;
-import org.opentripplanner.transit.model.trip.TripOnDate;
+import org.opentripplanner.transit.model.trip.TripOnDay;
 
 /**
  * TODO RTM - This is WIP - ignore ....
@@ -13,7 +12,7 @@ import org.opentripplanner.transit.model.trip.TripOnDate;
  *
  *
  * The purpose of this class is to provide a {@link RaptorTripScheduleSearch} on top
- * of {@link PatternsForDay} - the class will delegate the search for each day
+ * of {@link PatternsOnDay} - the class will delegate the search for each day
  *
  *
  * Collection of timetables witch provide access to the next/current/prev timetable,
@@ -21,7 +20,7 @@ import org.opentripplanner.transit.model.trip.TripOnDate;
  * <p>
  *
  */
-public class TripScheduleSearchOnDays implements RaptorTripScheduleSearch<TripOnDate> {
+public class TripScheduleSearchOnDays implements RaptorTripScheduleSearch<TripOnDay> {
 
   /**
    * If there is no schedule on a given day we need to check the prev/next days.
@@ -42,49 +41,30 @@ public class TripScheduleSearchOnDays implements RaptorTripScheduleSearch<TripOn
    */
   private static final int MAX_NUM_OF_DAYS_TO_SEARCH = 7;
 
-  private final TripPatternForDate pattern;
-  private TripPatternForDate currentPattern;
+  private final PatternOnDay originalPattern;
+  private PatternOnDay currentPattern;
 
-  private int currentDay;
+  private int currentDay = 0;
 
-  public TripScheduleSearchOnDays(TripPatternForDate pattern, int currentDay) {
-    this.pattern = pattern;
-    this.currentDay = currentDay;
+  public TripScheduleSearchOnDays(PatternOnDay pattern) {
+    this.originalPattern = pattern;
   }
 
   @Nullable
   Timetable prev() {
-    while (currentDay > 0) {
-      --currentDay;
-      var c = current();
-      if (c != null) {
-        return c;
-      }
-    }
+    // TODO RTM
     return null;
   }
 
   @Nullable
-  Timetable current() {
-    return null; //calendar.serviceDay(currentDay).timetable(patternIndex);
-  }
-
-  @Nullable
   Timetable next() {
-    int limit = Math.max(currentDay + MAX_NUM_OF_DAYS_TO_SEARCH, 7); // calendar.numberOfDays());
-    while (currentDay < limit) {
-      ++currentDay;
-      var c = current();
-      if (c != null) {
-        return c;
-      }
-    }
+    // TODO RTM
     return null;
   }
 
   @Nullable
   @Override
-  public RaptorBoardOrAlightEvent<TripOnDate> search(
+  public RaptorBoardOrAlightEvent<TripOnDay> search(
     int earliestBoardTime,
     int stopPositionInPattern,
     int tripIndexLimit

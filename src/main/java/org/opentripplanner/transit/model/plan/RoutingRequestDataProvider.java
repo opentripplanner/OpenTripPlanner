@@ -1,14 +1,9 @@
 package org.opentripplanner.transit.model.plan;
 
-import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopTime;
+import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.spi.CostCalculator;
@@ -20,22 +15,11 @@ import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.util.BitSetIterator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 import org.opentripplanner.transit.model.calendar.TransitCalendar;
-import org.opentripplanner.transit.model.calendar.TripScheduleSearchOnDays;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.StopPattern;
-import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.network.TripPatternBuilder;
-import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.model.trip.RoutingTripPattern;
-import org.opentripplanner.transit.model.trip.TripOnDate;
+import org.opentripplanner.transit.model.trip.TripOnDay;
+import org.opentripplanner.transit.service.StopModel;
 
 /**
  * This is the transit request scoped service to perform a routing request.
@@ -57,172 +41,119 @@ import org.opentripplanner.transit.model.trip.TripOnDate;
  *   3  20s
  */
 
-public class RoutingRequestDataProvider implements RaptorTransitDataProvider<TripOnDate> {
+public class RoutingRequestDataProvider implements RaptorTransitDataProvider<TripOnDay> {
 
-  private static final FeedScopedId FEED_ID = new FeedScopedId("FEED_ID", "TRIP_PATTERN_ID");
-  public static final StopPattern STOP_PATTERN = createStopPattern();
-
-  private static StopPattern createStopPattern() {
-    StopPattern.StopPatternBuilder stopPatternBuilder = StopPattern.create(3);
-    stopPatternBuilder.stops[0] = RegularStop.of(new FeedScopedId("FEED_ID", "STOP_ID_1")).build();
-    stopPatternBuilder.stops[1] = RegularStop.of(new FeedScopedId("FEED_ID", "STOP_ID_2")).build();
-    stopPatternBuilder.stops[2] = RegularStop.of(new FeedScopedId("FEED_ID", "STOP_ID_3")).build();
-    Arrays.fill(stopPatternBuilder.pickups, PickDrop.SCHEDULED);
-    Arrays.fill(stopPatternBuilder.dropoffs, PickDrop.SCHEDULED);
-    return stopPatternBuilder.build();
-  }
-
+  private final int day;
   private final TransitCalendar transitCalendar;
+  private final StopModel stopModel;
 
-  private static final int[] ROUTE_STOP_INDEX = new int[] { 1, 2, 3 };
-  private static final BitSet ROUTE_BOARD_ALIGHT_BIT_SET = createBitSet(3);
-  private static final Agency AGENCY = Agency
-    .of(new FeedScopedId("FEED_ID", "AGENCY_ID"))
-    .withName("AGENCY_NAME")
-    .withTimezone("Europe/Oslo")
-    .build();
-  private static final Route ROUTE = Route
-    .of(new FeedScopedId("FEED_ID", "ROUTE_ID"))
-    .withMode(TransitMode.BUS)
-    .withAgency(AGENCY)
-    .withLongName(new NonLocalizedString("ROUTE_LONG_NAME"))
-    .build();
-  private static final org.opentripplanner.transit.model.network.RoutingTripPattern ROUTING_TRIP_PATTERN = createRoutingTripPattern();
+  private final CostCalculator<TripOnDay> costCalculator;
 
-  public static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(60, 0, 0);
+  private StopPatternIndex stopPatternIndex;
 
-  private static org.opentripplanner.transit.model.network.RoutingTripPattern createRoutingTripPattern() {
-    TripPatternBuilder tripPatternBuilder = TripPattern
-      .of(FEED_ID)
-      .withRoute(ROUTE)
-      .withStopPattern(STOP_PATTERN);
-    return new org.opentripplanner.transit.model.network.RoutingTripPattern(
-      tripPatternBuilder.build(),
-      tripPatternBuilder
-    );
-  }
+  private RaptorSlackProvider slackProvider = new DefaultSlackProvider(0, 120, 0);
 
-  private TripPatternForDate tripPatternForDate = createTripPatternForDate();
+  private Deduplicator deduplicator = new Deduplicator();
 
-  private TripPatternForDate createTripPatternForDate() {
-    Trip trip = Trip.of(new FeedScopedId("FEED_ID", "TRIP_ID")).withRoute(ROUTE).build();
 
-    StopTime st1 = new StopTime();
-    st1.setDepartureTime(60);
-    StopTime st2 = new StopTime();
-    st1.setDepartureTime(180);
-    StopTime st3 = new StopTime();
-    st1.setDepartureTime(300);
-
-    Collection<StopTime> stopTimes = List.of(st1, st2, st3);
-    TripTimes tripTime = new TripTimes(trip, stopTimes, new Deduplicator());
-    return new TripPatternForDate(
-      ROUTING_TRIP_PATTERN,
-      List.of(tripTime),
-      List.of(),
-      LocalDate.now()
-    );
-  }
-
-  private static BitSet createBitSet(int size) {
-    BitSet bitSet = new BitSet(size);
-    for (int i = 0; i < size; i++) {
-      bitSet.set(i);
-    }
-    return bitSet;
-  }
-
-  public RoutingRequestDataProvider(TransitCalendar transitCalendar) {
+  public RoutingRequestDataProvider(
+    int day,
+    TransitCalendar transitCalendar,
+    StopModel stopModel,
+    CostCalculator<TripOnDay> costCalculator
+  ) {
+    this.day = day;
     this.transitCalendar = transitCalendar;
+    this.stopModel = stopModel;
+    this.costCalculator = costCalculator;
+
+    // TODO RTM - Insert patterns to build an index. we will need a better
+    //          - why to do this later when we have realTime
+    this.stopPatternIndex = new StopPatternIndex(stopModel.stopIndexSize(), null, deduplicator);
   }
 
   @Override
   public int numberOfStops() {
-    // TODO RTM
-    return 4;
+    return stopModel.stopIndexSize();
   }
 
   @Override
   public IntIterator routeIndexIterator(IntIterator stops) {
-    // TODO RTM
-    BitSet patternMask = new BitSet(1);
-    patternMask.set(0);
-    return new BitSetIterator(patternMask);
+    BitSet patterns = stopPatternIndex.activePatternsByStops(stops);
+    // TODO RTM - Use StopPatternIndex to compute the active patterns for the given stops
+    //          - 1) Then filter the bitset using TransitCalendar
+    //          - 2) Then filter the bitset using Request
+    return new BitSetIterator(patterns);
   }
 
   @Override
-  public RaptorRoute<TripOnDate> getRouteForIndex(int routeIndex) {
-    // TODO RTM
-    return new RaptorRouteAdaptor(
-      new RoutingTripPattern(
-        ROUTE_STOP_INDEX,
-        ROUTE_BOARD_ALIGHT_BIT_SET,
-        ROUTE_BOARD_ALIGHT_BIT_SET,
-        TransitMode.BUS,
-        "ROUTE_1"
-      ),
-      new TripScheduleSearchOnDays(tripPatternForDate, 0)
-    );
+  public RaptorRoute<TripOnDay> getRouteForIndex(int patternIndex) {
+    // TODO RTM - We need to know witch day we should start
+    //          - Fetch: transitCalendar -> PatternsOnDays#day -> PatternsOnDay#patternIndex -> PatternOnDay
+    return new RaptorRouteAdaptor(null);
   }
 
   @Override
-  public RaptorPathConstrainedTransferSearch<TripOnDate> transferConstraintsSearch() {
-    // TODO RTM
+  public RaptorPathConstrainedTransferSearch<TripOnDay> transferConstraintsSearch() {
+    //TODO RTM - Only needed to support constrained-transfer - ok for now
     return null;
   }
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfersFromStop(int fromStop) {
-    // TODO RTM
-    return null;
+    // TODO RTM - Replace this with real transfer, we should be able to do single
+    //          - transit leg routing with this
+    return Collections.<DefaultRaptorTransfer>emptyIterator();
   }
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfersToStop(int toStop) {
-    // TODO RTM
-    return null;
+    // TODO RTM - Replace this with real transfer, we should be able to do single
+    //          - transit leg routing with this
+    return Collections.<DefaultRaptorTransfer>emptyIterator();
   }
 
   @Override
-  public CostCalculator multiCriteriaCostCalculator() {
-    // TODO RTM
-    return null;
+  public CostCalculator<TripOnDay> multiCriteriaCostCalculator() {
+    return costCalculator;
   }
 
   @Override
   public RaptorSlackProvider slackProvider() {
-    return SLACK_PROVIDER;
+    return slackProvider;
   }
 
+  @Nonnull
   @Override
   public RaptorStopNameResolver stopNameResolver() {
-    // TODO RTM
-    return null;
+    return stopIndex -> stopModel.stopByIndex(stopIndex).logName();
   }
 
   @Override
   public int getValidTransitDataStartTime() {
-    //TODO RTM
+    //TODO RTM - Ok for now
     return 0;
   }
 
   @Override
   public int getValidTransitDataEndTime() {
-    //TODO RTM
+    //TODO RTM - OK for now
     return Integer.MAX_VALUE;
   }
 
   @Override
-  public RaptorConstrainedBoardingSearch<TripOnDate> transferConstraintsForwardSearch(
+  public RaptorConstrainedBoardingSearch<TripOnDay> transferConstraintsForwardSearch(
     int routeIndex
   ) {
+    //TODO RTM - Only needed to support constrained-transfer - ok for now
     return null;
   }
 
   @Override
-  public RaptorConstrainedBoardingSearch<TripOnDate> transferConstraintsReverseSearch(
+  public RaptorConstrainedBoardingSearch<TripOnDay> transferConstraintsReverseSearch(
     int routeIndex
   ) {
+    //TODO RTM - Only needed to support constrained-transfer - ok for now
     return null;
   }
 }

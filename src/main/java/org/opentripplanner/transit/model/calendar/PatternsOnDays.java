@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.calendar;
 import java.util.List;
 
 // For all days list the {@link PatternsForDay}
-public class PatternsForDays {
+public class PatternsOnDays {
 
-  private List<PatternsForDay> days = List.of();
+  private List<PatternsOnDay> days = List.of();
 }

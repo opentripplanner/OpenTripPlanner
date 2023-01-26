@@ -42,6 +42,22 @@ class BoardTimeSearch {
     }
   }
 
+  static int search(final int[] a, final int start, final int end, final int edt) {
+    if (edt < a[start]) {
+      return Timetable.PREV_TIME_TABLE_INDEX;
+    }
+    // The DepartureSearchTest#compareSearchPerformance is used to determine when to use the
+    // different searches
+    int nTrips = end - start;
+    if (nTrips <= THRESHOLD_LINEAR_APPROX_MIN_LIMIT) {
+      return findBoardTime(a, start, end, edt);
+    } else if (nTrips <= LINEAR_APPROXIMATION_TO_BINARY_THRESHOLD) {
+      return findBoardTimeLinearApproximation(a, start, end, edt);
+    } else {
+      return findBoardTimeBinarySearch(a, start, end, edt);
+    }
+  }
+
   /** Implement {@link TimeSearch#search(int[], int, int, int)} */
   static int findBoardTime(final int[] a, final int start, final int end, final int edt) {
     if (edt < a[start]) {

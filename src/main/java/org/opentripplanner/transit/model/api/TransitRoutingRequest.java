@@ -2,13 +2,13 @@ package org.opentripplanner.transit.model.api;
 
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParameters;
-import org.opentripplanner.transit.model.trip.TripOnDate;
+import org.opentripplanner.transit.model.trip.TripOnDay;
 
 /**
  * TODO RTM - This has nothing to do with the transit model, move somewhere else
  */
 public record TransitRoutingRequest(
-  RaptorRequest<TripOnDate> raptorRequest,
+  RaptorRequest<TripOnDay> raptorRequest,
   GeneralizedCostParameters generalizedCostParams,
 
   /**

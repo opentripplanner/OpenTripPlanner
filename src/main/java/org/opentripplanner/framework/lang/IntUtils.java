@@ -31,6 +31,20 @@ public final class IntUtils {
   }
 
   /**
+   * Check if each value in the array is equal to the given {@code value}. If all values
+   * are the same and equals to {@code value} or the array is empty this method returns
+   * {@code true}.
+   */
+  public static boolean arrayEquals(int[] array, int value) {
+    for (int i : array) {
+      if (value != i) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Concatenate list a and b and convert them to int arrays.
    */
   public static int[] concat(Collection<Integer> a, Collection<Integer> b) {
@@ -48,5 +62,20 @@ public final class IntUtils {
     }
 
     return Math.sqrt(sum / v.size());
+  }
+
+  /**
+   * Add a given {@code delta} value to all elements in an array, except {@code notSet}
+   * elements.
+   */
+  public static int[] arrayPlus(int[] array, int delta) {
+    if (array.length == 0) {
+      return array;
+    }
+    int[] newArray = new int[array.length];
+    for (int i = 0; i < array.length; i++) {
+      newArray[i] = array[i] + delta;
+    }
+    return newArray;
   }
 }

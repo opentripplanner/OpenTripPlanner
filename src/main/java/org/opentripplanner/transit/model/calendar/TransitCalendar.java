@@ -12,7 +12,7 @@ public class TransitCalendar {
 
   /** Info about the calendar days */
   private final CalendarDays daysInfo;
-  private final PatternsForDays patterns = null;
+  private final PatternsOnDays patterns = null;
 
   public TransitCalendar(CalendarDays daysInfo) {
     this.daysInfo = daysInfo;

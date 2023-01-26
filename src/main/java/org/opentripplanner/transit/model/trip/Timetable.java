@@ -5,8 +5,9 @@ package org.opentripplanner.transit.model.trip;
  * of the first boarding in the trip.
  */
 public interface Timetable {
-  int PREV_TIME_TABLE_INDEX = -1024;
-  int NEXT_TIME_TABLE_INDEX = -512;
+  int NOT_AVAILABLE = -900_000;
+  int PREV_TIME_TABLE_INDEX = -901_000;
+  int NEXT_TIME_TABLE_INDEX = -902_000;
 
   int numOfStops();
 

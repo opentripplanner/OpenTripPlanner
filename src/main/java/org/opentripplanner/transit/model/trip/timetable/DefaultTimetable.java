@@ -2,9 +2,19 @@ package org.opentripplanner.transit.model.trip.timetable;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.trip.Timetable;
 
+/**
+ * Implementation of {@link Timetable} witch store board and alight times in one
+ * long array.
+ * <p>
+ * When Raptor searches for a boarding it searches all trips for a given stop, so it is faster
+ * if the boarding/alighting for the same stop and different trips are close to each other in
+ * memory; Hence the first `nTrip` entries in the array is the stop=0 and trip=0-(n-1).
+ * <p>
+ * TODO RTM - Develop other implementaion and use statistics to create the ones with
+ *          - performs the best.
+ */
 public class DefaultTimetable implements Timetable {
 
   private final int hashCode;
@@ -29,27 +39,7 @@ public class DefaultTimetable implements Timetable {
     this.alightSearch = AlightTimeSearch.createSearch(numOfTrips());
     this.hashCode = TimetableIntUtils.matrixHashCode(nTrips, nStops, boardTimes, alightTimes);
     this.maxTripDurationInDays =
-      calculateMaxTripDurationInDays(alightTimes, nStops * (nTrips - 1), alightTimes.length);
-  }
-
-  public static DefaultTimetable create(
-    int[][] boardTimes,
-    int[][] alightTimes,
-    Deduplicator deduplicator
-  ) {
-    int[] bTimes = deduplicator.deduplicateIntArray(
-      TimetableIntUtils.collapseAndFlipMatrix(boardTimes)
-    );
-    int[] aTimes = deduplicator.deduplicateIntArray(
-      TimetableIntUtils.collapseAndFlipMatrix(alightTimes)
-    );
-
-    return new DefaultTimetable(boardTimes.length, boardTimes[0].length, bTimes, aTimes);
-  }
-
-  public static DefaultTimetable create(int[][] times, Deduplicator deduplicator) {
-    int[] array = deduplicator.deduplicateIntArray(TimetableIntUtils.collapseAndFlipMatrix(times));
-    return new DefaultTimetable(times.length, times[0].length, array, array);
+      calculateMaxTripDurationInDays(alightTimes, index(nTrips - 1, 0), alightTimes.length);
   }
 
   @Override
@@ -117,7 +107,7 @@ public class DefaultTimetable implements Timetable {
   }
 
   private int index(int tripIndex, int stopPos) {
-    return nStops * stopPos + tripIndex;
+    return nTrips * stopPos + tripIndex;
   }
 
   private int offset(int stopPos) {
