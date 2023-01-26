@@ -7,7 +7,6 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.spi.RaptorSlackProvider.defaultSlackProvider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,10 +15,11 @@ import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.raptor.spi.SearchDirection;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
@@ -48,6 +48,9 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
       route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
         .withTimetable(schedule("0:10, 0:12, 0:14, 0:16, 0:20"))
     );
+    // We will test board- and alight-slack in a separate test
+    data.withSlackProvider(new DefaultSlackProvider(TRANSFER_SLACK, 0, 0));
+
     requestBuilder
       .searchParams()
       // All access paths are all pareto-optimal (McRaptor).
@@ -64,9 +67,6 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
       .addEgressPaths(TestAccessEgress.walk(STOP_F, D1m));
 
     requestBuilder.searchParams().earliestDepartureTime(T00_00).latestArrivalTime(T00_30);
-
-    // We will test board- and alight-slack in a separate test
-    requestBuilder.slackProvider(defaultSlackProvider(TRANSFER_SLACK, 0, 0));
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }

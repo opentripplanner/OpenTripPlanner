@@ -3,9 +3,9 @@ package org.opentripplanner.raptor._data.transit;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransferBoarding;
 
 class TestConstrainedTransfer implements RaptorConstrainedTransfer {
@@ -79,7 +79,7 @@ class TestConstrainedTransfer implements RaptorConstrainedTransfer {
     return sourceStopPos;
   }
 
-  RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> boardingEvent(int earliestBoardingTime) {
+  RaptorBoardOrAlightEvent<TestTripSchedule> boardingEvent(int earliestBoardingTime) {
     return new ConstrainedTransferBoarding<>(
       transferConstraints,
       targetTripIndex,

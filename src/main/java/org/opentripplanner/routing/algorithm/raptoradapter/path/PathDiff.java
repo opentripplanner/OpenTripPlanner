@@ -15,9 +15,9 @@ import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.framework.text.TableBuilder;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.raptor.api.path.Path;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.PathLeg;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.routing.util.DiffTool;
 
@@ -38,12 +38,12 @@ public class PathDiff<T extends RaptorTripSchedule> {
    * The status is not final; This allows to update the status when matching expected and actual
    * results.
    */
-  public final Path<T> path;
+  public final RaptorPath<T> path;
   public final Integer walkDuration;
   public final List<String> routes = new ArrayList<>();
   public final List<Integer> stops = new ArrayList<>();
 
-  private PathDiff(Path<T> path) {
+  private PathDiff(RaptorPath<T> path) {
     this.path = path;
     this.walkDuration =
       path
@@ -59,9 +59,9 @@ public class PathDiff<T extends RaptorTripSchedule> {
 
   public static <T extends RaptorTripSchedule> void logDiff(
     String leftLabel,
-    Collection<? extends Path<T>> left,
+    Collection<? extends RaptorPath<T>> left,
     String rightLabel,
-    Collection<? extends Path<T>> right,
+    Collection<? extends RaptorPath<T>> right,
     boolean skipCost,
     boolean skipEquals,
     Consumer<String> logger
@@ -93,8 +93,8 @@ public class PathDiff<T extends RaptorTripSchedule> {
   }
 
   public static <T extends RaptorTripSchedule> List<DiffEntry<PathDiff<T>>> diff(
-    Collection<? extends Path<T>> left,
-    Collection<? extends Path<T>> right,
+    Collection<? extends RaptorPath<T>> left,
+    Collection<? extends RaptorPath<T>> right,
     boolean skipCost
   ) {
     return DiffTool.diff(

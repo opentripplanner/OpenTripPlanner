@@ -29,7 +29,6 @@ public abstract class AbstractIntersectionTraversalCalculator
   /**
    * Computes the turn duration in seconds for non-driving traversal modes.
    * <p>
-   * TODO(flamholz): this should probably account for whether there is a traffic light?
    */
   protected double computeNonDrivingTraversalDuration(
     StreetEdge from,

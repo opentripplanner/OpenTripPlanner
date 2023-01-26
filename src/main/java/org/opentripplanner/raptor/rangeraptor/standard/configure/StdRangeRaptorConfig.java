@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.standard.configure;
 
 import java.util.function.BiFunction;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicSearch;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
@@ -27,7 +28,6 @@ import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArriv
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.path.EgressArrivalToPathAdapter;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.raptor.spi.CostCalculator;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * The responsibility of this class is to wire different standard range raptor worker configurations
@@ -94,10 +94,18 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     switch (ctx.profile()) {
       case STANDARD:
       case BEST_TIME:
-        return new ArrivalTimeRoutingStrategy<>(ctx.calculator(), state);
+        return new ArrivalTimeRoutingStrategy<>(
+          state,
+          ctx.createTimeBasedBoardingSupport(),
+          ctx.calculator()
+        );
       case MIN_TRAVEL_DURATION:
       case MIN_TRAVEL_DURATION_BEST_TIME:
-        return new MinTravelDurationRoutingStrategy<>(ctx.calculator(), state);
+        return new MinTravelDurationRoutingStrategy<>(
+          state,
+          ctx.createTimeBasedBoardingSupport(),
+          ctx.calculator()
+        );
     }
     throw new IllegalArgumentException(ctx.profile().toString());
   }

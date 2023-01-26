@@ -2,13 +2,14 @@ package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
 import java.util.function.Supplier;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
-import org.opentripplanner.raptor.api.path.Path;
 import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
-import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
-import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.Path;
 
 /**
  * An OptimizedPath decorates a path returned from Raptor with a transfer-priority-cost and a
@@ -24,7 +25,7 @@ public class OptimizedPath<T extends RaptorTripSchedule>
   private final int waitTimeOptimizedCost;
   private final int breakTieCost;
 
-  public OptimizedPath(Path<T> originalPath) {
+  public OptimizedPath(RaptorPath<T> originalPath) {
     this(
       originalPath.accessLeg(),
       originalPath.rangeRaptorIterationDepartureTime(),
@@ -94,7 +95,7 @@ public class OptimizedPath<T extends RaptorTripSchedule>
     return toString(null);
   }
 
-  private static int priorityCost(Path<?> path) {
+  private static int priorityCost(RaptorPath<?> path) {
     return path.legStream().mapToInt(OptimizedPath::priorityCost).sum();
   }
 

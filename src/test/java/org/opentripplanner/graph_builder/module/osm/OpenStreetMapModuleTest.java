@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
@@ -39,6 +40,7 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -138,20 +140,20 @@ public class OpenStreetMapModuleTest {
     IntersectionVertex iv2 = (IntersectionVertex) gg.getVertex("osm:node:42442273");
     IntersectionVertex iv3 = (IntersectionVertex) gg.getVertex("osm:node:1919595927");
     IntersectionVertex iv4 = (IntersectionVertex) gg.getVertex("osm:node:42452026");
-    assertTrue(iv1.trafficLight);
-    assertTrue(iv2.trafficLight);
-    assertTrue(iv3.trafficLight);
-    assertTrue(iv4.trafficLight);
+    assertTrue(iv1.hasDrivingTrafficLight());
+    assertTrue(iv2.hasDrivingTrafficLight());
+    assertTrue(iv3.hasDrivingTrafficLight());
+    assertTrue(iv4.hasDrivingTrafficLight());
 
     // These are not.
     IntersectionVertex iv5 = (IntersectionVertex) gg.getVertex("osm:node:42435485");
     IntersectionVertex iv6 = (IntersectionVertex) gg.getVertex("osm:node:42439335");
     IntersectionVertex iv7 = (IntersectionVertex) gg.getVertex("osm:node:42436761");
     IntersectionVertex iv8 = (IntersectionVertex) gg.getVertex("osm:node:42442291");
-    assertFalse(iv5.trafficLight);
-    assertFalse(iv6.trafficLight);
-    assertFalse(iv7.trafficLight);
-    assertFalse(iv8.trafficLight);
+    assertFalse(iv5.hasDrivingTrafficLight());
+    assertFalse(iv6.hasDrivingTrafficLight());
+    assertFalse(iv7.hasDrivingTrafficLight());
+    assertFalse(iv8.hasDrivingTrafficLight());
 
     Set<VertexPair> edgeEndpoints = new HashSet<>();
     for (StreetEdge se : gg.getStreetEdges()) {
@@ -294,6 +296,30 @@ public class OpenStreetMapModuleTest {
 
   @Test
   void addParkingLotsToService() {
+    Graph graph = buildParkingLots();
+
+    var service = graph.getVehicleParkingService();
+    assertEquals(11, service.getVehicleParkings().count());
+    assertEquals(6, service.getBikeParks().count());
+    assertEquals(5, service.getCarParks().count());
+  }
+
+  @Test
+  void createArtificalEntrancesToUnlikedParkingLots() {
+    Graph graph = buildParkingLots();
+
+    graph
+      .getVerticesOfType(VehicleParkingEntranceVertex.class)
+      .stream()
+      .filter(v -> v.getLabel().contains("centroid"))
+      .forEach(v -> {
+        assertFalse(v.getOutgoing().isEmpty());
+        assertFalse(v.getIncoming().isEmpty());
+      });
+  }
+
+  @Nonnull
+  private Graph buildParkingLots() {
     var graph = new Graph();
     var providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
@@ -310,11 +336,7 @@ public class OpenStreetMapModuleTest {
     module.staticParkAndRide = true;
     module.staticBikeParkAndRide = true;
     module.buildGraph();
-
-    var service = graph.getVehicleParkingService();
-    assertEquals(8, service.getVehicleParkings().count());
-    assertEquals(4, service.getBikeParks().count());
-    assertEquals(4, service.getCarParks().count());
+    return graph;
   }
 
   /**

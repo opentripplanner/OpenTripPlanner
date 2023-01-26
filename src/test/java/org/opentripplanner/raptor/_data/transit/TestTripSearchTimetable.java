@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor._data.transit;
 
 import java.util.function.IntUnaryOperator;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
-import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripSearchTimetable;
 

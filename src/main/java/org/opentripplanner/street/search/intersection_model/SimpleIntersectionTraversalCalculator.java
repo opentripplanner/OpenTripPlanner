@@ -34,9 +34,9 @@ public class SimpleIntersectionTraversalCalculator
     if (mode.isDriving()) {
       return computeDrivingTraversalDuration(v, from, to);
     } else if (mode.isCycling()) {
-      return computeCyclingTraversalDuration(from, to, toSpeed);
+      return computeCyclingTraversalDuration(v, from, to, toSpeed);
     } else {
-      return computeNonDrivingTraversalDuration(from, to, toSpeed);
+      return computeWalkingTraversalDuration(v, from, to, toSpeed);
     }
   }
 
@@ -110,6 +110,16 @@ public class SimpleIntersectionTraversalCalculator
   }
 
   /**
+   * Sometimes this is applied twice (or even more than twice) when crossing a road which has
+   * multiple traffic lights which are synchronized. Therefore, this penalty should not be too high,
+   * so it's reasonable on average until we have implemented some logic for combining these traffic
+   * lights in intersections.
+   **/
+  public double getExpectedWalkingAndCyclingTrafficLightTimeSec() {
+    return 15;
+  }
+
+  /**
    * Returns if this angle represents a safe turn were incoming traffic does not have to be
    * crossed.
    * <p>
@@ -142,7 +152,7 @@ public class SimpleIntersectionTraversalCalculator
     StreetEdge to
   ) {
     int turnAngle = calculateTurnAngle(from, to);
-    if (v.trafficLight) {
+    if (v.hasDrivingTrafficLight()) {
       // Use constants that apply when there are stop lights.
       if (isSafeTurn(turnAngle)) {
         return getExpectedRightAtLightTimeSec();
@@ -168,17 +178,36 @@ public class SimpleIntersectionTraversalCalculator
     }
   }
 
-  private double computeCyclingTraversalDuration(StreetEdge from, StreetEdge to, float toSpeed) {
+  private double computeCyclingTraversalDuration(
+    IntersectionVertex v,
+    StreetEdge from,
+    StreetEdge to,
+    float toSpeed
+  ) {
     var turnAngle = calculateTurnAngle(from, to);
     final var baseDuration = computeNonDrivingTraversalDuration(from, to, toSpeed);
 
-    if (isTurnAcrossTraffic(turnAngle)) {
+    if (v.hasCyclingTrafficLight()) {
+      return baseDuration + getExpectedWalkingAndCyclingTrafficLightTimeSec();
+    } else if (isTurnAcrossTraffic(turnAngle)) {
       return baseDuration * getAcrossTrafficBicycleTurnMultiplier();
     } else if (isSafeTurn(turnAngle)) {
       return baseDuration * getSafeBicycleTurnModifier();
     } else {
       return baseDuration;
     }
+  }
+
+  private double computeWalkingTraversalDuration(
+    IntersectionVertex v,
+    StreetEdge from,
+    StreetEdge to,
+    float toSpeed
+  ) {
+    final var baseDuration = computeNonDrivingTraversalDuration(from, to, toSpeed);
+    return v.hasWalkingTrafficLight()
+      ? getExpectedWalkingAndCyclingTrafficLightTimeSec() + baseDuration
+      : baseDuration;
   }
 
   private boolean isLeftTurn(int turnAngle) {

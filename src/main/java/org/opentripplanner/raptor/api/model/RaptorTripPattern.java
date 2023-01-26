@@ -1,4 +1,6 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.api.model;
+
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
  * This interface represent a trip pattern. A trip-pattern in the raptor context is just a list of

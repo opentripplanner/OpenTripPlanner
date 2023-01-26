@@ -57,6 +57,10 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
     FlexConfig config
   );
 
+  /**
+   * Earliest departure time from fromStopIndex to toStopIndex, which departs after departureTime,
+   * and for which the flex trip has a duration of flexTime seconds.
+   */
   public abstract int earliestDepartureTime(
     int departureTime,
     int fromStopIndex,
@@ -64,12 +68,26 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
     int flexTime
   );
 
+  /**
+   * Earliest departure time from fromStopIndex.
+   */
+  public abstract int earliestDepartureTime(int stopIndex);
+
+  /**
+   * Latest arrival time to toStopIndex from fromStopIndex, which arrives before arrivalTime,
+   * and for which the flex trip has a duration of flexTime seconds.
+   */
   public abstract int latestArrivalTime(
     int arrivalTime,
     int fromStopIndex,
     int toStopIndex,
     int flexTime
   );
+
+  /**
+   * Latest arrival time to toStopIndex.
+   */
+  public abstract int latestArrivalTime(int stopIndex);
 
   /**
    * Returns all the stops that are in this trip.

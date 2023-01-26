@@ -8,7 +8,9 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -34,7 +36,7 @@ public class TimetabledPassingTimeType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("quay")
-          .type(quayType)
+          .type(new GraphQLNonNull(quayType))
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStop())
           .build()
       )
@@ -64,7 +66,7 @@ public class TimetabledPassingTimeType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("timingPoint")
-          .type(Scalars.GraphQLBoolean)
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description(
             "Whether this is a timing point or not. Boarding and alighting is not allowed at timing points."
           )
@@ -75,7 +77,7 @@ public class TimetabledPassingTimeType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("forBoarding")
-          .type(Scalars.GraphQLBoolean)
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description("Whether vehicle may be boarded at quay.")
           .dataFetcher(environment ->
             ((TripTimeOnDate) environment.getSource()).getPickupType() != PickDrop.NONE
@@ -86,7 +88,7 @@ public class TimetabledPassingTimeType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("forAlighting")
-          .type(Scalars.GraphQLBoolean)
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description("Whether vehicle may be alighted at quay.")
           .dataFetcher(environment ->
             ((TripTimeOnDate) environment.getSource()).getDropoffType() != PickDrop.NONE
@@ -97,7 +99,7 @@ public class TimetabledPassingTimeType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("requestStop")
-          .type(Scalars.GraphQLBoolean)
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description("Whether vehicle will only stop on request.")
           .dataFetcher(environment ->
             ((TripTimeOnDate) environment.getSource()).getDropoffType() ==
@@ -108,8 +110,46 @@ public class TimetabledPassingTimeType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
+          .name("earliestDepartureTime")
+          .type(gqlUtil.timeScalar)
+          .description(
+            "Earliest possible departure time for a service journey with a service window."
+          )
+          .dataFetcher(environment -> {
+            TripTimeOnDate tripTimeOnDate = environment.getSource();
+            FlexTrip<?, ?> flexTrip = getFlexTrip(environment, tripTimeOnDate);
+            if (flexTrip == null) {
+              return null;
+            }
+            return missingValueToNull(
+              flexTrip.earliestDepartureTime(tripTimeOnDate.getStopIndex())
+            );
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("latestArrivalTime")
+          .type(gqlUtil.timeScalar)
+          .description(
+            "Latest possible (planned) arrival time for a service journey with a service window."
+          )
+          .dataFetcher(environment -> {
+            TripTimeOnDate tripTimeOnDate = environment.getSource();
+            FlexTrip<?, ?> flexTrip = getFlexTrip(environment, tripTimeOnDate);
+            if (flexTrip == null) {
+              return null;
+            }
+            return missingValueToNull(flexTrip.latestArrivalTime(tripTimeOnDate.getStopIndex()));
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
           .name("serviceJourney")
-          .type(serviceJourneyType)
+          .type(new GraphQLNonNull(serviceJourneyType))
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getTrip())
           .build()
       )
@@ -145,6 +185,19 @@ public class TimetabledPassingTimeType {
           .build()
       )
       .build();
+  }
+
+  private static FlexTrip<?, ?> getFlexTrip(
+    DataFetchingEnvironment environment,
+    TripTimeOnDate tripTimeOnDate
+  ) {
+    if (OTPFeature.FlexRouting.isOff()) {
+      return null;
+    }
+    return GqlUtil
+      .getTransitService(environment)
+      .getFlexIndex()
+      .getTripById(tripTimeOnDate.getTrip().getId());
   }
 
   /**

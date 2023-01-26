@@ -10,6 +10,7 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
@@ -74,7 +75,8 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
         toStopIndex,
         flexTime
       );
-      if (latestArrivalTime == -1) {
+
+      if (latestArrivalTime == SearchParams.TIME_NOT_SET) {
         return null;
       }
 
@@ -88,7 +90,8 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
         toStopIndex,
         flexTime
       );
-      if (earliestDepartureTime == -1) {
+
+      if (earliestDepartureTime == SearchParams.TIME_NOT_SET) {
         return null;
       }
 

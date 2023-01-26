@@ -1,15 +1,16 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
+import java.util.function.Consumer;
 import javax.annotation.Nonnull;
-import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 
 /**
  * A boarding event passed to Raptor to perform a boarding.
  */
 public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
-  implements RaptorTripScheduleBoardOrAlightEvent<T> {
+  implements RaptorBoardOrAlightEvent<T> {
 
   private final RaptorTransferConstraint constraint;
   private final int tripIndex;
@@ -21,7 +22,7 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   public ConstrainedTransferBoarding(
     @Nonnull RaptorTransferConstraint constraint,
     int tripIndex,
-    @Nonnull T trip,
+    T trip,
     int stopPositionInPattern,
     int time,
     int earliestBoardTime
@@ -35,34 +36,51 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   }
 
   @Override
-  public int getTripIndex() {
+  public int tripIndex() {
     return tripIndex;
   }
 
   @Override
   @Nonnull
-  public T getTrip() {
+  public T trip() {
     return trip;
   }
 
   @Override
-  public int getStopPositionInPattern() {
+  public int stopPositionInPattern() {
     return stopPositionInPattern;
   }
 
   @Override
-  public int getTime() {
+  public int time() {
     return time;
   }
 
   @Override
-  public int getEarliestBoardTimeForConstrainedTransfer() {
+  public int earliestBoardTime() {
     return earliestBoardTime;
   }
 
   @Override
   @Nonnull
-  public RaptorTransferConstraint getTransferConstraint() {
+  public RaptorTransferConstraint transferConstraint() {
     return constraint;
+  }
+
+  @Override
+  public boolean empty() {
+    return false;
+  }
+
+  @Override
+  public void boardWithFallback(
+    Consumer<RaptorBoardOrAlightEvent<T>> boardCallback,
+    Consumer<RaptorBoardOrAlightEvent<T>> alternativeBoardingFallback
+  ) {
+    if (empty()) {
+      alternativeBoardingFallback.accept(this);
+    } else if (!constraint.isNotAllowed()) {
+      boardCallback.accept(this);
+    }
   }
 }

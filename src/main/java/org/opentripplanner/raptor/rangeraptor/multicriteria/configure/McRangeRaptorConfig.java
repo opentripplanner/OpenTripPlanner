@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.configure;
 
 import java.util.function.BiFunction;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -12,7 +13,6 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.MultiCriteriaRouting
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
-import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Configure and create multicriteria worker, state and child classes.
@@ -47,8 +47,10 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private RoutingStrategy<T> createTransitWorkerStrategy(McRangeRaptorWorkerState<T> state) {
     return new MultiCriteriaRoutingStrategy<>(
       state,
-      context.slackProvider(),
+      context.createTimeBasedBoardingSupport(),
+      context.calculator(),
       context.costCalculator(),
+      context.slackProvider(),
       context.debugFactory()
     );
   }
