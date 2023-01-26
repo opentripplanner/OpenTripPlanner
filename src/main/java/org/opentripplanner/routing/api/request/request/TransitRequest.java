@@ -3,7 +3,7 @@ package org.opentripplanner.routing.api.request.request;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
+import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
@@ -160,18 +160,16 @@ public class TransitRequest implements Cloneable, Serializable {
   }
 
   /**
-   * Completely disabling transit routing, for example when you're only interested in bike routes.
-   * <p>
-   * This shortcuts the {@link TransitRouter} so that it returns immediately.
-   */
-  public void disableTransitRouting() {
-    enabled = true;
-  }
-
-  /**
    * Returns whether it is requested to run the transit search for this request.
    */
   public boolean enabled() {
-    return enabled;
+    return filters.stream().noneMatch(ExcludeAllTransitFilter.class::isInstance);
+  }
+
+  /**
+   * Disables the transit search for this request, for example when you only want bike routes.
+   */
+  public void disable() {
+    this.filters = List.of(ExcludeAllTransitFilter.of());
   }
 }
