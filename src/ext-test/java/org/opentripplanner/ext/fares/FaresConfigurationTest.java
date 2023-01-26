@@ -9,7 +9,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService;
 import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareService;
-import org.opentripplanner.standalone.config.framework.JsonSupport;
+import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 
 class FaresConfigurationTest extends JsonSupport {
 

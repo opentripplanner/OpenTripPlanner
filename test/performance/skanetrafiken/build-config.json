@@ -4,8 +4,10 @@
   "transitModelTimeZone": "Europe/Oslo",
   "areaVisibility": true,
   "platformEntriesLinking": true,
-  "islandWithoutStopsMaxSize": 5,
-  "islandWithStopsMaxSize": 5,
+  "islandPruning": {
+    "islandWithoutStopsMaxSize": 5,
+    "islandWithStopsMaxSize": 5
+  },
   "dataImportReport": true,
   "maxTransferDurationSeconds": 3600,
   "maxStopToShapeSnapDistance": 500,

@@ -5,5 +5,9 @@
   },
   "osmDefaults": {
     "osmTagMapping": "houston"
+  },
+  "islandPruning": {
+    "islandWithoutStopsMaxSize": 300,
+    "islandWithStopsMaxSize": 300
   }
 }

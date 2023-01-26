@@ -27,6 +27,13 @@ public interface DataImportIssue {
   String getMessage();
 
   /**
+   * Priority for issue sorting. The issue with the highhest priority will appear first in its class.
+   */
+  default int getPriority() {
+    return 0;
+  }
+
+  /**
    * This method is used by the HTML report builder. It is useful to put links to OSM here.
    */
   default String getHTMLMessage() {

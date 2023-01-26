@@ -331,24 +331,24 @@ ferries, where the check-in process needs to be done in good time before ride.
           .asLinearFunction(dft.unpreferredCost())
       )
       .withRaptor(it ->
-        it.withRelaxTransitSearchGeneralizedCostAtDestination(
-          c
-            .of("relaxTransitSearchGeneralizedCostAtDestination")
-            .since(V2_3)
-            .summary("Whether non-optimal transit paths at the destination should be returned")
-            .description(
-              """
-              Let c be the existing minimum pareto optimal generalized cost to beat. Then a trip
-              with cost c' is accepted if the following is true:
-              `c' < Math.round(c * relaxRaptorCostCriteria)`.
-              
-              If the value is less than 0.0 a normal '<' comparison is performed.
-              
-              Values greater than 2.0 are not supported, due to performance reasons.
-              """
-            )
-            .asDouble(dft.raptor().relaxTransitSearchGeneralizedCostAtDestination())
-        )
+        c
+          .of("relaxTransitSearchGeneralizedCostAtDestination")
+          .since(V2_3)
+          .summary("Whether non-optimal transit paths at the destination should be returned")
+          .description(
+            """
+                Let c be the existing minimum pareto optimal generalized cost to beat. Then a trip
+                with cost c' is accepted if the following is true:
+                `c' < Math.round(c * relaxRaptorCostCriteria)`.
+                              
+                The parameter is optional. If not set a normal comparison is performed.
+                              
+                Values equals or less than zero is not allowed. Values greater than 2.0 are not
+                supported, due to performance reasons.
+                """
+          )
+          .asDoubleOptional()
+          .ifPresent(it::withRelaxGeneralizedCostAtDestination)
       );
   }
 

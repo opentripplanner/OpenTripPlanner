@@ -5,7 +5,8 @@ IT also OTP to download historical data from en HTTP endpoint on startup.
 
 ## Contact Info
 
-Skånetrafiken, Sweden
+Skånetrafiken, Sweden  
+developer.otp@skanetrafiken.se
 
 ## Changelog
 - Added configuration for turning off stop arrival time match feature. 

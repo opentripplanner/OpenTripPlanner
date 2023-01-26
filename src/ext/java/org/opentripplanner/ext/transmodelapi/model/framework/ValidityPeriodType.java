@@ -7,7 +7,7 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 
 public class ValidityPeriodType {
 
-  public static GraphQLObjectType create(GqlUtil qglUtil) {
+  public static GraphQLObjectType create(GqlUtil gqlUtil) {
     return GraphQLObjectType
       .newObject()
       .name("ValidityPeriod")
@@ -15,7 +15,7 @@ public class ValidityPeriodType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("startTime")
-          .type(qglUtil.dateTimeScalar)
+          .type(gqlUtil.dateTimeScalar)
           .description("Start of validity period")
           .dataFetcher(environment -> {
             Pair<Long, Long> period = environment.getSource();
@@ -27,7 +27,7 @@ public class ValidityPeriodType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("endTime")
-          .type(qglUtil.dateTimeScalar)
+          .type(gqlUtil.dateTimeScalar)
           .description("End of validity period. Will return 'null' if validity is open-ended.")
           .dataFetcher(environment -> {
             Pair<Long, Long> period = environment.getSource();

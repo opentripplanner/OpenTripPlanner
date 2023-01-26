@@ -21,40 +21,39 @@ public class BestMatchSpecifier implements OsmSpecifier {
    */
   public static final int EXACT_MATCH_SCORE = 100;
   public static final int WILDCARD_MATCH_SCORE = 1;
-  public static final int PREFIX_MATCH_SCORE = 75;
   public static final int NO_MATCH_SCORE = 0;
   private final Condition[] conditions;
 
   public BestMatchSpecifier(String spec) {
-    conditions = OsmSpecifier.parseEqualsTests(spec, ";");
+    conditions = OsmSpecifier.parseConditions(spec, ";");
   }
 
   @Override
   public Scores matchScores(OSMWithTags way) {
-    int leftScore = 0, rightScore = 0;
-    int leftMatches = 0, rightMatches = 0;
+    int backwardScore = 0, forwardScore = 0;
+    int backwardMatches = 0, forwardMatches = 0;
 
     for (var test : conditions) {
-      var leftMatch = test.matchLeft(way);
-      var rightMatch = test.matchRight(way);
+      var forwardMatch = test.matchForward(way);
+      var backwardMatch = test.matchBackward(way);
 
-      int leftTagScore = toTagScore(leftMatch);
-      leftScore += leftTagScore;
-      if (leftTagScore > 0) {
-        leftMatches++;
+      int backwardTagScore = toTagScore(backwardMatch);
+      backwardScore += backwardTagScore;
+      if (backwardTagScore > 0) {
+        backwardMatches++;
       }
-      int rightTagScore = toTagScore(rightMatch);
-      rightScore += rightTagScore;
-      if (rightTagScore > 0) {
-        rightMatches++;
+      int forwardTagScore = toTagScore(forwardMatch);
+      forwardScore += forwardTagScore;
+      if (forwardTagScore > 0) {
+        forwardMatches++;
       }
     }
 
-    int allMatchLeftBonus = (leftMatches == conditions.length) ? 10 : 0;
-    leftScore += allMatchLeftBonus;
-    int allMatchRightBonus = (rightMatches == conditions.length) ? 10 : 0;
-    rightScore += allMatchRightBonus;
-    return new Scores(leftScore, rightScore);
+    int allMatchBackwardBonus = (backwardMatches == conditions.length) ? 10 : 0;
+    backwardScore += allMatchBackwardBonus;
+    int allMatchForwardBonus = (forwardMatches == conditions.length) ? 10 : 0;
+    forwardScore += allMatchForwardBonus;
+    return new Scores(forwardScore, backwardScore);
   }
 
   @Override
@@ -89,8 +88,6 @@ public class BestMatchSpecifier implements OsmSpecifier {
       case EXACT -> EXACT_MATCH_SCORE;
       // wildcard matches are basically tiebreakers
       case WILDCARD -> WILDCARD_MATCH_SCORE;
-      // if the test says surface=cobblestone:flattened but the way has surface=cobblestone
-      case PREFIX -> PREFIX_MATCH_SCORE;
       // no match means no score
       case NONE -> NO_MATCH_SCORE;
     };

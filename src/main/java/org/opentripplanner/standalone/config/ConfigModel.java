@@ -101,7 +101,7 @@ public class ConfigModel {
     return routerConfig;
   }
 
-  private void initializeOtpFeatures(OtpConfig otpConfig) {
+  public static void initializeOtpFeatures(OtpConfig otpConfig) {
     OTPFeature.enableFeatures(otpConfig.otpFeatures);
     OTPFeature.logFeatureSetup();
   }

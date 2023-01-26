@@ -652,6 +652,69 @@ public class LegacyGraphQLTypes {
     }
   }
 
+  public static class LegacyGraphQLLegNextLegsArgs {
+
+    private Iterable<LegacyGraphQLTransitMode> destinationModesWithParentStation;
+    private Integer numberOfLegs;
+    private Iterable<LegacyGraphQLTransitMode> originModesWithParentStation;
+
+    public LegacyGraphQLLegNextLegsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("destinationModesWithParentStation") != null) {
+          this.destinationModesWithParentStation =
+            ((List<Object>) args.get("destinationModesWithParentStation")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLTransitMode
+                  ? item
+                  : LegacyGraphQLTransitMode.valueOf((String) item)
+              )
+              .map(LegacyGraphQLTransitMode.class::cast)
+              .collect(Collectors.toList());
+        }
+        this.numberOfLegs = (Integer) args.get("numberOfLegs");
+        if (args.get("originModesWithParentStation") != null) {
+          this.originModesWithParentStation =
+            ((List<Object>) args.get("originModesWithParentStation")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLTransitMode
+                  ? item
+                  : LegacyGraphQLTransitMode.valueOf((String) item)
+              )
+              .map(LegacyGraphQLTransitMode.class::cast)
+              .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public Iterable<LegacyGraphQLTransitMode> getLegacyGraphQLDestinationModesWithParentStation() {
+      return this.destinationModesWithParentStation;
+    }
+
+    public Integer getLegacyGraphQLNumberOfLegs() {
+      return this.numberOfLegs;
+    }
+
+    public Iterable<LegacyGraphQLTransitMode> getLegacyGraphQLOriginModesWithParentStation() {
+      return this.originModesWithParentStation;
+    }
+
+    public void setLegacyGraphQLDestinationModesWithParentStation(
+      Iterable<LegacyGraphQLTransitMode> destinationModesWithParentStation
+    ) {
+      this.destinationModesWithParentStation = destinationModesWithParentStation;
+    }
+
+    public void setLegacyGraphQLNumberOfLegs(Integer numberOfLegs) {
+      this.numberOfLegs = numberOfLegs;
+    }
+
+    public void setLegacyGraphQLOriginModesWithParentStation(
+      Iterable<LegacyGraphQLTransitMode> originModesWithParentStation
+    ) {
+      this.originModesWithParentStation = originModesWithParentStation;
+    }
+  }
+
   /** Identifies whether this stop represents a stop or station. */
   public enum LegacyGraphQLLocationType {
     ENTRANCE,
@@ -2998,6 +3061,21 @@ public class LegacyGraphQLTypes {
     public void setLegacyGraphQLLanguage(String language) {
       this.language = language;
     }
+  }
+
+  public enum LegacyGraphQLTransitMode {
+    AIRPLANE,
+    BUS,
+    CABLE_CAR,
+    CARPOOL,
+    COACH,
+    FERRY,
+    FUNICULAR,
+    GONDOLA,
+    RAIL,
+    SUBWAY,
+    TAXI,
+    TRAM,
   }
 
   public static class LegacyGraphQLTransportModeInput {

@@ -10,18 +10,18 @@ import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPL
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceJsonExample;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
+import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-@OnlyIfDocsExist
+@GeneratesDocumentation
 public class RouterConfigurationDocTest {
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "RouterConfiguration.md");
@@ -46,7 +46,7 @@ public class RouterConfigurationDocTest {
    */
   @Test
   public void updateBuildConfigurationDoc() {
-    NodeAdapter node = readBuildConfig();
+    NodeAdapter node = readRouterConfig();
 
     // Read and close inout file (same as output file)
     String doc = readFile(TEMPLATE);
@@ -61,7 +61,7 @@ public class RouterConfigurationDocTest {
     assertFileEquals(original, OUT_FILE);
   }
 
-  private NodeAdapter readBuildConfig() {
+  private NodeAdapter readRouterConfig() {
     var json = jsonNodeFromResource(CONFIG_PATH);
     var conf = new RouterConfig(json, CONFIG_PATH, true);
     return conf.asNodeAdapter();

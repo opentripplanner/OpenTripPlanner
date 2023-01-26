@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.framework;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,18 @@ class UnitsTest {
     assertEquals(2.1, Units.reluctance(2.1234));
     assertEquals(10.0, Units.reluctance(10.1234));
     assertThrows(IllegalArgumentException.class, () -> Units.reluctance(-0.01));
+  }
+
+  @Test
+  void normalizedFactor() {
+    assertEquals(0.0, Units.normalizedFactor(0.0, 0.0, 8.0));
+    assertThrows(IllegalArgumentException.class, () -> Units.normalizedFactor(0.999, 1.0, 8.0));
+  }
+
+  @Test
+  void normalizedOptionalFactor() {
+    assertNull(Units.normalizedOptionalFactor(null, 0.0, 8.0));
+    assertEquals(1.0, Units.normalizedOptionalFactor(1.0, 0.0, 8.0));
   }
 
   @Test

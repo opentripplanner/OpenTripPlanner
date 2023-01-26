@@ -11,14 +11,14 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentest4j.AssertionFailedError;
-import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
-import org.opentripplanner.standalone.config.framework.JsonSupport;
+import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
+import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
 
-@OnlyIfDocsExist
+@GeneratesDocumentation
 public class ExampleConfigTest {
 
   @FilePatternSource(pattern = "docs/examples/**/" + ROUTER_CONFIG_FILENAME)

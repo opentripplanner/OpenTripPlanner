@@ -8,21 +8,21 @@ import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.DocBuilder;
-import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
+import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-@OnlyIfDocsExist
+@GeneratesDocumentation
 public class UpdaterConfigDocTest {
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "UpdaterConfig.md");
@@ -97,12 +97,6 @@ public class UpdaterConfigDocTest {
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
     buf.addSection("##### Example configuration");
-
-    var updaters = mapper.createArrayNode();
-    updaters.add(node.rawNode());
-    var root = mapper.createObjectNode();
-    root.set("updaters", updaters);
-
-    buf.addExample(ROUTER_CONFIG_FILENAME, root);
+    buf.addUpdaterExample(ROUTER_CONFIG_FILENAME, node.rawNode());
   }
 }

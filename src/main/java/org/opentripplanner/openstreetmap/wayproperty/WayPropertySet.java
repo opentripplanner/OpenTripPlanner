@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
@@ -37,8 +37,8 @@ public class WayPropertySet {
   private static final Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
   /** Sets 1.0 as default safety value for all permissions. */
-  private final BiFunction<StreetTraversalPermission, Float, Double> DEFAULT_SAFETY_RESOLVER =
-    ((permission, speedLimit) -> 1.0);
+  private final TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> DEFAULT_SAFETY_RESOLVER =
+    ((permission, speedLimit, osmWay) -> 1.0);
 
   private final List<WayPropertyPicker> wayProperties;
 
@@ -54,9 +54,9 @@ public class WayPropertySet {
   /** The automobile speed for street segments that do not match any SpeedPicker. */
   public Float defaultSpeed;
   /** Resolves walk safety value for each {@link StreetTraversalPermission}. */
-  private BiFunction<StreetTraversalPermission, Float, Double> defaultWalkSafetyForPermission;
+  private TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultWalkSafetyForPermission;
   /** Resolves bicycle safety value for each {@link StreetTraversalPermission}. */
-  private BiFunction<StreetTraversalPermission, Float, Double> defaultBicycleSafetyForPermission;
+  private TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultBicycleSafetyForPermission;
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
   private final WayProperties defaultProperties;
 
@@ -87,70 +87,71 @@ public class WayPropertySet {
    * that are mixins will have their safety values applied if they match at all.
    */
   public WayProperties getDataForWay(OSMWithTags way) {
-    WayProperties leftResult = defaultProperties;
-    WayProperties rightResult = defaultProperties;
-    int bestLeftScore = 0;
-    int bestRightScore = 0;
-    List<MixinProperties> leftMixins = new ArrayList<>();
-    List<MixinProperties> rightMixins = new ArrayList<>();
+    WayProperties backwardResult = defaultProperties;
+    WayProperties forwardResult = defaultProperties;
+    int bestBackwardScore = 0;
+    int bestForwardScore = 0;
+    List<MixinProperties> backwardMixins = new ArrayList<>();
+    List<MixinProperties> forwardMixins = new ArrayList<>();
     for (WayPropertyPicker picker : wayProperties) {
       OsmSpecifier specifier = picker.specifier();
       WayProperties wayProperties = picker.properties();
       var score = specifier.matchScores(way);
-      if (score.left() > bestLeftScore) {
-        leftResult = wayProperties;
-        bestLeftScore = score.left();
+      if (score.backward() > bestBackwardScore) {
+        backwardResult = wayProperties;
+        bestBackwardScore = score.backward();
       }
-      if (score.right() > bestRightScore) {
-        rightResult = wayProperties;
-        bestRightScore = score.right();
+      if (score.forward() > bestForwardScore) {
+        forwardResult = wayProperties;
+        bestForwardScore = score.forward();
       }
     }
 
     for (var mixin : mixins) {
       var score = mixin.specifier().matchScores(way);
-      if (score.left() > 0) {
-        leftMixins.add(mixin);
+      if (score.backward() > 0) {
+        backwardMixins.add(mixin);
       }
-      if (score.right() > 0) {
-        rightMixins.add(mixin);
+      if (score.forward() > 0) {
+        forwardMixins.add(mixin);
       }
     }
 
     float forwardSpeed = getCarSpeedForWay(way, false);
     float backSpeed = getCarSpeedForWay(way, true);
-    StreetTraversalPermission permission = rightResult.getPermission();
+    StreetTraversalPermission permission = forwardResult.getPermission();
+    StreetTraversalPermission backwardPermission = backwardResult.getPermission();
 
-    WayProperties result = rightResult
+    WayProperties result = forwardResult
       .mutate()
       .bicycleSafety(
-        rightResult.getBicycleSafetyFeatures() != null
-          ? rightResult.getBicycleSafetyFeatures().forward()
-          : defaultBicycleSafetyForPermission.apply(permission, forwardSpeed),
-        leftResult.getBicycleSafetyFeatures() != null
-          ? leftResult.getBicycleSafetyFeatures().back()
-          : defaultBicycleSafetyForPermission.apply(permission, backSpeed)
+        forwardResult.getBicycleSafetyFeatures() != null
+          ? forwardResult.getBicycleSafetyFeatures().forward()
+          : defaultBicycleSafetyForPermission.apply(permission, forwardSpeed, way),
+        backwardResult.getBicycleSafetyFeatures() != null
+          ? backwardResult.getBicycleSafetyFeatures().back()
+          : defaultBicycleSafetyForPermission.apply(backwardPermission, backSpeed, way)
       )
       .walkSafety(
-        rightResult.getWalkSafetyFeatures() != null
-          ? rightResult.getWalkSafetyFeatures().forward()
-          : defaultWalkSafetyForPermission.apply(permission, forwardSpeed),
-        leftResult.getWalkSafetyFeatures() != null
-          ? leftResult.getWalkSafetyFeatures().back()
-          : defaultWalkSafetyForPermission.apply(permission, backSpeed)
+        forwardResult.getWalkSafetyFeatures() != null
+          ? forwardResult.getWalkSafetyFeatures().forward()
+          : defaultWalkSafetyForPermission.apply(permission, forwardSpeed, way),
+        backwardResult.getWalkSafetyFeatures() != null
+          ? backwardResult.getWalkSafetyFeatures().back()
+          : defaultWalkSafetyForPermission.apply(backwardPermission, backSpeed, way)
       )
       .build();
 
     /* apply mixins */
-    if (leftMixins.size() > 0) {
-      result = applyMixins(result, leftMixins, false);
+    if (backwardMixins.size() > 0) {
+      result = applyMixins(result, backwardMixins, true);
     }
-    if (rightMixins.size() > 0) {
-      result = applyMixins(result, rightMixins, true);
+    if (forwardMixins.size() > 0) {
+      result = applyMixins(result, forwardMixins, false);
     }
     if (
-      (bestLeftScore == 0 || bestRightScore == 0) &&
-      (leftMixins.size() == 0 || rightMixins.size() == 0)
+      (bestBackwardScore == 0 || bestForwardScore == 0) &&
+      (backwardMixins.size() == 0 || forwardMixins.size() == 0)
     ) {
       String all_tags = dumpTags(way);
       LOG.debug("Used default permissions: {}", all_tags);
@@ -179,7 +180,7 @@ public class WayPropertySet {
   /**
    * Calculate the automobile speed, in meters per second, for this way.
    */
-  public float getCarSpeedForWay(OSMWithTags way, boolean back) {
+  public float getCarSpeedForWay(OSMWithTags way, boolean backward) {
     // first, check for maxspeed tags
     Float speed = null;
     Float currentSpeed;
@@ -187,11 +188,11 @@ public class WayPropertySet {
     if (way.hasTag("maxspeed:motorcar")) speed =
       getMetersSecondFromSpeed(way.getTag("maxspeed:motorcar"));
 
-    if (speed == null && !back && way.hasTag("maxspeed:forward")) speed =
+    if (speed == null && !backward && way.hasTag("maxspeed:forward")) speed =
       getMetersSecondFromSpeed(way.getTag("maxspeed:forward"));
 
-    if (speed == null && back && way.hasTag("maxspeed:reverse")) speed =
-      getMetersSecondFromSpeed(way.getTag("maxspeed:reverse"));
+    if (speed == null && backward && way.hasTag("maxspeed:backward")) speed =
+      getMetersSecondFromSpeed(way.getTag("maxspeed:backward"));
 
     if (speed == null && way.hasTag("maxspeed:lanes")) {
       for (String lane : way.getTag("maxspeed:lanes").split("\\|")) {
@@ -373,7 +374,7 @@ public class WayPropertySet {
    * provide a default for each permission. Safety can vary based on car speed limit on a way.
    */
   public void setDefaultWalkSafetyForPermission(
-    BiFunction<StreetTraversalPermission, Float, Double> defaultWalkSafetyForPermission
+    TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultWalkSafetyForPermission
   ) {
     if (!this.defaultWalkSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default walk safety resolver was already set");
@@ -386,7 +387,7 @@ public class WayPropertySet {
    * provide a default for each permission. Safety can vary based on car speed limit on a way.
    */
   public void setDefaultBicycleSafetyForPermission(
-    BiFunction<StreetTraversalPermission, Float, Double> defaultBicycleSafetyForPermission
+    TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultBicycleSafetyForPermission
   ) {
     if (!this.defaultBicycleSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default cycling safety resolver was already set");
@@ -425,6 +426,13 @@ public class WayPropertySet {
     addSpeedPicker(picker);
   }
 
+  public void setCarSpeed(OsmSpecifier spec, float speed) {
+    SpeedPicker picker = new SpeedPicker();
+    picker.specifier = spec;
+    picker.speed = speed;
+    addSpeedPicker(picker);
+  }
+
   public List<WayPropertyPicker> getWayProperties() {
     return Collections.unmodifiableList(wayProperties);
   }
@@ -449,7 +457,7 @@ public class WayPropertySet {
   private WayProperties applyMixins(
     WayProperties result,
     List<MixinProperties> mixins,
-    boolean right
+    boolean backward
   ) {
     SafetyFeatures bicycleSafetyFeatures = result.getBicycleSafetyFeatures();
     double forwardBicycle = bicycleSafetyFeatures.forward();
@@ -458,7 +466,7 @@ public class WayPropertySet {
     double forwardWalk = walkSafetyFeatures.forward();
     double backWalk = walkSafetyFeatures.back();
     for (var mixin : mixins) {
-      if (right) {
+      if (backward) {
         if (mixin.bicycleSafety() != null) {
           backBicycle *= mixin.bicycleSafety().back();
         }

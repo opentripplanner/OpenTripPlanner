@@ -18,7 +18,9 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 public interface TransitDataProviderFilter {
   boolean tripPatternPredicate(TripPatternForDate tripPatternForDate);
 
-  boolean tripTimesPredicate(TripTimes tripTimes);
+  boolean hasSubModeFilters();
+
+  boolean tripTimesPredicate(TripTimes tripTimes, boolean withFilters);
 
   /**
    * Check if boarding/alighting is possible at each stop. If the values differ from the default

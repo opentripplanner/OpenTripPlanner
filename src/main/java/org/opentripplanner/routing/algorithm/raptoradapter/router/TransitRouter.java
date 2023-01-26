@@ -74,7 +74,7 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    if (request.journey().transit().modes().isEmpty()) {
+    if (!request.journey().transit().enabled()) {
       return new TransitRouterResult(List.of(), null);
     }
 
@@ -119,7 +119,7 @@ public class TransitRouter {
 
     Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
 
-    if (OTPFeature.OptimizeTransfers.isOn()) {
+    if (OTPFeature.OptimizeTransfers.isOn() && !transitResponse.containsUnknownPaths()) {
       paths =
         TransferOptimizationServiceConfigurator
           .createOptimizeTransferService(

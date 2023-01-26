@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.config.NetexFeedParameters;

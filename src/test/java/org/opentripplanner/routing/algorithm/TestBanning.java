@@ -10,6 +10,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RouteRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.request.TransitRequest;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -26,15 +28,16 @@ public class TestBanning {
   public void testSetBannedOnRequest() {
     Collection<Route> routes = getTestRoutes();
 
-    final TransitRequest transit = new TransitRequest();
-    transit.setBannedRoutes(RouteMatcher.parse("F__RUT:Route:1"));
-    transit.setBannedAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
+    var filterRequest = TransitFilterRequest
+      .of()
+      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__RUT:Route:1")).build())
+      .addNot(
+        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2"))).build()
+      )
+      .build();
 
     Collection<FeedScopedId> bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
-      Set.copyOf(transit.bannedAgencies()),
-      transit.bannedRoutes(),
-      Set.copyOf(transit.whiteListedAgencies()),
-      transit.whiteListedRoutes(),
+      List.of(filterRequest),
       routes
     );
 
@@ -47,15 +50,16 @@ public class TestBanning {
   public void testSetWhiteListedOnRequest() {
     Collection<Route> routes = getTestRoutes();
 
-    TransitRequest transit = new TransitRequest();
-    transit.setWhiteListedRoutes(RouteMatcher.parse("F__RUT:Route:1"));
-    transit.setWhiteListedAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
+    var filterRequest = TransitFilterRequest
+      .of()
+      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__RUT:Route:1")).build())
+      .addSelect(
+        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2"))).build()
+      )
+      .build();
 
     Collection<FeedScopedId> bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
-      Set.copyOf(transit.bannedAgencies()),
-      transit.bannedRoutes(),
-      Set.copyOf(transit.whiteListedAgencies()),
-      transit.whiteListedRoutes(),
+      List.of(filterRequest),
       routes
     );
 

@@ -7,19 +7,20 @@ import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.DocBuilder;
-import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
+import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
+import org.opentripplanner.generate.doc.framework.TemplateUtil;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-@OnlyIfDocsExist
+@GeneratesDocumentation
 public class FlexConfigurationDocTest {
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "Flex.md");
@@ -69,12 +70,7 @@ public class FlexConfigurationDocTest {
   }
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
-    buf
-      .header(3, "Example configuration", null)
-      .addExample(
-        "This feature allows a limited number of config options. To change the " +
-        "configuration, add the following to `router-config.json`.",
-        "\"flex\": %s".formatted(node.toPrettyString().indent(node.level() + 1).trim())
-      );
+    var root = TemplateUtil.jsonExampleBuilder(node.rawNode()).wrapInObject("flex").build();
+    buf.header(3, "Example configuration", null).addExample("router-config.json", root);
   }
 }

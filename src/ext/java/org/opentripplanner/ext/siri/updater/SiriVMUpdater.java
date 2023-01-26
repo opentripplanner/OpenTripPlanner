@@ -2,10 +2,12 @@ package org.opentripplanner.ext.siri.updater;
 
 import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
+import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
@@ -48,6 +50,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
    * Set only if we should attempt to match the trip_id from other data in TripDescriptor
    */
   private final SiriFuzzyTripMatcher siriFuzzyTripMatcher;
+  private final EntityResolver entityResolver;
 
   /**
    * The place where we'll record the incoming realtime timetables to make them available to the
@@ -70,7 +73,9 @@ public class SiriVMUpdater extends PollingGraphUpdater {
 
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
-    this.siriFuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
+    TransitService transitService = new DefaultTransitService(transitModel);
+    this.entityResolver = new EntityResolver(transitService, feedId);
+    this.siriFuzzyTripMatcher = SiriFuzzyTripMatcher.of(transitService);
 
     LOG.info(
       "Creating stop time updater (SIRI VM) running every {} seconds : {}",
@@ -107,6 +112,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
             snapshotSource.applyVehicleMonitoring(
               transitModel,
               siriFuzzyTripMatcher,
+              entityResolver,
               feedId,
               fullDataset,
               vmds

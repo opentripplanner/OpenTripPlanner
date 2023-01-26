@@ -3,7 +3,7 @@ package org.opentripplanner.routing.alertpatch;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Direction;
 
-public interface EntityKey {
+public sealed interface EntityKey {
   record Agency(FeedScopedId agencyId) implements EntityKey {}
 
   record Stop(FeedScopedId stopId) implements EntityKey {}
