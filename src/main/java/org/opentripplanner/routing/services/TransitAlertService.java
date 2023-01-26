@@ -13,7 +13,7 @@ public interface TransitAlertService {
 
   Collection<TransitAlert> getAllAlerts();
 
-  TransitAlert getAlertById(String id);
+  TransitAlert getAlertById(FeedScopedId id);
 
   default Collection<TransitAlert> getStopAlerts(FeedScopedId stop) {
     return getStopAlerts(stop, Set.of());

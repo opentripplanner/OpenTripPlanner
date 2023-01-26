@@ -59,13 +59,14 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-SX"));
 
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
-    this.updateHandler = new SiriAlertsUpdateHandler(config.getFeedId(), transitModel);
-    this.updateHandler.setEarlyStart(config.getEarlyStartSec());
-    this.updateHandler.setTransitAlertService(transitAlertService);
-    this.updateHandler.setSiriFuzzyTripMatcher(
-        SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel))
+    this.updateHandler =
+      new SiriAlertsUpdateHandler(
+        config.getFeedId(),
+        transitModel,
+        transitAlertService,
+        SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel)),
+        config.getEarlyStartSec()
       );
-
     LOG.info(
       "Creating real-time alert updater (SIRI SX) running every {} seconds : {}",
       pollingPeriodSeconds(),
