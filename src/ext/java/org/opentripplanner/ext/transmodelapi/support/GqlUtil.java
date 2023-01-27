@@ -19,7 +19,7 @@ import org.opentripplanner.ext.transmodelapi.model.scalars.DateTimeScalarFactory
 import org.opentripplanner.ext.transmodelapi.model.scalars.DoubleFunctionScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
-import org.opentripplanner.routing.DefaultRoutingService;
+import org.opentripplanner.routing.api.request.RoutingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.transit.service.TransitService;
@@ -54,7 +54,7 @@ public class GqlUtil {
         .build();
   }
 
-  public static DefaultRoutingService getRoutingService(DataFetchingEnvironment environment) {
+  public static RoutingService getRoutingService(DataFetchingEnvironment environment) {
     return ((TransmodelRequestContext) environment.getContext()).getRoutingService();
   }
 

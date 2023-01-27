@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
-import org.opentripplanner.routing.DefaultRoutingService;
+import org.opentripplanner.routing.api.request.RoutingService;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
@@ -8,13 +8,13 @@ import org.opentripplanner.transit.service.TransitService;
 public class LegacyGraphQLRequestContext {
 
   private final OtpServerRequestContext serverContext;
-  private final DefaultRoutingService routingService;
+  private final RoutingService routingService;
   private final TransitService transitService;
   private final FareService fareService;
 
   public LegacyGraphQLRequestContext(
     OtpServerRequestContext serverContext,
-    DefaultRoutingService routingService,
+    RoutingService routingService,
     TransitService transitService,
     FareService fareService
   ) {
@@ -28,7 +28,7 @@ public class LegacyGraphQLRequestContext {
     return serverContext;
   }
 
-  public DefaultRoutingService getRoutingService() {
+  public RoutingService getRoutingService() {
     return routingService;
   }
 

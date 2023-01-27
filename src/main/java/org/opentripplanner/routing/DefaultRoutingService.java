@@ -54,6 +54,7 @@ public class DefaultRoutingService implements RoutingService {
   }
 
   /** {@link GraphFinder#findClosestStops(Coordinate, double)} */
+  @Override
   public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
     return this.graphFinder.findClosestStops(coordinate, radiusMeters);
   }
@@ -61,6 +62,7 @@ public class DefaultRoutingService implements RoutingService {
   /**
    * {@link GraphFinder#findClosestPlaces(double, double, double, int, List, List, List, List, List, TransitService)}
    */
+  @Override
   public List<PlaceAtDistance> findClosestPlaces(
     double lat,
     double lon,

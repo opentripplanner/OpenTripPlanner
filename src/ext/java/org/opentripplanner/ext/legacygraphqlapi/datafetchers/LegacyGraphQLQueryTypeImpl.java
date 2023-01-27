@@ -44,10 +44,10 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.DefaultRoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RoutingService;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
@@ -440,9 +440,6 @@ public class LegacyGraphQLQueryTypeImpl
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeNodeArgs(environment.getArguments());
       String type = args.getLegacyGraphQLId().getType();
       String id = args.getLegacyGraphQLId().getId();
-      DefaultRoutingService routingService = environment
-        .<LegacyGraphQLRequestContext>getContext()
-        .getRoutingService();
       TransitService transitService = environment
         .<LegacyGraphQLRequestContext>getContext()
         .getTransitService();
@@ -900,7 +897,7 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      DefaultRoutingService routingService = getRoutingService(environment);
+      RoutingService routingService = getRoutingService(environment);
       TransitService transitService = getTransitService(environment);
 
       if (args.getLegacyGraphQLIds() != null) {
@@ -1275,7 +1272,7 @@ public class LegacyGraphQLQueryTypeImpl
     return environment.containsArgument(name) && environment.getArgument(name) != null;
   }
 
-  private DefaultRoutingService getRoutingService(DataFetchingEnvironment environment) {
+  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
   }
 
