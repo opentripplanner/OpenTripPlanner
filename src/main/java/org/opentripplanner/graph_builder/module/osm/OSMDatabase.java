@@ -704,7 +704,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
         level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels, issueStore);
       }
       if (level == null || (!level.reliable)) {
-        issueStore.add(new LevelAmbiguous(levelName, way.getId()));
+        issueStore.add(new LevelAmbiguous(levelName, way));
         level = OSMLevel.DEFAULT;
       }
       wayLevels.put(way, level);
