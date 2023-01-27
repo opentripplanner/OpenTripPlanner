@@ -499,12 +499,12 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private void timeShiftEgressTime(RaptorSlackProvider slackProvider) {
     var egressPath = asEgressLeg().streetPath;
-    int newFromTime = prev.stopArrivalTime(slackProvider);
+    int stopArrivalTime = prev.stopArrivalTime(slackProvider);
 
     if (egressPath.hasRides()) {
-      newFromTime += slackProvider.transferSlack();
+      stopArrivalTime += slackProvider.transferSlack();
     }
-    newFromTime = egressPath.earliestDepartureTime(newFromTime);
+    int newFromTime = egressPath.earliestDepartureTime(stopArrivalTime);
 
     setTime(newFromTime, newFromTime + egressPath.durationInSeconds());
   }
@@ -600,7 +600,16 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   /* PRIVATE CLASSES */
 
   /** Abstract access/transfer/egress leg */
-  private abstract static class MyStreetLeg implements MyLeg {
+
+  private abstract static class AbstractMyLeg implements MyLeg {
+
+    @Override
+    public final String toString() {
+      return addToString(new PathStringBuilder(null)).toString();
+    }
+  }
+
+  private abstract static class MyStreetLeg extends AbstractMyLeg {
 
     final RaptorAccessEgress streetPath;
 
@@ -611,11 +620,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     @Override
     public boolean hasRides() {
       return streetPath.hasRides();
-    }
-
-    @Override
-    public final String toString() {
-      return addToString(new PathStringBuilder(null)).toString();
     }
   }
 
@@ -641,7 +645,29 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
   }
 
-  private static class MyTransferLeg implements MyLeg {
+  private static class MyEgressLeg extends MyStreetLeg {
+
+    MyEgressLeg(RaptorAccessEgress streetPath) {
+      super(streetPath);
+    }
+
+    @Override
+    public boolean isEgress() {
+      return true;
+    }
+
+    @Override
+    public int toStop() {
+      throw new IllegalStateException("Egress leg have no toStop");
+    }
+
+    @Override
+    public PathStringBuilder addToString(PathStringBuilder builder) {
+      return builder.accessEgress(streetPath);
+    }
+  }
+
+  private static class MyTransferLeg extends AbstractMyLeg {
 
     final int toStop;
     final RaptorTransfer transfer;
@@ -672,7 +698,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
   }
 
-  private static class MyTransitLeg<T extends RaptorTripSchedule> implements MyLeg {
+  private static class MyTransitLeg<T extends RaptorTripSchedule> extends AbstractMyLeg {
 
     final T trip;
     final BoardAndAlightTime boardAndAlightTime;
@@ -738,33 +764,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     public int toTime() {
       return boardAndAlightTime.alightTime();
-    }
-
-    @Override
-    public final String toString() {
-      return addToString(new PathStringBuilder(null)).toString();
-    }
-  }
-
-  private static class MyEgressLeg extends MyStreetLeg {
-
-    MyEgressLeg(RaptorAccessEgress streetPath) {
-      super(streetPath);
-    }
-
-    @Override
-    public boolean isEgress() {
-      return true;
-    }
-
-    @Override
-    public int toStop() {
-      throw new IllegalStateException("Egress leg have no toStop");
-    }
-
-    @Override
-    public PathStringBuilder addToString(PathStringBuilder builder) {
-      return builder.accessEgress(streetPath);
     }
   }
 }
