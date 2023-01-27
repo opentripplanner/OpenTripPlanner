@@ -5,13 +5,15 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public record AreaTooComplicated(OSMWithTags entity, int nbNodes, int maxAreaNodes)
   implements DataImportIssue {
-  public static final String FMT = "Area %s is too complicated (%s > %s)";
-  public static final String HTMLFMT = "Area <a href='%s'>'%s'</a> is too complicated (%s > %s)";
+  private static String FMT = "Area %s is too complicated (%s > %s)";
+  private static String HTMLFMT = "Area <a href='%s'>'%s'</a> is too complicated (%s > %s)";
 
+  @Override
   public String getMessage() {
     return String.format(FMT, entity.getId(), nbNodes, maxAreaNodes);
   }
 
+  @Override
   public String getHTMLMessage() {
     return String.format(
       HTMLFMT,
@@ -22,6 +24,7 @@ public record AreaTooComplicated(OSMWithTags entity, int nbNodes, int maxAreaNod
     );
   }
 
+  @Override
   public int getPriority() {
     return nbNodes;
   }

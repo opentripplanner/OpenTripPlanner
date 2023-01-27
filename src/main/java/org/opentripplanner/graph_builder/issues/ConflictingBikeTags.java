@@ -2,20 +2,13 @@ package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 
-public class ConflictingBikeTags implements DataImportIssue {
-
-  public static final String FMT =
+public record ConflictingBikeTags(long wayId) implements DataImportIssue {
+  private static String FMT =
     "Conflicting tags bicycle:[yes|designated] and cycleway: " +
     "dismount on way %s, assuming dismount";
-  public static final String HTMLFMT =
+  private static String HTMLFMT =
     "Conflicting tags bicycle:[yes|designated] and cycleway: " +
     "dismount on way <a href=\"http://www.openstreetmap.org/way/%d\">\"%d\"</a>, assuming dismount";
-
-  final long wayId;
-
-  public ConflictingBikeTags(long wayId) {
-    this.wayId = wayId;
-  }
 
   @Override
   public String getMessage() {

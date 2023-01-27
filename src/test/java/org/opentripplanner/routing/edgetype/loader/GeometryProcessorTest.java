@@ -130,7 +130,7 @@ public class GeometryProcessorTest {
     boolean found = false;
     for (DataImportIssue it : issueStore.listIssues()) {
       if (it instanceof NegativeHopTime nht) {
-        assertTrue(nht.st0.getDepartureTime() > nht.st1.getArrivalTime());
+        assertTrue(nht.st0().getDepartureTime() > nht.st1().getArrivalTime());
         found = true;
       }
     }
