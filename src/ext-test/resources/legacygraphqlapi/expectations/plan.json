@@ -1,0 +1,47 @@
+{
+  "data" : {
+    "plan" : {
+      "itineraries" : [
+        {
+          "duration" : 0,
+          "legs" : [
+            {
+              "from" : {
+                "name" : "A",
+                "lat" : 5.0,
+                "lon" : 8.0
+              },
+              "to" : {
+                "name" : "E",
+                "lat" : 9.0,
+                "lon" : 10.0
+              },
+              "mode" : "WALK",
+              "route" : null,
+              "distance" : 28.0,
+              "duration" : 20.0
+            },
+            {
+              "from" : {
+                "name" : "E",
+                "lat" : 9.0,
+                "lon" : 10.0
+              },
+              "to" : {
+                "name" : "G",
+                "lat" : 9.5,
+                "lon" : 11.0
+              },
+              "mode" : "BUS",
+              "route" : {
+                "shortName" : "122"
+              },
+              "distance" : 0.0,
+              "duration" : 0.0
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

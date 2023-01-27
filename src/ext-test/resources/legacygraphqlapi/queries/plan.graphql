@@ -1,0 +1,30 @@
+{
+    plan(
+        from: {lat: 35.445288, lon: -97.39688873291017}
+        to: {lat: 35.4883496629, lon: -97.554473}
+        transportModes: [{mode: TRANSIT}]
+    ) {
+        itineraries {
+            duration
+            legs {
+                from {
+                    name
+                    lat
+                    lon
+                }
+                to {
+                    name
+                    lat
+                    lon
+                }
+                mode
+                route {
+                    shortName
+                }
+                distance
+                duration
+            }
+
+        }
+    }
+}

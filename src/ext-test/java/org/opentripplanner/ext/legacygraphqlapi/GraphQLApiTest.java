@@ -2,6 +2,7 @@ package org.opentripplanner.ext.legacygraphqlapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
 
 import jakarta.ws.rs.core.Response;
@@ -16,7 +17,11 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner.TestServerContext;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -26,11 +31,13 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.service.TransitModel;
 
 @Execution(ExecutionMode.CONCURRENT)
-class GraphQLApiTest {
+class GraphQLApiTest implements PlanTestConstants {
 
   static final OtpServerRequestContext context;
   static final Graph graph = new Graph();
   static final LegacyGraphQLAPI resource;
+
+  private static final int T10_20 = TimeUtils.hm2time(10, 20);
 
   static {
     graph
@@ -46,9 +53,14 @@ class GraphQLApiTest {
         List.of()
       );
     var transitModel = new TransitModel();
+    transitModel.initTimeZone(ZoneIds.BERLIN);
     transitModel.index();
     transitModel.getTransitModelIndex().addRoutes(TransitModelForTest.route("123").build());
-    context = TestServerContext.createServerContext(graph, transitModel);
+
+    Itinerary i1 = newItinerary(A, T10_20).walk(20, E).bus(122, T10_20, T10_20, G).build();
+
+    context =
+      TestServerContext.builder(graph, transitModel).withRoutingResponse(List.of(i1)).build();
     resource = new LegacyGraphQLAPI(context, "ignored");
   }
 
