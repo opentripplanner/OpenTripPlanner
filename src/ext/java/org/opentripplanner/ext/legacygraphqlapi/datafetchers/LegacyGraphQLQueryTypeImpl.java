@@ -56,6 +56,7 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -410,7 +411,7 @@ public class LegacyGraphQLQueryTypeImpl
       try {
         places =
           new ArrayList<>(
-            getRoutingService(environment)
+            getGraphFinder(environment)
               .findClosestPlaces(
                 args.getLegacyGraphQLLat(),
                 args.getLegacyGraphQLLon(),
@@ -421,8 +422,6 @@ public class LegacyGraphQLQueryTypeImpl
                 filterByStops,
                 filterByRoutes,
                 filterByBikeRentalStations,
-                filterByBikeParks,
-                filterByCarParks,
                 getTransitService(environment)
               )
           );
@@ -1062,7 +1061,7 @@ public class LegacyGraphQLQueryTypeImpl
       List<NearbyStop> stops;
       try {
         stops =
-          getRoutingService(environment)
+          getGraphFinder(environment)
             .findClosestStops(
               new Coordinate(args.getLegacyGraphQLLon(), args.getLegacyGraphQLLat()),
               args.getLegacyGraphQLRadius()
@@ -1299,6 +1298,10 @@ public class LegacyGraphQLQueryTypeImpl
 
   private FareService getFareService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().getFareService();
+  }
+
+  private GraphFinder getGraphFinder(DataFetchingEnvironment environment) {
+    return environment.<LegacyGraphQLRequestContext>getContext().getServerContext().graphFinder();
   }
 
   private static class CallerWithEnvironment {

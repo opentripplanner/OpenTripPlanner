@@ -19,7 +19,7 @@ import org.opentripplanner.ext.transmodelapi.model.scalars.DateTimeScalarFactory
 import org.opentripplanner.ext.transmodelapi.model.scalars.DoubleFunctionScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
-import org.opentripplanner.routing.api.request.RoutingService;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.transit.service.TransitService;
@@ -54,10 +54,6 @@ public class GqlUtil {
         .build();
   }
 
-  public static RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return ((TransmodelRequestContext) environment.getContext()).getRoutingService();
-  }
-
   public static TransitService getTransitService(DataFetchingEnvironment environment) {
     return ((TransmodelRequestContext) environment.getContext()).getTransitService();
   }
@@ -74,6 +70,10 @@ public class GqlUtil {
     return ((TransmodelRequestContext) environment.getContext()).getServerContext()
       .graph()
       .getVehicleParkingService();
+  }
+
+  public static GraphFinder getGraphFinder(DataFetchingEnvironment environment) {
+    return ((TransmodelRequestContext) environment.getContext()).getServerContext().graphFinder();
   }
 
   public static GraphQLFieldDefinition newTransitIdField() {

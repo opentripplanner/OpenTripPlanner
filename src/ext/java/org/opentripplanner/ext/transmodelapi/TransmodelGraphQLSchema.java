@@ -755,7 +755,7 @@ public class TransmodelGraphQLSchema {
             try {
               stops =
                 GqlUtil
-                  .getRoutingService(environment)
+                  .getGraphFinder(environment)
                   .findClosestStops(
                     new Coordinate(
                       environment.getArgument("longitude"),
@@ -937,7 +937,7 @@ public class TransmodelGraphQLSchema {
             List<PlaceAtDistance> places;
             places =
               GqlUtil
-                .getRoutingService(environment)
+                .getGraphFinder(environment)
                 .findClosestPlaces(
                   environment.getArgument("latitude"),
                   environment.getArgument("longitude"),
@@ -948,8 +948,6 @@ public class TransmodelGraphQLSchema {
                   filterByStops,
                   filterByRoutes,
                   filterByBikeRentalStations,
-                  filterByBikeParks,
-                  filterByCarParks,
                   GqlUtil.getTransitService(environment)
                 );
 
