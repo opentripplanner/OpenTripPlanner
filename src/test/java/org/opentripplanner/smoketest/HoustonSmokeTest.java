@@ -24,7 +24,7 @@ public class HoustonSmokeTest {
       galvestonRoad,
       northLindale,
       Set.of("TRANSIT", "WALK"),
-      List.of("WALK", "BUS", "BUS", "WALK", "BUS", "WALK")
+      List.of("WALK", "BUS", "BUS", "WALK", "TRAM", "WALK")
     );
   }
 }
