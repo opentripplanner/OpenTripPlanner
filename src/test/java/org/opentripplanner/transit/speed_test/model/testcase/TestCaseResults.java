@@ -6,6 +6,7 @@ import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.routing.util.DiffTool;
+import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 
 /**
  * Contains the expected, actual and matched test results. The responsibility is match all expected
@@ -20,17 +21,17 @@ class TestCaseResults {
 
   private final String testCaseId;
   private final boolean skipCost;
-  private final List<Result> expected;
+  private final ExpectedResults expected;
   private final List<Result> actual = new ArrayList<>();
   private final List<DiffEntry<Result>> matchedResults = new ArrayList<>();
   private TestStatus status = TestStatus.NA;
   private int transitTimeMs = 0;
   private int totalTimeMs = 0;
 
-  TestCaseResults(String testCaseId, boolean skipCost, Collection<Result> expected) {
+  TestCaseResults(String testCaseId, boolean skipCost, ExpectedResults expected) {
     this.testCaseId = testCaseId;
     this.skipCost = skipCost;
-    this.expected = List.copyOf(expected);
+    this.expected = expected == null ? new ExpectedResults() : expected;
   }
 
   public int transitTimeMs() {
@@ -39,6 +40,13 @@ class TestCaseResults {
 
   public int totalTimeMs() {
     return totalTimeMs;
+  }
+
+  /**
+   * All test results are OK.
+   */
+  public TestStatus status() {
+    return status;
   }
 
   /**
@@ -73,10 +81,12 @@ class TestCaseResults {
     this.totalTimeMs = totalTimeMs;
   }
 
-  void matchItineraries(Collection<Itinerary> itineraries) {
+  void matchItineraries(SpeedTestProfile profile, Collection<Itinerary> itineraries) {
     actual.addAll(ItineraryResultMapper.map(testCaseId, itineraries));
     matchedResults.clear();
-    matchedResults.addAll(DiffTool.diff(expected, actual, Result.comparator(skipCost)));
+    matchedResults.addAll(
+      DiffTool.diff(expected.get(profile), actual, Result.comparator(skipCost))
+    );
     status = resolveStatus();
   }
 

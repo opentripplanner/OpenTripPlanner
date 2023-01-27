@@ -108,7 +108,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       ctx.calculator(),
       ctx.createLifeCyclePublisher(),
       ctx.performanceTimers(),
-      ctx.enableConstrainedTransfers()
+      ctx.useConstrainedTransfers()
     );
   }
 

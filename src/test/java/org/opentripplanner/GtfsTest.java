@@ -28,6 +28,8 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.graph.Graph;
@@ -103,20 +105,31 @@ public abstract class GtfsTest {
       .withAccessMode(WALK)
       .withTransferMode(WALK)
       .withEgressMode(WALK);
-    if (preferredMode != null) {
-      requestModesBuilder.withTransitMode(preferredMode);
-    } else {
-      requestModesBuilder.withTransitModes(MainAndSubMode.all());
-    }
     routingRequest.journey().setModes(requestModesBuilder.build());
-    if (excludedRoute != null && !excludedRoute.isEmpty()) {
-      routingRequest
-        .journey()
-        .transit()
-        .setBannedRoutes(
-          RouteMatcher.idMatcher(List.of(new FeedScopedId(feedId.getId(), excludedRoute)))
-        );
+
+    var filterRequestBuilder = TransitFilterRequest.of();
+    if (preferredMode != null) {
+      filterRequestBuilder.addSelect(
+        SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
+      );
+    } else {
+      filterRequestBuilder.addSelect(
+        SelectRequest.of().withTransportModes(MainAndSubMode.all()).build()
+      );
     }
+
+    if (excludedRoute != null && !excludedRoute.isEmpty()) {
+      filterRequestBuilder.addNot(
+        SelectRequest
+          .of()
+          .withRoutes(
+            RouteMatcher.idMatcher(List.of(new FeedScopedId(feedId.getId(), excludedRoute)))
+          )
+          .build()
+      );
+    }
+
+    routingRequest.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
 
     // Init preferences
     routingRequest.withPreferences(preferences -> {

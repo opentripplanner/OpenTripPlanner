@@ -52,4 +52,9 @@ public class TransferCouldNotBeRouted implements DataImportIssue {
       directDistance
     );
   }
+
+  @Override
+  public int getPriority() {
+    return (int) -directDistance;
+  }
 }

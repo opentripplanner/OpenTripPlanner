@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 
@@ -67,7 +68,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_TO_PARK);
-    request.journey().transit().setModes(List.of());
+    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
     request.setFrom(p1);
     request.setTo(p2);
 
@@ -82,7 +83,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_PICKUP);
-    request.journey().transit().setModes(List.of());
+    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
     request.setFrom(p3);
     request.setTo(p4);
 
@@ -97,7 +98,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_PICKUP);
-    request.journey().transit().setModes(List.of());
+    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
     request.setFrom(p3);
     request.setTo(p4);
     request.setArriveBy(true);
@@ -113,7 +114,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().direct().setMode(StreetMode.CAR_PICKUP);
-    request.journey().transit().setModes(List.of());
+    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
     request.setFrom(p1);
     request.setTo(p2);
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));

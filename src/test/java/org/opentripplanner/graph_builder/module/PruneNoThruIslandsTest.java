@@ -29,7 +29,7 @@ public class PruneNoThruIslandsTest {
   }
 
   @Test
-  public void bicycleNoThruIslandsBecomeNoThru() {
+  public void bicycleIslandsBecomeNoThru() {
     Assertions.assertTrue(
       graph
         .getStreetEdges()
@@ -42,7 +42,7 @@ public class PruneNoThruIslandsTest {
   }
 
   @Test
-  public void carNoThruIslandsBecomeNoThru() {
+  public void carIslandsBecomeNoThru() {
     Assertions.assertTrue(
       graph
         .getStreetEdges()
@@ -50,7 +50,7 @@ public class PruneNoThruIslandsTest {
         .filter(StreetEdge::isMotorVehicleNoThruTraffic)
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())
-        .containsAll(Set.of("159830262", "55735898", "55735911"))
+        .containsAll(Set.of("159830262", "55735911"))
     );
   }
 
@@ -103,15 +103,16 @@ public class PruneNoThruIslandsTest {
       graph.index(transitModel.getStopModel());
 
       // Prune floating islands and set noThru where necessary
-      PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(
+      PruneIslands pruneIslands = new PruneIslands(
         graph,
         transitModel,
         DataImportIssueStore.NOOP,
         null
       );
-      pruneNoThruIslands.setPruningThresholdIslandWithoutStops(40);
-      pruneNoThruIslands.setPruningThresholdIslandWithStops(5);
-      pruneNoThruIslands.buildGraph();
+      pruneIslands.setPruningThresholdIslandWithoutStops(40);
+      pruneIslands.setPruningThresholdIslandWithStops(5);
+      pruneIslands.setAdaptivePruningFactor(1);
+      pruneIslands.buildGraph();
 
       return graph;
     } catch (Exception e) {

@@ -1,23 +1,27 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.join;
+import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCaseBuilder;
 
 /**
  * FEATURE UNDER TEST
@@ -61,43 +65,25 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  @Test
-  public void standard() {
-    requestBuilder.profile(STANDARD);
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    // expect: The latest departure combined with the earliest arrival is expected
-    assertEquals(
-      "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx]",
-      PathUtils.pathsToString(response)
-    );
+  /** Only the multi-criteria test-cases differ for timetableView on/off */
+  private static RaptorModuleTestCaseBuilder standardTestCases() {
+    return RaptorModuleTestCase
+      .of()
+      .add(
+        standard().manyIterationOnly(),
+        "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx]"
+      )
+      .add(TC_STANDARD_ONE, "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx]")
+      .add(
+        TC_STANDARD_REV_ONE,
+        "Walk 7m ~ C ~ BUS R1 0:18 0:40 ~ H ~ Walk 1s [0:11 0:40:01 29m1s 0tx]"
+      );
   }
 
-  @Test
-  public void standardReverse() {
-    requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    // expect: The latest departure combined with the earliest arrival is expected - same as
-    //         the forward search above
-    assertEquals(
-      "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx]",
-      PathUtils.pathsToString(response)
-    );
-  }
-
-  @Test
-  public void multiCriteriaWithTimetable() {
-    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetableEnabled(true);
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    // expect: With 3 optimal solutions for both access and egress we get 3 x 3 = 9 optimal
-    //         alternatives then timetable is enabled.
-    assertEquals(
-      join(
+  static List<RaptorModuleTestCase> testCases() {
+    return standardTestCases()
+      .add(
+        multiCriteria(),
         "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx $3120]",
         "Walk 4m ~ B ~ BUS R1 0:14 0:32 ~ F ~ Walk 7m [0:10 0:39 29m 0tx $3000]",
         "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx $2762]",
@@ -107,32 +93,38 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
         "Walk 7m ~ C ~ BUS R1 0:18 0:40 ~ H ~ Walk 1s [0:11 0:40:01 29m1s 0tx $2762]",
         "Walk 4m ~ B ~ BUS R1 0:14 0:40 ~ H ~ Walk 1s [0:10 0:40:01 30m1s 0tx $2642]",
         "Walk 1s ~ A ~ BUS R1 0:10 0:40 ~ H ~ Walk 1s [0:09:59 0:40:01 30m2s 0tx $2404]"
-      ),
-      PathUtils.pathsToString(response)
-    );
+      )
+      .build();
   }
 
-  /**
-   * This test turn timetable "off", this is the same as {@code arriveBy=false}. There is no support
-   * for {@code arriveBy=true}, which would prioritize the latest arrival if cost is the same.
-   */
-  @Test
-  public void multiCriteriaWithoutTimetable() {
-    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetableEnabled(false);
+  @ParameterizedTest
+  @MethodSource("testCases")
+  void testRaptorWithTimeTable(RaptorModuleTestCase testCase) {
+    requestBuilder.searchParams().timetable(true);
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
+  }
 
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    // expect: Expect pareto optimal results with earliest-arrival-time and cost as the criteria,
-    //         but not departure-time.
-    assertEquals(
-      join(
+  static List<RaptorModuleTestCase> noTimetableTestCases() {
+    return standardTestCases()
+      .add(
+        multiCriteria(),
         "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx $3120]",
         "Walk 4m ~ B ~ BUS R1 0:14 0:32 ~ F ~ Walk 7m [0:10 0:39 29m 0tx $3000]",
         "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx $2762]",
         "Walk 1s ~ A ~ BUS R1 0:10 0:36 ~ G ~ Walk 4m [0:09:59 0:40 30m1s 0tx $2642]",
         "Walk 1s ~ A ~ BUS R1 0:10 0:40 ~ H ~ Walk 1s [0:09:59 0:40:01 30m2s 0tx $2404]"
-      ),
-      PathUtils.pathsToString(response)
-    );
+      )
+      .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource("noTimetableTestCases")
+  void testRaptorWithoutTimetable(RaptorModuleTestCase testCase) {
+    requestBuilder.searchParams().timetable(false);
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 }

@@ -30,9 +30,9 @@ class LegacyGraphQLstepImplTest {
     note.effectiveEndDate = Date.from(endInstant);
 
     TransitAlert alert = LegacyGraphQLstepImpl.mapStreetNoteToAlert(note);
-    assertEquals(TEST_STREET_NOTE_HEADER, alert.alertHeaderText.toString(Locale.ROOT));
-    assertEquals(TEST_STREET_NOTE_DESCRIPTION, alert.alertDescriptionText.toString(Locale.ROOT));
-    assertEquals(TEST_STREET_NOTE_URL, alert.alertUrl.toString(Locale.ROOT));
+    assertEquals(TEST_STREET_NOTE_HEADER, alert.headerText().toString(Locale.ROOT));
+    assertEquals(TEST_STREET_NOTE_DESCRIPTION, alert.descriptionText().toString(Locale.ROOT));
+    assertEquals(TEST_STREET_NOTE_URL, alert.url().toString(Locale.ROOT));
     assertEquals(startInstant, alert.getEffectiveStartDate());
     assertEquals(endInstant, alert.getEffectiveEndDate());
   }

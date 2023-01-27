@@ -26,9 +26,9 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   private boolean preferLateArrival;
   private int numberOfAdditionalTransfers;
   private int maxNumberOfTransfers;
-  private double relaxCostAtDestination;
-  private boolean timetableEnabled;
-  private boolean constrainedTransfersEnabled;
+  private Double relaxCostAtDestination;
+  private boolean timetable;
+  private boolean constrainedTransfers;
   private boolean allowEmptyEgressPaths;
 
   public SearchParamsBuilder(RaptorRequestBuilder<T> parent, SearchParams defaults) {
@@ -39,9 +39,9 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     this.preferLateArrival = defaults.preferLateArrival();
     this.numberOfAdditionalTransfers = defaults.numberOfAdditionalTransfers();
     this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
-    this.relaxCostAtDestination = defaults.relaxCostAtDestination();
-    this.timetableEnabled = defaults.timetableEnabled();
-    this.constrainedTransfersEnabled = defaults.constrainedTransfersEnabled();
+    this.relaxCostAtDestination = defaults.relaxCostAtDestination().orElse(null);
+    this.timetable = defaults.timetable();
+    this.constrainedTransfers = defaults.constrainedTransfers();
     this.accessPaths.addAll(defaults.accessPaths());
     this.egressPaths.addAll(defaults.egressPaths());
     this.allowEmptyEgressPaths = defaults.allowEmptyEgressPaths();
@@ -115,30 +115,30 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     return this;
   }
 
-  public double relaxCostAtDestination() {
+  public Double relaxCostAtDestination() {
     return relaxCostAtDestination;
   }
 
-  public SearchParamsBuilder<T> relaxCostAtDestination(double relaxCostAtDestination) {
+  public SearchParamsBuilder<T> relaxCostAtDestination(Double relaxCostAtDestination) {
     this.relaxCostAtDestination = relaxCostAtDestination;
     return this;
   }
 
-  public boolean timetableEnabled() {
-    return timetableEnabled;
+  public boolean timetable() {
+    return timetable;
   }
 
-  public SearchParamsBuilder<T> timetableEnabled(boolean enable) {
-    this.timetableEnabled = enable;
+  public SearchParamsBuilder<T> timetable(boolean enable) {
+    this.timetable = enable;
     return this;
   }
 
-  public boolean constrainedTransfersEnabled() {
-    return constrainedTransfersEnabled;
+  public boolean constrainedTransfers() {
+    return constrainedTransfers;
   }
 
-  public SearchParamsBuilder<T> constrainedTransfersEnabled(boolean enable) {
-    this.constrainedTransfersEnabled = enable;
+  public SearchParamsBuilder<T> constrainedTransfers(boolean enable) {
+    this.constrainedTransfers = enable;
     return this;
   }
 
@@ -199,6 +199,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
       .addDurationSec("searchWindow", searchWindowInSeconds)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
+      .addNum("relaxCostAtDestination", relaxCostAtDestination)
       .addCollection("accessPaths", accessPaths, 5)
       .addCollection("egressPaths", egressPaths, 5)
       .toString();

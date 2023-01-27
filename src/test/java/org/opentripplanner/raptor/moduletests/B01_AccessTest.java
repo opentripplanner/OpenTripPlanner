@@ -1,25 +1,27 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.join;
+import static org.opentripplanner.raptor._data.api.PathUtils.pathsToStringDetailed;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig;
 
 /**
  * FEATURE UNDER TEST
@@ -36,7 +38,7 @@ public class B01_AccessTest implements RaptorTestConstants {
   );
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     data.withRoute(
       route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
         .withTimetable(schedule("0:10 0:14 0:18 0:22 0:25"))
@@ -59,46 +61,33 @@ public class B01_AccessTest implements RaptorTestConstants {
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  @Test
-  public void standard() {
-    requestBuilder.profile(STANDARD);
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    // expect: one path with the latest departure time.
-    assertEquals(
-      "Walk 7m ~ D ~ BUS R1 0:18 0:25 ~ F ~ Walk 1s [0:11 0:25:01 14m1s 0tx]",
-      PathUtils.pathsToString(response)
-    );
-  }
-
-  @Test
-  public void standardReverse() {
-    requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    // expect: one path with the latest departure time, same as found in the forward search.
-    assertEquals(
-      "Walk 7m ~ D ~ BUS R1 0:18 0:25 ~ F ~ Walk 1s [0:11 0:25:01 14m1s 0tx]",
-      PathUtils.pathsToString(response)
-    );
-  }
-
-  @Test
-  public void multiCriteria() {
-    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetableEnabled(true);
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    // expect: All pareto optimal paths
-    assertEquals(
-      join(
+  static List<RaptorModuleTestCase> testCases() {
+    return RaptorModuleTestCase
+      .of()
+      .add(
+        RaptorModuleTestConfig.standard().not(TC_STANDARD_ONE),
+        "Walk 7m 0:11 0:18 ~ D 0s ~ BUS R1 0:18 0:25 7m ~ F 0s ~ Walk 1s 0:25 0:25:01 [0:11 0:25:01 14m1s 0tx]"
+      )
+      .add(
+        // When we run one iteration the access boarding first is used as long as it
+        // arrives at the origin at the same time. In this case the "worst" path is kept.
+        TC_STANDARD_ONE,
+        "Walk 1s 0:09:59 0:10 ~ B 0s ~ BUS R1 0:10 0:25 15m ~ F 0s ~ Walk 1s 0:25 0:25:01 [0:09:59 0:25:01 15m2s 0tx]"
+      )
+      .add(
+        multiCriteria(),
         "Walk 7m 0:11 0:18 $840 ~ D 0s ~ BUS R1 0:18 0:25 7m $1020 ~ F 0s ~ Walk 1s 0:25 0:25:01 $2 [0:11 0:25:01 14m1s 0tx $1862]",
         "Walk 4m 0:10 0:14 $480 ~ C 0s ~ BUS R1 0:14 0:25 11m $1260 ~ F 0s ~ Walk 1s 0:25 0:25:01 $2 [0:10 0:25:01 15m1s 0tx $1742]",
         "Walk 1s 0:09:59 0:10 $2 ~ B 0s ~ BUS R1 0:10 0:25 15m $1500 ~ F 0s ~ Walk 1s 0:25 0:25:01 $2 [0:09:59 0:25:01 15m2s 0tx $1504]"
-      ),
-      PathUtils.pathsToStringDetailed(response)
-    );
+      )
+      .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource("testCases")
+  void testRaptor(RaptorModuleTestCase testCase) {
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToStringDetailed(response));
   }
 }

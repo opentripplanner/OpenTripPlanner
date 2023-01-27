@@ -35,7 +35,7 @@ public class DefaultMapperTest {
 
     way = new OSMWithTags();
     way.addTag("maxspeed:forward", "80");
-    way.addTag("maxspeed:reverse", "20");
+    way.addTag("maxspeed:backward", "20");
     way.addTag("maxspeed", "40");
     assertTrue(within(kmhAsMs(80), wps.getCarSpeedForWay(way, false), epsilon));
     assertTrue(within(kmhAsMs(20), wps.getCarSpeedForWay(way, true), epsilon));

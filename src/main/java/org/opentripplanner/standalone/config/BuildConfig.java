@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -33,6 +34,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
 import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
+import org.opentripplanner.standalone.config.buildconfig.IslandPruningConfig;
 import org.opentripplanner.standalone.config.buildconfig.NetexConfig;
 import org.opentripplanner.standalone.config.buildconfig.OsmConfig;
 import org.opentripplanner.standalone.config.buildconfig.S3BucketConfig;
@@ -143,8 +145,10 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final CustomNamer customNamer;
 
   public final boolean osmCacheDataInMem;
-  public final int pruningThresholdIslandWithoutStops;
-  public final int pruningThresholdIslandWithStops;
+
+  /** See {@link IslandPruningConfig}. */
+  public final IslandPruningConfig islandPruning;
+
   public final boolean banDiscouragedWalking;
   public final boolean banDiscouragedBiking;
   public final double maxTransferDurationSeconds;
@@ -277,37 +281,16 @@ public class BuildConfig implements OtpDataStoreConfig {
 When set to true (it is false by default), the elevation module will include the Ellipsoid to
 Geoid difference in the calculations of every point along every StreetWithElevationEdge in the
 graph.
-  
+
 NOTE: if this is set to true for graph building, make sure to not set the value of
 `RoutingResource#geoidElevation` to true otherwise OTP will add this geoid value again to
 all of the elevation values in the street edges.
 """
         )
         .asBoolean(false);
-    pruningThresholdIslandWithStops =
-      root
-        .of("islandWithStopsMaxSize")
-        .since(V2_1)
-        .summary("When a graph island with stops in it should be pruned.")
-        .description(
-          """
-        This field indicates the pruning threshold for islands with stops. Any such island under this
-        size will be pruned.
-        """
-        )
-        .asInt(5);
-    pruningThresholdIslandWithoutStops =
-      root
-        .of("islandWithoutStopsMaxSize")
-        .since(V2_1)
-        .summary("When a graph island without stops should be pruned.")
-        .description(
-          """
-        This field indicates the pruning threshold for islands without stops. Any such island under
-        this size will be pruned.
-        """
-        )
-        .asInt(40);
+
+    islandPruning = IslandPruningConfig.fromConfig(root);
+
     matchBusRoutesToStreets =
       root
         .of("matchBusRoutesToStreets")

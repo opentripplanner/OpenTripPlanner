@@ -46,6 +46,17 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Migration to Jakarta EE 9 [#4698](https://github.com/opentripplanner/OpenTripPlanner/pull/4698)
 - Upgrade dependencies to take newest GTFS Flex spec into account [#4693](https://github.com/opentripplanner/OpenTripPlanner/pull/4693)
 - Configuration of additional HTTP headers for GTFS-RT updaters [#4684](https://github.com/opentripplanner/OpenTripPlanner/pull/4684)
+- Configure Renovate [#4704](https://github.com/opentripplanner/OpenTripPlanner/pull/4704)
+- GTFS-RT extension to add completely new routes [#4667](https://github.com/opentripplanner/OpenTripPlanner/pull/4667)
+- New filter API [#4657](https://github.com/opentripplanner/OpenTripPlanner/pull/4657)
+- Adaptive street graph island pruning [#4688](https://github.com/opentripplanner/OpenTripPlanner/pull/4688)
+- Change tab to spaces [#4733](https://github.com/opentripplanner/OpenTripPlanner/pull/4733)
+- Refactor of wayproperty.specifier.Condition [#4696](https://github.com/opentripplanner/OpenTripPlanner/pull/4696)
+- Cleanup usage of SIRI DatedServiceJourneyId vs. ServiceJourneyId [#4699](https://github.com/opentripplanner/OpenTripPlanner/pull/4699)
+- Add validation on NeTEx flexible area import [#4765](https://github.com/opentripplanner/OpenTripPlanner/pull/4765)
+- Do not return a leg from a leg reference, if trip does not exist on date [#4758](https://github.com/opentripplanner/OpenTripPlanner/pull/4758)
+- Expose more data from SIRI-SX messages in the Transmodel API [#4755](https://github.com/opentripplanner/OpenTripPlanner/pull/4755)
+- Fix direct transfer analyzer [#4767](https://github.com/opentripplanner/OpenTripPlanner/pull/4767)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

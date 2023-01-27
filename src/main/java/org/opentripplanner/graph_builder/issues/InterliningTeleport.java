@@ -22,4 +22,9 @@ public class InterliningTeleport implements DataImportIssue {
   public String getMessage() {
     return String.format(FMT, prevTrip, blockId, distance);
   }
+
+  @Override
+  public int getPriority() {
+    return -distance;
+  }
 }

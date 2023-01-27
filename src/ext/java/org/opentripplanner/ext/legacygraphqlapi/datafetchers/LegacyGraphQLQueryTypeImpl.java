@@ -48,6 +48,8 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareType;
@@ -63,6 +65,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -137,17 +140,18 @@ public class LegacyGraphQLQueryTypeImpl
         .stream()
         .filter(alert ->
           args.getLegacyGraphQLFeeds() == null ||
-          ((List<String>) args.getLegacyGraphQLFeeds()).contains(alert.getFeedId())
+          ((List<String>) args.getLegacyGraphQLFeeds()).contains(alert.getId().getFeedId())
         )
         .filter(alert ->
-          severities == null || severities.contains(getLegacyGraphQLSeverity(alert.severity))
+          severities == null || severities.contains(getLegacyGraphQLSeverity(alert.severity()))
         )
-        .filter(alert -> effects == null || effects.contains(getLegacyGraphQLEffect(alert.effect)))
-        .filter(alert -> causes == null || causes.contains(getLegacyGraphQLCause(alert.cause)))
+        .filter(alert -> effects == null || effects.contains(getLegacyGraphQLEffect(alert.effect()))
+        )
+        .filter(alert -> causes == null || causes.contains(getLegacyGraphQLCause(alert.cause())))
         .filter(alert ->
           args.getLegacyGraphQLRoute() == null ||
           alert
-            .getEntities()
+            .entities()
             .stream()
             .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
             .map(EntitySelector.Route.class::cast)
@@ -158,7 +162,7 @@ public class LegacyGraphQLQueryTypeImpl
         .filter(alert ->
           args.getLegacyGraphQLStop() == null ||
           alert
-            .getEntities()
+            .entities()
             .stream()
             .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
             .map(EntitySelector.Stop.class::cast)
@@ -736,30 +740,76 @@ public class LegacyGraphQLQueryTypeImpl
         "unpreferred.agencies",
         request.journey().transit()::setUnpreferredAgenciesFromString
       );
-      callWith.argument("banned.routes", request.journey().transit()::setBannedRoutesFromString);
-      callWith.argument("banned.agencies", request.journey().transit()::setBannedAgenciesFromSting);
-      callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
+
       // callWith.argument("banned.stops", request::setBannedStops);
       // callWith.argument("banned.stopsHard", request::setBannedStopsHard);
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
 
-      if (hasArgument(environment, "transportModes")) {
-        QualifiedModeSet modes = new QualifiedModeSet("WALK");
+      var transitDisabled = false;
+      if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
+        var filterRequestBuilder = TransitFilterRequest.of();
 
-        modes.qModes =
-          environment
-            .<List<Map<String, String>>>getArgument("transportModes")
-            .stream()
-            .map(transportMode ->
-              new QualifiedMode(
-                transportMode.get("mode") +
-                (transportMode.get("qualifier") == null ? "" : "_" + transportMode.get("qualifier"))
+        if (hasArgument(environment, "banned.routes")) {
+          callWith.argument(
+            "banned.routes",
+            s ->
+              filterRequestBuilder.addNot(
+                SelectRequest.of().withRoutesFromString((String) s).build()
               )
-            )
-            .collect(Collectors.toSet());
+          );
+        }
 
-        request.journey().setModes(modes.getRequestModes());
+        if (hasArgument(environment, "banned.agencies")) {
+          callWith.argument(
+            "banned.agencies",
+            s ->
+              filterRequestBuilder.addNot(
+                SelectRequest.of().withAgenciesFromString((String) s).build()
+              )
+          );
+        }
+
+        callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
+
+        if (hasArgument(environment, "transportModes")) {
+          QualifiedModeSet modes = new QualifiedModeSet("WALK");
+
+          modes.qModes =
+            environment
+              .<List<Map<String, String>>>getArgument("transportModes")
+              .stream()
+              .map(transportMode ->
+                new QualifiedMode(
+                  transportMode.get("mode") +
+                  (
+                    transportMode.get("qualifier") == null
+                      ? ""
+                      : "_" + transportMode.get("qualifier")
+                  )
+                )
+              )
+              .collect(Collectors.toSet());
+
+          var requestModes = modes.getRequestModes();
+          request.journey().access().setMode(requestModes.accessMode);
+          request.journey().egress().setMode(requestModes.egressMode);
+          request.journey().direct().setMode(requestModes.directMode);
+          request.journey().transfer().setMode(requestModes.transferMode);
+
+          var tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
+          if (tModes.isEmpty()) {
+            transitDisabled = true;
+          } else {
+            filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
+          }
+        }
+
+        if (transitDisabled) {
+          request.journey().transit().disable();
+        } else {
+          request.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
+        }
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {

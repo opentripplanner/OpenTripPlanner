@@ -3,13 +3,15 @@ package org.opentripplanner.ext.siri.updater;
 import java.util.List;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.BooleanUtils;
+import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.UpdateResult;
 import org.opentripplanner.updater.WriteToGraphCallback;
-import org.opentripplanner.updater.trip.UpdateResult;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +55,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
   private final SiriTimetableSnapshotSource snapshotSource;
 
   private final SiriFuzzyTripMatcher fuzzyTripMatcher;
+  private final EntityResolver entityResolver;
 
   private final Consumer<UpdateResult> recordMetrics;
 
@@ -70,10 +73,10 @@ public class SiriETUpdater extends PollingGraphUpdater {
     this.snapshotSource = timetableSnapshot;
 
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
+    TransitService transitService = new DefaultTransitService(transitModel);
+    this.entityResolver = new EntityResolver(transitService, feedId);
     this.fuzzyTripMatcher =
-      config.isFuzzyTripMatching()
-        ? SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel))
-        : null;
+      config.isFuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
 
     LOG.info(
       "Creating stop time updater (SIRI ET) running every {} seconds : {}",
@@ -110,6 +113,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
             var result = snapshotSource.applyEstimatedTimetable(
               transitModel,
               fuzzyTripMatcher,
+              entityResolver,
               feedId,
               fullDataset,
               etds

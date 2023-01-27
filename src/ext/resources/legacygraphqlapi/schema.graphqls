@@ -1386,6 +1386,28 @@ type Leg {
     dropOffBookingInfo: BookingInfo
 
     pickupBookingInfo: BookingInfo
+
+    """
+    Future legs with same origin and destination stops or stations
+    """
+    nextLegs(
+        """
+        The number of alternative legs searched. If fewer than the requested number are found,
+        then only the found legs are returned.
+        """
+        numberOfLegs: Int!
+
+        """
+        Transportation modes for which all stops in the parent station are used as possible origin stops
+        for the next legs. For modes not listed, only the exact origin stop of the leg is considered.
+        """
+        originModesWithParentStation: [TransitMode!]
+
+        """
+        Transportation modes for which all stops in the parent station are used as possible destination stops
+        for the next legs. For modes not listed, only the exact destination stop of the leg is considered.
+        """
+        destinationModesWithParentStation: [TransitMode!]): [Leg!]
 }
 
 """A span of time."""
@@ -1479,6 +1501,44 @@ enum Mode {
 
     """WALK"""
     WALK
+}
+
+enum TransitMode {
+    """AIRPLANE"""
+    AIRPLANE
+
+    """BUS"""
+    BUS
+
+    """CABLE_CAR"""
+    CABLE_CAR
+
+    """COACH"""
+    COACH
+
+    """FERRY"""
+    FERRY
+
+    """FUNICULAR"""
+    FUNICULAR
+
+    """GONDOLA"""
+    GONDOLA
+
+    """RAIL"""
+    RAIL
+
+    """SUBWAY"""
+    SUBWAY
+
+    """TRAM"""
+    TRAM
+
+    """"Private car trips shared with others."""
+    CARPOOL
+
+    """A taxi, possibly operated by a public transport agency."""
+    TAXI
 }
 
 """An object with an ID"""

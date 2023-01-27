@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transferanalyzer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -86,12 +87,15 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         .filter(t -> t.stop instanceof RegularStop)
         .collect(Collectors.toMap(t -> (RegularStop) t.stop, t -> t));
 
-      /* Find nearby stops by street distance */
-      Map<RegularStop, NearbyStop> stopsStreets = nearbyStopFinderStreets
-        .findClosestStops(c0, radiusMeters * RADIUS_MULTIPLIER)
-        .stream()
-        .filter(t -> t.stop instanceof RegularStop)
-        .collect(Collectors.toMap(t -> (RegularStop) t.stop, t -> t));
+      Map<RegularStop, NearbyStop> stopsStreets = new HashMap<>();
+      try {
+        /* Find nearby stops by street distance */
+        nearbyStopFinderStreets
+          .findClosestStops(c0, radiusMeters * RADIUS_MULTIPLIER)
+          .stream()
+          .filter(t -> t.stop instanceof RegularStop)
+          .forEach(t -> stopsStreets.putIfAbsent((RegularStop) t.stop, t));
+      } catch (Exception ignored) {}
 
       RegularStop originStop = originStopVertex.getStop();
 

@@ -4,14 +4,11 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.routing.alertpatch.EntityKey;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
-import org.opentripplanner.routing.alertpatch.StopConditionsHelper;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -37,7 +34,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   public void setAlerts(Collection<TransitAlert> alerts) {
     Multimap<EntityKey, TransitAlert> newAlerts = HashMultimap.create();
     for (TransitAlert alert : alerts) {
-      for (EntitySelector entity : alert.getEntities()) {
+      for (EntitySelector entity : alert.entities()) {
         newAlerts.put(entity.key(), alert);
       }
     }
@@ -51,7 +48,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public TransitAlert getAlertById(String id) {
+  public TransitAlert getAlertById(FeedScopedId id) {
     return alerts
       .values()
       .stream()
@@ -68,7 +65,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     Set<TransitAlert> result = new HashSet<>();
     EntitySelector.Stop entitySelector = new EntitySelector.Stop(stopId, stopConditions);
     for (TransitAlert alert : alerts.get(entitySelector.key())) {
-      if (alert.getEntities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
+      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
         result.add(alert);
       }
     }
@@ -104,7 +101,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     Set<TransitAlert> result = new HashSet<>();
     EntitySelector.Trip entitySelector = new EntitySelector.Trip(trip, serviceDate);
     for (TransitAlert alert : alerts.get(entitySelector.key())) {
-      if (alert.getEntities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
+      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
         result.add(alert);
       }
     }
@@ -129,7 +126,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
       stopConditions
     );
     for (TransitAlert alert : alerts.get(entitySelector.key())) {
-      if (alert.getEntities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
+      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
         result.add(alert);
       }
     }
@@ -151,7 +148,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
       stopConditions
     );
     for (TransitAlert alert : alerts.get(entitySelector.key())) {
-      if (alert.getEntities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
+      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
         result.add(alert);
       }
     }

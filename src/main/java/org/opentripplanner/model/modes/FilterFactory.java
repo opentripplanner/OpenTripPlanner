@@ -96,6 +96,7 @@ class FilterFactory {
     if (result.size() == 1) {
       return result.get(0);
     }
+
     // Remove duplicates and preserve order
     return new FilterCollection(result.stream().distinct().toList());
   }

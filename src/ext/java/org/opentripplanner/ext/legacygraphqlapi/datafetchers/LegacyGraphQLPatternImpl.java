@@ -81,7 +81,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
                   .stream()
                   .filter(alert ->
                     alert
-                      .getEntities()
+                      .entities()
                       .stream()
                       .anyMatch(entity ->
                         (
@@ -108,7 +108,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
                     .stream()
                     .filter(alert ->
                       alert
-                        .getEntities()
+                        .entities()
                         .stream()
                         .anyMatch(entity ->
                           (

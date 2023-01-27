@@ -1,6 +1,5 @@
 package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
@@ -28,13 +27,5 @@ class ExactMatchSpecifierTest extends SpecifierTest {
     assertScore(0, highwayPrimarySpec, tunnel);
     assertScore(600, pedestrianUndergroundTunnelSpec, tunnel);
     assertScore(800, pedestrianUndergroundIndoorTunnelSpec, tunnel);
-  }
-
-  @Test
-  public void throwOnWildcard() {
-    Assertions.assertThrows(
-      IllegalArgumentException.class,
-      () -> new ExactMatchSpecifier("highway=*")
-    );
   }
 }

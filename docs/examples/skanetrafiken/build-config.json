@@ -4,8 +4,10 @@
   "osmDefaults": {
     "osmTagMapping": "norway"
   },
-  "islandWithoutStopsMaxSize": 5,
-  "islandWithStopsMaxSize": 5,
+  "islandPruning": {
+    "islandWithoutStopsMaxSize": 5,
+    "islandWithStopsMaxSize": 5
+  },
   "dataImportReport": true,
   "maxTransferDurationSeconds": 900,
   "maxStopToShapeSnapDistance": 500,

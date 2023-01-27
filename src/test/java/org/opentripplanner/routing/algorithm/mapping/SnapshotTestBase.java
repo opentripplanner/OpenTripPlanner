@@ -47,6 +47,8 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -272,7 +274,17 @@ public abstract class SnapshotTestBase {
       .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
-    var transitModes = mapModes(request.journey().transit().modes());
+    // TODO: 2022-12-20 filters: this is for REST so there should not be more than one filter
+    //  but technically this is not right
+    List<MainAndSubMode> transportModes = new ArrayList<>();
+    var filter = request.journey().transit().filters().get(0);
+    if (filter instanceof TransitFilterRequest) {
+      transportModes = ((TransitFilterRequest) filter).select().get(0).transportModes();
+    } else if (filter instanceof AllowAllTransitFilter) {
+      transportModes = MainAndSubMode.all();
+    }
+
+    var transitModes = mapModes(transportModes);
 
     var modes = Stream
       .concat(

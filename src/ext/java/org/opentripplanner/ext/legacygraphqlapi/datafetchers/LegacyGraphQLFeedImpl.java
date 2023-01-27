@@ -43,7 +43,7 @@ public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGr
                 .stream()
                 .filter(alert ->
                   alert
-                    .getEntities()
+                    .entities()
                     .stream()
                     .filter(EntitySelector.RouteType.class::isInstance)
                     .map(EntitySelector.RouteType.class::cast)
