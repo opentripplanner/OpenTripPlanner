@@ -29,6 +29,16 @@ public class HoustonSmokeTest {
   }
 
   @Test
+  public void selectOnlyBusses() {
+    SmokeTest.basicRouteTest(
+      galvestonRoad,
+      northLindale,
+      Set.of("BUS", "WALK"),
+      List.of("WALK", "BUS", "BUS", "WALK", "BUS", "WALK")
+    );
+  }
+
+  @Test
   public void bikeRoute() {
     SmokeTest.basicRouteTest(galvestonRoad, northLindale, Set.of("BICYCLE"), List.of("BICYCLE"));
   }
