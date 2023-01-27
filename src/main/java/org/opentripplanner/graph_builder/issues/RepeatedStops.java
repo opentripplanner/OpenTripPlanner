@@ -22,4 +22,9 @@ public class RepeatedStops implements DataImportIssue {
   public String getMessage() {
     return String.format(FMT, trip.getId(), removedStopSequences);
   }
+
+  @Override
+  public int getPriority() {
+    return removedStopSequences.size();
+  }
 }

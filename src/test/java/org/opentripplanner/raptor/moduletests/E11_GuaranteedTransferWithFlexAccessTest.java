@@ -5,19 +5,22 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.model.SearchDirection;
-import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
@@ -64,41 +67,25 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  @Test
-  public void standard() {
-    requestBuilder.profile(RaptorProfile.STANDARD);
-    requestBuilder.searchParams().searchOneIterationOnly();
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    assertEquals(
-      "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]",
-      pathsToString(response)
-    );
+  static List<RaptorModuleTestCase> testCases() {
+    return RaptorModuleTestCase
+      .of()
+      .add(
+        standard(),
+        "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]"
+      )
+      .add(
+        multiCriteria(),
+        "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx $3820]"
+      )
+      .build();
   }
 
-  @Test
-  public void standardReverse() {
-    requestBuilder.profile(RaptorProfile.STANDARD).searchDirection(SearchDirection.REVERSE);
-    requestBuilder.searchParams().searchOneIterationOnly();
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    assertEquals(
-      "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]",
-      pathsToString(response)
-    );
-  }
-
-  @Test
-  public void multiCriteria() {
-    requestBuilder.profile(RaptorProfile.MULTI_CRITERIA);
-
-    var response = raptorService.route(requestBuilder.build(), data);
-
-    assertEquals(
-      "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx $3820]",
-      pathsToString(response)
-    );
+  @ParameterizedTest
+  @MethodSource("testCases")
+  void testRaptor(RaptorModuleTestCase testCase) {
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 }
