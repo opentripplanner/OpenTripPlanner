@@ -1,24 +1,19 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public record StreetCarSpeedZero(long wayId) implements DataImportIssue {
+public record StreetCarSpeedZero(OSMWithTags entity) implements DataImportIssue {
   private static String FMT = "Way %s has car speed zero";
-  private static String HTMLFMT =
-    "Way <a href=\"http://www.openstreetmap.org/way/%d\">\"%d\"</a> has car speed zero";
+  private static String HTMLFMT = "Way <a href='%s'>'%s'</a> has car speed zero";
 
   @Override
   public String getMessage() {
-    return String.format(FMT, wayId);
+    return String.format(FMT, entity.getId());
   }
 
   @Override
   public String getHTMLMessage() {
-    if (wayId > 0) {
-      return String.format(HTMLFMT, wayId, wayId);
-      // If way is lower then 0 it means it is temporary ID and so useless to link to OSM
-    } else {
-      return getMessage();
-    }
+    return String.format(HTMLFMT, entity.getOpenStreetMapLink(), entity.getId());
   }
 }
