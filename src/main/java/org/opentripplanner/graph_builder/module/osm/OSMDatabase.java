@@ -1004,7 +1004,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
       tag =
         new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U, relation.getId());
     } else {
-      issueStore.add(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction")));
+      issueStore.add(new TurnRestrictionUnknown(relation, relation.getTag("restriction")));
       return;
     }
     tag.modes = modes.clone();
