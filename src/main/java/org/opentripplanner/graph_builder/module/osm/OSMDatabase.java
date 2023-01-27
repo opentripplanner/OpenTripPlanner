@@ -1142,7 +1142,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
     if (platformArea != null && !platformsNodes.isEmpty()) {
       stopsInAreas.put(platformArea, platformsNodes);
     } else {
-      issueStore.add(new PublicTransportRelationSkipped(relation.getId()));
+      issueStore.add(new PublicTransportRelationSkipped(relation));
     }
   }
 
