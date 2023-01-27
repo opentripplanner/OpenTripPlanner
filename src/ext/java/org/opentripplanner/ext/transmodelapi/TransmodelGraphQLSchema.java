@@ -31,10 +31,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
@@ -70,6 +73,7 @@ import org.opentripplanner.ext.transmodelapi.model.plan.TripPatternType;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripQuery;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripType;
 import org.opentripplanner.ext.transmodelapi.model.siri.et.EstimatedCallType;
+import org.opentripplanner.ext.transmodelapi.model.siri.sx.AffectsType;
 import org.opentripplanner.ext.transmodelapi.model.siri.sx.PtSituationElementType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeParkType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeRentalStationType;
@@ -127,8 +131,8 @@ public class TransmodelGraphQLSchema {
     this.routing = new DefaultRouteRequestType(defaultRequest);
   }
 
-  public static GraphQLSchema create(RouteRequest defaultRequest, GqlUtil qglUtil) {
-    return new TransmodelGraphQLSchema(defaultRequest, qglUtil).create();
+  public static GraphQLSchema create(RouteRequest defaultRequest, GqlUtil gqlUtil) {
+    return new TransmodelGraphQLSchema(defaultRequest, gqlUtil).create();
   }
 
   public GraphQLObjectType createPlanType(
@@ -275,6 +279,15 @@ public class TransmodelGraphQLSchema {
     );
     GraphQLOutputType interchangeType = InterchangeType.create(lineType, ServiceJourneyType.REF);
 
+    GraphQLOutputType affectsType = AffectsType.create(
+      quayType,
+      stopPlaceType,
+      lineType,
+      ServiceJourneyType.REF,
+      DatedServiceJourneyType.REF,
+      gqlUtil
+    );
+
     // Timetable
     GraphQLNamedOutputType ptSituationElementType = PtSituationElementType.create(
       authorityType,
@@ -285,6 +298,8 @@ public class TransmodelGraphQLSchema {
       multilingualStringType,
       validityPeriodType,
       infoLinkType,
+      affectsType,
+      gqlUtil,
       relay
     );
     GraphQLOutputType journeyPatternType = JourneyPatternType.create(
@@ -1484,6 +1499,17 @@ public class TransmodelGraphQLSchema {
               .newArgument()
               .name("authorities")
               .description("Filter by reporting authorities.")
+              .deprecate(
+                "Use codespaces instead. This only uses the codespace of the given authority."
+              )
+              .type(new GraphQLList(Scalars.GraphQLString))
+              .build()
+          )
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("codespaces")
+              .description("Filter by reporting source.")
               .type(new GraphQLList(Scalars.GraphQLString))
               .build()
           )
@@ -1500,20 +1526,37 @@ public class TransmodelGraphQLSchema {
               .getTransitService(environment)
               .getTransitAlertService()
               .getAllAlerts();
-            if ((environment.getArgument("authorities") instanceof List)) {
+
+            Set<String> codespaces = new HashSet<>();
+
+            if (environment.getArgument("authorities") instanceof List) {
               List<String> authorities = environment.getArgument("authorities");
+              authorities
+                .stream()
+                .map(authority -> authority.split(":")[0])
+                .filter(Objects::nonNull)
+                .filter(Predicate.not(String::isBlank))
+                .forEach(codespaces::add);
+            }
+
+            if (environment.getArgument("codespaces") instanceof List) {
+              codespaces.addAll((environment.getArgument("codespaces")));
+            }
+
+            if (!codespaces.isEmpty()) {
               alerts =
                 alerts
                   .stream()
-                  .filter(alert -> authorities.contains(alert.getFeedId()))
+                  .filter(alert -> codespaces.contains(alert.siriCodespace()))
                   .collect(Collectors.toSet());
             }
-            if ((environment.getArgument("severities") instanceof List)) {
+
+            if (environment.getArgument("severities") instanceof List) {
               List<String> severities = environment.getArgument("severities");
               alerts =
                 alerts
                   .stream()
-                  .filter(alert -> severities.contains(getTransmodelSeverity(alert.severity)))
+                  .filter(alert -> severities.contains(getTransmodelSeverity(alert.severity())))
                   .collect(Collectors.toSet());
             }
             return alerts;
@@ -1535,10 +1578,14 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
+            String situationNumber = environment.getArgument("situationNumber");
+            if (situationNumber.isBlank()) {
+              return null;
+            }
             return GqlUtil
               .getTransitService(environment)
               .getTransitAlertService()
-              .getAlertById(environment.getArgument("situationNumber"));
+              .getAlertById(TransitIdMapper.mapIDToDomain(situationNumber));
           })
           .build()
       )

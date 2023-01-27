@@ -12,4 +12,9 @@ public record RepeatedStops(Trip trip, TIntList removedStopSequences) implements
   public String getMessage() {
     return String.format(FMT, trip.getId(), removedStopSequences);
   }
+
+  @Override
+  public int getPriority() {
+    return removedStopSequences.size();
+  }
 }

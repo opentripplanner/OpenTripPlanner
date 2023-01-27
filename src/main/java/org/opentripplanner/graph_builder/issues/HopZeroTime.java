@@ -10,4 +10,9 @@ public record HopZeroTime(float dist, Trip trip, int seq) implements DataImportI
   public String getMessage() {
     return String.format(FMT, dist, trip.getRoute().getId(), trip.getId(), seq);
   }
+
+  @Override
+  public int getPriority() {
+    return (int) dist;
+  }
 }

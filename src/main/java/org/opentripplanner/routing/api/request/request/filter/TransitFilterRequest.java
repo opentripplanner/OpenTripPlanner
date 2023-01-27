@@ -12,8 +12,8 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
 
   public static class Builder {
 
-    private List<SelectRequest> select = new ArrayList<>();
-    private List<SelectRequest> not = new ArrayList<>();
+    private final List<SelectRequest> select = new ArrayList<>();
+    private final List<SelectRequest> not = new ArrayList<>();
 
     public Builder addSelect(SelectRequest selectRequest) {
       this.select.add(selectRequest);

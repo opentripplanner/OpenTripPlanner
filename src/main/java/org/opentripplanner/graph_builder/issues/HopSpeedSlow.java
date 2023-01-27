@@ -16,6 +16,6 @@ public record HopSpeedSlow(float metersPerSecond, float distance, Trip trip, int
 
   @Override
   public int getPriority() {
-    return (int) metersPerSecond;
+    return (int) metersPerSecond * -100;
   }
 }

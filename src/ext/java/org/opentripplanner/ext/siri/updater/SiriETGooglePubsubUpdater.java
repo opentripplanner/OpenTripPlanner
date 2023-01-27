@@ -26,11 +26,13 @@ import java.util.function.Consumer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.entur.protobuf.mapper.SiriMapper;
+import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.UpdateResult;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -105,6 +107,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private boolean primed;
 
   private final Consumer<UpdateResult> recordMetrics;
+  private final EntityResolver entityResolver;
 
   public SiriETGooglePubsubUpdater(
     SiriETGooglePubsubUpdaterParameters config,
@@ -134,10 +137,10 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     this.subscriptionName = ProjectSubscriptionName.of(projectName, subscriptionId);
     this.topic = ProjectTopicName.of(projectName, topicName);
     this.pushConfig = PushConfig.getDefaultInstance();
+    TransitService transitService = new DefaultTransitService(transitModel);
+    this.entityResolver = new EntityResolver(transitService, feedId);
     this.fuzzyTripMatcher =
-      config.fuzzyTripMatching()
-        ? SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel))
-        : null;
+      config.fuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
 
     try {
       if (
@@ -389,6 +392,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
           var results = snapshotSource.applyEstimatedTimetable(
             transitModel,
             fuzzyTripMatcher,
+            entityResolver,
             feedId,
             false,
             estimatedTimetableDeliveries

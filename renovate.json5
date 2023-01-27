@@ -21,10 +21,29 @@
         "com.azure.resourcemanager:azure-resourcemanager-servicebus",
         "com.azure:azure-core",
         "com.azure:azure-messaging-servicebus",
-        // need code changes
-        "io.github.origin-energy:java-snapshot-testing-junit5"
+        // need code changes, don't want to upgrade
+        "io.github.origin-energy:java-snapshot-testing-junit5",
+        "commons-cli:commons-cli",
+        "org.processing:core"
       ],
       "enabled": false
+    },
+    {
+      // https://github.com/graphql-java-kickstart/renovate-config/blob/main/default.json
+      "description": "GraphQL Java (ignoring snapshot builds)",
+      "matchPackagePrefixes": [
+        "com.graphql-java:"
+      ],
+      "allowedVersions": "/^[0-9]+\\.[0-9]+(\\.[0-9]+)?$/"
+    },
+    {
+      "description": "mkdocs-material updates very often but we don't need every new version",
+      "matchPackageNames": [
+        "mkdocs-material"
+      ],
+      "extends": [
+        "schedule:quarterly"
+      ]
     }
   ]
 }

@@ -100,9 +100,11 @@ public class RaptorRequestMapper {
       searchParams.numberOfAdditionalTransfers(preferences.transfer().maxAdditionalTransfers());
     }
 
-    searchParams.relaxCostAtDestination(
-      preferences.transit().raptor().relaxTransitSearchGeneralizedCostAtDestination()
-    );
+    preferences
+      .transit()
+      .raptor()
+      .relaxGeneralizedCostAtDestination()
+      .ifPresent(searchParams::relaxCostAtDestination);
 
     for (Optimization optimization : preferences.transit().raptor().optimizations()) {
       if (optimization.is(PARALLEL)) {

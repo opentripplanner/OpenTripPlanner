@@ -430,7 +430,10 @@ Http headers.
       "BIKE_RENTAL" : "20m"
     },
     "itineraryFilters" : {
-      "transitGeneralizedCostLimit" : "3600 + 2.5 x",
+      "transitGeneralizedCostLimit" : {
+        "costLimitFunction" : "900 + 1.5 x",
+        "intervalRelaxFactor" : 0.4
+      },
       "bikeRentalDistanceRatio" : 0.3,
       "accessibilityScore" : true,
       "minBikeParkingDistance" : 300

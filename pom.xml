@@ -56,9 +56,9 @@
 
 
     <properties>
-        <otp.serialization.version.id>81</otp.serialization.version.id>
+        <otp.serialization.version.id>82</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>28.0</geotools.version>
+        <geotools.version>28.1</geotools.version>
         <google.dagger.version>2.44.2</google.dagger.version>
         <jackson.version>2.14.1</jackson.version>
         <jersey.version>3.1.0</jersey.version>
@@ -553,7 +553,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>24.4.0</version>
+                <version>26.4.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -694,7 +694,7 @@
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>2.3.2</version>
+            <version>3.0.0</version>
         </dependency>
 
         <!-- TESTING -->
@@ -719,7 +719,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.11.0</version>
+            <version>5.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -733,7 +733,13 @@
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>kryo-tools</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
+        </dependency>
+        <!-- kryo serializers for Guava types !-->
+        <dependency>
+            <groupId>de.javakaffee</groupId>
+            <artifactId>kryo-serializers</artifactId>
+            <version>0.45</version>
         </dependency>
         <!-- Direct dependency with -jre version, in order to not resolve to the limited -android version -->
         <dependency>
@@ -998,7 +1004,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

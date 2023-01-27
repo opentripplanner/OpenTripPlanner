@@ -1,4 +1,4 @@
-package org.opentripplanner.filter;
+package org.opentripplanner.model.modes;
 
 import java.io.Serializable;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
@@ -8,7 +8,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 /**
  * This filter will exclude everything.
  */
-public class ExcludeAllTransitFilter implements Serializable, TransitFilter {
+public final class ExcludeAllTransitFilter implements Serializable, TransitFilter {
 
   private static final ExcludeAllTransitFilter INSTANCE = new ExcludeAllTransitFilter();
 

@@ -63,7 +63,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | numItineraries                                                                                       |        `integer`       | The maximum number of itineraries to return.                                                                                       | *Optional* | `50`                     |  2.0  |
 | [optimize](#rd_optimize)                                                                             |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                    | *Optional* | `"safe"`                 |  2.0  |
 | [otherThanPreferredRoutesPenalty](#rd_otherThanPreferredRoutesPenalty)                               |        `integer`       | Penalty added for using every route that is not preferred if user set any route as preferred.                                      | *Optional* | `300`                    |  2.0  |
-| [relaxTransitSearchGeneralizedCostAtDestination](#rd_relaxTransitSearchGeneralizedCostAtDestination) |        `double`        | Whether non-optimal transit paths at the destination should be returned                                                            | *Optional* | `-1.0`                   |  2.3  |
+| [relaxTransitSearchGeneralizedCostAtDestination](#rd_relaxTransitSearchGeneralizedCostAtDestination) |        `double`        | Whether non-optimal transit paths at the destination should be returned                                                            | *Optional* |                          |  2.3  |
 | [searchWindow](#rd_searchWindow)                                                                     |       `duration`       | The duration of the search-window.                                                                                                 | *Optional* |                          |  2.0  |
 | stairsReluctance                                                                                     |        `double`        | Used instead of walkReluctance for stairs.                                                                                         | *Optional* | `2.0`                    |  2.0  |
 | [stairsTimeFactor](#rd_stairsTimeFactor)                                                             |        `double`        | How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.                        | *Optional* | `3.0`                    |  2.1  |
@@ -96,6 +96,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [parkAndRideDurationRatio](#rd_if_parkAndRideDurationRatio)                                       |        `double`        | Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.                      | *Optional* | `0.0`                    |  2.1  |
 |    [removeItinerariesWithSameRoutesAndStops](#rd_if_removeItinerariesWithSameRoutesAndStops)         |        `boolean`       | Set to true if you want to list only the first itinerary  which goes through the same stops and routes.                            | *Optional* | `false`                  |  2.2  |
 |    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                                 |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                 | *Optional* |                          |  2.1  |
+|       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                      |    `linear-function`   | The base function used by the filter.                                                                                              | *Optional* | `"f(x) = 900 + 1.5 x"`   |  2.2  |
+|       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                  |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                 | *Optional* | `0.4`                    |  2.2  |
 | [maxAccessEgressDurationForMode](#rd_maxAccessEgressDurationForMode)                                 | `enum map of duration` | Limit access/egress per street mode.                                                                                               | *Optional* |                          |  2.1  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                                 | `enum map of duration` | Limit direct route duration per street mode.                                                                                       | *Optional* |                          |  2.2  |
 | [requiredVehicleParkingTags](#rd_requiredVehicleParkingTags)                                         |       `string[]`       | Tags which are required to use a vehicle parking. If empty, no tags are required.                                                  | *Optional* |                          |  2.1  |
@@ -243,7 +245,7 @@ We return number of seconds that we are willing to wait for preferred route.
 
 <h3 id="rd_relaxTransitSearchGeneralizedCostAtDestination">relaxTransitSearchGeneralizedCostAtDestination</h3>
 
-**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `-1.0`   
+**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults 
 
 Whether non-optimal transit paths at the destination should be returned
@@ -252,9 +254,10 @@ Let c be the existing minimum pareto optimal generalized cost to beat. Then a tr
 with cost c' is accepted if the following is true:
 `c' < Math.round(c * relaxRaptorCostCriteria)`.
 
-If the value is less than 0.0 a normal '<' comparison is performed.
+The parameter is optional. If not set a normal comparison is performed.
 
-Values greater than 2.0 are not supported, due to performance reasons.
+Values equals or less than zero is not allowed. Values greater than 2.0 are not
+supported, due to performance reasons.
 
 
 <h3 id="rd_searchWindow">searchWindow</h3>
@@ -543,6 +546,27 @@ dropped. The `transitGeneralizedCostLimit` is calculated using the `costLimitFun
 `intervalRelaxFactor` multiplied with the interval in seconds. To set the `costLimitFunction` to be
 _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`
 
+
+<h3 id="rd_if_transitGeneralizedCostLimit_costLimitFunction">costLimitFunction</h3>
+
+**Since version:** `2.2` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"f(x) = 900 + 1.5 x"`   
+**Path:** /routingDefaults/itineraryFilters/transitGeneralizedCostLimit 
+
+The base function used by the filter.
+
+This function calculates the threshold for the filter, when the itineraries have exactly the same arrival and departure times.
+
+<h3 id="rd_if_transitGeneralizedCostLimit_intervalRelaxFactor">intervalRelaxFactor</h3>
+
+**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.4`   
+**Path:** /routingDefaults/itineraryFilters/transitGeneralizedCostLimit 
+
+How much the filter should be relaxed for itineraries that do not overlap in time.
+
+This value is used to increase the filter threshold for itineraries further away in
+time, compared to those, that have exactly the same arrival and departure times.
+
+The unit is cost unit per second of time difference.
 
 <h3 id="rd_maxAccessEgressDurationForMode">maxAccessEgressDurationForMode</h3>
 

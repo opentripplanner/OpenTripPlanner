@@ -14,6 +14,6 @@ public record InterliningTeleport(Trip prevTrip, String blockId, int distance)
 
   @Override
   public int getPriority() {
-    return 10000000 - distance;
+    return -distance;
   }
 }
