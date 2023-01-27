@@ -7,16 +7,13 @@ import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.via.ViaRoutingWorker;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
+import org.opentripplanner.routing.api.request.RoutingService;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
-import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -26,18 +23,16 @@ import org.opentripplanner.transit.service.TransitService;
 /**
  * Entry point for requests towards the routing API.
  */
-public class RoutingService implements org.opentripplanner.routing.api.request.RoutingService {
+public class DefaultRoutingService implements RoutingService {
 
   private final OtpServerRequestContext serverContext;
-  private final Graph graph;
 
   private final ZoneId timeZone;
 
   private final GraphFinder graphFinder;
 
-  public RoutingService(OtpServerRequestContext serverContext) {
+  public DefaultRoutingService(OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
-    this.graph = serverContext.graph();
     this.timeZone = serverContext.transitService().getTimeZone();
     this.graphFinder = serverContext.graphFinder();
   }
@@ -56,20 +51,6 @@ public class RoutingService implements org.opentripplanner.routing.api.request.R
         new RoutingWorker(serverContext, req, serverContext.transitService().getTimeZone()).route()
     );
     return viaRoutingWorker.route();
-  }
-
-  public RealtimeVehiclePositionService getVehiclePositionService() {
-    return this.graph.getVehiclePositionService();
-  }
-
-  /** {@link Graph#getVehicleRentalService()} */
-  public VehicleRentalService getVehicleRentalService() {
-    return this.graph.getVehicleRentalService();
-  }
-
-  /** {@link Graph#getVehicleParkingService()} */
-  public VehicleParkingService getVehicleParkingService() {
-    return this.graph.getVehicleParkingService();
   }
 
   /** {@link GraphFinder#findClosestStops(Coordinate, double)} */

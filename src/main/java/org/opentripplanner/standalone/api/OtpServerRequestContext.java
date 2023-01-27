@@ -10,7 +10,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.DefaultRoutingService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -67,13 +67,13 @@ public interface OtpServerRequestContext {
   TransitService transitService();
 
   /**
-   * Get a request-scoped {@link RoutingService} valid for one HTTP request. It guarantees that
+   * Get a request-scoped {@link DefaultRoutingService} valid for one HTTP request. It guarantees that
    * the data and services used are consistent and operate on the same transit snapshot. Any
    * realtime update that happens during the request will not affect the returned service and will
    * not be visible to the request.
    */
   @HttpRequestScoped
-  RoutingService routingService();
+  DefaultRoutingService routingService();
 
   /**
    * Get information on geographical bounding box and center coordinates.

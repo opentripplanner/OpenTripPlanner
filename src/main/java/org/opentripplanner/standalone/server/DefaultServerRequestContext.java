@@ -9,7 +9,7 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.DefaultRoutingService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -141,8 +141,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public RoutingService routingService() {
-    return new RoutingService(this);
+  public DefaultRoutingService routingService() {
+    return new DefaultRoutingService(this);
   }
 
   @Override
