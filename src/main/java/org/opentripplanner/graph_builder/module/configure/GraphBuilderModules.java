@@ -4,11 +4,11 @@ import static org.opentripplanner.datastore.api.FileType.DEM;
 
 import dagger.Module;
 import dagger.Provides;
+import jakarta.inject.Singleton;
 import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Singleton;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
