@@ -48,10 +48,11 @@ to use car. Therefore, it represents a disconnected 'island' when considering th
 can be reached using any of the traverse modes. Instead, pruning removes traversal permission for each disconnected mode from the island.
 
 Pruning uses four parameters and some heuristics to decide if a disconnected sub graph is a real island to be retained, or a harmulf data error:
-- `islandWithStopsMaxSize` defines the threshold for graph islands, which include public transit stops. All stop islands which have less graph edges than this get pruned. Default value is 2.
-- `islandWithoutStopsMaxSize` defines the threshold for graph islands, which do not have public transit stops. All stopless islands which have less edges than this get pruned. Defaults to 10.
-- `adaptivePruningFactor` defines the maximal value for a distance based multiplier for the two thresholds defined above (default value 20).
-- `adaptivePruningDistance` defines the search radius as meters when estimating distance between graphs (default value 250).
+
+- `islandWithStopsMaxSize` defines the threshold for graph islands, which include public transit stops. All stop islands which have less graph edges than this get pruned. Default value is 2.  
+- `islandWithoutStopsMaxSize` defines the threshold for graph islands, which do not have public transit stops. All stopless islands which have less edges than this get pruned. Defaults to 10.  
+- `adaptivePruningFactor` defines the maximal value for a distance based multiplier for the two thresholds defined above (default value 20).  
+- `adaptivePruningDistance` defines the search radius as meters when estimating distance between graphs (default value 250).  
 
 Pruning thresholds are increased adaptively so that if the distance between an examined sub graph and the other graph is zero, the threshold is multiplied by a full adaptivePruningFactor value.
 The idea is that if a sub graph is closely entangled with another graph, it is likely to be a harmful modeling error, not a remote place like a true geographic island.
