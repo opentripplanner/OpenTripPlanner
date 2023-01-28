@@ -2,10 +2,10 @@ package org.opentripplanner.raptor.rangeraptor.standard;
 
 import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
 
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
@@ -54,7 +54,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
     int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
 
     // This access is not available after the iteration departure time
-    if (departureTime == SearchParams.TIME_NOT_SET) {
+    if (departureTime == RaptorConstants.TIME_NOT_SET) {
       return;
     }
 

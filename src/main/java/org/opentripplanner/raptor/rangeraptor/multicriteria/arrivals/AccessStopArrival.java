@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.view.AccessPathView;
 
 /**
@@ -39,7 +39,7 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
   public AbstractStopArrival<T> timeShiftNewArrivalTime(int newRequestedArrivalTime) {
     int newArrivalTime = access.latestArrivalTime(newRequestedArrivalTime);
 
-    if (newArrivalTime == SearchParams.TIME_NOT_SET || newArrivalTime == arrivalTime()) {
+    if (newArrivalTime == RaptorConstants.TIME_NOT_SET || newArrivalTime == arrivalTime()) {
       return this;
     }
 

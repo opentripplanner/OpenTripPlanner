@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 
 import java.util.Iterator;
 import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
@@ -46,7 +47,9 @@ public final class ForwardTransitCalculator<T extends RaptorTripSchedule>
     this.earliestDepartureTime = earliestDepartureTime;
     this.searchWindowInSeconds = searchWindowInSeconds;
     this.latestAcceptableArrivalTime =
-      latestAcceptableArrivalTime == TIME_NOT_SET ? unreachedTime() : latestAcceptableArrivalTime;
+      latestAcceptableArrivalTime == RaptorConstants.TIME_NOT_SET
+        ? unreachedTime()
+        : latestAcceptableArrivalTime;
     this.iterationStep = iterationStep;
   }
 

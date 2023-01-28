@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.opentripplanner.framework.time.TimeUtils.hm2time;
+import static org.opentripplanner.raptor.api.RaptorConstants.TIME_NOT_SET;
 
 import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -86,7 +87,7 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
    * search it will be the earliest possible departure time, while for reverse search it uses the
    * latest arrival time.
    * <p>
-   * Returns {@link org.opentripplanner.raptor.api.request.SearchParams#TIME_NOT_SET} if transfer
+   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible after the requested departure time
    */
   int departureTime(RaptorAccessEgress accessPath, int departureTime);

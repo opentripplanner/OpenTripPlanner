@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.raptor.api.request.SearchParams;
+import org.opentripplanner.raptor.api.RaptorConstants;
 
 /**
  * This class is used to adapt the FlexAccessEgress into a time-dependent multi-leg DefaultAccessEgress.
@@ -53,6 +53,6 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
   }
 
   private static int mapToRaptorTime(int flexTime) {
-    return flexTime == StopTime.MISSING_VALUE ? SearchParams.TIME_NOT_SET : flexTime;
+    return flexTime == StopTime.MISSING_VALUE ? RaptorConstants.TIME_NOT_SET : flexTime;
   }
 }

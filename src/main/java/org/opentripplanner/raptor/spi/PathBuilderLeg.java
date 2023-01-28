@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.spi;
 
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
@@ -13,7 +14,6 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.raptor.api.request.SearchParams;
 
 /**
  * This is the leg implementation for the {@link PathBuilder}. It is a private inner class which
@@ -477,7 +477,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
     newToTime = accessPath.latestArrivalTime(newToTime);
 
-    if (newToTime == SearchParams.TIME_NOT_SET) {
+    if (newToTime == RaptorConstants.TIME_NOT_SET) {
       throw new IllegalStateException("Can not time-shift accessPath: " + accessPath);
     }
 

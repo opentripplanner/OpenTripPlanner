@@ -5,8 +5,8 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.request.SearchParams;
 
 /**
  * Simple implementation for {@link RaptorAccessEgress} for use in unit-tests.
@@ -169,7 +169,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
       return requestedDepartureTime;
     }
     if (isClosed()) {
-      return SearchParams.TIME_NOT_SET;
+      return RaptorConstants.TIME_NOT_SET;
     }
 
     int days = Math.floorDiv(requestedDepartureTime, SECONDS_IN_DAY);
@@ -191,7 +191,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
       return requestedArrivalTime;
     }
     if (isClosed()) {
-      return SearchParams.TIME_NOT_SET;
+      return RaptorConstants.TIME_NOT_SET;
     }
 
     // opening & closing is relative to the departure

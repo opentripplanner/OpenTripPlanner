@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
@@ -101,7 +101,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
 
     // If egress is are closed (opening hours) then -1 should be returned
     assertEquals(
-      SearchParams.TIME_NOT_SET,
+      RaptorConstants.TIME_NOT_SET,
       calculateEgressDepartureTime(
         T00_30,
         TestAccessEgress.walk(STOP, D8m).openingHours(5, 4),
@@ -166,7 +166,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
 
     // If egress is are closed (opening hours) then -1 should be returned
     assertEquals(
-      SearchParams.TIME_NOT_SET,
+      RaptorConstants.TIME_NOT_SET,
       calculateEgressDepartureTime(
         T00_30,
         TestAccessEgress.walk(STOP, D8m).openingHours(5, 4),

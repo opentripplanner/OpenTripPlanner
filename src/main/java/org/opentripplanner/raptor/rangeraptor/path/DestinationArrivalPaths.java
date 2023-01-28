@@ -5,11 +5,11 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.logging.ThrottleLogger;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.DebugHandler;
@@ -169,7 +169,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
       transitCalculator
     );
 
-    if (departureTime == SearchParams.TIME_NOT_SET) {
+    if (departureTime == RaptorConstants.TIME_NOT_SET) {
       return null;
     }
 

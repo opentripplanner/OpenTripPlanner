@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.spi.IntIterator;
 
 public class ForwardTransitCalculatorTest {
@@ -37,7 +38,7 @@ public class ForwardTransitCalculatorTest {
       create().exceedsTimeLimitReason()
     );
 
-    latestAcceptableArrivalTime = TransitCalculator.TIME_NOT_SET;
+    latestAcceptableArrivalTime = RaptorConstants.TIME_NOT_SET;
     subject = create();
     assertFalse(subject.exceedsTimeLimit(0));
     assertFalse(subject.exceedsTimeLimit(2_000_000_000));
