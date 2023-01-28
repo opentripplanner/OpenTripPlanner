@@ -77,13 +77,7 @@ public class RouteRequestConfig {
         .summary("Whether the trip should depart or arrive at the specified date and time.")
         .asBoolean(dft.arriveBy())
     );
-    vehicleParking.setBannedTags(
-      c
-        .of("bannedVehicleParkingTags")
-        .since(V2_1)
-        .summary("Tags with which a vehicle parking will not be used. If empty, no tags are banned")
-        .asStringSet(vehicleParking.bannedTags())
-    );
+
     vehicleRental.setBannedNetworks(
       c
         .of("bannedVehicleRentalNetworks")
@@ -167,6 +161,41 @@ public class RouteRequestConfig {
           "Tags which are required to use a vehicle parking. If empty, no tags are required."
         )
         .asStringSet(vehicleParking.requiredTags())
+    );
+    vehicleParking.setBannedTags(
+      c
+        .of("bannedVehicleParkingTags")
+        .since(V2_1)
+        .summary("Tags with which a vehicle parking will not be used. If empty, no tags are banned")
+        .asStringSet(vehicleParking.bannedTags())
+    );
+    vehicleParking.setPreferredTags(
+      c
+        .of("preferredVehicleParkingTags")
+        .since(V2_3)
+        .summary(
+          "If a parking facility contains one of these tags it will be used preferably. If empty, no tags are preferred."
+        )
+        .description(
+          "If this is non-empty and a parking facility doesn't contain this tag, then using it will receive an extra cost" +
+          "configured in `unpreferredVehicleParkingTagCost`."
+        )
+        .asStringSet(vehicleParking.preferredTags())
+    );
+    vehicleParking.setUnpreferredTagCost(
+      c
+        .of("unpreferredVehicleParkingTagCost")
+        .since(V2_3)
+        .summary(
+          "If a parking facility contains one of these tags it will be used preferably. If empty, no tags are preferred."
+        )
+        .description(
+          """
+             If this is non-empty and a parking facility doesn't contain this tag, then using it will receive an extra cost
+             configured in `unpreferredVehicleParkingTagCost`.
+             """
+        )
+        .asInt(vehicleParking.unpreferredTagCost())
     );
 
     request.setWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
