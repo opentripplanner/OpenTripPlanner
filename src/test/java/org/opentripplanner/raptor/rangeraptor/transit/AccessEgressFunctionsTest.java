@@ -2,10 +2,8 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
-import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.calculateEgressDepartureTime;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByRound;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByStop;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForStandardRaptor;
@@ -17,23 +15,13 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
-import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 class AccessEgressFunctionsTest implements RaptorTestConstants {
 
-  public static final int T00_31 = hm2time(0, 31);
   public static final int BOARD_SLACK = D20s;
   public static final int ALIGHT_SLACK = D10s;
   public static final int TRANSFER_SLACK = D1m;
-  public static final RaptorSlackProvider EXTERNAL_SLACK_PROVIDER = new DefaultSlackProvider(
-    TRANSFER_SLACK,
-    BOARD_SLACK,
-    ALIGHT_SLACK
-  );
 
   private static final int STOP = 8;
 
@@ -46,135 +34,6 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
   private static final RaptorAccessEgress WALK_W_OPENING_HOURS_8m = TestAccessEgress
     .walk(STOP, D8m)
     .openingHours(T00_00, T01_00);
-
-  @Test
-  void calculateEgressDepartureTimeForwardSearch() {
-    var slackProvider = SlackProviderAdapter.forwardSlackProvider(
-      EXTERNAL_SLACK_PROVIDER,
-      new LifeCycleSubscriptions()
-    );
-    var calculator = new ForwardTimeCalculator();
-
-    // No time-shift expected for a regular walking egress
-    assertEquals(T00_30, calculateEgressDepartureTime(T00_30, WALK_8m, slackProvider, calculator));
-    // Transfers slack should be added if the egress arrive on-board
-    assertEquals(
-      T00_30 + TRANSFER_SLACK,
-      calculateEgressDepartureTime(T00_30, FLEX_1x_8m, slackProvider, calculator)
-    );
-    // Transfers slack should NOT be added if the flex egress arrive by walking
-    assertEquals(
-      T00_30,
-      calculateEgressDepartureTime(T00_30, FLEX_AND_WALK_1x_8m, slackProvider, calculator)
-    );
-    // No time-shift expected if egress is within opening hours
-    assertEquals(
-      T00_30,
-      calculateEgressDepartureTime(
-        T00_30,
-        TestAccessEgress.walk(STOP, D8m).openingHours(T00_00, T01_00),
-        slackProvider,
-        calculator
-      )
-    );
-    // Egress should be time-shifted to the opening hours if departure time is before
-    assertEquals(
-      T00_30,
-      calculateEgressDepartureTime(
-        T00_10,
-        TestAccessEgress.walk(STOP, D8m).openingHours(T00_30, T01_00),
-        slackProvider,
-        calculator
-      )
-    );
-    // Egress should be time-shifted to the next opening hours if departure time is after
-    // opening hours
-    assertEquals(
-      T00_10 + D24h,
-      calculateEgressDepartureTime(
-        T00_31,
-        TestAccessEgress.walk(STOP, D8m).openingHours(T00_10, T00_30),
-        slackProvider,
-        calculator
-      )
-    );
-
-    // If egress is are closed (opening hours) then -1 should be returned
-    assertEquals(
-      RaptorConstants.TIME_NOT_SET,
-      calculateEgressDepartureTime(
-        T00_30,
-        TestAccessEgress.walk(STOP, D8m).openingHours(5, 4),
-        slackProvider,
-        calculator
-      )
-    );
-  }
-
-  @Test
-  void calculateEgressDepartureTimeReverseSearch() {
-    var slackProvider = SlackProviderAdapter.forwardSlackProvider(
-      EXTERNAL_SLACK_PROVIDER,
-      new LifeCycleSubscriptions()
-    );
-    var calculator = new ReverseTimeCalculator();
-
-    // No time-shift expected for a regular walking egress
-    assertEquals(T00_30, calculateEgressDepartureTime(T00_30, WALK_8m, slackProvider, calculator));
-    // Transfers slack should be subtracted(reverse search) if the egress arrive on-board
-    assertEquals(
-      T00_30 - TRANSFER_SLACK,
-      calculateEgressDepartureTime(T00_30, FLEX_1x_8m, slackProvider, calculator)
-    );
-    // Transfers slack should NOT be added if the flex egress arrive by walking
-    assertEquals(
-      T00_30,
-      calculateEgressDepartureTime(T00_30, FLEX_AND_WALK_1x_8m, slackProvider, calculator)
-    );
-    // No time-shift expected if egress is within opening hours
-    assertEquals(
-      T00_30,
-      calculateEgressDepartureTime(
-        T00_30,
-        TestAccessEgress.walk(STOP, D8m).openingHours(T00_00, T01_00),
-        slackProvider,
-        calculator
-      )
-    );
-    // Egress should be time-shifted to the closing opening hours (entrance) plus the duration
-    // of the egress (to get to the exit) if the departure time is after.
-    assertEquals(
-      T00_30 + D5m,
-      calculateEgressDepartureTime(
-        T00_40,
-        TestAccessEgress.walk(STOP, D5m).openingHours(T00_10, T00_30),
-        slackProvider,
-        calculator
-      )
-    );
-    // Egress should be time-shifted to the next opening hours if departure time is after
-    // opening hours
-    assertEquals(
-      T00_30 + D3m - D24h,
-      calculateEgressDepartureTime(
-        T00_00,
-        TestAccessEgress.walk(STOP, D3m).openingHours(T00_10, T00_30),
-        slackProvider,
-        calculator
-      )
-    );
-
-    // If egress is are closed (opening hours) then -1 should be returned
-    assertEquals(
-      RaptorConstants.TIME_NOT_SET,
-      calculateEgressDepartureTime(
-        T00_30,
-        TestAccessEgress.walk(STOP, D8m).openingHours(5, 4),
-        slackProvider,
-        calculator
-      )
-    );
-  }
 
   @Test
   void removeNoneOptimalPathsForStandardRaptorTest() {

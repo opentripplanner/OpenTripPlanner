@@ -15,7 +15,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransferSto
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;
 
@@ -37,7 +37,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   private final HeuristicsProvider<T> heuristics;
   private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
   private final CostCalculator<T> costCalculator;
-  private final TransitCalculator<T> transitCalculator;
+  private final RaptorTransitCalculator<T> transitCalculator;
 
   /**
    * create a RaptorState for a network with a particular number of stops, and a given maximum
@@ -48,7 +48,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     DestinationArrivalPaths<T> paths,
     HeuristicsProvider<T> heuristics,
     CostCalculator<T> costCalculator,
-    TransitCalculator<T> transitCalculator,
+    RaptorTransitCalculator<T> transitCalculator,
     WorkerLifeCycle lifeCycle
   ) {
     this.arrivals = arrivals;

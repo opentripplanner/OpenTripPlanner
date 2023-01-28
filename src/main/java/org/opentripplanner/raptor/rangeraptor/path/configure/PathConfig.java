@@ -111,39 +111,39 @@ public class PathConfig<T extends RaptorTripSchedule> {
 
   private PathMapper<T> createPathMapper(boolean includeCost) {
     return createPathMapper(
-      ctx.transit().transferConstraintsSearch(),
+      ctx.profile(),
+      ctx.searchDirection(),
+      ctx.raptorSlackProvider(),
       includeCost ? ctx.costCalculator() : null,
       ctx.stopNameResolver(),
-      ctx.lifeCycle(),
-      ctx.searchDirection(),
-      ctx.profile(),
-      ctx.raptorSlackProvider()
+      ctx.transit().transferConstraintsSearch(),
+      ctx.lifeCycle()
     );
   }
 
   private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
-    RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
+    RaptorProfile profile,
+    SearchDirection searchDirection,
+    RaptorSlackProvider slackProvider,
     CostCalculator<S> costCalculator,
     RaptorStopNameResolver stopNameResolver,
-    WorkerLifeCycle lifeCycle,
-    SearchDirection searchDirection,
-    RaptorProfile profile,
-    RaptorSlackProvider slackProvider
+    RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
+    WorkerLifeCycle lifeCycle
   ) {
     return searchDirection.isForward()
-      ? new ForwardPathMapper<S>(
-        txConstraintsSearch,
+      ? new ForwardPathMapper<>(
         slackProvider,
         costCalculator,
         stopNameResolver,
+        txConstraintsSearch,
         lifeCycle,
         profile.useApproximateTripSearch()
       )
-      : new ReversePathMapper<S>(
-        txConstraintsSearch,
+      : new ReversePathMapper<>(
         slackProvider,
         costCalculator,
         stopNameResolver,
+        txConstraintsSearch,
         lifeCycle,
         profile.useApproximateTripSearch()
       );

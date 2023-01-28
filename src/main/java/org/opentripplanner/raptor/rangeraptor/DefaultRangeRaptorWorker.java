@@ -12,8 +12,8 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
-import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
@@ -73,7 +73,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
 
   private final SlackProvider slackProvider;
 
-  private final TransitCalculator<T> calculator;
+  private final RaptorTransitCalculator<T> calculator;
 
   private final RaptorTimers timers;
 
@@ -94,7 +94,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
     SlackProvider slackProvider,
     AccessPaths accessPaths,
     RoundProvider roundProvider,
-    TransitCalculator<T> calculator,
+    RaptorTransitCalculator<T> calculator,
     LifeCycleEventPublisher lifeCyclePublisher,
     RaptorTimers timers,
     boolean enableTransferConstraints

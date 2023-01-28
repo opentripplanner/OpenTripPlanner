@@ -15,8 +15,7 @@ import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.DebugHandler;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
-import org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions;
-import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.Path;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
@@ -44,7 +43,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private static final Logger LOG_MISS_MATCH = ThrottleLogger.throttle(LOG);
 
   private final ParetoSet<RaptorPath<T>> paths;
-  private final TransitCalculator<T> transitCalculator;
+  private final RaptorTransitCalculator<T> transitCalculator;
 
   @Nullable
   private final CostCalculator<T> costCalculator;
@@ -58,7 +57,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
   public DestinationArrivalPaths(
     ParetoComparator<RaptorPath<T>> paretoComparator,
-    TransitCalculator<T> transitCalculator,
+    RaptorTransitCalculator<T> transitCalculator,
     @Nullable CostCalculator<T> costCalculator,
     SlackProvider slackProvider,
     PathMapper<T> pathMapper,
@@ -162,13 +161,11 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     ArrivalView<T> stopArrival,
     RaptorAccessEgress egressPath
   ) {
-    int departureTime = AccessEgressFunctions.calculateEgressDepartureTime(
+    int departureTime = transitCalculator.calculateEgressDepartureTime(
       stopArrival.arrivalTime(),
       egressPath,
-      slackProvider,
-      transitCalculator
+      slackProvider.transferSlack()
     );
-
     if (departureTime == RaptorConstants.TIME_NOT_SET) {
       return null;
     }

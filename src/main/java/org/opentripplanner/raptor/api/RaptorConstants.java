@@ -24,10 +24,8 @@ public class RaptorConstants {
    * {@code generalized-cost}, {@code link min-travel-time} and {@code duration} inside Raptor.
    * Most of these types are "positive" numbers, but we want Raptor to be robust and work even
    * for negative values; Hence we choose a large negative value.
-   *
-   * TODO - Use 2_111_000_000 here, but FlexIntegrationTest fails if we change it now
    */
-  public static final int NOT_SET = -999;
+  public static final int NOT_SET = -1_999_000_000;
 
   /**
    * When searching for a stop position or trip index we will use this to signal NOT FOUND.
@@ -54,8 +52,11 @@ public class RaptorConstants {
    */
   public static final int UNREACHED_LOW = -2_000_000_000;
 
-  /** Alias for {@link #NOT_SET} */
-  public static final int TIME_NOT_SET = NOT_SET;
+  /**
+   * TODO - Should be alias for {@link #NOT_SET}
+   * TODO - Use 2_111_000_000 here, but FlexIntegrationTest fails if we change it now
+   */
+  public static final int TIME_NOT_SET = -999;
 
   /** Alias for {@link #UNREACHED_HIGH} */
   public static final int TIME_UNREACHED_FORWARD = UNREACHED_HIGH;

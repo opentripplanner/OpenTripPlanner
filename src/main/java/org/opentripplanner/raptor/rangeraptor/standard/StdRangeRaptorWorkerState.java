@@ -9,7 +9,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
-import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.util.BitSetIterator;
 
@@ -51,13 +51,13 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   /**
    * The calculator is used to calculate transit related times/events like access arrival time.
    */
-  private final TransitCalculator<T> calculator;
+  private final RaptorTransitCalculator<T> calculator;
 
   /**
    * create a BestTimes Range Raptor State for given context.
    */
   public StdRangeRaptorWorkerState(
-    TransitCalculator<T> calculator,
+    RaptorTransitCalculator<T> calculator,
     BestTimes bestTimes,
     StopArrivalsState<T> stopArrivalsState,
     ArrivedAtDestinationCheck arrivedAtDestinationCheck

@@ -12,6 +12,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 
@@ -34,7 +35,7 @@ public class HeuristicsAdapter implements Heuristics {
   public HeuristicsAdapter(
     int nStops,
     EgressPaths egressPaths,
-    TransitCalculator<?> calculator,
+    RaptorTransitCalculator<?> calculator,
     CostCalculator<?> costCalculator,
     SingleCriteriaStopArrivals bestOverallTimes,
     SingleCriteriaStopArrivals bestTransitTimes,
@@ -46,7 +47,7 @@ public class HeuristicsAdapter implements Heuristics {
     this.costCalculator = costCalculator;
     this.bestOverallTimes = bestOverallTimes;
     this.bestNumOfTransfers = bestNTransfers;
-    this.originDepartureTime = calculator.minIterationDepatureTime();
+    this.originDepartureTime = calculator.minIterationDepartureTime();
     this.aggregatedResults =
       AggregatedResults.create(
         calculator,

@@ -1,18 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import static org.opentripplanner.framework.time.TimeUtils.hm2time;
-import static org.opentripplanner.raptor.api.RaptorConstants.TIME_NOT_SET;
-
-import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.IntIterator;
-import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
-import org.opentripplanner.raptor.spi.RaptorTimeTable;
-import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
-import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 
 /**
  * The transit calculator is used to calculate transit related stuff, like calculating
@@ -44,22 +34,6 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
  */
 public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCalculator {
   /**
-   * Return a calculator for test purpose. The following parameters are fixed:
-   * <ul>
-   *     <li>'earliestDepartureTime' = 08:00:00
-   *     <li>'latestArrivalTime',  = 10:00:00
-   *     <li>'iterationStep' = 60 seconds
-   * </ul>
-   *
-   * @param forward if true create a calculator for forward search, if false search
-   */
-  static <T extends RaptorTripSchedule> TransitCalculator<T> testDummyCalculator(boolean forward) {
-    return forward
-      ? new ForwardTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60)
-      : new ReverseTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60);
-  }
-
-  /**
    * For a forward search return the trip arrival time at stop position including alightSlack. For a
    * reverse search return the next trips departure time at stop position with the boardSlack
    * added.
@@ -68,81 +42,6 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
    * @param stopPositionInPattern the stop position/index
    */
   int stopArrivalTime(T trip, int stopPositionInPattern, int slack);
-
-  /**
-   * Stop the search when the time exceeds the latest-acceptable-arrival-time. In a reverse search
-   * this is the earliest acceptable departure time.
-   *
-   * @return true if time exceeds limit, false means good to go.
-   */
-  boolean exceedsTimeLimit(int time);
-
-  /**
-   * Return a reason why a arrival time do not pass the {@link #exceedsTimeLimit(int)}
-   */
-  String exceedsTimeLimitReason();
-
-  /**
-   * Selects the earliest or latest possible departure time depending on the direction. For forward
-   * search it will be the earliest possible departure time, while for reverse search it uses the
-   * latest arrival time.
-   * <p>
-   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET} if transfer
-   * is not possible after the requested departure time
-   */
-  int departureTime(RaptorAccessEgress accessPath, int departureTime);
-
-  /**
-   * Return an iterator, iterating over the minutes in the RangeRaptor algorithm.
-   */
-  IntIterator rangeRaptorMinutes();
-
-  /**
-   * For a forward search this is the earliest-departure-time. For example this can be used to
-   * calculate an upper bound for the duration given an arrival time at the destination. For a
-   * reverse search this is the latest-time-arrival-time.
-   */
-  int minIterationDepatureTime();
-
-  /**
-   * Return TRUE if the Range Raptor should perform only ONE iteration. This is defined happens if
-   * the search window is less than or equals to the iteration step duration.
-   */
-  boolean oneIterationOnly();
-
-  /**
-   * Return an iterator, iterating over the stop positions in a pattern. Iterate from '0' to
-   * 'nStopsInPattern - 1' in a forward search and from 'nStopsInPattern - 1' to '0' in a reverse
-   * search.
-   *
-   * @param nStopsInPattern the number of stops in the trip pattern
-   */
-  IntIterator patternStopIterator(int nStopsInPattern);
-
-  /**
-   * Create a trip search, to use to find the correct trip to board/alight for a given pattern. This
-   * is used to to inject a forward or reverse search into the worker (strategy design pattern).
-   *
-   * @param timeTable the trip time-table to search
-   * @return The trip search strategy implementation.
-   */
-  RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable);
-
-  /**
-   * Same as {@link #createTripSearch(RaptorTimeTable)}, but create a trip search that only accept
-   * exact trip timeLimit matches.
-   */
-  RaptorTripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable);
-
-  /**
-   * Return a transfer provider for the given pattern. When searching forward the given {@code
-   * target} is the TO pattern/stop, while when searching in reverse the given target is the FROM
-   * pattern/stop.
-   */
-  RaptorConstrainedBoardingSearch<T> transferConstraintsSearch(
-    RaptorTransitDataProvider<T> transitData,
-    int routeIndex
-  );
 
   /**
    * Return {@code true} if it is allowed/possible to board at a particular stop index, on a normal
@@ -159,13 +58,42 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
   boolean alightingPossibleAt(RaptorTripPattern pattern, int stopPos);
 
   /**
-   * Returns an iterator over all transfers "from" (or "to" for reverse searches) a stopIndex.
-   *
-   * @see RaptorTransitDataProvider#getTransfersFromStop(int)
-   * @see RaptorTransitDataProvider#getTransfersToStop(int)
+   * Selects the earliest or latest possible departure time depending on the direction. For forward
+   * search it will be the earliest possible departure time, while for reverse search it uses the
+   * latest arrival time.
+   * <p>
+   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET} if transfer
+   * is not possible after the requested departure time
    */
-  Iterator<? extends RaptorTransfer> getTransfers(
-    RaptorTransitDataProvider<T> transitDataProvider,
-    int fromStop
-  );
+  int departureTime(RaptorAccessEgress accessPath, int departureTime);
+
+  /**
+   * This method helps with calculating the egress departure time.
+   * <ul>
+   *   <li>It will add transit slack if egress has rides</li>
+   *   <li>And time-shift the egress departure/arrival time</li>
+   * </ul>
+   * It will add transit slack (egress
+   * leaves on-board) and then time-shift the egress.
+   * <p>
+   * It returns the calculated departure time or
+   * {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET}
+   * if boarding is not possible.
+   */
+  default int calculateEgressDepartureTime(
+    int arrivalTime,
+    RaptorAccessEgress egressPath,
+    int transferSlack
+  ) {
+    int departureTime = arrivalTime;
+
+    if (egressPath.stopReachedOnBoard()) {
+      departureTime = plusDuration(departureTime, transferSlack);
+    }
+    if (searchForward()) {
+      return egressPath.earliestDepartureTime(departureTime);
+    } else {
+      return egressPath.latestArrivalTime(departureTime);
+    }
+  }
 }

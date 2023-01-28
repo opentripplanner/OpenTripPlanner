@@ -111,10 +111,10 @@ public class TestPathBuilder {
     this.startTime = startTime;
     this.builder =
       PathBuilder.tailPathBuilder(
-        null,
         new DefaultSlackProvider(0, 0, alightSlack),
         costCalculator,
-        RaptorStopNameResolver.nullSafe(null)
+        RaptorStopNameResolver.nullSafe(null),
+        null
       );
   }
 }

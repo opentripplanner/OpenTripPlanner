@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
@@ -36,7 +35,7 @@ public final class AccessEgressFunctions {
    *     </li>
    *     <li>
    *         reached the stop on-board, and not on foot. This is optimal because arriving on foot
-   *         limits your options, you are not allowed to contnue on foot and transfer(walk) to
+   *         limits your options, you are not allowed to continue on foot and transfer(walk) to
    *         a nearby stop.
    *     </li>
    *     <li>
@@ -52,28 +51,6 @@ public final class AccessEgressFunctions {
 
   /** private constructor to prevent instantiation of utils class. */
   private AccessEgressFunctions() {}
-
-  /**
-   * This method helps with calculating the egress departure time. It will add transit slack (egress
-   * leaves on-board) and then time-shift the egress.
-   */
-  public static int calculateEgressDepartureTime(
-    int arrivalTime,
-    RaptorAccessEgress egressPath,
-    SlackProvider slackProvider,
-    TimeCalculator timeCalculator
-  ) {
-    int departureTime = arrivalTime;
-
-    if (egressPath.stopReachedOnBoard()) {
-      departureTime = timeCalculator.plusDuration(departureTime, slackProvider.transferSlack());
-    }
-    if (timeCalculator.searchForward()) {
-      return egressPath.earliestDepartureTime(departureTime);
-    } else {
-      return egressPath.latestArrivalTime(departureTime);
-    }
-  }
 
   static Collection<RaptorAccessEgress> removeNoneOptimalPathsForStandardRaptor(
     Collection<RaptorAccessEgress> paths
