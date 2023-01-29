@@ -443,6 +443,14 @@ Http headers.
     "ignoreRealtimeUpdates" : false,
     "geoidElevation" : false,
     "maxJourneyDuration" : "36h",
+    "unpreferred" : {
+      "agencies" : [
+        "HSL:123"
+      ],
+      "routes" : [
+        "HSL:456"
+      ]
+    },
     "transferOptimization" : {
       "optimizeTransferWaitTime" : true,
       "minSafeWaitTimeFactor" : 5.0,
