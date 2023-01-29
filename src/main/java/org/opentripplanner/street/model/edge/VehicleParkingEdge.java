@@ -1,11 +1,13 @@
 package org.opentripplanner.street.model.edge;
 
+import com.google.common.collect.Sets;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -113,6 +115,9 @@ public class VehicleParkingEdge extends Edge {
     s0e.incrementWeight(parkingCost);
     s0e.incrementTimeInSeconds(parkingTime);
     s0e.setVehicleParked(false, mode);
+
+    addUnpreferredTagCost(s0.getRequest().parking(), s0e);
+
     return s0e.makeState();
   }
 
@@ -153,6 +158,24 @@ public class VehicleParkingEdge extends Edge {
     s0e.incrementWeight(parkingCost);
     s0e.incrementTimeInSeconds(parkingTime);
     s0e.setVehicleParked(true, TraverseMode.WALK);
+
+    addUnpreferredTagCost(s0.getRequest().parking(), s0e);
+
     return s0e.makeState();
+  }
+
+  private void addUnpreferredTagCost(VehicleParkingRequest req, StateEditor s0e) {
+    if (isUnpreferredParking(req, vehicleParking)) {
+      s0e.incrementWeight(req.unpreferredTagCost());
+    }
+  }
+
+  private static boolean isUnpreferredParking(VehicleParkingRequest req, VehicleParking parking) {
+    final var preferredTags = req.preferredTags();
+    if (preferredTags.isEmpty()) {
+      return false;
+    } else {
+      return Sets.intersection(preferredTags, parking.getTags()).isEmpty();
+    }
   }
 }

@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.edge;
 
-import com.google.common.collect.Sets;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -63,10 +62,6 @@ public class StreetVehicleParkingLink extends Edge {
 
     StateEditor s1 = s0.edit(this);
 
-    if (isUnpreferredParking(parkingRequest, vehicleParking)) {
-      s1.incrementWeight(parkingRequest.unpreferredTagCost());
-    }
-
     s1.incrementWeight(1);
     s1.setBackMode(null);
     return s1.makeState();
@@ -100,12 +95,5 @@ public class StreetVehicleParkingLink extends Edge {
     return !vehicleParking.getTags().containsAll(requiredTags);
   }
 
-  private static boolean isUnpreferredParking(VehicleParkingRequest req, VehicleParking parking) {
-    final var preferredTags = req.preferredTags();
-    if (preferredTags.isEmpty()) {
-      return false;
-    } else {
-      return Sets.intersection(preferredTags, parking.getTags()).isEmpty();
-    }
-  }
+
 }
