@@ -1,8 +1,10 @@
 package org.opentripplanner.street.model.edge;
 
+import com.google.common.collect.Sets;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -28,8 +30,9 @@ public class StreetVehicleParkingLink extends Edge {
     vehicleParkingEntranceVertex = fromv;
   }
 
+  @Override
   public String toString() {
-    return "StreetVehicleParkingLink(" + fromv + " -> " + tov + ")";
+    return ToStringBuilder.of(this.getClass()).addObj("fromv", fromv).addObj("tov", tov).toString();
   }
 
   public State traverse(State s0) {
@@ -59,11 +62,17 @@ public class StreetVehicleParkingLink extends Edge {
     }
 
     StateEditor s1 = s0.edit(this);
+
+    if (isUnpreferredParking(parkingRequest, vehicleParking)) {
+      s1.incrementWeight(parkingRequest.unpreferredTagCost());
+    }
+
     s1.incrementWeight(1);
     s1.setBackMode(null);
     return s1.makeState();
   }
 
+  @Override
   public I18NString getName() {
     return vehicleParkingEntranceVertex.getName();
   }
@@ -89,5 +98,14 @@ public class StreetVehicleParkingLink extends Edge {
       return false;
     }
     return !vehicleParking.getTags().containsAll(requiredTags);
+  }
+
+  private static boolean isUnpreferredParking(VehicleParkingRequest req, VehicleParking parking) {
+    final var preferredTags = req.preferredTags();
+    if (preferredTags.isEmpty()) {
+      return false;
+    } else {
+      return Sets.intersection(preferredTags, parking.getTags()).isEmpty();
+    }
   }
 }

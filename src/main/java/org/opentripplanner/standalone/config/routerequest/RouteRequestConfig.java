@@ -177,8 +177,13 @@ public class RouteRequestConfig {
           "If a parking facility contains one of these tags it will be used preferably. If empty, no tags are preferred."
         )
         .description(
-          "If this is non-empty and a parking facility doesn't contain this tag, then using it will receive an extra cost" +
-          "configured in `unpreferredVehicleParkingTagCost`."
+          """
+          If this is non-empty and a parking facility doesn't contain this tag, then using it will receive an extra cost
+          configured in `unpreferredVehicleParkingTagCost`.
+          
+          This is useful if you want prefer certain facilities, for example bicycle lockers for expensive e-bikes, but
+          you don't want to force their use since they are rare.
+          """
         )
         .asStringSet(vehicleParking.preferredTags())
     );
@@ -186,15 +191,8 @@ public class RouteRequestConfig {
       c
         .of("unpreferredVehicleParkingTagCost")
         .since(V2_3)
-        .summary(
-          "If a parking facility contains one of these tags it will be used preferably. If empty, no tags are preferred."
-        )
-        .description(
-          """
-             If this is non-empty and a parking facility doesn't contain this tag, then using it will receive an extra cost
-             configured in `unpreferredVehicleParkingTagCost`.
-             """
-        )
+        .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
+        .description("See `preferredVehicleParkingTags`.")
         .asInt(vehicleParking.unpreferredTagCost())
     );
 

@@ -71,7 +71,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [transferSlack](#rd_transferSlack)                                                                   |        `integer`       | The extra time needed to make a safe transfer in seconds.                                                                          | *Optional* | `120`                    |  2.0  |
 | turnReluctance                                                                                       |        `double`        | Multiplicative factor on expected turning time.                                                                                    | *Optional* | `1.0`                    |  2.0  |
 | [unpreferredCost](#rd_unpreferredCost)                                                               |    `linear-function`   | A cost function used to calculate penalty for an unpreferred route.                                                                | *Optional* | `"f(x) = 0 + 1.0 x"`     |  2.2  |
-| [unpreferredVehicleParkingTagCost](#rd_unpreferredVehicleParkingTagCost)                             |        `integer`       | If a parking facility contains one of these tags it will be used preferably. If empty, no tags are preferred.                      | *Optional* | `300`                    |  2.3  |
+| [unpreferredVehicleParkingTagCost](#rd_unpreferredVehicleParkingTagCost)                             |        `integer`       | What cost to add if a parking facility doesn't contain a preferred tag.                                                            | *Optional* | `300`                    |  2.3  |
 | useBikeRentalAvailabilityInformation                                                                 |        `boolean`       | Whether or not bike rental availability information will be used to plan bike rental trips.                                        | *Optional* | `false`                  |  2.0  |
 | useVehicleParkingAvailabilityInformation                                                             |        `boolean`       | TODO: Add short summary.                                                                                                           | *Optional* | `false`                  |  2.1  |
 | waitReluctance                                                                                       |        `double`        | How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.                                  | *Optional* | `1.0`                    |  2.0  |
@@ -341,11 +341,9 @@ or for an unpreferred agency's departure. For example, 600 + 2.0 x
 **Since version:** `2.3` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `300`   
 **Path:** /routingDefaults 
 
-If a parking facility contains one of these tags it will be used preferably. If empty, no tags are preferred.
+What cost to add if a parking facility doesn't contain a preferred tag.
 
-If this is non-empty and a parking facility doesn't contain this tag, then using it will receive an extra cost
-configured in `unpreferredVehicleParkingTagCost`.
-
+See `preferredVehicleParkingTags`.
 
 <h3 id="rd_walkReluctance">walkReluctance</h3>
 
@@ -612,7 +610,12 @@ done because some street modes searches are much more resource intensive than ot
 
 If a parking facility contains one of these tags it will be used preferably. If empty, no tags are preferred.
 
-If this is non-empty and a parking facility doesn't contain this tag, then using it will receive an extra costconfigured in `unpreferredVehicleParkingTagCost`.
+If this is non-empty and a parking facility doesn't contain this tag, then using it will receive an extra cost
+configured in `unpreferredVehicleParkingTagCost`.
+
+This is useful if you want prefer certain facilities, for example bicycle lockers for expensive e-bikes, but
+you don't want to force their use since they are rare.
+
 
 <h3 id="rd_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
 
