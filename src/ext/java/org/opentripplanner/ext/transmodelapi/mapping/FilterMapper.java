@@ -86,6 +86,12 @@ class FilterMapper {
         List<Map<String, ?>> transportModes = (List<Map<String, ?>>) modesInput.get(
           "transportModes"
         );
+        // Disable transit if transit modes is defined and empty
+        if (transportModes.isEmpty()) {
+          request.journey().transit().disable();
+          return;
+        }
+
         for (Map<String, ?> modeWithSubmodes : transportModes) {
           if (modeWithSubmodes.containsKey("transportMode")) {
             var mainMode = (TransitMode) modeWithSubmodes.get("transportMode");

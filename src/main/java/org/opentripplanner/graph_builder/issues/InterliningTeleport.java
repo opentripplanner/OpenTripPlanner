@@ -25,6 +25,6 @@ public class InterliningTeleport implements DataImportIssue {
 
   @Override
   public int getPriority() {
-    return 10000000 - distance;
+    return -distance;
   }
 }

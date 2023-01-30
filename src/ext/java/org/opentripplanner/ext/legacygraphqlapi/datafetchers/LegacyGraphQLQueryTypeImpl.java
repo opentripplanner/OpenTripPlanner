@@ -48,7 +48,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
-import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -747,6 +746,7 @@ public class LegacyGraphQLQueryTypeImpl
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
 
+      var transitDisabled = false;
       if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
         var filterRequestBuilder = TransitFilterRequest.of();
 
@@ -797,19 +797,19 @@ public class LegacyGraphQLQueryTypeImpl
           request.journey().direct().setMode(requestModes.directMode);
           request.journey().transfer().setMode(requestModes.transferMode);
 
-          var tModes = modes
-            .getTransitModes()
-            .stream()
-            .map(MainAndSubMode::new)
-            .collect(Collectors.toList());
+          var tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
           if (tModes.isEmpty()) {
-            tModes = MainAndSubMode.all();
+            transitDisabled = true;
+          } else {
+            filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
           }
-
-          filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
         }
 
-        request.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
+        if (transitDisabled) {
+          request.journey().transit().disable();
+        } else {
+          request.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
+        }
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {
