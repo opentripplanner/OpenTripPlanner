@@ -2,8 +2,8 @@ package org.opentripplanner.standalone.config.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import jakarta.inject.Singleton;
 import java.io.File;
-import javax.inject.Singleton;
 import org.opentripplanner.datastore.api.OtpBaseDirectory;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
