@@ -3,20 +3,11 @@ package org.opentripplanner.graph_builder.issues;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public class ParkAndRideUnlinked implements DataImportIssue {
-
-  public static final String FMT =
+public record ParkAndRideUnlinked(String name, OSMWithTags entity) implements DataImportIssue {
+  private static String FMT =
     "Park and ride '%s' (%s) not linked to any streets in OSM; entrance might not be placed correctly.";
-  public static final String HTMLFMT =
+  private static String HTMLFMT =
     "Park and ride <a href='%s'>'%s' (%s)</a> not linked to any streets in OSM; entrance might not be placed correctly.";
-
-  final String name;
-  final OSMWithTags entity;
-
-  public ParkAndRideUnlinked(String name, OSMWithTags entity) {
-    this.name = name;
-    this.entity = entity;
-  }
 
   @Override
   public String getMessage() {

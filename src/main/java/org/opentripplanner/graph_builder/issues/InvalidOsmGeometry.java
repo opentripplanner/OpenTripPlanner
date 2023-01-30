@@ -3,9 +3,9 @@ package org.opentripplanner.graph_builder.issues;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public record StreetCarSpeedZero(OSMWithTags entity) implements DataImportIssue {
-  private static String FMT = "Way %s has car speed zero";
-  private static String HTMLFMT = "Way <a href='%s'>'%s'</a> has car speed zero";
+public record InvalidOsmGeometry(OSMWithTags entity) implements DataImportIssue {
+  private static String FMT = "Invalid OSM geometry %s";
+  private static String HTMLFMT = "Invalid OSM geometry <a href='%s'>'%s'</a>";
 
   @Override
   public String getMessage() {
