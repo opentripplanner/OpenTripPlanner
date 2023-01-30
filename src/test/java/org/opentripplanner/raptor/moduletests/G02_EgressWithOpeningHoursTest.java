@@ -51,7 +51,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
           schedule("24:20 24:30")
         )
     );
-    requestBuilder.searchParams().addAccessPaths(TestAccessEgress.walk(STOP_A, D0s));
+    requestBuilder.searchParams().addAccessPaths(TestAccessEgress.free(STOP_A));
 
     requestBuilder.searchParams().earliestDepartureTime(T00_10).searchWindow(D15m).timetable(true);
 

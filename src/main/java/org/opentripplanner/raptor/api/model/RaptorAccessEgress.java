@@ -25,6 +25,9 @@ public interface RaptorAccessEgress {
    * <p>
    * This method is called many times, so care needs to be taken that the value is stored, not
    * calculated for each invocation.
+   * <p>
+   * If this is {@link #isFree()}, then this method must return
+   * {@link org.opentripplanner.raptor.api.RaptorConstants#ZERO_COST}.
    */
   int generalizedCost();
 
@@ -140,7 +143,7 @@ public interface RaptorAccessEgress {
    * An empty egress where you alight transit directly at the destination
    * @return true if the duration is 0;
    */
-  default boolean isEmpty() {
+  default boolean isFree() {
     return durationInSeconds() == 0;
   }
 

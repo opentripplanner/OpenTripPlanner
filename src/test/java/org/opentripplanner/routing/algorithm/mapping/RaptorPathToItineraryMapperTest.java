@@ -63,9 +63,7 @@ public class RaptorPathToItineraryMapperTest {
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
     RaptorPath<TestTripSchedule> path = getTestTripSchedulePath(getTestTripSchedule())
-      .egress(
-        TestAccessEgress.zeroDurationAccess(2, RaptorCostConverter.toRaptorCost(LAST_LEG_COST))
-      );
+      .egress(TestAccessEgress.free(2, RaptorCostConverter.toRaptorCost(LAST_LEG_COST)));
 
     // Act
     var itineraries = mapper.createItinerary(path);
@@ -103,9 +101,7 @@ public class RaptorPathToItineraryMapperTest {
 
   private TestPathBuilder getTestTripSchedulePath(TestTripSchedule testTripSchedule) {
     TestPathBuilder pathBuilder = new TestPathBuilder(0, COST_CALCULATOR);
-    return pathBuilder
-      .access(ACCESS_START, TestAccessEgress.zeroDurationAccess(1, 0))
-      .bus(testTripSchedule, 2);
+    return pathBuilder.access(ACCESS_START, TestAccessEgress.free(1, 0)).bus(testTripSchedule, 2);
   }
 
   private RaptorPathToItineraryMapper<TestTripSchedule> getRaptorPathToItineraryMapper() {

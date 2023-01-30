@@ -73,18 +73,6 @@ public class Itinerary {
   }
 
   /**
-   * Used to convert a list of itineraries to a SHORT human readable string.
-   *
-   * @see #toStr()
-   * <p>
-   * It is great for comparing lists of itineraries in a test: {@code
-   * assertEquals(toStr(List.of(it1)), toStr(result))}.
-   */
-  public static String toStr(List<Itinerary> list) {
-    return list.stream().map(Itinerary::toStr).collect(Collectors.joining(", "));
-  }
-
-  /**
    * Time that the trip departs.
    */
   public ZonedDateTime startTime() {
@@ -216,6 +204,18 @@ public class Itinerary {
     return super.equals(o);
   }
 
+  /**
+   * Used to convert a list of itineraries to a SHORT human-readable string.
+   *
+   * @see #toStr()
+   * <p>
+   * It is great for comparing lists of itineraries in a test: {@code
+   * assertEquals(toStr(List.of(it1)), toStr(result))}.
+   */
+  public static String toStr(List<Itinerary> list) {
+    return list.stream().map(Itinerary::toStr).collect(Collectors.joining(", "));
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder
@@ -224,12 +224,14 @@ public class Itinerary {
       .addStr("to", lastLeg().getTo().toStringShort())
       .addTime("start", firstLeg().getStartTime())
       .addTime("end", lastLeg().getEndTime())
-      .addNum("nTransfers", numberOfTransfers, -1)
+      .addNum("nTransfers", numberOfTransfers)
       .addDuration("duration", duration)
-      .addNum("generalizedCost", generalizedCost)
       .addDuration("nonTransitTime", nonTransitDuration)
       .addDuration("transitTime", transitDuration)
       .addDuration("waitingTime", waitingDuration)
+      .addNum("generalizedCost", generalizedCost, UNKNOWN)
+      .addNum("waitTimeOptimizedCost", waitTimeOptimizedCost, UNKNOWN)
+      .addNum("transferPriorityCost", transferPriorityCost, UNKNOWN)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
       .addBool("tooSloped", tooSloped)
       .addNum("elevationLost", elevationLost, 0.0)
@@ -516,6 +518,8 @@ public class Itinerary {
   /**
    * Get the index of a leg when you want to reference it in an API response, for example when you
    * want to say that a fare is valid for legs 2 and 3.
+   * <p>
+   * Return {@link #UNKNOWN} if not found.
    */
   public int getLegIndex(Leg leg) {
     var index = legs.indexOf(leg);
@@ -533,7 +537,7 @@ public class Itinerary {
           return i;
         }
       }
-      return -1;
+      return UNKNOWN;
     }
   }
 

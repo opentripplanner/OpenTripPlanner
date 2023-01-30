@@ -5,6 +5,8 @@ import static org.opentripplanner.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
@@ -16,7 +18,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -76,9 +77,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
       .latestArrivalTime(T00_30)
       .searchOneIterationOnly();
 
-    requestBuilder
-      .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D0s), flex(STOP_C, D11m));
+    requestBuilder.searchParams().addAccessPaths(free(STOP_A), flex(STOP_C, D11m));
 
     data
       .withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D2m))
@@ -107,7 +106,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
   @Test
   public void standardReverseExpectFlex() {
     requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-    requestBuilder.searchParams().addEgressPaths(TestAccessEgress.walk(STOP_F, D0s));
+    requestBuilder.searchParams().addEgressPaths(free(STOP_F));
 
     assertEquals(withoutCost(EXPECTED_FLEX), runSearch());
   }
@@ -124,7 +123,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
     requestBuilder.searchParams().earliestDepartureTime(T00_00);
     requestBuilder
       .searchParams()
-      .addEgressPaths(TestAccessEgress.walk(STOP_E, D3m), TestAccessEgress.walk(STOP_F, D0s));
+      .addEgressPaths(walk(STOP_E, D3m), free(STOP_F));
 
     String actual = runSearch();
 
@@ -139,7 +138,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
   private void withFlexAccessAsBestOption() {
     requestBuilder
       .searchParams()
-      .addEgressPaths(TestAccessEgress.walk(STOP_F, D0s), TestAccessEgress.walk(STOP_E, D3m));
+      .addEgressPaths(free(STOP_F), walk(STOP_E, D3m));
   }
 
   /**
@@ -149,7 +148,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
   private void withTripL1AsBestStartOption() {
     requestBuilder
       .searchParams()
-      .addEgressPaths(TestAccessEgress.walk(STOP_F, D0s), TestAccessEgress.walk(STOP_E, D1m));
+      .addEgressPaths(free(STOP_F), walk(STOP_E, D1m));
   }
 
   private String runSearch() {

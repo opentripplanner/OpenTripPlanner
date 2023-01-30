@@ -84,7 +84,7 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
       .searchWindowInSeconds(D20m)
       .latestArrivalTime(T00_30);
 
-    requestBuilder.searchParams().addAccessPaths(TestAccessEgress.walk(STOP_A, D0s));
+    requestBuilder.searchParams().addAccessPaths(TestAccessEgress.free(STOP_A));
 
     data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D2m));
 

@@ -25,7 +25,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   private final int cost;
   private final int numberOfRides;
   private final boolean stopReachedOnBoard;
-  private final boolean isEmpty;
+  private final boolean free;
   private final Integer opening;
   private final Integer closing;
 
@@ -35,9 +35,22 @@ public class TestAccessEgress implements RaptorAccessEgress {
     this.cost = builder.cost;
     this.numberOfRides = builder.numberOfRides;
     this.stopReachedOnBoard = builder.stopReachedOnBoard;
-    this.isEmpty = builder.isEmpty;
+    this.free = builder.free;
     this.opening = builder.opening;
     this.closing = builder.closing;
+  }
+
+  public static TestAccessEgress free(int stop) {
+    return new Builder(stop, 0).withFree().build();
+  }
+
+  /**
+   * @deprecated A stop can not be both free and have a cost - This is not a valid
+   *             access/egress.
+   */
+  @Deprecated
+  public static TestAccessEgress free(int stop, int cost) {
+    return new Builder(stop, 0).withFree().withCost(cost).build();
   }
 
   public static TestAccessEgress walk(int stop, int durationInSeconds) {
@@ -58,10 +71,6 @@ public class TestAccessEgress implements RaptorAccessEgress {
       .withNRides(1)
       .stopReachedOnBoard()
       .build();
-  }
-
-  public static TestAccessEgress zeroDurationAccess(int stop, int cost) {
-    return new Builder(stop, 0).withIsEmpty(true).withCost(cost).build();
   }
 
   /** Create a new flex access and arrive stop onBoard with 1 ride/extra transfer. */
@@ -215,8 +224,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   @Override
-  public boolean isEmpty() {
-    return this.isEmpty;
+  public boolean isFree() {
+    return this.free;
   }
 
   @Override
@@ -242,7 +251,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     boolean stopReachedOnBoard = STOP_REACHED_ON_FOOT;
     Integer opening = null;
     Integer closing = null;
-    private boolean isEmpty;
+    private boolean free;
 
     Builder(int stop, int durationInSeconds) {
       this.stop = stop;
@@ -260,8 +269,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
       this.closing = transfer.closing;
     }
 
-    Builder withIsEmpty(boolean isEmpty) {
-      this.isEmpty = isEmpty;
+    Builder withFree() {
+      this.free = true;
       return this;
     }
 
