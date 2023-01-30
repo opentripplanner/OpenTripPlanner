@@ -86,7 +86,9 @@ are examples to give you an idea of the exponential growth of adding criteria to
 
 In this context, Path and Itineraries are almost the same. We use *Path* to talk about the minimal
 set of data returned by Raptor. Those paths are decorated with information from the transit-layer
-and used to create the itineraries, which are returned from the routing code (to the end user).
+and used to create the itineraries, which are returned from the routing code (to the end user). The
+`RaptorPath` implementation is moved into a separate top level package, since this is also used
+outside of Raptor.
 
 ## Pareto optimal/efficiency set
 

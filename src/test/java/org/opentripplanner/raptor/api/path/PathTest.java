@@ -24,7 +24,7 @@ import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.Path;
+import org.opentripplanner.raptor.path.Path;
 
 public class PathTest implements RaptorTestConstants {
 

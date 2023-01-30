@@ -22,6 +22,7 @@ public class RaptorArchitectureTest {
   private static final Package RAPTOR_UTIL_PARETO_SET = RAPTOR_UTIL.subPackage("paretoset");
   private static final Module RAPTOR_UTILS = Module.of(RAPTOR_UTIL, RAPTOR_UTIL_PARETO_SET);
   private static final Package RAPTOR_SPI = RAPTOR.subPackage("spi");
+  private static final Package RAPTOR_PATH = RAPTOR.subPackage("path");
   private static final Package CONFIGURE = RAPTOR.subPackage("configure");
   private static final Package SERVICE = RAPTOR.subPackage("service");
   private static final Package RANGE_RAPTOR = RAPTOR.subPackage("rangeraptor");
@@ -62,6 +63,11 @@ public class RaptorArchitectureTest {
   }
 
   @Test
+  void enforcePackageDependenciesRaptorPath() {
+    RAPTOR_PATH.dependsOn(API_PATH, API_MODEL, RAPTOR_SPI).verify();
+  }
+
+  @Test
   void enforcePackageDependenciesInRaptorImplementation() {
     var internalApi = RR_INTERNAL_API.dependsOn(RAPTOR_API, RAPTOR_SPI).verify();
 
@@ -79,7 +85,7 @@ public class RaptorArchitectureTest {
     RR_LIFECYCLE.dependsOn(common).verify();
     RR_TRANSIT.dependsOn(common, RR_DEBUG, RR_LIFECYCLE).verify();
     RR_CONTEXT.dependsOn(common, RR_DEBUG, RR_LIFECYCLE, RR_SUPPORT, RR_TRANSIT).verify();
-    RR_PATH.dependsOn(common, RR_DEBUG, RR_TRANSIT).verify();
+    RR_PATH.dependsOn(common, RR_DEBUG, RR_TRANSIT, RAPTOR_PATH).verify();
 
     var pathConfigure = RR_PATH
       .subPackage("configure")

@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.path;
 
 import java.util.List;
 import java.util.Objects;

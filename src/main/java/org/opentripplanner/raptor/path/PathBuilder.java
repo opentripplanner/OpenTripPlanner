@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.path;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -11,6 +11,10 @@ import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.BoardAndAlightTime;
+import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
  * The path builder is a utility to build paths. The path builder is responsible for reconstructing
