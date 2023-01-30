@@ -26,6 +26,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.AreaTooComplicated;
+import org.opentripplanner.graph_builder.issues.UnconnectedArea;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
@@ -307,9 +308,10 @@ public class WalkableAreaBuilder {
 
       if (edgeList.visibilityVertices.size() == 0) {
         issueStore.add(
-          "UnconnectedArea",
-          "Area %s has no connection to street network",
-          osmWayIds.stream().map(Object::toString).collect(Collectors.joining(", "))
+          new UnconnectedArea(
+            group.getSomeOSMObject(),
+            osmWayIds.stream().map(Object::toString).collect(Collectors.joining(", "))
+          )
         );
       }
 
