@@ -47,5 +47,4 @@ public class TestServerContext {
   public static WorldEnvelopeService createWorldEnvelopeService() {
     return new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository());
   }
-
 }

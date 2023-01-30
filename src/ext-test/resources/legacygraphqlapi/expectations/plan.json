@@ -4,6 +4,8 @@
       "itineraries" : [
         {
           "duration" : 0,
+          "startTime" : 1580638800000,
+          "endTime" : 1580638800000,
           "legs" : [
             {
               "from" : {
@@ -19,7 +21,8 @@
               "mode" : "WALK",
               "route" : null,
               "distance" : 28.0,
-              "duration" : 20.0
+              "duration" : 20.0,
+              "legGeometry" : null
             },
             {
               "from" : {
@@ -37,7 +40,11 @@
                 "shortName" : "122"
               },
               "distance" : 0.0,
-              "duration" : 0.0
+              "duration" : 0.0,
+              "legGeometry" : {
+                "points" : "_y|u@_c`|@????_t`B_ibE",
+                "length" : 4
+              }
             }
           ]
         }

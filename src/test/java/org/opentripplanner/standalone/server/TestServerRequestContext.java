@@ -124,4 +124,8 @@ public class TestServerRequestContext implements OtpServerRequestContext {
   public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
     return null;
   }
+
+  public RouteRequest lastRouteRequest() {
+    return routingService.lastRouteRequest();
+  }
 }

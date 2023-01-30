@@ -809,6 +809,10 @@ public class LegacyGraphQLQueryTypeImpl
         (Collection<String> v) -> vehicleRental.setBannedNetworks(new HashSet<>(v))
       );
 
+      var parking = request.journey().parking();
+      callWith.argument("preferredVehicleParkingTags", parking::setPreferredTags);
+      callWith.argument("unpreferredVehicleParkingTagCost", parking::setUnpreferredTagCost);
+
       callWith.argument(
         "locale",
         (String v) -> request.setLocale(LegacyGraphQLUtils.getLocale(environment, v))

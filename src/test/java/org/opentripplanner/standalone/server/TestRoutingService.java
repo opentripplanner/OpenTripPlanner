@@ -31,6 +31,7 @@ public class TestRoutingService implements RoutingService {
         new DebugTimingAggregator()
       );
   }
+
   @Override
   public RoutingResponse route(RouteRequest request) {
     this.lastRouteRequest = request;

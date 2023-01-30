@@ -94,6 +94,4 @@ public class StreetVehicleParkingLink extends Edge {
     }
     return !vehicleParking.getTags().containsAll(requiredTags);
   }
-
-
 }

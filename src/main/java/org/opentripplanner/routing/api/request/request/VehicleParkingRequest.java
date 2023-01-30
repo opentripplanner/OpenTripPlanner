@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -34,7 +35,7 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
     return bannedTags;
   }
 
-  public void setPreferredTags(Set<String> tags) {
+  public void setPreferredTags(Collection<String> tags) {
     this.preferredTags = Set.copyOf(tags);
   }
 
