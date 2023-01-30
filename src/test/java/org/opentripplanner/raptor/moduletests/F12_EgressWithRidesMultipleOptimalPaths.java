@@ -7,12 +7,14 @@ import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
@@ -21,6 +23,7 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
@@ -89,61 +92,47 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  @Test
-  public void standardFlex() {
-    withFlexEgressAsBestDestinationArrivalTime();
-    requestBuilder.profile(STANDARD);
-    assertEquals(withoutCost(EXPECTED_PATH_FLEX), runSearch());
+  static List<RaptorModuleTestCase> withFlexAsBestOptionTestCases() {
+    return RaptorModuleTestCase
+      .of()
+      // TODO - Figure out/explain why TC_STANDARD_REV_ONE give another result
+      //      - Document if the std-rev-on is irrelevant or add the test-case
+      .add(standard().not(TC_STANDARD_REV_ONE), withoutCost(EXPECTED_PATH_FLEX))
+      .add(multiCriteria(), join(EXPECTED_PATH_FLEX, EXPECTED_MC_WALK_6M))
+      .build();
   }
 
-  @Test
-  public void standardWalking() {
-    withWalkingAsBestDestinationArrivalTime();
-    requestBuilder.profile(STANDARD);
-    assertEquals(withoutCost(EXPECTED_PATH_WALK_5M), runSearch());
-  }
-
-  @Test
-  public void standardReverseFlex() {
-    withFlexEgressAsBestDestinationArrivalTime();
-    requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-    assertEquals(withoutCost(EXPECTED_PATH_FLEX), runSearch());
-  }
-
-  @Test
-  public void standardReverseWalking() {
-    withWalkingAsBestDestinationArrivalTime();
-    requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-    assertEquals(withoutCost(EXPECTED_PATH_WALK_5M), runSearch());
-  }
-
-  @Test
-  public void multiCriteriaFlex() {
-    withFlexEgressAsBestDestinationArrivalTime();
-    requestBuilder.profile(MULTI_CRITERIA);
-    assertEquals(join(EXPECTED_PATH_FLEX, EXPECTED_MC_WALK_6M), runSearch());
-  }
-
-  @Test
-  public void multiCriteriaWalking() {
-    withWalkingAsBestDestinationArrivalTime();
-    requestBuilder.profile(MULTI_CRITERIA);
-    assertEquals(EXPECTED_PATH_WALK_5M, runSearch());
-  }
-
-  private void withFlexEgressAsBestDestinationArrivalTime() {
+  @ParameterizedTest
+  @MethodSource("withFlexAsBestOptionTestCases")
+  void withFlexAsBestOptionTest(RaptorModuleTestCase testCase) {
+    // with Flex egress as the best destination arrival-time
     requestBuilder
       .searchParams()
       .addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), TestAccessEgress.walk(STOP_C, D7m));
+
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 
-  private void withWalkingAsBestDestinationArrivalTime() {
+  static List<RaptorModuleTestCase> withWalkingAsBestOptionTestCase() {
+    return RaptorModuleTestCase
+      .of()
+      .add(standard(), withoutCost(EXPECTED_PATH_WALK_5M))
+      .add(multiCriteria(), join(EXPECTED_PATH_WALK_5M))
+      .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource("withWalkingAsBestOptionTestCase")
+  void withWalkingAsBestOptionTest(RaptorModuleTestCase testCase) {
+    // with walk egress as the best destination arrival-time
     requestBuilder
       .searchParams()
       .addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), TestAccessEgress.walk(STOP_C, D5m));
-  }
 
-  private String runSearch() {
-    return pathsToString(raptorService.route(requestBuilder.build(), data));
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 }
