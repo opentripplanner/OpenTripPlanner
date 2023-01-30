@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.issue.service;
 
+import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Singleton;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
