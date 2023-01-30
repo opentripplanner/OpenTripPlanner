@@ -7,18 +7,25 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.SECONDS_IN_DAY;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /*
  * FEATURE UNDER TEST
@@ -59,6 +66,32 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       .timetable(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+  }
+
+  static List<RaptorModuleTestCase> openInWholeSearchIntervalTestCases() {
+    var expected = new String[] {
+      "Walk 2m ~ B ~ BUS R1 0:15 0:30 ~ E ~ Walk 1m [0:13 0:31 18m 0tx $1860]",
+      "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m 0tx $1860]",
+      "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:23 0:41 18m 0tx $1860]",
+      "Walk 2m ~ B ~ BUS R1 0:30 0:45 ~ E ~ Walk 1m [0:28 0:46 18m 0tx $1860]",
+      "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m 0tx $1860]",
+    };
+
+    return RaptorModuleTestCase
+      .of()
+      .add(TC_STANDARD, PathUtils.withoutCost(expected))
+      .add(multiCriteria(), expected)
+      .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource("openInWholeSearchIntervalTestCases")
+  void openInWholeSearchIntervalTest(RaptorModuleTestCase testCase) {
+    requestBuilder.searchParams().addAccessPaths(TestAccessEgress.walk(STOP_B, D2m));
+
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 
   /*

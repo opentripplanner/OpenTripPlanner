@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
@@ -40,7 +41,7 @@ public class C02_OnStreetTransfersTest implements RaptorTestConstants {
     "Walk 30s ~ D ~ " +
     "BUS R2 0:04 0:05 ~ E ~ " +
     "Walk 20s " +
-    "[0:01:30 0:05:20 3m50s 1tx]";
+    "[0:01:30 0:05:20 3m50s 1tx $1510]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -82,8 +83,8 @@ public class C02_OnStreetTransfersTest implements RaptorTestConstants {
   static List<RaptorModuleTestCase> testCases() {
     return RaptorModuleTestCase
       .of()
-      .add(standard(), EXPECTED_RESULT)
-      .add(multiCriteria(), EXPECTED_RESULT.replace("]", " $1510]"))
+      .add(standard(), PathUtils.withoutCost(EXPECTED_RESULT))
+      .add(multiCriteria(), EXPECTED_RESULT)
       .build();
   }
 

@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
@@ -68,16 +69,18 @@ public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var expected =
+      "Flex 3m 1x ~ A " +
+      "~ Walk 10m ~ B " +
+      "~ BUS R1 0:30 0:45 ~ C " +
+      "~ BUS R2 0:45 0:55 ~ D " +
+      "~ Walk 1m " +
+      "[0:16 0:56 40m 2tx $3820]";
+
     return RaptorModuleTestCase
       .of()
-      .add(
-        standard(),
-        "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]"
-      )
-      .add(
-        multiCriteria(),
-        "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx $3820]"
-      )
+      .add(standard(), withoutCost(expected))
+      .add(multiCriteria(), expected)
       .build();
   }
 

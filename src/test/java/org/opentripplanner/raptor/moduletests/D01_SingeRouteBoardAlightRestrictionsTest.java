@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
@@ -71,13 +72,11 @@ public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var path = "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx $940]";
     return RaptorModuleTestCase
       .of()
-      .add(standard(), "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx]")
-      .add(
-        multiCriteria(),
-        "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx $940]"
-      )
+      .add(standard(), PathUtils.withoutCost(path))
+      .add(multiCriteria(), path)
       .build();
   }
 

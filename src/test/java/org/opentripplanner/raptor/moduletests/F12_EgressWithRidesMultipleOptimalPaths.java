@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
@@ -48,14 +49,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
 public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConstants {
 
   private static final String EXPECTED_PATH_FLEX =
-    "A ~ BUS R2 0:05 0:16 ~ B ~ Walk 2m ~ C ~ Flex 7m 1x [0:05 0:26 21m 1tx";
-  private static final String EXPECTED_STD_FLEX = EXPECTED_PATH_FLEX + "]";
-  private static final String EXPECTED_MC_FLEX = EXPECTED_PATH_FLEX + " $2160]";
+    "A ~ BUS R2 0:05 0:16 ~ B ~ Walk 2m ~ C ~ Flex 7m 1x [0:05 0:26 21m 1tx $2160]";
 
   private static final String EXPECTED_PATH_WALK_5M =
-    "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 5m [0:04 0:25 21m 0tx";
-  private static final String EXPECTED_STD_WALK_5M = EXPECTED_PATH_WALK_5M + "]";
-  private static final String EXPECTED_MC_WALK_5M = EXPECTED_PATH_WALK_5M + " $2160]";
+    "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 5m [0:04 0:25 21m 0tx $2160]";
 
   private static final String EXPECTED_MC_WALK_6M =
     "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 7m [0:04 0:27 23m 0tx $2400]";
@@ -96,42 +93,42 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
   public void standardFlex() {
     withFlexEgressAsBestDestinationArrivalTime();
     requestBuilder.profile(STANDARD);
-    assertEquals(EXPECTED_STD_FLEX, runSearch());
+    assertEquals(withoutCost(EXPECTED_PATH_FLEX), runSearch());
   }
 
   @Test
   public void standardWalking() {
     withWalkingAsBestDestinationArrivalTime();
     requestBuilder.profile(STANDARD);
-    assertEquals(EXPECTED_STD_WALK_5M, runSearch());
+    assertEquals(withoutCost(EXPECTED_PATH_WALK_5M), runSearch());
   }
 
   @Test
   public void standardReverseFlex() {
     withFlexEgressAsBestDestinationArrivalTime();
     requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-    assertEquals(EXPECTED_STD_FLEX, runSearch());
+    assertEquals(withoutCost(EXPECTED_PATH_FLEX), runSearch());
   }
 
   @Test
   public void standardReverseWalking() {
     withWalkingAsBestDestinationArrivalTime();
     requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-    assertEquals(EXPECTED_STD_WALK_5M, runSearch());
+    assertEquals(withoutCost(EXPECTED_PATH_WALK_5M), runSearch());
   }
 
   @Test
   public void multiCriteriaFlex() {
     withFlexEgressAsBestDestinationArrivalTime();
     requestBuilder.profile(MULTI_CRITERIA);
-    assertEquals(join(EXPECTED_MC_FLEX, EXPECTED_MC_WALK_6M), runSearch());
+    assertEquals(join(EXPECTED_PATH_FLEX, EXPECTED_MC_WALK_6M), runSearch());
   }
 
   @Test
   public void multiCriteriaWalking() {
     withWalkingAsBestDestinationArrivalTime();
     requestBuilder.profile(MULTI_CRITERIA);
-    assertEquals(EXPECTED_MC_WALK_5M, runSearch());
+    assertEquals(EXPECTED_PATH_WALK_5M, runSearch());
   }
 
   private void withFlexEgressAsBestDestinationArrivalTime() {

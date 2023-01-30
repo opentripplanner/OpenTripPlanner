@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -42,7 +43,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
     "BUS R1 0:02:11 0:03:01 ~ C ~ " +
     "BUS R2 0:04:41 0:05:01 ~ D ~ " +
     "Walk 20s " +
-    "[0:01:11 0:05:31 4m20s 1tx]";
+    "[0:01:11 0:05:31 4m20s 1tx $1510]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -81,8 +82,8 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
   static List<RaptorModuleTestCase> testCases() {
     return RaptorModuleTestCase
       .of()
-      .add(standard(), EXPECTED_RESULT)
-      .add(multiCriteria(), EXPECTED_RESULT.replace("]", " $1510]"))
+      .add(standard(), PathUtils.withoutCost(EXPECTED_RESULT))
+      .add(multiCriteria(), EXPECTED_RESULT)
       .build();
   }
 

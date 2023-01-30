@@ -17,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
@@ -32,9 +33,6 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
  */
 public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorTestConstants {
 
-  /** The expected result is tha same for all tests */
-  private static final String EXPECTED_RESULT =
-    "Flex 2m 1x ~ B ~ " + "BUS R1 0:04 0:06 ~ C ~ " + "Flex 2m 1x " + "[0:00:30 0:09:10 8m40s 2tx]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -76,11 +74,13 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var path =
+      "Flex 2m 1x ~ B ~ BUS R1 0:04 0:06 ~ C ~ Flex 2m 1x " + "[0:00:30 0:09:10 8m40s 2tx $1840]";
     return RaptorModuleTestCase
       .of()
       // TODO - TC_STANDARD_REV does not give tha same results - why?
-      .add(standard().not(TC_STANDARD_REV), EXPECTED_RESULT)
-      .add(multiCriteria(), EXPECTED_RESULT.replace("]", " $1840]"))
+      .add(standard().not(TC_STANDARD_REV), PathUtils.withoutCost(path))
+      .add(multiCriteria(), path)
       .build();
   }
 

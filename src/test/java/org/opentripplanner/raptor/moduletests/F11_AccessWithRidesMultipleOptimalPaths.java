@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
@@ -49,14 +50,9 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConstants {
 
   private static final String EXPECTED_FLEX =
-    "Flex 11m 1x ~ C ~ Walk 2m ~ D ~ BUS L3 0:16 0:22 ~ F [0:02 0:22 20m 1tx";
-  private static final String EXPECTED_FLEX_STD = EXPECTED_FLEX + "]";
-  private static final String EXPECTED_FLEX_MC = EXPECTED_FLEX + " $2580]";
-
+    "Flex 11m 1x ~ C ~ Walk 2m ~ D ~ BUS L3 0:16 0:22 ~ F [0:02 0:22 20m 1tx $2580]";
   private static final String EXPECTED_WALK =
-    "A ~ BUS L1 0:02 0:10 ~ B ~ Walk 2m ~ C ~ BUS L2 0:15 0:20 ~ E ~ Walk 1m [0:02 0:21 19m 1tx";
-  private static final String EXPECTED_WALK_STD = EXPECTED_WALK + "]";
-  private static final String EXPECTED_WALK_MC = EXPECTED_WALK + " $2460]";
+    "A ~ BUS L1 0:02 0:10 ~ B ~ Walk 2m ~ C ~ BUS L2 0:15 0:20 ~ E ~ Walk 1m [0:02 0:21 19m 1tx $2460]";
 
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
@@ -97,7 +93,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
     requestBuilder.profile(STANDARD);
     withFlexAccessAsBestOption();
 
-    assertEquals(EXPECTED_FLEX_STD, runSearch());
+    assertEquals(withoutCost(EXPECTED_FLEX), runSearch());
   }
 
   @Test
@@ -105,7 +101,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
     requestBuilder.profile(STANDARD);
     withTripL1AsBestStartOption();
 
-    assertEquals(EXPECTED_WALK_STD, runSearch());
+    assertEquals(withoutCost(EXPECTED_WALK), runSearch());
   }
 
   @Test
@@ -113,7 +109,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
     requestBuilder.profile(STANDARD).searchDirection(REVERSE);
     requestBuilder.searchParams().addEgressPaths(TestAccessEgress.walk(STOP_F, D0s));
 
-    assertEquals(EXPECTED_FLEX_STD, runSearch());
+    assertEquals(withoutCost(EXPECTED_FLEX), runSearch());
   }
 
   @Test
@@ -132,7 +128,8 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
 
     String actual = runSearch();
 
-    assertEquals(join(EXPECTED_FLEX_MC, EXPECTED_WALK_MC), actual);
+    String[] paths = new String[0];
+    assertEquals(join(withoutCost(EXPECTED_FLEX, EXPECTED_WALK)), actual);
   }
 
   /**

@@ -13,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -31,11 +32,6 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
  */
 public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
-  private static final String EXP_PATH =
-    "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B " +
-    "~ BUS R2 0:05 0:10 ~ C ~ Walk 30s [0:01:10 0:10:40 9m30s 1tx";
-  private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
-  private static final String EXP_PATH_WITH_COST = EXP_PATH + " $1230]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -77,10 +73,13 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var path =
+      "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R2 0:05 0:10 ~ C ~ Walk 30s " +
+      "[0:01:10 0:10:40 9m30s 1tx $1230]";
     return RaptorModuleTestCase
       .of()
-      .add(standard(), EXP_PATH_NO_COST)
-      .add(multiCriteria(), EXP_PATH_WITH_COST)
+      .add(standard(), PathUtils.withoutCost(path))
+      .add(multiCriteria(), path)
       .build();
   }
 

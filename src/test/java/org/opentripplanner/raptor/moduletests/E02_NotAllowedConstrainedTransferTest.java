@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -29,11 +30,6 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
  */
 public class E02_NotAllowedConstrainedTransferTest implements RaptorTestConstants {
 
-  private static final String EXP_PATH =
-    "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B " +
-    "~ BUS R3 0:15 0:20 ~ C ~ Walk 30s [0:01:30 0:20:30 19m 1tx";
-  private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
-  private static final String EXP_PATH_WITH_COST = EXP_PATH + " $2500]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -86,10 +82,14 @@ public class E02_NotAllowedConstrainedTransferTest implements RaptorTestConstant
   static List<RaptorModuleTestCase> testCases() {
     // TODO - This is a bug - the reverse search should not allow the forbidden boarding
     //      - TC_STANDARD_REV is excluded since the test fails
+
+    var path =
+      "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R3 0:15 0:20 ~ C ~ Walk 30s " +
+      "[0:01:30 0:20:30 19m 1tx $2500]";
     return RaptorModuleTestCase
       .of()
-      .add(standard().not(TC_STANDARD_REV), EXP_PATH_NO_COST)
-      .add(multiCriteria(), EXP_PATH_WITH_COST)
+      .add(standard().not(TC_STANDARD_REV), PathUtils.withoutCost(path))
+      .add(multiCriteria(), path)
       .build();
   }
 
