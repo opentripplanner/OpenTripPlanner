@@ -35,6 +35,10 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
     .walk(STOP, D8m)
     .openingHours(T00_00, T01_00);
 
+  private static final RaptorAccessEgress WALK_W_OPENING_HOURS_8m_OTHER = TestAccessEgress
+    .walk(STOP, D8m)
+    .openingHours(T00_10, T01_00);
+
   @Test
   void removeNoneOptimalPathsForStandardRaptorTest() {
     // Empty set
@@ -56,11 +60,12 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
     );
 
     // Arriving at the stop on-board, and by-foot.
-    // This is better because we can do a transfer walk to nearby stops.
+    // OnBoard is better because we can do a transfer walk to nearby stops.
     assertElements(
       List.of(FLEX_1x_8m),
       removeNoneOptimalPathsForStandardRaptor(List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_8m))
     );
+
     // Flex+walk is faster, flex arrive on-board, both is optimal
     assertElements(
       List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_10m),
@@ -85,6 +90,14 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
     assertElements(
       List.of(WALK_10m, WALK_W_OPENING_HOURS_8m),
       removeNoneOptimalPathsForStandardRaptor(List.of(WALK_10m, WALK_W_OPENING_HOURS_8m))
+    );
+
+    // If two paths both have opening hours, both should be accepted.
+    assertElements(
+      List.of(WALK_W_OPENING_HOURS_8m, WALK_W_OPENING_HOURS_8m_OTHER),
+      removeNoneOptimalPathsForStandardRaptor(
+        List.of(WALK_W_OPENING_HOURS_8m, WALK_W_OPENING_HOURS_8m_OTHER)
+      )
     );
   }
 

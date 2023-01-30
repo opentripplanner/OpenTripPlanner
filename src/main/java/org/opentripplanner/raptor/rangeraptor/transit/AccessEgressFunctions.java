@@ -41,13 +41,16 @@ public final class AccessEgressFunctions {
    *     <li>
    *         No opening hours is better than being restricted
    *     </li>
+   *     <li>
+   *         If Both have opening hours, both need to be accepted
+   *     </li>
    * </ol>
    */
   private static final ParetoComparator<RaptorAccessEgress> STANDARD_COMPARATOR = (l, r) ->
     (l.stopReachedOnBoard() && !r.stopReachedOnBoard()) ||
-    (!l.hasOpeningHours() && r.hasOpeningHours()) ||
-    l.numberOfRides() < r.numberOfRides() ||
-    l.durationInSeconds() < r.durationInSeconds();
+    r.hasOpeningHours() ||
+    (l.numberOfRides() < r.numberOfRides()) ||
+    (l.durationInSeconds() < r.durationInSeconds());
 
   /** private constructor to prevent instantiation of utils class. */
   private AccessEgressFunctions() {}
