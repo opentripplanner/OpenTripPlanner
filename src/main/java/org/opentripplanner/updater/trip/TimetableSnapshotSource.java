@@ -291,8 +291,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               tripId,
               serviceDate
             );
-            case CANCELED -> handleCanceledTrip(tripId, serviceDate, false);
-            case DELETED -> handleCanceledTrip(tripId, serviceDate, true);
+            case CANCELED -> handleCanceledTrip(tripId, serviceDate, CancelationType.CANCEL);
+            case DELETED -> handleCanceledTrip(tripId, serviceDate, CancelationType.DELETE);
             case REPLACEMENT -> validateAndHandleModifiedTrip(
               tripUpdate,
               tripDescriptor,
@@ -433,7 +433,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // If this trip_id has been used for previously ADDED/MODIFIED trip message (e.g. when the
     // sequence of stops has changed, and is now changing back to the originally scheduled one),
     // mark that previously created trip as DELETED.
-    cancelPreviouslyAddedTrip(tripId, serviceDate, true);
+    cancelPreviouslyAddedTrip(tripId, serviceDate, CancelationType.DELETE);
 
     // Get new TripTimes based on scheduled timetable
     var result = pattern
@@ -470,7 +470,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         pattern
       );
 
-      cancelScheduledTrip(tripId, serviceDate, true);
+      cancelScheduledTrip(tripId, serviceDate, CancelationType.DELETE);
       return buffer.update(newPattern, updatedTripTimes, serviceDate);
     } else {
       // Set the updated trip times in the buffer
@@ -679,7 +679,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Check whether trip id has been used for previously ADDED trip message and mark previously
     // created trip as DELETED
-    cancelPreviouslyAddedTrip(tripId, serviceDate, true);
+    cancelPreviouslyAddedTrip(tripId, serviceDate, CancelationType.DELETE);
 
     Route route = getOrCreateRoute(tripDescriptor, tripId);
 
@@ -930,7 +930,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private boolean cancelScheduledTrip(
     final FeedScopedId tripId,
     final LocalDate serviceDate,
-    boolean markAsDeleted
+    CancelationType cancelationType
   ) {
     boolean success = false;
 
@@ -944,10 +944,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         debug(tripId, "Could not cancel scheduled trip because it's not in the timetable");
       } else {
         final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
-        if (markAsDeleted) {
-          newTripTimes.deleteTrip();
-        } else {
-          newTripTimes.cancelTrip();
+        switch (cancelationType) {
+          case CANCEL -> newTripTimes.cancelTrip();
+          case DELETE -> newTripTimes.deleteTrip();
         }
         buffer.update(pattern, newTripTimes, serviceDate);
         success = true;
@@ -972,7 +971,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private boolean cancelPreviouslyAddedTrip(
     final FeedScopedId tripId,
     final LocalDate serviceDate,
-    boolean markAsDeleted
+    CancelationType cancelationType
   ) {
     boolean success = false;
 
@@ -985,10 +984,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         debug(tripId, "Could not cancel previously added trip on {}", serviceDate);
       } else {
         final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
-        if (markAsDeleted) {
-          newTripTimes.deleteTrip();
-        } else {
-          newTripTimes.cancelTrip();
+        switch (cancelationType) {
+          case CANCEL -> newTripTimes.cancelTrip();
+          case DELETE -> newTripTimes.deleteTrip();
         }
         buffer.update(pattern, newTripTimes, serviceDate);
         success = true;
@@ -1088,11 +1086,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Mark scheduled trip as DELETED
     var tripId = trip.getId();
-    cancelScheduledTrip(tripId, serviceDate, true);
+    cancelScheduledTrip(tripId, serviceDate, CancelationType.DELETE);
 
     // Check whether trip id has been used for previously ADDED/REPLACEMENT trip message and mark it
     // as DELETED
-    cancelPreviouslyAddedTrip(tripId, serviceDate, true);
+    cancelPreviouslyAddedTrip(tripId, serviceDate, CancelationType.DELETE);
 
     // Add new trip
     return addTripToGraphAndBuffer(
@@ -1108,7 +1106,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private Result<UpdateSuccess, UpdateError> handleCanceledTrip(
     FeedScopedId tripId,
     final LocalDate serviceDate,
-    boolean markAsDeleted
+    CancelationType markAsDeleted
   ) {
     // Try to cancel scheduled trip
     final boolean cancelScheduledSuccess = cancelScheduledTrip(tripId, serviceDate, markAsDeleted);
@@ -1162,5 +1160,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private static void debug(String feedId, String tripId, String message, Object... params) {
     String m = "[feedId: %s, tripId: %s] %s".formatted(feedId, tripId, message);
     LOG.debug(m, params);
+  }
+
+  private enum CancelationType {
+    CANCEL,
+    DELETE,
   }
 }

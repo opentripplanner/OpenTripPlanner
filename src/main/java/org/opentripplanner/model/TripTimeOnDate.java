@@ -13,12 +13,16 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a Trip at a specific stop index and on a specific service day. This is a read-only
  * data transfer object used to pass information from the OTP internal model to the APIs.
  */
 public class TripTimeOnDate {
+
+  private static final Logger LOG = LoggerFactory.getLogger(TripTimeOnDate.class);
 
   public static final int UNDEFINED = -1;
 
@@ -213,13 +217,35 @@ public class TripTimeOnDate {
   }
 
   public PickDrop getPickupType() {
-    return tripTimes.isCanceledOrDeleted() || tripTimes.isCancelledStop(stopIndex)
+    if (tripTimes.isDeleted()) {
+      LOG.warn(
+        "Returning pickup type for a deleted trip {} on pattern {} on date {}. This indicates a bug.",
+        tripTimes.getTrip().getId(),
+        tripPattern.getId(),
+        serviceDate
+      );
+
+      return tripPattern.getBoardType(stopIndex);
+    }
+
+    return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
       ? PickDrop.CANCELLED
       : tripPattern.getBoardType(stopIndex);
   }
 
   public PickDrop getDropoffType() {
-    return tripTimes.isCanceledOrDeleted() || tripTimes.isCancelledStop(stopIndex)
+    if (tripTimes.isDeleted()) {
+      LOG.warn(
+        "Returning dropoff type for a deleted trip {} on pattern {} on date {}. This indicates a bug.",
+        tripTimes.getTrip().getId(),
+        tripPattern.getId(),
+        serviceDate
+      );
+
+      return tripPattern.getAlightType(stopIndex);
+    }
+
+    return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
       ? PickDrop.CANCELLED
       : tripPattern.getAlightType(stopIndex);
   }

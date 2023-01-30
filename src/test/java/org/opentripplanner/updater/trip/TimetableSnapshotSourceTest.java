@@ -167,6 +167,51 @@ public class TimetableSnapshotSourceTest {
     assertEquals(RealTimeState.CANCELED, tripTimes.getRealTimeState());
   }
 
+  @Test
+  public void testHandleDeletedTrip() throws InvalidProtocolBufferException {
+    final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
+    final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
+    final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
+    final TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
+    final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
+    final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
+
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel
+    );
+
+    final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.DELETED);
+
+    final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+    var deletion = tripUpdateBuilder.build().toByteArray();
+
+    updater.applyTripUpdates(
+      TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
+      fullDataset,
+      List.of(TripUpdate.parseFrom(deletion)),
+      feedId
+    );
+
+    final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+    final Timetable forToday = snapshot.resolve(pattern, serviceDate);
+    final Timetable schedule = snapshot.resolve(pattern, null);
+    assertNotSame(forToday, schedule);
+    assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
+    assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
+
+    final TripTimes tripTimes = forToday.getTripTimes(tripIndex);
+
+    assertEquals(RealTimeState.DELETED, tripTimes.getRealTimeState());
+  }
+
   /**
    * This test just asserts that invalid trip ids don't throw an exception and are ignored instead
    */

@@ -33,7 +33,8 @@ public enum RealTimeState {
   MODIFIED,
 
   /**
-   * The trip has been canceled, and should not be visible to the end user
+   * The trip should not be visible to the end user. Either it has been set as deleted in the
+   * real-time feed, or it has been replaced by another trip on another pattern.
    */
   DELETED,
 }
