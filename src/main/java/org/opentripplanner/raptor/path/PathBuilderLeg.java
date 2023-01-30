@@ -14,6 +14,8 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.rangeraptor.transit.ForwardTransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
@@ -25,6 +27,12 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private static final int NOT_SET = -999_999_999;
+
+  /**
+   * The path is not reversed, so we can use the forward transit calculator to calculate the
+   * egress board-time (egress with rides).
+   */
+  private static final TransitCalculator<?> TRANSIT_CALCULATOR = new ForwardTransitCalculator<>();
 
   /** Immutable data for the current leg. */
   private MyLeg leg;
@@ -504,10 +512,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     var egressPath = asEgressLeg().streetPath;
     int stopArrivalTime = prev.stopArrivalTime(slackProvider);
 
-    if (egressPath.hasRides()) {
-      stopArrivalTime += slackProvider.transferSlack();
-    }
-    int egressDepartureTime = egressPath.earliestDepartureTime(stopArrivalTime);
+    int egressDepartureTime = TRANSIT_CALCULATOR.calculateEgressDepartureTime(
+      stopArrivalTime,
+      egressPath,
+      slackProvider.transferSlack()
+    );
 
     setTime(egressDepartureTime, egressDepartureTime + egressPath.durationInSeconds());
   }
