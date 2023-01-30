@@ -6,6 +6,8 @@
     ) {
         itineraries {
             duration
+            startTime
+            endTime
             legs {
                 from {
                     name
@@ -23,6 +25,10 @@
                 }
                 distance
                 duration
+                legGeometry {
+                    points
+                    length
+                }
             }
 
         }

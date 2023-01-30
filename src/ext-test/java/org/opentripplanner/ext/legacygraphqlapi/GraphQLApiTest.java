@@ -16,7 +16,6 @@ import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -24,8 +23,8 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
+import org.opentripplanner.standalone.server.TestServerRequestContext;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.service.TransitModel;
@@ -33,7 +32,7 @@ import org.opentripplanner.transit.service.TransitModel;
 @Execution(ExecutionMode.CONCURRENT)
 class GraphQLApiTest implements PlanTestConstants {
 
-  static final OtpServerRequestContext context;
+  static final TestServerRequestContext context;
   static final Graph graph = new Graph();
   static final LegacyGraphQLAPI resource;
 
@@ -59,8 +58,8 @@ class GraphQLApiTest implements PlanTestConstants {
 
     Itinerary i1 = newItinerary(A, T10_20).walk(20, E).bus(122, T10_20, T10_20, G).build();
 
-    context =
-      TestServerContext.builder(graph, transitModel).withRoutingResponse(List.of(i1)).build();
+    context = new TestServerRequestContext(graph, transitModel);
+    context.setRoutingResult(List.of(i1));
     resource = new LegacyGraphQLAPI(context, "ignored");
   }
 
