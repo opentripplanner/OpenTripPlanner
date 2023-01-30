@@ -7,9 +7,6 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 
 public class ViaTripType {
@@ -50,7 +47,7 @@ public class ViaTripType {
           .description("The index of the trip pattern in the segment before the via point")
           .type(Scalars.GraphQLInt)
           .dataFetcher(dataFetchingEnvironment ->
-            ((ViaTripPatternPair) dataFetchingEnvironment.getSource()).from()
+            ((ViaRoutingResponse.Connection) dataFetchingEnvironment.getSource()).from()
           )
           .build()
       )
@@ -61,7 +58,7 @@ public class ViaTripType {
           .description("The index of the trip pattern in the segment after the via point")
           .type(Scalars.GraphQLInt)
           .dataFetcher(dataFetchingEnvironment ->
-            ((ViaTripPatternPair) dataFetchingEnvironment.getSource()).to()
+            ((ViaRoutingResponse.Connection) dataFetchingEnvironment.getSource()).to()
           )
           .build()
       )
@@ -96,12 +93,7 @@ public class ViaTripType {
             "next segment."
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(viaTripPatternCombinations))))
-          .dataFetcher(env ->
-            ((ViaRoutingResponse) env.getSource()).createConnections()
-              .stream()
-              .flatMap(ViaTripPatternPair::map)
-              .toList()
-          )
+          .dataFetcher(env -> ((ViaRoutingResponse) env.getSource()).createConnections())
           .build()
       )
       .field(
@@ -114,22 +106,5 @@ public class ViaTripType {
           .build()
       )
       .build();
-  }
-
-  private record ViaTripPatternPair(int from, int to) {
-    /**
-     * Convert a list supplied by {@link ViaRoutingResponse#createConnections()} to a stream of
-     * {@link ViaTripPatternPair}s
-     */
-    private static Stream<ViaTripPatternPair> map(List<List<Integer>> connections) {
-      var ret = new ArrayList<ViaTripPatternPair>();
-      for (int from = 0; from < connections.size(); from++) {
-        for (int to : connections.get(from)) {
-          ret.add(new ViaTripPatternPair(from, to));
-        }
-      }
-
-      return ret.stream();
-    }
   }
 }

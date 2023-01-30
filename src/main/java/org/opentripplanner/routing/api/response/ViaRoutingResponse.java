@@ -34,25 +34,24 @@ public record ViaRoutingResponse(
    * list contains all indices of itineraries after the via that are compatible with the itinerary
    * before the via location.
    */
-  public List<List<List<Integer>>> createConnections() {
-    var connectionLists = new ArrayList<List<List<Integer>>>();
+  public List<List<Connection>> createConnections() {
+    var connectionLists = new ArrayList<List<Connection>>();
 
     List<List<Itinerary>> viaJourneys = getItineraries();
 
     for (int i = 0; i < viaJourneys.size() - 1; i++) {
-      var connectionList = new ArrayList<List<Integer>>();
+      var connectionList = new ArrayList<Connection>();
       connectionLists.add(connectionList);
       List<Itinerary> itineraries = viaJourneys.get(i);
       List<Itinerary> nextItineraries = viaJourneys.get(i + 1);
-      for (var itinerary : itineraries) {
-        var currentConnections = new ArrayList<Integer>();
-        connectionList.add(currentConnections);
+      for (int j = 0; j < itineraries.size(); j++) {
+        Itinerary itinerary = itineraries.get(j);
         var connections = plan.get(itinerary);
         if (connections != null) {
           for (var connection : connections) {
             var index = nextItineraries.indexOf(connection);
             if (index != -1) {
-              currentConnections.add(index);
+              connectionList.add(new Connection(j, index));
             }
           }
         }
@@ -60,4 +59,11 @@ public record ViaRoutingResponse(
     }
     return connectionLists;
   }
+
+  /**
+   * This represents an admissible connection between two via segments.
+   * @param from Index of the itinerary for this segment
+   * @param to Index of the itinerary for the next segment
+   */
+  public record Connection(int from, int to) {}
 }
