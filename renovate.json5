@@ -37,6 +37,14 @@
       "allowedVersions": "/^[0-9]+\\.[0-9]+(\\.[0-9]+)?$/"
     },
     {
+      "matchPackageNames": [
+        "org.onebusaway:onebusaway-gtfs"
+      ],
+      "extends": [
+        "schedule:monthly"
+      ]
+    },
+    {
       "description": "in order to keep review burden low, don't update these quite so frequently",
       "matchPackageNames": [
         "mkdocs-material",
