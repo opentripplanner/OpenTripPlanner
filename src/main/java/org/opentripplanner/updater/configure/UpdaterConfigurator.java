@@ -13,7 +13,7 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServic
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -46,25 +46,25 @@ public class UpdaterConfigurator {
   private final Graph graph;
   private final TransitModel transitModel;
   private final UpdatersParameters updatersParameters;
-  private final VehiclePositionService vehiclePositionService;
+  private final VehiclePositionRepository vehiclePositionRepository;
   private SiriTimetableSnapshotSource siriTimetableSnapshotSource = null;
   private TimetableSnapshotSource gtfsTimetableSnapshotSource = null;
 
   private UpdaterConfigurator(
     Graph graph,
-    VehiclePositionService vehiclePositionService,
+    VehiclePositionRepository vehiclePositionRepository,
     TransitModel transitModel,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
-    this.vehiclePositionService = vehiclePositionService;
+    this.vehiclePositionRepository = vehiclePositionRepository;
     this.transitModel = transitModel;
     this.updatersParameters = updatersParameters;
   }
 
   public static void configure(
     Graph graph,
-    VehiclePositionService vehiclePositionService,
+    VehiclePositionRepository vehiclePositionService,
     TransitModel transitModel,
     UpdatersParameters updatersParameters
   ) {
@@ -152,7 +152,7 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {
       updaters.add(
-        new PollingVehiclePositionUpdater(configItem, vehiclePositionService, transitModel)
+        new PollingVehiclePositionUpdater(configItem, vehiclePositionRepository, transitModel)
       );
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {

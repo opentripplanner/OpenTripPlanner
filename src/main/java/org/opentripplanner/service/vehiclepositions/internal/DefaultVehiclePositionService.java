@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Singleton;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 @Singleton
-public class DefaultVehiclePositionService implements VehiclePositionService {
+public class DefaultVehiclePositionService
+  implements VehiclePositionService, VehiclePositionRepository {
 
   private final Map<TripPattern, List<RealtimeVehiclePosition>> positions = new ConcurrentHashMap<>();
 
