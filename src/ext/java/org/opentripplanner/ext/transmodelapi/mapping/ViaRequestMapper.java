@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
 import graphql.schema.DataFetchingEnvironment;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +13,9 @@ import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
+/**
+ * This class maps a GraphQL viaTrip query into a {@link RouteViaRequest}
+ */
 public class ViaRequestMapper {
 
   /**
@@ -24,34 +26,20 @@ public class ViaRequestMapper {
     OtpServerRequestContext serverContext = context.getServerContext();
     RouteRequest request = serverContext.defaultRouteRequest();
 
-    List<ViaLocation> vias =
-      ((List<Map<String, Object>>) environment.getArgument("via")).stream()
-        .map(viaLocation ->
-          new ViaLocation(
-            GenericLocationMapper.toGenericLocation(viaLocation),
-            false,
-            (Duration) viaLocation.get("minSlack"),
-            (Duration) viaLocation.get("maxSlack")
-          )
-        )
-        .toList();
+    List<Map<String, Object>> viaInput = environment.getArgument("via");
+    List<ViaLocation> vias = viaInput.stream().map(ViaLocationMapper::mapViaLocation).toList();
 
-    List<JourneyRequest> requests = environment.containsArgument("segments")
-      ? ((List<Map<String, Object>>) environment.getArgument("segments")).stream()
-        .map(viaRequest -> {
-          JourneyRequest journey = request.journey().clone();
-          if (viaRequest.containsKey("modes")) {
-            Map<String, Object> modesInput = (Map<String, Object>) viaRequest.get("modes");
-            journey.setModes(RequestModesMapper.mapRequestModes(modesInput));
-          }
-          if (viaRequest.containsKey("filters")) {
-            List<Map<String, ?>> filters = (List<Map<String, ?>>) viaRequest.get("filters");
-            journey.transit().setFilters(FilterMapper.mapFilterNewWay(filters));
-          }
-          return journey;
-        })
-        .toList()
-      : Collections.nCopies(vias.size() + 1, request.journey());
+    List<JourneyRequest> requests;
+    if (environment.containsArgument("segments")) {
+      List<Map<String, Object>> segments = environment.getArgument("segments");
+      requests =
+        segments
+          .stream()
+          .map(viaRequest -> ViaSegmentMapper.mapViaSegment(request, viaRequest))
+          .toList();
+    } else {
+      requests = Collections.nCopies(vias.size() + 1, request.journey());
+    }
 
     return RouteViaRequest
       .of(vias, requests)
