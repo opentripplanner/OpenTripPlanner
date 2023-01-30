@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request;
+package org.opentripplanner.routing.api;
 
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
