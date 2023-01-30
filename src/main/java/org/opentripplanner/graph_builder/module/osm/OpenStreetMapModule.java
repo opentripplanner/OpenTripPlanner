@@ -974,7 +974,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
       // < 0.04: account for
       if (carSpeed < 0.04) {
-        issueStore.add(new StreetCarSpeedZero(way.getId()));
+        issueStore.add(new StreetCarSpeedZero(way));
       }
 
       if (customNamer != null) {
