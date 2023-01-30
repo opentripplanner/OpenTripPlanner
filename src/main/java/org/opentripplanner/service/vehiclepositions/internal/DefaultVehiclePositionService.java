@@ -1,10 +1,10 @@
 package org.opentripplanner.service.vehiclepositions.internal;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.inject.Singleton;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
