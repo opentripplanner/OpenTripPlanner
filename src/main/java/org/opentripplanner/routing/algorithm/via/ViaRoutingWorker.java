@@ -33,7 +33,6 @@ public class ViaRoutingWorker {
     Function<RouteRequest, RoutingResponse> routingWorker
   ) {
     this.request = request.routeRequest().clone();
-    this.request.setNumItineraries(request.routeRequest().numItineraries());
     this.viaRequest = request;
     this.routingWorker = routingWorker;
   }
