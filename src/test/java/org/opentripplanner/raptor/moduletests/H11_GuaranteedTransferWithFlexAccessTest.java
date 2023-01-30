@@ -2,8 +2,9 @@ package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
@@ -14,21 +15,24 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
-import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should return a path if it exists for a basic case with one route with one trip including
- * boarding/alighting restrictions and, an access and an egress path.
+ * Raptor should support combining multiple features, like Flexible access paths and constrained
+ * transfers. This test has only one path available, and it is expected that it should be returned
+ * irrespective of the profile.
  */
-public class A02_SingeRouteBoardAlightRestrictionsTest implements RaptorTestConstants {
+public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConstants {
+
+  private static final int COST_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -36,36 +40,29 @@ public class A02_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
     RaptorConfig.defaultConfigForTest()
   );
 
-  /**
-   * Stops: 0..3
-   *
-   * Route restrictions at stop (B:Board, A:Alight, W:Wheelchair):
-   *   Stop:  B   C   D
-   *     R1:  BW  BA  AW
-   *
-   * Schedule:
-   *   Stop:     B      C      D
-   *     R1:   00:01  00:03  00:05
-   *
-   * Access (toStop & duration):
-   *   1  30s
-   *
-   * Egress (fromStop & duration):
-   *   3  20s
-   *
-   */
   @BeforeEach
-  void setup() {
-    TestTripPattern pattern = pattern("R1", STOP_B, STOP_C, STOP_D);
-    pattern.restrictions("BW BA AW");
-    data.withRoute(route(pattern).withTimetable(schedule("00:01, 00:03, 00:05")));
+  public void setup() {
+    var r1 = route("R1", STOP_B, STOP_C).withTimetable(schedule("0:30 0:45"));
+    var r2 = route("R2", STOP_C, STOP_D).withTimetable(schedule("0:45 0:55"));
+
+    var tripA = r1.timetable().getTripSchedule(0);
+    var tripB = r2.timetable().getTripSchedule(0);
+
+    data.withRoutes(r1, r2);
+    data.withGuaranteedTransfer(tripA, STOP_C, tripB, STOP_C);
+    data.withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D10m));
+    data.mcCostParamsBuilder().transferCost(100);
+
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_D, D20s))
+      .addAccessPaths(flex(STOP_A, D3m, ONE_RIDE, 2 * COST_ONE_STOP))
+      .addEgressPaths(walk(STOP_D, D1m));
+
+    requestBuilder
+      .searchParams()
       .earliestDepartureTime(T00_00)
-      .latestArrivalTime(T00_10)
-      .timetable(true);
+      .latestArrivalTime(T01_00)
+      .constrainedTransfers(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
@@ -73,10 +70,13 @@ public class A02_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
   static List<RaptorModuleTestCase> testCases() {
     return RaptorModuleTestCase
       .of()
-      .add(standard(), "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx]")
+      .add(
+        standard(),
+        "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]"
+      )
       .add(
         multiCriteria(),
-        "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx $940]"
+        "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx $3820]"
       )
       .build();
   }

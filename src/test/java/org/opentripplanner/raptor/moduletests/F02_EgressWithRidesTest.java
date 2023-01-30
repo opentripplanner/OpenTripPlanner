@@ -3,8 +3,10 @@ package org.opentripplanner.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -12,27 +14,27 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
+import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should support combining multiple features, like Flexible access paths and constrained
- * transfers. This test has only one path available, and it is expected that it should be returned
- * irrespective of the profile.
+ * With FLEX access and egress Raptor must support access/egress paths with more then one leg. These
+ * access paths have more transfers that regular paths, hence should not dominate access/egress
+ * walking, but only get accepted when they are better on time and/or cost.
  */
-public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConstants {
+public class F02_EgressWithRidesTest implements RaptorTestConstants {
 
-  private static final int COST_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
+  private static final int D1m59s = DurationUtils.durationInSeconds("1m59s");
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -41,28 +43,25 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
   );
 
   @BeforeEach
-  public void setup() {
-    var r1 = route("R1", STOP_B, STOP_C).withTimetable(schedule("0:30 0:45"));
-    var r2 = route("R2", STOP_C, STOP_D).withTimetable(schedule("0:45 0:55"));
-
-    var tripA = r1.timetable().getTripSchedule(0);
-    var tripB = r2.timetable().getTripSchedule(0);
-
-    data.withRoutes(r1, r2);
-    data.withGuaranteedTransfer(tripA, STOP_C, tripB, STOP_C);
-    data.withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D10m));
-    data.mcCostParamsBuilder().transferCost(100);
+  void setup() {
+    data.withRoute(
+      route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
+        .withTimetable(schedule("0:10, 0:12, 0:14, 0:16, 0:18"))
+    );
+    // We will test board- and alight-slack in a separate test
+    data.withSlackProvider(new DefaultSlackProvider(60, 0, 0));
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(flex(STOP_A, D3m, ONE_RIDE, 2 * COST_ONE_STOP))
-      .addEgressPaths(TestAccessEgress.walk(STOP_D, D1m));
-
-    requestBuilder
-      .searchParams()
-      .earliestDepartureTime(T00_00)
-      .latestArrivalTime(T01_00)
-      .constrainedTransfers(true);
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D1m))
+      // All egress paths are all pareto-optimal (McRaptor).
+      .addEgressPaths(
+        flexAndWalk(STOP_C, D7m), // best combination of transfers and time
+        flex(STOP_D, D3m, TWO_RIDES), // earliest arrival time
+        flexAndWalk(STOP_E, D1m59s, TWO_RIDES), // lowest cost
+        TestAccessEgress.walk(STOP_F, D10m) // lowest num-of-transfers (0)
+      );
+    requestBuilder.searchParams().earliestDepartureTime(T00_00).latestArrivalTime(T00_30);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
@@ -71,12 +70,17 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
     return RaptorModuleTestCase
       .of()
       .add(
-        standard(),
-        "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]"
+        standard().not(TC_STANDARD_REV_ONE),
+        "Walk 1m ~ B ~ BUS R1 0:10 0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m 2tx]"
       )
+      // "First"(in reverse) alighting wins
+      .add(TC_STANDARD_REV_ONE, "Walk 1m ~ B ~ BUS R1 0:10 0:18 ~ F ~ Walk 10m [0:09 0:28 19m 0tx]")
       .add(
         multiCriteria(),
-        "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx $3820]"
+        "Walk 1m ~ B ~ BUS R1 0:10 0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m 2tx $1380]",
+        "Walk 1m ~ B ~ BUS R1 0:10 0:16 ~ E ~ Flex 1m59s 2x [0:09 0:18:59 9m59s 2tx $1378]",
+        "Walk 1m ~ B ~ BUS R1 0:10 0:12 ~ C ~ Flex 7m 1x [0:09 0:20 11m 1tx $1740]",
+        "Walk 1m ~ B ~ BUS R1 0:10 0:18 ~ F ~ Walk 10m [0:09 0:28 19m 0tx $2400]"
       )
       .build();
   }

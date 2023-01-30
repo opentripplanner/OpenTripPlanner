@@ -27,7 +27,7 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
  * Raptor should take into account time restrictions on egress. If the time restrictions require it,
  * there should be a wait before boarding the egress so that the egress is traversed while "open".
  */
-public class D02_TimeDependentEgressTest implements RaptorTestConstants {
+public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
   private static final int T00_25 = hm2time(0, 25);
   private static final int T00_35 = hm2time(0, 35);

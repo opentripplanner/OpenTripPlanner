@@ -46,7 +46,7 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
  * <p>
  * Note! The 'earliest-departure-time' is set to 00:02, and the board and alight slacks are zero.
  */
-public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
+public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConstants {
 
   private static final String EXPECTED_FLEX =
     "Flex 11m 1x ~ C ~ Walk 2m ~ D ~ BUS L3 0:16 0:22 ~ F [0:02 0:22 20m 1tx";

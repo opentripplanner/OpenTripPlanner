@@ -23,10 +23,11 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 /*
  * FEATURE UNDER TEST
  *
- * Raptor should take into account time restrictions on access. If the time restrictions require it,
- * there should be a wait before boarding the trip so that the access is traversed while "open".
+ * Raptor should take into account opening hours/time restrictions on access. If the time
+ * restrictions require it, there should be a wait before boarding the trip so that the access is
+ * traversed while "open".
  */
-public class D01_TimeDependentAccessTest implements RaptorTestConstants {
+public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
