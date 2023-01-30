@@ -1267,7 +1267,7 @@ type ViaTrip {
   "A list of routing errors, and fields which caused them"
   routingErrors: [RoutingError!]!
   "A list of the acceptable combinations of the trip patterns in this segment and the next segment."
-  tripPatternCombinations: [ViaConnection!]!
+  tripPatternCombinations: [[ViaConnection!]!]!
   "A list of segments of the via search. The first segment is from the start location to the first entry in the locations list and the last is from the last entry in the locations list to the end location."
   tripPatternsPerSegment: [ViaTripPatternSegment!]!
 }

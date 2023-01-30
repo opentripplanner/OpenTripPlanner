@@ -92,7 +92,13 @@ public class ViaTripType {
             "A list of the acceptable combinations of the trip patterns in this segment and the " +
             "next segment."
           )
-          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(viaTripPatternCombinations))))
+          .type(
+            new GraphQLNonNull(
+              new GraphQLList(
+                new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(viaTripPatternCombinations)))
+              )
+            )
+          )
           .dataFetcher(env -> ((ViaRoutingResponse) env.getSource()).createConnections())
           .build()
       )
