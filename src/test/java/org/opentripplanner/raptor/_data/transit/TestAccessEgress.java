@@ -63,29 +63,6 @@ public class TestAccessEgress implements RaptorAccessEgress {
     return new Builder(stop, 0).withIsEmpty(true).withCost(cost).build();
   }
 
-  /**
-   * Creates a walk transfer with time restrictions. opening and closing may be specified as seconds
-   * since the start of "RAPTOR time" to limit the time periods that the access is traversable,
-   * which is repeatead every 24 hours. This allows the access to only be traversable between for
-   * example 08:00 and 16:00 every day.
-   */
-  public static TestAccessEgress walk(int stop, int durationInSeconds, int opening, int closing) {
-    return new Builder(stop, durationInSeconds).withOpeningHours(opening, closing).build();
-  }
-
-  public static TestAccessEgress walk(
-    int stop,
-    int durationInSeconds,
-    int cost,
-    int opening,
-    int closing
-  ) {
-    return new Builder(stop, durationInSeconds)
-      .withCost(cost)
-      .withOpeningHours(opening, closing)
-      .build();
-  }
-
   /** Create a new flex access and arrive stop onBoard with 1 ride/extra transfer. */
   public static TestAccessEgress flex(int stop, int durationInSeconds) {
     return flex(stop, durationInSeconds, 1, walkCost(durationInSeconds));
@@ -143,7 +120,13 @@ public class TestAccessEgress implements RaptorAccessEgress {
     return toRaptorCost(durationInSeconds * reluctance);
   }
 
-  /** Set opening and closing hours and return a new object. */
+  /**
+   * Add opening and closing hours and return a new object.
+   * <p>
+   * Opening and closing is specified as seconds since the start of "RAPTOR time" to limit the
+   * time periods that the access is traversable, which is repeatead every 24 hours. This allows
+   * the access to only be traversable between for example 08:00 and 16:00 every day.
+   */
   public TestAccessEgress openingHours(int opening, int closing) {
     return new Builder(this).withOpeningHours(opening, closing).build();
   }

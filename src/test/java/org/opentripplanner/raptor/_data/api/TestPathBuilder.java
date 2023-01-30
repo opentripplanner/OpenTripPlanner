@@ -43,7 +43,10 @@ public class TestPathBuilder {
    * the access start time and prevent time-shifting it.
    */
   public TestPathBuilder access(int startTime, int duration, int toStop) {
-    return access(startTime, TestAccessEgress.walk(toStop, duration, startTime, startTime));
+    return access(
+      startTime,
+      TestAccessEgress.walk(toStop, duration).openingHours(startTime, startTime)
+    );
   }
 
   /**
