@@ -44,9 +44,9 @@ public class ReverseTransitCalculatorTest implements RaptorTestConstants {
       T00_30 - TRANSFER_SLACK,
       subject.calculateEgressDepartureTime(T00_30, FLEX_1x_8m, TRANSFER_SLACK)
     );
-    // Transfers slack should NOT be added if the flex egress arrive by walking
+    // Transfers slack is added if the flex egress arrive by walking as well
     assertEquals(
-      T00_30,
+      T00_30 - TRANSFER_SLACK,
       subject.calculateEgressDepartureTime(T00_30, FLEX_AND_WALK_1x_8m, TRANSFER_SLACK)
     );
     // No time-shift expected if egress is within opening hours

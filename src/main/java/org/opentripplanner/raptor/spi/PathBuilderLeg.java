@@ -504,9 +504,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     if (egressPath.hasRides()) {
       stopArrivalTime += slackProvider.transferSlack();
     }
-    int newFromTime = egressPath.earliestDepartureTime(stopArrivalTime);
+    int egressDepartureTime = egressPath.earliestDepartureTime(stopArrivalTime);
 
-    setTime(newFromTime, newFromTime + egressPath.durationInSeconds());
+    setTime(egressDepartureTime, egressDepartureTime + egressPath.durationInSeconds());
   }
 
   private int transitCost(CostCalculator<T> costCalculator, RaptorSlackProvider slackProvider) {

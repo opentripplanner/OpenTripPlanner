@@ -5,6 +5,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 
@@ -129,6 +130,11 @@ public class TestAccessEgress implements RaptorAccessEgress {
    */
   public TestAccessEgress openingHours(int opening, int closing) {
     return new Builder(this).withOpeningHours(opening, closing).build();
+  }
+
+  /** Alias for {@code openingHours(TimeUtils.time(opening), TimeUtils.time(closing))} */
+  public TestAccessEgress openingHours(String opening, String closing) {
+    return openingHours(TimeUtils.time(opening), TimeUtils.time(closing));
   }
 
   @Override

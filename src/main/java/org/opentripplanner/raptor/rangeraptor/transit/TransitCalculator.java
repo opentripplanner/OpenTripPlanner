@@ -87,7 +87,7 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
   ) {
     int departureTime = arrivalTime;
 
-    if (egressPath.stopReachedOnBoard()) {
+    if (egressPath.hasRides()) {
       departureTime = plusDuration(departureTime, transferSlack);
     }
     if (searchForward()) {

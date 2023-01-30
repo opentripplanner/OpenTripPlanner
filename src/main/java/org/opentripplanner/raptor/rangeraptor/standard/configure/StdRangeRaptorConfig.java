@@ -203,6 +203,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     EgressArrivalToPathAdapter<T> pathsAdapter = new EgressArrivalToPathAdapter<>(
       destinationArrivalPaths,
       ctx.calculator(),
+      ctx.slackProvider(),
       stopsCursor(),
       ctx.lifeCycle()
     );

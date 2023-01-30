@@ -52,11 +52,8 @@ public class RaptorConstants {
    */
   public static final int UNREACHED_LOW = -2_000_000_000;
 
-  /**
-   * TODO - Should be alias for {@link #NOT_SET}
-   * TODO - Use 2_111_000_000 here, but FlexIntegrationTest fails if we change it now
-   */
-  public static final int TIME_NOT_SET = -999;
+  /** Alias for {@link #NOT_SET} */
+  public static final int TIME_NOT_SET = NOT_SET;
 
   /** Alias for {@link #UNREACHED_HIGH} */
   public static final int TIME_UNREACHED_FORWARD = UNREACHED_HIGH;
