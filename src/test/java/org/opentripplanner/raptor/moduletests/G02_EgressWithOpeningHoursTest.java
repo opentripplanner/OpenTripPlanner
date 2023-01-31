@@ -126,8 +126,8 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
     assertEquals(
       join(
         // The first egress is only available after waiting for 5 minutes
-        "0:20 0:20A 0s ~ BUS R1 0:20 0:30 10m $1200 ~ B 5m ~ Walk 2m 0:35 0:37 $540 [0:20 0:37 17m 0tx $1740]",
-        "0:30 0:30A 0s ~ BUS R1 0:30 0:40 10m $1200 ~ B 0s ~ Walk 2m 0:40 0:42 $240 [0:30 0:42 12m 0tx $1440]"
+        "A 0s ~ BUS R1 0:20 0:30 10m $1200 ~ B 5m ~ Walk 2m 0:35 0:37 $540 [0:20 0:37 17m 0tx $1740]",
+        "A 0s ~ BUS R1 0:30 0:40 10m $1200 ~ B 0s ~ Walk 2m 0:40 0:42 $240 [0:30 0:42 12m 0tx $1440]"
       ),
       runSearchDetailedResult()
     );

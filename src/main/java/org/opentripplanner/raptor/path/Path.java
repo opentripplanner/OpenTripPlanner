@@ -206,8 +206,10 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
       int prevToTime = 0;
       for (PathLeg<T> leg : accessLeg.iterator()) {
         if (leg == accessLeg) {
-          buf.accessEgress(accessLeg.access());
-          addWalkDetails(detailed, buf, leg);
+          if (!accessLeg.access().isFree()) {
+            buf.accessEgress(accessLeg.access());
+            addWalkDetails(detailed, buf, leg);
+          }
         } else {
           buf.sep().stop(leg.fromStop());
 
@@ -243,8 +245,11 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
           }
           // Access and Egress
           else if (leg.isEgressLeg()) {
-            buf.accessEgress(leg.asEgressLeg().egress());
-            addWalkDetails(detailed, buf, leg);
+            var egress = leg.asEgressLeg().egress();
+            if (!egress.isFree()) {
+              buf.accessEgress(egress);
+              addWalkDetails(detailed, buf, leg);
+            }
           }
         }
         prevToTime = leg.toTime();

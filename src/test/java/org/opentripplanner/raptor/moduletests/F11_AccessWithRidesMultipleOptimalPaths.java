@@ -121,9 +121,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
     requestBuilder.profile(MULTI_CRITERIA);
     requestBuilder.searchParams().searchWindowInSeconds(D5m);
     requestBuilder.searchParams().earliestDepartureTime(T00_00);
-    requestBuilder
-      .searchParams()
-      .addEgressPaths(walk(STOP_E, D3m), free(STOP_F));
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_E, D3m), free(STOP_F));
 
     String actual = runSearch();
 
@@ -136,9 +134,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
    * is set to 3 minutes.
    */
   private void withFlexAccessAsBestOption() {
-    requestBuilder
-      .searchParams()
-      .addEgressPaths(free(STOP_F), walk(STOP_E, D3m));
+    requestBuilder.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D3m));
   }
 
   /**
@@ -146,9 +142,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
    * Stop E to Stop F is set to 1 minute.
    */
   private void withTripL1AsBestStartOption() {
-    requestBuilder
-      .searchParams()
-      .addEgressPaths(free(STOP_F), walk(STOP_E, D1m));
+    requestBuilder.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D1m));
   }
 
   private String runSearch() {
