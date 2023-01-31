@@ -86,7 +86,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
    */
   public void startUpdaters() {
     for (GraphUpdater updater : updaterList) {
-      LOG.debug("Starting new thread for updater {}", updater.toString());
+      LOG.info("Starting new thread for updater {}", updater);
       updaterPool.execute(() -> {
         try {
           updater.run();
