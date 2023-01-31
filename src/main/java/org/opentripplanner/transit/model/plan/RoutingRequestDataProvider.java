@@ -55,7 +55,6 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
 
   private Deduplicator deduplicator = new Deduplicator();
 
-
   public RoutingRequestDataProvider(
     int day,
     TransitCalendar transitCalendar,

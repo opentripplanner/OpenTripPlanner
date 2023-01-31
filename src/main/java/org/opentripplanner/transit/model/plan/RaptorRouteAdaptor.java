@@ -8,8 +8,7 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.model.calendar.PatternOnDay;
 import org.opentripplanner.transit.model.trip.TripOnDay;
 
-public class RaptorRouteAdaptor implements
-  RaptorRoute<TripOnDay>, RaptorTimeTable<TripOnDay> {
+public class RaptorRouteAdaptor implements RaptorRoute<TripOnDay>, RaptorTimeTable<TripOnDay> {
 
   private final PatternOnDay pattern;
 
@@ -28,7 +27,6 @@ public class RaptorRouteAdaptor implements
   public RaptorTripPattern pattern() {
     return pattern.pattern();
   }
-
 
   /* implement RaptorTimeTable */
 

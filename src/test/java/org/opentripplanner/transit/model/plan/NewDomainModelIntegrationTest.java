@@ -35,7 +35,7 @@ public class NewDomainModelIntegrationTest implements RaptorTestConstants {
   private static final double WAIT_RELUCTANCE = 1.0;
 
   public static final CostCalculator<TripOnDay> COST_CALCULATOR = new DefaultCostCalculatorV2<>(
-      BOARD_COST_SEC,
+    BOARD_COST_SEC,
     TRANSFER_COST_SEC,
     WAIT_RELUCTANCE,
     null,

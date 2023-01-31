@@ -74,18 +74,13 @@ class TimetableBuilderTest {
 
   @Test
   void veryLongSchedule() {
-    var timetable = TimetableBuilder
-      .of()
-      .schedule("00:30 12:30 47:30")
-      .build();
+    var timetable = TimetableBuilder.of().schedule("00:30 12:30 47:30").build();
     assertEquals(1, timetable.numOfTrips());
     assertEquals(3, timetable.numOfStops());
     assertEquals(1, timetable.maxTripDurationInDays());
   }
 
-
-
-    @Test
+  @Test
   void aTripScheduleNeedAtLeastTwoStops() {
     assertThrows(
       IllegalArgumentException.class,

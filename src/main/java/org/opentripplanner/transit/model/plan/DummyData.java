@@ -41,7 +41,8 @@ public class DummyData {
   public static final RegularStop STOP_3 = RegularStop.of(id("S3")).withName("Oslo S").build();
   public static final RegularStop STOP_4 = RegularStop.of(id("S4")).withName("Tøyen").build();
 
-  public static final StopModel STOP_MODEL = StopModel.of()
+  public static final StopModel STOP_MODEL = StopModel
+    .of()
     .withRegularStop(STOP_1)
     .withRegularStop(STOP_2)
     .withRegularStop(STOP_3)
@@ -50,7 +51,9 @@ public class DummyData {
 
   public static final StopPattern STOP_PATTERN = createStopPattern();
 
-  public static final TransitCalendar TRANSIT_CALENDAR = new TransitCalendar(CalendarDays.of().build());
+  public static final TransitCalendar TRANSIT_CALENDAR = new TransitCalendar(
+    CalendarDays.of().build()
+  );
 
   private static final int[] ROUTE_STOP_INDEX = new int[] { 1, 2, 3 };
   private static final BitSet ROUTE_BOARD_ALIGHT_BIT_SET = createBitSet(3);

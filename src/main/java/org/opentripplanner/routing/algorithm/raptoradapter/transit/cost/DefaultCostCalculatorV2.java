@@ -12,8 +12,7 @@ import org.opentripplanner.transit.model.trip.TripOnDay;
  * <p/>
  * This class is immutable and thread safe.
  */
-public final class DefaultCostCalculatorV2<T extends TripOnDay>
-  implements CostCalculator<T> {
+public final class DefaultCostCalculatorV2<T extends TripOnDay> implements CostCalculator<T> {
 
   private final int boardCostOnly;
   private final int transferCostOnly;
