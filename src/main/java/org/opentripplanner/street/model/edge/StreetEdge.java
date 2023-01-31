@@ -386,32 +386,32 @@ public class StreetEdge
 
   @Override
   public State traverse(State s0) {
-    final StateEditor s1;
+    final StateEditor editor;
 
     // if the traversal is banned for the current state because of a GBFS geofencing zone
     // we drop the vehicle and continue walking
     if (tov.traversalBanned(s0)) {
-      s1 = doTraverse(s0, TraverseMode.WALK, false);
-      if (s1 != null) {
-        s1.dropFloatingVehicle();
+      editor = doTraverse(s0, TraverseMode.WALK, false);
+      if (editor != null) {
+        editor.dropFloatingVehicle();
       }
     }
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
     else if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
-        s1 = doTraverse(s0, TraverseMode.BICYCLE, false);
+        editor = doTraverse(s0, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
-        s1 = doTraverse(s0, TraverseMode.WALK, true);
+        editor = doTraverse(s0, TraverseMode.WALK, true);
       } else {
         return null;
       }
     } else if (canTraverse(s0.getNonTransitMode())) {
-      s1 = doTraverse(s0, s0.getNonTransitMode(), false);
+      editor = doTraverse(s0, s0.getNonTransitMode(), false);
     } else {
-      s1 = null;
+      editor = null;
     }
 
-    State state = s1 != null ? s1.makeState() : null;
+    State state = editor != null ? editor.makeState() : null;
 
     // we are transitioning into a no-drop-off zone therefore we add a second state for dropping
     // off the vehicle and walking
