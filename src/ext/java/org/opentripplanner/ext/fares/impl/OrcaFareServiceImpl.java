@@ -585,13 +585,26 @@ public class OrcaFareServiceImpl extends DefaultFareService {
     var fareContainer = new FareContainer("orcaFares", usesOrca(fareType) ? "electronic" : "cash");
     var duration = Duration.ZERO;
     var money = new Money(currency, (int) (totalFare * 100));
-    var fareProduct = new FareProduct(id, "rideCost", money, duration, riderCategory, fareContainer);
+    var fareProduct = new FareProduct(
+      id,
+      "rideCost",
+      money,
+      duration,
+      riderCategory,
+      fareContainer
+    );
     itineraryFares.addFareProduct(leg, fareProduct);
     // If a transfer was used, then also add a transfer fare product.
     if (transferDiscount > 0) {
       var transferDiscountMoney = new Money(currency, (int) (transferDiscount * 100));
-      var transferFareProduct =
-        new FareProduct(id, "transfer", transferDiscountMoney, duration, riderCategory, fareContainer);
+      var transferFareProduct = new FareProduct(
+        id,
+        "transfer",
+        transferDiscountMoney,
+        duration,
+        riderCategory,
+        fareContainer
+      );
       itineraryFares.addFareProduct(leg, transferFareProduct);
     }
   }
