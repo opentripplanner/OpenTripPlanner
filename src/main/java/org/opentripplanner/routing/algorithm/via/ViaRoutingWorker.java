@@ -32,6 +32,8 @@ public class ViaRoutingWorker {
     RouteViaRequest request,
     Function<RouteRequest, RoutingResponse> routingWorker
   ) {
+    // The request is cloned here and put in a field, as getRoutingResponse loops over all the
+    // segments, modifying the request based on the result from each segment.
     this.request = request.routeRequest().clone();
     this.viaRequest = request;
     this.routingWorker = routingWorker;
