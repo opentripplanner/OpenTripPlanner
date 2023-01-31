@@ -53,12 +53,6 @@ public class TripRequestMapper {
     callWith.argument("timetableView", request::setTimetableView);
     callWith.argument("wheelchairAccessible", request::setWheelchair);
     callWith.argument("numTripPatterns", request::setNumItineraries);
-    //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
-    //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
-    //        callWith.argument("maxPreTransitWalkDistance", (Double v) ->  request.setMaxPreTransitWalkDistance(v));
-
-    //        callWith.argument("transitDistanceReluctance", (Double v) -> request.transitDistanceReluctance = v);
-
     callWith.argument("arriveBy", request::setArriveBy);
 
     callWith.argument(
@@ -82,9 +76,6 @@ public class TripRequestMapper {
         request.journey().transit().setUnpreferredRoutes(mapIDsToDomain(lines))
     );
 
-    // callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
-    // callWith.argument("banned.quaysHard", quaysHard -> request.setBannedStopsHard(mappingUtil.prepareListOfFeedScopedId((List<String>) quaysHard)));
-
     callWith.argument(
       "whiteListed.rentalNetworks",
       (List<String> networks) -> request.journey().rental().setAllowedNetworks(Set.copyOf(networks))
@@ -94,13 +85,6 @@ public class TripRequestMapper {
       "banned.rentalNetworks",
       (List<String> networks) -> request.journey().rental().setBannedNetworks(Set.copyOf(networks))
     );
-
-    // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
-    // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
-    // callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
-
-    // callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
-    // callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
     if (GqlUtil.hasArgument(environment, "modes")) {
       request
