@@ -89,7 +89,7 @@ Extra headers to add to the HTTP request fetching the data.
 <!-- real-time-alerts END -->
 
 
-### TripUpdates via HTTP
+### TripUpdates via HTTP(S)
 
 TripUpdates report on the status of scheduled trips as they happen, providing observed and 
 predicted arrival and departure times for the remainder of the trip.
@@ -164,7 +164,7 @@ Extra headers to add to the HTTP request fetching the data.
 <!-- stop-time-updater END -->
 
 
-### TripUpdates via web socket
+### TripUpdates via WebSocket
 
 <!-- websocket-gtfs-rt-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -260,7 +260,7 @@ Extra headers to add to the HTTP request fetching the data.
 
 Besides GTFS-RT transit data, OTP can also fetch real-time data about vehicle rental networks
 including the number of bikes and free parking spaces at each station. We support vehicle rental
-systems that using the GBFS feed format.
+systems that use the GBFS feed format.
 
 [GBFS](https://github.com/NABSA/gbfs) is used for a variety of shared mobility services, with
 partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)).
