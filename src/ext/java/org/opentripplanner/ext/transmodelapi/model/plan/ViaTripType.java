@@ -8,6 +8,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
+import org.opentripplanner.routing.api.response.ViaRoutingResponseConnection;
 
 public class ViaTripType {
 
@@ -47,7 +48,7 @@ public class ViaTripType {
           .description("The index of the trip pattern in the segment before the via point")
           .type(Scalars.GraphQLInt)
           .dataFetcher(dataFetchingEnvironment ->
-            ((ViaRoutingResponse.Connection) dataFetchingEnvironment.getSource()).from()
+            ((ViaRoutingResponseConnection) dataFetchingEnvironment.getSource()).from()
           )
           .build()
       )
@@ -58,7 +59,7 @@ public class ViaTripType {
           .description("The index of the trip pattern in the segment after the via point")
           .type(Scalars.GraphQLInt)
           .dataFetcher(dataFetchingEnvironment ->
-            ((ViaRoutingResponse.Connection) dataFetchingEnvironment.getSource()).to()
+            ((ViaRoutingResponseConnection) dataFetchingEnvironment.getSource()).to()
           )
           .build()
       )

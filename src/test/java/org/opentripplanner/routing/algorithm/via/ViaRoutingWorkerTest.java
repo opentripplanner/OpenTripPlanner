@@ -23,7 +23,7 @@ import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.api.response.ViaRoutingResponse;
+import org.opentripplanner.routing.api.response.ViaRoutingResponseConnection;
 
 /**
  * Create search from point A to point B via point C. Search will start at 12:00 and will find two
@@ -100,9 +100,9 @@ public class ViaRoutingWorkerTest {
     assertEquals(
       List.of(
         List.of(
-          new ViaRoutingResponse.Connection(0, 0),
-          new ViaRoutingResponse.Connection(0, 1),
-          new ViaRoutingResponse.Connection(1, 2)
+          new ViaRoutingResponseConnection(0, 0),
+          new ViaRoutingResponseConnection(0, 1),
+          new ViaRoutingResponseConnection(1, 2)
         )
       ),
       result.createConnections()
