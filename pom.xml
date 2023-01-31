@@ -327,6 +327,7 @@
                 </executions>
                 <configuration>
                     <verbose>false</verbose>
+                    <dateFormat>yyyy-MM-dd'T'HH:mm:ssXXX</dateFormat>
                     <includeOnlyProperties>
                         <!-- Including each property used reduce the plugin execution time. -->
                         <includeOnlyProperty>git.commit.id</includeOnlyProperty>
