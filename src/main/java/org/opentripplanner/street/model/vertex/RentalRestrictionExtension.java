@@ -101,7 +101,7 @@ public sealed interface RentalRestrictionExtension {
     public boolean traversalBanned(State state) {
       if (state.isRentingVehicle()) {
         return (
-          zone.id().getFeedId().equals(state.getVehicleRentalNetwork()) && zone.traversalBanned()
+          zone.traversalBanned() && zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
         );
       } else {
         return false;
@@ -112,7 +112,7 @@ public sealed interface RentalRestrictionExtension {
     public boolean dropOffBanned(State state) {
       if (state.isRentingVehicle()) {
         return (
-          zone.id().getFeedId().equals(state.getVehicleRentalNetwork()) && zone.dropOffBanned()
+          zone.dropOffBanned() && zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
         );
       } else {
         return false;
