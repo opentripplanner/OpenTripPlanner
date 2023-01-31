@@ -390,7 +390,7 @@ public class StreetEdge
 
     // if the traversal is banned for the current state because of a GBFS geofencing zone
     // we drop the vehicle and continue walking
-    if (tov.traversalBanned(s0)) {
+    if (s0.getRequest().mode().includesRenting() && tov.traversalBanned(s0)) {
       editor = doTraverse(s0, TraverseMode.WALK, false);
       if (editor != null) {
         editor.dropFloatingVehicle();
@@ -1029,10 +1029,12 @@ public class StreetEdge
       return null;
     }
 
-    if (tov.dropOffBanned(s0)) {
-      s1.enterNoRentalDropOffArea();
-    } else if (s0.isInsideNoRentalDropOffArea() && !tov.dropOffBanned(s0)) {
-      s1.leaveNoRentalDropOffArea();
+    if (s0.getRequest().mode().includesRenting()) {
+      if (tov.dropOffBanned(s0)) {
+        s1.enterNoRentalDropOffArea();
+      } else if (s0.isInsideNoRentalDropOffArea() && !tov.dropOffBanned(s0)) {
+        s1.leaveNoRentalDropOffArea();
+      }
     }
 
     final RoutingPreferences preferences = s0.getPreferences();
