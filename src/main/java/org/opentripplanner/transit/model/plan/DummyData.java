@@ -1,29 +1,23 @@
 package org.opentripplanner.transit.model.plan;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.calendar.CalendarDays;
 import org.opentripplanner.transit.model.calendar.TransitCalendar;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.RoutingTripPatternV2;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
 
 public class DummyData {
@@ -79,40 +73,23 @@ public class DummyData {
     .withAgency(AGENCY)
     .withLongName(new NonLocalizedString("ROUTE_LONG_NAME"))
     .build();
-  private static final org.opentripplanner.transit.model.network.RoutingTripPattern ROUTING_TRIP_PATTERN = createRoutingTripPattern();
+  private static final RoutingTripPatternV2 ROUTING_TRIP_PATTERN = createRoutingTripPattern();
 
   public static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(60, 0, 0);
 
-  private static org.opentripplanner.transit.model.network.RoutingTripPattern createRoutingTripPattern() {
+  private static RoutingTripPatternV2 createRoutingTripPattern() {
     TripPatternBuilder tripPatternBuilder = TripPattern
       .of(id("TP1"))
       .withRoute(ROUTE)
       .withStopPattern(STOP_PATTERN);
-    return new org.opentripplanner.transit.model.network.RoutingTripPattern(
-      tripPatternBuilder.build(),
-      tripPatternBuilder
-    );
-  }
-
-  private TripPatternForDate tripPatternForDate = createTripPatternForDate();
-
-  private TripPatternForDate createTripPatternForDate() {
-    Trip trip = Trip.of(id("TRIP_ID")).withRoute(ROUTE).build();
-
-    StopTime st1 = new StopTime();
-    st1.setDepartureTime(60);
-    StopTime st2 = new StopTime();
-    st1.setDepartureTime(180);
-    StopTime st3 = new StopTime();
-    st1.setDepartureTime(300);
-
-    Collection<StopTime> stopTimes = List.of(st1, st2, st3);
-    TripTimes tripTime = new TripTimes(trip, stopTimes, new Deduplicator());
-    return new TripPatternForDate(
-      ROUTING_TRIP_PATTERN,
-      List.of(tripTime),
-      List.of(),
-      LocalDate.now()
+    TripPattern tripPattern = tripPatternBuilder.build();
+    int[] stopIndexes = tripPattern.getStops().stream().mapToInt(StopLocation::getIndex).toArray();
+    return new RoutingTripPatternV2(
+      stopIndexes,
+      tripPattern.getRoutingTripPattern().getBoardingPossible(),
+      tripPattern.getRoutingTripPattern().getAlightingPossible(),
+      tripPattern.getMode(),
+      tripPattern.getName()
     );
   }
 

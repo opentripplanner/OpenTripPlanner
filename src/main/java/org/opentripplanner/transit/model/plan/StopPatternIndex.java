@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.RoutingTripPatternV2;
 
 public class StopPatternIndex {
 
@@ -13,7 +14,7 @@ public class StopPatternIndex {
 
   public StopPatternIndex(
     int nStop,
-    Collection<RoutingTripPattern> patterns,
+    Collection<RoutingTripPatternV2> patterns,
     @Nullable Deduplicator deduplicator
   ) {
     this.patternsByStopIndex = new BitSet[nStop];

@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.plan;
 
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import javax.annotation.Nonnull;
@@ -16,8 +17,10 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
+import org.opentripplanner.transit.model.calendar.PatternOnDay;
 import org.opentripplanner.transit.model.calendar.TransitCalendar;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.network.RoutingTripPatternV2;
 import org.opentripplanner.transit.model.trip.TripOnDay;
 import org.opentripplanner.transit.service.StopModel;
 
@@ -68,7 +71,15 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
 
     // TODO RTM - Insert patterns to build an index. we will need a better
     //          - why to do this later when we have realTime
-    this.stopPatternIndex = new StopPatternIndex(stopModel.stopIndexSize(), null, deduplicator);
+
+    Collection<RoutingTripPatternV2> routingTripPatterns = transitCalendar
+      .patternsOnDay(day)
+      .stream()
+      .map(PatternOnDay::pattern)
+      .toList();
+
+    this.stopPatternIndex =
+      new StopPatternIndex(stopModel.stopIndexSize(), routingTripPatterns, deduplicator);
   }
 
   @Override

@@ -6,4 +6,8 @@ import java.util.List;
 public class PatternsOnDays {
 
   private List<PatternsOnDay> days = List.of();
+
+  public PatternsOnDay patternsOnDay(int day) {
+    return days.get(day);
+  }
 }
