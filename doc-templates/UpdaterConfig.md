@@ -45,7 +45,7 @@ Alerts are text messages attached to GTFS objects, informing riders of disruptio
 <!-- INSERT: real-time-alerts -->
 
 
-### TripUpdates via HTTP
+### TripUpdates via HTTP(S)
 
 TripUpdates report on the status of scheduled trips as they happen, providing observed and 
 predicted arrival and departure times for the remainder of the trip.
@@ -53,7 +53,7 @@ predicted arrival and departure times for the remainder of the trip.
 <!-- INSERT: stop-time-updater -->
 
 
-### TripUpdates via web socket
+### TripUpdates via WebSocket
 
 <!-- INSERT: websocket-gtfs-rt-updater -->
 
@@ -70,7 +70,7 @@ geographic coordinates or position relative to their scheduled stops.
 
 Besides GTFS-RT transit data, OTP can also fetch real-time data about vehicle rental networks
 including the number of bikes and free parking spaces at each station. We support vehicle rental
-systems that using the GBFS feed format.
+systems that use the GBFS feed format.
 
 [GBFS](https://github.com/NABSA/gbfs) is used for a variety of shared mobility services, with
 partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)).
