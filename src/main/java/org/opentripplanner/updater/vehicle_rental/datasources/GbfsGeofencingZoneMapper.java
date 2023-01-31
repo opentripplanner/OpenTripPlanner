@@ -13,7 +13,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GbfsGeofencingZoneMapper {
+/**
+ * A mapper from the raw GBFS type into the internal model of the geofencing zones.
+ */
+class GbfsGeofencingZoneMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GeofencingZone.class);
 
@@ -23,7 +26,7 @@ public class GbfsGeofencingZoneMapper {
     this.systemId = systemId;
   }
 
-  public List<GeofencingZone> mapRentalVehicleType(GBFSGeofencingZones input) {
+  public List<GeofencingZone> mapGeofencingZone(GBFSGeofencingZones input) {
     return input
       .getData()
       .getGeofencingZones()

@@ -131,7 +131,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
       var zones = loader.getFeed(GBFSGeofencingZones.class);
 
       var mapper = new GbfsGeofencingZoneMapper(system.systemId);
-      this.geofencingZones = mapper.mapRentalVehicleType(zones);
+      this.geofencingZones = mapper.mapGeofencingZone(zones);
     }
     return stations;
   }
