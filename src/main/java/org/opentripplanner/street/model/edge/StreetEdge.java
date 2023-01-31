@@ -385,38 +385,38 @@ public class StreetEdge
   }
 
   @Override
-  public State traverse(State currentState) {
-    final StateEditor editor;
+  public State traverse(State s0) {
+    final StateEditor s1;
 
     // if the traversal is banned for the current state because of a GBFS geofencing zone
     // we drop the vehicle and continue walking
-    if (tov.traversalBanned(currentState)) {
-      editor = doTraverse(currentState, TraverseMode.WALK, false);
-      if (editor != null) {
-        editor.dropFloatingVehicle();
+    if (tov.traversalBanned(s0)) {
+      s1 = doTraverse(s0, TraverseMode.WALK, false);
+      if (s1 != null) {
+        s1.dropFloatingVehicle();
       }
     }
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
-    else if (currentState.getNonTransitMode() == TraverseMode.BICYCLE) {
+    else if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
-        editor = doTraverse(currentState, TraverseMode.BICYCLE, false);
+        s1 = doTraverse(s0, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
-        editor = doTraverse(currentState, TraverseMode.WALK, true);
+        s1 = doTraverse(s0, TraverseMode.WALK, true);
       } else {
         return null;
       }
-    } else if (canTraverse(currentState.getNonTransitMode())) {
-      editor = doTraverse(currentState, currentState.getNonTransitMode(), false);
+    } else if (canTraverse(s0.getNonTransitMode())) {
+      s1 = doTraverse(s0, s0.getNonTransitMode(), false);
     } else {
-      editor = null;
+      s1 = null;
     }
 
-    State state = editor != null ? editor.makeState() : null;
+    State state = s1 != null ? s1.makeState() : null;
 
     // we are transitioning into a no-drop-off zone therefore we add a second state for dropping
     // off the vehicle and walking
-    if (!fromv.dropOffBanned(currentState) && tov.dropOffBanned(currentState)) {
-      StateEditor afterTraversal = doTraverse(currentState, TraverseMode.WALK, false);
+    if (!fromv.dropOffBanned(s0) && tov.dropOffBanned(s0)) {
+      StateEditor afterTraversal = doTraverse(s0, TraverseMode.WALK, false);
       if (afterTraversal != null) {
         afterTraversal.dropFloatingVehicle();
         afterTraversal.leaveNoRentalDropOffArea();
@@ -426,10 +426,10 @@ public class StreetEdge
       }
     }
 
-    if (canPickupAndDrive(currentState) && canTraverse(TraverseMode.CAR)) {
-      StateEditor inCar = doTraverse(currentState, TraverseMode.CAR, false);
+    if (canPickupAndDrive(s0) && canTraverse(TraverseMode.CAR)) {
+      StateEditor inCar = doTraverse(s0, TraverseMode.CAR, false);
       if (inCar != null) {
-        driveAfterPickup(currentState, inCar);
+        driveAfterPickup(s0, inCar);
         State forkState = inCar.makeState();
         if (forkState != null) {
           // Return both the original WALK state, along with the new IN_CAR state
@@ -440,13 +440,13 @@ public class StreetEdge
     }
 
     if (
-      canDropOffAfterDriving(currentState) &&
+      canDropOffAfterDriving(s0) &&
       !getPermission().allows(TraverseMode.CAR) &&
       canTraverse(TraverseMode.WALK)
     ) {
-      StateEditor dropOff = doTraverse(currentState, TraverseMode.WALK, false);
+      StateEditor dropOff = doTraverse(s0, TraverseMode.WALK, false);
       if (dropOff != null) {
-        dropOffAfterDriving(currentState, dropOff);
+        dropOffAfterDriving(s0, dropOff);
         // Only the walk state is returned, since traversing by car was not possible
         return dropOff.makeState();
       }
@@ -1009,12 +1009,8 @@ public class StreetEdge
    * return a StateEditor rather than a State so that we can make parking/mode switch modifications
    * for kiss-and-ride.
    */
-  private StateEditor doTraverse(
-    State currentState,
-    TraverseMode traverseMode,
-    boolean walkingBike
-  ) {
-    Edge backEdge = currentState.getBackEdge();
+  private StateEditor doTraverse(State s0, TraverseMode traverseMode, boolean walkingBike) {
+    Edge backEdge = s0.getBackEdge();
     if (backEdge != null) {
       // No illegal U-turns.
       // NOTE(flamholz): we check both directions because both edges get a chance to decide
@@ -1027,19 +1023,19 @@ public class StreetEdge
       }
     }
 
-    var editor = createEditor(currentState, this, traverseMode, walkingBike);
+    var s1 = createEditor(s0, this, traverseMode, walkingBike);
 
-    if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, currentState, editor)) {
+    if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, s1)) {
       return null;
     }
 
-    if (tov.dropOffBanned(currentState)) {
-      editor.enterNoRentalDropOffArea();
-    } else if (currentState.isInsideNoRentalDropOffArea() && !tov.dropOffBanned(currentState)) {
-      editor.leaveNoRentalDropOffArea();
+    if (tov.dropOffBanned(s0)) {
+      s1.enterNoRentalDropOffArea();
+    } else if (s0.isInsideNoRentalDropOffArea() && !tov.dropOffBanned(s0)) {
+      s1.leaveNoRentalDropOffArea();
     }
 
-    final RoutingPreferences preferences = currentState.getPreferences();
+    final RoutingPreferences preferences = s0.getPreferences();
 
     // Automobiles have variable speeds depending on the edge type
     double speed = calculateSpeed(preferences, traverseMode, walkingBike);
@@ -1052,7 +1048,7 @@ public class StreetEdge
           traverseMode,
           speed,
           walkingBike,
-          currentState.getRequest().wheelchair()
+          s0.getRequest().wheelchair()
         );
         default -> otherTraversalCosts(preferences, traverseMode, walkingBike, speed);
       };
@@ -1062,23 +1058,19 @@ public class StreetEdge
 
     /* Compute turn cost. */
     if (backEdge instanceof StreetEdge backPSE) {
-      TraverseMode backMode = currentState.getBackMode();
-      final boolean arriveBy = currentState.getRequest().arriveBy();
+      TraverseMode backMode = s0.getBackMode();
+      final boolean arriveBy = s0.getRequest().arriveBy();
 
       // Apply turn restrictions
       if (
         arriveBy
-          ? !canTurnOnto(backPSE, currentState, backMode)
-          : !backPSE.canTurnOnto(this, currentState, traverseMode)
+          ? !canTurnOnto(backPSE, s0, backMode)
+          : !backPSE.canTurnOnto(this, s0, traverseMode)
       ) {
         return null;
       }
 
-      double backSpeed = backPSE.calculateSpeed(
-        preferences,
-        backMode,
-        currentState.isBackWalkingBike()
-      );
+      double backSpeed = backPSE.calculateSpeed(preferences, backMode, s0.isBackWalkingBike());
       final double turnDuration; // Units are seconds.
 
       /*
@@ -1094,7 +1086,7 @@ public class StreetEdge
        */
       if (arriveBy && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
         turnDuration =
-          currentState
+          s0
             .intersectionTraversalCalculator()
             .computeTraversalDuration(
               traversedVertex,
@@ -1106,7 +1098,7 @@ public class StreetEdge
             );
       } else if (!arriveBy && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
         turnDuration =
-          currentState
+          s0
             .intersectionTraversalCalculator()
             .computeTraversalDuration(
               traversedVertex,
@@ -1123,7 +1115,7 @@ public class StreetEdge
       }
 
       if (!traverseMode.isDriving()) {
-        editor.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
+        s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
       }
 
       time += (int) Math.ceil(turnDuration);
@@ -1131,18 +1123,18 @@ public class StreetEdge
     }
 
     if (!traverseMode.isDriving()) {
-      editor.incrementWalkDistance(getDistanceWithElevation());
+      s1.incrementWalkDistance(getDistanceWithElevation());
     }
 
     if (costExtension != null) {
-      weight += costExtension.calculateExtraCost(currentState, length_mm, traverseMode);
+      weight += costExtension.calculateExtraCost(s0, length_mm, traverseMode);
     }
 
-    editor.incrementTimeInSeconds(time);
+    s1.incrementTimeInSeconds(time);
 
-    editor.incrementWeight(weight);
+    s1.incrementWeight(weight);
 
-    return editor;
+    return s1;
   }
 
   @Nonnull
