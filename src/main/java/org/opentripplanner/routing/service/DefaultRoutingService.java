@@ -1,4 +1,4 @@
-package org.opentripplanner.routing;
+package org.opentripplanner.routing.service;
 
 import java.time.ZoneId;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
