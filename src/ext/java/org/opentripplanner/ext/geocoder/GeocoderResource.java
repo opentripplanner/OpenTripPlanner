@@ -13,6 +13,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -89,10 +93,17 @@ public class GeocoderResource {
     return results;
   }
 
+  public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+    Set<Object> seen = ConcurrentHashMap.newKeySet();
+    return t -> seen.add(keyExtractor.apply(t));
+  }
+
   private Collection<SearchResult> queryStopLocations(String query, boolean autocomplete) {
     return LuceneIndex
       .forServer(serverContext)
       .queryStopLocations(query, autocomplete)
+      .filter(distinctByKey(StopLocation::getRoundedCoordinate))
+      .filter(distinctByKey(StopLocation::getStationOrStopId))
       .map(sl ->
         new SearchResult(
           sl.getCoordinate().latitude(),

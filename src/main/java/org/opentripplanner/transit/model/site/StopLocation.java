@@ -115,6 +115,15 @@ public interface StopLocation extends LogInfo {
   WgsCoordinate getCoordinate();
 
   /**
+   * Returns coordinate rounded to 4 decimal places (which is an accuracy of ~10m)
+   */
+  public default WgsCoordinate getRoundedCoordinate() {
+    double scale = Math.pow(10, 3);
+    WgsCoordinate newCoord = new WgsCoordinate(Math.round(this.getCoordinate().latitude() * scale) / scale, Math.round(this.getCoordinate().longitude() * scale) / scale);
+    return newCoord;
+  }
+
+  /**
    * The geometry of the stop.
    * <p>
    * For fixed-schedule stops this will return the same data as getCoordinate().
