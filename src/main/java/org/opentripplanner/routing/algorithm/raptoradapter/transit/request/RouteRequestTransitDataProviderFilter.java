@@ -29,6 +29,8 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
 
   private final boolean includePlannedCancellations;
 
+  private final boolean includeRealtimeCancellations;
+
   private final List<TransitFilter> filters;
 
   private final Set<FeedScopedId> bannedTrips;
@@ -46,6 +48,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       request.wheelchair(),
       request.preferences().wheelchair(),
       request.preferences().transit().includePlannedCancellations(),
+      request.preferences().transit().includeRealtimeCancellations(),
       Set.copyOf(request.journey().transit().bannedTrips()),
       bannedRoutes(request.journey().transit().filters(), transitService.getAllRoutes()),
       request.journey().transit().filters()
@@ -58,6 +61,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     boolean wheelchairEnabled,
     WheelchairPreferences wheelchairPreferences,
     boolean includePlannedCancellations,
+    boolean includeRealtimeCancellations,
     Set<FeedScopedId> bannedTrips,
     Set<FeedScopedId> bannedRoutes,
     List<TransitFilter> filters
@@ -66,6 +70,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     this.wheelchairEnabled = wheelchairEnabled;
     this.wheelchairPreferences = wheelchairPreferences;
     this.includePlannedCancellations = includePlannedCancellations;
+    this.includeRealtimeCancellations = includeRealtimeCancellations;
     this.bannedRoutes = Set.copyOf(bannedRoutes);
     this.bannedTrips = bannedTrips;
     this.filters = filters;
@@ -110,8 +115,13 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     }
 
     if (!includePlannedCancellations) {
-      //noinspection RedundantIfStatement
       if (trip.getNetexAlteration().isCanceledOrReplaced()) {
+        return false;
+      }
+    }
+
+    if (!includeRealtimeCancellations) {
+      if (tripTimes.isCanceled()) {
         return false;
       }
     }
