@@ -1,7 +1,5 @@
 package org.opentripplanner.model.plan;
 
-import static java.util.Locale.ROOT;
-
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -14,6 +12,7 @@ import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.core.ItineraryFares;
@@ -260,7 +259,6 @@ public class Itinerary {
     buf.stop(firstLeg().getFrom().name.toString());
 
     for (Leg leg : legs) {
-      buf.sep();
       if (leg.isWalkingLeg()) {
         buf.walk((int) leg.getDuration().toSeconds());
       } else if (leg instanceof TransitLeg transitLeg) {
@@ -273,12 +271,10 @@ public class Itinerary {
       } else if (leg instanceof StreetLeg streetLeg) {
         buf.street(streetLeg.getMode().name(), leg.getStartTime(), leg.getEndTime());
       }
-
-      buf.sep();
       buf.stop(leg.getTo().name.toString());
     }
 
-    buf.space().append(String.format(ROOT, "[ $%d ]", generalizedCost));
+    buf.summary(RaptorCostConverter.toRaptorCost(generalizedCost));
 
     return buf.toString();
   }

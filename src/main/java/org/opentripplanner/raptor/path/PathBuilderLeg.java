@@ -653,7 +653,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     @Override
     public PathStringBuilder addToString(PathStringBuilder builder) {
-      return builder.accessEgress(streetPath).sep().stop(toStop()).sep();
+      return builder.accessEgress(streetPath).stop(toStop());
     }
   }
 
@@ -706,7 +706,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     @Override
     public PathStringBuilder addToString(PathStringBuilder builder) {
-      return builder.walk(transfer.durationInSeconds()).sep().stop(toStop()).sep();
+      return builder.walk(transfer.durationInSeconds()).stop(toStop());
     }
   }
 
@@ -751,11 +751,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     @Override
     public PathStringBuilder addToString(PathStringBuilder builder) {
-      return builder
-        .transit(trip.pattern().debugInfo(), fromTime(), toTime())
-        .sep()
-        .stop(toStop())
-        .sep();
+      return builder.transit(trip.pattern().debugInfo(), fromTime(), toTime()).stop(toStop());
     }
 
     public int fromStop() {

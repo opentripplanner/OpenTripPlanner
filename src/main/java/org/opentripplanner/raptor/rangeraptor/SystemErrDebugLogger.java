@@ -211,23 +211,15 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private String path(ArrivalView<?> a) {
-    return path(a, new PathStringBuilder(null))
-      .space()
-      .space()
-      .append("[ ")
-      .generalizedCostSentiSec(a.cost())
-      .append(" ]")
-      .toString();
+    return path(a, new PathStringBuilder(null)).summary(a.cost()).toString();
   }
 
   private PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {
     if (a.arrivedByAccess()) {
-      return buf.accessEgress(a.accessPath().access()).sep().stop(a.stop());
+      return buf.accessEgress(a.accessPath().access()).stop(a.stop());
     }
     // Recursively call this method to insert arrival in front of this arrival
     path(a.previous(), buf);
-
-    buf.sep();
 
     if (a.arrivedByTransit()) {
       String tripInfo = a.transitPath().trip().pattern().debugInfo();
@@ -247,7 +239,7 @@ public class SystemErrDebugLogger implements DebugLogger {
       buf.accessEgress(a.egressPath().egress());
     }
 
-    return buf.sep().stop(a.stop());
+    return buf.stop(a.stop());
   }
 
   private void printRoundHeader(int round) {

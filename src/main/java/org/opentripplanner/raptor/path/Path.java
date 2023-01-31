@@ -211,18 +211,16 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
             addWalkDetails(detailed, buf, leg);
           }
         } else {
-          buf.sep().stop(leg.fromStop());
+          buf.stop(leg.fromStop());
 
           if (detailed) {
             buf.duration(leg.fromTime() - prevToTime);
             // Add Transfer constraints info from the previous transit lag
             if (constraintPrevLeg != null) {
-              buf.space().append(constraintPrevLeg.toString());
+              buf.text(constraintPrevLeg.toString());
               constraintPrevLeg = null;
             }
           }
-
-          buf.sep();
 
           if (leg.isTransitLeg()) {
             TransitPathLeg<T> transitLeg = leg.asTransitLeg();
@@ -254,24 +252,10 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
         }
         prevToTime = leg.toTime();
       }
-      buf.space();
     }
     // Add summary info
-    {
-      buf
-        .append("[")
-        .time(startTime, endTime)
-        .duration(endTime - startTime)
-        .space()
-        .append(numberOfTransfers + "tx")
-        .generalizedCostSentiSec(generalizedCost);
+    buf.summary(startTime, endTime, numberOfTransfers, generalizedCost, appendToSummary);
 
-      if (appendToSummary != null) {
-        appendToSummary.accept(buf);
-      }
-
-      buf.append("]");
-    }
     return buf.toString();
   }
 
