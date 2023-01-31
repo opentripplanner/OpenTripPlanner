@@ -8,7 +8,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPatter
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * The split between TripPattern and RoutingTripPattern is done for the following technical reasons:
+ * The split between TripPattern and RoutingTripPatternV2 is done for the following technical reasons:
  *  - The RTP is accessed frequently during the Raptor search, and we want it to be as small as
  *    possible to load/access it in the cache and CPU for performance reasons.
  *  - Also, we deduplicate these so a RTP can be reused by more than one TP.
@@ -48,7 +48,7 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
   }
 
   /**
-   * This is the OTP internal <em>synthetic key</em>, used to reference a RoutingTripPattern inside
+   * This is the OTP internal <em>synthetic key</em>, used to reference a RoutingTripPatternV2 inside
    * OTP. This is used to optimize routing, we do not access the trip pattern instance only keep the
    * {code index}. The index will not change.
    * <p>
@@ -132,7 +132,7 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
 
   @Override
   public String toString() {
-    return "RoutingTripPattern{" + debugInfo() + '}';
+    return "RoutingTripPatternV2{" + debugInfo() + '}';
   }
 
   public static int indexCounter() {

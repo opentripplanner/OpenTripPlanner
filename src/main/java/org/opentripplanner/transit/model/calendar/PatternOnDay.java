@@ -1,19 +1,19 @@
 package org.opentripplanner.transit.model.calendar;
 
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
-import org.opentripplanner.transit.model.trip.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.RoutingTripPatternV2;
 import org.opentripplanner.transit.model.trip.Timetable;
 import org.opentripplanner.transit.model.trip.TripOnDay;
 
 public class PatternOnDay {
 
   private final OperatingDay day;
-  private final RoutingTripPattern pattern;
+  private final RoutingTripPatternV2 pattern;
   private final Timetable timetable;
 
   // TODO RTM  - Add next/prev
 
-  public PatternOnDay(OperatingDay day, RoutingTripPattern pattern, Timetable timetable) {
+  public PatternOnDay(OperatingDay day, RoutingTripPatternV2 pattern, Timetable timetable) {
     this.day = day;
     this.pattern = pattern;
     this.timetable = timetable;
@@ -23,7 +23,7 @@ public class PatternOnDay {
     return day;
   }
 
-  public RoutingTripPattern pattern() {
+  public RoutingTripPatternV2 pattern() {
     return pattern;
   }
 

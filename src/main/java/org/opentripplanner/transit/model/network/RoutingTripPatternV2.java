@@ -1,16 +1,17 @@
-package org.opentripplanner.transit.model.trip;
+package org.opentripplanner.transit.model.network;
 
 import java.util.BitSet;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.trip.ScheduledTripPattern;
 
 /**
  * This class include the information about a pattern that is needed for Raptor to route on. A
  * {@link ScheduledTripPattern} may include variations witch Raptor need to threat as separate
  * patterns. TODO RTM
  */
-public class RoutingTripPattern implements RaptorTripPattern {
+public class RoutingTripPatternV2 implements RaptorTripPattern {
 
   private final int[] stopsIndexes;
   private final BitSet boarding;
@@ -18,7 +19,7 @@ public class RoutingTripPattern implements RaptorTripPattern {
   private final int slackIndex;
   private final String debugInfo;
 
-  public RoutingTripPattern(
+  public RoutingTripPatternV2(
     int[] stopsIndexes,
     BitSet boarding,
     BitSet alighting,

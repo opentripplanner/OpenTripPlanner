@@ -1,10 +1,12 @@
 package org.opentripplanner.transit.model.trip;
 
+import org.opentripplanner.transit.model.network.RoutingTripPatternV2;
+
 public class TripService {
 
-  private final RoutingTripPattern[] routingTripPatterns;
+  private final RoutingTripPatternV2[] routingTripPatterns;
 
-  public TripService(RoutingTripPattern[] routingTripPatterns) {
+  public TripService(RoutingTripPatternV2[] routingTripPatterns) {
     this.routingTripPatterns = routingTripPatterns;
   }
 
@@ -12,7 +14,7 @@ public class TripService {
     return routingTripPatterns.length;
   }
 
-  public RoutingTripPattern routingPatterns(int index) {
+  public RoutingTripPatternV2 routingPatterns(int index) {
     return routingTripPatterns[index];
   }
 }
