@@ -36,10 +36,26 @@ public class DummyData {
     .withTimezone("Europe/Oslo")
     .build();
 
-  public static final RegularStop STOP_1 = RegularStop.of(id("S1")).withName("Majorstua").build();
-  public static final RegularStop STOP_2 = RegularStop.of(id("S2")).withName("Stortinget").build();
-  public static final RegularStop STOP_3 = RegularStop.of(id("S3")).withName("Oslo S").build();
-  public static final RegularStop STOP_4 = RegularStop.of(id("S4")).withName("Tøyen").build();
+  public static final RegularStop STOP_1 = RegularStop
+    .of(id("S1"))
+    .withName("Majorstua")
+    .withCoordinate(0, 0)
+    .build();
+  public static final RegularStop STOP_2 = RegularStop
+    .of(id("S2"))
+    .withName("Stortinget")
+    .withCoordinate(0, 0)
+    .build();
+  public static final RegularStop STOP_3 = RegularStop
+    .of(id("S3"))
+    .withName("Oslo S")
+    .withCoordinate(0, 0)
+    .build();
+  public static final RegularStop STOP_4 = RegularStop
+    .of(id("S4"))
+    .withName("Tøyen")
+    .withCoordinate(0, 0)
+    .build();
 
   public static final StopModel STOP_MODEL = StopModel
     .of()
