@@ -71,6 +71,7 @@ class PreferencesMapper {
       });
       callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
       callWith.argument("includePlannedCancellations", tr::setIncludePlannedCancellations);
+      callWith.argument("includeRealtimeCancellations", tr::setIncludeRealtimeCancellations);
       callWith.argument(
         "relaxTransitSearchGeneralizedCostAtDestination",
         (Double value) -> tr.withRaptor(it -> it.withRelaxGeneralizedCostAtDestination(value))

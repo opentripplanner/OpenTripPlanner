@@ -2,10 +2,10 @@ package org.opentripplanner.graph_builder.module.configure;
 
 import dagger.BindsInstance;
 import dagger.Component;
+import jakarta.inject.Singleton;
 import java.time.ZoneId;
 import java.util.List;
 import javax.annotation.Nullable;
-import javax.inject.Singleton;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;

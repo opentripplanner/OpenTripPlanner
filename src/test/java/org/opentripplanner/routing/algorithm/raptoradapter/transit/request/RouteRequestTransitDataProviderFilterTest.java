@@ -86,6 +86,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       true,
       DEFAULT_ACCESSIBILITY,
       false,
+      false,
       Set.of(),
       Set.of(),
       List.of(AllowAllTransitFilter.of())
@@ -110,6 +111,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
+      false,
       Set.of(),
       Set.of(),
       filterForMode(TransitMode.BUS)
@@ -128,6 +130,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       false,
       DEFAULT_ACCESSIBILITY,
+      false,
       false,
       Set.of(),
       Set.of(ROUTE.getId()),
@@ -155,6 +158,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       false,
       DEFAULT_ACCESSIBILITY,
+      false,
       false,
       Set.of(TRIP_ID),
       Set.of(),
@@ -209,6 +213,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
+      false,
       Set.of(),
       Set.of(),
       filterForMode(TransitMode.BUS)
@@ -235,6 +240,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       true,
       true,
       WheelchairPreferences.DEFAULT,
+      false,
       false,
       Set.of(),
       Set.of(),
@@ -263,6 +269,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       true,
       WheelchairPreferences.DEFAULT,
       false,
+      false,
       Set.of(),
       Set.of(),
       List.of(AllowAllTransitFilter.of())
@@ -290,6 +297,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       true,
       WheelchairPreferences.DEFAULT,
       false,
+      false,
       Set.of(),
       Set.of(),
       filterForMode(TransitMode.BUS)
@@ -316,6 +324,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       true,
       WheelchairPreferences.DEFAULT,
+      false,
       false,
       Set.of(),
       Set.of(),
@@ -356,6 +365,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       WheelchairPreferences.DEFAULT,
       true,
+      false,
       Set.of(),
       Set.of(),
       filterForMode(TransitMode.BUS)
@@ -377,6 +387,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
+      false,
       Set.of(),
       Set.of(),
       List.of(AllowAllTransitFilter.of())
@@ -389,6 +400,74 @@ public class RouteRequestTransitDataProviderFilterTest {
 
     // When
     boolean valid4 = filter2.tripTimesPredicate(tripTimesWithReplaced, true);
+    // Then
+    assertFalse(valid4);
+  }
+
+  @Test
+  public void includeRealtimeCancellationsTest() {
+    TripTimes tripTimes = createTestTripTimes(
+      TRIP_ID,
+      ROUTE,
+      BikeAccess.NOT_ALLOWED,
+      TransitMode.BUS,
+      null,
+      Accessibility.NOT_POSSIBLE,
+      TripAlteration.PLANNED
+    );
+
+    TripTimes tripTimesWithCancellation = createTestTripTimes(
+      TRIP_ID,
+      ROUTE,
+      BikeAccess.NOT_ALLOWED,
+      TransitMode.BUS,
+      null,
+      Accessibility.NOT_POSSIBLE,
+      TripAlteration.PLANNED
+    );
+    tripTimesWithCancellation.cancelTrip();
+
+    // Given
+    var filter1 = new RouteRequestTransitDataProviderFilter(
+      false,
+      false,
+      WheelchairPreferences.DEFAULT,
+      false,
+      true,
+      Set.of(),
+      Set.of(),
+      filterForMode(TransitMode.BUS)
+    );
+
+    // When
+    boolean valid1 = filter1.tripTimesPredicate(tripTimes, true);
+    // Then
+    assertTrue(valid1);
+
+    // When
+    boolean valid2 = filter1.tripTimesPredicate(tripTimesWithCancellation, true);
+    // Then
+    assertTrue(valid2);
+
+    // Given
+    var filter2 = new RouteRequestTransitDataProviderFilter(
+      false,
+      false,
+      DEFAULT_ACCESSIBILITY,
+      false,
+      false,
+      Set.of(),
+      Set.of(),
+      List.of(AllowAllTransitFilter.of())
+    );
+
+    // When
+    boolean valid3 = filter2.tripTimesPredicate(tripTimes, true);
+    // Then
+    assertTrue(valid3);
+
+    // When
+    boolean valid4 = filter2.tripTimesPredicate(tripTimesWithCancellation, true);
     // Then
     assertFalse(valid4);
   }
@@ -491,6 +570,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       true,
       DEFAULT_ACCESSIBILITY,
       false,
+      false,
       Set.of(),
       Set.of(),
       filterForMode(TransitMode.BUS)
@@ -513,6 +593,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       false,
       false,
       DEFAULT_ACCESSIBILITY,
+      false,
       false,
       Set.of(),
       Set.of(),

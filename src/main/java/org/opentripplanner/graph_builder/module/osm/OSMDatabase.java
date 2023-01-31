@@ -27,6 +27,8 @@ import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
+import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
 import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
 import org.opentripplanner.graph_builder.issues.PublicTransportRelationSkipped;
 import org.opentripplanner.graph_builder.issues.TooManyAreasInRelation;
@@ -501,13 +503,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
               checkDistanceWithin(ringSegment.nA, nA, epsilon) ||
               checkDistanceWithin(ringSegment.nB, nA, epsilon)
             ) {
-              issueStore.add(
-                "DisconnectedOsmNode",
-                "Node %s in way %s is coincident but disconnected with area %s",
-                nA.getId(),
-                way.getId(),
-                ringSegment.area.parent.getId()
-              );
+              issueStore.add(new DisconnectedOsmNode(nA, way, ringSegment.area.parent));
             }
           } else if (checkIntersectionDistance(p, nB, epsilon)) {
             // insert node B into the ring segment
@@ -521,13 +517,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
               checkDistanceWithin(ringSegment.nA, nB, epsilon) ||
               checkDistanceWithin(ringSegment.nB, nB, epsilon)
             ) {
-              issueStore.add(
-                "DisconnectedOsmNode",
-                "Node %s in way %s is coincident but disconnected with area %s",
-                nB.getId(),
-                way.getId(),
-                ringSegment.area.parent.getId()
-              );
+              issueStore.add(new DisconnectedOsmNode(nB, way, ringSegment.area.parent));
             }
           } else if (checkIntersectionDistance(p, ringSegment.nA, epsilon)) {
             // insert node A into the road, if it's not already there
@@ -542,13 +532,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
               checkDistanceWithin(ringSegment.nA, nA, epsilon) ||
               checkDistanceWithin(ringSegment.nA, nB, epsilon)
             ) {
-              issueStore.add(
-                "DisconnectedOsmNode",
-                "Node %s in area %s is coincident but disconnected with way %s",
-                ringSegment.nA.getId(),
-                ringSegment.area.parent.getId(),
-                way.getId()
-              );
+              issueStore.add(new DisconnectedOsmNode(nB, ringSegment.area.parent, way));
             }
             // restart loop over way segments as we may have more intersections
             // as we haven't modified the ring, there is no need to modify the spatial index, so breaking here is fine
@@ -565,13 +549,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
               checkDistanceWithin(ringSegment.nB, nA, epsilon) ||
               checkDistanceWithin(ringSegment.nB, nB, epsilon)
             ) {
-              issueStore.add(
-                "DisconnectedOsmNode",
-                "Node %s in area %s is coincident but disconnected with way %s",
-                ringSegment.nB.getId(),
-                ringSegment.area.parent.getId(),
-                way.getId()
-              );
+              issueStore.add(new DisconnectedOsmNode(ringSegment.nB, ringSegment.area.parent, way));
             }
             i--;
             break;
@@ -704,7 +682,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
         level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels, issueStore);
       }
       if (level == null || (!level.reliable)) {
-        issueStore.add(new LevelAmbiguous(levelName, way.getId()));
+        issueStore.add(new LevelAmbiguous(levelName, way));
         level = OSMLevel.DEFAULT;
       }
       wayLevels.put(way, level);
@@ -742,11 +720,11 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
         // this area cannot be constructed, but we already have all the
         // necessary nodes to construct it. So, something must be wrong with
         // the area; we'll mark it as processed so that we don't retry.
-        issueStore.add("InvalidGeometry", "Invalid geometry for osm way %s", way.getId());
+        issueStore.add(new InvalidOsmGeometry(way));
       } catch (IllegalArgumentException iae) {
         // This occurs when there are an invalid number of points in a LinearRing
         // Mark the ring as processed so we don't retry it.
-        issueStore.add("InvalidGeometry", "Invalid geometry for osm way %s", way.getId());
+        issueStore.add(new InvalidOsmGeometry(way));
       }
       processedAreas.add(way);
     }
@@ -807,7 +785,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
       try {
         newArea(new Area(relation, outerWays, innerWays, nodesById));
       } catch (Area.AreaConstructionException | Ring.RingConstructionException e) {
-        issueStore.add("InvalidGeometry", "Invalid geometry for osm relation %s", relation.getId());
+        issueStore.add(new InvalidOsmGeometry(relation));
         continue;
       }
 
@@ -1004,7 +982,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
       tag =
         new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U, relation.getId());
     } else {
-      issueStore.add(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction")));
+      issueStore.add(new TurnRestrictionUnknown(relation, relation.getTag("restriction")));
       return;
     }
     tag.modes = modes.clone();
@@ -1123,7 +1101,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
         if (platformArea == null) {
           platformArea = areaWaysById.get(member.getRef());
         } else {
-          issueStore.add(new TooManyAreasInRelation(relation.getId()));
+          issueStore.add(new TooManyAreasInRelation(relation));
         }
       } else if (
         "relation".equals(member.getType()) &&
@@ -1133,7 +1111,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
         if (platformArea == null) {
           platformArea = relationsById.get(member.getRef());
         } else {
-          issueStore.add(new TooManyAreasInRelation(relation.getId()));
+          issueStore.add(new TooManyAreasInRelation(relation));
         }
       } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
         platformsNodes.add(nodesById.get(member.getRef()));
@@ -1142,7 +1120,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
     if (platformArea != null && !platformsNodes.isEmpty()) {
       stopsInAreas.put(platformArea, platformsNodes);
     } else {
-      issueStore.add(new PublicTransportRelationSkipped(relation.getId()));
+      issueStore.add(new PublicTransportRelationSkipped(relation));
     }
   }
 

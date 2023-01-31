@@ -187,6 +187,17 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
+          .name("includeRealtimeCancellations")
+          .description(
+            "When true, service journeys cancelled by real-time updates will be included during this search."
+          )
+          .type(Scalars.GraphQLBoolean)
+          .defaultValue(preferences.transit().includeRealtimeCancellations())
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
           .name("locale")
           .description(
             "The preferable language to use for text targeted the end user. Note! The data " +

@@ -987,13 +987,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         if (tripTimes.getNumStops() == pattern.numberOfStops()) {
           // All tripTimes should be handled the same way to always allow latest realtime-update to
           // replace previous update regardless of realtimestate
-          cancelScheduledTrip(trip, serviceDate);
+          markScheduledTripAsDeleted(trip, serviceDate);
 
           // Also check whether trip id has been used for previously ADDED/MODIFIED trip message and
           // remove the previously created trip
           removePreviousRealtimeUpdate(trip, serviceDate);
 
-          if (!tripTimes.isCanceled()) {
+          if (!tripTimes.isDeleted()) {
             // Calculate modified stop-pattern
             var modifiedStops = createModifiedStops(
               pattern,
@@ -1008,6 +1008,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             );
 
             if (modifiedStops != null && modifiedStops.isEmpty()) {
+              // Empty modified stops means that there is no calls for the trip, cancel it
               tripTimes.cancelTrip();
             } else {
               // Add new trip
@@ -1167,26 +1168,26 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Cancel scheduled trip in buffer given trip on service date
+   * Mark the scheduled trip in the buffer as deleted, given trip on service date
    *
    * @param serviceDate service date
-   * @return true if scheduled trip was cancelled
+   * @return true if scheduled trip was marked as deleted
    */
-  private boolean cancelScheduledTrip(Trip trip, final LocalDate serviceDate) {
+  private boolean markScheduledTripAsDeleted(Trip trip, final LocalDate serviceDate) {
     boolean success = false;
 
     final TripPattern pattern = transitService.getPatternForTrip(trip);
 
     if (pattern != null) {
-      // Cancel scheduled trip times for this trip in this pattern
+      // Mark scheduled trip times for this trip in this pattern as deleted
       final Timetable timetable = pattern.getScheduledTimetable();
       final TripTimes tripTimes = timetable.getTripTimes(trip);
 
       if (tripTimes == null) {
-        LOG.warn("Could not cancel scheduled trip {}", trip.getId());
+        LOG.warn("Could not mark scheduled trip as deleted {}", trip.getId());
       } else {
         final TripTimes newTripTimes = new TripTimes(tripTimes);
-        newTripTimes.cancelTrip();
+        newTripTimes.deleteTrip();
         buffer.update(pattern, newTripTimes, serviceDate);
         success = true;
       }

@@ -139,7 +139,7 @@ public class OSMFilter {
     ) {
       permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
       if (forceBikes) {
-        issueStore.add(new ConflictingBikeTags(way.getId()));
+        issueStore.add(new ConflictingBikeTags(way));
       }
     }
 
