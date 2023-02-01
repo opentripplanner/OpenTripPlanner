@@ -1,10 +1,8 @@
 package org.opentripplanner.graph_builder.issue.report;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -51,10 +49,6 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
   //List of writers which are used for actual writing issues to HTML
   private final List<HTMLWriter> writers = new ArrayList<>();
 
-  //Key is classname, value is issue message
-  //Multimap because there are multiple issues for each classname
-  private final Multimap<String, String> issues = ArrayListMultimap.create();
-
   private final DataImportIssueStore issueStore;
 
   public DataImportIssuesToHTML(
@@ -90,7 +84,6 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
             .getValue()
             .stream()
             .sorted(Comparator.comparing(DataImportIssue::getPriority))
-            .map(DataImportIssue::getHTMLMessage)
             .collect(
               Collectors.collectingAndThen(
                 Collectors.toList(),
@@ -111,12 +104,12 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
       // this is the first place where actual number of files is known (because it depends on
       // the issue count)
       for (HTMLWriter writer : writers) {
-        writer.writeFile(sortedIssueTypes, false);
+        writer.writeFile(sortedIssueTypes);
       }
 
       try {
-        HTMLWriter indexFileWriter = new HTMLWriter("index", (Multimap<String, String>) null);
-        indexFileWriter.writeFile(sortedIssueTypes, true);
+        HTMLWriter indexFileWriter = new HTMLWriter("index");
+        indexFileWriter.writeFile(sortedIssueTypes);
       } catch (Exception e) {
         LOG.error("Index file coudn't be created:{}", e.getMessage());
       }
@@ -172,12 +165,12 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
    * @param issueTypeName name of import data issue class and then also filename
    * @param issues        list of all import data issue with that class
    */
-  private void addIssues(String issueTypeName, List<String> issues) {
+  private void addIssues(String issueTypeName, List<DataImportIssue> issues) {
     HTMLWriter file_writer;
     if (issues.size() > 1.2 * maxNumberOfIssuesPerFile) {
       LOG.debug("Number of issues is very large. Splitting: {}", issueTypeName);
-      List<List<String>> partitions = Lists.partition(issues, maxNumberOfIssuesPerFile);
-      for (List<String> partition : partitions) {
+      List<List<DataImportIssue>> partitions = Lists.partition(issues, maxNumberOfIssuesPerFile);
+      for (List<DataImportIssue> partition : partitions) {
         issueTypeOccurrences.add(issueTypeName);
         int labelCount = issueTypeOccurrences.count(issueTypeName);
         file_writer = new HTMLWriter(issueTypeName + labelCount, partition);
@@ -189,16 +182,6 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
       file_writer = new HTMLWriter(issueTypeName + labelCount, issues);
       writers.add(file_writer);
     }
-  }
-
-  /**
-   * Groups issues according to issue type, using the classname as type name.
-   * <p>
-   * All issues are saved together in multimap where key is issue classname and values are list of
-   * issue with that class
-   */
-  private void addIssue(DataImportIssue issue) {
-    issues.put(issue.getType(), issue.getHTMLMessage());
   }
 
   private void closeReportDirectory() {
@@ -218,26 +201,25 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
 
     private final DataSource target;
 
-    private final Multimap<String, String> writerIssues;
+    private final Collection<DataImportIssue> writerIssues;
 
     private final String issueTypeName;
 
-    HTMLWriter(String key, Collection<String> issues) {
+    HTMLWriter(String key, Collection<DataImportIssue> issues) {
       LOG.debug("Making file: {}", key);
       this.target = reportDirectory.entry(key + ".html");
-      this.writerIssues = ArrayListMultimap.create();
-      this.writerIssues.putAll(key, issues);
+      this.writerIssues = issues;
       this.issueTypeName = key;
     }
 
-    HTMLWriter(String filename, Multimap<String, String> curMap) {
+    HTMLWriter(String filename) {
       LOG.debug("Making file: {}", filename);
       this.target = reportDirectory.entry(filename + ".html");
-      this.writerIssues = curMap;
+      this.writerIssues = null;
       this.issueTypeName = filename;
     }
 
-    private void writeFile(Iterable<Multiset.Entry<String>> classes, boolean isIndexFile) {
+    private void writeFile(Iterable<Multiset.Entry<String>> classes) {
       try (
         PrintWriter out = new PrintWriter(target.asOutputStream(), true, StandardCharsets.UTF_8)
       ) {
@@ -321,7 +303,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
           }
         }
         out.println("</p>");
-        if (!isIndexFile) {
+        if (writerIssues != null) {
           out.println("<ul id=\"log\">");
           writeIssues(out);
           out.println("</ul>");
@@ -336,8 +318,8 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
      */
     private void writeIssues(PrintWriter out) {
       String FMT = "<li>%s</li>";
-      for (Map.Entry<String, String> it : writerIssues.entries()) {
-        out.printf(FMT, it.getValue());
+      for (DataImportIssue it : writerIssues) {
+        out.printf(FMT, it.getHTMLMessage());
       }
     }
   }
