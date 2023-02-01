@@ -11,7 +11,7 @@ import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
-import org.opentripplanner.graph_builder.issue.report.DataImportIssuesToHTML;
+import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GraphCoherencyCheckerModule;
 import org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule;
@@ -50,7 +50,7 @@ public interface GraphBuilderFactory {
   DirectTransferAnalyzer directTransferAnalyzer();
   GraphCoherencyCheckerModule graphCoherencyCheckerModule();
   EdgeUpdaterModule dataOverlayFactory();
-  DataImportIssuesToHTML dataImportIssuesToHTML();
+  DataImportIssueReporter dataImportIssueReporter();
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
 
   @Component.Builder

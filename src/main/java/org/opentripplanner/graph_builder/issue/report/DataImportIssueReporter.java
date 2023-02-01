@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author mabu
  */
-public class DataImportIssuesToHTML implements GraphBuilderModule {
+public class DataImportIssueReporter implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DataImportIssuesToHTML.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataImportIssueReporter.class);
 
   //Path to output folder
   private final CompositeDataSource reportDirectory;
@@ -47,7 +47,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
 
   private final DataImportIssueStore issueStore;
 
-  public DataImportIssuesToHTML(
+  public DataImportIssueReporter(
     DataImportIssueStore issueStore,
     CompositeDataSource reportDirectory,
     int maxNumberOfIssuesPerFile
