@@ -783,7 +783,7 @@ type QueryType {
     maximumTransfers: Int = 12,
     "The set of access/egress/direct/transit modes to be used for this search. Note that this only works at the Line level. If individual ServiceJourneys have modes that differ from the Line mode, this will NOT be accounted for."
     modes: Modes,
-    "The maximum number of trip patterns to return. Note! This reduce the number of trip patterns AFTER the OTP travel search is done in a post-filtering process. There is little performance gain in reducing the number of trip patterns returned. The post-filtering will reduce the number of trip-patterns down to this size. It does not make the search faster, as it did in OTP1. See also the trip meta-data on how to implement paging."
+    "The maximum number of trip patterns to return. Note! This reduce the number of trip patterns AFTER the OTP travel search is done in a post-filtering process. There is little/no performance gain in reducing the number of trip patterns returned. See also the trip meta-data on how to implement paging."
     numTripPatterns: Int = 50,
     "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from the last response and keep the original request as is. This will enable you to search for itineraries in the next or previous time-window."
     pageCursor: String,
@@ -825,7 +825,7 @@ type QueryType {
     Default: `true`
     """
     timetableView: Boolean,
-    "The end location"
+    "The destination location"
     to: Location!,
     "An extra penalty added on transfers (i.e. all boardings except the first one). The transferPenalty is used when a user requests even less transfers. In the latter case, we don't actually optimise for fewest transfers, as this can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers trip pattern is to wait until midnight, when the 4 train runs local the whole way. The actual fastest trip pattern is the 2/3 to the 4/5 at Nevins to the 6 at Union Square, which takes half an hour. Even someone optimise for fewest transfers doesn't want to wait until midnight. Maybe they would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6. If this takes less than transferPenalty seconds, then that's what we'll return."
     transferPenalty: Int = 0,
@@ -841,11 +841,44 @@ type QueryType {
     walkReluctance: Float = 2.0,
     "The maximum walk speed along streets, in meters per second."
     walkSpeed: Float = 1.33,
-    "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit jet."
+    "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit yet."
     wheelchairAccessible: Boolean = false,
     "Parameters for indicating the only authorities, lines or quays to be used in the trip patterns"
     whiteListed: InputWhiteListed
   ): Trip! @timingData
+  "Via trip search. Find trip patterns traveling via one or more intermediate (via) locations."
+  viaTrip(
+    "Date and time for the earliest time the user is willing to start the journey (if arriveBy=false/not set) or the latest acceptable time of arriving (arriveBy=true). Defaults to now"
+    dateTime: DateTime,
+    "The start location"
+    from: Location!,
+    "The preferable language to use for text targeted the end user. Note! The data quality is limited, only stop and quay names are translates, and not in all places of the API."
+    locale: Locale = no,
+    "The maximum number of trip patterns segment to return. Note! This reduces the number of trip patterns AFTER the OTP travel search is done in a post-filtering process. There is little/no performance gain in reducing the number of trip patterns returned. See also the trip meta-data on how to implement paging."
+    numTripPatterns: Int = 50,
+    "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from the last response and keep the original request as is. This will enable you to search for itineraries in the next or previous time-window."
+    pageCursor: String,
+    """
+    The length of the search-window. This parameter is optional.
+    
+    The search-window is defined as the duration between the earliest-departure-time(EDT) and the latest-departure-time(LDT). OTP will search for all itineraries in this departure window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP will dynamically calculate the EDT. Using a short search-window is faster than using a longer one, but the search duration is not linear. Using a "too" short search-window will waste resources server side, while using a search-window that is too long will be slow.
+    
+    OTP will dynamically calculate a reasonable value for the search-window, if not provided. The calculation comes with a significant overhead (10-20% extra). Whether you should use the dynamic calculated value or pass in a value depends on your use-case. For a travel planner in a small geographical area, with a dense network of public transportation, a fixed value between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust it so that the number of itineraries on average is around the wanted `numItineraries`. Make sure you set the `numItineraries` to a high number while testing. For a country wide area like Norway, using the dynamic search-window is the best.
+    
+    When paginating, the search-window is calculated using the `numItineraries` in the original search together with statistics from the search for the last page. This behaviour is configured server side, and can not be overridden from the client.
+    
+    The search-window used is returned to the response metadata as `searchWindowUsed` for debugging purposes.
+    """
+    searchWindow: Duration!,
+    "The requests for the individual segments of the search. The first segment is from the start location(`from`) to the first entry in the `via` locations list and the last is from the last entry in the `via` locations list to the end location(`to`). Note that the list must have length of exactly one greater than the `via` field."
+    segments: [ViaSegmentInput!],
+    "The destination location"
+    to: Location!,
+    "The locations needed to be visited along the route."
+    via: [ViaLocationInput!]!,
+    "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit yet."
+    wheelchairAccessible: Boolean = false
+  ): ViaTrip! @deprecated @timingData
 }
 
 type RentalVehicle implements PlaceInterface {
@@ -1221,6 +1254,30 @@ type ValidityPeriod {
   endTime: DateTime
   "Start of validity period"
   startTime: DateTime
+}
+
+"An acceptable combination of trip patterns between two segments of the via search"
+type ViaConnection {
+  "The index of the trip pattern in the segment before the via point"
+  from: Int
+  "The index of the trip pattern in the segment after the via point"
+  to: Int
+}
+
+"Description of a trip via one or more intermediate locations. For example from A, via B, then C to D."
+type ViaTrip {
+  "A list of routing errors, and fields which caused them"
+  routingErrors: [RoutingError!]!
+  "A list of the acceptable combinations of the trip patterns in this segment and the next segment."
+  tripPatternCombinations: [[ViaConnection!]!]!
+  "A list of segments of the via search. The first segment is from the start location to the first entry in the locations list and the last is from the last entry in the locations list to the end location."
+  tripPatternsPerSegment: [ViaTripPatternSegment!]!
+}
+
+"A segment of the via search. The first segment is from the start location to the first entry in the locations list and the last is from the last entry in the locations list to the end location."
+type ViaTripPatternSegment {
+  "A list of trip patterns for this segment of the search"
+  tripPatterns: [TripPattern!]!
 }
 
 type debugOutput {
@@ -1699,6 +1756,9 @@ scalar DateTime
 "A linear function to calculate a value(y) based on a parameter (x): `y = f(x) = a + bx`. It allows setting both a constant(a) and a coefficient(b) and the use those in the computation. Format: `a + b x`. Example: `1800 + 2.0 x`"
 scalar DoubleFunction
 
+"Duration in a lenient ISO-8601 duration format. Example P2DT2H12M40S, 2d2h12m40s or 1h"
+scalar Duration
+
 "Time using the format: HH:mm:SS. Example: 18:25:SS"
 scalar LocalTime
 
@@ -1792,6 +1852,16 @@ input Modes {
   transportModes: [TransportModes]
 }
 
+"Input format for specifying which modes will be allowed for this search. If this element is not present, it will default to all to foot."
+input StreetModes {
+  "The mode used to get from the origin to the access stops in the transit network the transit network (first-mile). If the element is not present or null,only transit that can be immediately boarded from the origin will be used."
+  accessMode: StreetMode
+  "The mode used to get from the origin to the destination directly, without using the transit network. If the element is not present or null,direct travel without using transit will be disallowed."
+  directMode: StreetMode
+  "The mode used to get from the egress stops in the transit network tothe destination (last-mile). If the element is not present or null,only transit that can immediately arrive at the origin will be used."
+  egressMode: StreetMode
+}
+
 input TransitGeneralizedCostFilterParams {
   costLimitFunction: DoubleFunction!
   intervalRelaxFactor: Float!
@@ -1840,4 +1910,25 @@ input TripFilterSelectInput {
   serviceJourneys: [ID!]
   "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
   transportModes: [TransportModes!]
+}
+
+"Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known. The location also contain information about the minimum and maximum time the user is willing to stay at the via location."
+input ViaLocationInput {
+  "Coordinates for the location. This can be used alone or as fallback if the place id is not found."
+  coordinates: InputCoordinates
+  "The maximum time the user wants to stay in the via location before continuing his journey"
+  maxSlack: Duration = "PT1H"
+  "The minimum time the user wants to stay in the via location before continuing his journey"
+  minSlack: Duration = "PT5M"
+  "The name of the location. This is pass-through informationand is not used in routing."
+  name: String
+  "The id of an element in the OTP model. Currently supports Quay, StopPlace, multimodal StopPlace, and GroupOfStopPlaces."
+  place: String
+}
+
+input ViaSegmentInput {
+  "A list of filters for which trips should be included. A trip will be included if it matches with at least one filter. An empty list of filters means that all trips should be included."
+  filters: [TripFilterInput!]
+  "The set of access/egress/direct modes to be used for this search."
+  modes: StreetModes
 }

@@ -61,7 +61,7 @@
         <geotools.version>28.1</geotools.version>
         <google.dagger.version>2.44.2</google.dagger.version>
         <jackson.version>2.14.2</jackson.version>
-        <jersey.version>3.1.0</jersey.version>
+        <jersey.version>3.1.1</jersey.version>
         <junit.version>5.9.2</junit.version>
         <micrometer.version>1.10.3</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
@@ -327,6 +327,7 @@
                 </executions>
                 <configuration>
                     <verbose>false</verbose>
+                    <dateFormat>yyyy-MM-dd'T'HH:mm:ssXXX</dateFormat>
                     <includeOnlyProperties>
                         <!-- Including each property used reduce the plugin execution time. -->
                         <includeOnlyProperty>git.commit.id</includeOnlyProperty>

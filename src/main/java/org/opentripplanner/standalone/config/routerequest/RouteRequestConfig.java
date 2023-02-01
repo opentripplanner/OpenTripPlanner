@@ -249,7 +249,9 @@ travel time `x` (in seconds).
             c
               .of("alightSlackForMode")
               .since(V2_0)
-              .summary("How much time alighting a vehicle takes for each given mode.")
+              .summary(
+                "How much extra time should be given when alighting a vehicle for each given mode."
+              )
               .description(
                 "Sometimes there is a need to configure a longer alighting times for specific " +
                 "modes, such as airplanes or ferries."
@@ -281,7 +283,9 @@ transit leg in the trip. This is the default value used, if not overridden by th
             c
               .of("boardSlackForMode")
               .since(V2_0)
-              .summary("How much time ride a vehicle takes for each given mode.")
+              .summary(
+                "How much extra time should be given when boarding a vehicle for each given mode."
+              )
               .description(
                 """
 Sometimes there is a need to configure a board times for specific modes, such as airplanes or

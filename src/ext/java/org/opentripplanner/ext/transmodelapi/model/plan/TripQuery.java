@@ -136,7 +136,7 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("to")
-          .description("The end location")
+          .description("The destination location")
           .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
           .build()
       )
@@ -158,7 +158,7 @@ public class TripQuery {
           .name("wheelchairAccessible")
           .description(
             "Whether the trip must be wheelchair accessible. Supported for the street part to " +
-            "the search, not implemented for the transit jet."
+            "the search, not implemented for the transit yet."
           )
           .type(Scalars.GraphQLBoolean)
           .defaultValue(routing.request.wheelchair())
@@ -424,10 +424,8 @@ public class TripQuery {
           .description(
             "The maximum number of trip patterns to return. Note! This reduce the number of " +
             "trip patterns AFTER the OTP travel search is done in a post-filtering process. " +
-            "There is little performance gain in reducing the number of trip patterns " +
-            "returned. The post-filtering will reduce the number of trip-patterns down to " +
-            "this size. It does not make the search faster, as it did in OTP1. See also the " +
-            "trip meta-data on how to implement paging."
+            "There is little/no performance gain in reducing the number of trip patterns " +
+            "returned. See also the trip meta-data on how to implement paging."
           )
           .defaultValue(routing.request.numItineraries())
           .type(Scalars.GraphQLInt)
