@@ -112,4 +112,19 @@ class Subgraph {
       .min(Double::compareTo)
       .orElse(searchRadius);
   }
+
+  /**
+   * Get a {@link Geometry for all the contained vertices}
+   */
+  Geometry getGeometry() {
+    List<Point> points = new ArrayList<>();
+    GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+
+    Consumer<Vertex> vertexAdder = vertex ->
+      points.add(geometryFactory.createPoint(vertex.getCoordinate()));
+    streetIterator().forEachRemaining(vertexAdder);
+    stopIterator().forEachRemaining(vertexAdder);
+
+    return new MultiPoint(points.toArray(new Point[0]), geometryFactory);
+  }
 }
