@@ -12,7 +12,6 @@ import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.graph_builder.issues.IsolatedStop;
-import org.opentripplanner.graph_builder.issues.PrunedStopIsland;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -27,7 +26,6 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
-import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -50,7 +48,6 @@ public class PruneIslands implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(PruneIslands.class);
 
-  private final int islandCounter = 0;
   private final Graph graph;
   private final TransitModel transitModel;
   private final DataImportIssueStore issueStore;
@@ -329,8 +326,6 @@ public class PruneIslands implements GraphBuilderModule {
         if (
           !(
             e instanceof StreetEdge ||
-            e instanceof StreetTransitStopLink ||
-            e instanceof StreetTransitEntranceLink ||
             e instanceof ElevatorEdge ||
             e instanceof FreeEdge ||
             e instanceof StreetTransitEntityLink
@@ -350,19 +345,11 @@ public class PruneIslands implements GraphBuilderModule {
         }
         Vertex out = s1.getVertex();
 
-        ArrayList<Vertex> vertexList = neighborsForVertex.get(gv);
-        if (vertexList == null) {
-          vertexList = new ArrayList<>();
-          neighborsForVertex.put(gv, vertexList);
-        }
+        var vertexList = neighborsForVertex.computeIfAbsent(gv, k -> new ArrayList<>());
         vertexList.add(out);
 
         // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
-        vertexList = neighborsForVertex.get(out);
-        if (vertexList == null) {
-          vertexList = new ArrayList<>();
-          neighborsForVertex.put(out, vertexList);
-        }
+        vertexList = neighborsForVertex.computeIfAbsent(out, k -> new ArrayList<>());
         vertexList.add(gv);
       }
     }
@@ -391,16 +378,14 @@ public class PruneIslands implements GraphBuilderModule {
         continue;
       }
       Subgraph subgraph = computeConnectedSubgraph(neighborsForVertex, gv, subgraphs, newgraphs);
-      if (subgraph != null) {
-        for (Iterator<Vertex> vIter = subgraph.streetIterator(); vIter.hasNext();) {
-          Vertex subnode = vIter.next();
-          newgraphs.put(subnode, subgraph);
-        }
-        if (islands != null) {
-          islands.add(subgraph);
-        }
-        count++;
+      for (Iterator<Vertex> vIter = subgraph.streetIterator(); vIter.hasNext();) {
+        Vertex subnode = vIter.next();
+        newgraphs.put(subnode, subgraph);
       }
+      if (islands != null) {
+        islands.add(subgraph);
+      }
+      count++;
     }
     return count;
   }
@@ -413,7 +398,6 @@ public class PruneIslands implements GraphBuilderModule {
     TraverseMode traverseMode
   ) {
     int nothru = 0, removed = 0, restricted = 0;
-    Vertex sample = null;
     //iterate over the street vertex of the subgraph
     for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {
       Vertex v = vIter.next();
@@ -448,9 +432,6 @@ public class PruneIslands implements GraphBuilderModule {
               }
               if (changed) {
                 stats.put("noThru", stats.get("noThru") + 1);
-                if (sample == null || v instanceof OsmVertex) {
-                  sample = v;
-                }
                 nothru++;
               }
             } else {
@@ -473,9 +454,6 @@ public class PruneIslands implements GraphBuilderModule {
                 }
               }
               if (changed) {
-                if (sample == null || v instanceof OsmVertex) {
-                  sample = v;
-                }
                 if (permission == StreetTraversalPermission.NONE) {
                   // currently we must update spatial index manually, graph.removeEdge does not do that
                   vertexLinker.removePermanentEdgeFromIndex(pse);
@@ -504,13 +482,13 @@ public class PruneIslands implements GraphBuilderModule {
       }
     }
 
-    if (sample == null) {
+    if (stats.isEmpty()) {
       return false;
     }
     if (traverseMode == TraverseMode.WALK) {
       // note: do not unlink stop if only CAR mode is pruned
       // maybe this needs more logic for flex routing cases
-      List<String> stopLabels = new ArrayList<String>();
+      List<String> stopLabels = new ArrayList<>();
       for (Iterator<Vertex> vIter = island.stopIterator(); vIter.hasNext();) {
         Vertex v = vIter.next();
         stopLabels.add(v.getLabel());
@@ -525,29 +503,11 @@ public class PruneIslands implements GraphBuilderModule {
       if (island.stopSize() > 0) {
         // issue about stops that got unlinked in pruning
         issueStore.add(
-          new PrunedStopIsland(
-            sample,
-            island.streetSize(),
-            island.stopSize(),
-            nothru,
-            restricted,
-            removed,
-            String.join(", ", stopLabels)
-          )
+          new PrunedStopIsland(island, nothru, restricted, removed, String.join(", ", stopLabels))
         );
       }
     }
-    issueStore.add(
-      new GraphIsland(
-        sample,
-        island.streetSize(),
-        island.stopSize(),
-        nothru,
-        restricted,
-        removed,
-        traverseMode.name()
-      )
-    );
+    issueStore.add(new GraphIsland(island, nothru, restricted, removed, traverseMode.name()));
     return true;
   }
 
