@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.api.model;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DurationUtils;
 
 /**
@@ -75,6 +76,15 @@ public interface RaptorAccessEgress {
    */
   boolean hasOpeningHours();
 
+  /**
+   * Return the opening hours in a short human-readable way. Do not parse this, this should
+   * only be used for things like debugging and logging.
+   * <p>
+   * This method return {@code null} if there is no opening hours, see {@link #hasOpeningHours()}.
+   */
+  @Nullable
+  String openingHoursToString();
+
   /*
        ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS
 
@@ -149,15 +159,23 @@ public interface RaptorAccessEgress {
 
   /** Call this from toString */
   default String asString() {
-    String duration = DurationUtils.durationToStr(durationInSeconds());
-    return hasRides()
-      ? String.format(
-        "Flex%s %s %dx ~ %d",
-        stopReachedOnBoard() ? "" : "+Walk",
-        duration,
-        numberOfRides(),
-        stop()
-      )
-      : String.format("On-Street %s ~ %d", duration, stop());
+    StringBuilder buf = new StringBuilder();
+    if (isFree()) {
+      buf.append("Free");
+    } else if (hasRides()) {
+      buf.append(stopReachedOnBoard() ? "Flex+Walk" : "Flex");
+    } else {
+      buf.append("On-Street");
+    }
+    buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
+    if (hasRides()) {
+      buf.append(' ').append(numberOfRides()).append('x');
+    }
+    if (hasOpeningHours()) {
+      buf.append(' ').append(openingHoursToString());
+    }
+    buf.append(" ~ ").append(stop());
+
+    return buf.toString();
   }
 }

@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 import static org.opentripplanner.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.SECONDS_IN_DAY;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.api.PathUtils;
@@ -35,6 +35,9 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
  * traversed while "open".
  */
 public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
+
+  private static final int T00_18 = TimeUtils.time("00:18");
+  public static final int T00_20 = TimeUtils.time("00:20");
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -173,7 +176,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(hm2time(0, 18), T01_00));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_18, T01_00));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -196,7 +199,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(Duration.ofDays(2))
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(hm2time(0, 18), T01_00));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_18, T01_00));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -220,7 +223,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(hm2time(0, 18), T01_00));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_18, T01_00));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -242,7 +245,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_00, hm2time(0, 20)));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_00, T00_20));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -263,7 +266,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(Duration.ofDays(2))
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_00, hm2time(0, 20)));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_00, T00_20));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -286,7 +289,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_00, hm2time(0, 20)));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_00, T00_20));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -309,9 +312,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addAccessPaths(
-        TestAccessEgress.walk(STOP_B, D2m).openingHours(hm2time(0, 18), hm2time(0, 20))
-      );
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_18, T00_20));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -331,9 +332,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(Duration.ofDays(2))
-      .addAccessPaths(
-        TestAccessEgress.walk(STOP_B, D2m).openingHours(hm2time(0, 18), hm2time(0, 20))
-      );
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_18, T00_20));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -354,9 +353,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addAccessPaths(
-        TestAccessEgress.walk(STOP_B, D2m).openingHours(hm2time(0, 18), hm2time(0, 20))
-      );
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_18, T00_20));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -375,7 +372,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(Duration.ofDays(2))
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_01, T00_00));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m).openingHoursClosed());
 
     var response = raptorService.route(requestBuilder.build(), data);
 

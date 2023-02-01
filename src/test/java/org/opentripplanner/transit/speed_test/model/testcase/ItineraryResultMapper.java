@@ -76,7 +76,7 @@ class ItineraryResultMapper {
 
     for (Leg leg : itin.getLegs()) {
       var fromStop = leg.getFrom().stop;
-      if(fromStop != null) {
+      if (fromStop != null) {
         buf.stop(formatStop(fromStop));
       }
 

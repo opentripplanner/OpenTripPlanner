@@ -81,7 +81,7 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
       RaptorConstants.TIME_NOT_SET,
       subject.calculateEgressDepartureTime(
         T00_30,
-        TestAccessEgress.walk(STOP, D8m).openingHours(5, 4),
+        TestAccessEgress.free(STOP).openingHoursClosed(),
         TRANSFER_SLACK
       )
     );

@@ -274,7 +274,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(D25h)
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_01, T00_00));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHoursClosed());
 
     assertEquals("", runSearch());
   }
