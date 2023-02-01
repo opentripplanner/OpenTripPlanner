@@ -104,7 +104,8 @@ public class SpeedIntegrationTest {
     var config = SpeedTestConfig.config(opts.rootDir());
     var speedTest = new SpeedTest(opts, config, model.graph(), model.transitModel());
 
-    // Run without Transfer Optimization
+    // We want to validate the Raptor paths without changes done by the OptimizeTransfers
+    // and itinerary filter chain(set to debug in config)
     OTPFeature.OptimizeTransfers.testOff(speedTest::runTest);
 
     assertEquals(

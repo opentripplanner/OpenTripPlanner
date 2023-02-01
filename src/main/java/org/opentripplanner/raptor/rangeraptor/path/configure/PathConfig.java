@@ -60,31 +60,35 @@ public class PathConfig<T extends RaptorTripSchedule> {
   }
 
   private ParetoComparator<RaptorPath<T>> paretoComparator(boolean includeCost) {
-    double relaxedCost = ctx.searchParams().relaxCostAtDestination();
-    boolean includeRelaxedCost = includeCost && relaxedCost > 0.0;
+    boolean includeRelaxedCost =
+      includeCost && ctx.searchParams().relaxCostAtDestination().isPresent();
     boolean includeTimetable = ctx.searchParams().timetable();
     boolean preferLateArrival = ctx.searchParams().preferLateArrival();
 
-    if (includeTimetable && includeRelaxedCost) {
-      return comparatorWithTimetableAndRelaxedCost(relaxedCost);
-    }
-    if (includeTimetable && includeCost) {
-      return comparatorWithTimetableAndCost();
-    }
-    if (includeTimetable) {
-      return comparatorWithTimetable();
-    }
-    if (includeRelaxedCost && preferLateArrival) {
-      return comparatorWithRelaxedCostAndLatestDeparture(relaxedCost);
-    }
     if (includeRelaxedCost) {
+      double relaxedCost = ctx.searchParams().relaxCostAtDestination().get();
+
+      if (includeTimetable) {
+        return comparatorWithTimetableAndRelaxedCost(relaxedCost);
+      }
+      if (preferLateArrival) {
+        return comparatorWithRelaxedCostAndLatestDeparture(relaxedCost);
+      }
       return comparatorWithRelaxedCost(relaxedCost);
     }
-    if (includeCost && preferLateArrival) {
-      return comparatorWithCostAndLatestDeparture();
-    }
+
     if (includeCost) {
+      if (includeTimetable) {
+        return comparatorWithTimetableAndCost();
+      }
+      if (preferLateArrival) {
+        return comparatorWithCostAndLatestDeparture();
+      }
       return comparatorWithCost();
+    }
+
+    if (includeTimetable) {
+      return comparatorWithTimetable();
     }
     if (preferLateArrival) {
       return comparatorStandardAndLatestDepature();

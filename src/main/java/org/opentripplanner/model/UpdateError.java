@@ -37,6 +37,7 @@ public record UpdateError(
     TRIP_ALREADY_EXISTS,
     NO_START_DATE,
     NO_UPDATES,
+    NO_TRIP_ID,
     TOO_FEW_STOPS,
     NO_VALID_STOPS,
     NO_SERVICE_ON_DATE,

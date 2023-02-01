@@ -48,7 +48,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
-import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -141,17 +140,18 @@ public class LegacyGraphQLQueryTypeImpl
         .stream()
         .filter(alert ->
           args.getLegacyGraphQLFeeds() == null ||
-          ((List<String>) args.getLegacyGraphQLFeeds()).contains(alert.getFeedId())
+          ((List<String>) args.getLegacyGraphQLFeeds()).contains(alert.getId().getFeedId())
         )
         .filter(alert ->
-          severities == null || severities.contains(getLegacyGraphQLSeverity(alert.severity))
+          severities == null || severities.contains(getLegacyGraphQLSeverity(alert.severity()))
         )
-        .filter(alert -> effects == null || effects.contains(getLegacyGraphQLEffect(alert.effect)))
-        .filter(alert -> causes == null || causes.contains(getLegacyGraphQLCause(alert.cause)))
+        .filter(alert -> effects == null || effects.contains(getLegacyGraphQLEffect(alert.effect()))
+        )
+        .filter(alert -> causes == null || causes.contains(getLegacyGraphQLCause(alert.cause())))
         .filter(alert ->
           args.getLegacyGraphQLRoute() == null ||
           alert
-            .getEntities()
+            .entities()
             .stream()
             .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
             .map(EntitySelector.Route.class::cast)
@@ -162,7 +162,7 @@ public class LegacyGraphQLQueryTypeImpl
         .filter(alert ->
           args.getLegacyGraphQLStop() == null ||
           alert
-            .getEntities()
+            .entities()
             .stream()
             .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
             .map(EntitySelector.Stop.class::cast)
@@ -746,6 +746,7 @@ public class LegacyGraphQLQueryTypeImpl
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
 
+      var transitDisabled = false;
       if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
         var filterRequestBuilder = TransitFilterRequest.of();
 
@@ -796,19 +797,19 @@ public class LegacyGraphQLQueryTypeImpl
           request.journey().direct().setMode(requestModes.directMode);
           request.journey().transfer().setMode(requestModes.transferMode);
 
-          var tModes = modes
-            .getTransitModes()
-            .stream()
-            .map(MainAndSubMode::new)
-            .collect(Collectors.toList());
+          var tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
           if (tModes.isEmpty()) {
-            tModes = MainAndSubMode.all();
+            transitDisabled = true;
+          } else {
+            filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
           }
-
-          filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
         }
 
-        request.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
+        if (transitDisabled) {
+          request.journey().transit().disable();
+        } else {
+          request.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
+        }
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {

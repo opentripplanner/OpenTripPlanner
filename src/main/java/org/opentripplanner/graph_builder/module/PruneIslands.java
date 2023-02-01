@@ -27,6 +27,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
+import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -447,7 +448,9 @@ public class PruneIslands implements GraphBuilderModule {
               }
               if (changed) {
                 stats.put("noThru", stats.get("noThru") + 1);
-                sample = v;
+                if (sample == null || v instanceof OsmVertex) {
+                  sample = v;
+                }
                 nothru++;
               }
             } else {
@@ -470,7 +473,9 @@ public class PruneIslands implements GraphBuilderModule {
                 }
               }
               if (changed) {
-                sample = v;
+                if (sample == null || v instanceof OsmVertex) {
+                  sample = v;
+                }
                 if (permission == StreetTraversalPermission.NONE) {
                   // currently we must update spatial index manually, graph.removeEdge does not do that
                   vertexLinker.removePermanentEdgeFromIndex(pse);

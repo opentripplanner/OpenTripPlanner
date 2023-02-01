@@ -337,10 +337,24 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   /**
+   * @return true if this TripTimes is canceled or soft-deleted
+   */
+  public boolean isCanceledOrDeleted() {
+    return isCanceled() || isDeleted();
+  }
+
+  /**
    * @return true if this TripTimes is canceled
    */
   public boolean isCanceled() {
     return realTimeState == RealTimeState.CANCELED;
+  }
+
+  /**
+   * @return true if this TripTimes is soft-deleted, and should not be visible to the user
+   */
+  public boolean isDeleted() {
+    return realTimeState == RealTimeState.DELETED;
   }
 
   /**
@@ -382,6 +396,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   /** Cancel this entire trip */
   public void cancelTrip() {
     realTimeState = RealTimeState.CANCELED;
+  }
+
+  /** Soft delete the entire trip */
+  public void deleteTrip() {
+    realTimeState = RealTimeState.DELETED;
   }
 
   public void updateDepartureTime(final int stop, final int time) {

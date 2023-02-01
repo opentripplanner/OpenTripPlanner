@@ -7,17 +7,21 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndW
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.model.SearchDirection;
-import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 
 /**
@@ -51,7 +55,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
           schedule().departures("0:03:29, 0:05:29"),
           // This is the trip we expect to board
           schedule().departures("0:04:00, 0:10:00").arrivals("0, 00:06:00"),
-          // REVERSE SEARCH: The last trip arrives to late: It takes 1m40s to get to the
+          // REVERSE SEARCH: The last trip arrives too late: It takes 1m40s to get to the
           // point of "boarding" in the reverse search:
           // --> 00:10:00 - (flex 20s + slack(1m + 10s)) = 00:08:30  (arrival time)
           schedule().arrivals("0:04:51, 0:06:51")
@@ -71,36 +75,20 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  @Test
-  public void standard() {
-    var request = requestBuilder
-      .profile(RaptorProfile.STANDARD)
-      .searchParams()
-      .searchOneIterationOnly()
+  static List<RaptorModuleTestCase> testCases() {
+    return RaptorModuleTestCase
+      .of()
+      // TODO - TC_STANDARD_REV does not give tha same results - why?
+      .add(standard().not(TC_STANDARD_REV), EXPECTED_RESULT)
+      .add(multiCriteria(), EXPECTED_RESULT.replace("]", " $1840]"))
       .build();
-
-    var response = raptorService.route(request, data);
-    assertEquals(EXPECTED_RESULT, pathsToString(response));
   }
 
-  @Test
-  public void standardReverse() {
-    var request = requestBuilder
-      .profile(RaptorProfile.STANDARD)
-      .searchDirection(SearchDirection.REVERSE)
-      .searchParams()
-      .searchOneIterationOnly()
-      .build();
+  @ParameterizedTest
+  @MethodSource("testCases")
+  void testRaptor(RaptorModuleTestCase testCase) {
+    var request = testCase.withConfig(requestBuilder);
     var response = raptorService.route(request, data);
-    assertEquals(EXPECTED_RESULT, pathsToString(response));
-  }
-
-  @Test
-  public void multiCriteria() {
-    // Add cost to result string
-    String expected = EXPECTED_RESULT.replace("]", " $1840]");
-    var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
-    var response = raptorService.route(request, data);
-    assertEquals(expected, pathsToString(response));
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 }

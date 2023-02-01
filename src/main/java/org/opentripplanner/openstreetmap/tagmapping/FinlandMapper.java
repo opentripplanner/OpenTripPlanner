@@ -7,7 +7,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import java.util.function.BiFunction;
+import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -28,9 +28,10 @@ class FinlandMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    BiFunction<StreetTraversalPermission, Float, Double> defaultWalkSafetyForPermission = (
+    TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultWalkSafetyForPermission = (
         permission,
-        speedLimit
+        speedLimit,
+        way
       ) ->
       switch (permission) {
         case ALL, PEDESTRIAN_AND_CAR -> {

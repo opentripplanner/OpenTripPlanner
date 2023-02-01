@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.preference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import java.time.Instant;
@@ -27,12 +28,15 @@ class RaptorPreferencesTest {
     .atStartOfDay(ZoneIds.UTC)
     .toInstant();
 
+  private static final double RELAX_GENERALIZED_COST_AT_DESTINATION = 1.2;
+
   private final RaptorPreferences subject = RaptorPreferences
     .of()
     .withSearchDirection(SEARCH_DIRECTION)
     .withProfile(PROFILE)
     .withOptimizations(OPTIMIZATIONS)
     .withTimeLimit(TIME_LIMIT)
+    .withRelaxGeneralizedCostAtDestination(RELAX_GENERALIZED_COST_AT_DESTINATION)
     .build();
 
   @Test
@@ -81,6 +85,33 @@ class RaptorPreferencesTest {
   }
 
   @Test
+  void relaxGeneralizedCostAtDestination() {
+    // Default is not set (null)
+    assertTrue(RaptorPreferences.of().build().relaxGeneralizedCostAtDestination().isEmpty());
+    assertEquals(
+      RELAX_GENERALIZED_COST_AT_DESTINATION,
+      subject.relaxGeneralizedCostAtDestination().orElseThrow()
+    );
+    assertEquals(
+      1.0,
+      RaptorPreferences
+        .of()
+        .withRelaxGeneralizedCostAtDestination(1.0)
+        .build()
+        .relaxGeneralizedCostAtDestination()
+        .orElseThrow()
+    );
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> RaptorPreferences.of().withRelaxGeneralizedCostAtDestination(0.99).build()
+    );
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> RaptorPreferences.of().withRelaxGeneralizedCostAtDestination(2.01).build()
+    );
+  }
+
+  @Test
   void testEqualsAndHashCode() {
     // Return same object if no value is set
     assertSame(RaptorPreferences.DEFAULT, RaptorPreferences.of().build());
@@ -100,7 +131,8 @@ class RaptorPreferencesTest {
       "optimizations: [PARALLEL], " +
       "profile: STANDARD, " +
       "searchDirection: REVERSE, " +
-      "timeLimit: 2020-06-09T00:00:00Z" +
+      "timeLimit: 2020-06-09T00:00:00Z, " +
+      "relaxGeneralizedCostAtDestination: 1.2" +
       "}",
       subject.toString()
     );

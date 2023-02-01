@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.filter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.BUS_ROUTE;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
@@ -16,6 +16,8 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class TransitAlertFilterTest implements PlanTestConstants {
+
+  private static final FeedScopedId ID = new FeedScopedId("FEED", "BUS");
 
   @Test
   void testFilter() {
@@ -38,18 +40,16 @@ class TransitAlertFilterTest implements PlanTestConstants {
     // Then: expect correct alerts to be added
     Itinerary first = list.get(0);
     assertEquals(1, first.getLegs().get(0).getTransitAlerts().size());
-    assertEquals("BUS", first.getLegs().get(0).getTransitAlerts().iterator().next().getId());
+    assertEquals(ID, first.getLegs().get(0).getTransitAlerts().iterator().next().getId());
     assertEquals(0, list.get(1).getLegs().get(0).getTransitAlerts().size());
   }
 
   abstract static class TestTransitAlertService implements TransitAlertService {
 
-    public static final TransitAlert BUS_ALERT = new TransitAlert();
-
-    static {
-      BUS_ALERT.setId("BUS");
-      BUS_ALERT.setTimePeriods(List.of(new TimePeriod(0, TimePeriod.OPEN_ENDED)));
-    }
+    public static final TransitAlert BUS_ALERT = TransitAlert
+      .of(ID)
+      .addTimePeriod(new TimePeriod(0, TimePeriod.OPEN_ENDED))
+      .build();
 
     @Override
     public Collection<TransitAlert> getRouteAlerts(FeedScopedId route) {

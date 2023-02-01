@@ -26,7 +26,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   private boolean preferLateArrival;
   private int numberOfAdditionalTransfers;
   private int maxNumberOfTransfers;
-  private double relaxCostAtDestination;
+  private Double relaxCostAtDestination;
   private boolean timetable;
   private boolean constrainedTransfers;
   private boolean allowEmptyEgressPaths;
@@ -39,7 +39,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     this.preferLateArrival = defaults.preferLateArrival();
     this.numberOfAdditionalTransfers = defaults.numberOfAdditionalTransfers();
     this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
-    this.relaxCostAtDestination = defaults.relaxCostAtDestination();
+    this.relaxCostAtDestination = defaults.relaxCostAtDestination().orElse(null);
     this.timetable = defaults.timetable();
     this.constrainedTransfers = defaults.constrainedTransfers();
     this.accessPaths.addAll(defaults.accessPaths());
@@ -115,11 +115,11 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     return this;
   }
 
-  public double relaxCostAtDestination() {
+  public Double relaxCostAtDestination() {
     return relaxCostAtDestination;
   }
 
-  public SearchParamsBuilder<T> relaxCostAtDestination(double relaxCostAtDestination) {
+  public SearchParamsBuilder<T> relaxCostAtDestination(Double relaxCostAtDestination) {
     this.relaxCostAtDestination = relaxCostAtDestination;
     return this;
   }
@@ -199,6 +199,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
       .addDurationSec("searchWindow", searchWindowInSeconds)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
+      .addNum("relaxCostAtDestination", relaxCostAtDestination)
       .addCollection("accessPaths", accessPaths, 5)
       .addCollection("egressPaths", egressPaths, 5)
       .toString();

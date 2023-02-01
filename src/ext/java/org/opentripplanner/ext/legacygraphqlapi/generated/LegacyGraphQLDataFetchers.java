@@ -361,6 +361,8 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> mode();
 
+    public DataFetcher<Iterable<Leg>> nextLegs();
+
     public DataFetcher<org.opentripplanner.model.BookingInfo> pickupBookingInfo();
 
     public DataFetcher<String> pickupType();
