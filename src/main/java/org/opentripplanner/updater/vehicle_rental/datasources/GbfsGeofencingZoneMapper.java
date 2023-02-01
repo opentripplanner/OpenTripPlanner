@@ -4,6 +4,8 @@ import com.google.common.hash.Hashing;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
+import org.entur.gbfs.v2_2.geofencing_zones.GBFSFeature;
 import org.entur.gbfs.v2_2.geofencing_zones.GBFSGeofencingZones;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -32,28 +34,31 @@ class GbfsGeofencingZoneMapper {
       .getGeofencingZones()
       .getFeatures()
       .stream()
-      .map(f -> {
-        try {
-          var g = GeometryUtils.convertGeoJsonToJtsGeometry(f.getGeometry());
-          var name = Objects.requireNonNullElseGet(
-            f.getProperties().getName(),
-            () -> fallbackId(g)
-          );
-          var dropOffBanned = !f.getProperties().getRules().get(0).getRideAllowed();
-          var passThroughBanned = !f.getProperties().getRules().get(0).getRideThroughAllowed();
-          return new GeofencingZone(
-            new FeedScopedId(systemId, name),
-            g,
-            dropOffBanned,
-            passThroughBanned
-          );
-        } catch (UnsupportedGeometryException e) {
-          LOG.error("Could not convert geofencing zone", e);
-          return null;
-        }
-      })
+      .map(this::toInternalModel)
       .filter(Objects::nonNull)
       .toList();
+  }
+
+  /**
+   * Convert the GBFS type to the internal model.
+   */
+  @Nullable
+  private GeofencingZone toInternalModel(GBFSFeature f) {
+    try {
+      var g = GeometryUtils.convertGeoJsonToJtsGeometry(f.getGeometry());
+      var name = Objects.requireNonNullElseGet(f.getProperties().getName(), () -> fallbackId(g));
+      var dropOffBanned = !f.getProperties().getRules().get(0).getRideAllowed();
+      var passThroughBanned = !f.getProperties().getRules().get(0).getRideThroughAllowed();
+      return new GeofencingZone(
+        new FeedScopedId(systemId, name),
+        g,
+        dropOffBanned,
+        passThroughBanned
+      );
+    } catch (UnsupportedGeometryException e) {
+      LOG.error("Could not convert geofencing zone", e);
+      return null;
+    }
   }
 
   /**
