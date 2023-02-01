@@ -154,7 +154,7 @@ class GeofencingVertexUpdater {
   private Set<Edge> getEdgesAlongLineStrings(Collection<LineString> lineStrings) {
     return lineStrings
       .stream()
-      .flatMap(ls -> GeometryUtils.partitionLineString(ls, 10).stream())
+      .flatMap(ls -> GeometryUtils.partitionLineString(ls, 2).stream())
       .map(GeofencingVertexUpdater::toEnvelope)
       .map(getEdgesForEnvelope)
       .flatMap(Collection::stream)
