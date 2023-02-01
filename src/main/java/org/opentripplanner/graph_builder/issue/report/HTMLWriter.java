@@ -38,7 +38,7 @@ class HTMLWriter {
     this.target = reportDirectory.entry(filename + ".html");
     this.keys = keys;
     this.issues = null;
-    this.bucketKey = null;
+    this.bucketKey = new BucketKey(filename, null);
   }
 
   void writeFile() {
