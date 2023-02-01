@@ -4,10 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -21,7 +22,7 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
 
   private static final int STOP = 8;
 
-  private static final RaptorAccessEgress WALK_8m = TestAccessEgress.walk(STOP, D8m);
+  private static final RaptorAccessEgress WALK_8m = walk(STOP, D8m);
   private static final RaptorAccessEgress FLEX_1x_8m = flex(STOP, D8m, 1);
   private static final RaptorAccessEgress FLEX_AND_WALK_1x_8m = flexAndWalk(STOP, D8m, 1);
 
@@ -52,7 +53,7 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
       T00_30,
       subject.calculateEgressDepartureTime(
         T00_30,
-        TestAccessEgress.walk(STOP, D8m).openingHours(T00_00, T01_00),
+        walk(STOP, D8m).openingHours(T00_00, T01_00),
         TRANSFER_SLACK
       )
     );
@@ -61,7 +62,7 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
       T00_30,
       subject.calculateEgressDepartureTime(
         T00_10,
-        TestAccessEgress.walk(STOP, D8m).openingHours(T00_30, T01_00),
+        walk(STOP, D8m).openingHours(T00_30, T01_00),
         TRANSFER_SLACK
       )
     );
@@ -71,7 +72,7 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
       T00_10 + D24h,
       subject.calculateEgressDepartureTime(
         T00_31,
-        TestAccessEgress.walk(STOP, D8m).openingHours(T00_10, T00_30),
+        walk(STOP, D8m).openingHours(T00_10, T00_30),
         TRANSFER_SLACK
       )
     );
@@ -79,11 +80,7 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
     // If egress is are closed (opening hours) then -1 should be returned
     assertEquals(
       RaptorConstants.TIME_NOT_SET,
-      subject.calculateEgressDepartureTime(
-        T00_30,
-        TestAccessEgress.free(STOP).openingHoursClosed(),
-        TRANSFER_SLACK
-      )
+      subject.calculateEgressDepartureTime(T00_30, free(STOP).openingHoursClosed(), TRANSFER_SLACK)
     );
   }
 }

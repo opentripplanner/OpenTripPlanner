@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
@@ -16,7 +17,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
@@ -59,7 +59,7 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
       // All access paths are all pareto-optimal (McRaptor).
       .addAccessPaths(
         // lowest num-of-transfers (0)
-        TestAccessEgress.walk(STOP_B, D10m, COST_ONE_STOP + COST_TRANSFER_SLACK),
+        walk(STOP_B, D10m, COST_ONE_STOP + COST_TRANSFER_SLACK),
         // lowest cost
         flexAndWalk(STOP_C, D2m, TWO_RIDES, 2 * COST_ONE_STOP - COST_ONE_SEC),
         // latest departure time
@@ -67,7 +67,7 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
         // best on combination of transfers and time
         flexAndWalk(STOP_E, D7m, ONE_RIDE, 4 * COST_ONE_STOP)
       )
-      .addEgressPaths(TestAccessEgress.walk(STOP_F, D1m));
+      .addEgressPaths(walk(STOP_F, D1m));
 
     requestBuilder.searchParams().earliestDepartureTime(T00_00).latestArrivalTime(T00_30);
 

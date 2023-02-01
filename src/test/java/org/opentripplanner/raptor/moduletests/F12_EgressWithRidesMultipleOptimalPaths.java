@@ -5,6 +5,7 @@ import static org.opentripplanner.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
@@ -106,9 +107,7 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
   @MethodSource("withFlexAsBestOptionTestCases")
   void withFlexAsBestOptionTest(RaptorModuleTestCase testCase) {
     // with Flex egress as the best destination arrival-time
-    requestBuilder
-      .searchParams()
-      .addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), TestAccessEgress.walk(STOP_C, D7m));
+    requestBuilder.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D7m));
 
     var request = testCase.withConfig(requestBuilder);
     var response = raptorService.route(request, data);
@@ -127,9 +126,7 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
   @MethodSource("withWalkingAsBestOptionTestCase")
   void withWalkingAsBestOptionTest(RaptorModuleTestCase testCase) {
     // with walk egress as the best destination arrival-time
-    requestBuilder
-      .searchParams()
-      .addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), TestAccessEgress.walk(STOP_C, D5m));
+    requestBuilder.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D5m));
 
     var request = testCase.withConfig(requestBuilder);
     var response = raptorService.route(request, data);

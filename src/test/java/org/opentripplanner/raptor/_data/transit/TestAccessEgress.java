@@ -1,5 +1,8 @@
 package org.opentripplanner.raptor._data.transit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 
 import java.util.ArrayList;
@@ -40,6 +43,17 @@ public class TestAccessEgress implements RaptorAccessEgress {
     this.opening = builder.opening;
     this.closing = builder.closing;
     this.closed = builder.closed;
+
+    if (free) {
+      assertEquals(0, durationInSeconds);
+    } else {
+      assertTrue(durationInSeconds > 0);
+    }
+    if (closed) {
+      assertNull(opening);
+      assertNull(closing);
+    }
+    assertTrue(numberOfRides >= 0);
   }
 
   public static TestAccessEgress free(int stop) {
@@ -283,6 +297,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     }
 
     Builder(TestAccessEgress original) {
+      this.free = original.free;
       this.stop = original.stop;
       this.durationInSeconds = original.durationInSeconds;
       this.stopReachedOnBoard = original.stopReachedOnBoard;
@@ -295,6 +310,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
 
     Builder withFree() {
       this.free = true;
+      this.durationInSeconds = 0;
       return this;
     }
 

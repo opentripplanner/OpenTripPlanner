@@ -49,10 +49,6 @@ public class PathStringBuilder {
     return legSep().text(stop).text("Rental").duration(duration);
   }
 
-  public PathStringBuilder flex(int duration, int nRides) {
-    return legSep().text("Flex").duration(duration).text(nRides + "x");
-  }
-
   public PathStringBuilder accessEgress(RaptorAccessEgress leg) {
     if (leg.isFree()) {
       return this;
