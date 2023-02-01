@@ -52,6 +52,11 @@ public sealed interface RentalRestrictionExtension {
   List<RentalRestrictionExtension> toList();
 
   /**
+   * List all networks that have a restriction in this extension.
+   */
+  List<String> networks();
+
+  /**
    * No restriction on traversal which is the default.
    */
   final class NoRestriction implements RentalRestrictionExtension {
@@ -78,6 +83,11 @@ public sealed interface RentalRestrictionExtension {
 
     @Override
     public List<RentalRestrictionExtension> toList() {
+      return List.of();
+    }
+
+    @Override
+    public List<String> networks() {
       return List.of();
     }
   }
@@ -137,6 +147,11 @@ public sealed interface RentalRestrictionExtension {
     }
 
     @Override
+    public List<String> networks() {
+      return List.of(zone.id().getFeedId());
+    }
+
+    @Override
     public String toString() {
       return zone.id().toString();
     }
@@ -171,6 +186,11 @@ public sealed interface RentalRestrictionExtension {
     @Override
     public List<RentalRestrictionExtension> toList() {
       return List.of(this);
+    }
+
+    @Override
+    public List<String> networks() {
+      return List.of(network);
     }
   }
 
@@ -252,6 +272,11 @@ public sealed interface RentalRestrictionExtension {
     @Override
     public List<RentalRestrictionExtension> toList() {
       return List.copyOf(Arrays.asList(exts));
+    }
+
+    @Override
+    public List<String> networks() {
+      return Arrays.stream(exts).flatMap(e -> e.networks().stream()).toList();
     }
   }
 

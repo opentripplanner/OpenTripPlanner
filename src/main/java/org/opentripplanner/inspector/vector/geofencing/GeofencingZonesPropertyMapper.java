@@ -20,16 +20,17 @@ public class GeofencingZonesPropertyMapper extends PropertyMapper<Vertex> {
     var ext = input.rentalRestrictions();
 
     // this logic does a best effort attempt at a simple mapping
-    // once you have several networks on the same edge it breaks down for that you would
-    // really need several layers
+    // once you have several networks on the same vertex it breaks down.
+    // for that you would really need several layers.
     // still, for a quick visualization it is useful
     var debug = ext.debugTypes();
+    var networks = new KeyValue("networks", String.join(",", ext.networks()));
     if (debug.contains(BUSINESS_AREA_BORDER)) {
-      return List.of(new KeyValue("type", "business-area-border"));
+      return List.of(new KeyValue("type", "business-area-border"), networks);
     } else if (debug.contains(NO_TRAVERSAL)) {
-      return List.of(new KeyValue("type", "traversal-banned"));
+      return List.of(new KeyValue("type", "traversal-banned"), networks);
     } else if (debug.contains(NO_DROP_OFF)) {
-      return List.of(new KeyValue("type", "drop-off-banned"));
+      return List.of(new KeyValue("type", "drop-off-banned"), networks);
     } else {
       return List.of();
     }
