@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.issue.report;
 
-import com.google.common.collect.Multiset;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.List;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
@@ -15,32 +15,34 @@ class HTMLWriter {
   private static final Logger LOG = LoggerFactory.getLogger(HTMLWriter.class);
   private final DataSource target;
   private final Collection<DataImportIssue> issues;
-  private final String issueTypeName;
+  private final BucketKey bucketKey;
+  private final List<BucketKey> keys;
 
-  HTMLWriter(CompositeDataSource reportDirectory, String key, Collection<DataImportIssue> issues) {
-    LOG.debug("Creating file: {}", key);
-    this.target = reportDirectory.entry(key + ".html");
-    this.issues = issues;
-    this.issueTypeName = key;
+  HTMLWriter(CompositeDataSource reportDirectory, Bucket bucket, List<BucketKey> keys) {
+    this.bucketKey = bucket.key();
+    LOG.debug("Creating file: {}", bucketKey.key());
+    this.target = reportDirectory.entry(bucketKey.key() + ".html");
+    this.keys = keys;
+    this.issues = bucket.issues();
   }
 
-  HTMLWriter(CompositeDataSource reportDirectory, String filename) {
+  HTMLWriter(CompositeDataSource reportDirectory, String filename, List<BucketKey> keys) {
     LOG.debug("Creating index file: {}", filename);
     this.target = reportDirectory.entry(filename + ".html");
+    this.keys = keys;
     this.issues = null;
-    this.issueTypeName = filename;
+    this.bucketKey = null;
   }
 
-  void writeFile(Iterable<Multiset.Entry<String>> classes) {
+  void writeFile() {
     try (PrintWriter out = new PrintWriter(target.asOutputStream(), true, StandardCharsets.UTF_8)) {
       printPrelude(out);
 
-      out.println(
-        String.format("<h1>OpenTripPlanner data import issue log for %s</h1>", issueTypeName)
-      );
+      String title = bucketKey.label();
+      out.println(String.format("<h1>OpenTripPlanner data import issue log%s</h1>", title));
       out.println("<h2>Graph report for <em>graph.obj</em></h2>");
 
-      printCategoryLinks(classes, out);
+      printCategoryLinks(out);
 
       if (issues != null) {
         writeIssues(out);
@@ -68,32 +70,26 @@ class HTMLWriter {
   /**
    * Adds links to the other HTML files.
    */
-  private void printCategoryLinks(Iterable<Multiset.Entry<String>> classes, PrintWriter out) {
+  private void printCategoryLinks(PrintWriter out) {
     out.println("<p>");
-    for (Multiset.Entry<String> htmlIssueType : classes) {
-      String label_name = htmlIssueType.getElement();
-      String label;
-      int currentCount = 1;
-      //it needs to add link to every file even if they are split
-      while (currentCount <= htmlIssueType.getCount()) {
-        label = label_name + currentCount;
-        if (label.equals(issueTypeName)) {
-          out.printf(
-            "<button class='pure-button pure-button-disabled button-%s' style='background-color: %s;'>%s</button>%n",
-            label_name.toLowerCase(),
-            IssueColors.rgb(label_name),
-            label
-          );
-        } else {
-          out.printf(
-            "<a class='pure-button button-%s' href=\"%s.html\" style='background-color: %s;'>%s</a>%n",
-            label_name.toLowerCase(),
-            label,
-            IssueColors.rgb(label_name),
-            label
-          );
-        }
-        currentCount++;
+    for (BucketKey linkKey : keys) {
+      String linkIssueType = linkKey.issueType();
+      String label = linkKey.label();
+      if (linkKey.equals(bucketKey)) {
+        out.printf(
+          "<button class='pure-button pure-button-disabled button-%s' style='background-color: %s;'>%s</button>%n",
+          linkIssueType.toLowerCase(),
+          IssueColors.rgb(linkIssueType),
+          label
+        );
+      } else {
+        out.printf(
+          "<a class='pure-button button-%s' href=\"%s.html\" style='background-color: %s;'>%s</a>%n",
+          linkIssueType.toLowerCase(),
+          linkKey.key(),
+          IssueColors.rgb(linkIssueType),
+          label
+        );
       }
     }
     out.println("</p>");

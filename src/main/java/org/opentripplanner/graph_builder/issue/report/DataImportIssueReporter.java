@@ -1,12 +1,8 @@
 package org.opentripplanner.graph_builder.issue.report;
 
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multiset;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +33,6 @@ public class DataImportIssueReporter implements GraphBuilderModule {
   //This is because browsers aren't made for giant HTML files which can be made with 500k lines
   private final int maxNumberOfIssuesPerFile;
 
-  //This counts all occurrences of HTML issue type
-  //If one issue type is split into two files it has two entries in this Multiset
-  //IT is used to show numbers in HTML files name and links
-  private final Multiset<String> issueTypeOccurrences = HashMultiset.create();
-
-  //List of writers which are used for actual writing issues to HTML
-  private final List<HTMLWriter> writers = new ArrayList<>();
-
   private final DataImportIssueStore issueStore;
 
   public DataImportIssueReporter(
@@ -60,52 +48,22 @@ public class DataImportIssueReporter implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     try {
-      // Delete all files in the report directory if it exist
+      // Delete all files in the report directory if it exists
       if (!deleteReportDirectoryAndContent()) {
         return;
       }
       LOG.info("Creating data import issue log");
 
-      //Groups issues according to issue type
-      Map<String, List<DataImportIssue>> sortedIssuesByType = issueStore
-        .listIssues()
-        .stream()
-        .collect(Collectors.groupingBy(DataImportIssue::getType));
+      List<Bucket> buckets = partitionIssues();
+      List<BucketKey> keys = buckets.stream().map(Bucket::key).sorted().toList();
 
-      // Sort each issue type by priority
-      for (Map.Entry<String, List<DataImportIssue>> entry : sortedIssuesByType.entrySet()) {
-        addIssues(
-          entry.getKey(),
-          entry
-            .getValue()
-            .stream()
-            .sorted(Comparator.comparing(DataImportIssue::getPriority))
-            .collect(
-              Collectors.collectingAndThen(
-                Collectors.toList(),
-                l -> {
-                  Collections.reverse(l);
-                  return l;
-                }
-              )
-            )
-        );
-      }
-
-      Iterable<Multiset.Entry<String>> sortedIssueTypes = ImmutableSortedMultiset
-        .copyOf(issueTypeOccurrences)
-        .entrySet();
-
-      //Actual writing to the file is made here since
-      // this is the first place where actual number of files is known (because it depends on
-      // the issue count)
-      for (HTMLWriter writer : writers) {
-        writer.writeFile(sortedIssueTypes);
+      for (Bucket bucket : buckets) {
+        new HTMLWriter(reportDirectory, bucket, keys).writeFile();
       }
 
       try {
-        HTMLWriter indexFileWriter = new HTMLWriter(reportDirectory, "index");
-        indexFileWriter.writeFile(sortedIssueTypes);
+        HTMLWriter indexFileWriter = new HTMLWriter(reportDirectory, "index", keys);
+        indexFileWriter.writeFile();
       } catch (Exception e) {
         LOG.error("Index file couldn't be created:{}", e.getMessage());
       }
@@ -153,31 +111,40 @@ public class DataImportIssueReporter implements GraphBuilderModule {
   }
 
   /**
-   * Creates file with given type of issues
-   * <p>
-   * If number of issues is larger then 'maxNumberOfIssuesPerFile' multiple files are generated. And
-   * named issueClassName1,2,3 etc.
-   *
-   * @param issueTypeName name of import data issue class and then also filename
-   * @param issues        list of all import data issue with that class
+   * Creates buckets, where each bucket has only a single issue type and max approximately
+   * {@link this#maxNumberOfIssuesPerFile} issues
    */
-  private void addIssues(String issueTypeName, List<DataImportIssue> issues) {
-    HTMLWriter file_writer;
-    if (issues.size() > 1.2 * maxNumberOfIssuesPerFile) {
-      LOG.debug("Number of issues is very large. Splitting: {}", issueTypeName);
-      List<List<DataImportIssue>> partitions = Lists.partition(issues, maxNumberOfIssuesPerFile);
-      for (List<DataImportIssue> partition : partitions) {
-        issueTypeOccurrences.add(issueTypeName);
-        int labelCount = issueTypeOccurrences.count(issueTypeName);
-        file_writer = new HTMLWriter(reportDirectory, issueTypeName + labelCount, partition);
-        writers.add(file_writer);
+  private List<Bucket> partitionIssues() {
+    //Groups issues according to issue type
+    Map<String, List<DataImportIssue>> sortedIssuesByType = issueStore
+      .listIssues()
+      .stream()
+      .collect(Collectors.groupingBy(DataImportIssue::getType));
+
+    List<Bucket> buckets = new ArrayList<>();
+
+    for (Map.Entry<String, List<DataImportIssue>> entry : sortedIssuesByType.entrySet()) {
+      var key = entry.getKey();
+
+      // Sort each issue type by priority
+      var issues = entry
+        .getValue()
+        .stream()
+        .sorted(Comparator.comparing(DataImportIssue::getPriority, Comparator.reverseOrder()))
+        .toList();
+
+      // Split the issues to buckets if needed
+      if (issues.size() > 1.2 * maxNumberOfIssuesPerFile) {
+        List<List<DataImportIssue>> partitions = Lists.partition(issues, maxNumberOfIssuesPerFile);
+        for (int i = 0; i < partitions.size(); i++) {
+          buckets.add(new Bucket(new BucketKey(key, i + 1), partitions.get(i)));
+        }
+      } else {
+        buckets.add(new Bucket(new BucketKey(key, null), issues));
       }
-    } else {
-      issueTypeOccurrences.add(issueTypeName);
-      int labelCount = issueTypeOccurrences.count(issueTypeName);
-      file_writer = new HTMLWriter(reportDirectory, issueTypeName + labelCount, issues);
-      writers.add(file_writer);
     }
+
+    return buckets;
   }
 
   private void closeReportDirectory() {
