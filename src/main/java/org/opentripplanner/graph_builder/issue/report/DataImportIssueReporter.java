@@ -58,7 +58,8 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       List<BucketKey> keys = buckets.stream().map(Bucket::key).sorted().toList();
 
       for (Bucket bucket : buckets) {
-        new HTMLWriter(reportDirectory, bucket, keys).writeFile();
+        boolean addGeoJSONLink = new GeoJsonWriter(reportDirectory, bucket).writeFile();
+        new HTMLWriter(reportDirectory, bucket, keys, addGeoJSONLink).writeFile();
       }
 
       try {

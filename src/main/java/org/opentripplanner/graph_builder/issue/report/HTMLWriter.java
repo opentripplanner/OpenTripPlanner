@@ -16,10 +16,17 @@ class HTMLWriter {
   private final DataSource target;
   private final Collection<DataImportIssue> issues;
   private final BucketKey bucketKey;
+  private boolean addGeoJSONLink;
   private final List<BucketKey> keys;
 
-  HTMLWriter(CompositeDataSource reportDirectory, Bucket bucket, List<BucketKey> keys) {
+  HTMLWriter(
+    CompositeDataSource reportDirectory,
+    Bucket bucket,
+    List<BucketKey> keys,
+    boolean addGeoJSONLink
+  ) {
     this.bucketKey = bucket.key();
+    this.addGeoJSONLink = addGeoJSONLink;
     LOG.debug("Creating file: {}", bucketKey.key());
     this.target = reportDirectory.entry(bucketKey.key() + ".html");
     this.keys = keys;
@@ -45,6 +52,10 @@ class HTMLWriter {
       printCategoryLinks(out);
 
       if (issues != null) {
+        if (addGeoJSONLink) {
+          out.printf("<a href=\"./%s.geojson\">Open issues in a GeoJSON file</a>", bucketKey.key());
+        }
+
         writeIssues(out);
       }
 
