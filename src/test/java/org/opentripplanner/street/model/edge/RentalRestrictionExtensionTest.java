@@ -117,8 +117,8 @@ class RentalRestrictionExtensionTest {
     edge.addRentalRestriction(new BusinessAreaBorder("a"));
     edge.addRentalRestriction(new BusinessAreaBorder("b"));
 
-    assertTrue(edge.fromv.traversalBanned(state("a")));
-    assertTrue(edge.fromv.traversalBanned(state("b")));
+    assertTrue(edge.fromv.rentalTraversalBanned(state("a")));
+    assertTrue(edge.fromv.rentalTraversalBanned(state("b")));
   }
 
   @Test

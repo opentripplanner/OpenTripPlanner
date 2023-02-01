@@ -199,7 +199,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return result;
   }
 
-  public boolean traversalBanned(State currentState) {
+  public boolean rentalTraversalBanned(State currentState) {
     return rentalRestrictions.traversalBanned(currentState);
   }
 
@@ -211,7 +211,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return rentalRestrictions;
   }
 
-  public boolean dropOffBanned(State currentState) {
+  public boolean rentalDropOffBanned(State currentState) {
     return rentalRestrictions.dropOffBanned(currentState);
   }
 
