@@ -25,13 +25,10 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.AreaTooComplicated;
-import org.opentripplanner.graph_builder.issues.UnconnectedArea;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
-import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -300,19 +297,12 @@ public class WalkableAreaBuilder {
       // FIXME: temporary hard limit on size of
       // areas to prevent way explosion
       if (polygon.getNumPoints() > maxAreaNodes) {
-        issueStore.add(
-          new AreaTooComplicated(group.getSomeOSMObject(), visibilityNodes.size(), maxAreaNodes)
-        );
+        issueStore.add(new AreaTooComplicated(group, visibilityNodes.size(), maxAreaNodes));
         continue;
       }
 
       if (edgeList.visibilityVertices.size() == 0) {
-        issueStore.add(
-          new UnconnectedArea(
-            group.getSomeOSMObject(),
-            osmWayIds.stream().map(Object::toString).collect(Collectors.joining(", "))
-          )
-        );
+        issueStore.add(new UnconnectedArea(group));
       }
 
       createNamedAreas(edgeList, ring, group.areas);
