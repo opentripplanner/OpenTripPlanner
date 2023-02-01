@@ -1,5 +1,8 @@
 package org.opentripplanner.ext.transferanalyzer.annotations;
 
+import java.util.List;
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.transit.model.site.RegularStop;
 
@@ -65,5 +68,15 @@ public class TransferRoutingDistanceTooLong implements DataImportIssue {
   @Override
   public int getPriority() {
     return (int) (ratio * 1000);
+  }
+
+  @Override
+  public Geometry getGeometry() {
+    return GeometryUtils.makeLineString(
+      List.of(
+        origin.getCoordinate().asJtsCoordinate(),
+        destination.getCoordinate().asJtsCoordinate()
+      )
+    );
   }
 }
