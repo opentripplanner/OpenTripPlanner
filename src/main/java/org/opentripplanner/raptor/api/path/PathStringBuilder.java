@@ -54,10 +54,10 @@ public class PathStringBuilder {
   }
 
   public PathStringBuilder accessEgress(RaptorAccessEgress leg) {
-    if (leg.hasRides()) {
-      return flex(leg.durationInSeconds(), leg.numberOfRides());
+    if (leg.isFree()) {
+      return this;
     }
-    return leg.durationInSeconds() == 0 ? this : walk(leg.durationInSeconds());
+    return legSep().text(leg.asString(false));
   }
 
   public PathStringBuilder transit(String description, int fromTime, int toTime) {

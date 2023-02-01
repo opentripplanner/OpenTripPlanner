@@ -247,13 +247,17 @@ public class TestAccessEgress implements RaptorAccessEgress {
       return "closed";
     }
     return (
-      "[" + TimeUtils.timeToStrCompact(opening) + " " + TimeUtils.timeToStrCompact(closing) + "]"
+      "Open(" +
+      TimeUtils.timeToStrCompact(opening) +
+      " " +
+      TimeUtils.timeToStrCompact(closing) +
+      ")"
     );
   }
 
   @Override
   public String toString() {
-    return asString();
+    return asString(true);
   }
 
   /**

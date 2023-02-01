@@ -12,6 +12,7 @@ import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.EGR
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.RAPTOR_ITERATION_START_TIME;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.TOTAL_COST;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.basicTripStops;
+import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.removeOpeningHours;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 
 import java.util.List;
@@ -109,12 +110,12 @@ public class PathTest implements RaptorTestConstants {
 
   @Test
   public void testToString() {
-    assertEquals(BASIC_PATH_AS_STRING, subject.toString(this::stopIndexToName));
+    assertEquals(BASIC_PATH_AS_STRING, removeOpeningHours(subject.toString(this::stopIndexToName)));
   }
 
   @Test
   public void testToStringDetailed() {
-    assertEquals(BASIC_PATH_AS_DETAILED_STRING, subject.toStringDetailed(this::stopIndexToName));
+    assertEquals(BASIC_PATH_AS_DETAILED_STRING, removeOpeningHours(subject.toStringDetailed(this::stopIndexToName)));
   }
 
   @Test

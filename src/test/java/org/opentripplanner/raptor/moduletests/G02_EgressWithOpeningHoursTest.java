@@ -6,6 +6,7 @@ import static org.opentripplanner.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToStringDetailed;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.SECONDS_IN_DAY;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 
@@ -66,7 +67,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m));
+      .addEgressPaths(walk(STOP_B, D2m));
 
     // Note the last result is outside the search window
     assertEquals(
@@ -85,14 +86,14 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(D25h)
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_00, T01_00));
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00));
 
     assertEquals(
       join(
-        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m [0:10 0:22 12m 0tx $1440]",
-        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m [0:20 0:32 12m 0tx $1440]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m [0:30 0:42 12m 0tx $1440]",
-        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:32+1d 12m 0tx $1440]"
+        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:00 1:00) [0:10 0:22 12m 0tx $1440]",
+        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m Open(0:00 1:00) [0:20 0:32 12m 0tx $1440]",
+        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:00 1:00) [0:30 0:42 12m 0tx $1440]",
+        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:00 1:00) [0:20+1d 0:32+1d 12m 0tx $1440]"
       ),
       runSearch()
     );
@@ -104,10 +105,10 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_00, T01_00));
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00));
 
     assertEquals(
-      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:32+1d 12m 0tx $1440]",
+      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:00 1:00) [0:20+1d 0:32+1d 12m 0tx $1440]",
       runSearch()
     );
   }
@@ -121,13 +122,13 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_35, T01_00));
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_35, T01_00));
 
     assertEquals(
       join(
         // The first egress is only available after waiting for 5 minutes
-        "A 0s ~ BUS R1 0:20 0:30 10m $1200 ~ B 5m ~ Walk 2m 0:35 0:37 $540 [0:20 0:37 17m 0tx $1740]",
-        "A 0s ~ BUS R1 0:30 0:40 10m $1200 ~ B 0s ~ Walk 2m 0:40 0:42 $240 [0:30 0:42 12m 0tx $1440]"
+        "A 0s ~ BUS R1 0:20 0:30 10m $1200 ~ B 5m ~ Walk 2m Open(0:35 1:00) 0:35 0:37 $540 [0:20 0:37 17m 0tx $1740]",
+        "A 0s ~ BUS R1 0:30 0:40 10m $1200 ~ B 0s ~ Walk 2m Open(0:35 1:00) 0:40 0:42 $240 [0:30 0:42 12m 0tx $1440]"
       ),
       runSearchDetailedResult()
     );
@@ -139,14 +140,14 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(D25h)
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_35, T01_00));
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_35, T01_00));
 
     // First and last path have time-shifted egress (wait 5 minutes to board)
     assertEquals(
       join(
-        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m [0:20 0:37 17m 0tx $1740]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m [0:30 0:42 12m 0tx $1440]",
-        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:37+1d 17m 0tx $1740]"
+        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m Open(0:35 1:00) [0:20 0:37 17m 0tx $1740]",
+        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:35 1:00) [0:30 0:42 12m 0tx $1440]",
+        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:35 1:00) [0:20+1d 0:37+1d 17m 0tx $1740]"
       ),
       runSearch()
     );
@@ -158,10 +159,10 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_25, T01_00));
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T01_00));
 
     assertEquals(
-      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:32+1d 12m 0tx $1440]",
+      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:25 1:00) [0:20+1d 0:32+1d 12m 0tx $1440]",
       runSearch()
     );
   }
@@ -171,12 +172,12 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_00, T00_25));
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_25));
 
     assertEquals(
       join(
-        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m [0:10 0:22 12m 0tx $1440]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m [0:30 0:02+1d 23h32m 0tx $85440]"
+        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:00 0:25) [0:10 0:22 12m 0tx $1440]",
+        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:00 0:25) [0:30 0:02+1d 23h32m 0tx $85440]"
       ),
       runSearch()
     );
@@ -188,13 +189,13 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(D25h)
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_00, T00_25));
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_25));
 
     assertEquals(
       join(
-        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m [0:10 0:22 12m 0tx $1440]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m [0:30 0:02+1d 23h32m 0tx $85440]",
-        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:02+2d 23h42m 0tx $86040]"
+        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:00 0:25) [0:10 0:22 12m 0tx $1440]",
+        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:00 0:25) [0:30 0:02+1d 23h32m 0tx $85440]",
+        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:00 0:25) [0:20+1d 0:02+2d 23h42m 0tx $86040]"
       ),
       runSearch()
     );
@@ -206,10 +207,10 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_00, T00_25));
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_25));
 
     assertEquals(
-      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:02+2d 23h42m 0tx $86040]",
+      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:00 0:25) [0:20+1d 0:02+2d 23h42m 0tx $86040]",
       runSearch()
     );
   }
@@ -223,13 +224,13 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_25, T00_35));
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_35));
 
     assertEquals(
       join(
-        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m [0:10 0:27 17m 0tx $1740]",
-        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m [0:20 0:32 12m 0tx $1440]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m [0:30 0:27+1d 23h57m 0tx $86940]"
+        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:25 0:35) [0:10 0:27 17m 0tx $1740]",
+        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m Open(0:25 0:35) [0:20 0:32 12m 0tx $1440]",
+        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:25 0:35) [0:30 0:27+1d 23h57m 0tx $86940]"
       ),
       runSearch()
     );
@@ -241,14 +242,14 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(D25h)
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_25, T00_35));
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_35));
 
     assertEquals(
       join(
-        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m [0:10 0:27 17m 0tx $1740]",
-        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m [0:20 0:32 12m 0tx $1440]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m [0:30 0:27+1d 23h57m 0tx $86940]",
-        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:32+1d 12m 0tx $1440]"
+        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:25 0:35) [0:10 0:27 17m 0tx $1740]",
+        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m Open(0:25 0:35) [0:20 0:32 12m 0tx $1440]",
+        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:25 0:35) [0:30 0:27+1d 23h57m 0tx $86940]",
+        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:25 0:35) [0:20+1d 0:32+1d 12m 0tx $1440]"
       ),
       runSearch()
     );
@@ -260,10 +261,10 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHours(T00_25, T00_35));
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_35));
 
     assertEquals(
-      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:32+1d 12m 0tx $1440]",
+      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:25 0:35) [0:20+1d 0:32+1d 12m 0tx $1440]",
       runSearch()
     );
   }
@@ -274,7 +275,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(D25h)
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m).openingHoursClosed());
+      .addEgressPaths(walk(STOP_B, D2m).openingHoursClosed());
 
     assertEquals("", runSearch());
   }

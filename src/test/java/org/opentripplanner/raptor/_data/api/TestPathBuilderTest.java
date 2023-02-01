@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
+import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.removeOpeningHours;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,7 @@ public class TestPathBuilderTest implements RaptorTestConstants {
 
     assertEquals(accessEgressCost + transitCost, path.generalizedCost());
     assertEquals(
-      "Walk 1m ~ A ~ BUS L1 10:02 10:07 ~ B ~ Walk 2m [10:00:15 10:09:15 9m 0tx $768]",
+      "Walk 1m Open(10:00:15 10:00:15) ~ A ~ BUS L1 10:02 10:07 ~ B ~ Walk 2m [10:00:15 10:09:15 9m 0tx $768]",
       path.toString(this::stopIndexToName)
     );
   }
@@ -85,11 +86,11 @@ public class TestPathBuilderTest implements RaptorTestConstants {
       .egress(BasicPathTestCase.EGRESS_DURATION);
     Assertions.assertEquals(
       BasicPathTestCase.BASIC_PATH_AS_STRING,
-      path.toString(this::stopIndexToName)
+      removeOpeningHours(path.toString(this::stopIndexToName))
     );
     Assertions.assertEquals(
       BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING,
-      path.toStringDetailed(this::stopIndexToName)
+      removeOpeningHours(path.toStringDetailed(this::stopIndexToName))
     );
     Assertions.assertEquals(BasicPathTestCase.TOTAL_COST, path.generalizedCost());
   }

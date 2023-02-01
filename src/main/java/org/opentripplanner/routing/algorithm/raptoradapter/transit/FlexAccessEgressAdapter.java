@@ -59,7 +59,7 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
 
   @Override
   public String toString() {
-    return asString();
+    return asString(true);
   }
 
   private static int mapToRaptorTime(int flexTime) {

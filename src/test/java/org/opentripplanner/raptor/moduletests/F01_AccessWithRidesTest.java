@@ -86,8 +86,8 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
       .add(
         multiCriteria(),
         "Flex 3m 2x ~ D ~ BUS R1 0:14 0:20 ~ F ~ Walk 1m [0:10 0:21 11m 2tx $1500]", // ldt
-        "Flex 2m 2x ~ C ~ BUS R1 0:12 0:20 ~ F ~ Walk 1m [0:09 0:21 12m 2tx $1499]", // cost
-        "Flex 7m 1x ~ E ~ BUS R1 0:16 0:20 ~ F ~ Walk 1m [0:08 0:21 13m 1tx $1500]", // tx+time
+        "Flex+Walk 2m 2x ~ C ~ BUS R1 0:12 0:20 ~ F ~ Walk 1m [0:09 0:21 12m 2tx $1499]", // cost
+        "Flex+Walk 7m 1x ~ E ~ BUS R1 0:16 0:20 ~ F ~ Walk 1m [0:08 0:21 13m 1tx $1500]", // tx+time
         "Walk 10m ~ B ~ BUS R1 0:10 0:20 ~ F ~ Walk 1m [0:00 0:21 21m 0tx $1500]" // tx
       )
       .build();

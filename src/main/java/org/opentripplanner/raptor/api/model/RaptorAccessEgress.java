@@ -158,14 +158,18 @@ public interface RaptorAccessEgress {
   }
 
   /** Call this from toString */
-  default String asString() {
+  default String asString(boolean includeStop) {
     StringBuilder buf = new StringBuilder();
     if (isFree()) {
       buf.append("Free");
     } else if (hasRides()) {
-      buf.append(stopReachedOnBoard() ? "Flex+Walk" : "Flex");
+      buf.append(stopReachedOnBoard() ? "Flex" : "Flex+Walk");
     } else {
-      buf.append("On-Street");
+      // This is not always walking, but inside Raptor we do not care if this is
+      // biking, walking or car - any on street is treated the same. So, for
+      // short easy reading in Raptor tests we use "Walk" instead of "On-Street"
+      // witch would be more precise.
+      buf.append("Walk");
     }
     buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
     if (hasRides()) {
@@ -174,8 +178,9 @@ public interface RaptorAccessEgress {
     if (hasOpeningHours()) {
       buf.append(' ').append(openingHoursToString());
     }
-    buf.append(" ~ ").append(stop());
-
+    if (includeStop) {
+      buf.append(" ~ ").append(stop());
+    }
     return buf.toString();
   }
 }

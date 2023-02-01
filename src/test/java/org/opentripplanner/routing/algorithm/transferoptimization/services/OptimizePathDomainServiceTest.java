@@ -190,8 +190,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var result = subject.findBestTransitPath(original);
 
     assertEquals(
-      "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ " +
-      "BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m 2tx $3010 $66pri]",
+      "Walk 0s Open(10:00:20 10:00:20) ~ A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ " +
+      "BUS T3 10:37 10:49 ~ G ~ Walk 0s [10:00:20 10:49:20 49m 2tx $3010 $66pri]",
       PathUtils.pathsToString(result)
     );
 
@@ -205,8 +205,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     result = subject.findBestTransitPath(original);
 
     assertEquals(
-      "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C ~ BUS T2 10:15 10:35 ~ F " +
-      "~ BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m 2tx $3040 $66pri $3354.05wtc]",
+      "Walk 0s Open(10:00:20 10:00:20) ~ A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C ~ BUS T2 10:15 10:35 ~ F " +
+      "~ BUS T3 10:37 10:49 ~ G ~ Walk 0s [10:00:20 10:49:20 49m 2tx $3040 $66pri $3354.05wtc]",
       PathUtils.pathsToString(result)
     );
   }
@@ -259,7 +259,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var it = result.iterator().next();
 
     assertEquals(
-      "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:00:20 10:30:20 30m 1tx $1810 $23pri]",
+      "Walk 0s Open(10:00:20 10:00:20) ~ A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D ~ Walk 0s [10:00:20 10:30:20 30m 1tx $1810 $23pri]",
       it.toString(this::stopIndexToName)
     );
     // Verify the attached Transfer is exist and is valid

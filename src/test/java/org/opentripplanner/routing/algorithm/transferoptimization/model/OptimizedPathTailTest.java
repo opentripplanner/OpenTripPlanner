@@ -79,7 +79,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     subject.access(orgPath.accessLeg().access());
 
     var exp =
-      "Walk 3m15s ~ A " +
+      "Walk 3m15s Open(10:00 10:00) ~ A " +
       "~ BUS L11 10:04 10:35 ~ B " +
       "~ Walk 2m ~ C " +
       "~ BUS L21 11:00 11:23 ~ D " +
@@ -96,7 +96,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     subject.access(orgPath.accessLeg().access());
 
     var exp =
-      "Walk 3m15s ~ A " +
+      "Walk 3m15s Open(10:00 10:00) ~ A " +
       "~ BUS L11 10:04 10:35 ~ B " +
       "~ Walk 3m45s ~ E " +
       "~ Flex 7m45s 1x " +
@@ -141,7 +141,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
 
     // We have replaced the first transfer with a 2 minute walk
     var expPath =
-      "Walk 3m15s 10:00 10:03:15 $390 ~ A 45s " +
+      "Walk 3m15s Open(10:00 10:00) 10:00 10:03:15 $390 ~ A 45s " +
       "~ BUS L11 10:04 10:35 31m $1998 ~ B 15s " +
       "~ Walk 2m 10:35:15 10:37:15 $240 ~ C 22m45s " +
       "~ BUS L21 11:00 11:23 23m $2724 ~ D 17m {staySeated} " +

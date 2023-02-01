@@ -1,9 +1,10 @@
 package org.opentripplanner.raptor.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 
@@ -12,6 +13,7 @@ public class PathStringBuilderTest {
   private static final RaptorStopNameResolver STOP_NAME_RESOLVER = RaptorStopNameResolver.nullSafe(
     null
   );
+  private static final int ANY_STOP = 7;
   private static final String MODE = "BUS";
   private static final int T_10_46_05 = time(10, 46, 5);
   private static final int T_10_55 = time(10, 55, 0);
@@ -48,13 +50,13 @@ public class PathStringBuilderTest {
   }
 
   @Test
-  public void flexZeroLength() {
-    assertEquals("Flex 0s 0x", subject.flex(0, 0).toString());
+  public void ignoreFreeLeg() {
+    assertEquals("Walk 1s", subject.accessEgress(free(ANY_STOP)).walk(1).toString());
   }
 
   @Test
   public void flexNormalCase() {
-    assertEquals("Flex 5m12s 2x", subject.flex(D_5_12, 2).toString());
+    assertEquals("Flex 5m12s 2x", subject.accessEgress(flex(ANY_STOP, D_5_12, 2)).toString());
   }
 
   @Test
@@ -93,11 +95,11 @@ public class PathStringBuilderTest {
     assertEquals(
       "227 ~ BUS 10:46:05 10:55 ~ 112 [10:46:05 10:55 8m55s 0tx $60 3pz]",
       subject
-        .accessEgress(TestAccessEgress.walk(227, 0, 0))
+        .accessEgress(free(227))
         .stop(227)
         .transit(MODE, T_10_46_05, T_10_55)
         .stop(112)
-        .accessEgress(TestAccessEgress.walk(112, 0, 0))
+        .accessEgress(free(112))
         .summary(T_10_46_05, T_10_55, 0, 6000, b -> b.text("3pz"))
         .toString()
     );
