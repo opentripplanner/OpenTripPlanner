@@ -681,7 +681,6 @@ public class StreetEdge
    */
   public void addRentalRestriction(RentalRestrictionExtension ext) {
     fromv.addRentalRestriction(ext);
-    tov.addRentalRestriction(ext);
   }
 
   /**
