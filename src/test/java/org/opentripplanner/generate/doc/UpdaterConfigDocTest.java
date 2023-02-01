@@ -87,7 +87,7 @@ public class UpdaterConfigDocTest {
     String details = getParameterDetailsTable(node);
 
     if (!details.isBlank()) {
-      buf.header(4, "Details", null).addSection(details);
+      buf.header(5, "Parameter details", null).addSection(details);
     }
   }
 

@@ -47,7 +47,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 | [headers](#u_0_headers)   | `map of string` | Extra headers to add to the HTTP request fetching the data.                  | *Optional* |               |  2.3  |
 
 
-#### Details
+##### Parameter details
 
 <h4 id="u_0_headers">headers</h4>
 
@@ -100,7 +100,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 | [headers](#u__5__headers)                                             | `map of string` | Extra headers to add to the HTTP request fetching the data. | *Optional* |                      |  2.3  |
 
 
-#### Details
+##### Parameter details
 
 <h4 id="u__5__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
@@ -177,7 +177,7 @@ file.
 | url                                                                   |  `string` | TODO                     | *Optional* |                      |  1.5  |
 
 
-#### Details
+##### Parameter details
 
 <h4 id="u__7__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
@@ -223,7 +223,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 | [headers](#u__6__headers)  | `map of string` | Extra headers to add to the HTTP request fetching the data.               | *Optional* |               |  2.3  |
 
 
-#### Details
+##### Parameter details
 
 <h4 id="u__6__headers">headers</h4>
 
@@ -281,7 +281,7 @@ partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.
 | [headers](#u_1_headers)                                                               | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |  1.5  |
 
 
-#### Details
+##### Parameter details
 
 <h4 id="u_1_allowKeepingRentedBicycleAtDestination">allowKeepingRentedBicycleAtDestination</h4>
 
