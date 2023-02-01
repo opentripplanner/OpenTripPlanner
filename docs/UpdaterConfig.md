@@ -27,20 +27,11 @@ The [GTFS-RT spec](https://developers.google.com/transit/gtfs-realtime/) complem
 additional kinds of feeds. In contrast to the base GTFS schedule feed, they provide *real-time*
 updates (*'dynamic'* data) and are updated from minute to minute.
 
-#### Types of data delivery
 
-Real-time data can be provided using either a pull or push system. In a pull configuration, the
-GTFS-RT consumer polls the real-time provider over HTTP. That is to say, OTP fetches a file from a
-web server every few minutes. In the push configuration, the consumer opens a persistent connection
-to the GTFS-RT provider, which then sends incremental updates immediately as they become available.
-OTP can use both approaches.
-The [OneBusAway GTFS-realtime exporter project](https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter)
-provides this kind of streaming, incremental updates over a websocket rather than a single large
-file.
+### Alerts
 
-### Realtime Alerts
-
-Alerts are text messages attached to GTFS objects, informing riders of disruptions and changes.
+Alerts are text messages attached to GTFS objects, informing riders of disruptions and changes. 
+The information is downloaded in a single HTTP request and polled regularly.
 
 <!-- real-time-alerts BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -93,6 +84,7 @@ Extra headers to add to the HTTP request fetching the data.
 
 TripUpdates report on the status of scheduled trips as they happen, providing observed and 
 predicted arrival and departure times for the remainder of the trip.
+The information is downloaded in a single HTTP request and polled regularly.
 
 <!-- stop-time-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -166,6 +158,13 @@ Extra headers to add to the HTTP request fetching the data.
 
 ### TripUpdates via WebSocket
 
+This updater doesn't poll a data source but opens a persistent connection to the GTFS-RT provider, 
+which then sends incremental updates immediately as they become available.
+
+The [OneBusAway GTFS-realtime exporter project](https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter)
+provides this kind of streaming, incremental updates over a websocket rather than a single large
+file.
+
 <!-- websocket-gtfs-rt-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
@@ -210,6 +209,7 @@ TODO
 
 VehiclePositions give the location of some or all vehicles currently in service, in terms of 
 geographic coordinates or position relative to their scheduled stops.
+The information is downloaded in a single HTTP request and polled regularly.
 
 <!-- vehicle-positions BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -365,7 +365,9 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 <!-- vehicle-rental END -->
 
-## Vehicle parking (sandbox feature)
+## Other updaters in sandboxes
+
+### Vehicle parking
 
 Vehicle parking options and configuration is documented in
 its [sandbox documentation](sandbox/VehicleParking.md).
@@ -373,14 +375,14 @@ its [sandbox documentation](sandbox/VehicleParking.md).
 <!-- INSERT: vehicle-parking -->
 
 
-## SIRI SX updater for Azure Service Bus (sandbox feature)
+### SIRI SX updater for Azure Service Bus
 
 This is a Sandbox updater, see [sandbox documentation](sandbox/SiriAzureUpdater.md).
 
 <!-- INSERT: siri-azure-sx-updater -->
 
 
-## Vehicle Rental Service Directory configuration (sandbox feature)
+### Vehicle Rental Service Directory configuration
 
 To configure and url for
 the [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md).
