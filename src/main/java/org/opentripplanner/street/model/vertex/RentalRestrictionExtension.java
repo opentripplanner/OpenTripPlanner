@@ -160,7 +160,7 @@ public sealed interface RentalRestrictionExtension {
 
     @Override
     public boolean dropOffBanned(State state) {
-      return traversalBanned(state);
+      return false;
     }
 
     @Override

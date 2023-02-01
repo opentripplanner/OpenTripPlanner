@@ -39,9 +39,11 @@ class RentalRestrictionExtensionTest {
 
   @Test
   public void leaveBusinessAreaOnFoot() {
-    var edge = streetEdge(V1, V2);
-    edge.addRentalRestriction(new BusinessAreaBorder(network));
-    State result = traverse(edge);
+    var edge1 = streetEdge(V1, V2);
+    var ext = new BusinessAreaBorder(network);
+    V2.addRentalRestriction(ext);
+
+    State result = traverse(edge1);
     assertEquals(HAVE_RENTED, result.getVehicleRentalState());
     assertEquals(TraverseMode.WALK, result.getBackMode());
     assertNull(result.getNextResult());
@@ -50,7 +52,7 @@ class RentalRestrictionExtensionTest {
   @Test
   public void dontEnterGeofencingZoneOnFoot() {
     var edge = streetEdge(V1, V2);
-    edge.addRentalRestriction(
+    V2.addRentalRestriction(
       new RentalRestrictionExtension.GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, true)
       )
@@ -95,11 +97,11 @@ class RentalRestrictionExtensionTest {
   @Test
   public void dontFinishInNoDropOffZone() {
     var edge = streetEdge(V1, V2);
-    edge.addRentalRestriction(
-      new RentalRestrictionExtension.GeofencingZoneExtension(
-        new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
-      )
+    var ext = new RentalRestrictionExtension.GeofencingZoneExtension(
+      new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
     );
+    V2.addRentalRestriction(ext);
+    edge.addRentalRestriction(ext);
     State result = traverse(edge);
     assertFalse(result.isFinal());
   }
