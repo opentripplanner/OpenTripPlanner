@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.issues;
+package org.opentripplanner.graph_builder.module.islandpruning;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.street.model.vertex.Vertex;

@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.graph_builder.module.islandpruning;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,10 +11,10 @@ import java.util.Queue;
 import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
-import org.opentripplanner.graph_builder.issues.GraphIsland;
 import org.opentripplanner.graph_builder.issues.IsolatedStop;
 import org.opentripplanner.graph_builder.issues.PrunedStopIsland;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
