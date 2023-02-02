@@ -3,6 +3,7 @@ package org.opentripplanner.datastore.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -85,7 +86,7 @@ public class ZipFileDataSource
 
     try {
       // The get name on ZipFile returns the full path, we want just the name.
-      this.zipFile = new ZipFile(file, ZipFile.OPEN_READ);
+      this.zipFile = new ZipFile(file, ZipFile.OPEN_READ, StandardCharsets.ISO_8859_1);
 
       Enumeration<? extends ZipEntry> entries = zipFile.entries();
 

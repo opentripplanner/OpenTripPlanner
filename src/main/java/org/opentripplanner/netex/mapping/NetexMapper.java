@@ -296,11 +296,15 @@ public class NetexMapper {
   }
 
   private void mapStopPlaceAndQuays(TariffZoneMapper tariffZoneMapper) {
+
+    String timeZone = currentNetexIndex.getTimeZone();
+    ZoneId zoneId = timeZone != null ? ZoneId.of(timeZone) : null;
+
     StopAndStationMapper stopMapper = new StopAndStationMapper(
       idFactory,
       currentNetexIndex.getQuayById(),
       tariffZoneMapper,
-      ZoneId.of(currentNetexIndex.getTimeZone()),
+      zoneId,
       issueStore,
       noTransfersOnIsolatedStops
     );

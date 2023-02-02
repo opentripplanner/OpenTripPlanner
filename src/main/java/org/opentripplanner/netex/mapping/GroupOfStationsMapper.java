@@ -3,6 +3,7 @@ package org.opentripplanner.netex.mapping;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -14,6 +15,7 @@ import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
+import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.StopPlaceRefStructure;
 import org.rutebanken.netex.model.StopPlaceRefs_RelStructure;
 
@@ -40,9 +42,17 @@ class GroupOfStationsMapper {
   }
 
   GroupOfStations map(GroupOfStopPlaces groupOfStopPlaces) {
+    I18NString name;
+
+    if (groupOfStopPlaces.getName() != null) {
+      name = NonLocalizedString.ofNullable(groupOfStopPlaces.getName().getValue());
+    } else {
+      StopPlaceRefStructure ref = groupOfStopPlaces.getMembers().getStopPlaceRef().get(0);
+      name = stations.get(idFactory.createId(ref.getRef())).getName();
+    }
     GroupOfStationsBuilder groupOfStations = GroupOfStations
       .of(idFactory.createId(groupOfStopPlaces.getId()))
-      .withName(NonLocalizedString.ofNullable(groupOfStopPlaces.getName().getValue()));
+      .withName(name);
 
     // TODO Map PurposeOfGrouping from NeTEx
 

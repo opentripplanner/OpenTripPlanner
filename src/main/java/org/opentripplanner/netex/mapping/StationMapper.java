@@ -106,7 +106,7 @@ class StationMapper {
       );
       List<WgsCoordinate> coordinates = new ArrayList<>();
       for (Object it : stopPlace.getQuays().getQuayRefOrQuay()) {
-        if (it instanceof Quay quay) {
+        if (it instanceof Quay quay && quay.getCentroid() != null) {
           coordinates.add(WgsCoordinateMapper.mapToDomain(quay.getCentroid()));
         }
       }
