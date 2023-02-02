@@ -1501,6 +1501,9 @@ enum Mode {
 
     """WALK"""
     WALK
+
+    TROLLEYBUS
+    MONORAIL
 }
 
 enum TransitMode {

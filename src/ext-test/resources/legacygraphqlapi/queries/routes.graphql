@@ -7,5 +7,6 @@
             gtfsId
             name
         }
+        mode
     }
 }
