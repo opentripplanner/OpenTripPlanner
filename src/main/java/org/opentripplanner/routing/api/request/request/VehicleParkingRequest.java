@@ -15,7 +15,7 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
   private Set<String> preferredTags = Set.of();
   private int unpreferredTagCost = 5 * 60;
 
-  private boolean useAvailabilityInformation = true;
+  private boolean useAvailabilityInformation = false;
 
   public void setRequiredTags(Collection<String> requiredTags) {
     this.requiredTags = Set.copyOf(requiredTags);
