@@ -90,14 +90,6 @@ class GeofencingVertexUpdater {
     return Map.copyOf(updates);
   }
 
-  private static Envelope toEnvelope(LineString ls) {
-    var env = new Envelope();
-    for (var c : ls.getCoordinates()) {
-      env.expandToInclude(c);
-    }
-    return env;
-  }
-
   private Map<StreetEdge, RentalRestrictionExtension> addExtensionToIntersectingStreetEdges(
     List<GeofencingZone> zones,
     Function<GeofencingZone, RentalRestrictionExtension> createExtension
@@ -143,7 +135,7 @@ class GeofencingVertexUpdater {
    * If you put the entire zone into an envelope you get lots and lots of edges in the middle of it
    * that are nowhere near the border. Since checking if they intersect with the border is an
    * expensive operation we apply the following optimization:
-   * <li>we split the line string into segments of equal number of coordinates
+   * <li>we split the line string into segments for each pair of coordinates
    * <li>for each segment we compute the envelope
    * <li>we only get the edges for that envelope and check if they intersect
    * <p>
@@ -154,8 +146,7 @@ class GeofencingVertexUpdater {
   private Set<Edge> getEdgesAlongLineStrings(Collection<LineString> lineStrings) {
     return lineStrings
       .stream()
-      .flatMap(ls -> GeometryUtils.partitionLineString(ls, 2).stream())
-      .map(GeofencingVertexUpdater::toEnvelope)
+      .flatMap(GeometryUtils::toEnvelopes)
       .map(getEdgesForEnvelope)
       .flatMap(Collection::stream)
       .collect(Collectors.toSet());

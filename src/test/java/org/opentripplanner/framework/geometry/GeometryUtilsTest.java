@@ -244,7 +244,7 @@ public class GeometryUtilsTest {
   }
 
   @Test
-  void partitionLineString() {
+  void toEnvelopes() {
     Coordinate[] coordinates = List
       .of(
         new Coordinate(0, 0),
@@ -259,11 +259,11 @@ public class GeometryUtilsTest {
 
     LineString line = GeometryUtils.makeLineString(coordinates);
 
-    var partitions = GeometryUtils.partitionLineString(line, 3);
+    var envelopes = GeometryUtils.toEnvelopes(line).toList();
 
     assertEquals(
-      "[LINESTRING (0 0, 1 1, 2 2, 3 3), LINESTRING (3 3, 4 4, 5 5, 6 6)]",
-      partitions.toString()
+      "[Env[0.0 : 1.0, 0.0 : 1.0], Env[1.0 : 2.0, 1.0 : 2.0], Env[2.0 : 3.0, 2.0 : 3.0], Env[3.0 : 4.0, 3.0 : 4.0], Env[4.0 : 5.0, 4.0 : 5.0], Env[5.0 : 6.0, 5.0 : 6.0]]",
+      envelopes.toString()
     );
   }
 }

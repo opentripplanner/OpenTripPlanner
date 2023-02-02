@@ -1,6 +1,5 @@
 package org.opentripplanner.framework.geometry;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.geotools.referencing.CRS;
@@ -15,6 +15,7 @@ import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.CoordinateSequenceFactory;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -188,34 +189,6 @@ public class GeometryUtils {
   }
 
   /**
-   * Splits a line string into a number of segments with the same number of coordinates.
-   * <p>
-   * The last coordinate of segment n will also be the first coordinate of segment n+1 so all
-   * partitions together will represent the original line string without gaps.
-   *
-   * @param segmentSize How many coordinates should be in each segment.
-   */
-  public static List<LineString> partitionLineString(LineString input, int segmentSize) {
-    var segments = Lists.partition(Arrays.asList(input.getCoordinates()), segmentSize);
-    var ret = new ArrayList<LineString>();
-    for (int i = 0; i < segments.size() - 1; i++) {
-      var segment = new ArrayList<>(segments.get(i));
-      // also add the first coordinate from the next segment
-      segment.add(segments.get(i + 1).get(0));
-
-      var ls = gf.createLineString(segment.toArray(new Coordinate[0]));
-      ret.add(ls);
-    }
-    var lastSegment = segments.get(segments.size() - 1);
-    if (lastSegment.size() > 1) {
-      var lastLinestring = gf.createLineString(lastSegment.toArray(new Coordinate[0]));
-      ret.add(lastLinestring);
-    }
-
-    return List.copyOf(ret);
-  }
-
-  /**
    * Returns the chunk of the given geometry between the two given coordinates.
    * <p>
    * Assumes that "second" is after "first" along the input geometry.
@@ -305,5 +278,24 @@ public class GeometryUtils {
       coords[i++] = new Coordinate(p.getLongitude(), p.getLatitude(), p.getAltitude());
     }
     return coords;
+  }
+
+  /**
+   * Split a linestring into its constituent segments and convert each into an envelope.
+   * <p>
+   * All segments form the complete line string again so [A,B,C,D] will be split into the
+   * segments [[A,B],[B,C],[C,D]].
+   */
+  public static Stream<Envelope> toEnvelopes(LineString ls) {
+    Coordinate[] coordinates = ls.getCoordinates();
+    Envelope[] envelopes = new Envelope[coordinates.length - 1];
+
+    for (int i = 0; i < envelopes.length; i++) {
+      Coordinate from = coordinates[i];
+      Coordinate to = coordinates[i + 1];
+      envelopes[i] = new Envelope(from, to);
+    }
+
+    return Arrays.stream(envelopes);
   }
 }
