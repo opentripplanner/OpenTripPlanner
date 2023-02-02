@@ -1,12 +1,12 @@
 package org.opentripplanner.ext.fares.impl;
 
-import static org.opentripplanner.ext.fares.impl.OrcaFareServiceImpl.COMM_TRANS_AGENCY_ID;
-import static org.opentripplanner.ext.fares.impl.OrcaFareServiceImpl.KC_METRO_AGENCY_ID;
-import static org.opentripplanner.ext.fares.impl.OrcaFareServiceImpl.KITSAP_TRANSIT_AGENCY_ID;
-import static org.opentripplanner.ext.fares.impl.OrcaFareServiceImpl.PIERCE_COUNTY_TRANSIT_AGENCY_ID;
-import static org.opentripplanner.ext.fares.impl.OrcaFareServiceImpl.SKAGIT_TRANSIT_AGENCY_ID;
-import static org.opentripplanner.ext.fares.impl.OrcaFareServiceImpl.SOUND_TRANSIT_AGENCY_ID;
-import static org.opentripplanner.ext.fares.impl.OrcaFareServiceImpl.WASHINGTON_STATE_FERRIES_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.COMM_TRANS_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.KC_METRO_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.KITSAP_TRANSIT_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.PIERCE_COUNTY_TRANSIT_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.SKAGIT_TRANSIT_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.SOUND_TRANSIT_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.WASHINGTON_STATE_FERRIES_AGENCY_ID;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
@@ -20,10 +20,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.fares.model.FareContainer;
-import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
-import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Leg;
@@ -38,21 +35,21 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 public class OrcaFareServiceTest {
 
-  private static OrcaFareServiceImpl orcaFareService;
+  private static OrcaFareService orcaFareService;
   private static float DEFAULT_RIDE_PRICE_IN_CENTS;
 
   @BeforeAll
   public static void setUpClass() {
     Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
-    orcaFareService = new OrcaFareServiceImpl(regularFareRules.values());
+    orcaFareService = new OrcaFareService(regularFareRules.values());
     orcaFareService.IS_TEST = true;
-    DEFAULT_RIDE_PRICE_IN_CENTS = OrcaFareServiceImpl.DEFAULT_TEST_RIDE_PRICE * 100;
+    DEFAULT_RIDE_PRICE_IN_CENTS = OrcaFareService.DEFAULT_TEST_RIDE_PRICE * 100;
   }
 
   /**
    * These tests are designed to specifically validate Orca fares. Since these fares are hard-coded, it is acceptable
    * to make direct calls to the Orca fare service with predefined routes. Where the default fare is applied a test
-   * substitute {@link OrcaFareServiceImpl#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash fare
+   * substitute {@link OrcaFareService#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash fare
    * types.
    */
   private static void calculateFare(List<Leg> legs, FareType fareType, float expectedFareInCents) {
@@ -488,7 +485,7 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareServiceImpl} to determine the
+   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareService} to determine the
    * correct ride type.
    */
   private static Leg createLeg(
@@ -514,7 +511,7 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareServiceImpl} to determine the
+   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareService} to determine the
    * correct ride type.
    */
   private static Leg createLeg(

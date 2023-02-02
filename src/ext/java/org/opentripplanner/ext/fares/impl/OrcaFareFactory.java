@@ -15,7 +15,7 @@ public class OrcaFareFactory extends DefaultFareServiceFactory {
 
   @Override
   public FareService makeFareService() {
-    return new OrcaFareServiceImpl(regularFareRules.values());
+    return new OrcaFareService(regularFareRules.values());
   }
 
   /**

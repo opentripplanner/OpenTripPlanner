@@ -21,9 +21,9 @@ import org.opentripplanner.transit.model.network.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OrcaFareServiceImpl extends DefaultFareService {
+public class OrcaFareService extends DefaultFareService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OrcaFareServiceImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OrcaFareService.class);
 
   private static final Duration MAX_TRANSFER_DISCOUNT_DURATION = Duration.ofHours(2);
 
@@ -132,7 +132,7 @@ public class OrcaFareServiceImpl extends DefaultFareService {
   public boolean IS_TEST;
   public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
 
-  public OrcaFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
+  public OrcaFareService(Collection<FareRuleSet> regularFareRules) {
     addFareRules(FareType.regular, regularFareRules);
     addFareRules(FareType.senior, regularFareRules);
     addFareRules(FareType.youth, regularFareRules);
@@ -437,7 +437,7 @@ public class OrcaFareServiceImpl extends DefaultFareService {
         if (legFare > orcaFareDiscount) {
           freeTransferStartTime = leg.getStartTime();
           // Note: on first leg, discount will be 0 meaning no transfer was applied.
-          addFareComponent(
+          addLegFareProduct(
             leg,
             fare,
             fareType,
@@ -448,7 +448,7 @@ public class OrcaFareServiceImpl extends DefaultFareService {
           orcaFareDiscount = legFare;
         } else {
           // Ride is free, counts as a transfer if legFare is NOT free
-          addFareComponent(leg, fare, fareType, currency, 0, legFare != 0 ? orcaFareDiscount : 0);
+          addLegFareProduct(leg, fare, fareType, currency, 0, legFare != 0 ? orcaFareDiscount : 0);
         }
       } else if (usesOrca(fareType) && !inFreeTransferWindow) {
         // If using Orca and outside of the free transfer window, add the cumulative Orca fare (the maximum leg
@@ -474,10 +474,10 @@ public class OrcaFareServiceImpl extends DefaultFareService {
           // window needs to be reset to 0 so that it is not applied after looping through all rides.
           orcaFareDiscount = 0;
         }
-        addFareComponent(leg, fare, fareType, currency, legFare, 0);
+        addLegFareProduct(leg, fare, fareType, currency, legFare, 0);
       } else {
         // If not using Orca, add the agency's default price for this leg.
-        addFareComponent(leg, fare, fareType, currency, legFare, 0);
+        addLegFareProduct(leg, fare, fareType, currency, legFare, 0);
         cost += legFare;
       }
     }
@@ -489,13 +489,15 @@ public class OrcaFareServiceImpl extends DefaultFareService {
   }
 
   /**
-   * Adds a fare component to a given ride.
-   * @param leg Ride receiving fare component
-   * @param fareType Fare type for fare component
-   * @param totalFare Cost of leg fare after transfer
-   * @param transferDiscount Transfer discount applied or 0 if no transfer was used.
+   * Adds a leg fare product to the given itinerary fares object
+   * @param leg The leg to create a fareproduct for
+   * @param itineraryFares The itinerary fares to store the fare product in
+   * @param fareType Fare type (split into container and rider category)
+   * @param currency Fare currency
+   * @param totalFare Total fare paid after transfer
+   * @param transferDiscount Transfer discount applied
    */
-  private static void addFareComponent(
+  private static void addLegFareProduct(
     Leg leg,
     ItineraryFares itineraryFares,
     FareType fareType,
