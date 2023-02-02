@@ -53,7 +53,10 @@ class HTMLWriter {
 
       if (issues != null) {
         if (addGeoJSONLink) {
-          out.printf("<a href=\"./%s.geojson\">Open issues in a GeoJSON file</a>", bucketKey.key());
+          out.printf(
+            "<a class=\"pure-button\" href=\"./%s.geojson\">Open issues in a GeoJSON file</a>",
+            bucketKey.key()
+          );
         }
 
         writeIssues(out);
