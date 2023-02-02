@@ -31,10 +31,12 @@ class GraphQLPlanTest implements PlanTestConstants {
       """
       query {
         plan(
-          bannedVehicleParkingTags: ["wheelbender"],
-          requiredVehicleParkingTags: ["covered"],
-          preferredVehicleParkingTags: ["roof", "locker", "cellar"],
-          unpreferredVehicleParkingTagCost: 555,
+          parking: {
+            bannedTags: ["wheelbender"],
+            requiredTags: ["covered"],
+            preferredTags: ["roof", "locker", "cellar"],
+            unpreferredTagCost: 555
+          }
         ) {
           itineraries {
             duration

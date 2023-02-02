@@ -1121,6 +1121,31 @@ input InputPreferred {
     otherThanPreferredRoutesPenalty: Int
 }
 
+input InputVehicleParking {
+    """
+    If non-empty every parking facility that doesn't contain at least one of these tags will
+    receive an extra cost (defined by `unpreferredVehicleParkingTagCost`) and therefore avoided.
+    """
+    preferredTags: [String]
+
+    """
+    If `preferredVehicleParkingTags` is non-empty, using a parking facility that doesn't contain
+    at least one of the preferred tags, will receive this extra cost and therefore avoided if
+    there the preferred options are available.
+    """
+    unpreferredTagCost: Int
+
+    """
+    Only parking facilities that have one of the tags in this list will used.
+    """
+    requiredTags: [String]
+
+    """
+    Parking facilities that have one of the tags in this list will be excluded.
+    """
+    bannedTags: [String]
+}
+
 """
 Relative importances of optimization factors. Only effective for bicycling legs.
 Invariant: `timeFactor + slopeFactor + safetyFactor == 1`
@@ -2776,28 +2801,8 @@ type QueryType {
         """
         walkSafetyFactor: Float
 
-        """
-        If non-empty every parking facility that doesn't contain at least one of these tags will
-        receive an extra cost (defined by `unpreferredVehicleParkingTagCost`) and therefore avoided.
-        """
-        preferredVehicleParkingTags: [String]
-
-        """
-        If `preferredVehicleParkingTags` is non-empty, using a parking facility that doesn't contain
-        at least one of the preferred tags, will receive this extra cost and therefore avoided if
-        there the preferred options are available.
-        """
-        unpreferredVehicleParkingTagCost: Int
-
-        """
-        Only parking facilities that have one of the tags in this list will used.
-        """
-        requiredVehicleParkingTags: [String]
-
-        """
-        Parking facilities that have one of the tags in this list will be excluded.
-        """
-        bannedVehicleParkingTags: [String]
+        "Preferences for vehicle parking"
+        parking: InputVehicleParking
     ): Plan @async
 }
 
