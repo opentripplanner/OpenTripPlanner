@@ -12,6 +12,7 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -35,21 +36,20 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 public class OrcaFareServiceTest {
 
-  private static OrcaFareService orcaFareService;
-  private static float DEFAULT_RIDE_PRICE_IN_CENTS;
+  private static TestOrcaFareService orcaFareService;
+  public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
+  private static final int DEFAULT_RIDE_PRICE_IN_CENTS = (int) (DEFAULT_TEST_RIDE_PRICE*100);
 
   @BeforeAll
   public static void setUpClass() {
     Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
-    orcaFareService = new OrcaFareService(regularFareRules.values());
-    orcaFareService.IS_TEST = true;
-    DEFAULT_RIDE_PRICE_IN_CENTS = OrcaFareService.DEFAULT_TEST_RIDE_PRICE * 100;
+    orcaFareService = new TestOrcaFareService(regularFareRules.values());
   }
 
   /**
    * These tests are designed to specifically validate Orca fares. Since these fares are hard-coded, it is acceptable
    * to make direct calls to the Orca fare service with predefined routes. Where the default fare is applied a test
-   * substitute {@link OrcaFareService#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash fare
+   * substitute {@link OrcaFareServiceTest#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash fare
    * types.
    */
   private static void calculateFare(List<Leg> legs, FareType fareType, float expectedFareInCents) {
@@ -142,8 +142,6 @@ public class OrcaFareServiceTest {
 
     assertLegFareEquals(349, rides.get(0), fares, false);
     assertLegFareEquals(0, rides.get(1), fares, true);
-    //    Assertions.assertFalse(rides.get(0).fareComponents.get(FareType.electronicRegular).isTransfer);
-    //    Assertions.assertTrue(rides.get(1).fareComponents.get(FareType.electronicRegular).isTransfer);
   }
 
   /**
@@ -561,4 +559,20 @@ public class OrcaFareServiceTest {
 
     return itin.getLegs().get(0);
   }
+
+  private static class TestOrcaFareService extends OrcaFareService {
+    public TestOrcaFareService(Collection<FareRuleSet> regularFareRules) {
+      super(regularFareRules);
+    }
+
+    @Override
+      protected float calculateCost(
+      FareType fareType,
+      List<Leg> rides,
+      Collection<FareRuleSet> fareRules
+    ) {
+      return DEFAULT_TEST_RIDE_PRICE;
+    }
+  }
 }
+

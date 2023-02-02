@@ -38,7 +38,7 @@ public class OrcaFareService extends DefaultFareService {
   public static final String KITSAP_TRANSIT_AGENCY_ID = "kt";
   public static final int ROUTE_TYPE_FERRY = 4;
 
-  private enum RideType {
+  protected enum RideType {
     COMM_TRANS_LOCAL_SWIFT,
     COMM_TRANS_COMMUTER_EXPRESS,
     EVERETT_TRANSIT,
@@ -127,10 +127,6 @@ public class OrcaFareService extends DefaultFareService {
       default -> null;
     };
   }
-
-  // If set to true, the test ride price is used instead of the actual agency cash fare.
-  public boolean IS_TEST;
-  public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
 
   public OrcaFareService(Collection<FareRuleSet> regularFareRules) {
     addFareRules(FareType.regular, regularFareRules);
@@ -390,11 +386,7 @@ public class OrcaFareService extends DefaultFareService {
    * Get the ride price for a single leg. If testing, this class is being called directly so the required agency cash
    * values are not available therefore the default test price is used instead.
    */
-  private float getRidePrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
-    if (IS_TEST) {
-      // Testing, return default test ride price.
-      return DEFAULT_TEST_RIDE_PRICE;
-    }
+  protected float getRidePrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
     return calculateCost(fareType, Lists.newArrayList(leg), fareRules);
   }
 
