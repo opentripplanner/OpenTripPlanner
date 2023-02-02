@@ -51,14 +51,6 @@ public class TestAccessEgress implements RaptorAccessEgress {
     return new Builder(stop, durationInSeconds).withCost(cost).build();
   }
 
-  public static TestAccessEgress flexWithOnBoard(int stop, int durationInSeconds, int cost) {
-    return new Builder(stop, durationInSeconds)
-      .withCost(cost)
-      .withNRides(1)
-      .stopReachedOnBoard()
-      .build();
-  }
-
   public static TestAccessEgress zeroDurationAccess(int stop, int cost) {
     return new Builder(stop, 0).withIsEmpty(true).withCost(cost).build();
   }
@@ -106,6 +98,24 @@ public class TestAccessEgress implements RaptorAccessEgress {
       .build();
   }
 
+  /** Create a new flex access and arrive stop onBoard, with opening hours*/
+  public static TestAccessEgress flex(
+    int stop,
+    int durationInSeconds,
+    int nRides,
+    int cost,
+    int opening,
+    int closing
+  ) {
+    assert nRides > DEFAULT_NUMBER_OF_RIDES;
+    return new Builder(stop, durationInSeconds)
+      .stopReachedOnBoard()
+      .withNRides(nRides)
+      .withCost(cost)
+      .withOpeningHours(opening, closing)
+      .build();
+  }
+
   /** Create a flex access arriving at given stop by walking with 1 ride/extra transfer. */
   public static TestAccessEgress flexAndWalk(int stop, int durationInSeconds) {
     return flexAndWalk(stop, durationInSeconds, 1, walkCost(durationInSeconds));
@@ -125,6 +135,23 @@ public class TestAccessEgress implements RaptorAccessEgress {
   ) {
     assert nRides > DEFAULT_NUMBER_OF_RIDES;
     return new Builder(stop, durationInSeconds).withNRides(nRides).withCost(cost).build();
+  }
+
+  /** Create a flex access arriving at given stop by walking, including opening hours */
+  public static TestAccessEgress flexAndWalk(
+    int stop,
+    int durationInSeconds,
+    int nRides,
+    int cost,
+    int opening,
+    int closing
+  ) {
+    assert nRides > DEFAULT_NUMBER_OF_RIDES;
+    return new Builder(stop, durationInSeconds)
+      .withNRides(nRides)
+      .withCost(cost)
+      .withOpeningHours(opening, closing)
+      .build();
   }
 
   public static Collection<RaptorAccessEgress> transfers(int... stopTimes) {

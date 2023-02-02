@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.DurationUtils.durationToStr;
 import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexWithOnBoard;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 
@@ -169,11 +169,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     EGRESS_COST
   );
   // this is of course not a real flex egress
-  private static final RaptorAccessEgress FLEX = flexWithOnBoard(
-    STOP_E,
-    EGRESS_DURATION,
-    EGRESS_COST
-  );
+  private static final RaptorAccessEgress FLEX = flex(STOP_E, EGRESS_DURATION, 1, EGRESS_COST);
 
   public static final String LINE_11 = "L11";
   public static final String LINE_21 = "L21";
