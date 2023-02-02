@@ -498,7 +498,7 @@ public class OrcaFareService extends DefaultFareService {
     float transferDiscount
   ) {
     var id = new FeedScopedId("orcaFares", "farePayment");
-    var riderCategory = new RiderCategory("orcaFares", getFareCategory(fareType), "");
+    var riderCategory = new RiderCategory("orcaFares", getFareCategory(fareType), null);
     var fareContainer = new FareContainer("orcaFares", usesOrca(fareType) ? "electronic" : "cash");
     var duration = Duration.ZERO;
     var money = new Money(currency, (int) (totalFare * 100));
