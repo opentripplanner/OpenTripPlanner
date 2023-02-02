@@ -117,14 +117,14 @@ public class DataImportIssueReporter implements GraphBuilderModule {
    */
   private List<Bucket> partitionIssues() {
     //Groups issues according to issue type
-    Map<String, List<DataImportIssue>> sortedIssuesByType = issueStore
+    Map<String, List<DataImportIssue>> issuesByType = issueStore
       .listIssues()
       .stream()
       .collect(Collectors.groupingBy(DataImportIssue::getType));
 
     List<Bucket> buckets = new ArrayList<>();
 
-    for (Map.Entry<String, List<DataImportIssue>> entry : sortedIssuesByType.entrySet()) {
+    for (Map.Entry<String, List<DataImportIssue>> entry : issuesByType.entrySet()) {
       var key = entry.getKey();
 
       // Sort each issue type by priority
