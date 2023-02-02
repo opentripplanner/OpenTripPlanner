@@ -1,4 +1,4 @@
-# HSL Legacy GraphQL API - OTP Sandbox Extension
+# HSL Legacy GraphQL API
 
 ## Contact Info
 
@@ -9,7 +9,7 @@
 
 To enable this you need to add the feature `SandboxAPILegacyGraphQLApi`.
 
-```
+```json
 // otp-config.json
 {
   "otpFeatures" : {
@@ -40,7 +40,7 @@ curl --request POST \
 
 ## Built-in API client
 
-A browser based GraphQL API client is available at `http://localhost:8080/legacygraphql/graphiql` 
+A browser based GraphQL API client is available at [http://localhost:8080/legacygraphql/graphiql](http://localhost:8080/legacygraphql/graphiql)
 
 ![GraphiQL](../images/graphiql.png)
 

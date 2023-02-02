@@ -1,12 +1,10 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.STREET_MODE;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
 
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
-import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 
 class ModeInputType {
 

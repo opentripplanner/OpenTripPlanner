@@ -4,14 +4,12 @@ import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSource;
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
 import org.opentripplanner.ext.vilkkubikerental.VilkkuBikeRentalDataSource;
 import org.opentripplanner.ext.vilkkubikerental.VilkkuBikeRentalDataSourceParameters;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 public class VehicleRentalDataSourceFactory {
 
-  public static DataSource<VehicleRentalPlace> create(VehicleRentalDataSourceParameters source) {
+  public static VehicleRentalDatasource create(VehicleRentalDataSourceParameters source) {
     return switch (source.sourceType()) {
       // There used to be a lot more updaters and corresponding config variables here, but since
       // the industry has largely moved towards GBFS, they were removed.

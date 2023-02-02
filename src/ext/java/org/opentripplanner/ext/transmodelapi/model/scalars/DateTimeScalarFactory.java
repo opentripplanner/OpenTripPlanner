@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 
@@ -20,7 +21,23 @@ public final class DateTimeScalarFactory {
     "Format:  `YYYY-MM-DD'T'hh:mm[:ss](Z|±01:00)`\n\n" +
     "Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`";
 
-  private static final DateTimeFormatter PARSER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+  // We need to have two offsets, in order to parse both "+0200" and "+02:00". The first is not
+  // really ISO-8601 compatible with the extended date and time. We need to make parsing strict, in
+  // order to keep the minute mandatory, otherwise we would be left with an unparsed minute
+  private static final DateTimeFormatter PARSER = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .parseLenient()
+    .append(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+    .optionalStart()
+    .parseStrict()
+    .appendOffset("+HH:MM:ss", "Z")
+    .parseLenient()
+    .optionalEnd()
+    .optionalStart()
+    .appendOffset("+HHmmss", "Z")
+    .optionalEnd()
+    .toFormatter();
+
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
   private DateTimeScalarFactory() {}

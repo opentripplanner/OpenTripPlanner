@@ -31,6 +31,7 @@ class TransitPreferencesTest {
   private static final SearchDirection RAPTOR_SEARCH_DIRECTION = SearchDirection.REVERSE;
   private static final boolean IGNORE_REALTIME_UPDATES = true;
   private static final boolean INCLUDE_PLANNED_CANCELLATIONS = true;
+  private static final boolean INCLUDE_REALTIME_CANCELLATIONS = true;
 
   private final TransitPreferences subject = TransitPreferences
     .of()
@@ -41,6 +42,7 @@ class TransitPreferencesTest {
     .withAlightSlack(b -> b.withDefault(D15s).with(TransitMode.AIRPLANE, D25m))
     .setIgnoreRealtimeUpdates(IGNORE_REALTIME_UPDATES)
     .setIncludePlannedCancellations(INCLUDE_PLANNED_CANCELLATIONS)
+    .setIncludeRealtimeCancellations(INCLUDE_REALTIME_CANCELLATIONS)
     .withRaptor(b -> b.withSearchDirection(RAPTOR_SEARCH_DIRECTION))
     .build();
 
@@ -84,6 +86,12 @@ class TransitPreferencesTest {
   }
 
   @Test
+  void includeRealtimeCancellations() {
+    assertFalse(TransitPreferences.DEFAULT.includeRealtimeCancellations());
+    assertTrue(subject.includeRealtimeCancellations());
+  }
+
+  @Test
   void raptorOptions() {
     assertEquals(RAPTOR_SEARCH_DIRECTION, subject.raptor().searchDirection());
   }
@@ -111,6 +119,7 @@ class TransitPreferencesTest {
       "unpreferredCost: f(x) = 300 + 1.15 x, " +
       "ignoreRealtimeUpdates, " +
       "includePlannedCancellations, " +
+      "includeRealtimeCancellations, " +
       "raptor: RaptorPreferences{searchDirection: REVERSE}" +
       "}",
       subject.toString()

@@ -1,26 +1,19 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public class TooManyAreasInRelation implements DataImportIssue {
-
-  public static final String FMT = "Too many areas in relation %s";
-  public static final String HTMLFMT =
-    "Too many areas in relation <a href='http://www.openstreetmap.org/relation/%s'>'%s'</a>";
-
-  final long relationId;
-
-  public TooManyAreasInRelation(long relationId) {
-    this.relationId = relationId;
-  }
+public record TooManyAreasInRelation(OSMWithTags entity) implements DataImportIssue {
+  private static String FMT = "Too many areas in relation %s";
+  private static String HTMLFMT = "Too many areas in relation  <a href='%s'>'%s'</a>";
 
   @Override
   public String getHTMLMessage() {
-    return String.format(HTMLFMT, relationId, relationId);
+    return String.format(HTMLFMT, entity.getOpenStreetMapLink(), entity.getId());
   }
 
   @Override
   public String getMessage() {
-    return String.format(FMT, relationId);
+    return String.format(FMT, entity.getId());
   }
 }

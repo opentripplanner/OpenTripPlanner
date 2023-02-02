@@ -1,5 +1,9 @@
 package org.opentripplanner.updater.vehicle_position;
 
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -10,10 +14,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -21,15 +25,21 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.model.UpdateError;
+import org.opentripplanner.model.UpdateSuccess;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.updater.ResultLogger;
+import org.opentripplanner.updater.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,15 +82,20 @@ public class VehiclePositionPatternMatcher {
    *
    * @param vehiclePositions List of vehicle positions to match to patterns
    */
-  public void applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions) {
+  public UpdateResult applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions) {
+    var matchResults = vehiclePositions
+      .stream()
+      .map(vehiclePosition -> toRealtimeVehiclePosition(feedId, vehiclePosition))
+      .toList();
+
     // we take the list of positions and out of them create a Map<TripPattern, List<VehiclePosition>>
     // that map makes it very easy to update the positions in the service
     // it also enables the bookkeeping about which pattern previously had positions but no longer do
     // these need to be removed from the service as we assume that the vehicle has stopped
-    var positions = vehiclePositions
+    var positions = matchResults
       .stream()
-      .map(vehiclePosition -> toRealtimeVehiclePosition(feedId, vehiclePosition))
-      .filter(Objects::nonNull)
+      .filter(Result::isSuccess)
+      .map(Result::successValue)
       .collect(Collectors.groupingBy(PatternAndVehiclePosition::pattern))
       .entrySet()
       .stream()
@@ -111,6 +126,22 @@ public class VehiclePositionPatternMatcher {
         feedId
       );
     }
+
+    // need to convert the sucess to the correct type.
+    var results = matchResults
+      .stream()
+      .map(e -> e.mapSuccess(ignored -> UpdateSuccess.noWarnings()))
+      .toList();
+    // needs to be put into a new list so the types are correct
+    var updateResult = UpdateResult.ofResults(new ArrayList<>(results));
+    ResultLogger.logUpdateResult(
+      feedId,
+      "vehicle-positions",
+      vehiclePositions.size(),
+      updateResult
+    );
+
+    return updateResult;
   }
 
   private LocalDate inferServiceDate(Trip trip) {
@@ -241,27 +272,33 @@ public class VehiclePositionPatternMatcher {
     }
   }
 
-  private PatternAndVehiclePosition toRealtimeVehiclePosition(
+  private Result<PatternAndVehiclePosition, UpdateError> toRealtimeVehiclePosition(
     String feedId,
     VehiclePosition vehiclePosition
   ) {
     if (!vehiclePosition.hasTrip()) {
-      LOG.warn(
+      LOG.debug(
         "Realtime vehicle positions {} has no trip ID. Ignoring.",
         toString(vehiclePosition)
       );
-      return null;
+      return Result.failure(UpdateError.noTripId(INVALID_INPUT_STRUCTURE));
     }
 
     var tripId = vehiclePosition.getTrip().getTripId();
-    var trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
+
+    if (!StringUtils.hasValue(tripId)) {
+      return Result.failure(UpdateError.noTripId(UpdateError.UpdateErrorType.NO_TRIP_ID));
+    }
+
+    var scopedTripId = new FeedScopedId(feedId, tripId);
+    var trip = getTripForId.apply(scopedTripId);
     if (trip == null) {
-      LOG.warn(
+      LOG.debug(
         "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
         feedId,
         tripId
       );
-      return null;
+      return UpdateError.result(scopedTripId, TRIP_NOT_FOUND);
     }
 
     var serviceDate = Optional
@@ -272,14 +309,14 @@ public class VehiclePositionPatternMatcher {
 
     var pattern = getRealtimePattern.apply(trip, serviceDate);
     if (pattern == null) {
-      LOG.warn("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
-      return null;
+      LOG.debug("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
+      return UpdateError.result(scopedTripId, NO_SERVICE_ON_DATE);
     }
 
     // Add position to pattern
     var newPosition = mapVehiclePosition(vehiclePosition, pattern.getStops(), trip);
 
-    return new PatternAndVehiclePosition(pattern, newPosition);
+    return Result.success(new PatternAndVehiclePosition(pattern, newPosition));
   }
 
   record PatternAndVehiclePosition(TripPattern pattern, RealtimeVehiclePosition position) {}

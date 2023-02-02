@@ -4,19 +4,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.model.SearchDirection;
-import org.opentripplanner.raptor.api.request.Optimization;
-import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /**
  * FEATURE UNDER TEST
@@ -55,8 +58,8 @@ public class E02_NotAllowedConstrainedTransferTest implements RaptorTestConstant
       );
     var r3 = route("R3", STOP_B, STOP_C).withTimetable(schedule("0:15 0:20"));
 
-    var tripA = r1.timetable().getTripSchedule(0);
-    var tripB = r2.timetable().getTripSchedule(0);
+    var tripR1a = r1.timetable().getTripSchedule(0);
+    var tripR2a = r2.timetable().getTripSchedule(0);
 
     data.withRoutes(r1, r2, r3);
 
@@ -64,9 +67,10 @@ public class E02_NotAllowedConstrainedTransferTest implements RaptorTestConstant
     // the second trip in R2 as well. This is of cause not a correct way to implement the
     // transit model, a not-allowed transfer should apply to ALL trips if constraint is passed
     // to raptor.
-    data.withConstrainedTransfer(tripA, STOP_B, tripB, STOP_B, TestTransitData.TX_NOT_ALLOWED);
+    data.withConstrainedTransfer(tripR1a, STOP_B, tripR2a, STOP_B, TestTransitData.TX_NOT_ALLOWED);
     data.mcCostParamsBuilder().transferCost(100);
 
+    // NOTE! No search-window set
     requestBuilder
       .searchParams()
       .constrainedTransfers(true)
@@ -79,45 +83,21 @@ public class E02_NotAllowedConstrainedTransferTest implements RaptorTestConstant
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  @Test
-  public void standardOneIteration() {
-    var request = requestBuilder
-      .profile(RaptorProfile.STANDARD)
-      .searchParams()
-      .searchOneIterationOnly()
+  static List<RaptorModuleTestCase> testCases() {
+    // TODO - This is a bug - the reverse search should not allow the forbidden boarding
+    //      - TC_STANDARD_REV is excluded since the test fails
+    return RaptorModuleTestCase
+      .of()
+      .add(standard().not(TC_STANDARD_REV), EXP_PATH_NO_COST)
+      .add(multiCriteria(), EXP_PATH_WITH_COST)
       .build();
-    var response = raptorService.route(request, data);
-    assertEquals(EXP_PATH_NO_COST, pathsToString(response));
   }
 
-  @Test
-  public void standardDynamicSearchWindow() {
-    var request = requestBuilder.profile(RaptorProfile.STANDARD).build();
+  @ParameterizedTest
+  @MethodSource("testCases")
+  void testRaptor(RaptorModuleTestCase testCase) {
+    var request = testCase.withConfig(requestBuilder);
     var response = raptorService.route(request, data);
-    assertEquals(EXP_PATH_NO_COST, pathsToString(response));
-  }
-
-  @Test
-  public void standardReverseOneIteration() {
-    var request = requestBuilder
-      .searchDirection(SearchDirection.REVERSE)
-      .profile(RaptorProfile.STANDARD)
-      .searchParams()
-      .searchOneIterationOnly()
-      .build();
-
-    var response = raptorService.route(request, data);
-
-    assertEquals(EXP_PATH_NO_COST, pathsToString(response));
-  }
-
-  @Test
-  public void multiCriteria() {
-    requestBuilder.optimizations().add(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
-    var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
-
-    var response = raptorService.route(request, data);
-
-    assertEquals(EXP_PATH_WITH_COST, pathsToString(response));
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 }

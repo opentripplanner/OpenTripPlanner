@@ -358,7 +358,8 @@ public class NetexMapper {
 
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       idFactory,
-      transitBuilder.getStops().values()
+      transitBuilder.getStops().values(),
+      issueStore
     );
 
     for (FlexibleStopPlace flexibleStopPlace : flexibleStopPlaces) {

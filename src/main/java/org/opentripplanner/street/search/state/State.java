@@ -146,7 +146,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   public boolean vehicleRentalIsFinished() {
     return (
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
-      stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING ||
+      (
+        stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING &&
+        !stateData.insideNoRentalDropOffArea
+      ) ||
       (
         getRequest().rental().allowArrivingInRentedVehicleAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
@@ -367,6 +370,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public DataOverlayContext dataOverlayContext() {
     return request.dataOverlayContext();
+  }
+
+  public boolean isInsideNoRentalDropOffArea() {
+    return stateData.insideNoRentalDropOffArea;
   }
 
   protected State clone() {

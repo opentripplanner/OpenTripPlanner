@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.issue.report;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
@@ -102,16 +103,20 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
         );
       }
 
+      Iterable<Multiset.Entry<String>> sortedIssueTypes = ImmutableSortedMultiset
+        .copyOf(issueTypeOccurrences)
+        .entrySet();
+
       //Actual writing to the file is made here since
       // this is the first place where actual number of files is known (because it depends on
       // the issue count)
       for (HTMLWriter writer : writers) {
-        writer.writeFile(issueTypeOccurrences, false);
+        writer.writeFile(sortedIssueTypes, false);
       }
 
       try {
         HTMLWriter indexFileWriter = new HTMLWriter("index", (Multimap<String, String>) null);
-        indexFileWriter.writeFile(issueTypeOccurrences, true);
+        indexFileWriter.writeFile(sortedIssueTypes, true);
       } catch (Exception e) {
         LOG.error("Index file coudn't be created:{}", e.getMessage());
       }
@@ -232,7 +237,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
       this.issueTypeName = filename;
     }
 
-    private void writeFile(Multiset<String> classes, boolean isIndexFile) {
+    private void writeFile(Iterable<Multiset.Entry<String>> classes, boolean isIndexFile) {
       try (
         PrintWriter out = new PrintWriter(target.asOutputStream(), true, StandardCharsets.UTF_8)
       ) {
@@ -287,8 +292,9 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
         );
         out.println("<h2>Graph report for <em>graph.obj</em></h2>");
         out.println("<p>");
+
         //adds links to the other HTML files
-        for (Multiset.Entry<String> htmlIssueType : classes.entrySet()) {
+        for (Multiset.Entry<String> htmlIssueType : classes) {
           String label_name = htmlIssueType.getElement();
           String label;
           int currentCount = 1;

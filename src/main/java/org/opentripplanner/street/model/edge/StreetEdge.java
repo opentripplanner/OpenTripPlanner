@@ -28,6 +28,7 @@ import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -387,8 +388,16 @@ public class StreetEdge
   public State traverse(State s0) {
     final StateEditor editor;
 
+    // if the traversal is banned for the current state because of a GBFS geofencing zone
+    // we drop the vehicle and continue walking
+    if (s0.getRequest().mode().includesRenting() && tov.rentalTraversalBanned(s0)) {
+      editor = doTraverse(s0, TraverseMode.WALK, false);
+      if (editor != null) {
+        editor.dropFloatingVehicle();
+      }
+    }
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
-    if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
+    else if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
         editor = doTraverse(s0, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
@@ -403,6 +412,19 @@ public class StreetEdge
     }
 
     State state = editor != null ? editor.makeState() : null;
+
+    // we are transitioning into a no-drop-off zone therefore we add a second state for dropping
+    // off the vehicle and walking
+    if (!fromv.rentalDropOffBanned(s0) && tov.rentalDropOffBanned(s0)) {
+      StateEditor afterTraversal = doTraverse(s0, TraverseMode.WALK, false);
+      if (afterTraversal != null) {
+        afterTraversal.dropFloatingVehicle();
+        afterTraversal.leaveNoRentalDropOffArea();
+        var forkState = afterTraversal.makeState();
+        forkState.addToExistingResultChain(state);
+        return forkState;
+      }
+    }
 
     if (canPickupAndDrive(s0) && canTraverse(TraverseMode.CAR)) {
       StateEditor inCar = doTraverse(s0, TraverseMode.CAR, false);
@@ -471,6 +493,14 @@ public class StreetEdge
     return hasElevationExtension()
       ? elevationExtension.getEffectiveWalkDistance()
       : getDistanceMeters();
+  }
+
+  /**
+   * This method is not thread-safe.
+   */
+  public void removeRentalExtension(RentalRestrictionExtension ext) {
+    fromv.removeRentalRestriction(ext);
+    tov.removeRentalRestriction(ext);
   }
 
   private void setGeometry(LineString geometry) {
@@ -644,6 +674,13 @@ public class StreetEdge
 
   public void setCostExtension(StreetEdgeCostExtension costExtension) {
     this.costExtension = costExtension;
+  }
+
+  /**
+   * This method is not thread-safe!
+   */
+  public void addRentalRestriction(RentalRestrictionExtension ext) {
+    fromv.addRentalRestriction(ext);
   }
 
   /**
@@ -895,6 +932,7 @@ public class StreetEdge
     splitEdge.setLink(isLink());
     splitEdge.setCarSpeed(getCarSpeed());
     splitEdge.setElevationExtensionUsingParent(this, fromDistance, toDistance);
+    splitEdge.addRentalRestriction(fromv.rentalRestrictions());
   }
 
   protected void setElevationExtensionUsingParent(
@@ -988,6 +1026,14 @@ public class StreetEdge
 
     if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, s1)) {
       return null;
+    }
+
+    if (s0.getRequest().mode().includesRenting()) {
+      if (tov.rentalDropOffBanned(s0)) {
+        s1.enterNoRentalDropOffArea();
+      } else if (s0.isInsideNoRentalDropOffArea() && !tov.rentalDropOffBanned(s0)) {
+        s1.leaveNoRentalDropOffArea();
+      }
     }
 
     final RoutingPreferences preferences = s0.getPreferences();

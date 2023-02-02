@@ -30,16 +30,16 @@ public class AlertMapper {
 
   ApiAlert mapToApi(TransitAlert domain) {
     ApiAlert api = new ApiAlert();
-    if (domain.alertHeaderText != null) {
-      api.alertHeaderText = domain.alertHeaderText.toString(locale);
+    if (domain.headerText() != null) {
+      api.alertHeaderText = domain.headerText().toString(locale);
     }
 
-    if (domain.alertDescriptionText != null) {
-      api.alertDescriptionText = domain.alertDescriptionText.toString(locale);
+    if (domain.descriptionText() != null) {
+      api.alertDescriptionText = domain.descriptionText().toString(locale);
     }
 
-    if (domain.alertUrl != null) {
-      api.alertUrl = domain.alertUrl.toString(locale);
+    if (domain.url() != null) {
+      api.alertUrl = domain.url().toString(locale);
     }
 
     api.effectiveStartDate = ofNullableInstant(domain.getEffectiveStartDate());

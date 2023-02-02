@@ -31,10 +31,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
@@ -69,7 +72,12 @@ import org.opentripplanner.ext.transmodelapi.model.plan.RoutingErrorType;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripPatternType;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripQuery;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripType;
+import org.opentripplanner.ext.transmodelapi.model.plan.ViaLocationInputType;
+import org.opentripplanner.ext.transmodelapi.model.plan.ViaSegmentInputType;
+import org.opentripplanner.ext.transmodelapi.model.plan.ViaTripQuery;
+import org.opentripplanner.ext.transmodelapi.model.plan.ViaTripType;
 import org.opentripplanner.ext.transmodelapi.model.siri.et.EstimatedCallType;
+import org.opentripplanner.ext.transmodelapi.model.siri.sx.AffectsType;
 import org.opentripplanner.ext.transmodelapi.model.siri.sx.PtSituationElementType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeParkType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeRentalStationType;
@@ -127,53 +135,8 @@ public class TransmodelGraphQLSchema {
     this.routing = new DefaultRouteRequestType(defaultRequest);
   }
 
-  public static GraphQLSchema create(RouteRequest defaultRequest, GqlUtil qglUtil) {
-    return new TransmodelGraphQLSchema(defaultRequest, qglUtil).create();
-  }
-
-  public GraphQLObjectType createPlanType(
-    GraphQLOutputType bookingArrangementType,
-    GraphQLOutputType interchangeType,
-    GraphQLOutputType linkGeometryType,
-    GraphQLOutputType systemNoticeType,
-    GraphQLOutputType authorityType,
-    GraphQLOutputType operatorType,
-    GraphQLOutputType bikeRentalStationType,
-    GraphQLOutputType rentalVehicleType,
-    GraphQLOutputType quayType,
-    GraphQLOutputType estimatedCallType,
-    GraphQLOutputType lineType,
-    GraphQLOutputType serviceJourneyType,
-    GraphQLOutputType ptSituationElementType,
-    GraphQLOutputType datedServiceJourneyType
-  ) {
-    GraphQLObjectType tripMetadataType = TripMetadataType.create(gqlUtil);
-    GraphQLObjectType placeType = PlanPlaceType.create(
-      bikeRentalStationType,
-      rentalVehicleType,
-      quayType
-    );
-    GraphQLObjectType pathGuidanceType = PathGuidanceType.create();
-    GraphQLObjectType legType = LegType.create(
-      bookingArrangementType,
-      interchangeType,
-      linkGeometryType,
-      authorityType,
-      operatorType,
-      quayType,
-      estimatedCallType,
-      lineType,
-      serviceJourneyType,
-      datedServiceJourneyType,
-      ptSituationElementType,
-      placeType,
-      pathGuidanceType,
-      gqlUtil
-    );
-    GraphQLObjectType tripPatternType = TripPatternType.create(systemNoticeType, legType, gqlUtil);
-    GraphQLObjectType routingErrorType = RoutingErrorType.create();
-
-    return TripType.create(placeType, tripPatternType, tripMetadataType, routingErrorType, gqlUtil);
+  public static GraphQLSchema create(RouteRequest defaultRequest, GqlUtil gqlUtil) {
+    return new TransmodelGraphQLSchema(defaultRequest, gqlUtil).create();
   }
 
   //    private BookingArrangement getBookingArrangementForTripTimeShort(TripTimeShort tripTimeShort) {
@@ -275,6 +238,15 @@ public class TransmodelGraphQLSchema {
     );
     GraphQLOutputType interchangeType = InterchangeType.create(lineType, ServiceJourneyType.REF);
 
+    GraphQLOutputType affectsType = AffectsType.create(
+      quayType,
+      stopPlaceType,
+      lineType,
+      ServiceJourneyType.REF,
+      DatedServiceJourneyType.REF,
+      gqlUtil
+    );
+
     // Timetable
     GraphQLNamedOutputType ptSituationElementType = PtSituationElementType.create(
       authorityType,
@@ -285,6 +257,8 @@ public class TransmodelGraphQLSchema {
       multilingualStringType,
       validityPeriodType,
       infoLinkType,
+      affectsType,
+      gqlUtil,
       relay
     );
     GraphQLOutputType journeyPatternType = JourneyPatternType.create(
@@ -339,24 +313,53 @@ public class TransmodelGraphQLSchema {
       gqlUtil
     );
 
-    GraphQLOutputType tripType = createPlanType(
+    GraphQLObjectType tripMetadataType = TripMetadataType.create(gqlUtil);
+    GraphQLObjectType placeType = PlanPlaceType.create(
+      bikeRentalStationType,
+      rentalVehicleType,
+      quayType
+    );
+    GraphQLObjectType pathGuidanceType = PathGuidanceType.create();
+    GraphQLObjectType legType = LegType.create(
       bookingArrangementType,
       interchangeType,
       linkGeometryType,
-      systemNoticeType,
       authorityType,
       operatorType,
-      bikeRentalStationType,
-      rentalVehicleType,
       quayType,
       estimatedCallType,
       lineType,
       serviceJourneyType,
+      datedServiceJourneyType,
       ptSituationElementType,
-      datedServiceJourneyType
+      placeType,
+      pathGuidanceType,
+      gqlUtil
+    );
+    GraphQLObjectType tripPatternType = TripPatternType.create(systemNoticeType, legType, gqlUtil);
+    GraphQLObjectType routingErrorType = RoutingErrorType.create();
+
+    GraphQLOutputType tripType = TripType.create(
+      placeType,
+      tripPatternType,
+      tripMetadataType,
+      routingErrorType,
+      gqlUtil
     );
 
     GraphQLFieldDefinition tripQuery = TripQuery.create(routing, tripType, gqlUtil);
+
+    GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
+    GraphQLInputObjectType viaLocationInputType = ViaLocationInputType.create(gqlUtil);
+    GraphQLInputObjectType viaSegmentInputType = ViaSegmentInputType.create();
+
+    GraphQLFieldDefinition viaTripQuery = ViaTripQuery.create(
+      routing,
+      viaTripType,
+      viaLocationInputType,
+      viaSegmentInputType,
+      gqlUtil
+    );
 
     GraphQLInputObjectType inputPlaceIds = GraphQLInputObjectType
       .newInputObject()
@@ -407,6 +410,7 @@ public class TransmodelGraphQLSchema {
       .newObject()
       .name("QueryType")
       .field(tripQuery)
+      .field(viaTripQuery)
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
@@ -740,7 +744,7 @@ public class TransmodelGraphQLSchema {
             try {
               stops =
                 GqlUtil
-                  .getRoutingService(environment)
+                  .getGraphFinder(environment)
                   .findClosestStops(
                     new Coordinate(
                       environment.getArgument("longitude"),
@@ -922,7 +926,7 @@ public class TransmodelGraphQLSchema {
             List<PlaceAtDistance> places;
             places =
               GqlUtil
-                .getRoutingService(environment)
+                .getGraphFinder(environment)
                 .findClosestPlaces(
                   environment.getArgument("latitude"),
                   environment.getArgument("longitude"),
@@ -933,8 +937,6 @@ public class TransmodelGraphQLSchema {
                   filterByStops,
                   filterByRoutes,
                   filterByBikeRentalStations,
-                  filterByBikeParks,
-                  filterByCarParks,
                   GqlUtil.getTransitService(environment)
                 );
 
@@ -1336,10 +1338,7 @@ public class TransmodelGraphQLSchema {
           .type(new GraphQLNonNull(new GraphQLList(bikeRentalStationType)))
           .dataFetcher(environment -> {
             Collection<VehicleRentalPlace> all = new ArrayList<>(
-              GqlUtil
-                .getRoutingService(environment)
-                .getVehicleRentalService()
-                .getVehicleRentalStations()
+              GqlUtil.getVehicleRentalService(environment).getVehicleRentalStations()
             );
             List<String> filterByIds = environment.getArgument("ids");
             if (filterByIds != null && !filterByIds.isEmpty()) {
@@ -1368,8 +1367,7 @@ public class TransmodelGraphQLSchema {
           )
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
-              .getVehicleRentalService()
+              .getVehicleRentalService(environment)
               .getVehicleRentalStations()
               .stream()
               .filter(bikeRentalStation ->
@@ -1409,8 +1407,7 @@ public class TransmodelGraphQLSchema {
           )
           .dataFetcher(environment ->
             GqlUtil
-              .getRoutingService(environment)
-              .getVehicleRentalService()
+              .getVehicleRentalService(environment)
               .getVehicleRentalStationForEnvelope(
                 environment.getArgument("minimumLongitude"),
                 environment.getArgument("minimumLatitude"),
@@ -1437,8 +1434,7 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment -> {
             var bikeParkId = TransitIdMapper.mapIDToDomain(environment.getArgument("id"));
             return GqlUtil
-              .getRoutingService(environment)
-              .getVehicleParkingService()
+              .getVehicleParkingService(environment)
               .getBikeParks()
               .filter(bikePark -> bikePark.getId().equals(bikeParkId))
               .findFirst()
@@ -1455,8 +1451,7 @@ public class TransmodelGraphQLSchema {
           .type(new GraphQLNonNull(new GraphQLList(bikeParkType)))
           .dataFetcher(environment ->
             GqlUtil
-              .getRoutingService(environment)
-              .getVehicleParkingService()
+              .getVehicleParkingService(environment)
               .getBikeParks()
               .collect(Collectors.toCollection(ArrayList::new))
           )
@@ -1484,6 +1479,17 @@ public class TransmodelGraphQLSchema {
               .newArgument()
               .name("authorities")
               .description("Filter by reporting authorities.")
+              .deprecate(
+                "Use codespaces instead. This only uses the codespace of the given authority."
+              )
+              .type(new GraphQLList(Scalars.GraphQLString))
+              .build()
+          )
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("codespaces")
+              .description("Filter by reporting source.")
               .type(new GraphQLList(Scalars.GraphQLString))
               .build()
           )
@@ -1500,20 +1506,37 @@ public class TransmodelGraphQLSchema {
               .getTransitService(environment)
               .getTransitAlertService()
               .getAllAlerts();
-            if ((environment.getArgument("authorities") instanceof List)) {
+
+            Set<String> codespaces = new HashSet<>();
+
+            if (environment.getArgument("authorities") instanceof List) {
               List<String> authorities = environment.getArgument("authorities");
+              authorities
+                .stream()
+                .map(authority -> authority.split(":")[0])
+                .filter(Objects::nonNull)
+                .filter(Predicate.not(String::isBlank))
+                .forEach(codespaces::add);
+            }
+
+            if (environment.getArgument("codespaces") instanceof List) {
+              codespaces.addAll((environment.getArgument("codespaces")));
+            }
+
+            if (!codespaces.isEmpty()) {
               alerts =
                 alerts
                   .stream()
-                  .filter(alert -> authorities.contains(alert.getFeedId()))
+                  .filter(alert -> codespaces.contains(alert.siriCodespace()))
                   .collect(Collectors.toSet());
             }
-            if ((environment.getArgument("severities") instanceof List)) {
+
+            if (environment.getArgument("severities") instanceof List) {
               List<String> severities = environment.getArgument("severities");
               alerts =
                 alerts
                   .stream()
-                  .filter(alert -> severities.contains(getTransmodelSeverity(alert.severity)))
+                  .filter(alert -> severities.contains(getTransmodelSeverity(alert.severity())))
                   .collect(Collectors.toSet());
             }
             return alerts;
@@ -1535,10 +1558,14 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
+            String situationNumber = environment.getArgument("situationNumber");
+            if (situationNumber.isBlank()) {
+              return null;
+            }
             return GqlUtil
               .getTransitService(environment)
               .getTransitAlertService()
-              .getAlertById(environment.getArgument("situationNumber"));
+              .getAlertById(TransitIdMapper.mapIDToDomain(situationNumber));
           })
           .build()
       )

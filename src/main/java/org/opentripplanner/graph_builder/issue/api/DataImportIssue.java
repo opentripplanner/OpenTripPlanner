@@ -27,7 +27,7 @@ public interface DataImportIssue {
   String getMessage();
 
   /**
-   * Priority for issue sorting. The issue with the highhest priority will appear first in its class.
+   * Priority for issue sorting. The issue with the highest priority will appear first in its class.
    */
   default int getPriority() {
     return 0;

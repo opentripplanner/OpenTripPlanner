@@ -51,7 +51,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public TransitAlert getAlertById(String id) {
+  public TransitAlert getAlertById(FeedScopedId id) {
     return transitAlertServices
       .stream()
       .map(transitAlertService -> transitAlertService.getAlertById(id))

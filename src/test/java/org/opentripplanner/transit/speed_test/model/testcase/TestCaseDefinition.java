@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.speed_test.model.testcase;
 
 import java.time.Duration;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RequestModes;
 
 public record TestCaseDefinition(
   String id,
@@ -20,7 +20,7 @@ public record TestCaseDefinition(
    * "Long Distance".
    */
   String category,
-  RequestModes modes
+  QualifiedModeSet modes
 ) {
   @Override
   public String toString() {

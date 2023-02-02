@@ -80,11 +80,11 @@ jobs:
 
       - name: Install Python dependencies
         run: pip install -r docs/requirements.txt
-
+        
       - name: Build documentation
         if: github.event_name == 'pull_request'
         run: mkdocs build
-
+        
       - name: Deploy docs to Github pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
         run: |
