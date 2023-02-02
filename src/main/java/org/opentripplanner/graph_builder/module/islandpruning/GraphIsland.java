@@ -18,6 +18,11 @@ public record GraphIsland(
     "Pruned %s <a href='http://www.openstreetmap.org/node/%s'>subgraph %s</a> of %d street vertices %d stops. Edge changes: %d to nothru, %d to no traversal, %d erased";
 
   @Override
+  public String getType() {
+    return "GraphIsland" + traversalMode + (nothru != 0 ? "NoThroughTraffic" : "");
+  }
+
+  @Override
   public String getMessage() {
     Vertex vertex = island.getRepresentativeVertex();
     return String.format(
