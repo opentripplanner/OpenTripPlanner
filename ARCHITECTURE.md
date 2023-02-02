@@ -15,18 +15,18 @@ Be sure to also read the [developer documentation](docs/Developers-Guide.md).
 
 ## Modules/Components
 
-The diagram show a "generic" version on how we want to model the OTP components.   
+The diagram shows a "generic" version on how we want to model the OTP components.   
 
 ![MainModelOverview](docs/images/ServiceModelOverview.png)
 
- - `Use Case Service` A service witch combine the functionality in many `Domain Services` to fulfill
+ - `Use Case Service` A service which combine the functionality in many `Domain Services` to fulfill
    a use-case or set of features. It may have an api with request/response classes. These are 
    usually stateless; Hence the `Use Case Service` does normally not have a model. The implementing
    class has the same name as the interface with prefix `Default`.
- - `Domain Service` A service witch is the aggregate root for a domain model. The model can be 
+ - `Domain Service` A service which is the aggregate root for a domain model. The model can be 
    immutable (created at Graph build time) or support real-time updates. We separate the *read-only*
    `Service` from the `Repository`. The `Repository` is responsible for the domain objects lifecycle
-   (insert, save, update and delete). The `Service` is usually a thin layer witch delegates 
+   (insert, save, update and delete). The `Service` is usually a thin layer which delegates 
    to the `Repository`. For small domains you may let the `Repository` implement the `Service` 
    interface.
  - The `Repository` may or may not inherit from the `DomainService` interface. If the domain
