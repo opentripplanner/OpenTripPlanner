@@ -64,7 +64,9 @@ class HTMLWriter {
   }
 
   private void printPrelude(PrintWriter out) {
-    out.println("<html><head><title>Graph report for OTP Graph</title>");
+    out.println("<!DOCTYPE html>");
+    out.println("<html lang=\"en\"><head>");
+    out.println("<title>Graph report for OTP Graph</title>");
     out.println("<meta charset=\"utf-8\">");
     out.println("<meta name='viewport' content='width=device-width, initial-scale=1'>");
     out.println(
