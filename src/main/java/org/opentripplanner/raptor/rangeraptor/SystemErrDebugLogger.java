@@ -4,6 +4,7 @@ import static org.opentripplanner.framework.text.Table.Align.Center;
 import static org.opentripplanner.framework.text.Table.Align.Left;
 import static org.opentripplanner.framework.text.Table.Align.Right;
 import static org.opentripplanner.framework.time.TimeUtils.timeToStrCompact;
+import static org.opentripplanner.framework.time.TimeUtils.timeToStrLong;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -14,7 +15,6 @@ import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.debug.DebugTopic;
@@ -100,14 +100,16 @@ public class SystemErrDebugLogger implements DebugLogger {
     }
 
     RaptorPath<?> p = e.element();
+    var aLeg = p.accessLeg();
+    var eLeg = p.egressLeg();
     System.err.println(
       pathTable.rowAsText(
         e.action().toString(),
         p.numberOfTransfers(),
-        p.accessLeg().toStop(),
-        p.egressLeg().fromStop(),
-        TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
-        TimeUtils.timeToStrLong(p.egressLeg().toTime()),
+        aLeg != null ? aLeg.toStop() : null,
+        eLeg != null ? eLeg.fromStop() : null,
+        aLeg != null ? timeToStrLong(aLeg.fromTime()) : null,
+        eLeg != null ? timeToStrLong(eLeg.toTime()) : null,
         DurationUtils.durationToStr(p.durationInSeconds()),
         OtpNumberFormat.formatCostCenti(p.generalizedCost()),
         details(e.action().toString(), e.reason(), e.element().toString())
@@ -187,7 +189,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         legType(a),
         a.round(),
         IntUtils.intToString(a.stop(), NOT_SET),
-        TimeUtils.timeToStrLong(a.arrivalTime()),
+        timeToStrLong(a.arrivalTime()),
         numFormat.format(a.cost()),
         pattern,
         details(action, optReason, path(a))
@@ -202,7 +204,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         "OnRide",
         p.prevArrival().round() + 1,
         p.boardStopIndex(),
-        TimeUtils.timeToStrLong(p.boardTime()),
+        timeToStrLong(p.boardTime()),
         numFormat.format(p.relativeCost()),
         p.trip().pattern().debugInfo(),
         p.toString()
