@@ -562,7 +562,10 @@ public class OrcaFareServiceImpl extends DefaultFareService {
    * All transit agencies permit free transfers, apart from these.
    */
   private boolean permitsFreeTransfers(RideType rideType) {
-    return rideType != RideType.WASHINGTON_STATE_FERRIES && rideType != RideType.SKAGIT_TRANSIT;
+    return switch (rideType) {
+      case WASHINGTON_STATE_FERRIES, SKAGIT_TRANSIT -> false;
+      default -> true;
+    };
   }
 
   /**
