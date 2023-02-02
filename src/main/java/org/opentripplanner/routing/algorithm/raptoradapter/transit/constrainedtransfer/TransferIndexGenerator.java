@@ -234,17 +234,17 @@ public class TransferIndexGenerator {
 
     // All trips have at least one pattern, no need to check for null here
     var patterns = patternsByTrip.get(trip);
-    var groupedPatterns = patterns
+    var patternsByRealtimeOrScheduled = patterns
       .stream()
       .collect(Collectors.groupingBy(pattern -> pattern.getPattern().isCreatedByRealtimeUpdater()));
 
     // Process first the pattern for which stopPosInPattern was calculated for
-    List<RoutingTripPattern> scheduledPatterns = groupedPatterns.get(Boolean.FALSE);
+    List<RoutingTripPattern> scheduledPatterns = patternsByRealtimeOrScheduled.get(Boolean.FALSE);
     if (scheduledPatterns == null || scheduledPatterns.size() != 1) {
       LOG.warn(
         "Trip {} does not have exactly one scheduled trip pattern, found: {}. " +
         "Skipping transfer generation.",
-        trip.getId(),
+        trip,
         scheduledPatterns
       );
       return List.of();
@@ -257,7 +257,7 @@ public class TransferIndexGenerator {
     TPoint scheduledPoint = new TPoint(scheduledPattern, sourcePoint, trip, stopPosInPattern);
 
     // Return early if only scheduled pattern exists
-    var realtimePatterns = groupedPatterns.get(Boolean.TRUE);
+    var realtimePatterns = patternsByRealtimeOrScheduled.get(Boolean.TRUE);
     if (realtimePatterns == null || realtimePatterns.isEmpty()) {
       return List.of(scheduledPoint);
     }
@@ -290,7 +290,8 @@ public class TransferIndexGenerator {
         scheduledStop,
         stopPosInPattern
       );
-      // TODO - Find the stop in the new pattern.
+      // TODO - Find the expected stop in the new pattern, as its position in the pattern has been
+      //  shifted due to added or removed (not just cancelled) stops in the realtime pattern.
     }
 
     return List.copyOf(res);
