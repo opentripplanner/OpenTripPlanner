@@ -735,6 +735,10 @@ public abstract class RoutingResource {
       }
       {
         var parking = journey.parking();
+        setIfNotNull(
+          useVehicleParkingAvailabilityInformation,
+          parking::setUseAvailabilityInformation
+        );
         setIfNotNull(bannedVehicleParkingTags, parking::setBannedTags);
         setIfNotNull(requiredVehicleParkingTags, parking::setRequiredTags);
       }

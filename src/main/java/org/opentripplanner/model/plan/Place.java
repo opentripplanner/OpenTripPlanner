@@ -133,10 +133,8 @@ public class Place {
       traverseMode = TraverseMode.BICYCLE;
     }
 
-    var preferences = state.getPreferences();
-
     boolean realTime =
-      preferences.parking().useAvailabilityInformation() &&
+      state.getRequest().parking().useAvailabilityInformation() &&
       vertex
         .getVehicleParking()
         .hasRealTimeDataForMode(traverseMode, state.getRequest().wheelchair());

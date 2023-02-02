@@ -20,7 +20,6 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
-import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
@@ -153,6 +152,12 @@ public class RouteRequestConfig {
         )
         .asDuration(dft.searchWindow())
     );
+    vehicleParking.setUseAvailabilityInformation(
+      c
+        .of("useVehicleParkingAvailabilityInformation")
+        .since(V2_1)
+        .asBoolean(vehicleParking.useAvailabilityInformation())
+    );
     vehicleParking.setRequiredTags(
       c
         .of("requiredVehicleParkingTags")
@@ -251,7 +256,6 @@ travel time `x` (in seconds).
     preferences.withCar(it -> mapCarPreferences(c, it));
     preferences.withSystem(it -> mapSystemPreferences(c, it));
     preferences.withTransfer(it -> mapTransferPreferences(c, it));
-    preferences.withParking(mapParkingPreferences(c, preferences));
     preferences.withWalk(it -> mapWalkPreferences(c, it));
     preferences.withWheelchair(mapWheelchairPreferences(c, WHEELCHAIR_ACCESSIBILITY));
     preferences.withItineraryFilter(it -> mapItineraryFilterParams("itineraryFilters", c, it));
@@ -769,18 +773,6 @@ search, hence, making it a bit slower. Recommended values would be from 12 hours
         )
       );
     }
-  }
-
-  private static VehicleParkingPreferences mapParkingPreferences(
-    NodeAdapter c,
-    RoutingPreferences.Builder preferences
-  ) {
-    return VehicleParkingPreferences.of(
-      c
-        .of("useVehicleParkingAvailabilityInformation")
-        .since(V2_1)
-        .asBoolean(preferences.parking().useAvailabilityInformation())
-    );
   }
 
   private static void mapWalkPreferences(NodeAdapter c, WalkPreferences.Builder walk) {

@@ -15,7 +15,7 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
   private Set<String> preferredTags = Set.of();
   private int unpreferredTagCost = 5 * 60;
 
-  // TODO: Move useAvailabilityInformation here
+  private boolean useAvailabilityInformation = true;
 
   public void setRequiredTags(Collection<String> requiredTags) {
     this.requiredTags = Set.copyOf(requiredTags);
@@ -55,6 +55,18 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
 
   public int unpreferredTagCost() {
     return unpreferredTagCost;
+  }
+
+  /**
+   * If realtime availability data should be used when deciding af a parking facility should be
+   * used.
+   */
+  public void setUseAvailabilityInformation(boolean b) {
+    useAvailabilityInformation = b;
+  }
+
+  public boolean useAvailabilityInformation() {
+    return useAvailabilityInformation;
   }
 
   public VehicleParkingRequest clone() {
