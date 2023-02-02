@@ -38,7 +38,7 @@ public class OrcaFareServiceTest {
 
   private static TestOrcaFareService orcaFareService;
   public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
-  private static final int DEFAULT_RIDE_PRICE_IN_CENTS = (int) (DEFAULT_TEST_RIDE_PRICE*100);
+  private static final int DEFAULT_RIDE_PRICE_IN_CENTS = (int) (DEFAULT_TEST_RIDE_PRICE * 100);
 
   @BeforeAll
   public static void setUpClass() {
@@ -58,15 +58,20 @@ public class OrcaFareServiceTest {
     Assertions.assertEquals(expectedFareInCents, fare.getFare(fareType).cents());
   }
 
-  private static void assertLegFareEquals(int fare, Leg leg, ItineraryFares fares, boolean hasXfer) {
+  private static void assertLegFareEquals(
+    int fare,
+    Leg leg,
+    ItineraryFares fares,
+    boolean hasXfer
+  ) {
     var legFareProducts = fares.getLegProducts().get(leg);
 
     var rideCost = legFareProducts
       .stream()
       .filter(fp ->
         fp.container().name().equals("electronic") &&
-          fp.category().name().equals("regular") &&
-          fp.name().equals("rideCost")
+        fp.category().name().equals("regular") &&
+        fp.name().equals("rideCost")
       )
       .findFirst();
     if (rideCost.isEmpty()) {
@@ -78,8 +83,8 @@ public class OrcaFareServiceTest {
       .stream()
       .filter(fp ->
         fp.container().name().equals("electronic") &&
-          fp.category().name().equals("regular") &&
-          fp.name().equals("transfer")
+        fp.category().name().equals("regular") &&
+        fp.name().equals("transfer")
       )
       .findFirst();
     Assertions.assertEquals(hasXfer, transfer.isPresent(), "Incorrect transfer leg fare product.");
@@ -561,12 +566,13 @@ public class OrcaFareServiceTest {
   }
 
   private static class TestOrcaFareService extends OrcaFareService {
+
     public TestOrcaFareService(Collection<FareRuleSet> regularFareRules) {
       super(regularFareRules);
     }
 
     @Override
-      protected float calculateCost(
+    protected float calculateCost(
       FareType fareType,
       List<Leg> rides,
       Collection<FareRuleSet> fareRules
@@ -575,4 +581,3 @@ public class OrcaFareServiceTest {
     }
   }
 }
-
