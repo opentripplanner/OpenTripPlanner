@@ -20,7 +20,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.fares.model.FareContainer;
+import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
+import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Leg;
@@ -56,6 +59,33 @@ public class OrcaFareServiceTest {
     ItineraryFares fare = new ItineraryFares();
     orcaFareService.populateFare(fare, null, fareType, legs, null);
     Assertions.assertEquals(expectedFareInCents, fare.getFare(fareType).cents());
+  }
+
+  private static void assertLegFareEquals(int fare, Leg leg, ItineraryFares fares, boolean hasXfer) {
+    var legFareProducts = fares.getLegProducts().get(leg);
+
+    var rideCost = legFareProducts
+      .stream()
+      .filter(fp ->
+        fp.container().name().equals("electronic") &&
+          fp.category().name().equals("regular") &&
+          fp.name().equals("rideCost")
+      )
+      .findFirst();
+    if (rideCost.isEmpty()) {
+      Assertions.fail("Missing leg fare product.");
+    }
+    Assertions.assertEquals(fare, rideCost.get().amount().cents());
+
+    var transfer = legFareProducts
+      .stream()
+      .filter(fp ->
+        fp.container().name().equals("electronic") &&
+          fp.category().name().equals("regular") &&
+          fp.name().equals("transfer")
+      )
+      .findFirst();
+    Assertions.assertEquals(hasXfer, transfer.isPresent(), "Incorrect transfer leg fare product.");
   }
 
   /**
@@ -104,19 +134,20 @@ public class OrcaFareServiceTest {
   /**
    * Check to make sure the fare by leg is calculated properly for a trip with two rides.
    */
-  //  @Test
-  //  public void calculateFareByLeg() {
-  //    List<Leg> rides = Arrays.asList(
-  //      getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
-  //      getLeg(COMM_TRANS_AGENCY_ID, 2)
-  //    );
-  //    ItineraryFares fare = new ItineraryFares();
-  //    orcaFareService.populateFare(fare, null, FareType.electronicRegular, rides, null);
-  //    Assertions.assertEquals(349, rides.get(0).fareComponents.get(FareType.electronicRegular).price.getCents());
-  //    Assertions.assertEquals(0, rides.get(1).fareComponents.get(FareType.electronicRegular).price.getCents());
-  //    Assertions.assertFalse(rides.get(0).fareComponents.get(FareType.electronicRegular).isTransfer);
-  //    Assertions.assertTrue(rides.get(1).fareComponents.get(FareType.electronicRegular).isTransfer);
-  //  }
+  @Test
+  public void calculateFareByLeg() {
+    List<Leg> rides = Arrays.asList(
+      getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
+      getLeg(COMM_TRANS_AGENCY_ID, 2)
+    );
+    ItineraryFares fares = new ItineraryFares();
+    orcaFareService.populateFare(fares, null, FareType.electronicRegular, rides, null);
+
+    assertLegFareEquals(349, rides.get(0), fares, false);
+    assertLegFareEquals(0, rides.get(1), fares, true);
+    //    Assertions.assertFalse(rides.get(0).fareComponents.get(FareType.electronicRegular).isTransfer);
+    //    Assertions.assertTrue(rides.get(1).fareComponents.get(FareType.electronicRegular).isTransfer);
+  }
 
   /**
    * Total trip time is 2h 30m. The first four transfers are within the permitted two hour window. A single (highest)
