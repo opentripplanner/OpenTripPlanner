@@ -44,21 +44,22 @@ class GbfsGeofencingZoneMapper {
    */
   @Nullable
   private GeofencingZone toInternalModel(GBFSFeature f) {
+    Geometry g;
     try {
-      var g = GeometryUtils.convertGeoJsonToJtsGeometry(f.getGeometry());
-      var name = Objects.requireNonNullElseGet(f.getProperties().getName(), () -> fallbackId(g));
-      var dropOffBanned = !f.getProperties().getRules().get(0).getRideAllowed();
-      var passThroughBanned = !f.getProperties().getRules().get(0).getRideThroughAllowed();
-      return new GeofencingZone(
-        new FeedScopedId(systemId, name),
-        g,
-        dropOffBanned,
-        passThroughBanned
-      );
+      g = GeometryUtils.convertGeoJsonToJtsGeometry(f.getGeometry());
     } catch (UnsupportedGeometryException e) {
       LOG.error("Could not convert geofencing zone", e);
       return null;
     }
+    var name = Objects.requireNonNullElseGet(f.getProperties().getName(), () -> fallbackId(g));
+    var dropOffBanned = !f.getProperties().getRules().get(0).getRideAllowed();
+    var passThroughBanned = !f.getProperties().getRules().get(0).getRideThroughAllowed();
+    return new GeofencingZone(
+      new FeedScopedId(systemId, name),
+      g,
+      dropOffBanned,
+      passThroughBanned
+    );
   }
 
   /**
