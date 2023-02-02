@@ -30,7 +30,12 @@ class GraphQLPlanTest implements PlanTestConstants {
     var query =
       """
       query {
-        plan(preferredVehicleParkingTags: ["roof", "locker", "cellar"], unpreferredVehicleParkingTagCost: 555) {
+        plan(
+          bannedVehicleParkingTags: ["wheelbender"],
+          requiredVehicleParkingTags: ["covered"],
+          preferredVehicleParkingTags: ["roof", "locker", "cellar"],
+          unpreferredVehicleParkingTagCost: 555,
+        ) {
           itineraries {
             duration
           }
@@ -45,5 +50,7 @@ class GraphQLPlanTest implements PlanTestConstants {
     var parking = routeRequest.journey().parking();
     assertEquals(Set.of("cellar", "roof", "locker"), parking.preferredTags());
     assertEquals(555, parking.unpreferredTagCost());
+    assertEquals(Set.of("wheelbender"), parking.bannedTags());
+    assertEquals(Set.of("covered"), parking.requiredTags());
   }
 }

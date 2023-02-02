@@ -2788,6 +2788,16 @@ type QueryType {
         there the preferred options are available.
         """
         unpreferredVehicleParkingTagCost: Int
+
+        """
+        Only parking facilities that have one of the tags in this list will used.
+        """
+        requiredVehicleParkingTags: [String]
+
+        """
+        Parking facilities that have one of the tags in this list will be excluded.
+        """
+        bannedVehicleParkingTags: [String]
     ): Plan @async
 }
 

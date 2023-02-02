@@ -17,7 +17,7 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
 
   // TODO: Move useAvailabilityInformation here
 
-  public void setRequiredTags(Set<String> requiredTags) {
+  public void setRequiredTags(Collection<String> requiredTags) {
     this.requiredTags = Set.copyOf(requiredTags);
   }
 
@@ -26,7 +26,7 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
     return requiredTags;
   }
 
-  public void setBannedTags(Set<String> bannedTags) {
+  public void setBannedTags(Collection<String> bannedTags) {
     this.bannedTags = Set.copyOf(bannedTags);
   }
 

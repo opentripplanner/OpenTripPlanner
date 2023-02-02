@@ -9,7 +9,6 @@ on:
       - master
       - dev-1.x
       - dev-2.x
-      - graphql-tests
   pull_request:
     branches:
       - master
