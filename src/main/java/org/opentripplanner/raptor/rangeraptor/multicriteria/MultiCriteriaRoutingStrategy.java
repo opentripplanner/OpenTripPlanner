@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
-import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -54,14 +53,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
-    int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
-
-    // This access is not available after the iteration departure time
-    if (departureTime == RaptorConstants.TIME_NOT_SET) {
-      return;
-    }
-
+  public void setAccessToStop(RaptorAccessEgress accessPath, int departureTime) {
     state.setAccessToStop(accessPath, departureTime);
   }
 

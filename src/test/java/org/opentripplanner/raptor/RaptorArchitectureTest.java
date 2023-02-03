@@ -64,7 +64,7 @@ public class RaptorArchitectureTest {
 
   @Test
   void enforcePackageDependenciesRaptorPath() {
-    RAPTOR_PATH.dependsOn(API_PATH, API_MODEL, RAPTOR_SPI, RR_TRANSIT).verify();
+    RAPTOR_PATH.dependsOn(FRAMEWORK_UTILS, API_PATH, API_MODEL, RAPTOR_SPI, RR_TRANSIT).verify();
   }
 
   @Test

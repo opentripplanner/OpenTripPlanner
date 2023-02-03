@@ -39,10 +39,14 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
   public AbstractStopArrival<T> timeShiftNewArrivalTime(int newRequestedArrivalTime) {
     int newArrivalTime = access.latestArrivalTime(newRequestedArrivalTime);
 
-    if (newArrivalTime == RaptorConstants.TIME_NOT_SET || newArrivalTime == arrivalTime()) {
+    if (newArrivalTime == RaptorConstants.TIME_NOT_SET) {
+      throw new IllegalStateException(
+        "The arrival should not have been accepted if it does not have a legal arrival-time."
+      );
+    }
+    if (newArrivalTime == arrivalTime()) {
       return this;
     }
-
     int newDepartureTime = newArrivalTime - access.durationInSeconds();
 
     return new AccessStopArrival<>(newDepartureTime, access);

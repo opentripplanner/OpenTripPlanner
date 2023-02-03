@@ -51,8 +51,8 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   }
 
   @Override
-  public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
-    state.setAccessToStop(accessPath, iterationDepartureTime);
+  public void setAccessToStop(RaptorAccessEgress accessPath, int departureTime) {
+    state.setAccessToStop(accessPath, departureTime);
   }
 
   @Override

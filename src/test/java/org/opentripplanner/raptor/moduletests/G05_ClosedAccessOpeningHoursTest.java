@@ -6,6 +6,7 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
@@ -56,7 +57,8 @@ public class G05_ClosedAccessOpeningHoursTest implements RaptorTestConstants {
     var expected = "Walk 7m ~ A ~ BUS R1 0:10 0:20 ~ E [0:03 0:20 17m 0tx $2040]";
     return RaptorModuleTestCase
       .of()
-      //.add(minDuration(), PathUtils.withoutCost(expected))
+      .add(TC_MIN_DURATION, PathUtils.withoutCost(expected))
+      //.add(TC_MIN_DURATION_REV, PathUtils.withoutCost(expected))
       .add(TC_STANDARD, PathUtils.withoutCost(expected))
       .add(TC_STANDARD_ONE, PathUtils.withoutCost(expected))
       //.add(TC_STANDARD_REV, PathUtils.withoutCost(expected))

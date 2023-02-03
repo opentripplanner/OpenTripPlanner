@@ -17,9 +17,10 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
    * every Raptor iteration. The access path can have more than one "leg"; hence the implementation
    * need to be aware of the round (Walk access in round 0, Flex with one leg in round 1, ...).
    *
-   * @param iterationDepartureTime The current iteration departure time.
+   * @param departureTime The access departure time. The current iteration departure time or
+   *                      the time-shifted departure time for access with opening hours.
    */
-  void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime);
+  void setAccessToStop(RaptorAccessEgress accessPath, int departureTime);
 
   /**
    * Prepare the {@link RoutingStrategy} to route using the {@link RaptorTimeTable}.

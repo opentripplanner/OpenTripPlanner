@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor;
 
 import java.util.Collection;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -269,7 +270,12 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
     }
 
     for (RaptorAccessEgress it : accessPaths) {
-      transitWorker.setAccessToStop(it, iterationDepartureTime);
+      int departureTime = calculator.departureTime(it, iterationDepartureTime);
+
+      // Access must be available after the iteration departure time
+      if (departureTime != RaptorConstants.TIME_NOT_SET) {
+        transitWorker.setAccessToStop(it, departureTime);
+      }
     }
   }
 
