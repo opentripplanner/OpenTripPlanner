@@ -15,7 +15,8 @@ Be sure to also read the [developer documentation](docs/Developers-Guide.md).
 
 ## Modules/Components
 
-The diagram shows a "generic" version on how we want to model the OTP components.   
+The diagram shows a simplified/generic version on how we want to model the OTP components with 2 
+examples. The Transit model is more complex than the VehiclePosition model.   
 
 ![MainModelOverview](docs/images/ServiceModelOverview.png)
 
@@ -23,12 +24,11 @@ The diagram shows a "generic" version on how we want to model the OTP components
    a use-case or set of features. It may have an api with request/response classes. These are 
    usually stateless; Hence the `Use Case Service` does normally not have a model. The implementing
    class has the same name as the interface with prefix `Default`.
- - `Domain Service` A service which is the aggregate root for a domain model. The model can be 
-   immutable (created at Graph build time) or support real-time updates. We separate the *read-only*
-   `Service` from the `Repository`. The `Repository` is responsible for the domain objects lifecycle
-   (insert, save, update and delete). The `Service` is usually a thin layer which delegates 
-   to the `Repository`. For small domains you may let the `Repository` implement the `Service` 
-   interface.
+ - `Domain Model` A model witch encapsulate a business area. In the drawing two examples are shown,
+   the `transit` and `vhicleposition` domain model. The transit model is more complex so the 
+   implementation have a separate `Service` and `Repository`. Almost all http endpoints are , 
+   read-only so the `Service` can focus on serving the http API endpoints, while the repository
+   is used to maintain the model by the updaters. 
 
 > **Note!** The above is the goal, the current package structure needs cleanup.
 
