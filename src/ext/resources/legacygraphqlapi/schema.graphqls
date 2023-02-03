@@ -2535,7 +2535,7 @@ type QueryType {
 
         Deprecated, not used, the timetable-view replaces this functionality.
         """
-        waitAtBeginningFactor: Float
+        waitAtBeginningFactor: Float @deprecated(reason: "Removed in OTP 2")
 
         """
         Max walk speed along streets, in meters per second. Default value: 1.33
@@ -2621,7 +2621,7 @@ type QueryType {
         This argument has no use for itinerary planning and will be removed later.
         ~~When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.~~
         """
-        batch: Boolean
+        batch: Boolean @deprecated(reason: "Removed in OTP 2")
 
         """
         List of transportation modes that the user is willing to use. Default: `["WALK","TRANSIT"]`
@@ -2701,7 +2701,7 @@ type QueryType {
         No effect on itinerary planning, adjust argument `time` instead to get later departures.
         ~~The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.~~
         """
-        claimInitialWait: Long
+        claimInitialWait: Long @deprecated(reason: "Removed in OTP 2")
 
         """
         **Consider this argument experimental** – setting this argument to true
@@ -2711,7 +2711,7 @@ type QueryType {
         processing each transit leg, rather than reverse-optimizing the entire path
         when it's done. Default value: false.
         """
-        reverseOptimizeOnTheFly: Boolean
+        reverseOptimizeOnTheFly: Boolean @deprecated(reason: "Removed in OTP 2")
 
         """
         When false, return itineraries using canceled trips. Default value: true.
@@ -2751,14 +2751,14 @@ type QueryType {
         Whether legs should be compacted by performing a reversed search.
         **Experimental argument, will be removed!**
         """
-        compactLegsByReversedSearch: Boolean
+        compactLegsByReversedSearch: Boolean @deprecated(reason: "Removed in OTP 2")
 
         """
         Which vehicle rental networks can be used. By default, all networks are allowed.
 
         Deprecated: Use `allowedVehicleRentalNetworks` instead.
         """
-        allowedBikeRentalNetworks: [String] @deprecated(reason: "Use allowedBikeRentalNetworks instead")
+        allowedBikeRentalNetworks: [String] @deprecated(reason: "Use allowedVehicleRentalNetworks instead")
 
         """
         Which vehicle rental networks can be used. By default, all networks are allowed.

@@ -23,6 +23,7 @@ import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.api.response.ViaRoutingResponseConnection;
 
 /**
  * Create search from point A to point B via point C. Search will start at 12:00 and will find two
@@ -93,6 +94,18 @@ public class ViaRoutingWorkerTest {
     assertTrue(
       result.plan().get(s1i2).contains(s2i3),
       "Second itinerary should be combined with s2i3"
+    );
+
+    // Assert that the connection creation logic works and returns the same combinations as above
+    assertEquals(
+      List.of(
+        List.of(
+          new ViaRoutingResponseConnection(0, 0),
+          new ViaRoutingResponseConnection(0, 1),
+          new ViaRoutingResponseConnection(1, 2)
+        )
+      ),
+      result.createConnections()
     );
   }
 

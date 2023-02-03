@@ -4,39 +4,21 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.OsmUrlGenerator;
 import org.opentripplanner.street.model.vertex.Vertex;
 
-public class PrunedStopIsland implements DataImportIssue {
-
-  public static final String FMT =
+public record PrunedStopIsland(
+  Vertex vertex,
+  int streetSize,
+  int stopSize,
+  int nothru,
+  int restricted,
+  int removed,
+  String stopLabels
+)
+  implements DataImportIssue {
+  private static String FMT =
     "Unlinked stops from pruned walk subgraph %s of %d street vertices and %d stops %s. Edge changes: %d to nothru, %d to no walking, %d erased";
 
-  public static final String HTMLFMT =
+  private static String HTMLFMT =
     "Unlinked stops from pruned walk <a href='http://www.openstreetmap.org/node/%s'>subgraph %s</a> of %d street vertices and %d stops %s. Edge changes: %d to nothru, %d to no walking, %d erased";
-
-  final Vertex vertex;
-  final int streetSize;
-  final int stopSize;
-  final int nothru;
-  final int restricted;
-  final int removed;
-  final String stopLabels;
-
-  public PrunedStopIsland(
-    Vertex vertex,
-    int streetSize,
-    int stopSize,
-    int nothru,
-    int restricted,
-    int removed,
-    String stopLabels
-  ) {
-    this.vertex = vertex;
-    this.streetSize = streetSize;
-    this.stopSize = stopSize;
-    this.nothru = nothru;
-    this.restricted = restricted;
-    this.removed = removed;
-    this.stopLabels = stopLabels;
-  }
 
   @Override
   public String getMessage() {

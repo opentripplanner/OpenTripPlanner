@@ -18,8 +18,8 @@ public record ViaLocation(
   Duration minSlack,
   Duration maxSlack
 ) {
-  public static final Duration DEFAULT_MAX_SLACK = Duration.ofMinutes(5L);
-  public static final Duration DEFAULT_MIN_SLACK = Duration.ofMinutes(20L);
+  public static final Duration DEFAULT_MAX_SLACK = Duration.ofHours(1);
+  public static final Duration DEFAULT_MIN_SLACK = Duration.ofMinutes(5);
 
   public ViaLocation {
     Objects.requireNonNull(minSlack);

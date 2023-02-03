@@ -22,6 +22,7 @@ import org.opentripplanner.inspector.vector.AreaStopsLayerBuilder;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
+import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -35,7 +36,8 @@ import org.opentripplanner.transit.service.TransitService;
 public class GraphInspectorVectorTileResource {
 
   private static final List<LayerParameters<LayerType>> DEBUG_LAYERS = List.of(
-    new LayerParams("areaStops", LayerType.AreaStop)
+    new LayerParams("areaStops", LayerType.AreaStop),
+    new LayerParams("geofencingZones", LayerType.GeofencingZones)
   );
 
   private final OtpServerRequestContext serverContext;
@@ -70,7 +72,7 @@ public class GraphInspectorVectorTileResource {
       grizzlyRequest.getLocale(),
       Arrays.asList(requestedLayers.split(",")),
       DEBUG_LAYERS,
-      GraphInspectorVectorTileResource::crateLayerBuilder,
+      GraphInspectorVectorTileResource::createLayerBuilder,
       serverContext.graph(),
       serverContext.transitService()
     );
@@ -104,7 +106,7 @@ public class GraphInspectorVectorTileResource {
     );
   }
 
-  private static LayerBuilder<?> crateLayerBuilder(
+  private static LayerBuilder<?> createLayerBuilder(
     LayerParameters<LayerType> layerParameters,
     Locale locale,
     Graph graph,
@@ -112,11 +114,13 @@ public class GraphInspectorVectorTileResource {
   ) {
     return switch (layerParameters.type()) {
       case AreaStop -> new AreaStopsLayerBuilder(transitService, layerParameters, locale);
+      case GeofencingZones -> new GeofencingZonesLayerBuilder(graph, layerParameters);
     };
   }
 
   private enum LayerType {
     AreaStop,
+    GeofencingZones,
   }
 
   private record LayerParams(String name, LayerType type) implements LayerParameters<LayerType> {

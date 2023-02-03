@@ -62,7 +62,8 @@
       "type" : "vehicle-rental",
       "sourceType" : "gbfs",
       "frequencySec" : -1,
-      "url" : "https://otp-performance.leonard.io/data/norway/tieroslo/gbfs.json"
+      "url" : "https://otp-performance.leonard.io/data/norway/tieroslo/gbfs.json",
+      "geofencingZones": true
     }
   ]
 

@@ -1,29 +1,19 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public class TurnRestrictionUnknown implements DataImportIssue {
-
-  public static final String FMT = "Invalid turn restriction tag %s in turn restriction %d";
-
-  public static final String HTMLFMT =
-    "Invalid turn restriction tag %s in  <a href=\"http://www.openstreetmap.org/relation/%d\">\"%d\"</a>";
-
-  final String tagval;
-  final long relationId;
-
-  public TurnRestrictionUnknown(long relationId, String tagval) {
-    this.relationId = relationId;
-    this.tagval = tagval;
-  }
+public record TurnRestrictionUnknown(OSMWithTags entity, String tagval) implements DataImportIssue {
+  private static String FMT = "Invalid turn restriction tag %s in turn restriction %d";
+  private static String HTMLFMT = "Invalid turn restriction tag %s in <a href='%s'>'%s'</a>";
 
   @Override
   public String getMessage() {
-    return String.format(FMT, tagval, relationId);
+    return String.format(FMT, tagval, entity.getId());
   }
 
   @Override
   public String getHTMLMessage() {
-    return String.format(FMT, tagval, relationId, relationId);
+    return String.format(HTMLFMT, tagval, entity.getOpenStreetMapLink(), entity.getId());
   }
 }

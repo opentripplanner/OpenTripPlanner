@@ -25,7 +25,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * <p>
  * TODO: The old transit index doesn't exist anymore, and the new one needs more tests.
  */
-public class RoutingServiceTest extends GtfsTest {
+public class DefaultRoutingServiceTest extends GtfsTest {
 
   @Override
   public String getFeedName() {

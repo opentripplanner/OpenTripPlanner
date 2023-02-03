@@ -39,6 +39,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   private transient Edge[] incoming = new Edge[0];
 
   private transient Edge[] outgoing = new Edge[0];
+  private RentalRestrictionExtension rentalRestrictions = RentalRestrictionExtension.NO_RESTRICTION;
 
   /* CONSTRUCTORS */
 
@@ -196,6 +197,26 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
       result.add((StreetEdge) out);
     }
     return result;
+  }
+
+  public boolean rentalTraversalBanned(State currentState) {
+    return rentalRestrictions.traversalBanned(currentState);
+  }
+
+  public void addRentalRestriction(RentalRestrictionExtension ext) {
+    rentalRestrictions = rentalRestrictions.add(ext);
+  }
+
+  public RentalRestrictionExtension rentalRestrictions() {
+    return rentalRestrictions;
+  }
+
+  public boolean rentalDropOffBanned(State currentState) {
+    return rentalRestrictions.dropOffBanned(currentState);
+  }
+
+  public void removeRentalRestriction(RentalRestrictionExtension ext) {
+    rentalRestrictions.remove(ext);
   }
 
   /**
