@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.path;
 
+import static org.opentripplanner.raptor.api.RaptorConstants.TIME_NOT_SET;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -67,12 +69,18 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
       egressPath,
       slackProvider.transferSlack()
     );
+
+    // If egress opening hours is closed
+    if (egressDepartureTime == TIME_NOT_SET) {
+      return;
+    }
+
     int arrivalTime = calculator.plusDuration(egressDepartureTime, egressPath.durationInSeconds());
 
     if (calculator.isBefore(arrivalTime, bestDestinationTime)) {
       debugRejectCurrentBestArrival();
-      bestDestinationTime = arrivalTime;
       bestArrival = new DestinationArrivalEvent(round, stopReachedOnBoard, egressPath);
+      bestDestinationTime = arrivalTime;
     } else {
       debugRejectNew(round, stopReachedOnBoard, egressPath);
     }

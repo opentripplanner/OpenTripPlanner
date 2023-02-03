@@ -8,6 +8,9 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
@@ -52,13 +55,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
  */
 public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConstants {
 
-  private static final String EXPECTED_PATH_FLEX =
+  private static final String EXPECTED_PATH_FLEX_7M =
     "A ~ BUS R2 0:05 0:16 ~ B ~ Walk 2m ~ C ~ Flex 7m 1x [0:05 0:26 21m 1tx $2160]";
 
   private static final String EXPECTED_PATH_WALK_5M =
     "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 5m [0:04 0:25 21m 0tx $2160]";
 
-  private static final String EXPECTED_MC_WALK_6M =
+  private static final String EXPECTED_PATH_WALK_7M =
     "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 7m [0:04 0:27 23m 0tx $2400]";
 
   private static final int COST_10m = RaptorCostConverter.toRaptorCost(D10m);
@@ -96,10 +99,11 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
   static List<RaptorModuleTestCase> withFlexAsBestOptionTestCases() {
     return RaptorModuleTestCase
       .of()
-      // TODO - Figure out/explain why TC_STANDARD_REV_ONE give another result
-      //      - Document if the std-rev-on is irrelevant or add the test-case
-      .add(standard().not(TC_STANDARD_REV_ONE), withoutCost(EXPECTED_PATH_FLEX))
-      .add(multiCriteria(), join(EXPECTED_PATH_FLEX, EXPECTED_MC_WALK_6M))
+      .add(TC_STANDARD, join(withoutCost(EXPECTED_PATH_FLEX_7M, EXPECTED_PATH_WALK_7M)))
+      .add(TC_STANDARD_ONE, join(withoutCost(EXPECTED_PATH_FLEX_7M)))
+      .add(TC_STANDARD_REV, join(withoutCost(EXPECTED_PATH_FLEX_7M)))
+      .add(TC_STANDARD_REV_ONE, join(withoutCost(EXPECTED_PATH_FLEX_7M, EXPECTED_PATH_WALK_7M)))
+      .add(multiCriteria(), join(EXPECTED_PATH_FLEX_7M, EXPECTED_PATH_WALK_7M))
       .build();
   }
 
