@@ -559,7 +559,7 @@ public class OrcaFareServiceTest {
 
     int start = (int) (T11_00 + (startTimeMins * 60));
     var itin = newItinerary(Place.forStop(firstStop), start)
-      .bus(route, tripId, start, T11_12, Place.forStop(lastStop))
+      .transit(route, tripId, start, T11_12, 5, 7, Place.forStop(lastStop), null, null, null)
       .build();
 
     return itin.getLegs().get(0);

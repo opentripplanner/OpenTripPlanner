@@ -146,29 +146,9 @@ public class TestItineraryBuilder implements PlanTestConstants {
     Place to,
     LocalDate serviceDate
   ) {
-    return bus(
-      Integer.toString(tripId),
-      startTime,
-      endTime,
-      fromStopIndex,
-      toStopIndex,
-      to,
-      serviceDate
-    );
-  }
-
-  public TestItineraryBuilder bus(
-    String tripId,
-    int startTime,
-    int endTime,
-    int fromStopIndex,
-    int toStopIndex,
-    Place to,
-    LocalDate serviceDate
-  ) {
     return transit(
-      BUS_ROUTE.copy().withShortName(tripId).build(),
-      tripId,
+      BUS_ROUTE.copy().withShortName(Integer.toString(tripId)).build(),
+      Integer.toString(tripId),
       startTime,
       endTime,
       fromStopIndex,
@@ -181,18 +161,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   public TestItineraryBuilder bus(int tripId, int startTime, int endTime, Place to) {
-    return bus(
-      Integer.toString(tripId),
-      startTime,
-      endTime,
-      TRIP_FROM_STOP_INDEX,
-      TRIP_TO_STOP_INDEX,
-      to,
-      null
-    );
-  }
-
-  public TestItineraryBuilder bus(String tripId, int startTime, int endTime, Place to) {
     return bus(tripId, startTime, endTime, TRIP_FROM_STOP_INDEX, TRIP_TO_STOP_INDEX, to, null);
   }
 
@@ -254,19 +222,9 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   public TestItineraryBuilder bus(Route route, int tripId, int startTime, int endTime, Place to) {
-    return bus(route, Integer.toString(tripId), startTime, endTime, to);
-  }
-
-  public TestItineraryBuilder bus(
-    Route route,
-    String tripId,
-    int startTime,
-    int endTime,
-    Place to
-  ) {
     return transit(
       route,
-      tripId,
+      Integer.toString(tripId),
       startTime,
       endTime,
       TRIP_FROM_STOP_INDEX,
@@ -280,16 +238,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   public TestItineraryBuilder bus(
     int tripId,
-    int startTime,
-    int endTime,
-    Place to,
-    LocalDate serviceDay
-  ) {
-    return bus(Integer.toString(tripId), startTime, endTime, to, serviceDay);
-  }
-
-  public TestItineraryBuilder bus(
-    String tripId,
     int startTime,
     int endTime,
     Place to,
@@ -312,7 +260,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public TestItineraryBuilder rail(int tripId, int startTime, int endTime, Place to) {
     return transit(
       RAIL_ROUTE,
-      tripId,
+      Integer.toString(tripId),
       startTime,
       endTime,
       TRIP_FROM_STOP_INDEX,
@@ -341,7 +289,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     return transit(
       route,
-      tripId,
+      Integer.toString(tripId),
       startTime,
       endTime,
       TRIP_FROM_STOP_INDEX,
@@ -367,7 +315,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public TestItineraryBuilder frequencyBus(int tripId, int startTime, int endTime, Place to) {
     return transit(
       RAIL_ROUTE,
-      tripId,
+      Integer.toString(tripId),
       startTime,
       endTime,
       TRIP_FROM_STOP_INDEX,
@@ -388,7 +336,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   ) {
     return transit(
       route,
-      tripId,
+      Integer.toString(tripId),
       startTime,
       endTime,
       TRIP_FROM_STOP_INDEX,
@@ -411,33 +359,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return Place.forStop(source.stop);
   }
 
-  private TestItineraryBuilder transit(
-    Route route,
-    int tripId,
-    int start,
-    int end,
-    int fromStopIndex,
-    int toStopIndex,
-    Place to,
-    LocalDate serviceDate,
-    Integer headwaySecs,
-    ConstrainedTransfer transferFromPreviousLeg
-  ) {
-    return transit(
-      route,
-      Integer.toString(tripId),
-      start,
-      end,
-      fromStopIndex,
-      toStopIndex,
-      to,
-      serviceDate,
-      headwaySecs,
-      transferFromPreviousLeg
-    );
-  }
-
-  private TestItineraryBuilder transit(
+  public TestItineraryBuilder transit(
     Route route,
     String tripId,
     int start,
