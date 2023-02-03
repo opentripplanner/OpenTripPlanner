@@ -23,7 +23,7 @@ public class PatternOnDay {
     return day;
   }
 
-  public RoutingTripPatternV2 pattern() {
+  public RoutingTripPatternV2 routingTripPattern() {
     return pattern;
   }
 

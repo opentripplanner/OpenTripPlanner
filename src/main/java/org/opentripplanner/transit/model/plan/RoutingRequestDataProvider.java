@@ -75,7 +75,7 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
     Collection<RoutingTripPatternV2> routingTripPatterns = transitCalendar
       .patternsOnDay(day)
       .stream()
-      .map(PatternOnDay::pattern)
+      .map(PatternOnDay::routingTripPattern)
       .toList();
 
     this.stopPatternIndex =

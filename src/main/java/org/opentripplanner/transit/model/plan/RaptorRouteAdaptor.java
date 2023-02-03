@@ -25,7 +25,7 @@ public class RaptorRouteAdaptor implements RaptorRoute<TripOnDay>, RaptorTimeTab
 
   @Override
   public RaptorTripPattern pattern() {
-    return pattern.pattern();
+    return pattern.routingTripPattern();
   }
 
   /* implement RaptorTimeTable */
