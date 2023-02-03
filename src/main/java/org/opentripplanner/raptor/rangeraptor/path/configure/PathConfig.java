@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.path.configure;
 
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandard;
-import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandardAndLatestDepature;
+import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandardAndLatestDeparture;
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCost;
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCostAndLatestDeparture;
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCost;
@@ -104,7 +104,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
       return comparatorWithTimetable();
     }
     if (preferLateArrival) {
-      return comparatorStandardAndLatestDepature();
+      return comparatorStandardAndLatestDeparture();
     }
     return comparatorStandard();
   }

@@ -34,7 +34,7 @@ public class PathParetoSetComparators {
 
   public static <
     T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorStandardAndLatestDepature() {
+  > ParetoComparator<RaptorPath<T>> comparatorStandardAndLatestDeparture() {
     return (l, r) ->
       l.startTime() > r.startTime() ||
       l.numberOfTransfers() < r.numberOfTransfers() ||
