@@ -125,7 +125,10 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
   public void debugReject(ArrivalView<T> stopArrival, RaptorAccessEgress egress, String reason) {
     if (isDebugOn()) {
-      debugReject(createDestinationArrivalView(stopArrival, egress), reason);
+      var destinationArrival = createDestinationArrivalView(stopArrival, egress);
+      if (destinationArrival != null) {
+        debugReject(destinationArrival, reason);
+      }
     }
   }
 
@@ -157,6 +160,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     }
   }
 
+  @Nullable
   private DestinationArrival<T> createDestinationArrivalView(
     ArrivalView<T> stopArrival,
     RaptorAccessEgress egressPath
