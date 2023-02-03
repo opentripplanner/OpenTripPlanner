@@ -417,6 +417,16 @@ Http headers.
     "bikeBoardCost" : 600,
     "otherThanPreferredRoutesPenalty" : 300,
     "transferSlack" : 120,
+    "preferredVehicleParkingTags" : [
+      "covered"
+    ],
+    "unpreferredVehicleParkingTagCost" : 360,
+    "requiredVehicleParkingTags" : [
+      "garage"
+    ],
+    "bannedVehicleParkingTags" : [
+      "lamp-post"
+    ],
     "boardSlackForMode" : {
       "AIRPLANE" : "35m"
     },
