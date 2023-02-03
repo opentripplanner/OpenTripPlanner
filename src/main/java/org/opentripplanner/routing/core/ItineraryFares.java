@@ -28,6 +28,7 @@ public class ItineraryFares {
   private final HashMap<FareType, List<FareComponent>> details = new HashMap<>();
   private final Set<FareProduct> itineraryProducts = new HashSet<>();
   private final Multimap<Leg, FareProduct> legProducts = ArrayListMultimap.create();
+
   /**
    * A mapping from {@link FareType} to {@link Money}.
    */
@@ -106,5 +107,9 @@ public class ItineraryFares {
           lp.products().stream().map(LegProducts.ProductWithTransfer::product).toList()
         )
     );
+  }
+
+  public void addFareProduct(Leg leg, FareProduct fareProduct) {
+    this.legProducts.put(leg, fareProduct);
   }
 }

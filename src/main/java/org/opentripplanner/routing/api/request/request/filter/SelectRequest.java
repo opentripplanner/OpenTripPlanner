@@ -2,7 +2,6 @@ package org.opentripplanner.routing.api.request.request.filter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
@@ -26,16 +25,16 @@ public class SelectRequest implements Serializable {
   // TODO: 2022-11-29 filters: group of routes
 
   public SelectRequest(Builder builder) {
-    if (!builder.transportModes.isEmpty()) {
-      this.transportModeFilter = AllowTransitModeFilter.of(builder.transportModes);
-    } else {
+    if (builder.transportModes.isEmpty()) {
       this.transportModeFilter = null;
+    } else {
+      this.transportModeFilter = AllowTransitModeFilter.of(builder.transportModes);
     }
 
     // TODO: 2022-12-20 filters: having list of modes and modes filter in same instance is not very elegant
     this.transportModes = builder.transportModes;
 
-    this.agencies = Collections.unmodifiableList(builder.agencies);
+    this.agencies = List.copyOf(builder.agencies);
     this.routes = builder.routes;
   }
 
@@ -79,9 +78,9 @@ public class SelectRequest implements Serializable {
   public String toString() {
     return ToStringBuilder
       .of(SelectRequest.class)
-      .addObj("transportModes", transportModes)
-      .addCol("agencies", agencies)
-      .addObj("routes", routes)
+      .addObj("transportModes", transportModesToString(), null)
+      .addCol("agencies", agencies, List.of())
+      .addObj("routes", routes, RouteMatcher.emptyMatcher())
       .toString();
   }
 
@@ -101,6 +100,26 @@ public class SelectRequest implements Serializable {
     return this.routes;
   }
 
+  private String transportModesToString() {
+    if (transportModes == null) {
+      return null;
+    }
+    if (transportModes.stream().allMatch(MainAndSubMode::isMainModeOnly)) {
+      int size = transportModes.size();
+      int total = MainAndSubMode.all().size();
+      if (size == total) {
+        return "ALL-MAIN-MODES";
+      }
+      if (size + 3 >= total) {
+        // If 3 or less of the main modes are *excluded* we guess that the user did exclude, and
+        // not included everything. This make it much easier to read: "NOT [FERRY]" instead of
+        // "[AIRPLANE, CABLE_CAR, CARPOOL, COACH ... "
+        return "NOT " + MainAndSubMode.toString(MainAndSubMode.notMainModes(transportModes));
+      }
+    }
+    return MainAndSubMode.toString(transportModes);
+  }
+
   public static class Builder {
 
     private List<MainAndSubMode> transportModes = new ArrayList<>();
@@ -111,13 +130,11 @@ public class SelectRequest implements Serializable {
 
     public Builder withTransportModes(List<MainAndSubMode> transportModes) {
       this.transportModes = transportModes;
-
       return this;
     }
 
     public Builder addTransportMode(MainAndSubMode transportMode) {
       this.transportModes.add(transportMode);
-
       return this;
     }
 
@@ -125,13 +142,11 @@ public class SelectRequest implements Serializable {
       if (!s.isEmpty()) {
         this.agencies = FeedScopedId.parseListOfIds(s);
       }
-
       return this;
     }
 
     public Builder withAgencies(List<FeedScopedId> agencies) {
       this.agencies = agencies;
-
       return this;
     }
 
@@ -141,13 +156,11 @@ public class SelectRequest implements Serializable {
       } else {
         this.routes = RouteMatcher.emptyMatcher();
       }
-
       return this;
     }
 
     public Builder withRoutes(RouteMatcher routes) {
       this.routes = routes;
-
       return this;
     }
 

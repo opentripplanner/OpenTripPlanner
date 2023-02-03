@@ -1,6 +1,7 @@
 #! /bin/bash -e
 
 LOCATION=$1
+SLEEP_SECS=$2
 
 cd smoke-tests
 make build-"${LOCATION}"
@@ -8,7 +9,7 @@ make build-"${LOCATION}"
 make run-"${LOCATION}" &
 
 # OTP needs a little while to start up so we sleep
-sleep 15
+sleep "$SLEEP_SECS"
 
 cd ..
 

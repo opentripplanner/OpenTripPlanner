@@ -19,7 +19,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
 public class ConstructApplicationModule {
 
   @Provides
-  public OtpServerRequestContext providesServerContext(
+  OtpServerRequestContext providesServerContext(
     RouterConfig routerConfig,
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,

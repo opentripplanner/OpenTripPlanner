@@ -14,6 +14,7 @@ import org.opentripplanner._support.arch.Package;
 public class FrameworkArchitectureTest {
 
   private static final Package APACHE_HTTP = Package.of("org.apache.http..");
+  private static final Package GUAVA_COLLECTIONS = Package.of("com.google.common.collect");
 
   private static final Module XML_MODULES = Module.of(
     Package.of("com.fasterxml.jackson.."),
@@ -46,7 +47,16 @@ public class FrameworkArchitectureTest {
   @Test
   void enforceGeometryPackageDependencies() {
     GEOMETRY
-      .dependsOn(GEO_JSON, GEO_TOOLS, GNU_TROVE, JTS_GEOM, OPEN_GIS, LANG, TO_STRING)
+      .dependsOn(
+        GEO_JSON,
+        GEO_TOOLS,
+        GNU_TROVE,
+        JTS_GEOM,
+        OPEN_GIS,
+        LANG,
+        TO_STRING,
+        GUAVA_COLLECTIONS
+      )
       .verify();
   }
 

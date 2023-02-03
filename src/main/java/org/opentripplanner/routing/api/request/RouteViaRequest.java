@@ -17,13 +17,15 @@ import org.opentripplanner.routing.api.request.request.JourneyRequest;
  */
 public class RouteViaRequest implements Serializable {
 
-  private List<ViaLeg> viaLegs = new ArrayList<>();
-  private GenericLocation from = new GenericLocation(null, null);
-  private GenericLocation to = new GenericLocation(null, null);
-  private Instant dateTime = Instant.now();
-  private Duration searchWindow;
-  private boolean wheelchair = false;
-  private RoutingPreferences preferences = new RoutingPreferences();
+  private final GenericLocation from;
+  private final List<ViaSegment> viaSegments;
+  private final GenericLocation to;
+  private final Instant dateTime;
+  private final Duration searchWindow;
+  private final boolean wheelchair;
+  private final RoutingPreferences preferences;
+  private final Locale locale;
+  private final Integer numItineraries;
 
   private RouteViaRequest(List<ViaLocation> viaLocations, List<JourneyRequest> viaJourneys) {
     if (viaLocations == null || viaLocations.isEmpty()) {
@@ -36,21 +38,33 @@ public class RouteViaRequest implements Serializable {
       throw new IllegalArgumentException("There must be one more JourneyRequest than ViaLocation");
     }
 
-    // Last ViaLeg has no ViaLocation
+    this.from = null;
+    this.viaSegments = new ArrayList<>();
+    this.to = null;
+    this.dateTime = Instant.now();
+    this.searchWindow = null;
+    this.wheelchair = false;
+    this.preferences = new RoutingPreferences();
+    this.locale = null;
+    this.numItineraries = null;
+
+    // Last ViaSegment has no ViaLocation
     for (int i = 0; i < viaJourneys.size(); i++) {
       var viaLocation = i < viaJourneys.size() - 1 ? viaLocations.get(i) : null;
-      viaLegs.add(new ViaLeg(viaJourneys.get(i), viaLocation));
+      viaSegments.add(new ViaSegment(viaJourneys.get(i), viaLocation));
     }
   }
 
   private RouteViaRequest(Builder builder) {
-    this.viaLegs = Objects.requireNonNull(builder.viaLegs);
     this.from = Objects.requireNonNull(builder.from);
+    this.viaSegments = Objects.requireNonNull(builder.viaSegments);
     this.to = Objects.requireNonNull(builder.to);
     this.dateTime = Objects.requireNonNull(builder.dateTime);
     this.searchWindow = Objects.requireNonNull(builder.searchWindow);
     this.wheelchair = builder.wheelchair;
+    this.locale = builder.locale;
     this.preferences = Objects.requireNonNull(builder.preferences);
+    this.numItineraries = builder.numItineraries;
   }
 
   public static Builder of(List<ViaLocation> viaLocations, List<JourneyRequest> viaJourneys) {
@@ -70,16 +84,19 @@ public class RouteViaRequest implements Serializable {
     request.setDateTime(dateTime);
     request.setWheelchair(wheelchair);
     request.setPreferences(preferences);
+    if (numItineraries != null) {
+      request.setNumItineraries(numItineraries);
+    }
 
     return request;
   }
 
-  public List<ViaLeg> viaLegs() {
-    return viaLegs;
-  }
-
   public GenericLocation from() {
     return from;
+  }
+
+  public List<ViaSegment> viaSegment() {
+    return viaSegments;
   }
 
   public GenericLocation to() {
@@ -102,6 +119,10 @@ public class RouteViaRequest implements Serializable {
     return preferences;
   }
 
+  public Locale locale() {
+    return locale;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -113,34 +134,44 @@ public class RouteViaRequest implements Serializable {
     }
 
     return (
-      viaLegs.equals(other.viaLegs) &&
+      viaSegments.equals(other.viaSegments) &&
       from.equals(other.from) &&
       to.equals(other.to) &&
       dateTime.equals(other.dateTime) &&
       searchWindow.equals(other.searchWindow) &&
       wheelchair == other.wheelchair &&
-      preferences.equals(other.preferences)
+      Objects.equals(locale, other.locale) &&
+      preferences.equals(other.preferences) &&
+      Objects.equals(numItineraries, other.numItineraries)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(viaLegs, from, to, dateTime, searchWindow, wheelchair, preferences);
+    return Objects.hash(
+      viaSegments,
+      from,
+      to,
+      dateTime,
+      searchWindow,
+      wheelchair,
+      locale,
+      preferences,
+      numItineraries
+    );
   }
 
   public static class Builder {
 
-    private final List<ViaLeg> viaLegs;
+    private final List<ViaSegment> viaSegments;
     private GenericLocation from;
     private GenericLocation to;
     private Instant dateTime;
     private Duration searchWindow;
-    private boolean timetableView;
-    private boolean arriveBy;
     private Locale locale;
-    private JourneyRequest journey;
     private boolean wheelchair;
     private RoutingPreferences preferences;
+    private Integer numItineraries;
 
     public Builder(RouteViaRequest original) {
       this.from = original.from;
@@ -149,7 +180,8 @@ public class RouteViaRequest implements Serializable {
       this.searchWindow = original.searchWindow;
       this.wheelchair = original.wheelchair;
       this.preferences = original.preferences;
-      this.viaLegs = original.viaLegs;
+      this.viaSegments = original.viaSegments;
+      this.numItineraries = original.numItineraries;
     }
 
     public RouteViaRequest build() {
@@ -176,16 +208,6 @@ public class RouteViaRequest implements Serializable {
       return this;
     }
 
-    public Builder withTimetableView(boolean timetableView) {
-      this.timetableView = timetableView;
-      return this;
-    }
-
-    public Builder withArriveBy(boolean arriveBy) {
-      this.arriveBy = arriveBy;
-      return this;
-    }
-
     public Builder withLocale(Locale locale) {
       this.locale = locale;
       return this;
@@ -200,7 +222,16 @@ public class RouteViaRequest implements Serializable {
       preferences = preferences.copyOf().apply(prefs).build();
       return this;
     }
+
+    public Builder withNumItineraries(Integer numItineraries) {
+      this.numItineraries = numItineraries;
+      return this;
+    }
   }
 
-  public record ViaLeg(JourneyRequest journeyRequest, ViaLocation viaLocation) {}
+  /**
+   * ViaSegments contains the {@link JourneyRequest} to the next {@link ViaLocation}. The last
+   * segment has null viaLocation, as `to` is the destination of that segment.
+   */
+  public record ViaSegment(JourneyRequest journeyRequest, ViaLocation viaLocation) {}
 }

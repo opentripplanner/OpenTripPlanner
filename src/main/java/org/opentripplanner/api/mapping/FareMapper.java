@@ -89,8 +89,8 @@ public class FareMapper {
             p.id().toString(),
             p.name(),
             toApiMoney(p.amount()),
-            toApiFareQualifier(p.category()),
-            toApiFareQualifier(p.container())
+            toApiFareQualifier(p.container()),
+            toApiFareQualifier(p.category())
           )
         )
         .toList();

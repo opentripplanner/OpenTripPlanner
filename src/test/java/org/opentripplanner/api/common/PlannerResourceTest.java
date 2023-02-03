@@ -9,16 +9,13 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.HashMap;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.api.resource.PlannerResource;
-import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.configure.ConstructApplicationModule;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
 class PlannerResourceTest {
@@ -26,16 +23,7 @@ class PlannerResourceTest {
   static OtpServerRequestContext context() {
     var transitModel = new TransitModel();
     transitModel.initTimeZone(ZoneIds.BERLIN);
-    var transitService = new DefaultTransitService(transitModel);
-    var module = new ConstructApplicationModule();
-    return module.providesServerContext(
-      RouterConfig.DEFAULT,
-      RaptorConfig.defaultConfigForTest(),
-      new Graph(),
-      transitService,
-      null,
-      null
-    );
+    return TestServerContext.createServerContext(new Graph(), transitModel);
   }
 
   @Test
