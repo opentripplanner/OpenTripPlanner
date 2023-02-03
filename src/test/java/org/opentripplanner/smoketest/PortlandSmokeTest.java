@@ -23,6 +23,10 @@ public class PortlandSmokeTest {
     );
   }
 
+  /**
+   * Checks that a scooter rental finishes at the edge of the business area and is continued on
+   * foot rather than scootering all the way to the destination.
+   */
   @Test
   public void geofencingZone() {
     SmokeTest.basicRouteTest(
