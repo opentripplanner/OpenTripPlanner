@@ -45,6 +45,7 @@ The classes and their maintainers are as follows:
 | CombinedInterlinedLegsFareService          | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
 | HSLFareServiceImpl                         | HSL ([Viljami Nurminen](mailto:viljami.nurminen@cgi.com))  |
 | SFBayFareServiceImpl                       | unmaintained                                               |
+| OrcaFareService                            | IBI Group ([Daniel Heppner](mailto:daniel.heppner@ibigroup.com))|
 
 
 
@@ -130,6 +131,7 @@ The current list of custom fare type is:
   It has a single parameter `mode` which controls when exactly the combination should happen:
     - `ALWAYS`: All interlined legs are combined. (default)
     - `SAME_ROUTE`: Only interlined legs whose route ID are identical are combined.
+- `orca` (no parameters)
 - `off` (no parameters)
 
 The current list of `combinationStrategy` is:
