@@ -29,9 +29,6 @@ The diagram shows a "generic" version on how we want to model the OTP components
    (insert, save, update and delete). The `Service` is usually a thin layer which delegates 
    to the `Repository`. For small domains you may let the `Repository` implement the `Service` 
    interface.
- - The `Repository` may or may not inherit from the `DomainService` interface. If the domain
-   service is a simple domain model with few specialized business methods you may save a few 
-   lines of code this way. 
 
 > **Note!** The above is the goal, the current package structure needs cleanup.
 
