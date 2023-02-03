@@ -424,7 +424,7 @@ public class TimetableSnapshotSourceTest {
 
       var tripUpdateBuilder = new TripUpdateBuilder(
         tripId.getId(),
-        LocalDate.now(),
+        LocalDate.now(transitModel.getTimeZone()),
         ScheduleRelationship.SCHEDULED,
         transitModel.getTimeZone()
       );
