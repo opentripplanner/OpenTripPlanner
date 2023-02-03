@@ -1,0 +1,12 @@
+{
+  "osmDefaults": {
+    "osmTagMapping": "portland"
+  },
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "feedId": "TriMet",
+      "source": "https://developer.trimet.org/schedule/gtfs.zip"
+    }
+  ]
+}

@@ -37,6 +37,12 @@ septa/bus.gtfs.zip:
 septa/gtfs.zip: septa/bus.gtfs.zip
 	${CURL} https://www3.septa.org/developer/google_rail.zip  -o $@
 
+portland/osm.pbf:
+	${CURL} http://osm.ibi-transit.com/vex/45.424388,-122.885443,45.684746,-122.44084.pbf -o $@
+
+portland/gtfs.zip:
+	echo "Downloaded by OTP"
+
 build-%: otp.jar %/osm.pbf %/gtfs.zip
 	java -Xmx6G -jar otp.jar --build --save $*
 
