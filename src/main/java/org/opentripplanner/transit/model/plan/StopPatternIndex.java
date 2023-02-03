@@ -5,7 +5,6 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.RoutingTripPatternV2;
 
 public class StopPatternIndex {
@@ -37,7 +36,10 @@ public class StopPatternIndex {
   }
 
   public BitSet activePatternsByStops(IntIterator stops) {
-    // TODO RTM - Return a bit set with all patterns visiting the given stops
-    return null;
+    BitSet activePatterns = new BitSet();
+    while (stops.hasNext()) {
+      activePatterns.or(patternsByStopIndex[stops.next()]);
+    }
+    return activePatterns;
   }
 }
