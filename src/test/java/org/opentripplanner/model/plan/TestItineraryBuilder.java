@@ -148,7 +148,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   ) {
     return transit(
       BUS_ROUTE.copy().withShortName(Integer.toString(tripId)).build(),
-      tripId,
+      Integer.toString(tripId),
       startTime,
       endTime,
       fromStopIndex,
@@ -175,7 +175,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     StopTime toStopTime = new StopTime();
     toStopTime.setStop(to.stop);
 
-    Trip trip = trip(1, route("flex").build());
+    Trip trip = trip("1", route("flex").build());
 
     var flexTrip = UnscheduledTrip
       .of(id("flex-1"))
@@ -224,7 +224,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public TestItineraryBuilder bus(Route route, int tripId, int startTime, int endTime, Place to) {
     return transit(
       route,
-      tripId,
+      Integer.toString(tripId),
       startTime,
       endTime,
       TRIP_FROM_STOP_INDEX,
@@ -260,7 +260,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public TestItineraryBuilder rail(int tripId, int startTime, int endTime, Place to) {
     return transit(
       RAIL_ROUTE,
-      tripId,
+      Integer.toString(tripId),
       startTime,
       endTime,
       TRIP_FROM_STOP_INDEX,
@@ -289,7 +289,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     return transit(
       route,
-      tripId,
+      Integer.toString(tripId),
       startTime,
       endTime,
       TRIP_FROM_STOP_INDEX,
@@ -315,7 +315,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public TestItineraryBuilder frequencyBus(int tripId, int startTime, int endTime, Place to) {
     return transit(
       RAIL_ROUTE,
-      tripId,
+      Integer.toString(tripId),
       startTime,
       endTime,
       TRIP_FROM_STOP_INDEX,
@@ -336,7 +336,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   ) {
     return transit(
       route,
-      tripId,
+      Integer.toString(tripId),
       startTime,
       endTime,
       TRIP_FROM_STOP_INDEX,
@@ -351,17 +351,17 @@ public class TestItineraryBuilder implements PlanTestConstants {
   /* private methods */
 
   /** Create a dummy trip */
-  private static Trip trip(int id, Route route) {
-    return TransitModelForTest.trip(Integer.toString(id)).withRoute(route).build();
+  private static Trip trip(String id, Route route) {
+    return TransitModelForTest.trip(id).withRoute(route).build();
   }
 
   private static Place stop(Place source) {
     return Place.forStop(source.stop);
   }
 
-  private TestItineraryBuilder transit(
+  public TestItineraryBuilder transit(
     Route route,
-    int tripId,
+    String tripId,
     int start,
     int end,
     int fromStopIndex,
