@@ -18,6 +18,7 @@ public class RoutingTripPatternV2 implements RaptorTripPattern {
   private final BitSet alighting;
   private final int slackIndex;
   private final String debugInfo;
+  private final int index;
 
   public RoutingTripPatternV2(
     int[] stopsIndexes,
@@ -26,6 +27,7 @@ public class RoutingTripPatternV2 implements RaptorTripPattern {
     TransitMode mode,
     String shortName
   ) {
+    this.index = INDEX_COUNTER.getAndIncrement();
     this.stopsIndexes = stopsIndexes;
     this.boarding = boarding;
     this.alighting = alighting;
@@ -35,8 +37,7 @@ public class RoutingTripPatternV2 implements RaptorTripPattern {
 
   @Override
   public int patternIndex() {
-    // TODO RTM
-    return 0;
+    return index;
   }
 
   @Override

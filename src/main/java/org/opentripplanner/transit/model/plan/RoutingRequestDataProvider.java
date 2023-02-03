@@ -100,7 +100,15 @@ public class RoutingRequestDataProvider implements RaptorTransitDataProvider<Tri
   public RaptorRoute<TripOnDay> getRouteForIndex(int patternIndex) {
     // TODO RTM - We need to know witch day we should start
     //          - Fetch: transitCalendar -> PatternsOnDays#day -> PatternsOnDay#patternIndex -> PatternOnDay
-    return new RaptorRouteAdaptor(null);
+
+    PatternOnDay match = transitCalendar
+      .patternsOnDay(day)
+      .stream()
+      .filter(patternOnDay -> patternOnDay.routingTripPattern().patternIndex() == patternIndex)
+      .findFirst()
+      .orElseThrow();
+
+    return new RaptorRouteAdaptor(match);
   }
 
   @Override
