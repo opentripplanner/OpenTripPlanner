@@ -95,15 +95,9 @@ public class AccessStopArrivalTest {
 
   @Test
   public void timeShiftNotAllowed() {
-    AbstractStopArrival<RaptorTripSchedule> original, result;
-    RaptorAccessEgress access = TestAccessEgress.free(ALIGHT_STOP).openingHoursClosed();
-
-    original = new AccessStopArrival<>(DEPARTURE_TIME, access);
-
-    final int dTime = 60;
-    result = original.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
-
-    assertSame(original, result);
+    var access = TestAccessEgress.free(ALIGHT_STOP).openingHoursClosed();
+    var original = new AccessStopArrival<>(DEPARTURE_TIME, access);
+    assertThrows(IllegalStateException.class, () -> original.timeShiftNewArrivalTime(6000));
   }
 
   @Test

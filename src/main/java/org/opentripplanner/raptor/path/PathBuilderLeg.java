@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.path;
 
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
@@ -518,6 +519,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       slackProvider.transferSlack()
     );
 
+    if (egressDepartureTime == RaptorConstants.TIME_NOT_SET) {
+      throw egressDepartureNotAvailable(stopArrivalTime, egressPath);
+    }
+
     setTime(egressDepartureTime, egressDepartureTime + egressPath.durationInSeconds());
   }
 
@@ -580,6 +585,19 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     final int waitCost = costCalculator.waitCost(waitTimeAfterPrevStopArrival(slackProvider));
 
     return waitCost + egressCost;
+  }
+
+  private IllegalStateException egressDepartureNotAvailable(
+    int arrivalTime,
+    RaptorAccessEgress egressPath
+  ) {
+    return new IllegalStateException(
+      "Unable to reconstruct path. Transit does not arrive in time to board flex access." +
+      " Arrived: " +
+      TimeUtils.timeToStrCompact(arrivalTime) +
+      " Egress: " +
+      egressPath
+    );
   }
 
   /* PRIVATE INTERFACES */
