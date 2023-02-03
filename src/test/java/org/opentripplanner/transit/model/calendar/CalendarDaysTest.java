@@ -97,7 +97,7 @@ class CalendarDaysTest {
   @Test
   void assertMoreThanMaxSizeForCalendar() {
     Assertions.assertThrows(
-      IllegalStateException.class,
+      IllegalArgumentException.class,
       () ->
         CalendarDays
           .of()

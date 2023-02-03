@@ -28,8 +28,8 @@ public class CalendarDays {
    * We set the default start time for each day to 04:00 in the given zone.
    */
   private static final Duration TIME_OFFSET = Duration.ofHours(4);
-  private static final LocalDate START = LocalDate.now(ZONE_ID).minusMonths(3);
-  private static final LocalDate END = START.plusYears(1);
+  private static final LocalDate DEFAULT_START = LocalDate.now(ZONE_ID).minusMonths(3);
+  private static final LocalDate DEFAULT_END = DEFAULT_START.plusYears(1);
 
   private final ZoneId zoneId;
   private final LocalDate start;
@@ -45,7 +45,7 @@ public class CalendarDays {
   }
 
   public static CalendarDaysBuilder of() {
-    return new CalendarDaysBuilder(ZONE_ID, START, END, TIME_OFFSET);
+    return new CalendarDaysBuilder(ZONE_ID, DEFAULT_START, DEFAULT_END, TIME_OFFSET);
   }
 
   public ZoneId zoneId() {
@@ -70,5 +70,9 @@ public class CalendarDays {
 
   public int dayLengthSeconds(int dayIndex) {
     return operatingDays[dayIndex].lengthSeconds();
+  }
+
+  public OperatingDay operatingDay(int day) {
+    return operatingDays[day];
   }
 }

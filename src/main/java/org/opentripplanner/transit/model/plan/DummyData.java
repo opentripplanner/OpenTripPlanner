@@ -1,23 +1,23 @@
 package org.opentripplanner.transit.model.plan;
 
-import java.util.Arrays;
 import java.util.BitSet;
+import java.util.List;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
-import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.calendar.CalendarDays;
+import org.opentripplanner.transit.model.calendar.OperatingDay;
+import org.opentripplanner.transit.model.calendar.PatternOnDay;
+import org.opentripplanner.transit.model.calendar.PatternsOnDay;
+import org.opentripplanner.transit.model.calendar.PatternsOnDays;
 import org.opentripplanner.transit.model.calendar.TransitCalendar;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPatternV2;
-import org.opentripplanner.transit.model.network.StopPattern;
-import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.trip.Timetable;
+import org.opentripplanner.transit.model.trip.timetable.TimetableBuilder;
 import org.opentripplanner.transit.service.StopModel;
 
 public class DummyData {
@@ -59,38 +59,44 @@ public class DummyData {
     .withRegularStop(STOP_4)
     .build();
 
-  public static final StopPattern STOP_PATTERN = createStopPattern();
-
-  public static final TransitCalendar TRANSIT_CALENDAR = new TransitCalendar(
-    CalendarDays.of().build()
-  );
-
-  private static final int[] ROUTE_STOP_INDEX = new int[] { 1, 2, 3 };
-  private static final BitSet ROUTE_BOARD_ALIGHT_BIT_SET = createBitSet(3);
   private static final Route ROUTE = Route
     .of(id("ROUTE_ID"))
     .withMode(TransitMode.BUS)
     .withAgency(AGENCY)
     .withLongName(new NonLocalizedString("ROUTE_LONG_NAME"))
     .build();
-  private static final RoutingTripPatternV2 ROUTING_TRIP_PATTERN = createRoutingTripPattern();
 
-  public static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(60, 0, 0);
+  private static final Timetable TIMETABLE = TimetableBuilder
+    .of()
+    .schedule("0:00 0:01 0:03")
+    .build();
+
+  private static final List<StopLocation> STOP_LIST = List.of(STOP_1, STOP_2, STOP_3);
+  private static final BitSet ROUTE_BOARD_ALIGHT_BIT_SET = createBitSet(3);
+  private static final CalendarDays CALENDAR_DAYS = CalendarDays.of().build();
+  private static final RoutingTripPatternV2 ROUTING_TRIP_PATTERN = createRoutingTripPattern();
+  private static final PatternsOnDays PATTERNS_ON_DAYS = createPatternsOnDays();
+
+  public static final TransitCalendar TRANSIT_CALENDAR = new TransitCalendar(
+    CALENDAR_DAYS,
+    PATTERNS_ON_DAYS
+  );
 
   private static RoutingTripPatternV2 createRoutingTripPattern() {
-    TripPatternBuilder tripPatternBuilder = TripPattern
-      .of(id("TP1"))
-      .withRoute(ROUTE)
-      .withStopPattern(STOP_PATTERN);
-    TripPattern tripPattern = tripPatternBuilder.build();
-    int[] stopIndexes = tripPattern.getStops().stream().mapToInt(StopLocation::getIndex).toArray();
     return new RoutingTripPatternV2(
-      stopIndexes,
-      tripPattern.getRoutingTripPattern().getBoardingPossible(),
-      tripPattern.getRoutingTripPattern().getAlightingPossible(),
-      tripPattern.getMode(),
-      tripPattern.getName()
+      STOP_LIST.stream().mapToInt(StopLocation::getIndex).toArray(),
+      ROUTE_BOARD_ALIGHT_BIT_SET,
+      ROUTE_BOARD_ALIGHT_BIT_SET,
+      ROUTE.getMode(),
+      "RoutingTripPattern name"
     );
+  }
+
+  private static PatternsOnDays createPatternsOnDays() {
+    OperatingDay operatingDay = CALENDAR_DAYS.operatingDay(0);
+    PatternOnDay patternOnDay = new PatternOnDay(operatingDay, ROUTING_TRIP_PATTERN, TIMETABLE);
+    PatternsOnDay patternsOnDay = new PatternsOnDay(List.of(patternOnDay));
+    return new PatternsOnDays(List.of(patternsOnDay));
   }
 
   private static BitSet createBitSet(int size) {
@@ -101,15 +107,5 @@ public class DummyData {
 
   private static FeedScopedId id(String id) {
     return new FeedScopedId(FEED_ID, id);
-  }
-
-  private static StopPattern createStopPattern() {
-    StopPattern.StopPatternBuilder stopPatternBuilder = StopPattern.create(3);
-    stopPatternBuilder.stops[0] = STOP_1;
-    stopPatternBuilder.stops[1] = STOP_2;
-    stopPatternBuilder.stops[2] = STOP_3;
-    Arrays.fill(stopPatternBuilder.pickups, PickDrop.SCHEDULED);
-    Arrays.fill(stopPatternBuilder.dropoffs, PickDrop.SCHEDULED);
-    return stopPatternBuilder.build();
   }
 }

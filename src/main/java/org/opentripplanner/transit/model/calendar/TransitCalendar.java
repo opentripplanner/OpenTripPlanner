@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.calendar;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * This calendar contains timetables for each day and pattern. The switch from one day to another
@@ -13,10 +14,11 @@ public class TransitCalendar {
 
   /** Info about the calendar days */
   private final CalendarDays daysInfo;
-  private final PatternsOnDays patterns = new PatternsOnDays();
+  private final PatternsOnDays patternsOnDays;
 
-  public TransitCalendar(CalendarDays daysInfo) {
-    this.daysInfo = daysInfo;
+  public TransitCalendar(CalendarDays daysInfo, PatternsOnDays patternsOnDays) {
+    this.daysInfo = Objects.requireNonNull(daysInfo);
+    this.patternsOnDays = Objects.requireNonNull(patternsOnDays);
   }
 
   /**
@@ -30,7 +32,7 @@ public class TransitCalendar {
   }
 
   public Collection<PatternOnDay> patternsOnDay(int day) {
-    return patterns.patternsOnDay(day).patterns();
+    return patternsOnDays.patternsOnDay(day).patterns();
   }
 
   TripScheduleSearchOnDays timetables(int patternIndex, int currentDay) {

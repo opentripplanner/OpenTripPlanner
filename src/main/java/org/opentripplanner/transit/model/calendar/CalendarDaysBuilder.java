@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 public class CalendarDaysBuilder {
 
   public static final int SUPPORTED_YEARS = 10;
-  private ZoneId zoneId = ZoneId.of("Z");
+  private ZoneId zoneId;
 
   private LocalDate start;
   private LocalDate end;
@@ -80,7 +80,7 @@ public class CalendarDaysBuilder {
     var time = toStartOfServiceDay(start);
     var end = toStartOfServiceDay(this.end).plusDays(1);
 
-    ZonedDateTime prev = null;
+    ZonedDateTime prev;
 
     while (time.isBefore(end)) {
       list.add(time);
@@ -102,8 +102,11 @@ public class CalendarDaysBuilder {
 
   private void assertPeriodIsLimited() {
     var period = start.until(end);
+    if (period.isNegative()) {
+      throw new IllegalArgumentException("end date " + end + " must be after start date " + start);
+    }
     if (period.getYears() > SUPPORTED_YEARS && (period.getDays() > 0 || period.getMonths() > 0)) {
-      throw new IllegalStateException(
+      throw new IllegalArgumentException(
         "Period is too long, more than %d years from %s to %s.".formatted(
             SUPPORTED_YEARS,
             start,
