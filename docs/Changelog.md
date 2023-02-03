@@ -60,6 +60,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Refactor data import issue reporting [#4777](https://github.com/opentripplanner/OpenTripPlanner/pull/4777)
 - Add support for deleted trips & including real-time cancelations in trip search [#4759](https://github.com/opentripplanner/OpenTripPlanner/pull/4759)
 - GBFS geofencing zones - part 1 [#4741](https://github.com/opentripplanner/OpenTripPlanner/pull/4741)
+- Add ORCA Fares support with Fare by Leg [#4773](https://github.com/opentripplanner/OpenTripPlanner/pull/4773)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
