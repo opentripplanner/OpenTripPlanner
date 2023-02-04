@@ -36,6 +36,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   private static final int NOT_SET = Integer.MIN_VALUE;
 
   private final boolean enableDebugLogging;
+  private final boolean eventLoggingDryRun;
   private final NumberFormat numFormat = NumberFormat.getInstance(Locale.FRANCE);
   private final Table arrivalTable = Table
     .of()
@@ -54,8 +55,15 @@ public class SystemErrDebugLogger implements DebugLogger {
   private int lastRound = NOT_SET;
   private boolean printPathHeader = true;
 
-  public SystemErrDebugLogger(boolean enableDebugLogging) {
+  /**
+   * @param enableDebugLogging Log debug information on {@link DebugTopic}s.
+   * @param eventLoggingDryRun DryRun will do the Raptor event logging, except printing the result.
+   *                           This is used to test the logging framework without logging. To turn
+   *                           off logging completely used the {@link #noop()} logger.
+   */
+  public SystemErrDebugLogger(boolean enableDebugLogging, boolean eventLoggingDryRun) {
     this.enableDebugLogging = enableDebugLogging;
+    this.eventLoggingDryRun = eventLoggingDryRun;
   }
 
   /**
@@ -94,15 +102,15 @@ public class SystemErrDebugLogger implements DebugLogger {
    */
   public void pathFilteringListener(DebugEvent<RaptorPath<?>> e) {
     if (printPathHeader) {
-      System.err.println();
-      System.err.println(pathTable.headerRow());
+      println();
+      println(pathTable.headerRow());
       printPathHeader = false;
     }
 
     RaptorPath<?> p = e.element();
     var aLeg = p.accessLeg();
     var eLeg = p.egressLeg();
-    System.err.println(
+    println(
       pathTable.rowAsText(
         e.action().toString(),
         p.numberOfTransfers(),
@@ -177,13 +185,13 @@ public class SystemErrDebugLogger implements DebugLogger {
     lastIterationTime = iterationTime;
     lastRound = NOT_SET;
     printPathHeader = true;
-    System.err.println("\n**  RUN RAPTOR FOR MINUTE: " + timeToStrCompact(iterationTime) + "  **");
+    println("\n**  RUN RAPTOR FOR MINUTE: " + timeToStrCompact(iterationTime) + "  **");
   }
 
   private void print(ArrivalView<?> a, String action, String optReason) {
     printPathHeader = true;
     String pattern = a.arrivedByTransit() ? a.transitPath().trip().pattern().debugInfo() : "";
-    System.err.println(
+    println(
       arrivalTable.rowAsText(
         action,
         legType(a),
@@ -198,7 +206,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private void print(PatternRideView<?> p, String action) {
-    System.err.println(
+    println(
       arrivalTable.rowAsText(
         action,
         "OnRide",
@@ -250,8 +258,8 @@ public class SystemErrDebugLogger implements DebugLogger {
     }
     lastRound = round;
 
-    System.err.println();
-    System.err.println(arrivalTable.headerRow());
+    println();
+    println(arrivalTable.headerRow());
   }
 
   private String legType(ArrivalView<?> a) {
@@ -269,5 +277,17 @@ public class SystemErrDebugLogger implements DebugLogger {
       return "Egress";
     }
     throw new IllegalStateException("Unknown mode for: " + this);
+  }
+
+  private void println() {
+    if (!eventLoggingDryRun) {
+      System.err.println();
+    }
+  }
+
+  private void println(String text) {
+    if (!eventLoggingDryRun) {
+      System.err.println(text);
+    }
   }
 }

@@ -130,7 +130,7 @@ public class RaptorRequestMapper {
 
     if (raptorDebugging.isEnabled()) {
       var debug = builder.debug();
-      var debugLogger = new SystemErrDebugLogger(true);
+      var debugLogger = new SystemErrDebugLogger(true, false);
 
       debug
         .addStops(raptorDebugging.stops())
