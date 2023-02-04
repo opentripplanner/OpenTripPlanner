@@ -26,19 +26,13 @@ public class PathParetoSetComparators {
   public static <
     T extends RaptorTripSchedule
   > ParetoComparator<RaptorPath<T>> comparatorStandard() {
-    return (l, r) ->
-      l.endTime() < r.endTime() ||
-      l.numberOfTransfers() < r.numberOfTransfers() ||
-      l.durationInSeconds() < r.durationInSeconds();
+    return (l, r) -> l.endTime() < r.endTime() || l.numberOfTransfers() < r.numberOfTransfers();
   }
 
   public static <
     T extends RaptorTripSchedule
   > ParetoComparator<RaptorPath<T>> comparatorStandardAndLatestDeparture() {
-    return (l, r) ->
-      l.startTime() > r.startTime() ||
-      l.numberOfTransfers() < r.numberOfTransfers() ||
-      l.durationInSeconds() < r.durationInSeconds();
+    return (l, r) -> l.startTime() > r.startTime() || l.numberOfTransfers() < r.numberOfTransfers();
   }
 
   public static <
@@ -47,8 +41,7 @@ public class PathParetoSetComparators {
     return (l, r) ->
       l.rangeRaptorIterationDepartureTime() > r.rangeRaptorIterationDepartureTime() ||
       l.endTime() < r.endTime() ||
-      l.numberOfTransfers() < r.numberOfTransfers() ||
-      l.durationInSeconds() < r.durationInSeconds();
+      l.numberOfTransfers() < r.numberOfTransfers();
   }
 
   public static <

@@ -55,6 +55,7 @@ public class B01_AccessTest implements RaptorTestConstants {
       .addEgressPaths(TestAccessEgress.walk(STOP_F, D1s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
+      .timetable(true)
       // Removing the search-window should not have any effect, but it does.
       .searchWindow(Duration.ofMinutes(20));
 
