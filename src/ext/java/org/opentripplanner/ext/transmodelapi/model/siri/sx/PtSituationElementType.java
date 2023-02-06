@@ -11,6 +11,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Objects;
@@ -19,7 +20,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.stop.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.TranslatedString;
+import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.service.TransitService;
@@ -38,6 +41,8 @@ public class PtSituationElementType {
     GraphQLOutputType multilingualStringType,
     GraphQLObjectType validityPeriodType,
     GraphQLObjectType infoLinkType,
+    GraphQLOutputType affectsType,
+    GqlUtil gqlUtil,
     Relay relay
   ) {
     return GraphQLObjectType
@@ -50,7 +55,7 @@ public class PtSituationElementType {
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(environment ->
-            relay.toGlobalId(NAME, ((TransitAlert) environment.getSource()).getId())
+            relay.toGlobalId(NAME, ((TransitAlert) environment.getSource()).getId().getId())
           )
           .build()
       )
@@ -60,11 +65,12 @@ public class PtSituationElementType {
           .name("authority")
           .type(authorityType)
           .description("Get affected authority for this situation element")
+          .deprecate("Use affects instead")
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
               .getAgencyForId(
-                ((TransitAlert) environment.getSource()).getEntities()
+                ((TransitAlert) environment.getSource()).entities()
                   .stream()
                   .filter(EntitySelector.Agency.class::isInstance)
                   .map(EntitySelector.Agency.class::cast)
@@ -80,9 +86,10 @@ public class PtSituationElementType {
           .newFieldDefinition()
           .name("lines")
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
+          .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).getEntities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Route.class::isInstance)
               .map(EntitySelector.Route.class::cast)
@@ -97,9 +104,10 @@ public class PtSituationElementType {
           .newFieldDefinition()
           .name("serviceJourneys")
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
+          .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).getEntities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Trip.class::isInstance)
               .map(EntitySelector.Trip.class::cast)
@@ -114,9 +122,10 @@ public class PtSituationElementType {
           .newFieldDefinition()
           .name("quays")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
+          .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).getEntities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Stop.class::isInstance)
               .map(EntitySelector.Stop.class::cast)
@@ -132,9 +141,10 @@ public class PtSituationElementType {
           .newFieldDefinition()
           .name("stopPlaces")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopPlaceType))))
+          .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).getEntities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Stop.class::isInstance)
               .map(EntitySelector.Stop.class::cast)
@@ -151,12 +161,15 @@ public class PtSituationElementType {
           })
           .build()
       )
-      //                .field(GraphQLFieldDefinition.newFieldDefinition()
-      //                        .name("journeyPatterns")
-      //                        .description("Get all journey patterns for this situation element")
-      //                        .type(new GraphQLNonNull(new GraphQLList(journeyPatternType)))
-      //                        .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getTripPatterns())
-      //                        .build())
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("affects")
+          .description("Get all affected entities for the situation")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(affectsType))))
+          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).entities())
+          .build()
+      )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
@@ -164,11 +177,11 @@ public class PtSituationElementType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Summary of situation in all different translations available")
           .dataFetcher(environment -> {
-            TransitAlert alert = environment.getSource();
-            if (alert.alertHeaderText instanceof TranslatedString) {
-              return ((TranslatedString) alert.alertHeaderText).getTranslations();
-            } else if (alert.alertHeaderText != null) {
-              return List.of(new AbstractMap.SimpleEntry<>(null, alert.alertHeaderText.toString()));
+            I18NString headerText = environment.<TransitAlert>getSource().headerText();
+            if (headerText instanceof TranslatedString translatedString) {
+              return translatedString.getTranslations();
+            } else if (headerText != null) {
+              return List.of(new AbstractMap.SimpleEntry<>(null, headerText.toString()));
             } else {
               return emptyList();
             }
@@ -182,13 +195,11 @@ public class PtSituationElementType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Description of situation in all different translations available")
           .dataFetcher(environment -> {
-            TransitAlert alert = environment.getSource();
-            if (alert.alertDescriptionText instanceof TranslatedString) {
-              return ((TranslatedString) alert.alertDescriptionText).getTranslations();
-            } else if (alert.alertDescriptionText != null) {
-              return List.of(
-                new AbstractMap.SimpleEntry<>(null, alert.alertDescriptionText.toString())
-              );
+            I18NString descriptionText = environment.<TransitAlert>getSource().descriptionText();
+            if (descriptionText instanceof TranslatedString translatedString) {
+              return translatedString.getTranslations();
+            } else if (descriptionText != null) {
+              return List.of(new AbstractMap.SimpleEntry<>(null, descriptionText.toString()));
             } else {
               return emptyList();
             }
@@ -202,11 +213,11 @@ public class PtSituationElementType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Advice of situation in all different translations available")
           .dataFetcher(environment -> {
-            TransitAlert alert = environment.getSource();
-            if (alert.alertAdviceText instanceof TranslatedString) {
-              return ((TranslatedString) alert.alertAdviceText).getTranslations();
-            } else if (alert.alertAdviceText != null) {
-              return List.of(new AbstractMap.SimpleEntry<>(null, alert.alertAdviceText.toString()));
+            I18NString adviceText = environment.<TransitAlert>getSource().adviceText();
+            if (adviceText instanceof TranslatedString translatedString) {
+              return translatedString.getTranslations();
+            } else if (adviceText != null) {
+              return List.of(new AbstractMap.SimpleEntry<>(null, adviceText.toString()));
             } else {
               return emptyList();
             }
@@ -220,9 +231,9 @@ public class PtSituationElementType {
           .type(new GraphQLList(new GraphQLNonNull(infoLinkType)))
           .description("Optional links to more information.")
           .dataFetcher(environment -> {
-            TransitAlert alert = environment.getSource();
-            if (!alert.getAlertUrlList().isEmpty()) {
-              return alert.getAlertUrlList();
+            List<AlertUrl> siriUrls = environment.<TransitAlert>getSource().siriUrls();
+            if (!siriUrls.isEmpty()) {
+              return siriUrls;
             }
             return null;
           })
@@ -252,7 +263,7 @@ public class PtSituationElementType {
           .name("reportType")
           .type(EnumTypes.REPORT_TYPE)
           .description("ReportType of this situation")
-          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).alertType)
+          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).type())
           .build()
       )
       .field(
@@ -261,7 +272,7 @@ public class PtSituationElementType {
           .name("situationNumber")
           .type(Scalars.GraphQLString)
           .description("Operator's internal id for this situation")
-          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).getId())
+          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).getId().getId())
           .build()
       )
       .field(
@@ -271,7 +282,7 @@ public class PtSituationElementType {
           .type(EnumTypes.SEVERITY)
           .description("Severity of this situation ")
           .dataFetcher(environment ->
-            getTransmodelSeverity(((TransitAlert) environment.getSource()).severity)
+            getTransmodelSeverity(((TransitAlert) environment.getSource()).severity())
           )
           .build()
       )
@@ -281,7 +292,40 @@ public class PtSituationElementType {
           .name("priority")
           .type(Scalars.GraphQLInt)
           .description("Priority of this situation ")
-          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).priority)
+          .dataFetcher(environment -> ((TransitAlert) environment.getSource()).priority())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("creationTime")
+          .type(gqlUtil.dateTimeScalar)
+          .description("Timestamp for when the situation was created.")
+          .dataFetcher(environment -> {
+            final ZonedDateTime creationTime = environment.<TransitAlert>getSource().creationTime();
+            return creationTime == null ? null : creationTime.toInstant().toEpochMilli();
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("versionedAtTime")
+          .type(gqlUtil.dateTimeScalar)
+          .description("Timestamp when the situation element was updated.")
+          .dataFetcher(environment -> {
+            final ZonedDateTime updatedTime = environment.<TransitAlert>getSource().updatedTime();
+            return updatedTime == null ? null : updatedTime.toInstant().toEpochMilli();
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("participant")
+          .type(Scalars.GraphQLString)
+          .description("Codespace of the data source.")
+          .dataFetcher(environment -> environment.<TransitAlert>getSource().siriCodespace())
           .build()
       )
       .field(
@@ -289,21 +333,26 @@ public class PtSituationElementType {
           .newFieldDefinition()
           .name("reportAuthority")
           .type(authorityType)
-          .description("Authority that reported this situation")
-          .deprecate("Not yet officially supported. May be removed or renamed.")
-          .dataFetcher(environment ->
-            GqlUtil
-              .getTransitService(environment)
-              .getAgencyForId(
-                ((TransitAlert) environment.getSource()).getEntities()
-                  .stream()
-                  .filter(EntitySelector.Agency.class::isInstance)
-                  .map(EntitySelector.Agency.class::cast)
-                  .findAny()
-                  .map(EntitySelector.Agency::agencyId)
-                  .orElse(null)
-              )
+          .description(
+            "Authority that reported this situation. Always returns the first agency in the codespace"
           )
+          .deprecate("Not yet officially supported. May be removed or renamed.")
+          .dataFetcher(environment -> {
+            TransitAlert alert = environment.getSource();
+            String feedId = alert.getId().getFeedId();
+            String codespace = alert.siriCodespace();
+            if (codespace == null) {
+              return null;
+            }
+            return GqlUtil
+              .getTransitService(environment)
+              .getAgencies()
+              .stream()
+              .filter(agency -> agency.getId().getFeedId().equals(feedId))
+              .filter(agency -> agency.getId().getId().startsWith(codespace))
+              .findFirst()
+              .orElse(null);
+          })
           .build()
       )
       .build();

@@ -31,6 +31,7 @@ public final class TransitPreferences implements Serializable {
   private final DoubleAlgorithmFunction unpreferredCost;
   private final boolean ignoreRealtimeUpdates;
   private final boolean includePlannedCancellations;
+  private final boolean includeRealtimeCancellations;
   private final RaptorPreferences raptor;
 
   private TransitPreferences() {
@@ -40,6 +41,7 @@ public final class TransitPreferences implements Serializable {
     this.unpreferredCost = createLinearFunction(0.0, DEFAULT_ROUTE_RELUCTANCE);
     this.ignoreRealtimeUpdates = false;
     this.includePlannedCancellations = false;
+    this.includeRealtimeCancellations = false;
     this.raptor = RaptorPreferences.DEFAULT;
   }
 
@@ -51,6 +53,7 @@ public final class TransitPreferences implements Serializable {
     this.unpreferredCost = requireNonNull(builder.unpreferredCost);
     this.ignoreRealtimeUpdates = builder.ignoreRealtimeUpdates;
     this.includePlannedCancellations = builder.includePlannedCancellations;
+    this.includeRealtimeCancellations = builder.includeRealtimeCancellations;
     this.raptor = requireNonNull(builder.raptor);
   }
 
@@ -139,6 +142,13 @@ public final class TransitPreferences implements Serializable {
   }
 
   /**
+   * When true, trips cancelled in by real-time updates are included in this search.
+   */
+  public boolean includeRealtimeCancellations() {
+    return includeRealtimeCancellations;
+  }
+
+  /**
    * Set of options to use with Raptor. These are available here for testing purposes.
    */
   public RaptorPreferences raptor() {
@@ -154,6 +164,7 @@ public final class TransitPreferences implements Serializable {
       otherThanPreferredRoutesPenalty == that.otherThanPreferredRoutesPenalty &&
       ignoreRealtimeUpdates == that.ignoreRealtimeUpdates &&
       includePlannedCancellations == that.includePlannedCancellations &&
+      includeRealtimeCancellations == that.includeRealtimeCancellations &&
       boardSlack.equals(that.boardSlack) &&
       alightSlack.equals(that.alightSlack) &&
       reluctanceForMode.equals(that.reluctanceForMode) &&
@@ -172,6 +183,7 @@ public final class TransitPreferences implements Serializable {
       unpreferredCost,
       ignoreRealtimeUpdates,
       includePlannedCancellations,
+      includeRealtimeCancellations,
       raptor
     );
   }
@@ -197,6 +209,10 @@ public final class TransitPreferences implements Serializable {
         "includePlannedCancellations",
         includePlannedCancellations != DEFAULT.includePlannedCancellations
       )
+      .addBoolIfTrue(
+        "includeRealtimeCancellations",
+        includeRealtimeCancellations != DEFAULT.includeRealtimeCancellations
+      )
       .addObj("raptor", raptor, DEFAULT.raptor)
       .toString();
   }
@@ -213,6 +229,7 @@ public final class TransitPreferences implements Serializable {
     private DoubleAlgorithmFunction unpreferredCost;
     private boolean ignoreRealtimeUpdates;
     private boolean includePlannedCancellations;
+    private boolean includeRealtimeCancellations;
     private RaptorPreferences raptor;
 
     public Builder(TransitPreferences original) {
@@ -224,6 +241,7 @@ public final class TransitPreferences implements Serializable {
       this.unpreferredCost = original.unpreferredCost;
       this.ignoreRealtimeUpdates = original.ignoreRealtimeUpdates;
       this.includePlannedCancellations = original.includePlannedCancellations;
+      this.includeRealtimeCancellations = original.includeRealtimeCancellations;
       this.raptor = original.raptor;
     }
 
@@ -276,6 +294,11 @@ public final class TransitPreferences implements Serializable {
 
     public Builder setIncludePlannedCancellations(boolean includePlannedCancellations) {
       this.includePlannedCancellations = includePlannedCancellations;
+      return this;
+    }
+
+    public Builder setIncludeRealtimeCancellations(boolean includeRealtimeCancellations) {
+      this.includeRealtimeCancellations = includeRealtimeCancellations;
       return this;
     }
 

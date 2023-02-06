@@ -10,7 +10,9 @@ public class LocationInputType {
     .newInputObject()
     .name("Location")
     .description(
-      "Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known."
+      "Input format for specifying a location through either a place reference (id), coordinates " +
+      "or both. If both place and coordinates are provided the place ref will be used if found, " +
+      "coordinates will only be used if place is not known."
     )
     .field(
       GraphQLInputObjectField

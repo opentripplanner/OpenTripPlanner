@@ -96,7 +96,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
                   .stream()
                   .filter(alert ->
                     alert
-                      .getEntities()
+                      .entities()
                       .stream()
                       .anyMatch(entity ->
                         (

@@ -8,7 +8,7 @@ import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
@@ -87,7 +87,7 @@ public class UpdaterConfigDocTest {
     String details = getParameterDetailsTable(node);
 
     if (!details.isBlank()) {
-      buf.header(4, "Details", null).addSection(details);
+      buf.header(5, "Parameter details", null).addSection(details);
     }
   }
 

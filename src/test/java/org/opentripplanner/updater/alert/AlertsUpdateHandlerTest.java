@@ -85,7 +85,7 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertNull(transitAlert.alertUrl);
+    assertNull(transitAlert.url());
   }
 
   @Test
@@ -104,7 +104,7 @@ public class AlertsUpdateHandlerTest {
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals("https://www.opentripplanner.org/", transitAlert.alertUrl.toString());
+    assertEquals("https://www.opentripplanner.org/", transitAlert.url().toString());
   }
 
   @Test
@@ -137,7 +137,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
 
     List<Entry<String, String>> translations =
-      ((TranslatedString) transitAlert.alertUrl).getTranslations();
+      ((TranslatedString) transitAlert.url()).getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("https://www.opentripplanner.org/", translations.get(0).getValue());
@@ -158,7 +158,7 @@ public class AlertsUpdateHandlerTest {
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals("Title", transitAlert.alertHeaderText.toString());
+    assertEquals("Title", transitAlert.headerText().toString());
   }
 
   @Test
@@ -177,7 +177,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
 
     List<Entry<String, String>> translations =
-      ((TranslatedString) transitAlert.alertHeaderText).getTranslations();
+      ((TranslatedString) transitAlert.headerText()).getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("Title", translations.get(0).getValue());
@@ -198,7 +198,7 @@ public class AlertsUpdateHandlerTest {
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals("Description", transitAlert.alertDescriptionText.toString());
+    assertEquals("Description", transitAlert.descriptionText().toString());
   }
 
   @Test
@@ -223,7 +223,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
 
     List<Entry<String, String>> translations =
-      ((TranslatedString) transitAlert.alertDescriptionText).getTranslations();
+      ((TranslatedString) transitAlert.descriptionText()).getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("Description", translations.get(0).getValue());
@@ -238,7 +238,7 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals(AlertSeverity.UNKNOWN_SEVERITY, transitAlert.severity);
+    assertEquals(AlertSeverity.UNKNOWN_SEVERITY, transitAlert.severity());
   }
 
   @Test
@@ -249,7 +249,7 @@ public class AlertsUpdateHandlerTest {
       .setSeverityLevel(SeverityLevel.SEVERE)
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals(AlertSeverity.SEVERE, transitAlert.severity);
+    assertEquals(AlertSeverity.SEVERE, transitAlert.severity());
   }
 
   @Test
@@ -259,7 +259,7 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals(AlertCause.UNKNOWN_CAUSE, transitAlert.cause);
+    assertEquals(AlertCause.UNKNOWN_CAUSE, transitAlert.cause());
   }
 
   @Test
@@ -270,7 +270,7 @@ public class AlertsUpdateHandlerTest {
       .setCause(Cause.MAINTENANCE)
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals(AlertCause.MAINTENANCE, transitAlert.cause);
+    assertEquals(AlertCause.MAINTENANCE, transitAlert.cause());
   }
 
   @Test
@@ -280,7 +280,7 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals(AlertEffect.UNKNOWN_EFFECT, transitAlert.effect);
+    assertEquals(AlertEffect.UNKNOWN_EFFECT, transitAlert.effect());
   }
 
   @Test
@@ -291,7 +291,7 @@ public class AlertsUpdateHandlerTest {
       .setEffect(Effect.MODIFIED_SERVICE)
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals(AlertEffect.MODIFIED_SERVICE, transitAlert.effect);
+    assertEquals(AlertEffect.MODIFIED_SERVICE, transitAlert.effect());
   }
 
   @Test
@@ -301,10 +301,10 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
     long agencySelectorCount = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Agency)
       .count();
@@ -318,10 +318,10 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setRouteId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
     long routeSelectorCount = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
       .count();
@@ -339,10 +339,10 @@ public class AlertsUpdateHandlerTest {
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
     long tripSelectorCount = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Trip)
       .count();
@@ -356,10 +356,10 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setStopId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
     long stopSelectorCount = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
       .count();
@@ -373,10 +373,10 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(0, GtfsRealtime.EntitySelector.newBuilder().setStopId("1").setRouteId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
     long stopAndRouteSelectorCount = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.StopAndRoute)
       .count();
@@ -396,10 +396,10 @@ public class AlertsUpdateHandlerTest {
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
     long stopAndTripSelectorCount = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.StopAndTrip)
       .count();
@@ -415,16 +415,16 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setRouteId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(3l, totalSelectorCount);
     long agencySelectorCount = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Agency)
       .count();
     assertEquals(2l, agencySelectorCount);
     long routeSelectorCount = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
       .count();
@@ -435,10 +435,10 @@ public class AlertsUpdateHandlerTest {
   public void testMissingSelector() {
     GtfsRealtime.Alert alert = Alert.newBuilder().build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
     List<EntitySelector> selectors = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
       .toList();
@@ -457,10 +457,10 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setDirectionId(1).build())
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
     List<EntitySelector> selectors = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
       .toList();
@@ -480,10 +480,10 @@ public class AlertsUpdateHandlerTest {
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
     long directionAndRouteSelectorCount = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.DirectionAndRoute)
       .count();
@@ -497,10 +497,10 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setRouteType(1).build())
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
     long RouteTypeSelectorCount = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.RouteType)
       .count();
@@ -516,10 +516,10 @@ public class AlertsUpdateHandlerTest {
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    long totalSelectorCount = transitAlert.getEntities().size();
+    long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
     long RouteTypeAndAgencySelectorCount = transitAlert
-      .getEntities()
+      .entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.RouteTypeAndAgency)
       .count();
@@ -546,7 +546,7 @@ public class AlertsUpdateHandlerTest {
     public void setAlerts(Collection<TransitAlert> alerts) {
       Multimap<EntitySelector, TransitAlert> newAlerts = HashMultimap.create();
       for (TransitAlert alert : alerts) {
-        for (EntitySelector entity : alert.getEntities()) {
+        for (EntitySelector entity : alert.entities()) {
           newAlerts.put(entity, alert);
         }
       }

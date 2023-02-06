@@ -1386,6 +1386,28 @@ type Leg {
     dropOffBookingInfo: BookingInfo
 
     pickupBookingInfo: BookingInfo
+
+    """
+    Future legs with same origin and destination stops or stations
+    """
+    nextLegs(
+        """
+        The number of alternative legs searched. If fewer than the requested number are found,
+        then only the found legs are returned.
+        """
+        numberOfLegs: Int!
+
+        """
+        Transportation modes for which all stops in the parent station are used as possible origin stops
+        for the next legs. For modes not listed, only the exact origin stop of the leg is considered.
+        """
+        originModesWithParentStation: [TransitMode!]
+
+        """
+        Transportation modes for which all stops in the parent station are used as possible destination stops
+        for the next legs. For modes not listed, only the exact destination stop of the leg is considered.
+        """
+        destinationModesWithParentStation: [TransitMode!]): [Leg!]
 }
 
 """A span of time."""
@@ -1479,6 +1501,44 @@ enum Mode {
 
     """WALK"""
     WALK
+}
+
+enum TransitMode {
+    """AIRPLANE"""
+    AIRPLANE
+
+    """BUS"""
+    BUS
+
+    """CABLE_CAR"""
+    CABLE_CAR
+
+    """COACH"""
+    COACH
+
+    """FERRY"""
+    FERRY
+
+    """FUNICULAR"""
+    FUNICULAR
+
+    """GONDOLA"""
+    GONDOLA
+
+    """RAIL"""
+    RAIL
+
+    """SUBWAY"""
+    SUBWAY
+
+    """TRAM"""
+    TRAM
+
+    """"Private car trips shared with others."""
+    CARPOOL
+
+    """A taxi, possibly operated by a public transport agency."""
+    TAXI
 }
 
 """An object with an ID"""
@@ -2475,7 +2535,7 @@ type QueryType {
 
         Deprecated, not used, the timetable-view replaces this functionality.
         """
-        waitAtBeginningFactor: Float
+        waitAtBeginningFactor: Float @deprecated(reason: "Removed in OTP 2")
 
         """
         Max walk speed along streets, in meters per second. Default value: 1.33
@@ -2561,7 +2621,7 @@ type QueryType {
         This argument has no use for itinerary planning and will be removed later.
         ~~When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.~~
         """
-        batch: Boolean
+        batch: Boolean @deprecated(reason: "Removed in OTP 2")
 
         """
         List of transportation modes that the user is willing to use. Default: `["WALK","TRANSIT"]`
@@ -2641,7 +2701,7 @@ type QueryType {
         No effect on itinerary planning, adjust argument `time` instead to get later departures.
         ~~The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.~~
         """
-        claimInitialWait: Long
+        claimInitialWait: Long @deprecated(reason: "Removed in OTP 2")
 
         """
         **Consider this argument experimental** – setting this argument to true
@@ -2651,7 +2711,7 @@ type QueryType {
         processing each transit leg, rather than reverse-optimizing the entire path
         when it's done. Default value: false.
         """
-        reverseOptimizeOnTheFly: Boolean
+        reverseOptimizeOnTheFly: Boolean @deprecated(reason: "Removed in OTP 2")
 
         """
         When false, return itineraries using canceled trips. Default value: true.
@@ -2691,14 +2751,14 @@ type QueryType {
         Whether legs should be compacted by performing a reversed search.
         **Experimental argument, will be removed!**
         """
-        compactLegsByReversedSearch: Boolean
+        compactLegsByReversedSearch: Boolean @deprecated(reason: "Removed in OTP 2")
 
         """
         Which vehicle rental networks can be used. By default, all networks are allowed.
 
         Deprecated: Use `allowedVehicleRentalNetworks` instead.
         """
-        allowedBikeRentalNetworks: [String] @deprecated(reason: "Use allowedBikeRentalNetworks instead")
+        allowedBikeRentalNetworks: [String] @deprecated(reason: "Use allowedVehicleRentalNetworks instead")
 
         """
         Which vehicle rental networks can be used. By default, all networks are allowed.

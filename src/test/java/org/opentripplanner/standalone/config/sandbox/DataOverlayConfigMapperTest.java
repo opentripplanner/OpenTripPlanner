@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config.sandbox;
 
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;

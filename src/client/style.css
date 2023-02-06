@@ -1113,6 +1113,9 @@ p#splash-text span {
 @media only screen and (min-width: 1300px) {
 }
 
+.leaflet-gl-layer {
+  z-index: 10;
+}
 
 /* =Media Query Size Indicator
 -------------------------------------------------------------- */

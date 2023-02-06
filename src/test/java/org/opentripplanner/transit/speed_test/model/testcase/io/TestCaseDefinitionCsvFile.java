@@ -42,7 +42,7 @@ public class TestCaseDefinitionCsvFile extends AbstractCsvFile<TestCaseDefinitio
         parseDouble("toLon")
       ),
       parseString("category"),
-      new QualifiedModeSet(parseCollection("modes").toArray(new String[0])).getRequestModes()
+      new QualifiedModeSet(parseCollection("modes").toArray(new String[0]))
     );
   }
 }

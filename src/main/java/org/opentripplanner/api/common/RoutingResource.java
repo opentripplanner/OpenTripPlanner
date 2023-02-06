@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
@@ -22,6 +21,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
@@ -160,7 +160,7 @@ public abstract class RoutingResource {
    * Whether the trip must be wheelchair accessible.
    *
    * @deprecated TODO OTP2 Regression. Not currently working in OTP2. This is not implemented
-   * in Raptor jet.
+   * in Raptor yet.
    */
   @Deprecated
   @QueryParam("wheelchair")
@@ -780,14 +780,12 @@ public abstract class RoutingResource {
           s -> selectors.add(SelectRequest.of().withRoutesFromString(s))
         );
 
-        // Create modes
-        var tModes = modes
-          .getTransitModes()
-          .stream()
-          .map(MainAndSubMode::new)
-          .collect(Collectors.toList());
-        if (tModes.isEmpty()) {
+        List<MainAndSubMode> tModes;
+        if (modes == null) {
           tModes = MainAndSubMode.all();
+        } else {
+          // Create modes
+          tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
         }
 
         // Add modes filter to all existing selectors
@@ -800,7 +798,11 @@ public abstract class RoutingResource {
           filterBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
         }
 
-        transit.setFilters(List.of(filterBuilder.build()));
+        if (tModes.isEmpty()) {
+          transit.disable();
+        } else {
+          transit.setFilters(List.of(filterBuilder.build()));
+        }
       }
       {
         var debugRaptor = journey.transit().raptorDebugging();

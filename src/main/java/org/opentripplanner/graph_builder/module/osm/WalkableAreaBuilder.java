@@ -26,6 +26,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.AreaTooComplicated;
+import org.opentripplanner.graph_builder.issues.UnconnectedArea;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
@@ -299,17 +300,18 @@ public class WalkableAreaBuilder {
       // FIXME: temporary hard limit on size of
       // areas to prevent way explosion
       if (polygon.getNumPoints() > maxAreaNodes) {
-        OSMWithTags osm = group.getSomeOSMObject();
-        String id = (osm instanceof OSMWay) ? "way/" + osm.getId() : "relation/" + osm.getId();
-        issueStore.add(new AreaTooComplicated(id, visibilityNodes.size(), maxAreaNodes));
+        issueStore.add(
+          new AreaTooComplicated(group.getSomeOSMObject(), visibilityNodes.size(), maxAreaNodes)
+        );
         continue;
       }
 
       if (edgeList.visibilityVertices.size() == 0) {
         issueStore.add(
-          "UnconnectedArea",
-          "Area %s has no connection to street network",
-          osmWayIds.stream().map(Object::toString).collect(Collectors.joining(", "))
+          new UnconnectedArea(
+            group.getSomeOSMObject(),
+            osmWayIds.stream().map(Object::toString).collect(Collectors.joining(", "))
+          )
         );
       }
 

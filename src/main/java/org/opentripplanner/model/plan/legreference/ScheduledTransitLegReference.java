@@ -42,6 +42,14 @@ public record ScheduledTransitLegReference(
 
     TripTimes tripTimes = timetable.getTripTimes(trip);
 
+    if (
+      !transitService
+        .getServiceCodesRunningForDate(serviceDate)
+        .contains(tripTimes.getServiceCode())
+    ) {
+      return null;
+    }
+
     // TODO: What should we have here
     ZoneId timeZone = transitService.getTimeZone();
 

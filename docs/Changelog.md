@@ -52,6 +52,15 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Adaptive street graph island pruning [#4688](https://github.com/opentripplanner/OpenTripPlanner/pull/4688)
 - Change tab to spaces [#4733](https://github.com/opentripplanner/OpenTripPlanner/pull/4733)
 - Refactor of wayproperty.specifier.Condition [#4696](https://github.com/opentripplanner/OpenTripPlanner/pull/4696)
+- Cleanup usage of SIRI DatedServiceJourneyId vs. ServiceJourneyId [#4699](https://github.com/opentripplanner/OpenTripPlanner/pull/4699)
+- Add validation on NeTEx flexible area import [#4765](https://github.com/opentripplanner/OpenTripPlanner/pull/4765)
+- Do not return a leg from a leg reference, if trip does not exist on date [#4758](https://github.com/opentripplanner/OpenTripPlanner/pull/4758)
+- Expose more data from SIRI-SX messages in the Transmodel API [#4755](https://github.com/opentripplanner/OpenTripPlanner/pull/4755)
+- Fix direct transfer analyzer [#4767](https://github.com/opentripplanner/OpenTripPlanner/pull/4767)
+- Refactor data import issue reporting [#4777](https://github.com/opentripplanner/OpenTripPlanner/pull/4777)
+- Add support for deleted trips & including real-time cancelations in trip search [#4759](https://github.com/opentripplanner/OpenTripPlanner/pull/4759)
+- GBFS geofencing zones - part 1 [#4741](https://github.com/opentripplanner/OpenTripPlanner/pull/4741)
+- Add ORCA Fares support with Fare by Leg [#4773](https://github.com/opentripplanner/OpenTripPlanner/pull/4773)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.BindsInstance;
 import dagger.Component;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;

@@ -78,11 +78,11 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [walkReluctance](#rd_walkReluctance)                                                                 |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                       | *Optional* | `2.0`                    |  2.0  |
 | [walkSafetyFactor](#rd_walkSafetyFactor)                                                             |        `double`        | Factor for how much the walk safety is considered in routing.                                                                      | *Optional* | `1.0`                    |  2.2  |
 | walkSpeed                                                                                            |        `double`        | The user's walking speed in meters/second.                                                                                         | *Optional* | `1.33`                   |  2.0  |
-| [alightSlackForMode](#rd_alightSlackForMode)                                                         | `enum map of duration` | How much time alighting a vehicle takes for each given mode.                                                                       | *Optional* |                          |  2.0  |
+| [alightSlackForMode](#rd_alightSlackForMode)                                                         | `enum map of duration` | How much extra time should be given when alighting a vehicle for each given mode.                                                  | *Optional* |                          |  2.0  |
 | [allowedVehicleRentalNetworks](#rd_allowedVehicleRentalNetworks)                                     |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                  | *Optional* |                          |  2.1  |
 | [bannedVehicleParkingTags](#rd_bannedVehicleParkingTags)                                             |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned                                                   | *Optional* |                          |  2.1  |
 | [bannedVehicleRentalNetworks](#rd_bannedVehicleRentalNetworks)                                       |       `string[]`       | he vehicle rental networks which may not be used. If empty, no networks are banned.                                                | *Optional* |                          |  2.1  |
-| [boardSlackForMode](#rd_boardSlackForMode)                                                           | `enum map of duration` | How much time ride a vehicle takes for each given mode.                                                                            | *Optional* |                          |  2.0  |
+| [boardSlackForMode](#rd_boardSlackForMode)                                                           | `enum map of duration` | How much extra time should be given when boarding a vehicle for each given mode.                                                   | *Optional* |                          |  2.0  |
 | [itineraryFilters](#rd_itineraryFilters)                                                             |        `object`        | Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results.                       | *Optional* |                          |  2.0  |
 |    [accessibilityScore](#rd_if_accessibilityScore)                                                   |        `boolean`       | An experimental feature contributed by IBI which adds a sandbox accessibility *score* between 0 and 1 for each leg and itinerary.  | *Optional* | `false`                  |  2.2  |
 |    [bikeRentalDistanceRatio](#rd_if_bikeRentalDistanceRatio)                                         |        `double`        | Filter routes that consist of bike-rental and walking by the minimum fraction of the bike-rental leg using _distance_.             | *Optional* | `0.0`                    |  2.1  |
@@ -96,6 +96,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [parkAndRideDurationRatio](#rd_if_parkAndRideDurationRatio)                                       |        `double`        | Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.                      | *Optional* | `0.0`                    |  2.1  |
 |    [removeItinerariesWithSameRoutesAndStops](#rd_if_removeItinerariesWithSameRoutesAndStops)         |        `boolean`       | Set to true if you want to list only the first itinerary  which goes through the same stops and routes.                            | *Optional* | `false`                  |  2.2  |
 |    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                                 |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                 | *Optional* |                          |  2.1  |
+|       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                      |    `linear-function`   | The base function used by the filter.                                                                                              | *Optional* | `"f(x) = 900 + 1.5 x"`   |  2.2  |
+|       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                  |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                 | *Optional* | `0.4`                    |  2.2  |
 | [maxAccessEgressDurationForMode](#rd_maxAccessEgressDurationForMode)                                 | `enum map of duration` | Limit access/egress per street mode.                                                                                               | *Optional* |                          |  2.1  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                                 | `enum map of duration` | Limit direct route duration per street mode.                                                                                       | *Optional* |                          |  2.2  |
 | [requiredVehicleParkingTags](#rd_requiredVehicleParkingTags)                                         |       `string[]`       | Tags which are required to use a vehicle parking. If empty, no tags are required.                                                  | *Optional* |                          |  2.1  |
@@ -361,7 +363,7 @@ Value should be between 0 and 1. If the value is set to be 0, safety is ignored.
 **Path:** /routingDefaults   
 **Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi`
 
-How much time alighting a vehicle takes for each given mode.
+How much extra time should be given when alighting a vehicle for each given mode.
 
 Sometimes there is a need to configure a longer alighting times for specific modes, such as airplanes or ferries.
 
@@ -392,7 +394,7 @@ he vehicle rental networks which may not be used. If empty, no networks are bann
 **Path:** /routingDefaults   
 **Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi`
 
-How much time ride a vehicle takes for each given mode.
+How much extra time should be given when boarding a vehicle for each given mode.
 
 Sometimes there is a need to configure a board times for specific modes, such as airplanes or
 ferries, where the check-in process needs to be done in good time before ride.
@@ -544,6 +546,27 @@ dropped. The `transitGeneralizedCostLimit` is calculated using the `costLimitFun
 `intervalRelaxFactor` multiplied with the interval in seconds. To set the `costLimitFunction` to be
 _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`
 
+
+<h3 id="rd_if_transitGeneralizedCostLimit_costLimitFunction">costLimitFunction</h3>
+
+**Since version:** `2.2` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"f(x) = 900 + 1.5 x"`   
+**Path:** /routingDefaults/itineraryFilters/transitGeneralizedCostLimit 
+
+The base function used by the filter.
+
+This function calculates the threshold for the filter, when the itineraries have exactly the same arrival and departure times.
+
+<h3 id="rd_if_transitGeneralizedCostLimit_intervalRelaxFactor">intervalRelaxFactor</h3>
+
+**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.4`   
+**Path:** /routingDefaults/itineraryFilters/transitGeneralizedCostLimit 
+
+How much the filter should be relaxed for itineraries that do not overlap in time.
+
+This value is used to increase the filter threshold for itineraries further away in
+time, compared to those, that have exactly the same arrival and departure times.
+
+The unit is cost unit per second of time difference.
 
 <h3 id="rd_maxAccessEgressDurationForMode">maxAccessEgressDurationForMode</h3>
 

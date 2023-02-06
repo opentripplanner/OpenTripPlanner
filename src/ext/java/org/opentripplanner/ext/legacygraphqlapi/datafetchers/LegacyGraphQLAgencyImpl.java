@@ -38,7 +38,7 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
                 .stream()
                 .filter(alert ->
                   alert
-                    .getEntities()
+                    .entities()
                     .stream()
                     .filter(EntitySelector.RouteTypeAndAgency.class::isInstance)
                     .map(EntitySelector.RouteTypeAndAgency.class::cast)
