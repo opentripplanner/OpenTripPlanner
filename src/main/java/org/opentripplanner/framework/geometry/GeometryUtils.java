@@ -1,10 +1,13 @@
 package org.opentripplanner.framework.geometry;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.geotools.referencing.CRS;
@@ -12,11 +15,13 @@ import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.CoordinateSequenceFactory;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequenceFactory;
 import org.locationtech.jts.linearref.LengthLocationMap;
@@ -198,36 +203,6 @@ public class GeometryUtils {
     return splitGeom.beginning();
   }
 
-  /**
-   * Adapted from org.locationtech.jts.geom.LineSegment Combines segmentFraction and
-   * projectionFactor methods.
-   */
-  public static double segmentFraction(
-    double x0,
-    double y0,
-    double x1,
-    double y1,
-    double xp,
-    double yp,
-    double xscale
-  ) {
-    // Use comp.graphics.algorithms Frequently Asked Questions method
-    double dx = (x1 - x0) * xscale;
-    double dy = y1 - y0;
-    double len2 = dx * dx + dy * dy;
-    // this fixes a (reported) divide by zero bug in JTS when line segment has 0 length
-    if (len2 == 0) {
-      return 0;
-    }
-    double r = ((xp - x0) * xscale * dx + (yp - y0) * dy) / len2;
-    if (r < 0.0) {
-      return 0.0;
-    } else if (r > 1.0) {
-      return 1.0;
-    }
-    return r;
-  }
-
   // TODO OTP2 move this method to a separate mapper class
   /**
    * Convert a org.geojson.Xxxx geometry to a JTS geometry. Only support Point, Polygon and
@@ -284,6 +259,17 @@ public class GeometryUtils {
     throw new UnsupportedGeometryException(geoJsonGeom.getClass().toString());
   }
 
+  /**
+   * Extract individual line string from a mult-line string.
+   */
+  public static List<LineString> getLineStrings(MultiLineString mls) {
+    var ret = new ArrayList<LineString>();
+    for (var i = 0; i < mls.getNumGeometries(); i++) {
+      ret.add((LineString) mls.getGeometryN(i));
+    }
+    return List.copyOf(ret);
+  }
+
   private static Coordinate[] convertPath(List<LngLatAlt> path) {
     Coordinate[] coords = new Coordinate[path.size()];
     int i = 0;
@@ -292,5 +278,24 @@ public class GeometryUtils {
       coords[i++] = new Coordinate(p.getLongitude(), p.getLatitude(), p.getAltitude());
     }
     return coords;
+  }
+
+  /**
+   * Split a linestring into its constituent segments and convert each into an envelope.
+   * <p>
+   * All segments form the complete line string again so [A,B,C,D] will be split into the
+   * segments [[A,B],[B,C],[C,D]].
+   */
+  public static Stream<Envelope> toEnvelopes(LineString ls) {
+    Coordinate[] coordinates = ls.getCoordinates();
+    Envelope[] envelopes = new Envelope[coordinates.length - 1];
+
+    for (int i = 0; i < envelopes.length; i++) {
+      Coordinate from = coordinates[i];
+      Coordinate to = coordinates[i + 1];
+      envelopes[i] = new Envelope(from, to);
+    }
+
+    return Arrays.stream(envelopes);
   }
 }

@@ -20,9 +20,9 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -173,6 +173,11 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   }
 
   @Override
+  public DataFetcher<TripPattern> originalTripPattern() {
+    return environment -> getSource(environment).getOriginalTripPattern();
+  }
+
+  @Override
   public DataFetcher<Geometry> patternGeometry() {
     return environment -> getSource(environment).getGeometry();
   }
@@ -224,9 +229,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   @Override
   public DataFetcher<Iterable<RealtimeVehiclePosition>> vehiclePositions() {
     return environment ->
-      getRoutingService(environment)
-        .getVehiclePositionService()
-        .getVehiclePositions(this.getSource(environment));
+      getVehiclePositionsService(environment).getVehiclePositions(this.getSource(environment));
   }
 
   private Agency getAgency(DataFetchingEnvironment environment) {
@@ -249,8 +252,10 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
     return getSource(environment).scheduledTripsAsStream().collect(Collectors.toList());
   }
 
-  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+  private RealtimeVehiclePositionService getVehiclePositionsService(
+    DataFetchingEnvironment environment
+  ) {
+    return environment.<LegacyGraphQLRequestContext>getContext().getVehiclePositionService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

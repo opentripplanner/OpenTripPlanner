@@ -59,6 +59,11 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       return false;
     }
 
+    // we cannot compare the states where one is inside a "no-drop off" zone and one isn't
+    if (a.isInsideNoRentalDropOffArea() != b.isInsideNoRentalDropOffArea()) {
+      return false;
+    }
+
     /*
      * The OTP algorithm tries hard to never visit the same node twice. This is generally a good idea because it avoids
      * useless loops in the traversal leading to way faster processing time.

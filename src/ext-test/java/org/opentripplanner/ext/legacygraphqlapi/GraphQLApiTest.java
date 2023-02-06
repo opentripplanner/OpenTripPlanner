@@ -15,17 +15,14 @@ import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
-import org.opentripplanner.standalone.configure.ConstructApplicationModule;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -51,17 +48,7 @@ class GraphQLApiTest {
     var transitModel = new TransitModel();
     transitModel.index();
     transitModel.getTransitModelIndex().addRoutes(TransitModelForTest.route("123").build());
-    var transitService = new DefaultTransitService(transitModel);
-    var module = new ConstructApplicationModule();
-    context =
-      module.providesServerContext(
-        RouterConfig.DEFAULT,
-        RaptorConfig.defaultConfigForTest(),
-        graph,
-        transitService,
-        null,
-        null
-      );
+    context = TestServerContext.createServerContext(graph, transitModel);
     resource = new LegacyGraphQLAPI(context, "ignored");
   }
 
