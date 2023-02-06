@@ -108,7 +108,6 @@ public class ScheduledTransitLeg implements TransitLeg {
         )
       )
     );
-
   }
 
   public ZoneId getZoneId() {
@@ -436,9 +435,5 @@ public class ScheduledTransitLeg implements TransitLeg {
       distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
     }
     return distance;
-  }
-
-  public double getDirectDistance(Coordinate coord1, Coordinate coord2) {
-    return SphericalDistanceLibrary.distance(coord1, coord2);
   }
 }
