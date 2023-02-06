@@ -5,6 +5,7 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -58,18 +59,16 @@ public class B02_EgressTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    String expStd = "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx]";
+    String expStdRevOne =
+      "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s 0tx]";
     return RaptorModuleTestCase
       .of()
-      .add(
-        standard().not(TC_STANDARD_REV_ONE),
-        "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx]"
-      )
-      .add(
-        // When we run one iteration the egress "alighting" last is used as long as it
-        // arrives at the origin at the same time. In this case the "worst" path is kept.
-        TC_STANDARD_REV_ONE,
-        "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s 0tx]"
-      )
+      .add(minDuration(), expStd)
+      .add(standard().not(TC_STANDARD_REV_ONE), expStd)
+      // When we run one iteration the egress "alighting" last is used as long as it
+      // arrives at the origin at the same time. In this case the "worst" path is kept.
+      .add(TC_STANDARD_REV_ONE, expStdRevOne)
       .add(
         multiCriteria(),
         "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx $2080]",

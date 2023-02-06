@@ -8,10 +8,13 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -39,7 +42,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
  * option might not be possible.
  * <p>
  * Test case:
- * <img src="images/B13.svg" width="432" height="212" />
+ * <img src="images/F12.svg" width="432" height="212" />
  * <p>
  * <pre>
  * // Allowed paths
@@ -99,6 +102,10 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
   static List<RaptorModuleTestCase> withFlexAsBestOptionTestCases() {
     return RaptorModuleTestCase
       .of()
+      // min-duration is added to verify that we get a result, the min-duration is not part of
+      // the destination criteria; Hence we can not verify that the min-duration is correct
+      .add(TC_MIN_DURATION, join(withoutCost(EXPECTED_PATH_FLEX_7M)))
+      .add(TC_MIN_DURATION_REV, join(withoutCost(EXPECTED_PATH_FLEX_7M, EXPECTED_PATH_WALK_7M)))
       .add(TC_STANDARD, join(withoutCost(EXPECTED_PATH_FLEX_7M, EXPECTED_PATH_WALK_7M)))
       .add(TC_STANDARD_ONE, join(withoutCost(EXPECTED_PATH_FLEX_7M)))
       .add(TC_STANDARD_REV, join(withoutCost(EXPECTED_PATH_FLEX_7M)))
@@ -121,6 +128,7 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
   static List<RaptorModuleTestCase> withWalkingAsBestOptionTestCase() {
     return RaptorModuleTestCase
       .of()
+      .add(minDuration(), withoutCost(EXPECTED_PATH_WALK_5M))
       .add(standard(), withoutCost(EXPECTED_PATH_WALK_5M))
       .add(multiCriteria(), join(EXPECTED_PATH_WALK_5M))
       .build();

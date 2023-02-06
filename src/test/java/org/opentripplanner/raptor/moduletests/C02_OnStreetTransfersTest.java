@@ -5,6 +5,8 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -34,14 +36,6 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
  */
 public class C02_OnStreetTransfersTest implements RaptorTestConstants {
 
-  /** The expected result is tha same for all tests */
-  private static final String EXPECTED_RESULT =
-    "Walk 30s ~ B ~ " +
-    "BUS R1 0:02 0:03 ~ C ~ " +
-    "Walk 30s ~ D ~ " +
-    "BUS R2 0:04 0:05 ~ E ~ " +
-    "Walk 20s " +
-    "[0:01:30 0:05:20 3m50s 1tx $1510]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -81,10 +75,28 @@ public class C02_OnStreetTransfersTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var expectedMinDuration =
+      "Walk 30s ~ B " +
+      "~ BUS R1 0:02 0:03 ~ C ~ Walk 30s ~ D " +
+      "~ BUS R2 0:03:59 0:04:59 ~ E " +
+      "~ Walk 20s " +
+      "[0:01:30 0:05:19 3m49s 1tx]";
+
+    var expected =
+      "Walk 30s ~ B ~ " +
+      "BUS R1 0:02 0:03 ~ C ~ " +
+      "Walk 30s ~ D ~ " +
+      "BUS R2 0:04 0:05 ~ E ~ " +
+      "Walk 20s " +
+      "[0:01:30 0:05:20 3m50s 1tx $1510]";
     return RaptorModuleTestCase
       .of()
-      .add(standard(), PathUtils.withoutCost(EXPECTED_RESULT))
-      .add(multiCriteria(), EXPECTED_RESULT)
+      // TODO - The slacks are not added, to avoid blocking Constrained transfers, but we
+      //      - can solve this for stop pairs where there is no constrained transfers
+      .add(TC_MIN_DURATION, PathUtils.withoutCost(expectedMinDuration))
+      .add(TC_MIN_DURATION_REV, PathUtils.withoutCost(expected))
+      .add(standard(), PathUtils.withoutCost(expected))
+      .add(multiCriteria(), expected)
       .build();
   }
 

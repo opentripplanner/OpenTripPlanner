@@ -5,6 +5,7 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -71,6 +72,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
     var path = "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx $940]";
     return RaptorModuleTestCase
       .of()
+      .add(minDuration(), PathUtils.withoutCost(path))
       .add(standard(), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)
       .build();

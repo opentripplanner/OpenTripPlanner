@@ -96,6 +96,7 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
   static List<RaptorModuleTestCase> testCases() {
     return RaptorModuleTestCase
       .of()
+      .add(minDuration(), EXP_PATH_MIN_TRAVEL_DURATION)
       // A test on the standard profile is included to demonstrate that the min-travel-duration
       // and the standard give different results. The boarding stop is different.
       .add(standard().forwardOnly(), EXP_PATH_BEST_ARRIVAL_TIME)
@@ -103,7 +104,6 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
       // min-travel-duration and the standard give different results when searching
       // in reverse. The alight stop is different.
       .add(standard().reverseOnly(), EXP_PATH_BEST_ARRIVAL_TIME_REVERSE)
-      .add(minDuration(), EXP_PATH_MIN_TRAVEL_DURATION)
       .add(multiCriteria(), EXP_PATH_MC)
       .build();
   }

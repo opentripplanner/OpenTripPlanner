@@ -7,6 +7,8 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndW
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
@@ -75,14 +77,15 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    String expFlexAccess = "Flex 3m 2x ~ D ~ BUS R1 0:14 0:20 ~ F ~ Walk 1m [0:10 0:21 11m 2tx]";
+    String expWalkAccess = "Walk 10m ~ B ~ BUS R1 0:10 0:20 ~ F ~ Walk 1m [0:00 0:21 21m 0tx]";
     return RaptorModuleTestCase
       .of()
-      .add(
-        standard().not(TC_STANDARD_ONE),
-        "Flex 3m 2x ~ D ~ BUS R1 0:14 0:20 ~ F ~ Walk 1m [0:10 0:21 11m 2tx]"
-      )
-      // First boarding wins with one-iteration
-      .add(TC_STANDARD_ONE, "Walk 10m ~ B ~ BUS R1 0:10 0:20 ~ F ~ Walk 1m [0:00 0:21 21m 0tx]")
+      .add(TC_MIN_DURATION_REV, expFlexAccess)
+      .add(standard().not(TC_STANDARD_ONE), expFlexAccess)
+      // First boarding wins with one-iteration (apply to min-duration and std-one)
+      .add(TC_MIN_DURATION, expWalkAccess)
+      .add(TC_STANDARD_ONE, expWalkAccess)
       .add(
         multiCriteria(),
         "Flex 3m 2x ~ D ~ BUS R1 0:14 0:20 ~ F ~ Walk 1m [0:10 0:21 11m 2tx $1500]", // ldt

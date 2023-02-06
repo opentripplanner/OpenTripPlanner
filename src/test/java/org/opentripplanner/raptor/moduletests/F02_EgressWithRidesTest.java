@@ -2,11 +2,14 @@ package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
@@ -67,21 +70,22 @@ public class F02_EgressWithRidesTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var prefix = "Walk 1m ~ B ~ BUS R1 0:10 ";
+
+    var bestArrivalTime = prefix + "0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m 2tx $1380]";
+    var bestNTransfers = prefix + "0:18 ~ F ~ Walk 10m [0:09 0:28 19m 0tx $2400]";
+    var bestCost = prefix + "0:16 ~ E ~ Flex+Walk 1m59s 2x [0:09 0:18:59 9m59s 2tx $1378]";
+    var bestTxAndTime = prefix + "0:12 ~ C ~ Flex+Walk 7m 1x [0:09 0:20 11m 1tx $1740]";
+
     return RaptorModuleTestCase
       .of()
-      .add(
-        standard().not(TC_STANDARD_REV_ONE),
-        "Walk 1m ~ B ~ BUS R1 0:10 0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m 2tx]"
-      )
-      // "First"(in reverse) alighting wins
-      .add(TC_STANDARD_REV_ONE, "Walk 1m ~ B ~ BUS R1 0:10 0:18 ~ F ~ Walk 10m [0:09 0:28 19m 0tx]")
-      .add(
-        multiCriteria(),
-        "Walk 1m ~ B ~ BUS R1 0:10 0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m 2tx $1380]",
-        "Walk 1m ~ B ~ BUS R1 0:10 0:16 ~ E ~ Flex+Walk 1m59s 2x [0:09 0:18:59 9m59s 2tx $1378]",
-        "Walk 1m ~ B ~ BUS R1 0:10 0:12 ~ C ~ Flex+Walk 7m 1x [0:09 0:20 11m 1tx $1740]",
-        "Walk 1m ~ B ~ BUS R1 0:10 0:18 ~ F ~ Walk 10m [0:09 0:28 19m 0tx $2400]"
-      )
+      .add(TC_MIN_DURATION, withoutCost(bestArrivalTime))
+      // TODO - The best alternative for 1, 2 and 3 transfers
+      .add(TC_MIN_DURATION_REV, withoutCost(bestArrivalTime, bestTxAndTime, bestNTransfers))
+      .add(standard().not(TC_STANDARD_REV_ONE), withoutCost(bestArrivalTime))
+      // "First" alighting wins for reverse
+      .add(TC_STANDARD_REV_ONE, withoutCost(bestNTransfers))
+      .add(multiCriteria(), bestArrivalTime, bestCost, bestTxAndTime, bestNTransfers)
       .build();
   }
 

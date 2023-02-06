@@ -7,7 +7,7 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndW
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -79,8 +79,8 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
       "[0:00:30 0:09:10 8m40s 2tx $1840]";
     return RaptorModuleTestCase
       .of()
-      // TODO - TC_STANDARD_REV does not give tha same results - why?
-      .add(standard().not(TC_STANDARD_REV), PathUtils.withoutCost(path))
+      .add(minDuration(), PathUtils.withoutCost(path))
+      .add(standard(), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)
       .build();
   }

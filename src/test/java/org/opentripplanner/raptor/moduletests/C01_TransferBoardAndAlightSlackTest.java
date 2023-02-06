@@ -5,6 +5,7 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -37,13 +38,6 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
  */
 public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants {
 
-  /** The expected result is tha same for all tests */
-  private static final String EXPECTED_RESULT =
-    "Walk 30s ~ B ~ " +
-    "BUS R1 0:02:11 0:03:01 ~ C ~ " +
-    "BUS R2 0:04:41 0:05:01 ~ D ~ " +
-    "Walk 20s " +
-    "[0:01:11 0:05:31 4m20s 1tx $1510]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -80,10 +74,20 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var expected =
+      "Walk 30s ~ B ~ " +
+      "BUS R1 0:02:11 0:03:01 ~ C ~ " +
+      "BUS R2 0:04:41 0:05:01 ~ D ~ " +
+      "Walk 20s " +
+      "[0:01:11 0:05:31 4m20s 1tx $1510]";
+
     return RaptorModuleTestCase
       .of()
-      .add(standard(), PathUtils.withoutCost(EXPECTED_RESULT))
-      .add(multiCriteria(), EXPECTED_RESULT)
+      // TODO Investigate why this is not respecting the board/alight slack
+      //.add(TC_MIN_DURATION, PathUtils.withoutCost(expected))
+      .add(TC_MIN_DURATION_REV, PathUtils.withoutCost(expected))
+      .add(standard(), PathUtils.withoutCost(expected))
+      .add(multiCriteria(), expected)
       .build();
   }
 

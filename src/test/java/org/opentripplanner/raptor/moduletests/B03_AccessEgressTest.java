@@ -6,6 +6,7 @@ import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -67,17 +68,15 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
   /** Only the multi-criteria test-cases differ for timetableView on/off */
   private static RaptorModuleTestCaseBuilder standardTestCases() {
+    String expStd = "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx]";
+    String expStdOne = "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx]";
+    String expStdRevOne = "Walk 7m ~ C ~ BUS R1 0:18 0:40 ~ H ~ Walk 1s [0:11 0:40:01 29m1s 0tx]";
     return RaptorModuleTestCase
       .of()
-      .add(
-        standard().manyIterationOnly(),
-        "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx]"
-      )
-      .add(TC_STANDARD_ONE, "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx]")
-      .add(
-        TC_STANDARD_REV_ONE,
-        "Walk 7m ~ C ~ BUS R1 0:18 0:40 ~ H ~ Walk 1s [0:11 0:40:01 29m1s 0tx]"
-      );
+      .add(minDuration(), expStd)
+      .add(standard().manyIterations(), expStd)
+      .add(TC_STANDARD_ONE, expStdOne)
+      .add(TC_STANDARD_REV_ONE, expStdRevOne);
   }
 
   static List<RaptorModuleTestCase> testCases() {
@@ -106,7 +105,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
     assertEquals(testCase.expected(), pathsToString(response));
   }
 
-  static List<RaptorModuleTestCase> noTimetableTestCases() {
+  static List<RaptorModuleTestCase> testCasesWithoutTimetable() {
     return standardTestCases()
       .add(
         multiCriteria(),
@@ -120,7 +119,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
   }
 
   @ParameterizedTest
-  @MethodSource("noTimetableTestCases")
+  @MethodSource("testCasesWithoutTimetable")
   void testRaptorWithoutTimetable(RaptorModuleTestCase testCase) {
     requestBuilder.searchParams().timetable(false);
     var request = testCase.withConfig(requestBuilder);
