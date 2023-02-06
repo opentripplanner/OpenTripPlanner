@@ -448,6 +448,8 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> name();
 
+    public DataFetcher<TripPattern> originalTripPattern();
+
     public DataFetcher<Geometry> patternGeometry();
 
     public DataFetcher<Route> route();
