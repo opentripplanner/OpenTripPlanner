@@ -302,9 +302,10 @@ public class StateEditor {
     if (reverse) {
       child.stateData.mayKeepRentedVehicleAtDestination = false;
       child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
-      child.stateData.currentMode = TraverseMode.BICYCLE;
-      child.stateData.vehicleRentalNetwork = "tieroslo";
-      child.stateData.rentalVehicleFormFactor = FormFactor.SCOOTER;
+      child.stateData.currentMode =
+        formFactor != null ? formFactor.traverseMode : TraverseMode.BICYCLE;
+      child.stateData.vehicleRentalNetwork = network;
+      child.stateData.rentalVehicleFormFactor = formFactor;
     } else {
       child.stateData.mayKeepRentedVehicleAtDestination = false;
       child.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
