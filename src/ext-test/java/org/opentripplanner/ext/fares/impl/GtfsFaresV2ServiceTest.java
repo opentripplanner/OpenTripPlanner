@@ -121,23 +121,14 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
-      new FareLegRule(LEG_GROUP1, null, null, null, null, null, null, single),
-      new FareLegRule(LEG_GROUP1, null, null, OUTER_ZONE, null, null, null, singleToOuter),
-      new FareLegRule(LEG_GROUP1, null, OUTER_ZONE, null, null, null, null, singleFromOuter),
-      new FareLegRule(LEG_GROUP1, null, null, null, null, null, null, dayPass),
-      new FareLegRule(LEG_GROUP1, expressNetwork, null, null, null, null, null, expressPass),
-      new FareLegRule(LEG_GROUP1, localNetwork, null, null, null, null, null, localPass),
-      new FareLegRule(
-        LEG_GROUP1,
-        null,
-        INNER_ZONE,
-        OUTER_ZONE,
-        null,
-        null,
-        null,
-        innerToOuterZoneSingle
-      ),
-      new FareLegRule("another-leg-group", null, null, null, null, null, null, monthlyPass)
+      new FareLegRule(LEG_GROUP1, null, null, null, single),
+      new FareLegRule(LEG_GROUP1, null, null, OUTER_ZONE, singleToOuter),
+      new FareLegRule(LEG_GROUP1, null, OUTER_ZONE, null, singleFromOuter),
+      new FareLegRule(LEG_GROUP1, null, null, null, dayPass),
+      new FareLegRule(LEG_GROUP1, expressNetwork, null, null, expressPass),
+      new FareLegRule(LEG_GROUP1, localNetwork, null, null, localPass),
+      new FareLegRule(LEG_GROUP1, null, INNER_ZONE, OUTER_ZONE, innerToOuterZoneSingle),
+      new FareLegRule("another-leg-group", null, null, null, monthlyPass)
     ),
     List.of(),
     Multimaps.forMap(
@@ -252,19 +243,10 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
     GtfsFaresV2Service service = new GtfsFaresV2Service(
       List.of(
-        new FareLegRule(
-          LEG_GROUP2,
-          null,
-          INNER_ZONE,
-          INNER_ZONE,
-          null,
-          null,
-          null,
-          freeTransferFromInnerToOuter
-        ),
-        new FareLegRule(LEG_GROUP3, null, OUTER_ZONE, OUTER_ZONE, null, null, null, single),
-        new FareLegRule(LEG_GROUP4, null, null, null, null, null, null, freeTransferSingle),
-        new FareLegRule(LEG_GROUP5, null, INNER_ZONE, OUTER_ZONE, null, null, null, singleToOuter)
+        new FareLegRule(LEG_GROUP2, null, INNER_ZONE, INNER_ZONE, freeTransferFromInnerToOuter),
+        new FareLegRule(LEG_GROUP3, null, OUTER_ZONE, OUTER_ZONE, single),
+        new FareLegRule(LEG_GROUP4, null, null, null, freeTransferSingle),
+        new FareLegRule(LEG_GROUP5, null, INNER_ZONE, OUTER_ZONE, singleToOuter)
       ),
       List.of(
         new FareTransferRule(LEG_GROUP1, LEG_GROUP1, 1, null, freeTransfer),
@@ -363,7 +345,6 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     @Test
     void stops() {
       var i1 = newItinerary(A, 0).bus(ID, 0, 50, 1, 20, C).build();
-      var result = service.getProducts(i1);
       var faresV2Service = new GtfsFaresV2Service(
         rules,
         List.of(),
