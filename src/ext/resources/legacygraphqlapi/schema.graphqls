@@ -1501,6 +1501,12 @@ enum Mode {
 
     """WALK"""
     WALK
+
+    "Electric buses that draw power from overhead wires using poles."
+    TROLLEYBUS
+
+    "Railway in which the track consists of a single rail or a beam."
+    MONORAIL
 }
 
 enum TransitMode {
@@ -1539,6 +1545,12 @@ enum TransitMode {
 
     """A taxi, possibly operated by a public transport agency."""
     TAXI
+
+    "Electric buses that draw power from overhead wires using poles."
+    TROLLEYBUS
+
+    "Railway in which the track consists of a single rail or a beam."
+    MONORAIL
 }
 
 """An object with an ID"""
@@ -2837,7 +2849,7 @@ type Route implements Node {
         language: String): String
 
     """Transport mode of this route, e.g. `BUS`"""
-    mode: Mode
+    mode: TransitMode
 
     """
     The raw GTFS route type as a integer. For the list of possible values, see:
