@@ -56,7 +56,7 @@ config:
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
     Mode: String
-    TransitMode: String
+    TransitMode: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLTransitMode#LegacyGraphQLTransitMode
     PageInfo: Object
     Pattern: org.opentripplanner.transit.model.network.TripPattern#TripPattern
     PickupDropoffType: String
