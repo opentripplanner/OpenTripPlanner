@@ -101,11 +101,11 @@ public class ScheduledTransitLeg implements TransitLeg {
 
     setDistanceMeters(getDistanceFromCoordinates(transitLegCoordinates));
     setDirectDistanceMeters(
-      getDirectDistance(
-        transitLegCoordinates.get(0),
-        transitLegCoordinates.get(transitLegCoordinates.size() - 1)
+      getDistanceFromCoordinates(
+        List.of(transitLegCoordinates.get(0), transitLegCoordinates.get(transitLegCoordinates.size() -1))
       )
     );
+
   }
 
   public ZoneId getZoneId() {
