@@ -19,6 +19,7 @@ import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.PropertyOfDay;
+import org.rutebanken.netex.model.UicOperatingPeriod;
 
 /**
  * Map {@link DayTypeAssignment}s to set of {@link LocalDate}s.
@@ -41,6 +42,7 @@ public class DayTypeAssignmentMapper {
   private final DayType dayType;
   private final ReadOnlyHierarchicalMapById<OperatingDay> operatingDays;
   private final ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriods;
+  private final ReadOnlyHierarchicalMapById<UicOperatingPeriod> uicOperatingPeriods;
 
   // Result data
   private final Set<LocalDate> dates = new HashSet<>();
@@ -53,11 +55,13 @@ public class DayTypeAssignmentMapper {
   private DayTypeAssignmentMapper(
     DayType dayType,
     ReadOnlyHierarchicalMapById<OperatingDay> operatingDays,
-    ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriods
+    ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriods,
+    ReadOnlyHierarchicalMapById<UicOperatingPeriod> uicOperatingPeriods
   ) {
     this.dayType = dayType;
     this.operatingDays = operatingDays;
     this.operatingPeriods = operatingPeriods;
+    this.uicOperatingPeriods = uicOperatingPeriods;
   }
 
   /**
@@ -69,12 +73,13 @@ public class DayTypeAssignmentMapper {
     ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> assignments,
     ReadOnlyHierarchicalMapById<OperatingDay> operatingDays,
     ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriods,
+    ReadOnlyHierarchicalMapById<UicOperatingPeriod> uicOperatingPeriods,
     DataImportIssueStore issueStore
   ) {
     Map<String, Set<LocalDate>> result = new HashMap<>();
 
     for (var dayType : dayTypes.localValues()) {
-      var mapper = new DayTypeAssignmentMapper(dayType, operatingDays, operatingPeriods);
+      var mapper = new DayTypeAssignmentMapper(dayType, operatingDays, operatingPeriods, uicOperatingPeriods);
 
       for (DayTypeAssignment it : assignments.lookup(dayType.getId())) {
         mapper.map(it);
@@ -150,19 +155,40 @@ public class DayTypeAssignmentMapper {
 
     String ref = dayTypeAssignment.getOperatingPeriodRef().getRef();
     OperatingPeriod period = operatingPeriods.lookup(ref);
+    UicOperatingPeriod uicPeriod = uicOperatingPeriods.lookup(ref);
 
     if (period != null) {
       Set<DayOfWeek> daysOfWeek = daysOfWeekForDayType(dayType);
-
       // Plus 1 to make the end date exclusive - simplify the loop test
       LocalDateTime endDate = period.getToDate().plusDays(1);
       LocalDateTime date = period.getFromDate();
 
-      for (; date.isBefore(endDate); date = date.plusDays(1)) {
-        if (daysOfWeek.contains(date.getDayOfWeek())) {
-          addDate(isAvailable, date);
-        }
+      addDates(isAvailable, daysOfWeek, endDate, date);
+    } else if (uicPeriod != null) {
+      LocalDateTime endDate = uicPeriod.getToDate().plusDays(1);
+      LocalDateTime date = uicPeriod.getFromDate();
+
+      addDates(uicPeriod.getValidDayBits(), isAvailable, endDate, date);
+    }
+  }
+
+  private void addDates(boolean isAvailable, Set<DayOfWeek> daysOfWeek, LocalDateTime endDate, LocalDateTime date) {
+    for (; date.isBefore(endDate); date = date.plusDays(1)) {
+      if (daysOfWeek.contains(date.getDayOfWeek())) {
+        addDate(isAvailable, date);
       }
+    }
+  }
+
+  private void addDates(String validDayBits, boolean isAvailable, LocalDateTime endDate, LocalDateTime date) {
+    int i = 0;
+    for (; date.isBefore(endDate); date = date.plusDays(1)) {
+      if (i >= validDayBits.length() || validDayBits.charAt(i) == '1') {
+        addDate(isAvailable, date);
+      } else if (validDayBits.charAt(i) != '0') {
+        throw new IllegalArgumentException("Invalid character '" + validDayBits.charAt(i) + "' in validDayBits");
+      }
+      i++;
     }
   }
 

@@ -20,7 +20,7 @@ import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
-import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.Notice;
@@ -35,6 +35,7 @@ import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone_VersionStructure;
+import org.rutebanken.netex.model.UicOperatingPeriod;
 
 /**
  * This class holds indexes of Netex objects for lookup during the NeTEx import using the {@link
@@ -77,7 +78,7 @@ public class NetexEntityIndex {
   public final HierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById;
   public final HierarchicalMapById<GroupOfLines> groupOfLinesById;
   public final HierarchicalMapById<GroupOfStopPlaces> groupOfStopPlacesById;
-  public final HierarchicalMapById<JourneyPattern> journeyPatternsById;
+  public final HierarchicalMapById<JourneyPattern_VersionStructure> journeyPatternsById;
   public final HierarchicalMapById<FlexibleLine> flexibleLineByid;
   public final HierarchicalMapById<Line> lineById;
   public final HierarchicalMapById<StopPlace> multiModalStopPlaceById;
@@ -86,6 +87,7 @@ public class NetexEntityIndex {
   public final HierarchicalMapById<NoticeAssignment> noticeAssignmentById;
   public final HierarchicalMapById<OperatingDay> operatingDayById;
   public final HierarchicalMapById<OperatingPeriod> operatingPeriodById;
+  public final HierarchicalMapById<UicOperatingPeriod> uicOperatingPeriodById;
   public final HierarchicalMapById<Operator> operatorsById;
   public final HierarchicalVersionMapById<Quay> quayById;
   public final HierarchicalMap<String, String> flexibleStopPlaceByStopPointRef;
@@ -130,6 +132,7 @@ public class NetexEntityIndex {
     this.noticeAssignmentById = new HierarchicalMapById<>();
     this.operatingDayById = new HierarchicalMapById<>();
     this.operatingPeriodById = new HierarchicalMapById<>();
+    this.uicOperatingPeriodById = new HierarchicalMapById<>();
     this.operatorsById = new HierarchicalMapById<>();
     this.quayById = new HierarchicalVersionMapById<>();
     this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>();
@@ -170,6 +173,7 @@ public class NetexEntityIndex {
     this.noticeAssignmentById = new HierarchicalMapById<>(parent.noticeAssignmentById);
     this.operatingDayById = new HierarchicalMapById<>(parent.operatingDayById);
     this.operatingPeriodById = new HierarchicalMapById<>(parent.operatingPeriodById);
+    this.uicOperatingPeriodById = new HierarchicalMapById<>(parent.uicOperatingPeriodById);
     this.operatorsById = new HierarchicalMapById<>(parent.operatorsById);
     this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
     this.flexibleStopPlaceByStopPointRef =
@@ -269,7 +273,7 @@ public class NetexEntityIndex {
       }
 
       @Override
-      public ReadOnlyHierarchicalMapById<JourneyPattern> getJourneyPatternsById() {
+      public ReadOnlyHierarchicalMapById<JourneyPattern_VersionStructure> getJourneyPatternsById() {
         return journeyPatternsById;
       }
 
@@ -306,6 +310,11 @@ public class NetexEntityIndex {
       @Override
       public ReadOnlyHierarchicalMapById<OperatingPeriod> getOperatingPeriodById() {
         return operatingPeriodById;
+      }
+
+      @Override
+      public ReadOnlyHierarchicalMapById<UicOperatingPeriod> getUicOperatingPeriodById() {
+        return uicOperatingPeriodById;
       }
 
       @Override

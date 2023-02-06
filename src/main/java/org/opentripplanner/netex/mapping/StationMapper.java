@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.netex.issues.InvalidTimeZone;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
@@ -55,7 +57,7 @@ class StationMapper {
         Optional
           .ofNullable(stopPlace.getLocale())
           .map(LocaleStructure::getTimeZone)
-          .map(ZoneId::of)
+          .map(zoneId -> ofZoneId(stopPlace.getId(), zoneId))
           .orElse(defaultTimeZone)
       );
 
@@ -66,6 +68,15 @@ class StationMapper {
     }
 
     return builder.build();
+  }
+
+  private ZoneId ofZoneId(String stopPlaceId, String zoneId) {
+    try {
+      return ZoneId.of(zoneId);
+    } catch (DateTimeException e) {
+      issueStore.add(new InvalidTimeZone(stopPlaceId, zoneId));
+    }
+    return null;
   }
 
   private I18NString resolveName(StopPlace stopPlace) {

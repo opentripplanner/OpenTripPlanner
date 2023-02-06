@@ -34,7 +34,7 @@ import org.rutebanken.netex.model.Branding;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
-import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.LineRefs_RelStructure;
 import org.rutebanken.netex.model.NoticeAssignment;
@@ -388,7 +388,8 @@ public class NetexMapper {
       currentNetexIndex.getDayTypeById(),
       currentNetexIndex.getDayTypeAssignmentByDayTypeId(),
       currentNetexIndex.getOperatingDayById(),
-      currentNetexIndex.getOperatingPeriodById()
+      currentNetexIndex.getOperatingPeriodById(),
+      currentNetexIndex.getUicOperatingPeriodById()
     );
   }
 
@@ -450,7 +451,7 @@ public class NetexMapper {
       maxStopToShapeSnapDistance
     );
 
-    for (JourneyPattern journeyPattern : currentNetexIndex.getJourneyPatternsById().localValues()) {
+    for (JourneyPattern_VersionStructure journeyPattern : currentNetexIndex.getJourneyPatternsById().localValues()) {
       TripPatternMapperResult result = tripPatternMapper.mapTripPattern(journeyPattern);
 
       for (Map.Entry<Trip, List<StopTime>> it : result.tripStopTimes.entrySet()) {

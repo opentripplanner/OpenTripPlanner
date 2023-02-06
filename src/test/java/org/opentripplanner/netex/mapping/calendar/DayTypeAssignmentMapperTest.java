@@ -22,6 +22,7 @@ import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.UicOperatingPeriod;
 
 public class DayTypeAssignmentMapperTest {
 
@@ -48,6 +49,7 @@ public class DayTypeAssignmentMapperTest {
 
   private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS = new HierarchicalMapById<>();
   private static final HierarchicalMapById<OperatingPeriod> EMPTY_PERIODS = new HierarchicalMapById<>();
+  private static final HierarchicalMapById<UicOperatingPeriod> EMPTY_UIC_PERIODS = new HierarchicalMapById<>();
 
   @Test
   public void mapDayTypesToLocalDatesForAGivenDate() {
@@ -71,6 +73,7 @@ public class DayTypeAssignmentMapperTest {
       assignments,
       EMPTY_OPERATING_DAYS,
       EMPTY_PERIODS,
+      EMPTY_UIC_PERIODS,
       null
     );
 
@@ -103,6 +106,7 @@ public class DayTypeAssignmentMapperTest {
       assignments,
       EMPTY_OPERATING_DAYS,
       EMPTY_PERIODS,
+      EMPTY_UIC_PERIODS,
       null
     );
 
@@ -128,6 +132,7 @@ public class DayTypeAssignmentMapperTest {
       assignments,
       operatingDays,
       EMPTY_PERIODS,
+      EMPTY_UIC_PERIODS,
       null
     );
 
@@ -135,6 +140,7 @@ public class DayTypeAssignmentMapperTest {
     assertEquals("[2020-10-21]", toStr(result, DAY_TYPE_1));
   }
 
+  // TODO add test for uicOperatingPeriods
   @Test
   public void mapDayTypesToLocalDatesWithPeriods() {
     // GIVEN
@@ -162,6 +168,7 @@ public class DayTypeAssignmentMapperTest {
       assignments,
       EMPTY_OPERATING_DAYS,
       periods,
+      EMPTY_UIC_PERIODS,
       null
     );
 
@@ -199,6 +206,7 @@ public class DayTypeAssignmentMapperTest {
       assignments,
       operatingDays,
       periods,
+      EMPTY_UIC_PERIODS,
       null
     );
 
