@@ -13,7 +13,7 @@ public record GraphConnectivity(
   long nothru
 )
   implements DataImportIssue {
-  private static String FMT =
+  private static final String FMT =
     "%s graph connectivity: found %d islands, %d islands with stops, modified %d islands with stops, removed %d isolated edges, removed traverse mode from %d edges, converted %d edges to no through traffic";
 
   @Override

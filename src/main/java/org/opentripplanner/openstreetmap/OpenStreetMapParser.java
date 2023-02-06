@@ -8,7 +8,6 @@ import org.openstreetmap.osmosis.osmbinary.BinaryParser;
 import org.openstreetmap.osmosis.osmbinary.Osmformat;
 import org.opentripplanner.openstreetmap.api.OSMProvider;
 import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMNodeRef;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMTag;
@@ -198,10 +197,7 @@ class OpenStreetMapParser extends BinaryParser {
 
       long lastId = 0;
       for (long j : i.getRefsList()) {
-        OSMNodeRef nodeRef = new OSMNodeRef();
-        nodeRef.setRef(j + lastId);
-        tmp.addNodeRef(nodeRef);
-
+        tmp.addNodeRef(j + lastId);
         lastId = j + lastId;
       }
 
