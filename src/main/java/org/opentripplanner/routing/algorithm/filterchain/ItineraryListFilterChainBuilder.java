@@ -281,7 +281,9 @@ public class ItineraryListFilterChainBuilder {
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
-    filters.addAll(buildGroupBySameRoutesAndStopsFilter());
+    if (removeItinerariesWithSameRoutesAndStops) {
+      filters.addAll(buildGroupBySameRoutesAndStopsFilter());
+    }
 
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
@@ -402,7 +404,6 @@ public class ItineraryListFilterChainBuilder {
    * meanings we chose to use a long, but descriptive name instead.
    */
   private List<ItineraryListFilter> buildGroupBySameRoutesAndStopsFilter() {
-    if (removeItinerariesWithSameRoutesAndStops) {
       return List.of(
         new GroupByFilter<>(
           GroupBySameRoutesAndStops::new,
@@ -412,9 +413,6 @@ public class ItineraryListFilterChainBuilder {
           )
         )
       );
-    } else {
-      return List.of();
-    }
   }
 
   /**
