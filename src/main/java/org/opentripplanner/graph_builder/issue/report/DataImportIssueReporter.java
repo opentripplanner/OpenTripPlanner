@@ -54,7 +54,7 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       }
       LOG.info("Creating data import issue log");
 
-      List<Bucket> buckets = partitionIssues();
+      List<Bucket> buckets = partitionIssues(issueStore.listIssues(), maxNumberOfIssuesPerFile);
       List<BucketKey> keys = buckets.stream().map(Bucket::key).sorted().toList();
 
       for (Bucket bucket : buckets) {
@@ -115,10 +115,9 @@ public class DataImportIssueReporter implements GraphBuilderModule {
    * Creates buckets, where each bucket has only a single issue type and max approximately
    * {@link this#maxNumberOfIssuesPerFile} issues
    */
-  private List<Bucket> partitionIssues() {
+  static List<Bucket> partitionIssues(List<DataImportIssue> issues, int maxNumberOfIssuesPerFile) {
     //Groups issues according to issue type
-    Map<String, List<DataImportIssue>> issuesByType = issueStore
-      .listIssues()
+    Map<String, List<DataImportIssue>> issuesByType = issues
       .stream()
       .collect(Collectors.groupingBy(DataImportIssue::getType));
 
@@ -128,20 +127,23 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       var key = entry.getKey();
 
       // Sort each issue type by priority
-      var issues = entry
+      var sortedIssues = entry
         .getValue()
         .stream()
         .sorted(Comparator.comparing(DataImportIssue::getPriority, Comparator.reverseOrder()))
         .toList();
 
       // Split the issues to buckets if needed
-      if (issues.size() > 1.2 * maxNumberOfIssuesPerFile) {
-        List<List<DataImportIssue>> partitions = Lists.partition(issues, maxNumberOfIssuesPerFile);
+      if (sortedIssues.size() > 1.2 * maxNumberOfIssuesPerFile) {
+        List<List<DataImportIssue>> partitions = Lists.partition(
+          sortedIssues,
+          maxNumberOfIssuesPerFile
+        );
         for (int i = 0; i < partitions.size(); i++) {
           buckets.add(new Bucket(new BucketKey(key, i + 1), partitions.get(i)));
         }
       } else {
-        buckets.add(new Bucket(new BucketKey(key, null), issues));
+        buckets.add(new Bucket(new BucketKey(key, null), sortedIssues));
       }
     }
 

@@ -16,7 +16,7 @@ class HTMLWriter {
   private final DataSource target;
   private final Collection<DataImportIssue> issues;
   private final BucketKey bucketKey;
-  private boolean addGeoJSONLink;
+  private final boolean addGeoJSONLink;
   private final List<BucketKey> keys;
 
   HTMLWriter(
@@ -25,9 +25,9 @@ class HTMLWriter {
     List<BucketKey> keys,
     boolean addGeoJSONLink
   ) {
+    LOG.debug("Creating file: {}", bucket.key().key());
     this.bucketKey = bucket.key();
     this.addGeoJSONLink = addGeoJSONLink;
-    LOG.debug("Creating file: {}", bucketKey.key());
     this.target = reportDirectory.entry(bucketKey.key() + ".html");
     this.keys = keys;
     this.issues = bucket.issues();
@@ -39,6 +39,7 @@ class HTMLWriter {
     this.keys = keys;
     this.issues = null;
     this.bucketKey = new BucketKey(filename, null);
+    this.addGeoJSONLink = false;
   }
 
   void writeFile() {

@@ -77,7 +77,7 @@ public class GeoJsonWriter {
     typeBuilder.setName("dataImportIssues");
     typeBuilder.setCRS(DefaultGeographicCRS.WGS84);
     typeBuilder.setDefaultGeometry("the_geom");
-    // Do not use "geom" or "geometry" below, it seems to broke shapefile generation
+    // Do not use "geom" or "geometry" below, it seems to break shapefile generation
     typeBuilder.add("the_geom", MultiPolygon.class);
     typeBuilder.add("description", String.class);
     return typeBuilder.buildFeatureType();

@@ -13,6 +13,13 @@ record BucketKey(String issueType, Integer index) implements Comparable<BucketKe
 
   @Override
   public int compareTo(BucketKey o) {
-    return key().compareTo(o.key());
+    if (issueType.equals(o.issueType)) {
+      if (index == null) {
+        return o.index == null ? 0 : -1;
+      }
+      return index.compareTo(o.index);
+    }
+
+    return issueType.compareTo(o.issueType);
   }
 }
