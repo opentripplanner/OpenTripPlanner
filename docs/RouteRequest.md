@@ -73,7 +73,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [unpreferredCost](#rd_unpreferredCost)                                                               |    `linear-function`   | A cost function used to calculate penalty for an unpreferred route.                                                                | *Optional* | `"f(x) = 0 + 1.0 x"`     |  2.2  |
 | [unpreferredVehicleParkingTagCost](#rd_unpreferredVehicleParkingTagCost)                             |        `integer`       | What cost to add if a parking facility doesn't contain a preferred tag.                                                            | *Optional* | `300`                    |  2.3  |
 | useBikeRentalAvailabilityInformation                                                                 |        `boolean`       | Whether or not bike rental availability information will be used to plan bike rental trips.                                        | *Optional* | `false`                  |  2.0  |
-| useVehicleParkingAvailabilityInformation                                                             |        `boolean`       | TODO: Add short summary.                                                                                                           | *Optional* | `false`                  |  2.1  |
+| useVehicleParkingAvailabilityInformation                                                             |        `boolean`       | Whether realtime information about free parking spaces should be taken into consideration.                                         | *Optional* | `false`                  |  2.1  |
 | waitReluctance                                                                                       |        `double`        | How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.                                  | *Optional* | `1.0`                    |  2.0  |
 | walkBoardCost                                                                                        |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that is used when boarding while walking. | *Optional* | `600`                    |  2.0  |
 | [walkReluctance](#rd_walkReluctance)                                                                 |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                       | *Optional* | `2.0`                    |  2.0  |
@@ -110,8 +110,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [optimizeTransferWaitTime](#rd_to_optimizeTransferWaitTime)                                       |        `boolean`       | This enables the transfer wait time optimization.                                                                                  | *Optional* | `true`                   |  2.1  |
 | [transitReluctanceForMode](#rd_transitReluctanceForMode)                                             |  `enum map of double`  | Transit reluctance for a given transport mode                                                                                      | *Optional* |                          |  2.1  |
 | [unpreferred](#rd_unpreferred)                                                                       |        `object`        | Parameters listing authorities or lines that preferably should not be used in trip patters.                                        | *Optional* |                          |  2.2  |
-|    [agencies](#rd_unpreferred_agencies)                                                              |   `feed-scoped-id[]`   | TODO                                                                                                                               | *Optional* |                          |  2.0  |
-|    [routes](#rd_unpreferred_routes)                                                                  |   `feed-scoped-id[]`   | TODO                                                                                                                               | *Optional* |                          |  2.0  |
+|    [agencies](#rd_unpreferred_agencies)                                                              |   `feed-scoped-id[]`   | The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`                                        | *Optional* |                          |  2.2  |
+|    [routes](#rd_unpreferred_routes)                                                                  |   `feed-scoped-id[]`   | The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`                                           | *Optional* |                          |  2.2  |
 | wheelchairAccessibility                                                                              |        `object`        | See [Wheelchair Accessibility](Accessibility.md)                                                                                   | *Optional* |                          |  2.2  |
 |    enabled                                                                                           |        `boolean`       | Enable wheelchair accessibility.                                                                                                   | *Optional* | `false`                  |  2.0  |
 |    inaccessibleStreetReluctance                                                                      |        `double`        | The factor to multiply the cost of traversing a street edge that is not wheelchair-accessible.                                     | *Optional* | `25.0`                   |  2.2  |
@@ -733,17 +733,17 @@ travel time `x` (in seconds).
 
 <h3 id="rd_unpreferred_agencies">agencies</h3>
 
-**Since version:** `2.0` ∙ **Type:** `feed-scoped-id[]` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.2` ∙ **Type:** `feed-scoped-id[]` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults/unpreferred 
 
-TODO
+The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`
 
 <h3 id="rd_unpreferred_routes">routes</h3>
 
-**Since version:** `2.0` ∙ **Type:** `feed-scoped-id[]` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.2` ∙ **Type:** `feed-scoped-id[]` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults/unpreferred 
 
-TODO
+The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`
 
 <h3 id="rd_wheelchairAccessibility_maxSlope">maxSlope</h3>
 

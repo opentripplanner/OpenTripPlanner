@@ -155,6 +155,9 @@ public class RouteRequestConfig {
     vehicleParking.setUseAvailabilityInformation(
       c
         .of("useVehicleParkingAvailabilityInformation")
+        .summary(
+          "Whether realtime information about free parking spaces should be taken into consideration."
+        )
         .since(V2_1)
         .asBoolean(vehicleParking.useAvailabilityInformation())
     );
@@ -226,8 +229,10 @@ travel time `x` (in seconds).
       .setUnpreferredRoutes(
         unpreferred
           .of("routes")
-          .since(V2_0)
-          .summary("TODO")
+          .since(V2_2)
+          .summary(
+            "The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`"
+          )
           .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
       );
 
@@ -237,8 +242,10 @@ travel time `x` (in seconds).
       .setUnpreferredAgencies(
         unpreferred
           .of("agencies")
-          .since(V2_0)
-          .summary("TODO")
+          .since(V2_2)
+          .summary(
+            "The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`"
+          )
           .asFeedScopedIds(request.journey().transit().unpreferredAgencies())
       );
 
