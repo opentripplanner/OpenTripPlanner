@@ -173,6 +173,11 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   }
 
   @Override
+  public DataFetcher<TripPattern> originalTripPattern() {
+    return environment -> getSource(environment).getOriginalTripPattern();
+  }
+
+  @Override
   public DataFetcher<Geometry> patternGeometry() {
     return environment -> getSource(environment).getGeometry();
   }
