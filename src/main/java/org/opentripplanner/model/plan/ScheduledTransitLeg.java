@@ -102,7 +102,10 @@ public class ScheduledTransitLeg implements TransitLeg {
     setDistanceMeters(getDistanceFromCoordinates(transitLegCoordinates));
     setDirectDistanceMeters(
       getDistanceFromCoordinates(
-        List.of(transitLegCoordinates.get(0), transitLegCoordinates.get(transitLegCoordinates.size() -1))
+        List.of(
+          transitLegCoordinates.get(0),
+          transitLegCoordinates.get(transitLegCoordinates.size() - 1)
+        )
       )
     );
 
