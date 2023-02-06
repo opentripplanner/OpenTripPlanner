@@ -57,11 +57,13 @@ the world.
 
 ## Mailing Lists
 
-The main forums through which the OpenTripPlanner community organizes development and provides
-mutual assistance are our two Google discussion groups. Changes and extensions to OTP are debated on
-the [opentripplanner-dev](https://groups.google.com/forum/#!forum/opentripplanner-dev) developers'
-list. More general questions and announcements of interest to non-developer OTP users should be
-directed to
+The fastest way to get help is to use our [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner)
+where most of the core developers are. You can also send questions and comments to the 
+[mailing list](http://groups.google.com/group/opentripplanner-users).
+
+Changes and extensions to OTP are debated in issues on [GitHub](https://github.com/opentripplanner/OpenTripPlanner/issues)
+and in the  [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner). More general 
+questions and announcements of interest to non-developer OTP users should be directed to
 the [opentripplanner-users](https://groups.google.com/forum/#!forum/opentripplanner-users) list.
 Other details of [project governance](http://docs.opentripplanner.org/en/dev-2.x/Governance/) can be
 found in the main documentation.
