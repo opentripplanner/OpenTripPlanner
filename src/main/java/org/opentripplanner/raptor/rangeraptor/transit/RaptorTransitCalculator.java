@@ -97,7 +97,7 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule>
   int minIterationDepartureTime();
 
   /**
-   * Return TRUE if the Range Raptor should perform only ONE iteration. This is defined happens if
+   * Return TRUE if the Range Raptor should perform only ONE iteration. This happens if
    * the search window is less than or equals to the iteration step duration.
    */
   boolean oneIterationOnly();

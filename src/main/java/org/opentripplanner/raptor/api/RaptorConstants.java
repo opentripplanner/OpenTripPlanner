@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.api;
 
 /**
- * Raptor relay on {@code int} operation to be fast, so in many cases we use a "magic number" to
+ * Raptor relies on {@code int} operation to be fast, so in many cases we use a "magic number" to
  * represent state. In general "magic numbers" should be avoided, at least encapsulated - but in
- * Raptor performance is more important. All Raptor "magic numbers" used i OTP are listed here.
+ * Raptor performance is more important. All Raptor "magic numbers" used in OTP are listed here.
  * <p>
  * They are made public, because they appear in logging, debugging and sometimes as
  * parameters/return values for functions and methods in the API and SPI. These are not meant to

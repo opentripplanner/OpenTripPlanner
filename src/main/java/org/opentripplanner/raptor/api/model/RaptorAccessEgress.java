@@ -168,7 +168,7 @@ public interface RaptorAccessEgress {
       // This is not always walking, but inside Raptor we do not care if this is
       // biking, walking or car - any on street is treated the same. So, for
       // short easy reading in Raptor tests we use "Walk" instead of "On-Street"
-      // witch would be more precise.
+      // which would be more precise.
       buf.append("Walk");
     }
     buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));

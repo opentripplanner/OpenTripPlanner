@@ -25,7 +25,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   /**
    * The exact start time to walk to stop A to catch Trip_1 with 40s board slack
    */
-  private static final int ITTERATION_START_TIME = time("10:00");
+  private static final int ITERATION_START_TIME = time("10:00");
   private static final int TRANSFER_SLACK = D1m;
   private static final int BOARD_SLACK = D40s;
   private static final int ALIGHT_SLACK = D20s;
@@ -73,7 +73,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     // and a path: Walk ~ B ~ T1 ~ C ~ Walk
     var original = pathBuilder()
-      .access(ITTERATION_START_TIME, STOP_B, D1m)
+      .access(ITERATION_START_TIME, STOP_B, D1m)
       .bus(trip1, STOP_C)
       .egress(D1m);
 
@@ -116,7 +116,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     // Path:  Access ~ B ~ T1 ~ C ~ Walk 30s ~ D ~ T2 ~ E ~ Egress
     var original = pathBuilder()
-      .access(ITTERATION_START_TIME, STOP_B, D1m)
+      .access(ITERATION_START_TIME, STOP_B, D1m)
       .bus(trip1, STOP_C)
       .walk(D30s, STOP_F)
       .bus(trip2, STOP_G)
@@ -176,7 +176,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     );
 
     var original = pathBuilder()
-      .access(ITTERATION_START_TIME, STOP_A)
+      .access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
       .walk(D30s, STOP_E)
@@ -249,7 +249,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     );
 
     var original = pathBuilder()
-      .access(ITTERATION_START_TIME, STOP_A)
+      .access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
       .egress(D0s);
