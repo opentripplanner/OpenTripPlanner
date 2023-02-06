@@ -389,16 +389,16 @@ public class StreetEdge
   public State traverse(State s0) {
     final StateEditor editor;
 
-    if (
-      s0.getRequest().arriveBy() &&
-      s0.getBackState().getBackState() == null &&
-      tov.rentalDropOffBanned(s0)
-    ) {
-      s0.stateData.startedReverseSearchInNoDropOffZone = true;
+    if (s0.getRequest().mode().includesRenting() && s0.getRequest().arriveBy()) {
+      if (s0.getBackState().getBackState() == null && tov.rentalDropOffBanned(s0)) {
+        s0.stateData.startedReverseSearchInNoDropOffZone = true;
+      }
+      if (tov.rentalTraversalBanned(s0)) {
+        return null;
+      }
     }
 
     if (
-      s0.getRequest().arriveBy() &&
       fromv.rentalDropOffBanned(s0) &&
       !tov.rentalDropOffBanned(s0) &&
       s0.stateData.startedReverseSearchInNoDropOffZone
@@ -407,7 +407,7 @@ public class StreetEdge
     }
     // if the traversal is banned for the current state because of a GBFS geofencing zone
     // we drop the vehicle and continue walking
-    if (s0.getRequest().mode().includesRenting() && tov.rentalTraversalBanned(s0)) {
+    else if (s0.getRequest().mode().includesRenting() && tov.rentalTraversalBanned(s0)) {
       editor = doTraverse(s0, TraverseMode.WALK, false);
       if (editor != null) {
         editor.dropFloatingVehicle(
@@ -416,8 +416,6 @@ public class StreetEdge
           s0.getRequest().arriveBy()
         );
       }
-    } else if (s0.getRequest().arriveBy() && tov.rentalTraversalBanned(s0)) {
-      return null;
     } else if (
       s0.getRequest().arriveBy() &&
       s0.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED &&

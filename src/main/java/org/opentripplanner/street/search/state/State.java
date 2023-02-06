@@ -449,7 +449,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   /**
-   * This exception is thrown when an edge has a negative weight. Dijkstra' algorithm (and A*) don't
+   * This exception is thrown when an edge has a negative weight. Dijkstra's algorithm (and A*) don't
    * work on graphs that have negative weights.  This exception almost always indicates a programming
    * error, but could be caused by bad GTFS data.
    */
