@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -55,7 +56,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   /**
    * Create an initial state, forcing vertex to the specified value. Useful for tests, etc.
    */
-  public State(Vertex vertex, StreetSearchRequest streetSearchRequest) {
+  public State(@Nonnull Vertex vertex, StreetSearchRequest streetSearchRequest) {
     this(
       vertex,
       streetSearchRequest.startTime(),
@@ -64,7 +65,12 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     );
   }
 
-  public State(Vertex vertex, Instant startTime, StateData stateData, StreetSearchRequest request) {
+  public State(
+    @Nonnull Vertex vertex,
+    Instant startTime,
+    StateData stateData,
+    StreetSearchRequest request
+  ) {
     this.request = request;
     this.weight = 0;
     this.vertex = vertex;
