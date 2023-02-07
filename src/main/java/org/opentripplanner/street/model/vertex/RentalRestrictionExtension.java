@@ -58,6 +58,8 @@ public sealed interface RentalRestrictionExtension {
 
   boolean hasRestrictions();
 
+  Set<String> noDropOffNetworks();
+
   /**
    * No restriction on traversal which is the default.
    */
@@ -96,6 +98,11 @@ public sealed interface RentalRestrictionExtension {
     @Override
     public boolean hasRestrictions() {
       return false;
+    }
+
+    @Override
+    public Set<String> noDropOffNetworks() {
+      return Set.of();
     }
   }
 
@@ -172,6 +179,15 @@ public sealed interface RentalRestrictionExtension {
     }
 
     @Override
+    public Set<String> noDropOffNetworks() {
+      if (zone.dropOffBanned()) {
+        return Set.of(zone.id().getFeedId());
+      } else {
+        return Set.of();
+      }
+    }
+
+    @Override
     public String toString() {
       return zone.id().toString();
     }
@@ -215,6 +231,11 @@ public sealed interface RentalRestrictionExtension {
     @Override
     public boolean hasRestrictions() {
       return true;
+    }
+
+    @Override
+    public Set<String> noDropOffNetworks() {
+      return Set.of();
     }
 
     @Override
@@ -306,6 +327,14 @@ public sealed interface RentalRestrictionExtension {
     @Override
     public boolean hasRestrictions() {
       return exts.length > 0;
+    }
+
+    @Override
+    public Set<String> noDropOffNetworks() {
+      return Arrays
+        .stream(exts)
+        .flatMap(e -> e.noDropOffNetworks().stream())
+        .collect(Collectors.toSet());
     }
 
     @Override

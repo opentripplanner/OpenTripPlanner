@@ -390,18 +390,16 @@ public class StreetEdge
     final StateEditor editor;
 
     if (s0.getRequest().mode().includesRenting() && s0.getRequest().arriveBy()) {
-      if (s0.getBackState().getBackState() == null && tov.rentalDropOffBanned(s0)) {
-        s0.stateData.startedReverseSearchInNoDropOffZone = true;
-      }
       if (tov.rentalTraversalBanned(s0)) {
         return null;
       }
     }
 
     if (
-      fromv.rentalDropOffBanned(s0) &&
-      !tov.rentalDropOffBanned(s0) &&
-      s0.stateData.startedReverseSearchInNoDropOffZone
+      s0.isRentingVehicle() &&
+      !fromv.rentalDropOffBanned(s0) &&
+      tov.rentalDropOffBanned(s0) &&
+      !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty()
     ) {
       return null;
     }
@@ -419,8 +417,8 @@ public class StreetEdge
     } else if (
       s0.getRequest().arriveBy() &&
       s0.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED &&
-      fromv.rentalRestrictions().hasRestrictions() &&
-      !tov.rentalRestrictions().hasRestrictions()
+      !fromv.rentalRestrictions().hasRestrictions() &&
+      tov.rentalRestrictions().hasRestrictions()
     ) {
       editor = doTraverse(s0, TraverseMode.WALK, false);
       if (editor != null) {

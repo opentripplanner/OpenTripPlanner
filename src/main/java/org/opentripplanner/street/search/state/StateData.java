@@ -2,6 +2,7 @@ package org.opentripplanner.street.search.state;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.street.search.TraverseMode;
@@ -46,7 +47,7 @@ public class StateData implements Cloneable {
   protected boolean enteredNoThroughTrafficArea;
 
   protected boolean insideNoRentalDropOffArea = false;
-  public boolean startedReverseSearchInNoDropOffZone;
+  public Set<String> noRentalDropOffZonesAtStartOfReverseSearch = Set.of();
 
   /** Private constructor, use static methods to get a set of initial states. */
   private StateData(StreetMode requestMode) {

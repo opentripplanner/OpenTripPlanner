@@ -70,6 +70,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     this.vertex = vertex;
     this.backState = null;
     this.stateData = stateData;
+    if (!vertex.rentalRestrictions().noDropOffNetworks().isEmpty()) {
+      this.stateData.noRentalDropOffZonesAtStartOfReverseSearch =
+        vertex.rentalRestrictions().noDropOffNetworks();
+    }
     this.walkDistance = 0;
     this.time = startTime.getEpochSecond();
   }
