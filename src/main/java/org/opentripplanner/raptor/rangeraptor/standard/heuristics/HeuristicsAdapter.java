@@ -178,18 +178,15 @@ public class HeuristicsAdapter implements Heuristics {
         boolean stopReached = bestOverallTimes.isReached(stop);
         boolean stopReachedByTransit = bestTransitTimes.isReached(stop);
 
-        if (stopReached || stopReachedByTransit) {
+        if (stopReached) {
           int durationExEgress = calculator.duration(
             originDepartureTime,
             bestOverallTimes.value(stop)
           );
 
           for (RaptorAccessEgress it : list) {
-            boolean destinationReached = it.stopReachedOnBoard()
-              ? stopReached
-              : stopReachedByTransit;
-
-            if (!destinationReached) {
+            // Prevent transfer(walking) and the egress witch start with walking
+            if (!(it.stopReachedOnBoard() || stopReachedByTransit)) {
               continue;
             }
 
