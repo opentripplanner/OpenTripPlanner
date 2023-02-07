@@ -404,15 +404,15 @@ public class ItineraryListFilterChainBuilder {
    * meanings we chose to use a long, but descriptive name instead.
    */
   private List<ItineraryListFilter> buildGroupBySameRoutesAndStopsFilter() {
-      return List.of(
-        new GroupByFilter<>(
-          GroupBySameRoutesAndStops::new,
-          List.of(
-            new SortingFilter(SortOrderComparator.comparator(sortOrder)),
-            new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
-          )
+    return List.of(
+      new GroupByFilter<>(
+        GroupBySameRoutesAndStops::new,
+        List.of(
+          new SortingFilter(SortOrderComparator.comparator(sortOrder)),
+          new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
         )
-      );
+      )
+    );
   }
 
   /**
