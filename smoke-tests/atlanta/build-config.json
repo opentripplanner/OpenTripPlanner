@@ -2,5 +2,22 @@
   "fares": "atlanta",
   "osmDefaults": {
     "osmTagMapping": "atlanta"
-  }
+  },
+  "transitFeeds" : [
+    {
+      "type" : "gtfs",
+      "feedId" : "cobblinc",
+      "source" : "https://internal-test-gtfs-testing.s3.amazonaws.com/Cobblinc-static-extended-dates.zip"
+    },
+    {
+      "type" : "gtfs",
+      "feedId" : "cobblinc-flex",
+      "source" : "https://internal-test-gtfs-testing.s3.amazonaws.com/cobblinc-gtfs-flex.zip"
+    },
+    {
+      "type" : "gtfs",
+      "feedId" : "MARTA",
+      "source" : "https://itsmarta.com/google_transit_feed/google_transit.zip"
+    }
+  ]
 }

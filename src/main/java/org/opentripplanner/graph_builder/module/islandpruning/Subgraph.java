@@ -1,11 +1,20 @@
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.graph_builder.module.islandpruning;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.geom.Point;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.index.StreetIndex;
+import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -40,7 +49,14 @@ class Subgraph {
   }
 
   Vertex getRepresentativeVertex() {
-    //TODO this is not very smart but good enough at the moment
+    // Return first OSM vertex if available
+    for (var vertx : streetVertexSet) {
+      if (vertx instanceof OsmVertex) {
+        return vertx;
+      }
+    }
+
+    // Otherwise fallback to what is available
     return streetVertexSet.iterator().next();
   }
 
@@ -91,9 +107,24 @@ class Subgraph {
     return index
       .getVerticesForEnvelope(envelope)
       .stream()
-      .filter(vx -> contains(vx) == false)
+      .filter(vx -> !contains(vx))
       .map(vx -> vertexDistanceFromSubgraph(vx, searchRadius))
       .min(Double::compareTo)
       .orElse(searchRadius);
+  }
+
+  /**
+   * Get a {@link Geometry for all the contained vertices}
+   */
+  Geometry getGeometry() {
+    List<Point> points = new ArrayList<>();
+    GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+
+    Consumer<Vertex> vertexAdder = vertex ->
+      points.add(geometryFactory.createPoint(vertex.getCoordinate()));
+    streetIterator().forEachRemaining(vertexAdder);
+    stopIterator().forEachRemaining(vertexAdder);
+
+    return new MultiPoint(points.toArray(new Point[0]), geometryFactory);
   }
 }

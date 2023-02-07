@@ -1,0 +1,26 @@
+{
+  "transitModelTimeZone": "America/Los_Angeles",
+  "fares": "orca",
+  "transitFeeds" : [
+    {
+      "type" : "gtfs",
+      "feedId" : "soundgenerations",
+      "source" : "https://data.trilliumtransit.com/gtfs/soundgenerations-wa-us/soundgenerations-wa-us--flex-v2.zip"
+    },
+    {
+      "type" : "gtfs",
+      "feedId" : "homage",
+      "source" : "https://data.trilliumtransit.com/gtfs/homage-wa-us/homage-wa-us--flex-v2.zip"
+    },
+    {
+      "type" : "gtfs",
+      "feedId" : "kcm",
+      "source" : "https://metro.kingcounty.gov/GTFS/google_transit.zip"
+    },
+    {
+      "type" : "gtfs",
+      "feedId" : "monorail",
+      "source" : "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/seattlemonorail-wa-us.zip"
+    }
+  ]
+}

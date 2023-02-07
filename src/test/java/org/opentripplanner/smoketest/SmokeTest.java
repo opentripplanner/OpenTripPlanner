@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
+import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.smoketest.util.GraphQLClient;
@@ -41,6 +42,7 @@ public class SmokeTest {
 
     SimpleModule module = new SimpleModule("SmokeTests");
     module.addDeserializer(ItineraryFares.class, new FareDeserializer());
+    module.addDeserializer(DebugOutput.class, new DebugOutputDeserializer());
 
     mapper = provider.getContext(null);
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -127,6 +129,17 @@ public class SmokeTest {
 
     @Override
     public ItineraryFares deserialize(
+      JsonParser jsonParser,
+      DeserializationContext deserializationContext
+    ) {
+      return null;
+    }
+  }
+
+  static class DebugOutputDeserializer extends JsonDeserializer<DebugOutput> {
+
+    @Override
+    public DebugOutput deserialize(
       JsonParser jsonParser,
       DeserializationContext deserializationContext
     ) {
