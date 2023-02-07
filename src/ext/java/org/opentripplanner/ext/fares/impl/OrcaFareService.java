@@ -56,20 +56,14 @@ public class OrcaFareService extends DefaultFareService {
     SOUND_TRANSIT_SOUNDER,
     SOUND_TRANSIT_LINK,
     WASHINGTON_STATE_FERRIES,
+    UNKNOWN,
   }
 
-  private static final Map<String, Map<FareType, Float>> washingtonStateFerriesFares =
-    OrcaFaresData.washingtonStateFerriesFares;
-  private static final Map<String, Map<FareType, Float>> soundTransitLinkFares =
-    OrcaFaresData.linkFares;
-  private static final Map<String, Map<FareType, Float>> soundTransitSounderFares =
-    OrcaFaresData.sounderFares;
-
-  static RideType getRideType(String agencyId, Route routeData) {
+  static RideType getRideType(String agencyId, Route route) {
     return switch (agencyId) {
       case COMM_TRANS_AGENCY_ID -> {
         try {
-          int routeId = Integer.parseInt(routeData.getShortName());
+          int routeId = Integer.parseInt(route.getShortName());
           if (routeId >= 500 && routeId < 600) {
             yield RideType.SOUND_TRANSIT_BUS; // CommTrans operates some ST routes.
           }
@@ -78,13 +72,13 @@ public class OrcaFareService extends DefaultFareService {
           }
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         } catch (NumberFormatException e) {
-          LOG.warn("Unable to determine comm trans route id from {}.", routeData.getShortName(), e);
+          LOG.warn("Unable to determine comm trans route id from {}.", route.getShortName(), e);
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         }
       }
       case KC_METRO_AGENCY_ID -> {
         try {
-          int routeId = Integer.parseInt(routeData.getShortName());
+          int routeId = Integer.parseInt(route.getShortName());
           if (routeId >= 500 && routeId < 600) {
             yield RideType.SOUND_TRANSIT_BUS;
           }
@@ -93,13 +87,13 @@ public class OrcaFareService extends DefaultFareService {
         }
 
         if (
-          routeData.getGtfsType() == ROUTE_TYPE_FERRY &&
-          routeData.getLongName().toString().contains("Water Taxi: West Seattle")
+          route.getGtfsType() == ROUTE_TYPE_FERRY &&
+          route.getLongName().toString().contains("Water Taxi: West Seattle")
         ) {
           yield RideType.KC_WATER_TAXI_WEST_SEATTLE;
         } else if (
-          routeData.getGtfsType() == ROUTE_TYPE_FERRY &&
-          routeData.getDescription().contains("Water Taxi: Vashon Island")
+          route.getGtfsType() == ROUTE_TYPE_FERRY &&
+          route.getDescription().contains("Water Taxi: Vashon Island")
         ) {
           yield RideType.KC_WATER_TAXI_VASHON_ISLAND;
         }
@@ -107,14 +101,14 @@ public class OrcaFareService extends DefaultFareService {
       }
       case PIERCE_COUNTY_TRANSIT_AGENCY_ID -> {
         try {
-          int routeId = Integer.parseInt(routeData.getShortName());
+          int routeId = Integer.parseInt(route.getShortName());
           if (routeId >= 520 && routeId < 600) {
             // PierceTransit operates some ST routes. But 500 and 501 are PT routes.
             yield RideType.SOUND_TRANSIT_BUS;
           }
           yield RideType.PIERCE_COUNTY_TRANSIT;
         } catch (NumberFormatException e) {
-          LOG.warn("Unable to determine comm trans route id from {}.", routeData.getShortName(), e);
+          LOG.warn("Unable to determine comm trans route id from {}.", route.getShortName(), e);
           yield RideType.PIERCE_COUNTY_TRANSIT;
         }
       }
@@ -124,7 +118,7 @@ public class OrcaFareService extends DefaultFareService {
       case SEATTLE_STREET_CAR_AGENCY_ID -> RideType.SEATTLE_STREET_CAR;
       case WASHINGTON_STATE_FERRIES_AGENCY_ID -> RideType.WASHINGTON_STATE_FERRIES;
       case KITSAP_TRANSIT_AGENCY_ID -> RideType.KITSAP_TRANSIT;
-      default -> null;
+      default -> RideType.UNKNOWN;
     };
   }
 
@@ -265,8 +259,8 @@ public class OrcaFareService extends DefaultFareService {
     String lookupKey = String.format("%s-%s", start, end);
     String reverseLookupKey = String.format("%s-%s", end, start);
     Map<String, Map<FareType, Float>> fareModel = (rideType == RideType.SOUND_TRANSIT_LINK)
-      ? soundTransitLinkFares
-      : soundTransitSounderFares;
+      ? OrcaFaresData.linkFares
+      : OrcaFaresData.sounderFares;
     Map<FareType, Float> fare = Optional
       .ofNullable(fareModel.get(lookupKey))
       .orElseGet(() -> fareModel.get(reverseLookupKey));
@@ -362,7 +356,9 @@ public class OrcaFareService extends DefaultFareService {
     if (routeLongName == null || routeLongName.isEmpty()) {
       return defaultFare;
     }
-    Map<FareType, Float> fares = washingtonStateFerriesFares.get(routeLongName.replaceAll(" ", ""));
+    Map<FareType, Float> fares = OrcaFaresData.washingtonStateFerriesFares.get(
+      routeLongName.replaceAll(" ", "")
+    );
     // WSF doesn't support transfers so we only care about cash fares.
     FareType wsfFareType;
     if (fareType == FareType.electronicRegular) {
