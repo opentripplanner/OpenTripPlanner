@@ -424,6 +424,7 @@ public class StreetEdge
           s0.getVehicleRentalNetwork(),
           s0.getRequest().arriveBy()
         );
+        editor.resetStartedInNoDropOffZone();
       }
     }
     // If we are biking, or walking with a bike check if we may continue by biking or by walking

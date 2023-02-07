@@ -1,5 +1,6 @@
 package org.opentripplanner.street.search.state;
 
+import java.util.Set;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -355,6 +356,11 @@ public class StateEditor {
 
   public State getBackState() {
     return child.getBackState();
+  }
+
+  public void resetStartedInNoDropOffZone() {
+    cloneStateDataAsNeeded();
+    child.stateData.noRentalDropOffZonesAtStartOfReverseSearch = Set.of();
   }
 
   /* PRIVATE METHODS */
