@@ -389,17 +389,12 @@ public class StreetEdge
   public State traverse(State s0) {
     final StateEditor editor;
 
-    if (s0.getRequest().mode().includesRenting() && s0.getRequest().arriveBy()) {
-      if (tov.rentalTraversalBanned(s0)) {
-        return null;
-      }
-    }
+    final boolean arriveByRental =
+      s0.getRequest().mode().includesRenting() && s0.getRequest().arriveBy();
 
     if (
-      s0.isRentingVehicle() &&
-      !fromv.rentalDropOffBanned(s0) &&
-      tov.rentalDropOffBanned(s0) &&
-      !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty()
+      arriveByRental &&
+      (tov.rentalTraversalBanned(s0) || hasStartedSearchInNoDropOffZoneAndIsExitingIt(s0))
     ) {
       return null;
     }
@@ -501,6 +496,19 @@ public class StreetEdge
     }
 
     return state;
+  }
+
+  /**
+   * If the reverse search has starte in a no-drop off rental zone and you are exiting
+   * it .
+   */
+  private boolean hasStartedSearchInNoDropOffZoneAndIsExitingIt(State s0) {
+    return (
+      s0.isRentingVehicle() &&
+      !fromv.rentalDropOffBanned(s0) &&
+      tov.rentalDropOffBanned(s0) &&
+      !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty()
+    );
   }
 
   /**
