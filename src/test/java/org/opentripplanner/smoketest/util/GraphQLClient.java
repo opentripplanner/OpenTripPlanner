@@ -12,6 +12,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import org.opentripplanner.smoketest.SmokeTest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +82,31 @@ public class GraphQLClient {
     }
   }
 
+  public static List<Route> routes() {
+    var json = GraphQLClient.sendGraphQLRequest(
+      """
+        query {
+        	routes {
+        	  shortName
+        		mode
+        	}
+        }
+          """
+    );
+
+    try {
+      List<Route> routes = SmokeTest.mapper.readValue(
+        json.path("routes").toString(),
+        new TypeReference<>() {}
+      );
+
+      LOG.info("Fetched {} routes", routes.size());
+      return routes;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public static JsonNode sendGraphQLRequest(String query) {
     var body = mapper.createObjectNode();
     body.put("query", query);
@@ -107,6 +133,8 @@ public class GraphQLClient {
       throw new RuntimeException(e);
     }
   }
+
+  public record Route(String shortName, TransitMode mode) {}
 
   public record VehicleRentalStation(String name, float lat, float lon) {}
 

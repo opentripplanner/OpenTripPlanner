@@ -43,6 +43,12 @@ portland/osm.pbf:
 portland/gtfs.zip:
 	echo "Downloaded by OTP"
 
+seattle/osm.pbf:
+	${CURL} http://osm.ibi-transit.com/vex/47.481002,-122.459681,47.734124,-122.224433.pbf -o $@
+
+seattle/gtfs.zip:
+	echo "Downloaded by OTP"
+
 build-%: otp.jar %/osm.pbf %/gtfs.zip
 	java -Xmx6G -jar otp.jar --build --save $*
 

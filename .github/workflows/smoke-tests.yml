@@ -45,18 +45,21 @@ jobs:
           mvn --batch-mode clean package -Dmaven.test.skip -P prettierSkip
           mvn org.apache.maven.plugins:maven-compiler-plugin:testCompile
         
-      - name: "[Atlanta] Build graph, run OTP, run smoke tests"
+      - name: "[Seattle] Run smoke tests"
+        run: scripts/smoke-tests.sh seattle 15
+        
+      - name: "[Atlanta] Run smoke tests"
         run: scripts/smoke-tests.sh atlanta 15
 
-      - name: "[Houston] Build graph, run OTP, run smoke tests"
+      - name: "[Houston] Run smoke tests"
         run: scripts/smoke-tests.sh houston 15
 
-      - name: "[Denver] Build graph, run OTP, run smoke tests"
+      - name: "[Denver] Run smoke tests"
         run: scripts/smoke-tests.sh denver 15
 
-      - name: "[SEPTA] Build graph, run OTP, run smoke tests"
+      - name: "[SEPTA] Run smoke tests"
         run: scripts/smoke-tests.sh septa 15
 
-      - name: "[Portland] Build graph, run OTP, run smoke tests"
+      - name: "[Portland] Run smoke tests"
         # have to sleep longer since computing geofencing zones takes a while
-        run: scripts/smoke-tests.sh portland 60
+        run: scripts/smoke-tests.sh portland 70
