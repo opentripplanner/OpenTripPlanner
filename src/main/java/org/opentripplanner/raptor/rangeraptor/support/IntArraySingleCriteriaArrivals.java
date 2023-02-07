@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.support;
 
-import org.opentripplanner.framework.lang.IntToIntFunction;
+import java.util.function.IntUnaryOperator;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 
 public final class IntArraySingleCriteriaArrivals implements SingleCriteriaStopArrivals {
@@ -16,11 +16,11 @@ public final class IntArraySingleCriteriaArrivals implements SingleCriteriaStopA
   public static IntArraySingleCriteriaArrivals create(
     int size,
     int unreached,
-    IntToIntFunction mapValue
+    IntUnaryOperator mapValue
   ) {
     int[] array = new int[size];
     for (int i = 0; i < size; ++i) {
-      array[i] = mapValue.apply(i);
+      array[i] = mapValue.applyAsInt(i);
     }
     return new IntArraySingleCriteriaArrivals(unreached, array);
   }

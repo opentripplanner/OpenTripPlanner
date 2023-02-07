@@ -26,10 +26,10 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
  * "target", in stead of "from/to" and "board/alight".
  * <ul>
  * <li>
- *     In a FORWARD search the "source" means "from" and "TARGET" means "to".
+ *     In a FORWARD search the "source" means "from" and "target" means "to".
  * </li>
  * <li>
- *     In a BACKWARD search the "source" means "to" and "TARGET" means "from". The traversal of the
+ *     In a BACKWARD search the "source" means "to" and "target" means "from". The traversal of the
  *     graph happens from the destination towards the origin - backwards in time. The "from/to"
  *     refer to the "natural way" we think about a journey, while "source/target" the destination
  *     is the source and the origin is the target in a BACKWARD search.
@@ -37,7 +37,7 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
  * </ul>
  * "Source" and "target" may apply to stop-arrival, trip, board-/aligh-slack, and so on.
  * <p>
- * For a BACKWORD search the "source" means "from" (stop-arrival, trip, and so on).
+ * For a BACKWARD search the "source" means "from" (stop-arrival, trip, and so on).
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -115,7 +115,7 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule>
    * Create a trip search, to use to find the correct trip to board/alight for a given pattern. This
    * is used to to inject a forward or reverse search into the worker (strategy design pattern).
    *
-   * @param timeTable the trip time-table to search
+   * @param timeTable the trip timetable to search
    * @return The trip search strategy implementation.
    */
   RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable);

@@ -15,7 +15,7 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.util.IntIterators;
 
-public class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
+public final class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
   extends ReverseTransitCalculator<T>
   implements RaptorTransitCalculator<T> {
 

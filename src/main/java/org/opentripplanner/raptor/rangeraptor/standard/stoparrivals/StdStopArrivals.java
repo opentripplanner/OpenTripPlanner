@@ -62,13 +62,11 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
 
   @Override
   public SingleCriteriaStopArrivals extractBestNumberOfTransfers() {
-    long start = System.currentTimeMillis();
-    var res = IntArraySingleCriteriaArrivals.create(
+    return IntArraySingleCriteriaArrivals.create(
       arrivals[0].length,
       unreachedMinNumberOfTransfers(),
       this::calculateMinNumberOfTransfers
     );
-    return res;
   }
 
   void setAccessTime(int time, RaptorAccessEgress access, boolean bestTime) {
