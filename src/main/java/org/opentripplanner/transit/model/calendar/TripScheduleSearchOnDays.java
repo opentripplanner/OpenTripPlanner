@@ -70,6 +70,8 @@ public class TripScheduleSearchOnDays implements RaptorTripScheduleSearch<TripOn
     int tripIndexLimit
   ) {
     // TODO RTM
-    return null;
+    return originalPattern
+      .createBoardSearch()
+      .search(earliestBoardTime, stopPositionInPattern, tripIndexLimit);
   }
 }
