@@ -154,7 +154,13 @@ public class InterlineProcessor {
           );
           if (teleportationDistance > maxInterlineDistance) {
             issueStore.add(
-              new InterliningTeleport(prev.getTrip(), block.blockId(), (int) teleportationDistance)
+              new InterliningTeleport(
+                prev.getTrip(),
+                block.blockId(),
+                (int) teleportationDistance,
+                fromStop,
+                toStop
+              )
             );
             // Only skip this particular interline edge; there may be other valid ones in the block.
           } else {

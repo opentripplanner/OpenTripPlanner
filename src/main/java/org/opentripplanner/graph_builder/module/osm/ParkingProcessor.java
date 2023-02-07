@@ -421,7 +421,7 @@ class ParkingProcessor {
   private OptionalInt parseCapacity(OSMWithTags element, String capacityTag) {
     return element.getTagAsInt(
       capacityTag,
-      v -> issueStore.add(new InvalidVehicleParkingCapacity(element.getId(), v))
+      v -> issueStore.add(new InvalidVehicleParkingCapacity(element, v))
     );
   }
 

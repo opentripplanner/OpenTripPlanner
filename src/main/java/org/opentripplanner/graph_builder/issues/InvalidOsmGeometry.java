@@ -4,8 +4,8 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public record InvalidOsmGeometry(OSMWithTags entity) implements DataImportIssue {
-  private static String FMT = "Invalid OSM geometry %s";
-  private static String HTMLFMT = "Invalid OSM geometry <a href='%s'>'%s'</a>";
+  private static final String FMT = "Invalid OSM geometry %s";
+  private static final String HTMLFMT = "Invalid OSM geometry <a href='%s'>'%s'</a>";
 
   @Override
   public String getMessage() {

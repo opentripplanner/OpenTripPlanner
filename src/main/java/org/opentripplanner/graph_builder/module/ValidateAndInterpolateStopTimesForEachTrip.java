@@ -197,14 +197,28 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       double hopSpeed = hopDistance / runningTime;
 
       if (hopDistance == 0) {
-        issueStore.add(new HopZeroDistance(runningTime, st1.getTrip(), st1.getStopSequence()));
+        issueStore.add(
+          new HopZeroDistance(
+            runningTime,
+            st1.getTrip(),
+            st1.getStopSequence(),
+            st0.getStop(),
+            st1.getStop()
+          )
+        );
       }
       // sanity-check the hop
       if (runningTime == 0) {
         // identical stop times at different stops
         if (hopDistance > MIN_ZERO_TIME_HOP_DISTANCE_METERS) {
           issueStore.add(
-            new HopZeroTime((float) hopDistance, st1.getTrip(), st1.getStopSequence())
+            new HopZeroTime(
+              (float) hopDistance,
+              st1.getTrip(),
+              st1.getStopSequence(),
+              st0.getStop(),
+              st1.getStop()
+            )
           );
         }
       } else if (hopSpeed > getMaxSpeedForMode(st0.getTrip().getMode())) {
@@ -213,7 +227,9 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
             (float) hopSpeed,
             (float) hopDistance,
             st0.getTrip(),
-            st0.getStopSequence()
+            st0.getStopSequence(),
+            st0.getStop(),
+            st1.getStop()
           )
         );
       } else if (hopSpeed < 0.3) {
@@ -223,7 +239,9 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
             (float) hopSpeed,
             (float) hopDistance,
             st0.getTrip(),
-            st0.getStopSequence()
+            st0.getStopSequence(),
+            st0.getStop(),
+            st1.getStop()
           )
         );
       }

@@ -5,7 +5,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public record MissingShapeGeometry(FeedScopedId tripId, FeedScopedId shapeId)
   implements DataImportIssue {
-  private static String FMT = "Trip %s refers to unknown shape geometry %s";
+  private static final String FMT = "Trip %s refers to unknown shape geometry %s";
 
   @Override
   public String getMessage() {
