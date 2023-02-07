@@ -7,6 +7,8 @@ import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.model.calendar.PatternOnDay;
 import org.opentripplanner.transit.model.trip.TripOnDay;
+import org.opentripplanner.transit.model.trip.search.ForwardSearch;
+import org.opentripplanner.transit.model.trip.search.ReverseSearch;
 
 public class RaptorRouteAdaptor implements RaptorRoute<TripOnDay>, RaptorTimeTable<TripOnDay> {
 
@@ -43,8 +45,8 @@ public class RaptorRouteAdaptor implements RaptorRoute<TripOnDay>, RaptorTimeTab
   @Override
   public RaptorTripScheduleSearch<TripOnDay> tripSearch(SearchDirection direction) {
     return switch (direction) {
-      case REVERSE -> pattern.createAlightSearch();
-      case FORWARD -> pattern.createBoardSearch();
+      case FORWARD -> new ForwardSearch(pattern.timetable());
+      case REVERSE -> new ReverseSearch(pattern.timetable());
     };
   }
 }
