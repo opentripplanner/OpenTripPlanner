@@ -55,7 +55,7 @@ of [OTP history](http://docs.opentripplanner.org/en/dev-2.x/History/) and a list
 of [cities and regions using OTP](http://docs.opentripplanner.org/en/dev-2.x/Deployments/) around
 the world.
 
-## Mailing Lists
+## Getting in touch
 
 The fastest way to get help is to use our [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner)
 where most of the core developers are. You can also send questions and comments to the 
