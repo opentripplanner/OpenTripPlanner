@@ -42,8 +42,9 @@ public class RaptorRouteAdaptor implements RaptorRoute<TripOnDay>, RaptorTimeTab
 
   @Override
   public RaptorTripScheduleSearch<TripOnDay> tripSearch(SearchDirection direction) {
-    // TODO RTM -
-
-    return null;
+    return switch (direction) {
+      case REVERSE -> pattern.createAlightSearch();
+      case FORWARD -> pattern.createBoardSearch();
+    };
   }
 }
