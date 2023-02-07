@@ -409,12 +409,14 @@ public class StreetEdge
           s0.getRequest().arriveBy()
         );
       }
-    } else if (
-      s0.getRequest().arriveBy() &&
-      s0.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED &&
-      !fromv.rentalRestrictions().hasRestrictions() &&
-      tov.rentalRestrictions().hasRestrictions()
-    ) {
+      // when we start the reverse search of a rental request there are three cases when we need
+      // to stop walking and pick up a vehicle:
+      //  - crossing the border of a business zone
+      //  - leaving a no-drop-off zone
+      //  - leaving a no-traversal zone
+      // remember that this is a reverse search so calling dropFloatingVehicle actually transitions
+      // from walking to using the vehicle.
+    } else if (arriveByRental && leavesAzoneWithRentalRestrictionsWhenHavingRented(s0)) {
       editor = doTraverse(s0, TraverseMode.WALK, false);
       if (editor != null) {
         editor.dropFloatingVehicle(
@@ -496,6 +498,14 @@ public class StreetEdge
     }
 
     return state;
+  }
+
+  private boolean leavesAzoneWithRentalRestrictionsWhenHavingRented(State s0) {
+    return (
+      s0.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED &&
+      !fromv.rentalRestrictions().hasRestrictions() &&
+      tov.rentalRestrictions().hasRestrictions()
+    );
   }
 
   /**
