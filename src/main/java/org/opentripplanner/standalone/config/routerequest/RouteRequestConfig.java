@@ -194,8 +194,11 @@ travel time `x` (in seconds).
       .setUnpreferredRoutes(
         unpreferred
           .of("routes")
-          .since(V2_0)
-          .summary("TODO")
+          .since(V2_2)
+          .summary(
+            "The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`"
+          )
+          .description("How much cost is added is configured in `unpreferredCost`.")
           .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
       );
 
@@ -205,8 +208,11 @@ travel time `x` (in seconds).
       .setUnpreferredAgencies(
         unpreferred
           .of("agencies")
-          .since(V2_0)
-          .summary("TODO")
+          .since(V2_2)
+          .summary(
+            "The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`"
+          )
+          .description("How much cost is added is configured in `unpreferredCost`.")
           .asFeedScopedIds(request.journey().transit().unpreferredAgencies())
       );
 

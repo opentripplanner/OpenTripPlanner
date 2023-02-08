@@ -108,6 +108,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [optimizeTransferWaitTime](#rd_to_optimizeTransferWaitTime)                                       |        `boolean`       | This enables the transfer wait time optimization.                                                                                  | *Optional* | `true`                   |  2.1  |
 | [transitReluctanceForMode](#rd_transitReluctanceForMode)                                             |  `enum map of double`  | Transit reluctance for a given transport mode                                                                                      | *Optional* |                          |  2.1  |
 | [unpreferred](#rd_unpreferred)                                                                       |        `object`        | Parameters listing authorities or lines that preferably should not be used in trip patters.                                        | *Optional* |                          |  2.2  |
+|    [agencies](#rd_unpreferred_agencies)                                                              |   `feed-scoped-id[]`   | The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`                                        | *Optional* |                          |  2.2  |
+|    [routes](#rd_unpreferred_routes)                                                                  |   `feed-scoped-id[]`   | The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`                                           | *Optional* |                          |  2.2  |
 | wheelchairAccessibility                                                                              |        `object`        | See [Wheelchair Accessibility](Accessibility.md)                                                                                   | *Optional* |                          |  2.2  |
 |    enabled                                                                                           |        `boolean`       | Enable wheelchair accessibility.                                                                                                   | *Optional* | `false`                  |  2.0  |
 |    inaccessibleStreetReluctance                                                                      |        `double`        | The factor to multiply the cost of traversing a street edge that is not wheelchair-accessible.                                     | *Optional* | `25.0`                   |  2.2  |
@@ -703,6 +705,24 @@ cost function. The cost function (`unpreferredCost`) is defined as a linear func
 `A + B x`, where `A` is a fixed cost (in seconds) and `B` is reluctance multiplier for transit leg
 travel time `x` (in seconds).
 
+
+<h3 id="rd_unpreferred_agencies">agencies</h3>
+
+**Since version:** `2.2` ∙ **Type:** `feed-scoped-id[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/unpreferred 
+
+The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`
+
+How much cost is added is configured in `unpreferredCost`.
+
+<h3 id="rd_unpreferred_routes">routes</h3>
+
+**Since version:** `2.2` ∙ **Type:** `feed-scoped-id[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/unpreferred 
+
+The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`
+
+How much cost is added is configured in `unpreferredCost`.
 
 <h3 id="rd_wheelchairAccessibility_maxSlope">maxSlope</h3>
 
