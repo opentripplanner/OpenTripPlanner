@@ -2,11 +2,13 @@ package org.opentripplanner.routing.api.request.request.filter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -20,9 +22,8 @@ public class SelectRequest implements Serializable {
   private final List<MainAndSubMode> transportModes;
   private final AllowTransitModeFilter transportModeFilter;
   private final List<FeedScopedId> agencies;
+  private final List<FeedScopedId> groupOfRoutes;
   private final RouteMatcher routes;
-
-  // TODO: 2022-11-29 filters: group of routes
 
   public SelectRequest(Builder builder) {
     if (builder.transportModes.isEmpty()) {
@@ -35,6 +36,7 @@ public class SelectRequest implements Serializable {
     this.transportModes = builder.transportModes;
 
     this.agencies = List.copyOf(builder.agencies);
+    this.groupOfRoutes = List.copyOf(builder.groupOfRoutes);
     this.routes = builder.routes;
   }
 
@@ -52,6 +54,14 @@ public class SelectRequest implements Serializable {
 
     if (!routes.isEmpty() && !routes.matches(route)) {
       return false;
+    }
+
+    if (!groupOfRoutes.isEmpty()) {
+      var ids = route.getGroupsOfRoutes().stream().map(AbstractTransitEntity::getId).toList();
+
+      if (Collections.disjoint(groupOfRoutes, ids)) {
+        return false;
+      }
     }
 
     return true;
@@ -124,9 +134,8 @@ public class SelectRequest implements Serializable {
 
     private List<MainAndSubMode> transportModes = new ArrayList<>();
     private List<FeedScopedId> agencies = new ArrayList<>();
+    private List<FeedScopedId> groupOfRoutes = new ArrayList<>();
     private RouteMatcher routes = RouteMatcher.emptyMatcher();
-
-    // TODO: 2022-11-29 filters: group of routes
 
     public Builder withTransportModes(List<MainAndSubMode> transportModes) {
       this.transportModes = transportModes;
@@ -161,6 +170,11 @@ public class SelectRequest implements Serializable {
 
     public Builder withRoutes(RouteMatcher routes) {
       this.routes = routes;
+      return this;
+    }
+
+    public Builder withGroupOfRoutes(List<FeedScopedId> groupOfRoutes) {
+      this.groupOfRoutes = groupOfRoutes;
       return this;
     }
 
