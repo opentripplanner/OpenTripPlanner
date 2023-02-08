@@ -30,33 +30,33 @@ public class DummyData {
     .withTimezone("Europe/Oslo")
     .build();
 
-  public static final RegularStop STOP_1 = RegularStop
-    .of(id("S1"))
+  public static final RegularStop STOP_A = RegularStop
+    .of(id("SA"))
     .withName("Majorstua")
     .withCoordinate(0, 0)
     .build();
-  public static final RegularStop STOP_2 = RegularStop
-    .of(id("S2"))
+  public static final RegularStop STOP_B = RegularStop
+    .of(id("SB"))
     .withName("Stortinget")
     .withCoordinate(0, 0)
     .build();
-  public static final RegularStop STOP_3 = RegularStop
-    .of(id("S3"))
+  public static final RegularStop STOP_C = RegularStop
+    .of(id("SC"))
     .withName("Oslo S")
     .withCoordinate(0, 0)
     .build();
-  public static final RegularStop STOP_4 = RegularStop
-    .of(id("S4"))
+  public static final RegularStop STOP_D = RegularStop
+    .of(id("SD"))
     .withName("Tøyen")
     .withCoordinate(0, 0)
     .build();
 
   public static final StopModel STOP_MODEL = StopModel
     .of()
-    .withRegularStop(STOP_1)
-    .withRegularStop(STOP_2)
-    .withRegularStop(STOP_3)
-    .withRegularStop(STOP_4)
+    .withRegularStop(STOP_A)
+    .withRegularStop(STOP_B)
+    .withRegularStop(STOP_C)
+    .withRegularStop(STOP_D)
     .build();
 
   private static final Route ROUTE = Route
@@ -71,7 +71,7 @@ public class DummyData {
     .schedule("0:00 0:01 0:03")
     .build();
 
-  private static final List<StopLocation> STOP_LIST = List.of(STOP_1, STOP_2, STOP_3);
+  private static final List<StopLocation> STOPS_IN_PATTERN = List.of(STOP_B, STOP_C, STOP_D);
   private static final BitSet ROUTE_BOARD_ALIGHT_BIT_SET = createBitSet(3);
   private static final CalendarDays CALENDAR_DAYS = CalendarDays.of().build();
   private static final RoutingTripPatternV2 ROUTING_TRIP_PATTERN = createRoutingTripPattern();
@@ -84,7 +84,7 @@ public class DummyData {
 
   private static RoutingTripPatternV2 createRoutingTripPattern() {
     return new RoutingTripPatternV2(
-      STOP_LIST.stream().mapToInt(StopLocation::getIndex).toArray(),
+      STOPS_IN_PATTERN.stream().mapToInt(StopLocation::getIndex).toArray(),
       ROUTE_BOARD_ALIGHT_BIT_SET,
       ROUTE_BOARD_ALIGHT_BIT_SET,
       ROUTE.getMode(),
