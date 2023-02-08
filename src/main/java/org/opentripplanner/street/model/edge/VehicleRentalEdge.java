@@ -53,11 +53,8 @@ public class VehicleRentalEdge extends Edge {
           return null;
         case HAVE_RENTED:
           if (
-            realtimeAvailability &&
-            (
-              !station.allowDropoffNow() ||
-              !station.getAvailableDropoffFormFactors(true).contains(formFactor)
-            )
+            (realtimeAvailability && !station.allowDropoffNow()) ||
+            !station.getAvailableDropoffFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return null;
           }
@@ -65,10 +62,7 @@ public class VehicleRentalEdge extends Edge {
           pickedUp = false;
           break;
         case RENTING_FLOATING:
-          if (
-            realtimeAvailability &&
-            !station.getAvailablePickupFormFactors(true).contains(formFactor)
-          ) {
+          if (!station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)) {
             return null;
           }
           if (station.isFloatingVehicle()) {
@@ -80,11 +74,8 @@ public class VehicleRentalEdge extends Edge {
           break;
         case RENTING_FROM_STATION:
           if (
-            realtimeAvailability &&
-            (
-              !station.allowPickupNow() ||
-              !station.getAvailablePickupFormFactors(true).contains(formFactor)
-            )
+            (realtimeAvailability && !station.allowPickupNow()) ||
+            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return null;
           }
@@ -109,11 +100,8 @@ public class VehicleRentalEdge extends Edge {
       switch (s0.getVehicleRentalState()) {
         case BEFORE_RENTING:
           if (
-            realtimeAvailability &&
-            (
-              !station.allowPickupNow() ||
-              !station.getAvailablePickupFormFactors(true).contains(formFactor)
-            )
+            (realtimeAvailability && !station.allowPickupNow()) ||
+            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return null;
           }
@@ -135,11 +123,8 @@ public class VehicleRentalEdge extends Edge {
             return null;
           }
           if (
-            realtimeAvailability &&
-            (
-              !station.allowDropoffNow() ||
-              !station.getAvailableDropoffFormFactors(true).contains(formFactor)
-            )
+            (realtimeAvailability && !station.allowDropoffNow()) ||
+            !station.getAvailableDropoffFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return null;
           }
