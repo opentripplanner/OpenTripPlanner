@@ -95,8 +95,9 @@ public class ForwardSearch
   @Override
   public String toString() {
     var builder = ToStringBuilder.of(ForwardSearch.class);
-    if(!empty()) {
-      builder.addNum("tripIndex", tripIndex)
+    if (!empty()) {
+      builder
+        .addNum("tripIndex", tripIndex)
         .addNum("stopPosition", stopPositionInPattern)
         .addServiceTime("earliestBoardTime", earliestBoardTime);
     }

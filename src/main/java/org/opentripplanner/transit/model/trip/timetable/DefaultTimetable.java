@@ -118,18 +118,18 @@ public class DefaultTimetable implements Timetable {
 
   @Override
   public String toString() {
-    ToStringBuilder buf = ToStringBuilder.of(DefaultTimetable.class)
+    ToStringBuilder buf = ToStringBuilder
+      .of(DefaultTimetable.class)
       .addNum("nTrips", nTrips)
       .addNum("nStops", nStops);
-    if(maxTripDurationInDays > 0) {
+    if (maxTripDurationInDays > 0) {
       buf.addNum("maxTripDuration", maxTripDurationInDays, "d");
     }
 
     // The Deduplicator should ensure that these are the same if they are equal
-    if(boardTimes == alightTimes) {
+    if (boardTimes == alightTimes) {
       buf.addObj("times", timesToString(boardTimes));
-    }
-    else {
+    } else {
       buf
         .addObj("boardTimes", timesToString(boardTimes))
         .addObj("alightTimes", timesToString(alightTimes));
@@ -147,14 +147,14 @@ public class DefaultTimetable implements Timetable {
     appendTripTimesToString(buf, times, 0);
 
     // Append the middle trip in the timetable
-    if(nTrips > 2) {
+    if (nTrips > 2) {
       buf.append(", ");
-      appendTripTimesToString(buf, times, (nTrips-1)/2);
+      appendTripTimesToString(buf, times, (nTrips - 1) / 2);
     }
     // Append the last trip in the timetable
-    if(nTrips > 1) {
+    if (nTrips > 1) {
       buf.append(", ");
-      appendTripTimesToString(buf, times, nTrips-1);
+      appendTripTimesToString(buf, times, nTrips - 1);
     }
     buf.append("}");
     return buf.toString();
@@ -163,7 +163,7 @@ public class DefaultTimetable implements Timetable {
   private void appendTripTimesToString(StringBuilder buf, int[] times, int tripIndex) {
     buf.append("trip ").append(tripIndex).append(": ").append("[");
     for (int s = 0; s < nStops; s++) {
-      if(s!=0) {
+      if (s != 0) {
         buf.append(' ');
       }
       buf.append(TimeUtils.timeToStrCompact(times[index(tripIndex, s)]));

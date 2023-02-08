@@ -92,11 +92,24 @@ class TimetableBuilderTest {
     );
     assertEquals(
       "DefaultTimetable{nTrips: 3, nStops: 2, times: {trip 0: [12:00 13:30], trip 1: [13:00 14:30], trip 2: [14:00 15:30]}}",
-      TimetableBuilder.of().schedule("12:00 13:30").schedule("13:00 14:30").schedule("14:00 15:30").build().toString()
+      TimetableBuilder
+        .of()
+        .schedule("12:00 13:30")
+        .schedule("13:00 14:30")
+        .schedule("14:00 15:30")
+        .build()
+        .toString()
     );
     assertEquals(
       "DefaultTimetable{nTrips: 4, nStops: 2, times: {trip 0: [12:00 13:30], trip 1: [13:00 14:30], trip 3: [15:00 16:30]}}",
-      TimetableBuilder.of().schedule("12:00 13:30").schedule("13:00 14:30").schedule("14:00 15:30").schedule("15:00 16:30").build().toString()
+      TimetableBuilder
+        .of()
+        .schedule("12:00 13:30")
+        .schedule("13:00 14:30")
+        .schedule("14:00 15:30")
+        .schedule("15:00 16:30")
+        .build()
+        .toString()
     );
   }
 

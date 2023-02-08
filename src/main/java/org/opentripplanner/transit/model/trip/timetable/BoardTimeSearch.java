@@ -61,7 +61,12 @@ class BoardTimeSearch {
   /** Implement {@link TimeSearch#search(int[], int, int, int)} */
   static int findBoardTime(final int[] a, final int start, final int end, final int edt) {
     if (edt < a[start]) {
-      return Timetable.PREV_TIME_TABLE_INDEX;
+      // TODO RTM - Fix this, if we go back, then we should test the last trip and return
+      //          - not found if not boardable.
+      // if(edt < a[start] - minOffsetFirstDepartureAllStops0) {
+      //   return Timetable.PREV_TIME_TABLE_INDEX;
+      // }
+      return 0;
     }
     return findBoardTimeBasic(a, start, end, edt);
   }
