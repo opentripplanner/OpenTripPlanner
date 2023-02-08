@@ -32,7 +32,7 @@ public class TimetableBuilder {
   }
 
   private TimetableBuilder() {
-    this(null);
+    this(new Deduplicator());
   }
 
   public static TimetableBuilder of() {

@@ -2,6 +2,8 @@ package org.opentripplanner.transit.model.trip.timetable;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.trip.Timetable;
 
 /**
@@ -35,8 +37,8 @@ public class DefaultTimetable implements Timetable {
     this.nStops = nStops;
     this.boardTimes = boardTimes;
     this.alightTimes = alightTimes;
-    this.boardSearch = BoardTimeSearch.createSearch(numOfTrips());
-    this.alightSearch = AlightTimeSearch.createSearch(numOfTrips());
+    this.boardSearch = BoardTimeSearch.createSearch(nTrips);
+    this.alightSearch = AlightTimeSearch.createSearch(nTrips);
     this.hashCode = TimetableIntUtils.matrixHashCode(nTrips, nStops, boardTimes, alightTimes);
     this.maxTripDurationInDays =
       calculateMaxTripDurationInDays(alightTimes, index(nTrips - 1, 0), alightTimes.length);
@@ -107,11 +109,66 @@ public class DefaultTimetable implements Timetable {
   }
 
   private int index(int tripIndex, int stopPos) {
-    return nTrips * stopPos + tripIndex;
+    return offset(stopPos) + tripIndex;
   }
 
   private int offset(int stopPos) {
-    return nStops * stopPos;
+    return nTrips * stopPos;
+  }
+
+  @Override
+  public String toString() {
+    ToStringBuilder buf = ToStringBuilder.of(DefaultTimetable.class)
+      .addNum("nTrips", nTrips)
+      .addNum("nStops", nStops);
+    if(maxTripDurationInDays > 0) {
+      buf.addNum("maxTripDuration", maxTripDurationInDays, "d");
+    }
+
+    // The Deduplicator should ensure that these are the same if they are equal
+    if(boardTimes == alightTimes) {
+      buf.addObj("times", timesToString(boardTimes));
+    }
+    else {
+      buf
+        .addObj("boardTimes", timesToString(boardTimes))
+        .addObj("alightTimes", timesToString(alightTimes));
+    }
+    return buf.toString();
+  }
+
+  /**
+   * Sample trip-times, add first, middle and last trip to string.
+   */
+  private String timesToString(int[] times) {
+    StringBuilder buf = new StringBuilder();
+    buf.append("{");
+    // Append the first trip in the timetable
+    appendTripTimesToString(buf, times, 0);
+
+    // Append the middle trip in the timetable
+    if(nTrips > 2) {
+      buf.append(", ");
+      appendTripTimesToString(buf, times, (nTrips-1)/2);
+    }
+    // Append the last trip in the timetable
+    if(nTrips > 1) {
+      buf.append(", ");
+      appendTripTimesToString(buf, times, nTrips-1);
+    }
+    buf.append("}");
+    return buf.toString();
+  }
+
+  private void appendTripTimesToString(StringBuilder buf, int[] times, int tripIndex) {
+    buf.append("trip ").append(tripIndex).append(": ").append("[");
+    for (int s = 0; s < nStops; s++) {
+      if(s!=0) {
+        buf.append(' ');
+      }
+      buf.append(TimeUtils.timeToStrCompact(times[index(tripIndex, s)]));
+    }
+    buf.append("]");
   }
 
   private static int calculateMaxTripDurationInDays(int[] times, int start, int end) {

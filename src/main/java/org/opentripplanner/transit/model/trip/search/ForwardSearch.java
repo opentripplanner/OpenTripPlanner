@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.trip.search;
 
 import javax.annotation.Nonnull;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
@@ -89,5 +90,17 @@ public class ForwardSearch
       return;
     }
     this.tripIndex = index;
+  }
+
+  @Override
+  public String toString() {
+    var builder = ToStringBuilder.of(ForwardSearch.class);
+    if(!empty()) {
+      builder.addNum("tripIndex", tripIndex)
+        .addNum("stopPosition", stopPositionInPattern)
+        .addServiceTime("earliestBoardTime", earliestBoardTime);
+    }
+    builder.addObj("timetable", timetable);
+    return builder.toString();
   }
 }
