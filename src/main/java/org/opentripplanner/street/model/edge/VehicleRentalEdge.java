@@ -30,7 +30,7 @@ public class VehicleRentalEdge extends Edge {
       return null;
     }
 
-    var allowedRentalFormFactors = allowedModes(s0.getRequest().mode());
+    var allowedRentalFormFactors = toFormFactors(s0.getRequest().mode());
     if (!allowedRentalFormFactors.isEmpty() && !allowedRentalFormFactors.contains(formFactor)) {
       return null;
     }
@@ -207,7 +207,7 @@ public class VehicleRentalEdge extends Edge {
     return rentedNetwork.equals(stationNetwork);
   }
 
-  private static Set<FormFactor> allowedModes(StreetMode streetMode) {
+  private static Set<FormFactor> toFormFactors(StreetMode streetMode) {
     return switch (streetMode) {
       case BIKE_RENTAL -> Set.of(RentalVehicleType.FormFactor.BICYCLE);
       case SCOOTER_RENTAL -> Set.of(RentalVehicleType.FormFactor.SCOOTER);

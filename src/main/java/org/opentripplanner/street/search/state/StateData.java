@@ -140,7 +140,7 @@ public class StateData implements Cloneable {
           }
           var floatingRentalStateData = proto.clone();
           floatingRentalStateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
-          floatingRentalStateData.rentalVehicleFormFactor = FormFactor.SCOOTER;
+          floatingRentalStateData.rentalVehicleFormFactor = toFormFactor(requestMode);
           floatingRentalStateData.currentMode = TraverseMode.BICYCLE;
           res.add(floatingRentalStateData);
         }
@@ -170,6 +170,25 @@ public class StateData implements Cloneable {
     }
 
     return res;
+  }
+
+  private static FormFactor toFormFactor(StreetMode streetMode) {
+    return switch (streetMode) {
+      case BIKE_RENTAL -> FormFactor.BICYCLE;
+      case SCOOTER_RENTAL -> FormFactor.SCOOTER;
+      case CAR_RENTAL -> FormFactor.CAR;
+      // there is no default here so you get a compiler error when you add a new value to the enum
+      case NOT_SET,
+        WALK,
+        BIKE,
+        BIKE_TO_PARK,
+        CAR,
+        CAR_TO_PARK,
+        CAR_PICKUP,
+        FLEXIBLE -> throw new IllegalStateException(
+        "Cannot convert street mode %s to a form factor".formatted(streetMode)
+      );
+    };
   }
 
   public StateData clone() {
