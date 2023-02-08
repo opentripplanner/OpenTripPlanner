@@ -102,6 +102,25 @@ class RentalRestrictionExtensionTest {
   }
 
   @Test
+  public void backwardsRejectWhenEnteringNoTraversalZone() {
+    var restrictedEdge = streetEdge(V1, V2);
+    V2.addRentalRestriction(NO_DROP_OFF);
+
+    var req = StreetSearchRequest
+      .of()
+      .withMode(StreetMode.SCOOTER_RENTAL)
+      .withArriveBy(true)
+      .build();
+
+    var editor = new StateEditor(restrictedEdge.getToVertex(), req);
+    editor.dropFloatingVehicle(RentalVehicleType.FormFactor.SCOOTER, network, true);
+
+    var result = restrictedEdge.traverse(editor.makeState());
+
+    assertNull(result);
+  }
+
+  @Test
   public void forwardDontFinishInNoDropOffZone() {
     var edge = streetEdge(V1, V2);
     V2.addRentalRestriction(NO_DROP_OFF);
@@ -122,7 +141,7 @@ class RentalRestrictionExtensionTest {
   @Test
   public void backwardsDontEnterNoTraversalZone() {
     var edge = streetEdge(V1, V2);
-    V2.addRentalRestriction(NO_DROP_OFF);
+    V2.addRentalRestriction(NO_TRAVERSAL);
     var intialState = initialState(V2, network, true);
     var result = edge.traverse(intialState);
     assertNull(result);

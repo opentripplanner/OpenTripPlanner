@@ -67,7 +67,7 @@ public class StateEditorTest {
     StreetEdge edge1 = StreetModelForTest.streetEdge(v1, v2);
 
     @Test
-    void enterZone() {
+    void forwardEnterZone() {
       var editor = new StateEditor(
         v1,
         StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build()
