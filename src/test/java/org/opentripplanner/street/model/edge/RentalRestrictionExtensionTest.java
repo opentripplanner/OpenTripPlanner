@@ -23,6 +23,7 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
 import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.BusinessAreaBorder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -31,7 +32,13 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class RentalRestrictionExtensionTest {
 
-  String network = "tier-oslo";
+  static String network = "tier-oslo";
+  static RentalRestrictionExtension NO_DROP_OFF = new RentalRestrictionExtension.GeofencingZoneExtension(
+    new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
+  );
+  static RentalRestrictionExtension NO_TRAVERSAL = new RentalRestrictionExtension.GeofencingZoneExtension(
+    new GeofencingZone(new FeedScopedId(network, "a-park"), null, false, true)
+  );
   StreetVertex V1 = intersectionVertex("V1", 0, 0);
   StreetVertex V2 = intersectionVertex("V2", 1, 1);
   StreetVertex V3 = intersectionVertex("V3", 2, 2);
@@ -43,7 +50,7 @@ class RentalRestrictionExtensionTest {
     var ext = new BusinessAreaBorder(network);
     V2.addRentalRestriction(ext);
 
-    State result = traverse(edge1);
+    State result = traverseFromV1(edge1);
     assertEquals(HAVE_RENTED, result.getVehicleRentalState());
     assertEquals(TraverseMode.WALK, result.getBackMode());
     assertNull(result.getNextResult());
@@ -57,7 +64,7 @@ class RentalRestrictionExtensionTest {
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, true)
       )
     );
-    State result = traverse(edge);
+    State result = traverseFromV1(edge);
     assertEquals(WALK, result.getBackMode());
     assertEquals(HAVE_RENTED, result.getVehicleRentalState());
   }
@@ -95,21 +102,36 @@ class RentalRestrictionExtensionTest {
   }
 
   @Test
-  public void dontFinishInNoDropOffZone() {
+  public void forwardDontFinishInNoDropOffZone() {
     var edge = streetEdge(V1, V2);
-    var ext = new RentalRestrictionExtension.GeofencingZoneExtension(
-      new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
-    );
-    V2.addRentalRestriction(ext);
-    edge.addRentalRestriction(ext);
-    State result = traverse(edge);
+    V2.addRentalRestriction(NO_DROP_OFF);
+    edge.addRentalRestriction(NO_DROP_OFF);
+    State result = traverseFromV1(edge);
     assertFalse(result.isFinal());
+  }
+
+  @Test
+  public void backwardDontFinishInNoDropOffZone() {
+    var edge = streetEdge(V1, V2);
+    edge.addRentalRestriction(NO_DROP_OFF);
+    var state = initialState(V2, network, true);
+    var state2 = edge.traverse(state);
+    assertFalse(state2.isFinal());
+  }
+
+  @Test
+  public void backwardsDontEnterNoTraversalZone() {
+    var edge = streetEdge(V1, V2);
+    V2.addRentalRestriction(NO_DROP_OFF);
+    var intialState = initialState(V2, network, true);
+    var result = edge.traverse(intialState);
+    assertNull(result);
   }
 
   @Test
   public void finishInEdgeWithoutRestrictions() {
     var edge = streetEdge(V1, V2);
-    State result = traverse(edge);
+    State result = traverseFromV1(edge);
     assertTrue(result.isFinal());
   }
 
@@ -119,8 +141,8 @@ class RentalRestrictionExtensionTest {
     edge.addRentalRestriction(new BusinessAreaBorder("a"));
     edge.addRentalRestriction(new BusinessAreaBorder("b"));
 
-    assertTrue(edge.fromv.rentalTraversalBanned(state("a")));
-    assertTrue(edge.fromv.rentalTraversalBanned(state("b")));
+    assertTrue(edge.fromv.rentalTraversalBanned(forwardState("a")));
+    assertTrue(edge.fromv.rentalTraversalBanned(forwardState("b")));
   }
 
   @Test
@@ -132,19 +154,19 @@ class RentalRestrictionExtensionTest {
 
     edge.addRentalRestriction(a);
 
-    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(state("a")));
+    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(forwardState("a")));
 
     edge.addRentalRestriction(b);
     edge.addRentalRestriction(c);
 
     edge.removeRentalExtension(a);
 
-    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(state("b")));
-    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(state("c")));
+    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(forwardState("b")));
+    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(forwardState("c")));
 
     edge.removeRentalExtension(b);
 
-    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(state("c")));
+    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(forwardState("c")));
   }
 
   @Test
@@ -152,21 +174,30 @@ class RentalRestrictionExtensionTest {
     var edge = streetEdge(V1, V2);
     edge.addRentalRestriction(new BusinessAreaBorder("a"));
 
-    var state = traverse(edge);
+    var state = traverseFromV1(edge);
 
     assertEquals(RENTING_FLOATING, state.getVehicleRentalState());
     assertNull(state.getNextResult());
   }
 
-  private State traverse(StreetEdge edge) {
-    var state = state(network);
+  private State traverseFromV1(StreetEdge edge) {
+    var state = initialState(V1, network, false);
     return edge.traverse(state);
   }
 
   @Nonnull
-  private State state(String network) {
-    var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
-    var editor = new StateEditor(V1, req);
+  private State forwardState(String network) {
+    return initialState(V1, network, false);
+  }
+
+  @Nonnull
+  private State initialState(Vertex startVertex, String network, boolean arriveBy) {
+    var req = StreetSearchRequest
+      .of()
+      .withMode(StreetMode.SCOOTER_RENTAL)
+      .withArriveBy(arriveBy)
+      .build();
+    var editor = new StateEditor(startVertex, req);
     editor.beginFloatingVehicleRenting(RentalVehicleType.FormFactor.SCOOTER, network, false);
     return editor.makeState();
   }
