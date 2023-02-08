@@ -160,7 +160,7 @@ class BoardTimeSearch {
   ) {
     for (int i = start; i < end; ++i) {
       if (edt <= a[i]) {
-        return i;
+        return i - start;
       }
     }
     return Timetable.NEXT_TIME_TABLE_INDEX;

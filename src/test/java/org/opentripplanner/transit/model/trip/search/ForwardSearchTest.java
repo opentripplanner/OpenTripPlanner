@@ -26,18 +26,35 @@ class ForwardSearchTest {
     .build();
   private static final Timetable timetableTwoTrips = TimetableBuilder
     .of()
+    .schedule("12:00 13:00 14:00")
     .schedule("12:30 13:30 14:30")
-    .schedule("12:40 13:40 14:40")
     .build();
 
   static Stream<Arguments> boardingSearchTestCases = Stream.of(
+    // Basic timetable with just one trip
     Arguments.of(timetableBasic, "11:37", STOP_0, TRIP_0, "12:00"),
-    Arguments.of(timetableBasic, "12:00", STOP_0, TRIP_0, "12:00")
-    // Arguments.of(timetableBasic, "14:01", STOP_1, TRIP_0, "13:00")
-    //Arguments.of(timetableBasic, "14:00", STOP_2, TRIP_0, "14:00"),
-    //Arguments.of(timetableTwoTrips, "12:01", STOP_0, TRIP_1, "12:30"),
-    //Arguments.of(timetableTwoTrips, "13:00", TRIP_1, TRIP_1, "13:00"),
-    //Arguments.of(timetableTwoTrips, "13:01", TRIP_1, TRIP_1, "13:30")
+    Arguments.of(timetableBasic, "12:00", STOP_0, TRIP_0, "12:00"),
+    Arguments.of(timetableBasic, "12:12", STOP_1, TRIP_0, "13:00"),
+    Arguments.of(timetableBasic, "13:00", STOP_1, TRIP_0, "13:00"),
+    Arguments.of(timetableBasic, "13:59", STOP_2, TRIP_0, "14:00"),
+    Arguments.of(timetableBasic, "14:00", STOP_2, TRIP_0, "14:00"),
+
+    // Timetable with more than one trip
+    // First stop pos: 0
+    Arguments.of(timetableTwoTrips, "11:59", STOP_0, TRIP_0, "12:00"),
+    Arguments.of(timetableTwoTrips, "12:00", STOP_0, TRIP_0, "12:00"),
+    Arguments.of(timetableTwoTrips, "12:01", STOP_0, TRIP_1, "12:30"),
+    Arguments.of(timetableTwoTrips, "12:30", STOP_0, TRIP_1, "12:30"),
+    // Middle stop pos: 1
+    Arguments.of(timetableTwoTrips, "12:59", STOP_1, TRIP_0, "13:00"),
+    Arguments.of(timetableTwoTrips, "13:00", STOP_1, TRIP_0, "13:00"),
+    Arguments.of(timetableTwoTrips, "13:01", STOP_1, TRIP_1, "13:30"),
+    Arguments.of(timetableTwoTrips, "13:30", STOP_1, TRIP_1, "13:30"),
+    // Last stop pos: 2
+    Arguments.of(timetableTwoTrips, "13:59", STOP_2, TRIP_0, "14:00"),
+    Arguments.of(timetableTwoTrips, "14:00", STOP_2, TRIP_0, "14:00"),
+    Arguments.of(timetableTwoTrips, "14:01", STOP_2, TRIP_1, "14:30"),
+    Arguments.of(timetableTwoTrips, "14:30", STOP_2, TRIP_1, "14:30")
   );
 
   @ParameterizedTest(
