@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
-import org.opentripplanner.netex.issues.LineWithoutRepresentedByGroupRef;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.framework.EntityById;
@@ -151,8 +150,6 @@ class RouteMapper {
       if (this.groupOfRoutesById.containsKey(groupOfRoutesId)) {
         groupsOfRoutes.add(groupOfRoutesById.get(groupOfRoutesId));
       }
-    } else {
-      issueStore.add(new LineWithoutRepresentedByGroupRef(line.getId()));
     }
 
     return groupsOfRoutes;

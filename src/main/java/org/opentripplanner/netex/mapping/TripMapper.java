@@ -189,9 +189,9 @@ class TripMapper {
     if (route == null) {
       LOG.warn(
         "Unable to link ServiceJourney to Route. ServiceJourney id: " +
-        serviceJourney.getId() +
-        ", Line ref: " +
-        lineRef
+          serviceJourney.getId() +
+          ", Line ref: " +
+          lineRef
       );
     }
     return route;
