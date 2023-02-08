@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.trip.search;
 
 import javax.annotation.Nonnull;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
@@ -79,6 +80,19 @@ public class ReverseSearch
   public boolean empty() {
     return tripIndex == NOT_FOUND;
   }
+
+  @Override
+  public String toString() {
+    var builder = ToStringBuilder.of(ReverseSearch.class);
+    if(!empty()) {
+      builder.addNum("tripIndex", tripIndex)
+        .addNum("stopPosition", stopPositionInPattern)
+        .addServiceTime("latestAlightTime", latestAlightTime);
+    }
+    builder.addObj("timetable", timetable);
+    return builder.toString();
+  }
+
 
   private void searchForTrip() {
     int index = timetable.findTripIndexAlightingBefore(stopPositionInPattern, latestAlightTime);

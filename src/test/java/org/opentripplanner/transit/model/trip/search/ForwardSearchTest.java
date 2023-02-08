@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -38,7 +39,6 @@ class ForwardSearchTest {
     Arguments.of(timetableBasic, "13:00", STOP_1, TRIP_0, "13:00"),
     Arguments.of(timetableBasic, "13:59", STOP_2, TRIP_0, "14:00"),
     Arguments.of(timetableBasic, "14:00", STOP_2, TRIP_0, "14:00"),
-
     // Timetable with more than one trip
     // First stop pos: 0
     Arguments.of(timetableTwoTrips, "11:59", STOP_0, TRIP_0, "12:00"),
@@ -69,17 +69,37 @@ class ForwardSearchTest {
     String expTime
   ) {
     int earliestBoardTime = TimeUtils.time(ebt);
-    var bae = new ForwardSearch(timetable);
+    var forwardSearch = new ForwardSearch(timetable);
 
-    bae.search(earliestBoardTime, stopPos);
+    var boardEvent = forwardSearch.search(earliestBoardTime, stopPos);
 
     // Verify correct input stored in event
-    assertEquals(ebt, TimeUtils.timeToStrCompact(bae.earliestBoardTime()));
-    assertEquals(stopPos, bae.stopPositionInPattern());
+    assertEquals(ebt, TimeUtils.timeToStrCompact(boardEvent.earliestBoardTime()));
+    assertEquals(stopPos, boardEvent.stopPositionInPattern());
 
     // Correct trip found
-    assertEquals(expTripIndex, bae.tripIndex());
-    assertEquals(expTime, TimeUtils.timeToStrCompact(bae.time()));
-    assertFalse(bae.empty());
+    assertEquals(expTripIndex, boardEvent.tripIndex());
+    assertEquals(expTime, TimeUtils.timeToStrCompact(boardEvent.time()));
+    assertFalse(boardEvent.empty());
+  }
+
+  // TODO RTM - Add none-hapy day tests
+
+  @Test
+  void testToString() {
+    int earliestBoardTime = TimeUtils.time("12:00");
+    var forwardSearch = new ForwardSearch(timetableBasic);
+
+    assertEquals(
+      "ForwardSearch{timetable: DefaultTimetable{nTrips: 1, nStops: 3, times: {trip 0: [12:00 13:00 14:00]}}}",
+      forwardSearch.toString()
+    );
+
+    var boardEvent = forwardSearch.search(earliestBoardTime, 0);
+
+    assertEquals(
+      "ForwardSearch{tripIndex: 0, stopPosition: 0, earliestBoardTime: 12:00, timetable: DefaultTimetable{nTrips: 1, nStops: 3, times: {trip 0: [12:00 13:00 14:00]}}}",
+      boardEvent.toString()
+    );
   }
 }
