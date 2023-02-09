@@ -214,6 +214,9 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- we are seeing random failures in Windows CI builds which appear related to the
+                 properties files: https://issues.apache.org/jira/browse/MRESOURCES-265
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
