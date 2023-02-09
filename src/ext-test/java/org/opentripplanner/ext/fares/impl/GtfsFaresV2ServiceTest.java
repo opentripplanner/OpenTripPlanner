@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.fares.model.Distance;
+import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
@@ -280,7 +282,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   }
 
   @Nested
-  class Distance {
+  class DistanceFares {
 
     FareProduct threeStopProduct = new FareProduct(
       new FeedScopedId(FEED_ID, "three-stop-product"),
@@ -333,45 +335,63 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       null
     );
 
-    List<FareLegRule> rules = List.of(
-      new FareLegRule(null, null, null, null, 0.0, 3.0, 0, threeStopProduct),
-      new FareLegRule(null, null, null, null, 5d, 10d, 0, fiveStopProduct),
-      new FareLegRule(null, null, null, null, 12d, 20d, 0, twelveStopProduct),
-      new FareLegRule(null, null, null, null, 7000d, 10000d, 1, tenKmProduct),
-      new FareLegRule(null, null, null, null, 3000d, 6000d, 1, threeKmProduct),
-      new FareLegRule(null, null, null, null, null, 2000d, 1, twoKmProduct)
+    List<FareLegRule> stopRules = List.of(
+      new FareLegRule(null, null, null, null, new FareDistance.Stops(0, 3), threeStopProduct),
+      new FareLegRule(null, null, null, null, new FareDistance.Stops(5, 10), fiveStopProduct),
+      new FareLegRule(null, null, null, null, new FareDistance.Stops(12, 20), twelveStopProduct)
+    );
+
+    List<FareLegRule> distanceRules = List.of(
+      new FareLegRule(
+        null,
+        null,
+        null,
+        null,
+        new FareDistance.LinearDistance(Distance.ofMeters(7000), Distance.ofMeters(10_000)),
+        tenKmProduct
+      ),
+      new FareLegRule(
+        null,
+        null,
+        null,
+        null,
+        new FareDistance.LinearDistance(Distance.ofMeters(3000), Distance.ofMeters(6000)),
+        threeKmProduct
+      ),
+      new FareLegRule(
+        null,
+        null,
+        null,
+        null,
+        new FareDistance.LinearDistance(Distance.ofMeters(0), Distance.ofMeters(2000)),
+        twoKmProduct
+      )
     );
 
     @Test
     void stops() {
       var i1 = newItinerary(A, 0).bus(ID, 0, 50, 1, 20, C).build();
       var faresV2Service = new GtfsFaresV2Service(
-        rules,
+        stopRules,
         List.of(),
         Multimaps.forMap(
           Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
         )
       );
-      assertEquals(
-        faresV2Service.getProducts(i1).itineraryProducts(),
-        Set.of(twelveStopProduct, threeKmProduct)
-      );
+      assertEquals(faresV2Service.getProducts(i1).itineraryProducts(), Set.of(twelveStopProduct));
     }
 
     @Test
     void directDistance() {
       var i1 = newItinerary(A, 0).bus(ID, 0, 50, C).build();
       var faresV2Service = new GtfsFaresV2Service(
-        rules,
+        distanceRules,
         List.of(),
         Multimaps.forMap(
           Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
         )
       );
-      assertEquals(
-        faresV2Service.getProducts(i1).itineraryProducts(),
-        Set.of(threeStopProduct, threeKmProduct)
-      );
+      assertEquals(faresV2Service.getProducts(i1).itineraryProducts(), Set.of(threeKmProduct));
     }
   }
 }

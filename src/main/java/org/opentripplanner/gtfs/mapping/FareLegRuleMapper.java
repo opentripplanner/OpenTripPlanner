@@ -2,6 +2,8 @@ package org.opentripplanner.gtfs.mapping;
 
 import java.util.Collection;
 import java.util.Objects;
+import org.opentripplanner.ext.fares.model.Distance;
+import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -23,15 +25,29 @@ public final class FareLegRuleMapper {
       .stream()
       .map(r -> {
         FareProduct productForRule = fareProductMapper.map(r.getFareProduct());
+        FareDistance fareDistance =
+          switch (r.getDistanceType()) {
+            case 0:
+              yield new FareDistance.Stops(
+                r.getMinDistance().intValue(),
+                r.getMaxDistance().intValue()
+              );
+            case 1:
+              yield new FareDistance.LinearDistance(
+                Distance.ofMeters(r.getMinDistance()),
+                Distance.ofMeters(r.getMaxDistance())
+              );
+            default:
+              yield null;
+          };
+
         if (productForRule != null) {
           return new FareLegRule(
             r.getLegGroupId(),
             r.getNetworkId(),
             r.getFromAreaId(),
             r.getToAreaId(),
-            r.getMinDistance(),
-            r.getMaxDistance(),
-            r.getDistanceType(),
+            fareDistance,
             productForRule
           );
         } else {

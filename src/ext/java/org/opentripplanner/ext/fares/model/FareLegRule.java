@@ -8,9 +8,7 @@ public record FareLegRule(
   @Nullable String networkId,
   @Nullable String fromAreaId,
   @Nullable String toAreadId,
-  @Nullable Double minDistance,
-  @Nullable Double maxDistance,
-  @Nullable Integer distanceType,
+  @Nullable FareDistance fareDistance,
   @Nonnull FareProduct fareProduct
 ) {
   public FareLegRule(
@@ -20,7 +18,7 @@ public record FareLegRule(
     String toAreaId,
     FareProduct fareProduct
   ) {
-    this(legGroupId, networkId, fromAreaId, toAreaId, null, null, null, fareProduct);
+    this(legGroupId, networkId, fromAreaId, toAreaId, null, fareProduct);
   }
   public String feedId() {
     return fareProduct.id().getFeedId();

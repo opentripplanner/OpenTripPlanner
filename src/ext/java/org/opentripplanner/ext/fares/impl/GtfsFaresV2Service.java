@@ -14,10 +14,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opentripplanner.ext.fares.model.Distance;
+import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.ext.fares.model.LegProducts;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -241,24 +244,20 @@ public final class GtfsFaresV2Service implements Serializable {
 
   private boolean matchesDistance(ScheduledTransitLeg leg, FareLegRule rule) {
     // If no valid distance type is given, do not consider distances in fare computation
-    if (rule.distanceType() == null) {
-      return true;
-    }
-    Double minDistance = rule.minDistance() == null ? 0 : rule.minDistance();
-    Double maxDistance = rule.maxDistance() == null ? Double.POSITIVE_INFINITY : rule.maxDistance();
 
-    if (rule.distanceType() == 0) {
-      return (
-        leg.getIntermediateStops().size() >= minDistance &&
-        leg.getIntermediateStops().size() <= maxDistance
-      );
-    } else if (rule.distanceType() == 1) {
-      return (
-        leg.getDirectDistanceMeters() >= minDistance && leg.getDirectDistanceMeters() <= maxDistance
-      );
-    } else {
-      return false;
-    }
+    FareDistance distance = rule.fareDistance();
+    if (distance instanceof FareDistance.Stops) {
+      var numStops = leg.getIntermediateStops().size();
+      var ruleDistance = (FareDistance.Stops) rule.fareDistance();
+      return numStops >= ruleDistance.min() && ruleDistance.max() >= numStops;
+    } else if (rule.fareDistance() instanceof FareDistance.LinearDistance) {
+      var ruleDistance = (FareDistance.LinearDistance) rule.fareDistance();
+      var ruleMax = ruleDistance.max();
+      var ruleMin = ruleDistance.min();
+      var legDistance = Distance.ofMeters(leg.getDirectDistanceMeters());
+
+      return legDistance.isAbove(ruleMin) && ruleMax.isAbove(legDistance);
+    } else return true;
   }
 
   /**
