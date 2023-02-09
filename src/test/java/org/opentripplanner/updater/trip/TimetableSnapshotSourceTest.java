@@ -52,12 +52,12 @@ import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 
 public class TimetableSnapshotSourceTest {
 
+  private static final LocalDate SERVICE_DATE = LocalDate.parse("2009-02-01");
   private TransitModel transitModel;
 
   private final GtfsRealtimeFuzzyTripMatcher TRIP_MATCHER_NOOP = null;
 
   private final boolean fullDataset = false;
-  private final LocalDate SERVICE_DATE = LocalDate.parse("2009-02-01");
   private byte[] cancellation;
   private String feedId;
 
