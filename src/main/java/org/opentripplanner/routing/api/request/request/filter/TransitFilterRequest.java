@@ -11,22 +11,6 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class TransitFilterRequest implements Serializable, TransitFilter {
 
-  public static class Builder {
-
-    private final List<SelectRequest> select = new ArrayList<>();
-    private final List<SelectRequest> not = new ArrayList<>();
-
-    public Builder addSelect(SelectRequest selectRequest) {
-      this.select.add(selectRequest);
-
-      return this;
-    }
-
-    public Builder addNot(SelectRequest selectRequest) {
-      this.not.add(selectRequest);
-
-      return this;
-    }
   /**
    * This is stored as an array, as they are iterated over for each trip when filtering transit
    * data. Iterator creation is relatively expensive compared to iterating over a short array.
@@ -128,5 +112,27 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
       .addCol("select", Arrays.asList(select))
       .addCol("not", Arrays.asList(not))
       .toString();
+  }
+
+  public static class Builder {
+
+    private final List<SelectRequest> select = new ArrayList<>();
+    private final List<SelectRequest> not = new ArrayList<>();
+
+    public Builder addSelect(SelectRequest selectRequest) {
+      this.select.add(selectRequest);
+
+      return this;
+    }
+
+    public Builder addNot(SelectRequest selectRequest) {
+      this.not.add(selectRequest);
+
+      return this;
+    }
+
+    public TransitFilterRequest build() {
+      return new TransitFilterRequest(this);
+    }
   }
 }
