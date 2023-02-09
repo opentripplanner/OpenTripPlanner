@@ -179,6 +179,11 @@ public final class StreetPreferences implements Serializable {
       return this;
     }
 
+    public Builder withMaxAccessEgressDuration(DurationForEnum<StreetMode> maxAccessEgressDuration) {
+      this.maxAccessEgressDuration = maxAccessEgressDuration;
+      return this;
+    }
+
     public Builder withMaxAccessEgressDuration(
       Duration defaultValue,
       Map<StreetMode, Duration> values

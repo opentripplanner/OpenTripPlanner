@@ -66,6 +66,7 @@ import org.opentripplanner.ext.transmodelapi.model.network.LineType;
 import org.opentripplanner.ext.transmodelapi.model.network.PresentationType;
 import org.opentripplanner.ext.transmodelapi.model.network.StopToStopGeometryType;
 import org.opentripplanner.ext.transmodelapi.model.plan.LegType;
+import org.opentripplanner.ext.transmodelapi.model.plan.MaxAccessEgressInputType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PathGuidanceType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PlanPlaceType;
 import org.opentripplanner.ext.transmodelapi.model.plan.RoutingErrorType;
@@ -347,7 +348,9 @@ public class TransmodelGraphQLSchema {
       gqlUtil
     );
 
-    GraphQLFieldDefinition tripQuery = TripQuery.create(routing, tripType, gqlUtil);
+    GraphQLInputObjectType maxAccessEgressInput = MaxAccessEgressInputType.create(gqlUtil);
+
+    GraphQLFieldDefinition tripQuery = TripQuery.create(routing, tripType, maxAccessEgressInput, gqlUtil);
 
     GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
     GraphQLInputObjectType viaLocationInputType = ViaLocationInputType.create(gqlUtil);

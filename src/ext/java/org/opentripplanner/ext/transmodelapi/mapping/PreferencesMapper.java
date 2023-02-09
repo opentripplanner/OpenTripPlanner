@@ -1,10 +1,13 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Duration;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputType;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 class PreferencesMapper {
@@ -24,6 +27,24 @@ class PreferencesMapper {
         setStreetReluctance(preferences, streetReluctance);
       }
     );
+
+    preferences.withStreet(street -> {
+      var maxAccessEgressDuration = StreetPreferences.DEFAULT.maxAccessEgressDuration().copyOf();
+
+      callWith.argument("maxAccessEgressDurationForMode.walk", d -> maxAccessEgressDuration.with(StreetMode.WALK, (Duration) d));
+      callWith.argument("maxAccessEgressDurationForMode.bike", d -> maxAccessEgressDuration.with(StreetMode.BIKE, (Duration) d));
+      callWith.argument("maxAccessEgressDurationForMode.bikeToPark", d -> maxAccessEgressDuration.with(StreetMode.BIKE_TO_PARK, (Duration) d));
+      callWith.argument("maxAccessEgressDurationForMode.bikeRental", d -> maxAccessEgressDuration.with(StreetMode.BIKE_RENTAL, (Duration) d));
+      callWith.argument("maxAccessEgressDurationForMode.scooterRental", d -> maxAccessEgressDuration.with(StreetMode.SCOOTER_RENTAL, (Duration) d));
+      callWith.argument("maxAccessEgressDurationForMode.car", d -> maxAccessEgressDuration.with(StreetMode.CAR, (Duration) d));
+      callWith.argument("maxAccessEgressDurationForMode.carToPark", d -> maxAccessEgressDuration.with(StreetMode.CAR_TO_PARK, (Duration) d));
+      callWith.argument("maxAccessEgressDurationForMode.carPickup", d -> maxAccessEgressDuration.with(StreetMode.CAR_PICKUP, (Duration) d));
+      callWith.argument("maxAccessEgressDurationForMode.carRental", d -> maxAccessEgressDuration.with(StreetMode.CAR_RENTAL, (Duration) d));
+      callWith.argument("maxAccessEgressDurationForMode.flexible", d -> maxAccessEgressDuration.with(StreetMode.FLEXIBLE, (Duration) d));
+
+      street.withMaxAccessEgressDuration(maxAccessEgressDuration.build());
+    });
+
     preferences.withBike(bike -> {
       callWith.argument("bikeSpeed", bike::withSpeed);
       callWith.argument("bikeSwitchTime", bike::withSwitchTime);
