@@ -100,14 +100,13 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
     setDistanceMeters(getDistanceFromCoordinates(transitLegCoordinates));
-    setDirectDistanceMeters(
+    this.directDistanceMeters =
       getDistanceFromCoordinates(
         List.of(
           transitLegCoordinates.get(0),
           transitLegCoordinates.get(transitLegCoordinates.size() - 1)
         )
-      )
-    );
+      );
   }
 
   public ZoneId getZoneId() {
@@ -226,10 +225,6 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   public double getDirectDistanceMeters() {
     return directDistanceMeters;
-  }
-
-  protected void setDirectDistanceMeters(double directDistanceMeters) {
-    this.directDistanceMeters = DoubleUtils.roundTo2Decimals(directDistanceMeters);
   }
 
   @Override

@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.plan.PlanTestConstants.place;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 
@@ -16,6 +17,7 @@ import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -383,7 +385,13 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
     @Test
     void directDistance() {
-      var i1 = newItinerary(A, 0).bus(ID, 0, 50, C).build();
+      Place dest = place(
+        "Destination",
+        A.coordinate.latitude(),
+        A.coordinate.longitude() + SphericalDistanceLibrary.metersToDegrees(5_000)
+      );
+      System.out.println(SphericalDistanceLibrary.metersToDegrees(5000));
+      var i1 = newItinerary(A, 0).bus(ID, 0, 50, dest).build();
       var faresV2Service = new GtfsFaresV2Service(
         distanceRules,
         List.of(),

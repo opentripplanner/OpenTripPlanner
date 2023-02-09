@@ -416,6 +416,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     TripPattern tripPattern = TripPattern
       .of(route.getId())
       .withRoute(route)
+      .withRoute(route)
       .withStopPattern(stopPattern)
       .build();
     final TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
@@ -459,7 +460,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
     }
 
     leg.setDistanceMeters(speed(leg.getMode()) * (end - start));
-    leg.setDirectDistanceMeters(5000);
 
     legs.add(leg);
     cost += legCost;
