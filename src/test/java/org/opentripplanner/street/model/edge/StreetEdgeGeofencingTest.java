@@ -180,7 +180,14 @@ class StreetEdgeGeofencingTest {
       V2.addRentalRestriction(NO_TRAVERSAL);
       var result = edge.traverse(haveRentedState);
 
-      assertEquals(RENTING_FLOATING, result.getVehicleRentalState());
+      // we want to pick up a vehicle
+      final State rentalState = result.getNextResult();
+      assertEquals(RENTING_FLOATING, rentalState.getVehicleRentalState());
+      assertEquals(BICYCLE, rentalState.getNonTransitMode());
+
+      // but also keep on walking in case we don't find an edge where to leave the vehicle
+      assertEquals(HAVE_RENTED, result.getVehicleRentalState());
+      assertEquals(WALK, result.getNonTransitMode());
     }
   }
 
