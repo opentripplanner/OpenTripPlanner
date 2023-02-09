@@ -3,9 +3,9 @@ package org.opentripplanner.ext.legacygraphqlapi;
 import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -55,7 +55,7 @@ public class LegacyGraphQLRequestContext {
   }
 
   @Nonnull
-  public RealtimeVehiclePositionService getVehiclePositionService() {
-    return serverContext.graph().getVehiclePositionService();
+  public VehiclePositionService getVehiclePositionService() {
+    return serverContext.vehiclePositionService();
   }
 }
