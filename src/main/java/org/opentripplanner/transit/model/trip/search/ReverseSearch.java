@@ -84,15 +84,15 @@ public class ReverseSearch
   @Override
   public String toString() {
     var builder = ToStringBuilder.of(ReverseSearch.class);
-    if(!empty()) {
-      builder.addNum("tripIndex", tripIndex)
+    if (!empty()) {
+      builder
+        .addNum("tripIndex", tripIndex)
         .addNum("stopPosition", stopPositionInPattern)
         .addServiceTime("latestAlightTime", latestAlightTime);
     }
     builder.addObj("timetable", timetable);
     return builder.toString();
   }
-
 
   private void searchForTrip() {
     int index = timetable.findTripIndexAlightingBefore(stopPositionInPattern, latestAlightTime);

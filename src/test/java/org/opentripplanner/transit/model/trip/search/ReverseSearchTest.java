@@ -34,7 +34,6 @@ class ReverseSearchTest {
   static Stream<Arguments> boardingSearchTestCases = Stream.of(
     // Basic timetable with just one trip
     Arguments.of(timetableBasic, "12:01", STOP_0, TRIP_0, "12:00")
-
     // TODO RTM - Add tests cases
 
     // Timetable with more than one trip
@@ -88,5 +87,4 @@ class ReverseSearchTest {
       boardEvent.toString()
     );
   }
-
 }
