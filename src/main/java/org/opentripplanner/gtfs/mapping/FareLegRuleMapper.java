@@ -27,18 +27,15 @@ public final class FareLegRuleMapper {
         FareProduct productForRule = fareProductMapper.map(r.getFareProduct());
         FareDistance fareDistance =
           switch (r.getDistanceType()) {
-            case 0:
-              yield new FareDistance.Stops(
-                r.getMinDistance().intValue(),
-                r.getMaxDistance().intValue()
-              );
-            case 1:
-              yield new FareDistance.LinearDistance(
-                Distance.ofMeters(r.getMinDistance()),
-                Distance.ofMeters(r.getMaxDistance())
-              );
-            default:
-              yield null;
+            case 0 -> new FareDistance.Stops(
+              r.getMinDistance().intValue(),
+              r.getMaxDistance().intValue()
+            );
+            case 1 -> new FareDistance.LinearDistance(
+              Distance.ofMeters(r.getMinDistance()),
+              Distance.ofMeters(r.getMaxDistance())
+            );
+            default -> null;
           };
 
         if (productForRule != null) {

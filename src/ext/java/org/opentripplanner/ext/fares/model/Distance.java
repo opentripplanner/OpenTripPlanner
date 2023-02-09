@@ -2,39 +2,33 @@ package org.opentripplanner.ext.fares.model;
 
 public class Distance {
 
-  private double distance;
-  private boolean isKilometers;
+  private final double meters;
 
-  public Distance(double value, boolean isKilometers) {
-    this.distance = value;
-    this.isKilometers = isKilometers;
+  public Distance(double value) {
+    this.meters = value;
   }
 
   public static Distance ofMeters(double value) {
-    return new Distance(value, false);
+    return new Distance(value);
   }
 
   public static Distance ofKilometers(double value) {
-    return new Distance(value, true);
+    return new Distance(value);
   }
 
-  public void toKilometers() {
-    if (!this.isKilometers) {
-      this.distance /= 1000;
-      this.isKilometers = true;
-    }
+  public double toKilometers() {
+    return this.meters / 1000;
   }
 
-  public void toMeters() {
-    if (this.isKilometers) {
-      this.distance *= 1000;
-      this.isKilometers = false;
-    }
+  public double toMeters() {
+    return this.meters;
   }
 
   public boolean isAbove(Distance otherDistance) {
-    this.toMeters();
-    otherDistance.toMeters();
-    return this.distance > otherDistance.distance;
+    return this.toMeters() > otherDistance.toMeters();
+  }
+
+  public boolean isBelow(Distance otherDistance) {
+    return this.toMeters() < otherDistance.toMeters();
   }
 }

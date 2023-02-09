@@ -14,13 +14,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opentripplanner.ext.fares.model.Distance;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.ext.fares.model.LegProducts;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -246,17 +244,15 @@ public final class GtfsFaresV2Service implements Serializable {
     // If no valid distance type is given, do not consider distances in fare computation
 
     FareDistance distance = rule.fareDistance();
-    if (distance instanceof FareDistance.Stops) {
+    if (distance instanceof FareDistance.Stops ruleDistance) {
       var numStops = leg.getIntermediateStops().size();
-      var ruleDistance = (FareDistance.Stops) rule.fareDistance();
       return numStops >= ruleDistance.min() && ruleDistance.max() >= numStops;
-    } else if (rule.fareDistance() instanceof FareDistance.LinearDistance) {
-      var ruleDistance = (FareDistance.LinearDistance) rule.fareDistance();
+    } else if (rule.fareDistance() instanceof FareDistance.LinearDistance ruleDistance) {
       var ruleMax = ruleDistance.max();
       var ruleMin = ruleDistance.min();
-      var legDistance = Distance.ofMeters(leg.getDirectDistanceMeters());
+      var legDistance = leg.getDirectDistanceMeters();
 
-      return legDistance.isAbove(ruleMin) && ruleMax.isAbove(legDistance);
+      return legDistance.isAbove(ruleMin) && legDistance.isBelow(ruleMax);
     } else return true;
   }
 
