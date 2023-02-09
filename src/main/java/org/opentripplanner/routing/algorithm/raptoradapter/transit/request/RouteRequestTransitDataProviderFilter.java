@@ -27,7 +27,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
 
   private final boolean includeRealtimeCancellations;
 
-  private final List<TransitFilter> filters;
+  private final TransitFilter[] filters;
 
   private final Set<FeedScopedId> bannedTrips;
 
@@ -61,7 +61,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     this.includePlannedCancellations = includePlannedCancellations;
     this.includeRealtimeCancellations = includeRealtimeCancellations;
     this.bannedTrips = bannedTrips;
-    this.filters = filters;
+    this.filters = filters.toArray(TransitFilter[]::new);
     this.hasSubModeFilters = filters.stream().anyMatch(TransitFilter::isSubModePredicate);
   }
 
