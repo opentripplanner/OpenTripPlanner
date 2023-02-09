@@ -416,7 +416,7 @@ public class StreetEdge
       //  - leaving a no-traversal zone
       // remember that this is a reverse search so calling dropFloatingVehicle actually transitions
       // from walking to using the vehicle.
-    } else if (arriveByRental && leavesAzoneWithRentalRestrictionsWhenHavingRented(s0)) {
+    } else if (arriveByRental && leavesZoneWithRentalRestrictionsWhenHavingRented(s0)) {
       editor = doTraverse(s0, TraverseMode.WALK, false);
       if (editor != null) {
         editor.dropFloatingVehicle(
@@ -501,7 +501,13 @@ public class StreetEdge
     return state;
   }
 
-  private boolean leavesAzoneWithRentalRestrictionsWhenHavingRented(State s0) {
+  /**
+   * This is the state that starts a backwards search inside a restricted zone
+   * (no drop off, no traversal or outside business area) and is walking towards finding a rental
+   * vehicle. Once we are leaving a geofencing zone or are entering a business area we want to
+   * speculatively pick up a vehicle a ride towards an edge where there is one parked.
+   */
+  private boolean leavesZoneWithRentalRestrictionsWhenHavingRented(State s0) {
     return (
       s0.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED &&
       !fromv.rentalRestrictions().hasRestrictions() &&

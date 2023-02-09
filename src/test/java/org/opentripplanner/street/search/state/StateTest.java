@@ -8,35 +8,39 @@ import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING
 
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.test.support.VariableSource;
 
 class StateTest {
 
   Vertex v1 = intersectionVertex(1, 1);
 
-  @Test
-  void forwardsInitialRentalStates() {
-    var req = req(false);
+  static Stream<Arguments> testCases = Stream.of(
+    Arguments.of(false, 1, Set.of(BEFORE_RENTING)),
+    Arguments.of(true, 2, Set.of(HAVE_RENTED, RENTING_FLOATING))
+  );
+
+  @ParameterizedTest(
+    name = "arriveBy={0} should lead to {1} initial state(s) with rental state(s) {2}"
+  )
+  @VariableSource("testCases")
+  void initialRentalStates(
+    boolean arriveBy,
+    int expectedStateCount,
+    Set<VehicleRentalState> expectedRentalStates
+  ) {
+    var req = req(arriveBy);
 
     var state = State.getInitialStates(Set.of(v1), req);
-    assertEquals(1, state.size());
+    assertEquals(expectedStateCount, state.size());
 
     var modes = state.stream().map(State::getVehicleRentalState).collect(Collectors.toSet());
-    assertEquals(Set.of(BEFORE_RENTING), modes);
-  }
-
-  @Test
-  void backwardsInitialRentalStates() {
-    var req = req(true);
-
-    var state = State.getInitialStates(Set.of(v1), req);
-    assertEquals(2, state.size());
-
-    var modes = state.stream().map(State::getVehicleRentalState).collect(Collectors.toSet());
-    assertEquals(Set.of(RENTING_FLOATING, HAVE_RENTED), modes);
+    assertEquals(expectedRentalStates, modes);
   }
 
   private static StreetSearchRequest req(boolean arriveBy) {
