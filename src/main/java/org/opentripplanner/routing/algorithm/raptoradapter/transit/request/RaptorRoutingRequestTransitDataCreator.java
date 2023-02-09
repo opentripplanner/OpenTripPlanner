@@ -172,7 +172,7 @@ class RaptorRoutingRequestTransitDataCreator {
     Predicate<TripTimes> tripTimesWithSubmodesPredicate = tripTimes ->
       filter.tripTimesPredicate(tripTimes, filter.hasSubModeFilters());
     Predicate<TripTimes> tripTimesWithoutSubmodesPredicate = tripTimes ->
-      filter.tripTimesPredicate(tripTimes, filter.hasSubModeFilters());
+      filter.tripTimesPredicate(tripTimes, false);
     Collection<TripPatternForDate> tripPatternsForDate = transitLayer.getTripPatternsForDate(date);
     List<TripPatternForDate> result = new ArrayList<>(tripPatternsForDate.size());
     for (TripPatternForDate p : tripPatternsForDate) {
