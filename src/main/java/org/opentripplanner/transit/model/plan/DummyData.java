@@ -66,9 +66,14 @@ public class DummyData {
     .withLongName(new NonLocalizedString("ROUTE_LONG_NAME"))
     .build();
 
-  private static final Timetable TIMETABLE = TimetableBuilder
+  private static final Timetable TIMETABLE_1 = TimetableBuilder
     .of()
-    .schedule("0:00 0:01 0:03")
+    .schedule("0:03 0:05 0:08")
+    .build();
+
+  private static final Timetable TIMETABLE_2 = TimetableBuilder
+    .of()
+    .schedule("0:07 0:09 0:14")
     .build();
 
   private static final List<StopLocation> STOPS_IN_PATTERN = List.of(STOP_B, STOP_C, STOP_D);
@@ -94,8 +99,9 @@ public class DummyData {
 
   private static PatternsOnDays createPatternsOnDays() {
     OperatingDay operatingDay = CALENDAR_DAYS.operatingDay(0);
-    PatternOnDay patternOnDay = new PatternOnDay(operatingDay, ROUTING_TRIP_PATTERN, TIMETABLE);
-    PatternsOnDay patternsOnDay = new PatternsOnDay(List.of(patternOnDay));
+    PatternOnDay patternOnDay1 = new PatternOnDay(operatingDay, ROUTING_TRIP_PATTERN, TIMETABLE_1);
+    PatternOnDay patternOnDay2 = new PatternOnDay(operatingDay, ROUTING_TRIP_PATTERN, TIMETABLE_2);
+    PatternsOnDay patternsOnDay = new PatternsOnDay(List.of(patternOnDay1, patternOnDay2));
     return new PatternsOnDays(List.of(patternsOnDay));
   }
 

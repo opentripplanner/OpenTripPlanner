@@ -79,7 +79,7 @@ public class NewDomainModelIntegrationTest implements RaptorTestConstants {
     requestBuilder
       .searchParams()
       .addAccessPaths(TestAccessEgress.walk(DummyData.STOP_B.getIndex(), D30s))
-      .addEgressPaths(TestAccessEgress.walk(DummyData.STOP_C.getIndex(), D20s))
+      .addEgressPaths(TestAccessEgress.walk(DummyData.STOP_D.getIndex(), D20s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       .timetableEnabled(true);
