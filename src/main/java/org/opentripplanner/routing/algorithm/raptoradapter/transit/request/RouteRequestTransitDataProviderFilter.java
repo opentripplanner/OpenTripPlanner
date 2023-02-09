@@ -27,6 +27,10 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
 
   private final boolean includeRealtimeCancellations;
 
+  /**
+   * This is stored as an array, as they are iterated over for each trip when filtering transit
+   * data. Iterator creation is relatively expensive compared to iterating over a short array.
+   */
   private final TransitFilter[] filters;
 
   private final Set<FeedScopedId> bannedTrips;

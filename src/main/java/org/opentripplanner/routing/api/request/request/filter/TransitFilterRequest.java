@@ -27,19 +27,21 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
 
       return this;
     }
+  /**
+   * This is stored as an array, as they are iterated over for each trip when filtering transit
+   * data. Iterator creation is relatively expensive compared to iterating over a short array.
+   */
+  private final SelectRequest[] select;
 
-    public TransitFilterRequest build() {
-      return new TransitFilterRequest(this);
-    }
-  }
+  /**
+   * {@link TransitFilterRequest#select}
+   */
+  private final SelectRequest[] not;
 
   public TransitFilterRequest(Builder builder) {
     this.select = builder.select.toArray(SelectRequest[]::new);
     this.not = builder.not.toArray(SelectRequest[]::new);
   }
-
-  private final SelectRequest[] select;
-  private final SelectRequest[] not;
 
   public List<SelectRequest> select() {
     return Collections.unmodifiableList(Arrays.asList(select));
