@@ -16,6 +16,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
@@ -79,6 +80,8 @@ public interface OtpServerRequestContext {
    * Get information on geographical bounding box and center coordinates.
    */
   WorldEnvelopeService worldEnvelopeService();
+
+  VehiclePositionService vehiclePositionService();
 
   TransitTuningParameters transitTuningParameters();
 
