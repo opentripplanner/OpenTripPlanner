@@ -115,10 +115,6 @@ public class StreetSearchRequest implements AStarRequest {
     return arriveBy;
   }
 
-  public boolean departAt() {
-    return !arriveBy;
-  }
-
   public boolean wheelchair() {
     return wheelchair;
   }

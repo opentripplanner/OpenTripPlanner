@@ -206,10 +206,12 @@ public sealed interface RentalRestrictionExtension {
 
     @Override
     public boolean traversalBanned(State state) {
-      if (state.getRequest().departAt()) {
-        return state.isRentingVehicle() && network.equals(state.getVehicleRentalNetwork());
-      } else {
+      if (state.getRequest().arriveBy()) {
+        // TODO: since in the arrive by search we don't know the rental network yet, we disallow it for _all_ networks
+        // there will be another PR fixing this
         return state.isRentingVehicle();
+      } else {
+        return state.isRentingVehicle() && network.equals(state.getVehicleRentalNetwork());
       }
     }
 
