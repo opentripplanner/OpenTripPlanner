@@ -222,7 +222,7 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <propertiesEncoding>ISO-8859-1</propertiesEncoding>
+                    <propertiesEncoding>UTF-8</propertiesEncoding>
                 </configuration>
             </plugin>
             <plugin>
