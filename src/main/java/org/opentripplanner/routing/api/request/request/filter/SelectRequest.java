@@ -8,7 +8,7 @@ import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class SelectRequest implements Serializable {
@@ -38,19 +38,22 @@ public class SelectRequest implements Serializable {
     this.routes = builder.routes;
   }
 
-  public boolean matches(Route route) {
+  public boolean matches(TripPattern tripPattern) {
     if (
+      // If the pattern contains multiple modes, we will do the filtering in
+      // SelectRequest.matches(TripTimes)
+      !tripPattern.getContainsMultipleModes() &&
       this.transportModeFilter != null &&
-      !this.transportModeFilter.match(route.getMode(), route.getNetexSubmode())
+      !this.transportModeFilter.match(tripPattern.getMode(), tripPattern.getNetexSubmode())
     ) {
       return false;
     }
 
-    if (!agencies.isEmpty() && !agencies.contains(route.getAgency().getId())) {
+    if (!agencies.isEmpty() && !agencies.contains(tripPattern.getRoute().getAgency().getId())) {
       return false;
     }
 
-    if (!routes.isEmpty() && !routes.matches(route)) {
+    if (!routes.isEmpty() && !routes.matches(tripPattern.getRoute())) {
       return false;
     }
 

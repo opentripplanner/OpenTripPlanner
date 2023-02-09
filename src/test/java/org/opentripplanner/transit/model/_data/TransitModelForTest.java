@@ -14,6 +14,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -58,6 +60,10 @@ public class TransitModelForTest {
   /** Create a valid Bus Route to use in unit tests */
   public static RouteBuilder route(FeedScopedId id) {
     return Route.of(id).withAgency(AGENCY).withShortName("R" + id).withMode(TransitMode.BUS);
+  }
+
+  public static TripPatternBuilder tripPattern(String id, Route route) {
+    return TripPattern.of(id(id)).withRoute(route);
   }
 
   /** Create a valid Bus Route to use in unit tests */
