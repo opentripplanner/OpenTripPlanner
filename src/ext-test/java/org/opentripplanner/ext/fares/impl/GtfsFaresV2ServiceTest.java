@@ -390,7 +390,6 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         A.coordinate.latitude(),
         A.coordinate.longitude() + SphericalDistanceLibrary.metersToDegrees(5_000)
       );
-      System.out.println(SphericalDistanceLibrary.metersToDegrees(5000));
       var i1 = newItinerary(A, 0).bus(ID, 0, 50, dest).build();
       var faresV2Service = new GtfsFaresV2Service(
         distanceRules,
