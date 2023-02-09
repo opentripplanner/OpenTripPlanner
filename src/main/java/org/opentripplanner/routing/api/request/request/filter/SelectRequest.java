@@ -63,18 +63,10 @@ public class SelectRequest implements Serializable {
   public boolean matches(TripTimes tripTimes) {
     var trip = tripTimes.getTrip();
 
-    if (
-      this.transportModeFilter != null &&
-      !this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode())
-    ) {
-      return false;
-    }
-
-    if (!agencies.isEmpty() && !agencies.contains(trip.getRoute().getAgency().getId())) {
-      return false;
-    }
-
-    return true;
+    return (
+      this.transportModeFilter == null ||
+      this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode())
+    );
   }
 
   @Override
