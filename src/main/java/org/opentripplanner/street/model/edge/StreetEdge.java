@@ -460,14 +460,15 @@ public class StreetEdge
         return forkState;
       }
     }
-    if (
-      state != null &&
-      s0.getRequest().arriveBy() &&
-      s0.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED &&
-      !fromv.rentalRestrictions().toList().isEmpty()
-    ) {
-      StateEditor continueWAlking = doTraverse(s0, TraverseMode.WALK, false);
-      var forkState = continueWAlking.makeState();
+
+    // when we leave a geofencing zone in reverse search we want to speculatively pick up a rental
+    // vehicle, however, we _also_ want to keep on walking in case the renting state doesn't lead
+    // anywhere due to these cases:
+    //  - no rental vehicle available
+    //  - not being able to continue renting due to traversal restrictions or geofencing zones
+    if (state != null && arriveByRental && leavesZoneWithRentalRestrictionsWhenHavingRented(s0)) {
+      StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
+      var forkState = walking.makeState();
       forkState.addToExistingResultChain(state);
       return forkState;
     }
