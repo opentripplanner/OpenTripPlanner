@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
-import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -20,7 +19,7 @@ public class SelectRequest implements Serializable {
   private final List<MainAndSubMode> transportModes;
   private final AllowTransitModeFilter transportModeFilter;
   private final List<FeedScopedId> agencies;
-  private final RouteMatcher routes;
+  private final List<FeedScopedId> routes;
 
   // TODO: 2022-11-29 filters: group of routes
 
@@ -53,7 +52,7 @@ public class SelectRequest implements Serializable {
       return false;
     }
 
-    if (!routes.isEmpty() && !routes.matches(tripPattern.getRoute())) {
+    if (!routes.isEmpty() && !routes.contains(tripPattern.getRoute().getId())) {
       return false;
     }
 
@@ -75,7 +74,7 @@ public class SelectRequest implements Serializable {
       .of(SelectRequest.class)
       .addObj("transportModes", transportModesToString(), null)
       .addCol("agencies", agencies, List.of())
-      .addObj("routes", routes, RouteMatcher.emptyMatcher())
+      .addObj("routes", routes, List.of())
       .toString();
   }
 
@@ -91,8 +90,8 @@ public class SelectRequest implements Serializable {
     return agencies;
   }
 
-  public RouteMatcher routes() {
-    return this.routes;
+  public List<FeedScopedId> routes() {
+    return routes;
   }
 
   private String transportModesToString() {
@@ -119,7 +118,7 @@ public class SelectRequest implements Serializable {
 
     private List<MainAndSubMode> transportModes = new ArrayList<>();
     private List<FeedScopedId> agencies = new ArrayList<>();
-    private RouteMatcher routes = RouteMatcher.emptyMatcher();
+    private List<FeedScopedId> routes = new ArrayList<>();
 
     // TODO: 2022-11-29 filters: group of routes
 
@@ -147,14 +146,12 @@ public class SelectRequest implements Serializable {
 
     public Builder withRoutesFromString(String s) {
       if (!s.isEmpty()) {
-        this.routes = RouteMatcher.parse(s);
-      } else {
-        this.routes = RouteMatcher.emptyMatcher();
+        this.routes = FeedScopedId.parseListOfIds(s);
       }
       return this;
     }
 
-    public Builder withRoutes(RouteMatcher routes) {
+    public Builder withRoutes(List<FeedScopedId> routes) {
       this.routes = routes;
       return this;
     }
