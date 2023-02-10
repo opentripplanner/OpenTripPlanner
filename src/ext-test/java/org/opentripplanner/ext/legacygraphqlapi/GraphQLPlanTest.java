@@ -32,10 +32,14 @@ class GraphQLPlanTest implements PlanTestConstants {
       query {
         plan(
           parking: {
-            bannedTags: ["wheelbender"],
-            requiredTags: ["covered"],
-            preferredTags: ["roof", "locker", "cellar"],
-            unpreferredTagCost: 555
+            banned: { tags: ["wheelbender"] },
+            required: {
+              and: {
+                tags: ["roof", "locker", "cellar"] 
+              }
+            }
+            preferred: { tags: ["covered"] },
+            unpreferredCost: 555
           }
         ) {
           itineraries {
@@ -50,9 +54,9 @@ class GraphQLPlanTest implements PlanTestConstants {
 
     var routeRequest = context.lastRouteRequest();
     var parking = routeRequest.journey().parking();
-    assertEquals(Set.of("cellar", "roof", "locker"), parking.preferredTags());
+    assertEquals(Set.of("covered"), parking.preferredTags());
     assertEquals(555, parking.unpreferredTagCost());
     assertEquals(Set.of("wheelbender"), parking.bannedTags());
-    assertEquals(Set.of("covered"), parking.requiredTags());
+    assertEquals(Set.of("cellar", "roof", "locker"), parking.requiredTags());
   }
 }

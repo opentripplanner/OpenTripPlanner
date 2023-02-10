@@ -810,10 +810,10 @@ public class LegacyGraphQLQueryTypeImpl
       );
 
       var parking = request.journey().parking();
-      callWith.argument("parking.bannedTags", parking::setBannedTags);
-      callWith.argument("parking.requiredTags", parking::setRequiredTags);
-      callWith.argument("parking.preferredTags", parking::setPreferredTags);
-      callWith.argument("parking.unpreferredTagCost", parking::setUnpreferredTagCost);
+      callWith.argument("parking.banned.tags", parking::setBannedTags);
+      callWith.argument("parking.required.and.tags", parking::setRequiredTags);
+      callWith.argument("parking.preferred.tags", parking::setPreferredTags);
+      callWith.argument("parking.unpreferredCost", parking::setUnpreferredTagCost);
 
       callWith.argument(
         "locale",

@@ -1121,29 +1121,39 @@ input InputPreferred {
     otherThanPreferredRoutesPenalty: Int
 }
 
+input InputParkingFilter {
+    """ The tags to select. """
+    tags: [String]
+}
+
+input InputRequiredParking {
+    or: InputParkingFilter
+    and: InputParkingFilter
+}
+
 input InputVehicleParking {
     """
-    If non-empty every parking facility that doesn't contain at least one of these tags will
+    If non-empty every parking facility that doesn't contain at least one of these conditions will
     receive an extra cost (defined by `unpreferredVehicleParkingTagCost`) and therefore avoided.
     """
-    preferredTags: [String]
+    preferred: InputParkingFilter
 
     """
     If `preferredVehicleParkingTags` is non-empty, using a parking facility that doesn't contain
-    at least one of the preferred tags, will receive this extra cost and therefore avoided if
+    at least one of the preferred conditions, will receive this extra cost and therefore avoided if
     there the preferred options are available.
     """
-    unpreferredTagCost: Int
+    unpreferredCost: Int
 
     """
-    Only parking facilities that have one of the tags in this list will used.
+    Only parking facilities that have one of the conditions in this list will used.
     """
-    requiredTags: [String]
+    required: InputRequiredParking
 
     """
-    Parking facilities that have one of the tags in this list will be excluded.
+    Parking facilities that have one of the conditions in this list will be excluded.
     """
-    bannedTags: [String]
+    banned: InputParkingFilter
 }
 
 """
