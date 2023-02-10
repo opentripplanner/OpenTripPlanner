@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.resource.WebMercatorTile;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehiclerental.VehicleRentalService;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
  * Common functionality for creating a vector tile response.
@@ -24,9 +22,7 @@ public class VectorTileResponseFactory {
     List<String> requestedLayers,
     List<LayerParameters<LayerType>> availableLayers,
     LayerBuilderFactory<LayerType> layerBuilderFactory,
-    Graph graph,
-    TransitService transitService,
-    VehicleRentalService vehicleRentalService
+    OtpServerRequestContext context
   ) {
     VectorTile.Tile.Builder mvtBuilder = VectorTile.Tile.newBuilder();
     Envelope envelope = WebMercatorTile.tile2Envelope(x, y, z);
@@ -41,7 +37,7 @@ public class VectorTileResponseFactory {
       ) {
         cacheMaxSeconds = Math.min(cacheMaxSeconds, layerParameters.cacheMaxSeconds());
         VectorTile.Tile.Layer layer = layerBuilderFactory
-          .crateLayerBuilder(layerParameters, locale, graph, transitService, vehicleRentalService)
+          .createLayerBuilder(layerParameters, locale, context)
           .build(envelope);
         mvtBuilder.addLayers(layer);
       }
@@ -60,12 +56,10 @@ public class VectorTileResponseFactory {
 
   @FunctionalInterface
   public interface LayerBuilderFactory<LayerType extends Enum<LayerType>> {
-    LayerBuilder<?> crateLayerBuilder(
+    LayerBuilder<?> createLayerBuilder(
       LayerParameters<LayerType> layerParameters,
       Locale locale,
-      Graph graph,
-      TransitService transitService,
-      VehicleRentalService vehicleRentalService
+      OtpServerRequestContext context
     );
   }
 }

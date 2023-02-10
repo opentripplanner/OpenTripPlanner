@@ -24,10 +24,7 @@ import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Slippy map vector tile API for rendering various graph information for inspection/debugging
@@ -74,9 +71,7 @@ public class GraphInspectorVectorTileResource {
       Arrays.asList(requestedLayers.split(",")),
       DEBUG_LAYERS,
       GraphInspectorVectorTileResource::createLayerBuilder,
-      serverContext.graph(),
-      serverContext.transitService(),
-      serverContext.vehicleRentalService()
+      serverContext
     );
   }
 
@@ -111,13 +106,11 @@ public class GraphInspectorVectorTileResource {
   private static LayerBuilder<?> createLayerBuilder(
     LayerParameters<LayerType> layerParameters,
     Locale locale,
-    Graph graph,
-    TransitService transitService,
-    VehicleRentalService vehicleRentalService
+    OtpServerRequestContext context
   ) {
     return switch (layerParameters.type()) {
-      case AreaStop -> new AreaStopsLayerBuilder(transitService, layerParameters, locale);
-      case GeofencingZones -> new GeofencingZonesLayerBuilder(graph, layerParameters);
+      case AreaStop -> new AreaStopsLayerBuilder(context.transitService(), layerParameters, locale);
+      case GeofencingZones -> new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
     };
   }
 
