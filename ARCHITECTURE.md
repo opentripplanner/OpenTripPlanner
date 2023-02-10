@@ -15,6 +15,24 @@ Be sure to also read the [developer documentation](docs/Developers-Guide.md).
 
 ## Modules/Components
 
+The diagram shows a simplified/generic version on how we want to model the OTP components with 2 
+examples. The Transit model is more complex than the VehiclePosition model.   
+
+![MainModelOverview](docs/images/ServiceModelOverview.png)
+
+ - `Use Case Service` A service which combine the functionality in many `Domain Services` to fulfill
+   a use-case or set of features. It may have an api with request/response classes. These are 
+   usually stateless; Hence the `Use Case Service` does normally not have a model. The implementing
+   class has the same name as the interface with prefix `Default`.
+ - `Domain Model` A model witch encapsulate a business area. In the drawing two examples are shown,
+   the `transit` and `vhicleposition` domain model. The transit model is more complex so the 
+   implementation have a separate `Service` and `Repository`. Almost all http endpoints are , 
+   read-only so the `Service` can focus on serving the http API endpoints, while the repository
+   is used to maintain the model by the updaters. 
+
+> **Note!** The above is the goal, the current package structure needs cleanup.
+
+
 Below is a list of documented components in OTP. Not every component is documented at a high level,
 but this is a start and we would like to expand this list in the future.
 

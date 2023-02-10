@@ -1,25 +1,30 @@
-package org.opentripplanner.graph_builder.issues;
+package org.opentripplanner.graph_builder.module.islandpruning;
 
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 public record GraphIsland(
-  Vertex vertex,
-  int streetSize,
-  int stopSize,
+  Subgraph island,
   int nothru,
   int restricted,
   int removed,
   String traversalMode
 )
   implements DataImportIssue {
-  private static String FMT =
+  private static final String FMT =
     "Pruned %s subgraph %s containing vertex '%s' at (%f, %f) of %d street vertices and %d stops. Edge changes: %d to nothru, %d to no traversal, %d erased";
-  private static String HTMLFMT =
+  private static final String HTMLFMT =
     "Pruned %s <a href='http://www.openstreetmap.org/node/%s'>subgraph %s</a> of %d street vertices %d stops. Edge changes: %d to nothru, %d to no traversal, %d erased";
 
   @Override
+  public String getType() {
+    return "GraphIsland" + traversalMode + (nothru != 0 ? "NoThroughTraffic" : "");
+  }
+
+  @Override
   public String getMessage() {
+    Vertex vertex = island.getRepresentativeVertex();
     return String.format(
       FMT,
       traversalMode,
@@ -27,8 +32,8 @@ public record GraphIsland(
       vertex,
       vertex.getCoordinate().x,
       vertex.getCoordinate().y,
-      this.streetSize,
-      this.stopSize,
+      island.streetSize(),
+      island.stopSize(),
       this.nothru,
       this.restricted,
       this.removed
@@ -37,7 +42,7 @@ public record GraphIsland(
 
   @Override
   public String getHTMLMessage() {
-    String label = vertex.getLabel();
+    String label = island.getRepresentativeVertex().getLabel();
     if (label.startsWith("osm:")) {
       String osmNodeId = label.split(":")[2];
       return String.format(
@@ -45,8 +50,8 @@ public record GraphIsland(
         traversalMode,
         osmNodeId,
         osmNodeId,
-        this.streetSize,
-        this.stopSize,
+        island.streetSize(),
+        island.stopSize(),
         this.nothru,
         this.restricted,
         this.removed
@@ -58,11 +63,16 @@ public record GraphIsland(
 
   @Override
   public int getPriority() {
-    return stopSize + streetSize;
+    return island.streetSize() + island.stopSize();
   }
 
   @Override
   public Vertex getReferencedVertex() {
-    return vertex;
+    return island.getRepresentativeVertex();
+  }
+
+  @Override
+  public Geometry getGeometry() {
+    return island.getGeometry();
   }
 }

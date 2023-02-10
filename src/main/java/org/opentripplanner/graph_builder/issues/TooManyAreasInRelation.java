@@ -4,8 +4,8 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public record TooManyAreasInRelation(OSMWithTags entity) implements DataImportIssue {
-  private static String FMT = "Too many areas in relation %s";
-  private static String HTMLFMT = "Too many areas in relation  <a href='%s'>'%s'</a>";
+  private static final String FMT = "Too many areas in relation %s";
+  private static final String HTMLFMT = "Too many areas in relation <a href='%s'>'%s'</a>";
 
   @Override
   public String getHTMLMessage() {

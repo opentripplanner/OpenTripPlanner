@@ -5,7 +5,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public record RepeatedStops(Trip trip, TIntList removedStopSequences) implements DataImportIssue {
-  private static String FMT =
+  private static final String FMT =
     "Trip %s visits stops repeatedly. Removed duplicates at stop sequence numbers %s.";
 
   @Override

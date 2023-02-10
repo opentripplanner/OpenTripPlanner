@@ -7,6 +7,10 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclepositions.configure.VehiclePositionsRepositoryModule;
+import org.opentripplanner.service.vehiclepositions.configure.VehiclePositionsServiceModule;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.service.worldenvelope.configure.WorldEnvelopeServiceModule;
@@ -28,6 +32,8 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     ConfigModule.class,
     TransitModule.class,
     WorldEnvelopeServiceModule.class,
+    VehiclePositionsServiceModule.class,
+    VehiclePositionsRepositoryModule.class,
     ConstructApplicationModule.class,
   }
 )
@@ -38,6 +44,8 @@ public interface ConstructApplicationFactory {
   TransitModel transitModel();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
+  VehiclePositionRepository vehiclePositionRepository();
+  VehiclePositionService vehiclePositionService();
 
   @Nullable
   GraphVisualizer graphVisualizer();

@@ -4,8 +4,8 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public record StreetCarSpeedZero(OSMWithTags entity) implements DataImportIssue {
-  private static String FMT = "Way %s has car speed zero";
-  private static String HTMLFMT = "Way <a href='%s'>'%s'</a> has car speed zero";
+  private static final String FMT = "Way %s has car speed zero";
+  private static final String HTMLFMT = "Way <a href='%s'>'%s'</a> has car speed zero";
 
   @Override
   public String getMessage() {

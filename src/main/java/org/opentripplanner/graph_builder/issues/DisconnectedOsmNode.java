@@ -1,12 +1,15 @@
 package org.opentripplanner.graph_builder.issues;
 
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public record DisconnectedOsmNode(OSMWithTags node, OSMWithTags way, OSMWithTags area)
+public record DisconnectedOsmNode(OSMNode node, OSMWithTags way, OSMWithTags area)
   implements DataImportIssue {
-  private static String FMT = "Node %s in way %s is coincident but disconnected with area %s";
-  private static String HTMLFMT =
+  private static final String FMT = "Node %s in way %s is coincident but disconnected with area %s";
+  private static final String HTMLFMT =
     "Node<a href='%s'>'%s'</a> in way <a href='%s'>'%s'</a> is coincident but disconnected with area <a href='%s'>'%s'</a>";
 
   @Override
@@ -25,5 +28,10 @@ public record DisconnectedOsmNode(OSMWithTags node, OSMWithTags way, OSMWithTags
       area.getOpenStreetMapLink(),
       area.getId()
     );
+  }
+
+  @Override
+  public Geometry getGeometry() {
+    return GeometryUtils.getGeometryFactory().createPoint(node.getCoordinate());
   }
 }

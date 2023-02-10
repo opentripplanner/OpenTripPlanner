@@ -7,8 +7,8 @@ public class OSMWay extends OSMWithTags {
 
   private final TLongList nodes = new TLongArrayList();
 
-  public void addNodeRef(OSMNodeRef nodeRef) {
-    nodes.add(nodeRef.getRef());
+  public void addNodeRef(long nodeRef) {
+    nodes.add(nodeRef);
   }
 
   public void addNodeRef(long nodeRef, int index) {

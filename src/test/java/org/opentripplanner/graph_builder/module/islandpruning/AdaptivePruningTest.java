@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.graph_builder.module.islandpruning;
 
 import java.io.File;
 import java.util.List;
@@ -19,50 +19,54 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
-public class PruneNoThruIslandsTest {
+/* Test data consists of one bigger graph and two small sub graphs. These are totally disconnected.
+   One small graphs is only at 5 meter distance from the big graph and another one 30 m away.
+   Adaptive pruning retains the distant island but removes the closer one which appears to be
+   disconnected part of the main graph.
+ */
+
+public class AdaptivePruningTest {
 
   private static Graph graph;
 
   @BeforeAll
   static void setup() {
-    graph = buildOsmGraph(ConstantsForTests.ISLAND_PRUNE_OSM);
+    graph = buildOsmGraph(ConstantsForTests.ADAPTIVE_PRUNE_OSM);
   }
 
   @Test
-  public void bicycleIslandsBecomeNoThru() {
+  public void distantIslandIsRetained() {
     Assertions.assertTrue(
       graph
         .getStreetEdges()
         .stream()
-        .filter(StreetEdge::isBicycleNoThruTraffic)
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())
-        .containsAll(Set.of("159830262", "55735898", "159830266", "159830254"))
+        .contains("73386383")
     );
   }
 
   @Test
-  public void carIslandsBecomeNoThru() {
-    Assertions.assertTrue(
-      graph
-        .getStreetEdges()
-        .stream()
-        .filter(StreetEdge::isMotorVehicleNoThruTraffic)
-        .map(streetEdge -> streetEdge.getName().toString())
-        .collect(Collectors.toSet())
-        .containsAll(Set.of("159830262", "55735911"))
-    );
-  }
-
-  @Test
-  public void pruneFloatingBikeAndWalkIsland() {
+  public void nearIslandIsRemoved() {
     Assertions.assertFalse(
       graph
         .getStreetEdges()
         .stream()
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())
-        .contains("159830257")
+        .contains("37751757")
+    );
+  }
+
+  @Test
+  public void mainGraphIsNotRemoved() {
+    Assertions.assertTrue(
+      graph
+        .getStreetEdges()
+        .stream()
+        .map(streetEdge -> streetEdge.getName().toString())
+        .collect(Collectors.toSet())
+        .contains("73347312")
     );
   }
 
@@ -109,9 +113,15 @@ public class PruneNoThruIslandsTest {
         DataImportIssueStore.NOOP,
         null
       );
-      pruneIslands.setPruningThresholdIslandWithoutStops(40);
-      pruneIslands.setPruningThresholdIslandWithStops(5);
-      pruneIslands.setAdaptivePruningFactor(1);
+      // all 3 sub graphs are larger than 5 edges
+      pruneIslands.setPruningThresholdIslandWithoutStops(5);
+
+      //  up to 5*20 = 100 edge graphs get pruned if they are too close
+      pruneIslands.setAdaptivePruningFactor(20);
+
+      //  Distant island is 30 m away from main graph, let's keep it
+      pruneIslands.setAdaptivePruningDistance(30);
+
       pruneIslands.buildGraph();
 
       return graph;
