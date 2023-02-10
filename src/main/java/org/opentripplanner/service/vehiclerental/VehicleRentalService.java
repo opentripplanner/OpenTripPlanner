@@ -20,10 +20,6 @@ public interface VehicleRentalService {
 
   VehicleRentalStation getVehicleRentalStation(FeedScopedId id);
 
-  void addVehicleRentalStation(VehicleRentalPlace vehicleRentalStation);
-
-  void removeVehicleRentalStation(FeedScopedId vehicleRentalStationId);
-
   boolean hasRentalBikes();
 
   List<VehicleRentalPlace> getVehicleRentalStationForEnvelope(

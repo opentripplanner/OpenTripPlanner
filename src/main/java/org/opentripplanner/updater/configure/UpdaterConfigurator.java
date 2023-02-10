@@ -14,7 +14,7 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalSe
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
-import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -48,20 +48,20 @@ public class UpdaterConfigurator {
   private final TransitModel transitModel;
   private final UpdatersParameters updatersParameters;
   private final VehiclePositionRepository vehiclePositionRepository;
-  private final VehicleRentalService vehicleRentalService;
+  private final VehicleRentalRepository vehicleRentalRepository;
   private SiriTimetableSnapshotSource siriTimetableSnapshotSource = null;
   private TimetableSnapshotSource gtfsTimetableSnapshotSource = null;
 
   private UpdaterConfigurator(
     Graph graph,
     VehiclePositionRepository vehiclePositionRepository,
-    VehicleRentalService vehicleRentalService,
+    VehicleRentalRepository vehicleRentalRepository,
     TransitModel transitModel,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
     this.vehiclePositionRepository = vehiclePositionRepository;
-    this.vehicleRentalService = vehicleRentalService;
+    this.vehicleRentalRepository = vehicleRentalRepository;
     this.transitModel = transitModel;
     this.updatersParameters = updatersParameters;
   }
@@ -69,7 +69,7 @@ public class UpdaterConfigurator {
   public static void configure(
     Graph graph,
     VehiclePositionRepository vehiclePositionService,
-    VehicleRentalService vehicleRentalService,
+    VehicleRentalRepository vehicleRentalService,
     TransitModel transitModel,
     UpdatersParameters updatersParameters
   ) {
@@ -130,7 +130,7 @@ public class UpdaterConfigurator {
     return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(
       parameters,
       graph.getLinker(),
-      vehicleRentalService
+      vehicleRentalRepository
     );
   }
 
@@ -145,7 +145,7 @@ public class UpdaterConfigurator {
     for (var configItem : updatersParameters.getVehicleRentalParameters()) {
       var source = VehicleRentalDataSourceFactory.create(configItem.sourceParameters());
       updaters.add(
-        new VehicleRentalUpdater(configItem, source, graph.getLinker(), vehicleRentalService)
+        new VehicleRentalUpdater(configItem, source, graph.getLinker(), vehicleRentalRepository)
       );
     }
     for (var configItem : updatersParameters.getGtfsRealtimeAlertsUpdaterParameters()) {

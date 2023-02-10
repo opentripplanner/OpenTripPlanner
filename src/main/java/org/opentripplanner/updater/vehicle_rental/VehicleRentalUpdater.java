@@ -16,7 +16,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -53,7 +53,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
   private final VertexLinker linker;
 
-  private final VehicleRentalService service;
+  private final VehicleRentalRepository service;
 
   private boolean isPrimed = false;
 
@@ -61,7 +61,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     VehicleRentalUpdaterParameters parameters,
     VehicleRentalDatasource source,
     VertexLinker vertexLinker,
-    VehicleRentalService vehicleRentalStationService
+    VehicleRentalRepository repository
   ) throws IllegalArgumentException {
     super(parameters);
     // Configure updater
@@ -73,7 +73,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     this.linker = vertexLinker;
 
     // Adding a vehicle rental station service needs a graph writer runnable
-    this.service = vehicleRentalStationService;
+    this.service = repository;
 
     try {
       // Do any setup if needed

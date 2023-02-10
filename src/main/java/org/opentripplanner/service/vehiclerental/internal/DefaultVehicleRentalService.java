@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -16,7 +17,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 @Singleton
-public class DefaultVehicleRentalService implements VehicleRentalService {
+public class DefaultVehicleRentalService implements VehicleRentalService, VehicleRentalRepository {
 
   @Inject
   public DefaultVehicleRentalService() {}
