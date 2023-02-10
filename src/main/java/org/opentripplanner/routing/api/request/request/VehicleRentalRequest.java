@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 
 // TODO VIA: Javadoc
 public class VehicleRentalRequest implements Cloneable, Serializable {

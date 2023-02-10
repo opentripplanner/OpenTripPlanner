@@ -1,6 +1,6 @@
 package org.opentripplanner.street.search.state;
 
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;

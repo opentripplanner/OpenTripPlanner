@@ -13,7 +13,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;

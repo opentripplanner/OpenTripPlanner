@@ -4,7 +4,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;

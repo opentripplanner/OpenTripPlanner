@@ -6,7 +6,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.ModeMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.transit.service.TransitService;
 

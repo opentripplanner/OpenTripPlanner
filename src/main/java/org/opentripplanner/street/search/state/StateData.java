@@ -3,7 +3,7 @@ package org.opentripplanner.street.search.state;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 

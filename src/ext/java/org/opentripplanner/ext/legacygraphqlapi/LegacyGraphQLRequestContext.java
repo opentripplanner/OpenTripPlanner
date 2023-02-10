@@ -4,8 +4,8 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 

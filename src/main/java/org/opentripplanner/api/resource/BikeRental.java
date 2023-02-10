@@ -15,8 +15,8 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.mapping.VehicleRentalStationMapper;
 import org.opentripplanner.api.model.ApiVehicleRentalStation;
 import org.opentripplanner.api.model.ApiVehicleRentalStationList;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 @Path("/routers/{ignoreRouterId}/bike_rental")

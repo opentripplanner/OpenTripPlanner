@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vehicle_rental;
+package org.opentripplanner.service.vehiclerental.model;
 
 import static java.util.Locale.ROOT;
 
@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.collection.SetUtils;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**

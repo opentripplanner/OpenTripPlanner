@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.vertex;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
 import org.opentripplanner.street.model.edge.VehicleRentalEdge;
 

@@ -1,27 +1,35 @@
-package org.opentripplanner.routing.vehicle_rental;
+package org.opentripplanner.service.vehiclerental.internal;
 
-import java.io.Serializable;
+import jakarta.inject.Singleton;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class VehicleRentalService implements Serializable {
+@Singleton
+public class DefaultVehicleRentalService implements VehicleRentalService {
 
   private final Map<FeedScopedId, VehicleRentalPlace> rentalPlaces = new HashMap<>();
 
+  @Override
   public Collection<VehicleRentalPlace> getVehicleRentalPlaces() {
     return rentalPlaces.values();
   }
 
+  @Override
   public VehicleRentalPlace getVehicleRentalPlace(FeedScopedId id) {
     return rentalPlaces.get(id);
   }
 
+  @Override
   public List<VehicleRentalVehicle> getVehicleRentalVehicles() {
     return rentalPlaces
       .values()
@@ -31,6 +39,7 @@ public class VehicleRentalService implements Serializable {
       .toList();
   }
 
+  @Override
   public VehicleRentalVehicle getVehicleRentalVehicle(FeedScopedId id) {
     VehicleRentalPlace vehicleRentalPlace = rentalPlaces.get(id);
     return vehicleRentalPlace instanceof VehicleRentalVehicle
@@ -38,6 +47,7 @@ public class VehicleRentalService implements Serializable {
       : null;
   }
 
+  @Override
   public List<VehicleRentalStation> getVehicleRentalStations() {
     return rentalPlaces
       .values()
@@ -47,6 +57,7 @@ public class VehicleRentalService implements Serializable {
       .toList();
   }
 
+  @Override
   public VehicleRentalStation getVehicleRentalStation(FeedScopedId id) {
     VehicleRentalPlace vehicleRentalPlace = rentalPlaces.get(id);
     return vehicleRentalPlace instanceof VehicleRentalStation
@@ -54,16 +65,19 @@ public class VehicleRentalService implements Serializable {
       : null;
   }
 
+  @Override
   public void addVehicleRentalStation(VehicleRentalPlace vehicleRentalStation) {
     // Remove old reference first, as adding will be a no-op if already present
     rentalPlaces.remove(vehicleRentalStation.getId());
     rentalPlaces.put(vehicleRentalStation.getId(), vehicleRentalStation);
   }
 
+  @Override
   public void removeVehicleRentalStation(FeedScopedId vehicleRentalStationId) {
     rentalPlaces.remove(vehicleRentalStationId);
   }
 
+  @Override
   public boolean hasRentalBikes() {
     return rentalPlaces
       .values()
@@ -87,6 +101,7 @@ public class VehicleRentalService implements Serializable {
    * over a set, but we could use a spatial index if the number of vehicle rental stations is high
    * enough for performance to be a concern.
    */
+  @Override
   public List<VehicleRentalPlace> getVehicleRentalStationForEnvelope(
     double minLon,
     double minLat,

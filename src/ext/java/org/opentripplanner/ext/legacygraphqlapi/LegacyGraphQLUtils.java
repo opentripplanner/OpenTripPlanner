@@ -14,7 +14,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.graphfinder.PlaceType;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 

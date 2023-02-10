@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.search.state.State;
 
 /**
