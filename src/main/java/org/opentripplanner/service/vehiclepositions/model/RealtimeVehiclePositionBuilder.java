@@ -1,10 +1,10 @@
-package org.opentripplanner.model.vehicle_position;
+package org.opentripplanner.service.vehiclepositions.model;
 
 import java.time.Instant;
 import java.util.Optional;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
+import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship;
+import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;

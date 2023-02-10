@@ -1,4 +1,4 @@
-package org.opentripplanner.model.vehicle_position;
+package org.opentripplanner.service.vehiclepositions.model;
 
 import java.time.Instant;
 import org.opentripplanner.framework.geometry.WgsCoordinate;

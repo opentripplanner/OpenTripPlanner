@@ -37,8 +37,12 @@ public class FilterTest {
   final String GROUP_OF_Routes_ID_1 = "RUT:GroupOfLines:1";
   final String GROUP_OF_Routes_ID_2 = "RUT:GroupOfLines:2";
 
-  final GroupOfRoutes GROUP_OF_ROUTES_1 = TransitModelForTest.groupOfRoutes(GROUP_OF_Routes_ID_1).build();
-  final GroupOfRoutes GROUP_OF_ROUTES_2 = TransitModelForTest.groupOfRoutes(GROUP_OF_Routes_ID_2).build();
+  final GroupOfRoutes GROUP_OF_ROUTES_1 = TransitModelForTest
+    .groupOfRoutes(GROUP_OF_Routes_ID_1)
+    .build();
+  final GroupOfRoutes GROUP_OF_ROUTES_2 = TransitModelForTest
+    .groupOfRoutes(GROUP_OF_Routes_ID_2)
+    .build();
 
   @Test
   @DisplayName(
@@ -476,9 +480,13 @@ public class FilterTest {
       TransitModelForTest.route(ROUTE_ID_2).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2)).build()
     );
 
-    var filter = TransitFilterRequest.of()
+    var filter = TransitFilterRequest
+      .of()
       .addSelect(
-        SelectRequest.of().withGroupOfRoutes(List.of(FeedScopedId.parseId("F:" + GROUP_OF_Routes_ID_1))).build()
+        SelectRequest
+          .of()
+          .withGroupOfRoutes(List.of(FeedScopedId.parseId("F:" + GROUP_OF_Routes_ID_1)))
+          .build()
       )
       .build();
 
@@ -495,9 +503,13 @@ public class FilterTest {
       TransitModelForTest.route(ROUTE_ID_2).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2)).build()
     );
 
-    var filter = TransitFilterRequest.of()
+    var filter = TransitFilterRequest
+      .of()
       .addNot(
-        SelectRequest.of().withGroupOfRoutes(List.of(FeedScopedId.parseId("F:" + GROUP_OF_Routes_ID_1))).build()
+        SelectRequest
+          .of()
+          .withGroupOfRoutes(List.of(FeedScopedId.parseId("F:" + GROUP_OF_Routes_ID_1)))
+          .build()
       )
       .build();
 
