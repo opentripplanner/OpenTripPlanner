@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.trip;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
@@ -33,7 +34,7 @@ public class TripOnDay implements RaptorTripSchedule {
 
   @Override
   public RaptorTripPattern pattern() {
-    return null;
+    throw new NotImplementedException("TODO RTM");
   }
 
   /**
