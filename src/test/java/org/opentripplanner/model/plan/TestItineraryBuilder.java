@@ -416,7 +416,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
     TripPattern tripPattern = TripPattern
       .of(route.getId())
       .withRoute(route)
-      .withRoute(route)
       .withStopPattern(stopPattern)
       .build();
     final TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
