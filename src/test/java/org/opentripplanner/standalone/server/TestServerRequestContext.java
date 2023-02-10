@@ -16,6 +16,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -78,6 +80,11 @@ public class TestServerRequestContext implements OtpServerRequestContext {
   @Override
   public WorldEnvelopeService worldEnvelopeService() {
     return null;
+  }
+
+  @Override
+  public VehiclePositionService vehiclePositionService() {
+    return new DefaultVehiclePositionService();
   }
 
   @Override
