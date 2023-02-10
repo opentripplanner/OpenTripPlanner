@@ -60,6 +60,16 @@ public class EntityResolver {
       }
     }
 
+    // It is possible that the trip has previously been added, resolve the added trip
+    if (journey.getEstimatedVehicleJourneyCode() != null) {
+      var addedTrip = transitService.getTripForId(
+        resolveId(journey.getEstimatedVehicleJourneyCode())
+      );
+      if (addedTrip != null) {
+        return addedTrip;
+      }
+    }
+
     return null;
   }
 

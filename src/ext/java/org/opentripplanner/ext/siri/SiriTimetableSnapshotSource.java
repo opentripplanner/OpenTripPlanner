@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri;
 
+import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
 import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -317,8 +317,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         List<EstimatedVehicleJourney> journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
         LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
         for (EstimatedVehicleJourney journey : journeys) {
-          if (isReplacementDeparture(journey, entityResolver)) {
-            // Added trip
+          if (shouldAddNewTrip(journey, entityResolver)) {
             try {
               Result<UpdateSuccess, UpdateError> res = handleAddedTrip(
                 transitModel,
@@ -363,17 +362,17 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Check if VehicleJourney is a replacement departure according to SIRI-ET requirements.
    */
-  private boolean isReplacementDeparture(
+  private boolean shouldAddNewTrip(
     EstimatedVehicleJourney vehicleJourney,
     EntityResolver entityResolver
   ) {
     // Replacement departure only if ExtraJourney is true
-    if (!Optional.ofNullable(vehicleJourney.isExtraJourney()).orElse(false)) {
+    if (!(TRUE.equals(vehicleJourney.isExtraJourney()))) {
       return false;
     }
 
-    // If Trip exists by DatedServiceJourney then this is not replacement departure
-    return entityResolver.resolveTripOnServiceDate(vehicleJourney) != null;
+    // And if the trip has not been added before
+    return entityResolver.resolveTrip(vehicleJourney) == null;
   }
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
