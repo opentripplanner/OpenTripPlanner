@@ -29,6 +29,7 @@ import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -71,7 +72,8 @@ public class VectorTilesResource {
       serverContext.vectorTileLayers().layers(),
       VectorTilesResource::crateLayerBuilder,
       serverContext.graph(),
-      serverContext.transitService()
+      serverContext.transitService(),
+      serverContext.vehicleRentalService()
     );
   }
 
@@ -107,23 +109,24 @@ public class VectorTilesResource {
     LayerParameters<LayerType> layerParameters,
     Locale locale,
     Graph graph,
-    TransitService transitService
+    TransitService transitService,
+    VehicleRentalService vehicleRentalService
   ) {
     return switch (layerParameters.type()) {
       case Stop -> new StopsLayerBuilder(transitService, layerParameters, locale);
       case Station -> new StationsLayerBuilder(transitService, layerParameters, locale);
       case VehicleRental -> new VehicleRentalPlacesLayerBuilder(
-        graph.getVehicleRentalService(),
+        vehicleRentalService,
         layerParameters,
         locale
       );
       case VehicleRentalStation -> new VehicleRentalStationsLayerBuilder(
-        graph.getVehicleRentalService(),
+        vehicleRentalService,
         layerParameters,
         locale
       );
       case VehicleRentalVehicle -> new VehicleRentalVehiclesLayerBuilder(
-        graph.getVehicleRentalService(),
+        vehicleRentalService,
         layerParameters
       );
       case VehicleParking -> new VehicleParkingsLayerBuilder(graph, layerParameters, locale);

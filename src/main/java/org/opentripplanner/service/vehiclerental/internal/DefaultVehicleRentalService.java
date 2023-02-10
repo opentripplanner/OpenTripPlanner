@@ -1,5 +1,6 @@
 package org.opentripplanner.service.vehiclerental.internal;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +17,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 @Singleton
 public class DefaultVehicleRentalService implements VehicleRentalService {
+
+  @Inject
+  public DefaultVehicleRentalService() {}
 
   private final Map<FeedScopedId, VehicleRentalPlace> rentalPlaces = new HashMap<>();
 

@@ -51,7 +51,7 @@ public class LegacyGraphQLRequestContext {
 
   @Nonnull
   public VehicleRentalService getVehicleRentalService() {
-    return serverContext.graph().getVehicleRentalService();
+    return serverContext.vehicleRentalService();
   }
 
   @Nonnull

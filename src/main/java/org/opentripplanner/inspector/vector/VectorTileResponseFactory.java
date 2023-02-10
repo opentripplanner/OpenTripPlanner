@@ -8,6 +8,7 @@ import java.util.Locale;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -24,7 +25,8 @@ public class VectorTileResponseFactory {
     List<LayerParameters<LayerType>> availableLayers,
     LayerBuilderFactory<LayerType> layerBuilderFactory,
     Graph graph,
-    TransitService transitService
+    TransitService transitService,
+    VehicleRentalService vehicleRentalService
   ) {
     VectorTile.Tile.Builder mvtBuilder = VectorTile.Tile.newBuilder();
     Envelope envelope = WebMercatorTile.tile2Envelope(x, y, z);
@@ -39,7 +41,7 @@ public class VectorTileResponseFactory {
       ) {
         cacheMaxSeconds = Math.min(cacheMaxSeconds, layerParameters.cacheMaxSeconds());
         VectorTile.Tile.Layer layer = layerBuilderFactory
-          .crateLayerBuilder(layerParameters, locale, graph, transitService)
+          .crateLayerBuilder(layerParameters, locale, graph, transitService, vehicleRentalService)
           .build(envelope);
         mvtBuilder.addLayers(layer);
       }
@@ -62,7 +64,8 @@ public class VectorTileResponseFactory {
       LayerParameters<LayerType> layerParameters,
       Locale locale,
       Graph graph,
-      TransitService transitService
+      TransitService transitService,
+      VehicleRentalService vehicleRentalService
     );
   }
 }

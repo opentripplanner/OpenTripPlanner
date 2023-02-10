@@ -11,6 +11,8 @@ import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.service.vehiclepositions.configure.VehiclePositionsRepositoryModule;
 import org.opentripplanner.service.vehiclepositions.configure.VehiclePositionsServiceModule;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.configure.VehicleRentalServiceModule;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.service.worldenvelope.configure.WorldEnvelopeServiceModule;
@@ -34,6 +36,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     WorldEnvelopeServiceModule.class,
     VehiclePositionsServiceModule.class,
     VehiclePositionsRepositoryModule.class,
+    VehicleRentalServiceModule.class,
     ConstructApplicationModule.class,
   }
 )
@@ -46,6 +49,8 @@ public interface ConstructApplicationFactory {
   WorldEnvelopeService worldEnvelopeService();
   VehiclePositionRepository vehiclePositionRepository();
   VehiclePositionService vehiclePositionService();
+
+  VehicleRentalService vehicleRentalService();
 
   @Nullable
   GraphVisualizer graphVisualizer();

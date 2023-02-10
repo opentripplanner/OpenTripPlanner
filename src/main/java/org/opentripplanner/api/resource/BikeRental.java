@@ -57,7 +57,7 @@ public class BikeRental {
   ) {
     OtpServerRequestContext serverContext = this.serverContext;
 
-    VehicleRentalService vehicleRentalService = serverContext.graph().getVehicleRentalService();
+    VehicleRentalService vehicleRentalService = serverContext.vehicleRentalService();
     Locale locale = locale_param != null && !locale_param.isBlank()
       ? Locale.forLanguageTag(locale_param.replaceAll("-", "_"))
       : Locale.ENGLISH;

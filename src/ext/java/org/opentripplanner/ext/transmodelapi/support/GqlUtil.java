@@ -63,8 +63,7 @@ public class GqlUtil {
 
   public static VehicleRentalService getVehicleRentalService(DataFetchingEnvironment environment) {
     return ((TransmodelRequestContext) environment.getContext()).getServerContext()
-      .graph()
-      .getVehicleRentalService();
+      .vehicleRentalService();
   }
 
   public static VehicleParkingService getVehicleParkingService(

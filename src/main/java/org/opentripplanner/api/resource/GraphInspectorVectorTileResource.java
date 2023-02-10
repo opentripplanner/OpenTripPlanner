@@ -25,6 +25,7 @@ import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -74,7 +75,8 @@ public class GraphInspectorVectorTileResource {
       DEBUG_LAYERS,
       GraphInspectorVectorTileResource::createLayerBuilder,
       serverContext.graph(),
-      serverContext.transitService()
+      serverContext.transitService(),
+      serverContext.vehicleRentalService()
     );
   }
 
@@ -110,7 +112,8 @@ public class GraphInspectorVectorTileResource {
     LayerParameters<LayerType> layerParameters,
     Locale locale,
     Graph graph,
-    TransitService transitService
+    TransitService transitService,
+    VehicleRentalService vehicleRentalService
   ) {
     return switch (layerParameters.type()) {
       case AreaStop -> new AreaStopsLayerBuilder(transitService, layerParameters, locale);
