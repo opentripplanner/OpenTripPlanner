@@ -11,6 +11,10 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * TODO RTM - This is used in the street mdel as well, so we should move it to
+ *          - 'o.o.framework.entity'
+ */
 public final class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
   /**

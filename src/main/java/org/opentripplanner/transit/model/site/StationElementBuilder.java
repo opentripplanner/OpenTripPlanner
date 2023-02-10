@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.site;
 
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -47,6 +48,11 @@ public abstract class StationElementBuilder<
 
   public B withName(I18NString name) {
     this.name = name;
+    return instance();
+  }
+
+  public B withName(String name) {
+    this.name = NonLocalizedString.ofNullable(name);
     return instance();
   }
 

@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.api.model;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
@@ -8,6 +9,8 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
  * no gaps, as the trips visit the stops.
  */
 public interface RaptorTripPattern {
+  AtomicInteger INDEX_COUNTER = new AtomicInteger(0);
+
   int patternIndex();
 
   /**

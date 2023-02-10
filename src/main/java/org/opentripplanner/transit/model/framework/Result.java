@@ -6,6 +6,9 @@ import java.util.function.Function;
 import javax.annotation.Nonnull;
 
 /**
+ * TODO RTM - No need for this inside the transit model, move to realtime updater framework
+ *          - (unsure if package exist)
+ *
  * A type for containing either a success or a failure type as the result of a computation.
  * <p>
  * It's very similar to the Either or Validation type found in functional programming languages.

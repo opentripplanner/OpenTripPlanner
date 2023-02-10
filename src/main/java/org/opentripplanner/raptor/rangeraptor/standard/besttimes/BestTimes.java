@@ -54,12 +54,12 @@ public final class BestTimes {
     lifeCycle.onPrepareForNextRound(round -> prepareForNextRound());
   }
 
-  public int time(int stop) {
-    return times[stop];
+  public int time(int stopIndex) {
+    return times[stopIndex];
   }
 
-  public int transitArrivalTime(int stop) {
-    return transitArrivalTimes[stop];
+  public int transitArrivalTime(int stopIndex) {
+    return transitArrivalTimes[stopIndex];
   }
 
   /**
@@ -91,25 +91,25 @@ public final class BestTimes {
   }
 
   /**
-   * @return return true if stop is reached.
+   * @return return true if stopIndex is reached.
    */
-  public boolean isStopReached(int stop) {
-    return time(stop) != calculator.unreachedTime();
+  public boolean isStopReached(int stopIndex) {
+    return time(stopIndex) != calculator.unreachedTime();
   }
 
   /**
-   * @return return true if stop is reached.
+   * @return return true if stopIndex is reached.
    */
-  public boolean isStopReachedByTransit(int stop) {
-    return transitArrivalTime(stop) != calculator.unreachedTime();
+  public boolean isStopReachedByTransit(int stopIndex) {
+    return transitArrivalTime(stopIndex) != calculator.unreachedTime();
   }
 
   /**
    * @return true iff new best time is updated
    */
-  public boolean updateBestTransitArrivalTime(int stop, int time) {
-    if (isBestTransitArrivalTime(stop, time)) {
-      setBestTime(stop, time);
+  public boolean updateBestTransitArrivalTime(int stopIndex, int time) {
+    if (isBestTransitArrivalTime(stopIndex, time)) {
+      setBestTime(stopIndex, time);
       return true;
     }
     return false;
@@ -118,9 +118,9 @@ public final class BestTimes {
   /**
    * @return true iff new best time is updated
    */
-  public boolean updateNewBestTime(int stop, int time) {
-    if (isBestTime(stop, time)) {
-      setTime(stop, time);
+  public boolean updateNewBestTime(int stopIndex, int time) {
+    if (isBestTime(stopIndex, time)) {
+      setTime(stopIndex, time);
       return true;
     }
     return false;
@@ -144,10 +144,10 @@ public final class BestTimes {
   }
 
   /**
-   * @return true if the given stop was reached by on-board in the current round.
+   * @return true if the given stopIndex was reached by on-board in the current round.
    */
-  boolean isStopReachedOnBoardInCurrentRound(int stop) {
-    return reachedByTransitCurrentRound.get(stop);
+  boolean isStopReachedOnBoardInCurrentRound(int stopIndex) {
+    return reachedByTransitCurrentRound.get(stopIndex);
   }
 
   /**
@@ -171,22 +171,22 @@ public final class BestTimes {
 
   /* private methods */
 
-  private void setTime(final int stop, final int time) {
-    times[stop] = time;
-    reachedCurrentRound.set(stop);
+  private void setTime(final int stopIndex, final int time) {
+    times[stopIndex] = time;
+    reachedCurrentRound.set(stopIndex);
   }
 
-  private boolean isBestTime(int stop, int time) {
-    return calculator.isBefore(time, times[stop]);
+  private boolean isBestTime(int stopIndex, int time) {
+    return calculator.isBefore(time, times[stopIndex]);
   }
 
-  private boolean isBestTransitArrivalTime(int stop, int time) {
-    return calculator.isBefore(time, transitArrivalTimes[stop]);
+  private boolean isBestTransitArrivalTime(int stopIndex, int time) {
+    return calculator.isBefore(time, transitArrivalTimes[stopIndex]);
   }
 
-  private void setBestTime(int stop, int time) {
-    transitArrivalTimes[stop] = time;
-    reachedByTransitCurrentRound.set(stop);
+  private void setBestTime(int stopIndex, int time) {
+    transitArrivalTimes[stopIndex] = time;
+    reachedByTransitCurrentRound.set(stopIndex);
   }
 
   private void swapReachedCurrentAndLastRound() {

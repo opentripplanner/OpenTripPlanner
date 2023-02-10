@@ -17,6 +17,9 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
+ * TODO RTM - This class should be split in a generic on (o.o.framework) and a transit
+ *          - specific one witch delagate the to generic one(single instance needed).
+ *
  * Does the same thing as String.intern, but for several different types. Java's String.intern uses
  * perm gen space and is broken anyway.
  */

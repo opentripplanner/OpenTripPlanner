@@ -4,6 +4,7 @@ import java.util.Map;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
  * This class provides transferSlack, boardSlack and alightSlack for the Raptor algorithm.
@@ -62,6 +63,10 @@ public final class SlackProvider implements RaptorSlackProvider {
       result[SlackProvider.slackIndex(mode)] = (int) slack.valueOf(mode).toSeconds();
     }
     return result;
+  }
+
+  public static int slackIndex(TripPattern pattern) {
+    return slackIndex(pattern.getMode());
   }
 
   public static int slackIndex(final TransitMode mode) {

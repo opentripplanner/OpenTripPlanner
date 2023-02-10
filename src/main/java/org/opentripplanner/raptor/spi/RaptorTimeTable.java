@@ -10,7 +10,11 @@ import org.opentripplanner.raptor.api.model.SearchDirection;
  * trip-schedule, so even for long time-tables the Raptor search perform quite well.
  * <p>
  * @param <T> The TripSchedule type defined by the user of the raptor API.
+ * @deprecated TODO RTM - The trip search is modved out of Raptor, so we do not need this class any
+ *                        more. Move the tripSeach() method the RaptorRoute - Try to remove the two
+ *                        other methods.
  */
+@Deprecated
 public interface RaptorTimeTable<T extends RaptorTripSchedule> {
   /**
    * Get trip schedule by index. Trip schedules should be listed in order by the departure time for
@@ -24,7 +28,12 @@ public interface RaptorTimeTable<T extends RaptorTripSchedule> {
 
   /**
    * Number of trips in time-table.
+   * @deprecated TODO RTM - We should get rid of this, it is specific to the period we extract data,
+   *                        but we get into problems when we want to support unbounded periods. Use
+   *                        the trip search instead to find a start point (index) and iterate from
+   *                        there.
    */
+  @Deprecated
   int numberOfTripSchedules();
 
   /**
