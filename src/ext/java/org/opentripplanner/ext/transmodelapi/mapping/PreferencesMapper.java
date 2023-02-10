@@ -31,16 +31,46 @@ class PreferencesMapper {
     preferences.withStreet(street -> {
       var maxAccessEgressDuration = StreetPreferences.DEFAULT.maxAccessEgressDuration().copyOf();
 
-      callWith.argument("maxAccessEgressDurationForMode.walk", d -> maxAccessEgressDuration.with(StreetMode.WALK, (Duration) d));
-      callWith.argument("maxAccessEgressDurationForMode.bike", d -> maxAccessEgressDuration.with(StreetMode.BIKE, (Duration) d));
-      callWith.argument("maxAccessEgressDurationForMode.bikeToPark", d -> maxAccessEgressDuration.with(StreetMode.BIKE_TO_PARK, (Duration) d));
-      callWith.argument("maxAccessEgressDurationForMode.bikeRental", d -> maxAccessEgressDuration.with(StreetMode.BIKE_RENTAL, (Duration) d));
-      callWith.argument("maxAccessEgressDurationForMode.scooterRental", d -> maxAccessEgressDuration.with(StreetMode.SCOOTER_RENTAL, (Duration) d));
-      callWith.argument("maxAccessEgressDurationForMode.car", d -> maxAccessEgressDuration.with(StreetMode.CAR, (Duration) d));
-      callWith.argument("maxAccessEgressDurationForMode.carToPark", d -> maxAccessEgressDuration.with(StreetMode.CAR_TO_PARK, (Duration) d));
-      callWith.argument("maxAccessEgressDurationForMode.carPickup", d -> maxAccessEgressDuration.with(StreetMode.CAR_PICKUP, (Duration) d));
-      callWith.argument("maxAccessEgressDurationForMode.carRental", d -> maxAccessEgressDuration.with(StreetMode.CAR_RENTAL, (Duration) d));
-      callWith.argument("maxAccessEgressDurationForMode.flexible", d -> maxAccessEgressDuration.with(StreetMode.FLEXIBLE, (Duration) d));
+      callWith.argument(
+        "maxAccessEgressDurationForMode.walk",
+        d -> maxAccessEgressDuration.with(StreetMode.WALK, (Duration) d)
+      );
+      callWith.argument(
+        "maxAccessEgressDurationForMode.bike",
+        d -> maxAccessEgressDuration.with(StreetMode.BIKE, (Duration) d)
+      );
+      callWith.argument(
+        "maxAccessEgressDurationForMode.bikeToPark",
+        d -> maxAccessEgressDuration.with(StreetMode.BIKE_TO_PARK, (Duration) d)
+      );
+      callWith.argument(
+        "maxAccessEgressDurationForMode.bikeRental",
+        d -> maxAccessEgressDuration.with(StreetMode.BIKE_RENTAL, (Duration) d)
+      );
+      callWith.argument(
+        "maxAccessEgressDurationForMode.scooterRental",
+        d -> maxAccessEgressDuration.with(StreetMode.SCOOTER_RENTAL, (Duration) d)
+      );
+      callWith.argument(
+        "maxAccessEgressDurationForMode.car",
+        d -> maxAccessEgressDuration.with(StreetMode.CAR, (Duration) d)
+      );
+      callWith.argument(
+        "maxAccessEgressDurationForMode.carToPark",
+        d -> maxAccessEgressDuration.with(StreetMode.CAR_TO_PARK, (Duration) d)
+      );
+      callWith.argument(
+        "maxAccessEgressDurationForMode.carPickup",
+        d -> maxAccessEgressDuration.with(StreetMode.CAR_PICKUP, (Duration) d)
+      );
+      callWith.argument(
+        "maxAccessEgressDurationForMode.carRental",
+        d -> maxAccessEgressDuration.with(StreetMode.CAR_RENTAL, (Duration) d)
+      );
+      callWith.argument(
+        "maxAccessEgressDurationForMode.flexible",
+        d -> maxAccessEgressDuration.with(StreetMode.FLEXIBLE, (Duration) d)
+      );
 
       street.withMaxAccessEgressDuration(maxAccessEgressDuration.build());
     });

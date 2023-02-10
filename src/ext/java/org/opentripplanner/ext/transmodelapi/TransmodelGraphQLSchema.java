@@ -350,7 +350,12 @@ public class TransmodelGraphQLSchema {
 
     GraphQLInputObjectType maxAccessEgressInput = MaxAccessEgressInputType.create(gqlUtil);
 
-    GraphQLFieldDefinition tripQuery = TripQuery.create(routing, tripType, maxAccessEgressInput, gqlUtil);
+    GraphQLFieldDefinition tripQuery = TripQuery.create(
+      routing,
+      tripType,
+      maxAccessEgressInput,
+      gqlUtil
+    );
 
     GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
     GraphQLInputObjectType viaLocationInputType = ViaLocationInputType.create(gqlUtil);

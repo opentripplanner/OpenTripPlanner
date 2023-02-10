@@ -1842,6 +1842,7 @@ input Location {
   place: String
 }
 
+"Maximum duration for access/egress for street searches per respective mode."
 input MaxAccessEgressInput {
   bike: Duration
   bikeRental: Duration

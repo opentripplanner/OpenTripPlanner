@@ -509,7 +509,9 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("maxAccessEgressDurationForMode")
-          .description("Maximum duration for access/egress for street searches per respective mode.")
+          .description(
+            "Maximum duration for access/egress for street searches per respective mode."
+          )
           .type(maxAccessEgressType)
           .build()
       )
