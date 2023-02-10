@@ -1121,8 +1121,10 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<FareRuleSet>> ticketTypes() {
     return environment -> {
-      Map<FareType, Collection<FareRuleSet>> fareRules =
-        ((GtfsFaresService) getFareService(environment)).faresV1().getFareRulesPerType();
+      var fareService = getFareService(environment);
+      Map<FareType, Collection<FareRuleSet>> fareRules = fareService instanceof GtfsFaresService
+        ? ((GtfsFaresService) fareService).faresV1().getFareRulesPerType()
+        : ((DefaultFareService) fareService).getFareRulesPerType();
 
       return fareRules
         .entrySet()
