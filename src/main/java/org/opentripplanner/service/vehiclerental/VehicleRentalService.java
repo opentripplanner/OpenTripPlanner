@@ -7,6 +7,11 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
+/**
+ * The read-only service for getting information about rental vehicles.
+ *
+ * For writing data see {@link VehicleRentalRepository}
+ */
 public interface VehicleRentalService {
   Collection<VehicleRentalPlace> getVehicleRentalPlaces();
 
@@ -22,6 +27,11 @@ public interface VehicleRentalService {
 
   boolean hasRentalBikes();
 
+  /**
+   * Gets all the vehicle rental stations inside the envelope. This is currently done by iterating
+   * over a set, but we could use a spatial index if the number of vehicle rental stations is high
+   * enough for performance to be a concern.
+   */
   List<VehicleRentalPlace> getVehicleRentalStationForEnvelope(
     double minLon,
     double minLat,

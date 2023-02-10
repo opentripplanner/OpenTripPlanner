@@ -101,11 +101,6 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
       });
   }
 
-  /**
-   * Gets all the vehicle rental stations inside the envelope. This is currently done by iterating
-   * over a set, but we could use a spatial index if the number of vehicle rental stations is high
-   * enough for performance to be a concern.
-   */
   @Override
   public List<VehicleRentalPlace> getVehicleRentalStationForEnvelope(
     double minLon,
