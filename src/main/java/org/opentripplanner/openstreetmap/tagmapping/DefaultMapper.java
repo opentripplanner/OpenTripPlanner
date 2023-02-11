@@ -502,8 +502,11 @@ class DefaultMapper implements OsmTagMapper {
 
     // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad)
     // this uses a OR since you don't want to apply the safety multiplier more than once.
+    // Cyclestreets where bicycles have priority or are the only permitted vehicles (a thing in traffic rules of
+    // some european countries) get an identical safety multiplier. See e.g. https://nl.wikipedia.org/wiki/Fietsstraat
+    // For simplicity these two concepts are handled together.
     props.setMixinProperties(
-      new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
+      new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes", "bicycle_road=yes", "cyclestreet=yes"),
       ofBicycleSafety(0.7)
     );
 
