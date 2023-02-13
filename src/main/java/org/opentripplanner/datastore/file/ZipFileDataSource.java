@@ -3,6 +3,7 @@ package org.opentripplanner.datastore.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -85,7 +86,24 @@ public class ZipFileDataSource
 
     try {
       // The get name on ZipFile returns the full path, we want just the name.
-      this.zipFile = new ZipFile(file, ZipFile.OPEN_READ);
+      // Java needs help for standard ZIP files with names encoded in cp437
+      // As Cp437 is not guaranteed to be available try it but don't depend on it.
+      // see APPENDIX D - Language Encoding (EFS) in the format documentation
+      // https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
+      Charset charset = null;
+      try {
+        charset = Charset.forName("Cp437");
+      } catch (UnsupportedCharsetException uce) {
+        LOG.warn(
+          "Support for charset cp437 not available. Details: " + uce.getLocalizedMessage(),
+          uce
+        );
+      }
+      if (charset != null) {
+        this.zipFile = new ZipFile(file, ZipFile.OPEN_READ, charset);
+      } else {
+        this.zipFile = new ZipFile(file, ZipFile.OPEN_READ);
+      }
 
       Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
