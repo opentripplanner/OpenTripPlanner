@@ -8,7 +8,9 @@ class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, Servic
 
   @Override
   public Status validate(ServiceJourney sj) {
-    JourneyPattern_VersionStructure journeyPattern = index.getJourneyPatternsById().lookup(getPatternId(sj));
+    JourneyPattern_VersionStructure journeyPattern = index
+      .getJourneyPatternsById()
+      .lookup(getPatternId(sj));
 
     int nStopPointsInJourneyPattern = journeyPattern
       .getPointsInSequence()

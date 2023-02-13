@@ -79,7 +79,12 @@ public class DayTypeAssignmentMapper {
     Map<String, Set<LocalDate>> result = new HashMap<>();
 
     for (var dayType : dayTypes.localValues()) {
-      var mapper = new DayTypeAssignmentMapper(dayType, operatingDays, operatingPeriods, uicOperatingPeriods);
+      var mapper = new DayTypeAssignmentMapper(
+        dayType,
+        operatingDays,
+        operatingPeriods,
+        uicOperatingPeriods
+      );
 
       for (DayTypeAssignment it : assignments.lookup(dayType.getId())) {
         mapper.map(it);
@@ -172,7 +177,12 @@ public class DayTypeAssignmentMapper {
     }
   }
 
-  private void addDates(boolean isAvailable, Set<DayOfWeek> daysOfWeek, LocalDateTime endDate, LocalDateTime date) {
+  private void addDates(
+    boolean isAvailable,
+    Set<DayOfWeek> daysOfWeek,
+    LocalDateTime endDate,
+    LocalDateTime date
+  ) {
     for (; date.isBefore(endDate); date = date.plusDays(1)) {
       if (daysOfWeek.contains(date.getDayOfWeek())) {
         addDate(isAvailable, date);
@@ -180,13 +190,20 @@ public class DayTypeAssignmentMapper {
     }
   }
 
-  private void addDates(String validDayBits, boolean isAvailable, LocalDateTime endDate, LocalDateTime date) {
+  private void addDates(
+    String validDayBits,
+    boolean isAvailable,
+    LocalDateTime endDate,
+    LocalDateTime date
+  ) {
     int i = 0;
     for (; date.isBefore(endDate); date = date.plusDays(1)) {
       if (i >= validDayBits.length() || validDayBits.charAt(i) == '1') {
         addDate(isAvailable, date);
       } else if (validDayBits.charAt(i) != '0') {
-        throw new IllegalArgumentException("Invalid character '" + validDayBits.charAt(i) + "' in validDayBits");
+        throw new IllegalArgumentException(
+          "Invalid character '" + validDayBits.charAt(i) + "' in validDayBits"
+        );
       }
       i++;
     }

@@ -160,7 +160,6 @@ class RouteMapper {
    * agency is created and returned.
    */
   private Agency findOrCreateAuthority(Line_VersionStructure line) {
-
     GroupOfLinesRefStructure representedByGroupRef = line.getRepresentedByGroupRef();
     Agency agency = null;
     if (representedByGroupRef != null) {

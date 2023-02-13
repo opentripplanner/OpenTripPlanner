@@ -347,14 +347,20 @@ class TripPatternMapper {
     }
   }
 
-  private Trip mapTrip(JourneyPattern_VersionStructure journeyPattern, ServiceJourney serviceJourney) {
+  private Trip mapTrip(
+    JourneyPattern_VersionStructure journeyPattern,
+    ServiceJourney serviceJourney
+  ) {
     return tripMapper.mapServiceJourney(
       serviceJourney,
       () -> findTripHeadsign(journeyPattern, serviceJourney)
     );
   }
 
-  private String findTripHeadsign(JourneyPattern_VersionStructure journeyPattern, ServiceJourney serviceJourney) {
+  private String findTripHeadsign(
+    JourneyPattern_VersionStructure journeyPattern,
+    ServiceJourney serviceJourney
+  ) {
     var times = serviceJourney.getPassingTimes().getTimetabledPassingTime();
     if (times == null || times.isEmpty()) {
       return HEADSIGN_EMPTY;

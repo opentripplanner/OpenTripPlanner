@@ -128,7 +128,10 @@ class StopTimesMapper {
 
       StopPointInJourneyPattern stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
 
-      if (stopPoint != null && (isFalse(stopPoint.isForAlighting()) && isFalse(stopPoint.isForBoarding()))) {
+      if (
+        stopPoint != null &&
+          (isFalse(stopPoint.isForAlighting()) && isFalse(stopPoint.isForBoarding()))
+      ) {
         continue;
       }
 
@@ -137,7 +140,7 @@ class StopTimesMapper {
         issueStore.add(
           "JourneyPatternStopNotFound",
           "Stop with id %s not found for StopPoint %s in JourneyPattern %s. " +
-          "Trip %s will not be mapped.",
+            "Trip %s will not be mapped.",
           stopPoint != null && stopPoint.getScheduledStopPointRef() != null
             ? stopPoint.getScheduledStopPointRef().getValue().getRef()
             : "null",
@@ -171,7 +174,10 @@ class StopTimesMapper {
    * @return a map of stop-times indexed by the TimetabledPassingTime id.
    */
   @Nullable
-  String findTripHeadsign(JourneyPattern_VersionStructure journeyPattern, TimetabledPassingTime firstPassingTime) {
+  String findTripHeadsign(
+    JourneyPattern_VersionStructure journeyPattern,
+    TimetabledPassingTime firstPassingTime
+  ) {
     String pointInJourneyPattern = firstPassingTime
       .getPointInJourneyPatternRef()
       .getValue()

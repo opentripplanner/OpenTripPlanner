@@ -296,7 +296,6 @@ public class NetexMapper {
   }
 
   private void mapStopPlaceAndQuays(TariffZoneMapper tariffZoneMapper) {
-
     String timeZone = currentNetexIndex.getTimeZone();
     ZoneId zoneId = timeZone != null ? ZoneId.of(timeZone) : null;
 
@@ -451,7 +450,9 @@ public class NetexMapper {
       maxStopToShapeSnapDistance
     );
 
-    for (JourneyPattern_VersionStructure journeyPattern : currentNetexIndex.getJourneyPatternsById().localValues()) {
+    for (JourneyPattern_VersionStructure journeyPattern : currentNetexIndex
+      .getJourneyPatternsById()
+      .localValues()) {
       TripPatternMapperResult result = tripPatternMapper.mapTripPattern(journeyPattern);
 
       for (Map.Entry<Trip, List<StopTime>> it : result.tripStopTimes.entrySet()) {

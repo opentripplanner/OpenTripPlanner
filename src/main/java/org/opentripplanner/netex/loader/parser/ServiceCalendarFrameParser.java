@@ -35,7 +35,6 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
   private final Collection<OperatingDay> operatingDays = new ArrayList<>();
   private final Multimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId = ArrayListMultimap.create();
 
-
   @Override
   void parse(ServiceCalendarFrame_VersionFrameStructure frame) {
     parseServiceCalendar(frame.getServiceCalendar());
