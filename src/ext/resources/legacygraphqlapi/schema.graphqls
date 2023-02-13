@@ -1121,25 +1121,25 @@ input InputPreferred {
     otherThanPreferredRoutesPenalty: Int
 }
 
-input ParkingFilter @oneOf{
-    """ The tags to select. """
-    tags: [String]
-    feed: [String]
+input ParkingFilterOperation {
+    oneOfTags: [String]
+    allTags: [String]
+    # the following will be implemented when the need arises
+    oneOfFeeds: [String]
+    feed: String
 }
 
-input ParkingFilterOperation @oneOf {
-    containsOne: ParkingFilter
-    containsAll: ParkingFilter
-    and: [ParkingFilterOperation]
-    or: [ParkingFilterOperation]
+input ParkingFilter {
+    not: [ParkingFilterOperation]
+    select: [ParkingFilterOperation]
 }
 
-input InputVehicleParking {
+input VehicleParkingInput {
     """
     If non-empty every parking facility that doesn't contain at least one of these conditions will
     receive an extra cost (defined by `unpreferredVehicleParkingTagCost`) and therefore avoided.
     """
-    preferred: [ParkingFilterOperation]
+    filters: [ParkingFilter]
 
     """
     If `preferredVehicleParkingTags` is non-empty, using a parking facility that doesn't contain
@@ -1148,15 +1148,7 @@ input InputVehicleParking {
     """
     unpreferredCost: Int
 
-    """
-    Only parking facilities that have one of the conditions in this list will used.
-    """
-    required: [ParkingFilterOperation]
-
-    """
-    Parking facilities that have one of the conditions in this list will be excluded.
-    """
-    banned: [ParkingFilterOperation]
+    preferred: [ParkingFilter]
 }
 
 """
@@ -2830,7 +2822,7 @@ type QueryType {
         walkSafetyFactor: Float
 
         "Preferences for vehicle parking"
-        parking: InputVehicleParking
+        parking: VehicleParkingInput
     ): Plan @async
 }
 
