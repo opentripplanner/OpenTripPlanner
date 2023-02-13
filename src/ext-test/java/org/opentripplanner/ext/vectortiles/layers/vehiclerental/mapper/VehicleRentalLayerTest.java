@@ -2,8 +2,8 @@ package org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor.BICYCLE;
-import static org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor.SCOOTER;
+import static org.opentripplanner.street.model.RentalFormFactor.BICYCLE;
+import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -15,6 +15,7 @@ import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class VehicleRentalLayerTest {
@@ -113,7 +114,7 @@ public class VehicleRentalLayerTest {
   }
 
   @Nonnull
-  private static RentalVehicleType vehicleType(RentalVehicleType.FormFactor formFactor) {
+  private static RentalVehicleType vehicleType(RentalFormFactor formFactor) {
     return new RentalVehicleType(
       new FeedScopedId("1", formFactor.name()),
       "bicycle",

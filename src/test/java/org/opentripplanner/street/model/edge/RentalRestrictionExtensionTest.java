@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
-import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.BusinessAreaBorder;
+import org.opentripplanner.service.vehiclerental.model.RentalRestrictionExtension;
+import org.opentripplanner.service.vehiclerental.model.RentalRestrictionExtension.BusinessAreaBorder;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -70,7 +70,7 @@ class RentalRestrictionExtensionTest {
 
     var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
     var editor = new StateEditor(edge1.getFromVertex(), req);
-    editor.beginFloatingVehicleRenting(RentalVehicleType.FormFactor.SCOOTER, network, false);
+    editor.beginFloatingVehicleRenting(RentalFormFactor.SCOOTER, network, false);
     restrictedEdge.addRentalRestriction(
       new RentalRestrictionExtension.GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
@@ -167,7 +167,7 @@ class RentalRestrictionExtensionTest {
   private State state(String network) {
     var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
     var editor = new StateEditor(V1, req);
-    editor.beginFloatingVehicleRenting(RentalVehicleType.FormFactor.SCOOTER, network, false);
+    editor.beginFloatingVehicleRenting(RentalFormFactor.SCOOTER, network, false);
     return editor.makeState();
   }
 

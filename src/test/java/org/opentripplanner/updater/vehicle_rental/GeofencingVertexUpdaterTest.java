@@ -14,10 +14,10 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.model.RentalRestrictionExtension;
+import org.opentripplanner.service.vehiclerental.model.RentalRestrictionExtension.GeofencingZoneExtension;
+import org.opentripplanner.service.vehiclerental.model.RentalRestrictionExtension.NoRestriction;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.GeofencingZoneExtension;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.NoRestriction;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 
 class GeofencingVertexUpdaterTest {

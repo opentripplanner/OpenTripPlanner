@@ -10,10 +10,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
-import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 @Singleton
@@ -89,12 +89,12 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
       .stream()
       .anyMatch(place -> {
         if (place instanceof VehicleRentalVehicle vehicle) {
-          return vehicle.vehicleType.formFactor == FormFactor.BICYCLE;
+          return vehicle.vehicleType.formFactor == RentalFormFactor.BICYCLE;
         } else if (place instanceof VehicleRentalStation station) {
           return station.vehicleTypesAvailable
             .keySet()
             .stream()
-            .anyMatch(t -> t.formFactor == FormFactor.BICYCLE);
+            .anyMatch(t -> t.formFactor == RentalFormFactor.BICYCLE);
         } else {
           return false;
         }

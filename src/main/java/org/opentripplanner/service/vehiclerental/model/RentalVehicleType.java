@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
-import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -18,14 +18,14 @@ public class RentalVehicleType implements Serializable, Comparable<RentalVehicle
 
   public final FeedScopedId id;
   public final String name;
-  public final FormFactor formFactor;
+  public final RentalFormFactor formFactor;
   public final PropulsionType propulsionType;
   public final Double maxRangeMeters;
 
   public RentalVehicleType(
     FeedScopedId id,
     String name,
-    FormFactor formFactor,
+    RentalFormFactor formFactor,
     PropulsionType propulsionType,
     Double maxRangeMeters
   ) {
@@ -44,7 +44,7 @@ public class RentalVehicleType implements Serializable, Comparable<RentalVehicle
           new RentalVehicleType(
             new FeedScopedId(id, "DEFAULT"),
             "Default vehicle type",
-            FormFactor.BICYCLE,
+            RentalFormFactor.BICYCLE,
             PropulsionType.HUMAN,
             null
           )
@@ -71,30 +71,6 @@ public class RentalVehicleType implements Serializable, Comparable<RentalVehicle
   @Override
   public int compareTo(RentalVehicleType rentalVehicleType) {
     return id.compareTo(rentalVehicleType.id);
-  }
-
-  public enum FormFactor {
-    BICYCLE(TraverseMode.BICYCLE),
-    CAR(TraverseMode.CAR),
-    MOPED(TraverseMode.BICYCLE),
-    SCOOTER(TraverseMode.BICYCLE),
-    OTHER(TraverseMode.BICYCLE);
-
-    public final TraverseMode traverseMode;
-
-    FormFactor(TraverseMode traverseMode) {
-      this.traverseMode = traverseMode;
-    }
-
-    public static FormFactor fromGbfs(GBFSVehicleType.FormFactor formFactor) {
-      return switch (formFactor) {
-        case BICYCLE -> BICYCLE;
-        case CAR -> CAR;
-        case MOPED -> MOPED;
-        case SCOOTER -> SCOOTER;
-        case OTHER -> OTHER;
-      };
-    }
   }
 
   public enum PropulsionType {

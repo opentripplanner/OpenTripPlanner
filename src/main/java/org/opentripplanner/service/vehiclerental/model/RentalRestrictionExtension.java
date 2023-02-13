@@ -1,11 +1,10 @@
-package org.opentripplanner.street.model.vertex;
+package org.opentripplanner.service.vehiclerental.model;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.search.state.State;
 
 /**

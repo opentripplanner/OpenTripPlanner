@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.collection.SetUtils;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -133,13 +133,11 @@ public class VehicleRentalStation implements VehicleRentalPlace {
   public boolean isCarStation() {
     return Stream
       .concat(vehicleTypesAvailable.keySet().stream(), vehicleSpacesAvailable.keySet().stream())
-      .anyMatch(rentalVehicleType ->
-        rentalVehicleType.formFactor.equals(RentalVehicleType.FormFactor.CAR)
-      );
+      .anyMatch(rentalVehicleType -> rentalVehicleType.formFactor.equals(RentalFormFactor.CAR));
   }
 
   @Override
-  public Set<FormFactor> getAvailablePickupFormFactors(boolean includeRealtimeAvailability) {
+  public Set<RentalFormFactor> getAvailablePickupFormFactors(boolean includeRealtimeAvailability) {
     return vehicleTypesAvailable
       .entrySet()
       .stream()
@@ -149,7 +147,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   @Override
-  public Set<FormFactor> getAvailableDropoffFormFactors(boolean includeRealtimeAvailability) {
+  public Set<RentalFormFactor> getAvailableDropoffFormFactors(boolean includeRealtimeAvailability) {
     return vehicleSpacesAvailable
       .entrySet()
       .stream()
@@ -184,7 +182,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     );
   }
 
-  public Set<FormFactor> formFactors() {
+  public Set<RentalFormFactor> formFactors() {
     return SetUtils.combine(
       getAvailableDropoffFormFactors(false),
       getAvailablePickupFormFactors(false)

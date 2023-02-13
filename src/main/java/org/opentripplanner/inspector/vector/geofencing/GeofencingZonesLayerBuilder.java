@@ -10,7 +10,7 @@ import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
+import org.opentripplanner.service.vehiclerental.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 

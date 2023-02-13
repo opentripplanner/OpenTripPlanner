@@ -18,13 +18,13 @@ import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
-import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.FormFactor;
+import org.opentripplanner.service.vehiclerental.model.RentalRestrictionExtension;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
-import org.opentripplanner.street.model.edge.VehicleRentalEdge;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
-import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -170,13 +170,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             // the toString includes the text "Bike rental station"
             LOG.info("VehicleRentalPlace {} is unlinked", vehicleRentalVertex);
           }
-          Set<FormFactor> formFactors = Stream
+          Set<RentalFormFactor> formFactors = Stream
             .concat(
               station.getAvailablePickupFormFactors(false).stream(),
               station.getAvailableDropoffFormFactors(false).stream()
             )
             .collect(Collectors.toSet());
-          for (FormFactor formFactor : formFactors) {
+          for (RentalFormFactor formFactor : formFactors) {
             tempEdges.addEdge(new VehicleRentalEdge(vehicleRentalVertex, formFactor));
           }
           verticesByStation.put(station.getId(), vehicleRentalVertex);
