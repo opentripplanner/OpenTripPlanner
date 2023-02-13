@@ -145,6 +145,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       // Make a new snapshot if necessary
       try {
         snapshotToReturn = getTimetableSnapshot(false);
+        // Force commit so that we get non-null snapshot
+        // This should happen only once on startup
+        if (snapshotToReturn == null) {
+          snapshotToReturn = getTimetableSnapshot(true);
+        }
       } finally {
         bufferLock.unlock();
       }
