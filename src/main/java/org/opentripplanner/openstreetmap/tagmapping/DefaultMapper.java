@@ -506,7 +506,13 @@ class DefaultMapper implements OsmTagMapper {
     // some european countries) get an identical safety multiplier. See e.g. https://nl.wikipedia.org/wiki/Fietsstraat
     // For simplicity these two concepts are handled together.
     props.setMixinProperties(
-      new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes", "bicycle_road=yes", "cyclestreet=yes"),
+      new LogicalOrSpecifier(
+        "lcn=yes",
+        "rcn=yes",
+        "ncn=yes",
+        "bicycle_road=yes",
+        "cyclestreet=yes"
+      ),
       ofBicycleSafety(0.7)
     );
 
