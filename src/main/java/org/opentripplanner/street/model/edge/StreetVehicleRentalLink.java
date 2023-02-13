@@ -2,7 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlaceVertex;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;

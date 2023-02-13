@@ -14,9 +14,9 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
-import org.opentripplanner.service.vehiclerental.model.RentalRestrictionExtension;
-import org.opentripplanner.service.vehiclerental.model.RentalRestrictionExtension.GeofencingZoneExtension;
-import org.opentripplanner.service.vehiclerental.model.RentalRestrictionExtension.NoRestriction;
+import org.opentripplanner.service.vehiclerental.street.RentalRestrictionExtension;
+import org.opentripplanner.service.vehiclerental.street.RentalRestrictionExtension.GeofencingZoneExtension;
+import org.opentripplanner.service.vehiclerental.street.RentalRestrictionExtension.NoRestriction;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 
