@@ -1121,14 +1121,17 @@ input InputPreferred {
     otherThanPreferredRoutesPenalty: Int
 }
 
-input InputParkingFilter {
+input ParkingFilter @oneOf{
     """ The tags to select. """
     tags: [String]
+    feed: [String]
 }
 
-input InputRequiredParking {
-    or: InputParkingFilter
-    and: InputParkingFilter
+input ParkingFilterOperation @oneOf {
+    containsOne: ParkingFilter
+    containsAll: ParkingFilter
+    and: [ParkingFilterOperation]
+    or: [ParkingFilterOperation]
 }
 
 input InputVehicleParking {
@@ -1136,7 +1139,7 @@ input InputVehicleParking {
     If non-empty every parking facility that doesn't contain at least one of these conditions will
     receive an extra cost (defined by `unpreferredVehicleParkingTagCost`) and therefore avoided.
     """
-    preferred: InputParkingFilter
+    preferred: [ParkingFilterOperation]
 
     """
     If `preferredVehicleParkingTags` is non-empty, using a parking facility that doesn't contain
@@ -1148,12 +1151,12 @@ input InputVehicleParking {
     """
     Only parking facilities that have one of the conditions in this list will used.
     """
-    required: InputRequiredParking
+    required: [ParkingFilterOperation]
 
     """
     Parking facilities that have one of the conditions in this list will be excluded.
     """
-    banned: InputParkingFilter
+    banned: [ParkingFilterOperation]
 }
 
 """
