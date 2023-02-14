@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -132,7 +131,7 @@ public class AccessStopArrivalTest {
 
       @Override
       public boolean stopReachedOnBoard() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
       }
 
       @Override
