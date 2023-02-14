@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
@@ -87,6 +88,15 @@ public class ZipFileDataSource
 
     try {
       // The get name on ZipFile returns the full path, we want just the name.
+      this.zipFile = new ZipFile(file, ZipFile.OPEN_READ);
+
+      Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+      while (entries.hasMoreElements()) {
+        ZipEntry entry = entries.nextElement();
+        content.add(new ZipFileEntryDataSource(this, entry));
+      }
+    } catch (ZipException ze) {
       // Java needs help for standard ZIP files with names encoded in cp437
       // this allows decoding of utf-8 and cp437 at the same time!
       // As Cp437 is not guaranteed to be available try it but don't depend on it.
@@ -94,26 +104,18 @@ public class ZipFileDataSource
       // https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
       // additional Recommendations for Interoperability can be found at Apache Commons
       // https://commons.apache.org/proper/commons-compress/zip.html
-      Charset charset = null;
       try {
-        charset = Charset.forName("Cp437"); // <- comment out for verification
-      } catch (UnsupportedCharsetException uce) {
-        LOG.warn(
-          "Support for charset cp437 not available. Details: " + uce.getLocalizedMessage(),
-          uce
-        );
-      }
-      if (charset != null) {
+        Charset charset = Charset.forName("Cp437");
         this.zipFile = new ZipFile(file, ZipFile.OPEN_READ, charset);
-      } else {
-        this.zipFile = new ZipFile(file, ZipFile.OPEN_READ);
-      }
 
-      Enumeration<? extends ZipEntry> entries = zipFile.entries();
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
-      while (entries.hasMoreElements()) {
-        ZipEntry entry = entries.nextElement();
-        content.add(new ZipFileEntryDataSource(this, entry));
+        while (entries.hasMoreElements()) {
+          ZipEntry entry = entries.nextElement();
+          content.add(new ZipFileEntryDataSource(this, entry));
+        }
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to load " + path() + ": " + e.getLocalizedMessage(), e);
       }
     } catch (IOException e) {
       throw new RuntimeException("Failed to load " + path() + ": " + e.getLocalizedMessage(), e);
