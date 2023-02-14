@@ -7,10 +7,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 import java.util.List;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -103,5 +108,66 @@ public class ZipFileDataSourceTest {
 
     // When: delete entry is not implemented
     assertThrows(Exception.class, subject::delete, "ZipFileDataSource");
+  }
+
+  @Test
+  public void testEntryEncoding() {
+    // has worked before #4835, for verification remove the attempt to set to code page to cp437
+    File target = new File(ConstantsForTests.UMLAUT_UTF8_ZIP);
+    CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
+    DataSource entry = subject.content().iterator().next();
+
+    assertEquals(ConstantsForTests.UMLAUT_UTF8_TXT, entry.name());
+    assertTrue(entry.exists());
+
+    // only works after #4835, will fail with "Invalid CEN header (bad entry name)" when verifying
+    target = new File(ConstantsForTests.UMLAUT_CP437_ZIP);
+    subject = new ZipFileDataSource(target, GTFS);
+    entry = subject.content().iterator().next();
+
+    assertEquals(ConstantsForTests.UMLAUT_CP437_TXT, entry.name());
+    assertTrue(entry.exists());
+  }
+
+  /*
+   * generate test files
+   *
+   * mvn exec:java -D"exec.mainClass"="org.opentripplanner.datastore.file.ZipFileDataSourceTest" -D"exec.classpathScope"=test
+   */
+  public static void main(String[] args) throws FileNotFoundException, IOException {
+    /* cp437 encoded file names in zip */
+    final ZipArchiveOutputStream zos = new ZipArchiveOutputStream(new FileOutputStream(
+      ConstantsForTests.UMLAUT_CP437_ZIP
+    ));
+    /* set original ZIP character encoding aka OEM-US or DOS-US */
+    zos.setEncoding("Cp437");
+
+    final byte[] data = {};
+
+    ZipArchiveEntry entry = new ZipArchiveEntry(ConstantsForTests.UMLAUT_CP437_TXT);
+    entry.setSize(data.length);
+    entry.setTime(FileTime.fromMillis(0));
+    zos.putArchiveEntry(entry);
+    zos.write(data);
+    zos.closeArchiveEntry();
+
+    zos.close();
+ 
+ 
+    /* utf-8 encoded file names in zip */
+    final ZipArchiveOutputStream zos2 = new ZipArchiveOutputStream(new FileOutputStream(
+      ConstantsForTests.UMLAUT_UTF8_ZIP
+    ));
+    /* explicitely set Apache Commons default for documentation */
+    zos2.setEncoding("utf-8");
+
+    ZipArchiveEntry entry2 = new ZipArchiveEntry(ConstantsForTests.UMLAUT_UTF8_TXT);
+    entry2.setSize(data.length);
+    entry2.setTime(FileTime.fromMillis(0));
+    zos2.putArchiveEntry(entry2);
+    zos2.write(data);
+    zos2.closeArchiveEntry();
+
+    zos2.close();
   }
 }

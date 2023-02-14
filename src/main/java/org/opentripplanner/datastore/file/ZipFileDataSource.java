@@ -88,12 +88,15 @@ public class ZipFileDataSource
     try {
       // The get name on ZipFile returns the full path, we want just the name.
       // Java needs help for standard ZIP files with names encoded in cp437
+      // this allows decoding of utf-8 and cp437 at the same time!
       // As Cp437 is not guaranteed to be available try it but don't depend on it.
       // see APPENDIX D - Language Encoding (EFS) in the format documentation
       // https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
+      // additional Recommendations for Interoperability can be found at Apache Commons
+      // https://commons.apache.org/proper/commons-compress/zip.html
       Charset charset = null;
       try {
-        charset = Charset.forName("Cp437");
+        charset = Charset.forName("Cp437"); // <- comment out for verification
       } catch (UnsupportedCharsetException uce) {
         LOG.warn(
           "Support for charset cp437 not available. Details: " + uce.getLocalizedMessage(),
