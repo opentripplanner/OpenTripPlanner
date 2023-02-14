@@ -778,7 +778,7 @@ type QueryType {
     "The preferable language to use for text targeted the end user. Note! The data quality is limited, only stop and quay names are translates, and not in all places of the API."
     locale: Locale = no,
     "Maximum duration for access/egress for street searches per respective mode."
-    maxAccessEgressDurationForMode: MaxAccessEgressInput,
+    maxAccessEgressDurationForMode: [DurationPerModeInput!],
     "Maximum number of additional transfers compared to the best number of transfers allowed. Note! The best way to reduce the number of transfers is to set the `transferPenalty` parameter."
     maximumAdditionalTransfers: Int = 5,
     "Maximum number of transfers. Note! The best way to reduce the number of transfers is to set the `transferPenalty` parameter."
@@ -1770,6 +1770,12 @@ scalar Long
 "Time using the format: `HH:MM:SS`. Example: `18:25:43`"
 scalar Time
 
+"A combination of street mode and corresponding duration"
+input DurationPerModeInput {
+  duration: Duration!
+  streetMode: StreetMode!
+}
+
 "Filter trips by disallowing lines involving certain elements. If both lines and authorities are specified, only one must be valid for each line to be banned. If a line is both banned and whitelisted, it will be counted as banned."
 input InputBanned {
   "Set of ids for authorities that should not be used"
@@ -1840,20 +1846,6 @@ input Location {
   name: String
   "The id of an element in the OTP model. Currently supports Quay, StopPlace, multimodal StopPlace, and GroupOfStopPlaces."
   place: String
-}
-
-"Maximum duration for access/egress for street searches per respective mode."
-input MaxAccessEgressInput {
-  bike: Duration
-  bikeRental: Duration
-  bikeToPark: Duration
-  car: Duration
-  carPickup: Duration
-  carRental: Duration
-  carToPark: Duration
-  flexible: Duration
-  scooterRental: Duration
-  walk: Duration
 }
 
 "Input format for specifying which modes will be allowed for this search. If this element is not present, it will default to accessMode/egressMode/directMode of foot and all transport modes will be allowed."

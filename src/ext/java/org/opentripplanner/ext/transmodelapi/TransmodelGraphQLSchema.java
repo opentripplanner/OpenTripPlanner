@@ -50,6 +50,7 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.ext.transmodelapi.model.framework.AuthorityType;
 import org.opentripplanner.ext.transmodelapi.model.framework.BrandingType;
+import org.opentripplanner.ext.transmodelapi.model.framework.DurationPerStreetModeInputType;
 import org.opentripplanner.ext.transmodelapi.model.framework.InfoLinkType;
 import org.opentripplanner.ext.transmodelapi.model.framework.MultilingualStringType;
 import org.opentripplanner.ext.transmodelapi.model.framework.NoticeType;
@@ -66,7 +67,6 @@ import org.opentripplanner.ext.transmodelapi.model.network.LineType;
 import org.opentripplanner.ext.transmodelapi.model.network.PresentationType;
 import org.opentripplanner.ext.transmodelapi.model.network.StopToStopGeometryType;
 import org.opentripplanner.ext.transmodelapi.model.plan.LegType;
-import org.opentripplanner.ext.transmodelapi.model.plan.MaxAccessEgressInputType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PathGuidanceType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PlanPlaceType;
 import org.opentripplanner.ext.transmodelapi.model.plan.RoutingErrorType;
@@ -348,12 +348,14 @@ public class TransmodelGraphQLSchema {
       gqlUtil
     );
 
-    GraphQLInputObjectType maxAccessEgressInput = MaxAccessEgressInputType.create(gqlUtil);
+    GraphQLInputObjectType durationPerStreetModeInput = DurationPerStreetModeInputType.create(
+      gqlUtil
+    );
 
     GraphQLFieldDefinition tripQuery = TripQuery.create(
       routing,
       tripType,
-      maxAccessEgressInput,
+      durationPerStreetModeInput,
       gqlUtil
     );
 

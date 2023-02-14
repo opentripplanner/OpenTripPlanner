@@ -22,7 +22,7 @@ public class TripQuery {
   public static GraphQLFieldDefinition create(
     DefaultRouteRequestType routing,
     GraphQLOutputType tripType,
-    GraphQLInputObjectType maxAccessEgressType,
+    GraphQLInputObjectType durationPerStreetModeType,
     GqlUtil gqlUtil
   ) {
     RoutingPreferences preferences = routing.request.preferences();
@@ -512,7 +512,7 @@ public class TripQuery {
           .description(
             "Maximum duration for access/egress for street searches per respective mode."
           )
-          .type(maxAccessEgressType)
+          .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
           .build()
       )
       .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))
