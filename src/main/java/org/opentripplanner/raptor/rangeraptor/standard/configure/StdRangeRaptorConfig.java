@@ -1,5 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.standard.configure;
 
+import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
+import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
+
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -43,7 +46,6 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   private final PathConfig<T> pathConfig;
 
   private BestTimes bestTimes = null;
-  private StdStopArrivals<T> arrivals = null;
   private ArrivedAtDestinationCheck destinationCheck = null;
   private BestNumberOfTransfers bestNumberOfTransfers = null;
 
@@ -65,9 +67,9 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     new VerifyRequestIsValid(ctx).verify();
     switch (ctx.profile()) {
       case STANDARD:
-      case MIN_TRAVEL_DURATION:
         return workerState(stdStopArrivalsState());
       case BEST_TIME:
+      case MIN_TRAVEL_DURATION:
       case MIN_TRAVEL_DURATION_BEST_TIME:
         return workerState(bestTimeStopArrivalsState());
     }
@@ -88,7 +90,8 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         return new MinTravelDurationRoutingStrategy<>(
           state,
           ctx.createTimeBasedBoardingSupport(),
-          ctx.calculator()
+          ctx.calculator(),
+          ctx.lifeCycle()
         );
     }
     throw new IllegalArgumentException(ctx.profile().toString());
@@ -115,17 +118,11 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     );
   }
 
-  private BestTimesOnlyStopArrivalsState<T> bestTimeStopArrivalsState() {
+  private StopArrivalsState<T> bestTimeStopArrivalsState() {
     return new BestTimesOnlyStopArrivalsState<>(
       bestTimes(),
       simpleBestNumberOfTransfers(),
-      new UnknownPathFactory<>(
-        bestTimes(),
-        simpleBestNumberOfTransfers(),
-        ctx.calculator(),
-        ctx.lifeCycle(),
-        ctx.egressPaths()
-      )
+      unknownPathFactory()
     );
   }
 
@@ -224,6 +221,19 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     return bestTimes;
   }
 
+  private UnknownPathFactory<T> unknownPathFactory() {
+    return new UnknownPathFactory<>(
+      bestTimes(),
+      simpleBestNumberOfTransfers(),
+      ctx.calculator(),
+      ctx.slackProvider().transferSlack(),
+      ctx.egressPaths(),
+      MIN_TRAVEL_DURATION.is(ctx.profile()),
+      paretoComparator(ctx.searchParams(), false, ctx.searchDirection()),
+      ctx.lifeCycle()
+    );
+  }
+
   private ArrivedAtDestinationCheck destinationCheck() {
     // Cache best times; request scope
     if (destinationCheck == null) {
@@ -244,6 +254,10 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private SimpleArrivedAtDestinationCheck simpleDestinationCheck() {
-    return new SimpleArrivedAtDestinationCheck(ctx.egressStops(), bestTimes());
+    return new SimpleArrivedAtDestinationCheck(
+      bestTimes(),
+      ctx.egressPaths().egressesWitchStartByWalking(),
+      ctx.egressPaths().egressesWitchStartByARide()
+    );
   }
 }

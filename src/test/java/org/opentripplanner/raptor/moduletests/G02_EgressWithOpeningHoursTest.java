@@ -2,25 +2,35 @@ package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.TimeUtils.hm2time;
-import static org.opentripplanner.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToStringDetailed;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.SECONDS_IN_DAY;
+import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.ExpectedList;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /*
  * FEATURE UNDER TEST
@@ -32,6 +42,8 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
   private static final int T00_25 = hm2time(0, 25);
   private static final int T00_35 = hm2time(0, 35);
+  private static final int T24_10 = hm2time(24, 10);
+  private static final int T25_00 = hm2time(25, 0);
   private static final Duration D15m = Duration.ofMinutes(15);
   private static final Duration D25h = Duration.ofHours(25);
 
@@ -54,237 +66,215 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
     );
     requestBuilder.searchParams().addAccessPaths(TestAccessEgress.free(STOP_A));
 
-    requestBuilder.searchParams().earliestDepartureTime(T00_10).searchWindow(D15m).timetable(true);
+    requestBuilder
+      .searchParams()
+      .earliestDepartureTime(T00_10)
+      .latestArrivalTime(T25_00)
+      .searchWindow(D15m)
+      .timetable(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+  }
+
+  private static List<RaptorModuleTestCase> openNoTimeRestrictionTestCase() {
+    var expected = new ExpectedList(
+      "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m [0:10 0:22 12m 0tx $1440]",
+      "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m [0:20 0:32 12m 0tx $1440]",
+      "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m [0:30 0:42 12m 0tx $1440]",
+      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:32+1d 12m 0tx]"
+    );
+
+    return RaptorModuleTestCase
+      .of()
+      .add(TC_MIN_DURATION, "[0:10 0:22 12m 0tx]")
+      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .add(TC_STANDARD, withoutCost(expected.first(3)))
+      .add(TC_STANDARD_ONE, withoutCost(expected.first()))
+      .add(TC_STANDARD_REV, withoutCost(expected.last()))
+      .add(TC_STANDARD_REV_ONE, withoutCost(expected.last()))
+      .add(multiCriteria(), expected.first(3))
+      .build();
   }
 
   /*
    * There is no time restriction, all routes are found.
    */
-  @Test
-  public void openInWholeSearchIntervalTest() {
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .searchParams()
-      .addEgressPaths(walk(STOP_B, D2m));
+  @ParameterizedTest
+  @MethodSource("openNoTimeRestrictionTestCase")
+  void openNoTimeRestrictionTest(RaptorModuleTestCase testCase) {
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_B, D2m));
 
-    // Note the last result is outside the search window
-    assertEquals(
-      join(
-        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m [0:10 0:22 12m 0tx $1440]",
-        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m [0:20 0:32 12m 0tx $1440]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m [0:30 0:42 12m 0tx $1440]"
-      ),
-      runSearch()
-    );
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 
-  @Test
-  public void openInWholeSearchIntervalTestFullDay() {
+  private static List<RaptorModuleTestCase> openOneHourTestCase() {
+    var expected = new ExpectedList(
+      "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:00 1:00) [0:10 0:22 12m 0tx $1440]",
+      "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m Open(0:00 1:00) [0:20 0:32 12m 0tx $1440]",
+      "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:00 1:00) [0:30 0:42 12m 0tx $1440]",
+      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:00 1:00) [0:20+1d 0:32+1d 12m 0tx $1440]"
+    );
+
+    return RaptorModuleTestCase
+      .of()
+      .add(TC_MIN_DURATION, "[0:10 0:22 12m 0tx]")
+      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .add(TC_STANDARD, withoutCost(expected.first(3)))
+      .add(TC_STANDARD_ONE, withoutCost(expected.first()))
+      .add(TC_STANDARD_REV, withoutCost(expected.last()))
+      .add(TC_STANDARD_REV_ONE, withoutCost(expected.last()))
+      .add(multiCriteria(), expected.first(3))
+      .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource("openOneHourTestCase")
+  void openOneHourTest(RaptorModuleTestCase testCase) {
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00));
+
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
+  }
+
+  private static List<RaptorModuleTestCase> openInWholeSearchIntervalTestNextDayTestCase() {
+    var expected =
+      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:00 1:00) [0:20+1d 0:32+1d 12m 0tx $1440]";
+
+    return RaptorModuleTestCase
+      .of()
+      .add(TC_MIN_DURATION, "[0:10+1d 0:22+1d 12m 0tx]")
+      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .add(standard(), withoutCost(expected))
+      .add(multiCriteria(), expected)
+      .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource("openInWholeSearchIntervalTestNextDayTestCase")
+  void openInWholeSearchIntervalTestNextDayTest(RaptorModuleTestCase testCase) {
     requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .searchWindow(D25h)
+      .earliestDepartureTime(T24_10)
       .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00));
 
-    assertEquals(
-      join(
-        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:00 1:00) [0:10 0:22 12m 0tx $1440]",
-        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m Open(0:00 1:00) [0:20 0:32 12m 0tx $1440]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:00 1:00) [0:30 0:42 12m 0tx $1440]",
-        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:00 1:00) [0:20+1d 0:32+1d 12m 0tx $1440]"
-      ),
-      runSearch()
-    );
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 
-  @Test
-  public void openInWholeSearchIntervalTestNextDay() {
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .searchParams()
-      .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00));
-
-    assertEquals(
-      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:00 1:00) [0:20+1d 0:32+1d 12m 0tx $1440]",
-      runSearch()
+  private static List<RaptorModuleTestCase> openInFirstHalfIntervalTestCase() {
+    var expected = new ExpectedList(
+      "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:00 0:25) [0:10 0:22 12m 0tx $1440]",
+      "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:00 0:25) [0:30 0:02+1d 23h32m 0tx $85440]"
     );
+
+    return RaptorModuleTestCase
+      .of()
+      .add(TC_MIN_DURATION, "[0:10 0:22 12m 0tx]")
+      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .add(TC_STANDARD, withoutCost(expected.all()))
+      .add(TC_STANDARD_ONE, withoutCost(expected.first()))
+      .add(TC_STANDARD_REV, withoutCost(expected.last()))
+      .add(TC_STANDARD_REV_ONE, withoutCost(expected.last()))
+      .add(multiCriteria(), expected.all())
+      .build();
   }
 
-  /*
-   * The access is only open after 00:18, which means that we may arrive at the stop at 00:20 at
-   * the earliest.
-   */
-  @Test
-  public void openInSecondHalfIntervalTest() {
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .searchParams()
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_35, T01_00));
+  @ParameterizedTest
+  @MethodSource("openInFirstHalfIntervalTestCase")
+  void openInFirstHalfIntervalTest(RaptorModuleTestCase testCase) {
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_25));
 
-    assertEquals(
-      join(
-        // The first egress is only available after waiting for 5 minutes
-        "A 0s ~ BUS R1 0:20 0:30 10m $1200 ~ B 5m ~ Walk 2m Open(0:35 1:00) 0:35 0:37 $540 [0:20 0:37 17m 0tx $1740]",
-        "A 0s ~ BUS R1 0:30 0:40 10m $1200 ~ B 0s ~ Walk 2m Open(0:35 1:00) 0:40 0:42 $240 [0:30 0:42 12m 0tx $1440]"
-      ),
-      runSearchDetailedResult()
-    );
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 
-  @Test
-  public void openInSecondHalfIntervalTestFullDay() {
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .searchParams()
-      .searchWindow(D25h)
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_35, T01_00));
+  private static List<RaptorModuleTestCase> openInFirstHalfIntervalTestNextDayTestCase() {
+    var expected =
+      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:25 0:40) [0:20+1d 0:32+1d 12m 0tx $1440]";
 
-    // First and last path have time-shifted egress (wait 5 minutes to board)
-    assertEquals(
-      join(
-        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m Open(0:35 1:00) [0:20 0:37 17m 0tx $1740]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:35 1:00) [0:30 0:42 12m 0tx $1440]",
-        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:35 1:00) [0:20+1d 0:37+1d 17m 0tx $1740]"
-      ),
-      runSearch()
-    );
+    return RaptorModuleTestCase
+      .of()
+      .add(TC_MIN_DURATION, "[0:10+1d 0:22+1d 12m 0tx]")
+      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .add(standard(), withoutCost(expected))
+      .add(multiCriteria(), expected)
+      .build();
   }
 
-  @Test
-  public void openInSecondHalfIntervalTestNextDay() {
+  @ParameterizedTest
+  @MethodSource("openInFirstHalfIntervalTestNextDayTestCase")
+  void openInFirstHalfIntervalTestNextDayTest(RaptorModuleTestCase testCase) {
     requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T01_00));
+      .earliestDepartureTime(T24_10)
+      .latestArrivalTime(T25_00)
+      .searchWindow(Duration.ofMinutes(30))
+      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_40));
 
-    assertEquals(
-      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:25 1:00) [0:20+1d 0:32+1d 12m 0tx $1440]",
-      runSearch()
-    );
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 
-  @Test
-  public void openInFirstHalfIntervalTest() {
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .searchParams()
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_25));
-
-    assertEquals(
-      join(
-        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:00 0:25) [0:10 0:22 12m 0tx $1440]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:00 0:25) [0:30 0:02+1d 23h32m 0tx $85440]"
-      ),
-      runSearch()
+  private static List<RaptorModuleTestCase> partiallyOpenIntervalTestCase() {
+    var expected = new ExpectedList(
+      "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:25 0:35) [0:10 0:27 17m 0tx $1740]",
+      "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m Open(0:25 0:35) [0:20 0:32 12m 0tx $1440]",
+      "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:25 0:35) [0:30 0:27+1d 23h57m 0tx $86940]",
+      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:25 0:35) [0:20+1d 0:32+1d 12m 0tx]"
     );
-  }
 
-  @Test
-  public void openInFirstHalfIntervalTestFullDay() {
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .searchParams()
-      .searchWindow(D25h)
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_25));
-
-    assertEquals(
-      join(
-        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:00 0:25) [0:10 0:22 12m 0tx $1440]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:00 0:25) [0:30 0:02+1d 23h32m 0tx $85440]",
-        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:00 0:25) [0:20+1d 0:02+2d 23h42m 0tx $86040]"
-      ),
-      runSearch()
-    );
-  }
-
-  @Test
-  public void openInFirstHalfIntervalTestNextDay() {
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .searchParams()
-      .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_25));
-
-    assertEquals(
-      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:00 0:25) [0:20+1d 0:02+2d 23h42m 0tx $86040]",
-      runSearch()
-    );
+    return RaptorModuleTestCase
+      .of()
+      .add(TC_MIN_DURATION, "[0:10 0:22 12m 0tx]")
+      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .add(TC_STANDARD, withoutCost(expected.first(3)))
+      .add(TC_STANDARD_ONE, withoutCost(expected.first()))
+      .add(TC_STANDARD_REV, withoutCost(expected.last()))
+      .add(TC_STANDARD_REV_ONE, withoutCost(expected.last()))
+      .add(multiCriteria(), expected.first(3))
+      .build();
   }
 
   /*
    * The access is only open after 00:18 and before 00:20. This means that we arrive at the stop at
    * 00:20 at the earliest and 00:22 at the latest.
    */
-  @Test
-  public void partiallyOpenIntervalTest() {
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .searchParams()
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_35));
+  @ParameterizedTest
+  @MethodSource("partiallyOpenIntervalTestCase")
+  void partiallyOpenIntervalTest(RaptorModuleTestCase testCase) {
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_35));
 
-    assertEquals(
-      join(
-        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:25 0:35) [0:10 0:27 17m 0tx $1740]",
-        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m Open(0:25 0:35) [0:20 0:32 12m 0tx $1440]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:25 0:35) [0:30 0:27+1d 23h57m 0tx $86940]"
-      ),
-      runSearch()
-    );
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 
-  @Test
-  public void partiallyOpenIntervalTestFullDay() {
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .searchParams()
-      .searchWindow(D25h)
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_35));
-
-    assertEquals(
-      join(
-        "A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Open(0:25 0:35) [0:10 0:27 17m 0tx $1740]",
-        "A ~ BUS R1 0:20 0:30 ~ B ~ Walk 2m Open(0:25 0:35) [0:20 0:32 12m 0tx $1440]",
-        "A ~ BUS R1 0:30 0:40 ~ B ~ Walk 2m Open(0:25 0:35) [0:30 0:27+1d 23h57m 0tx $86940]",
-        "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:25 0:35) [0:20+1d 0:32+1d 12m 0tx $1440]"
-      ),
-      runSearch()
-    );
+  private static List<RaptorModuleTestCase> closedTestCase() {
+    return RaptorModuleTestCase
+      .of()
+      .add(minDuration())
+      .add(standard())
+      .add(multiCriteria())
+      .build();
   }
 
-  @Test
-  public void partiallyOpenIntervalTestNextDay() {
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .searchParams()
-      .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_35));
+  /*
+   * The access is only open after 00:18 and before 00:20. This means that we arrive at the stop at
+   * 00:20 at the earliest and 00:22 at the latest.
+   */
+  @ParameterizedTest
+  @MethodSource("closedTestCase")
+  void closedTest(RaptorModuleTestCase testCase) {
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHoursClosed());
 
-    assertEquals(
-      "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:25 0:35) [0:20+1d 0:32+1d 12m 0tx $1440]",
-      runSearch()
-    );
-  }
-
-  @Test
-  public void closed() {
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
-      .searchParams()
-      .searchWindow(D25h)
-      .addEgressPaths(walk(STOP_B, D2m).openingHoursClosed());
-
-    assertEquals("", runSearch());
-  }
-
-  private String runSearch() {
-    return pathsToString(raptorService.route(requestBuilder.build(), data));
-  }
-
-  private String runSearchDetailedResult() {
-    return pathsToStringDetailed(raptorService.route(requestBuilder.build(), data));
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
   }
 }

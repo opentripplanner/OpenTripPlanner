@@ -25,6 +25,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
@@ -44,8 +45,8 @@ public class C02_OnStreetTransfersTest implements RaptorTestConstants {
 
   @BeforeEach
   public void setup() {
-    //Given slack: transfer 1m, board 30s, alight 10s
-    data.withSlackProvider(new DefaultSlackProvider(D30s, 0, 0));
+    //Given slack: transfer 30s, board 0s, alight 0s
+    data.withSlackProvider(new DefaultSlackProvider(D30s, D0s, D0s));
 
     data.withRoute(
       route(pattern("R1", STOP_B, STOP_C))
@@ -75,13 +76,7 @@ public class C02_OnStreetTransfersTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var expectedMinDuration =
-      "Walk 30s ~ B " +
-      "~ BUS R1 0:02 0:03 ~ C ~ Walk 30s ~ D " +
-      "~ BUS R2 0:03:59 0:04:59 ~ E " +
-      "~ Walk 20s " +
-      "[0:01:30 0:05:19 3m49s 1tx]";
-
+    var expMinDuration = UnknownPathString.of("3m50s", 1);
     var expected =
       "Walk 30s ~ B ~ " +
       "BUS R1 0:02 0:03 ~ C ~ " +
@@ -91,10 +86,8 @@ public class C02_OnStreetTransfersTest implements RaptorTestConstants {
       "[0:01:30 0:05:20 3m50s 1tx $1510]";
     return RaptorModuleTestCase
       .of()
-      // TODO - The slacks are not added, to avoid blocking Constrained transfers, but we
-      //      - can solve this for stop pairs where there is no constrained transfers
-      .add(TC_MIN_DURATION, PathUtils.withoutCost(expectedMinDuration))
-      .add(TC_MIN_DURATION_REV, PathUtils.withoutCost(expected))
+      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_00))
+      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
       .add(standard(), PathUtils.withoutCost(expected))
       .add(multiCriteria(), expected)
       .build();

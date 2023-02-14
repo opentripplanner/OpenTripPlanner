@@ -4,8 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -21,6 +22,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
+import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
@@ -59,12 +61,14 @@ public class B02_EgressTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var expMinDuration = UnknownPathString.of("17m20s", 0);
     String expStd = "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx]";
     String expStdRevOne =
       "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s 0tx]";
     return RaptorModuleTestCase
       .of()
-      .add(minDuration(), expStd)
+      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_00))
+      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
       .add(standard().not(TC_STANDARD_REV_ONE), expStd)
       // When we run one iteration the egress "alighting" last is used as long as it
       // arrives at the origin at the same time. In this case the "worst" path is kept.

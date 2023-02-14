@@ -27,6 +27,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
@@ -70,6 +71,8 @@ public class F02_EgressWithRidesTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var expMinDuration = UnknownPathString.of("9m", 0);
+
     var prefix = "Walk 1m ~ B ~ BUS R1 0:10 ";
 
     var bestArrivalTime = prefix + "0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m 2tx $1380]";
@@ -79,9 +82,8 @@ public class F02_EgressWithRidesTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, withoutCost(bestArrivalTime))
-      // TODO - The best alternative for 1, 2 and 3 transfers
-      .add(TC_MIN_DURATION_REV, withoutCost(bestArrivalTime, bestTxAndTime, bestNTransfers))
+      .add(TC_MIN_DURATION, "[0:00 0:09 9m 2tx]", "[0:00 0:11 11m 1tx]", "[0:00 0:19 19m 0tx]")
+      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
       .add(standard().not(TC_STANDARD_REV_ONE), withoutCost(bestArrivalTime))
       // "First" alighting wins for reverse
       .add(TC_STANDARD_REV_ONE, withoutCost(bestNTransfers))

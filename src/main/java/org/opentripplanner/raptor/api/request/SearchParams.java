@@ -126,6 +126,11 @@ public class SearchParams {
    * Keep the latest departures arriving before the given latest-arrival-time(LAT). LAT is required
    * if this parameter is set. This parameter is not allowed if the {@link #timetable} is
    * enabled.
+   * <p>
+   * TODO - Reactor, we should use an Enum value instead of this and 'timetable':
+   *      - timePreference : enum TimePreference{ TIMETABLE, DEPART_AFTER, ARRIVE_BY }
+   *      - PS! There are some corner cases here. E.g. DEPART_AFTER must work when
+   *        edt=null & lat!=null - same for ARRIVE_BY.
    */
   public boolean preferLateArrival() {
     return preferLateArrival;
@@ -295,8 +300,7 @@ public class SearchParams {
 
   void verify() {
     assertProperty(
-      earliestDepartureTime != RaptorConstants.TIME_NOT_SET ||
-      latestArrivalTime != RaptorConstants.TIME_NOT_SET,
+      isEarliestDepartureTimeSet() || isLatestArrivalTimeSet(),
       "'earliestDepartureTime' or 'latestArrivalTime' is required."
     );
     assertProperty(!accessPaths.isEmpty(), "At least one 'accessPath' is required.");
@@ -305,7 +309,7 @@ public class SearchParams {
       "At least one 'egressPath' is required."
     );
     assertProperty(
-      !(preferLateArrival && latestArrivalTime == RaptorConstants.TIME_NOT_SET),
+      !(preferLateArrival && !isLatestArrivalTimeSet()),
       "The 'latestArrivalTime' is required when 'departAsLateAsPossible' is set."
     );
     assertProperty(

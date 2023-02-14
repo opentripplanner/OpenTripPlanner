@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
+import static org.opentripplanner.raptor.api.RaptorConstants.TIME_NOT_SET;
+
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -85,15 +87,41 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
     RaptorAccessEgress egressPath,
     int transferSlack
   ) {
+    return calculateEgressDepartureTime(this, arrivalTime, egressPath, transferSlack, true);
+  }
+
+  /**
+   * This method does the same as {@link #calculateEgressDepartureTime(int, RaptorAccessEgress, int)},
+   * but instead of time-shifting egress with opening hours the wait-time is ignored and
+   * only the egress duration is added.
+   */
+  default int calculateEgressDepartureTimeWithoutTimeShift(
+    int arrivalTime,
+    RaptorAccessEgress egressPath,
+    int transferSlack
+  ) {
+    return calculateEgressDepartureTime(this, arrivalTime, egressPath, transferSlack, false);
+  }
+
+  private static int calculateEgressDepartureTime(
+    TransitCalculator<?> calculator,
+    int arrivalTime,
+    RaptorAccessEgress egressPath,
+    int transferSlack,
+    boolean includeTimeShift
+  ) {
     int departureTime = arrivalTime;
 
     if (egressPath.hasRides()) {
-      departureTime = plusDuration(departureTime, transferSlack);
+      departureTime = calculator.plusDuration(departureTime, transferSlack);
     }
-    if (searchForward()) {
-      return egressPath.earliestDepartureTime(departureTime);
-    } else {
-      return egressPath.latestArrivalTime(departureTime);
+    int timeShiftedDepartureTime = calculator.searchForward()
+      ? egressPath.earliestDepartureTime(departureTime)
+      : egressPath.latestArrivalTime(departureTime);
+
+    if (timeShiftedDepartureTime == TIME_NOT_SET) {
+      return TIME_NOT_SET;
     }
+    return includeTimeShift ? timeShiftedDepartureTime : departureTime;
   }
 }

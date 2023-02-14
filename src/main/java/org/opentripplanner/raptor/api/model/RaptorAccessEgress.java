@@ -88,9 +88,9 @@ public interface RaptorAccessEgress {
   /*
        ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS
 
-       The methods below should be only overridden when a RaptorTransfer contains information about
-       public services, which were generated outside the RAPTOR algorithm. Examples of such schemes
-       include flexible transit service and TNC. They should not be used for regular
+       The methods below should be only overridden when a RaptorAccessEgress contains information
+       about public services, which were generated outside the RAPTOR algorithm. Examples of such
+       schemes include flexible transit service and TNC. They should not be used for regular
        access/transfer/egress.
     */
 
@@ -133,7 +133,7 @@ public interface RaptorAccessEgress {
   }
 
   /**
-   * Is this {@link RaptorTransfer} is connected to the given {@code stop} directly by
+   * Is this {@link RaptorAccessEgress} is connected to the given {@code stop} directly by
    * <b>transit</b>? For access and egress paths we allow plugging in flexible transit and other
    * means of transport, which might include one or more legs onboard a vehicle. This method should
    * return {@code true} if the leg connecting to the given stop arrives `onBoard` a public
@@ -144,6 +144,16 @@ public interface RaptorAccessEgress {
    */
   default boolean stopReachedOnBoard() {
     return false;
+  }
+
+  /**
+   * Is this {@link RaptorAccessEgress} is connected to the given {@code stop} directly by
+   * <b>walking</b>(or other street mode)? This should be {@code true} if the access/egress
+   * is NOT reached on-board.
+   * @see #stopReachedOnBoard()
+   */
+  default boolean stopReachedByWalking() {
+    return !stopReachedOnBoard();
   }
 
   /**

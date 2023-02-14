@@ -77,10 +77,75 @@ public class ForwardTransitCalculatorTest implements RaptorTestConstants {
       )
     );
 
-    // If egress is are closed (opening hours) then -1 should be returned
+    // If egress is are closed (opening hours) then TIME_NOT_SET should be returned
     assertEquals(
       RaptorConstants.TIME_NOT_SET,
       subject.calculateEgressDepartureTime(T00_30, free(STOP).openingHoursClosed(), TRANSFER_SLACK)
+    );
+  }
+
+  @Test
+  void calculateEgressDepartureTimeWithoutTimeShift() {
+    // No time-shift expected for a regular walking egress
+    assertEquals(
+      T00_30,
+      subject.calculateEgressDepartureTimeWithoutTimeShift(T00_30, WALK_8m, TRANSFER_SLACK)
+    );
+
+    // Transfers slack should be added if the egress arrive on-board
+    assertEquals(
+      T00_30 + TRANSFER_SLACK,
+      subject.calculateEgressDepartureTimeWithoutTimeShift(T00_30, FLEX_1x_8m, TRANSFER_SLACK)
+    );
+
+    // Transfers slack is added if the flex egress arrive by walking as well
+    assertEquals(
+      T00_30 + TRANSFER_SLACK,
+      subject.calculateEgressDepartureTimeWithoutTimeShift(
+        T00_30,
+        FLEX_AND_WALK_1x_8m,
+        TRANSFER_SLACK
+      )
+    );
+
+    // No time-shift expected if egress is within opening hours
+    assertEquals(
+      T00_30,
+      subject.calculateEgressDepartureTimeWithoutTimeShift(
+        T00_30,
+        walk(STOP, D8m).openingHours(T00_00, T01_00),
+        TRANSFER_SLACK
+      )
+    );
+
+    // Egress should NOT be time-shifted to the opening hours if departure time is before
+    assertEquals(
+      T00_10,
+      subject.calculateEgressDepartureTimeWithoutTimeShift(
+        T00_10,
+        walk(STOP, D8m).openingHours(T00_30, T01_00),
+        TRANSFER_SLACK
+      )
+    );
+    // Egress should NOT be time-shifted to the next opening hours if departure time is after
+    // opening hours
+    assertEquals(
+      T00_31,
+      subject.calculateEgressDepartureTimeWithoutTimeShift(
+        T00_31,
+        walk(STOP, D8m).openingHours(T00_10, T00_30),
+        TRANSFER_SLACK
+      )
+    );
+
+    // If egress is are closed (opening hours) then TIME_NOT_SET should be returned
+    assertEquals(
+      RaptorConstants.TIME_NOT_SET,
+      subject.calculateEgressDepartureTimeWithoutTimeShift(
+        T00_30,
+        free(STOP).openingHoursClosed(),
+        TRANSFER_SLACK
+      )
     );
   }
 }

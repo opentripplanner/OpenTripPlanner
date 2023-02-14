@@ -69,7 +69,7 @@ public class RaptorArchitectureTest {
 
   @Test
   void enforcePackageDependenciesInRaptorImplementation() {
-    var internalApi = RR_INTERNAL_API.dependsOn(RAPTOR_API, RAPTOR_SPI).verify();
+    var internalApi = RR_INTERNAL_API.dependsOn(FRAMEWORK_UTILS, RAPTOR_API, RAPTOR_SPI).verify();
 
     // RangeRaptor common allowed dependencies
     var common = Module.of(

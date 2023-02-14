@@ -7,6 +7,8 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -79,6 +81,8 @@ public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
 
     return RaptorModuleTestCase
       .of()
+      .add(TC_MIN_DURATION, "[0:00 0:40 40m 2tx]")
+      .add(TC_MIN_DURATION_REV, "[0:20 1:00 40m 2tx]")
       .add(standard(), withoutCost(expected))
       .add(multiCriteria(), expected)
       .build();

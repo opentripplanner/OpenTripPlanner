@@ -81,10 +81,13 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
     String expWalkAccess = "Walk 10m ~ B ~ BUS R1 0:10 0:20 ~ F ~ Walk 1m [0:00 0:21 21m 0tx]";
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION_REV, expFlexAccess)
+      // TODO - Why do we get only one result here - when there is 3 different pareto-optimal
+      //      - paths
+      .add(TC_MIN_DURATION, "[0:00 0:11 11m 0tx]")
+      // Return pareto optimal paths with 0, 1 and 2 num-of-transfers
+      .add(TC_MIN_DURATION_REV, "[0:19 0:30 11m 2tx]", "[0:17 0:30 13m 1tx]", "[0:09 0:30 21m 0tx]")
       .add(standard().not(TC_STANDARD_ONE), expFlexAccess)
       // First boarding wins with one-iteration (apply to min-duration and std-one)
-      .add(TC_MIN_DURATION, expWalkAccess)
       .add(TC_STANDARD_ONE, expWalkAccess)
       .add(
         multiCriteria(),

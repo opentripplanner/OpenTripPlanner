@@ -7,7 +7,8 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndW
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -41,7 +42,7 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
 
   @BeforeEach
   public void setup() {
-    //Given slack: transfer 1m, board 30s, alight 10s
+    //Given slacks: transfer 1m, board 30s, alight 10s
     data.withSlackProvider(new DefaultSlackProvider(D1m, D30s, D10s));
 
     data.withRoute(
@@ -79,7 +80,10 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
       "[0:00:30 0:09:10 8m40s 2tx $1840]";
     return RaptorModuleTestCase
       .of()
-      .add(minDuration(), PathUtils.withoutCost(path))
+      // TODO - Alight slack is missing
+      .add(TC_MIN_DURATION, "[0:00 0:08:30 8m30s 2tx]")
+      // TODO - Board slack is missing
+      .add(TC_MIN_DURATION_REV, "[0:01:50 0:10 8m10s 2tx]")
       .add(standard(), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)
       .build();

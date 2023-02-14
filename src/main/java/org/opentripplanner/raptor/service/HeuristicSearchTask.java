@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.service;
 
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -128,13 +127,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
 
   private void createHeuristicSearchIfNotExist(RaptorRequest<T> request) {
     if (search == null) {
-      var profile = MIN_TRAVEL_DURATION_BEST_TIME;
-
-      if (request.searchParams().constrainedTransfers()) {
-        // We need to look up the previous transit arrival, this is not possible with the
-        // BEST_TIMES only states.
-        profile = MIN_TRAVEL_DURATION;
-      }
+      var profile = MIN_TRAVEL_DURATION;
 
       var builder = request
         .mutate()

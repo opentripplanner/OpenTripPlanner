@@ -161,6 +161,13 @@ public final class BestTimes {
   }
 
   /**
+   * @return true if the given stop was reached by transfer or on-board in the current round.
+   */
+  boolean isStopReachedInCurrentRound(int stop) {
+    return reachedCurrentRound.get(stop);
+  }
+
+  /**
    * Clear all reached flags before we start a new iteration. This is important so stops visited in
    * the previous iteration in the last round does not "overflow" into the next iteration.
    */
