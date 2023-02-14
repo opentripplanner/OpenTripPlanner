@@ -57,7 +57,10 @@ public class SelectRequest implements Serializable {
     }
 
     if (!groupOfRoutes.isEmpty()) {
-      var ids = route.getGroupsOfRoutes().stream().map(AbstractTransitEntity::getId).toList();
+      var ids = new ArrayList<FeedScopedId>();
+      for (var gor : route.getGroupsOfRoutes()) {
+        ids.add(gor.getId());
+      }
 
       if (Collections.disjoint(groupOfRoutes, ids)) {
         return false;
