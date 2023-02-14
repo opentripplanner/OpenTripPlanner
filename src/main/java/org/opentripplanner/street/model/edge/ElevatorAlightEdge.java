@@ -42,8 +42,8 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
 
     // set up the geometry
     Coordinate[] coords = new Coordinate[2];
-    coords[0] = new Coordinate(from.getX(), from.getY());
-    coords[1] = new Coordinate(to.getX(), to.getY());
+    coords[0] = new Coordinate(from.getLon(), from.getLat());
+    coords[1] = new Coordinate(to.getLon(), to.getLat());
     the_geom = GeometryUtils.getGeometryFactory().createLineString(coords);
   }
 

@@ -658,8 +658,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     drawVertex(v, 8);
     str += " " + shortDateFormat.format(Instant.ofEpochSecond(s.getTimeSeconds()));
     str += " [" + (int) s.getWeight() + "]";
-    double x = toScreenX(v.getX()) + 10;
-    double y = toScreenY(v.getY());
+    double x = toScreenX(v.getLon()) + 10;
+    double y = toScreenY(v.getLat());
     double dy = y - lastLabelY;
     if (dy == 0) {
       y = lastLabelY + 20;

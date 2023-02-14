@@ -158,8 +158,8 @@ class ElevatorProcessor {
     ElevatorOffboardVertex offboardVertex = new ElevatorOffboardVertex(
       graph,
       sourceVertexLabel + "_offboard",
-      sourceVertex.getX(),
-      sourceVertex.getY(),
+      sourceVertex.getLon(),
+      sourceVertex.getLat(),
       new NonLocalizedString(levelName)
     );
 
@@ -169,8 +169,8 @@ class ElevatorProcessor {
     ElevatorOnboardVertex onboardVertex = new ElevatorOnboardVertex(
       graph,
       sourceVertexLabel + "_onboard",
-      sourceVertex.getX(),
-      sourceVertex.getY(),
+      sourceVertex.getLon(),
+      sourceVertex.getLat(),
       new NonLocalizedString(levelName)
     );
 

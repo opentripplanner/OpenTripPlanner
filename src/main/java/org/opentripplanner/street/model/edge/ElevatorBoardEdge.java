@@ -29,7 +29,10 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
     super(from, to);
     geometry =
       GeometryUtils.makeLineString(
-        List.of(new Coordinate(from.getX(), from.getY()), new Coordinate(to.getX(), to.getY()))
+        List.of(
+          new Coordinate(from.getLon(), from.getLat()),
+          new Coordinate(to.getLon(), to.getLat())
+        )
       );
   }
 

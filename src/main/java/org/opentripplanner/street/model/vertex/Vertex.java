@@ -27,13 +27,11 @@ import org.slf4j.LoggerFactory;
 public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serializable, Cloneable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
+  private static final NonLocalizedString NO_NAME = new NonLocalizedString("(no name provided)");
 
-  /**
-   * Short debugging name. This is a graph mathematical term as in https://en.wikipedia.org/wiki/Graph_labeling
-   */
   private final String label;
-  private final double x;
-  private final double y;
+  private final double lon;
+  private final double lat;
   /* Longer human-readable name for the client */
   private I18NString name;
   private transient Edge[] incoming = new Edge[0];
@@ -43,19 +41,19 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
 
   /* CONSTRUCTORS */
 
-  protected Vertex(Graph g, String label, double x, double y) {
+  protected Vertex(Graph g, String label, double lon, double lat) {
     this.label = label;
-    this.x = x;
-    this.y = y;
+    this.lon = lon;
+    this.lat = lat;
     // null graph means temporary vertex
     if (g != null) {
       g.addVertex(this);
     }
-    this.name = new NonLocalizedString("(no name provided)");
+    this.name = NO_NAME;
   }
 
-  protected Vertex(Graph g, String label, double x, double y, I18NString name) {
-    this(g, label, x, y);
+  protected Vertex(Graph g, String label, double lon, double lat, I18NString name) {
+    this(g, label, lon, lat);
     this.name = name;
   }
 
@@ -127,23 +125,13 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /** Get the longitude of the vertex */
-  public final double getX() {
-    return getLon();
-  }
-
-  /** Get the latitude of the vertex */
-  public final double getY() {
-    return getLat();
-  }
-
-  /** Get the longitude of the vertex */
   public final double getLon() {
-    return x;
+    return lon;
   }
 
   /** Get the latitude of the vertex */
   public final double getLat() {
-    return y;
+    return lat;
   }
 
   /** If this vertex is located on only one street, get that street's name */
@@ -164,7 +152,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   public Coordinate getCoordinate() {
-    return new Coordinate(getX(), getY());
+    return new Coordinate(getLon(), getLat());
   }
 
   /** Get the bearing, in degrees, between this vertex and another coordinate. */

@@ -80,24 +80,24 @@ public class GeometryProcessorTest {
       IntersectionVertex front = new IntersectionVertex(
         graph,
         "near_1_" + stop.getStop().getId(),
-        stop.getX() + 0.0001,
-        stop.getY() + 0.0001
+        stop.getLon() + 0.0001,
+        stop.getLat() + 0.0001
       );
       IntersectionVertex back = new IntersectionVertex(
         graph,
         "near_2_" + stop.getStop().getId(),
-        stop.getX() - 0.0001,
-        stop.getY() - 0.0001
+        stop.getLon() - 0.0001,
+        stop.getLat() - 0.0001
       );
 
       StreetEdge street1 = new StreetEdge(
         front,
         back,
         GeometryUtils.makeLineString(
-          stop.getX() + 0.0001,
-          stop.getY() + 0.0001,
-          stop.getX() - 0.0001,
-          stop.getY() - 0.0001
+          stop.getLon() + 0.0001,
+          stop.getLat() + 0.0001,
+          stop.getLon() - 0.0001,
+          stop.getLat() - 0.0001
         ),
         "street",
         100,
@@ -108,10 +108,10 @@ public class GeometryProcessorTest {
         back,
         front,
         GeometryUtils.makeLineString(
-          stop.getX() - 0.0001,
-          stop.getY() - 0.0001,
-          stop.getX() + 0.0001,
-          stop.getY() + 0.0001
+          stop.getLon() - 0.0001,
+          stop.getLat() - 0.0001,
+          stop.getLon() + 0.0001,
+          stop.getLat() + 0.0001
         ),
         "street",
         100,

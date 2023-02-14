@@ -220,8 +220,8 @@ public class TestHalfEdges {
       tempEdges
     );
 
-    assertTrue(start.getX() < end.getX());
-    assertTrue(start.getY() < end.getY());
+    assertTrue(start.getLon() < end.getLon());
+    assertTrue(start.getLat() < end.getLat());
 
     Collection<Edge> edges = end.getIncoming();
 
@@ -425,8 +425,8 @@ public class TestHalfEdges {
 
     DisposableEdgeCollection connection = SameEdgeAdjuster.adjust(start, end, graph);
 
-    assertEquals(start.getX(), end.getX(), 0.0001);
-    assertTrue(start.getY() < end.getY());
+    assertEquals(start.getLon(), end.getLon(), 0.0001);
+    assertTrue(start.getLat() < end.getLat());
 
     Collection<Edge> edges = end.getIncoming();
 
@@ -482,8 +482,8 @@ public class TestHalfEdges {
 
     DisposableEdgeCollection connection = SameEdgeAdjuster.adjust(start, end, graph);
 
-    assertEquals(start.getX(), end.getX(), 0.001);
-    assertTrue(start.getY() > end.getY());
+    assertEquals(start.getLon(), end.getLon(), 0.001);
+    assertTrue(start.getLat() > end.getLat());
 
     Collection<Edge> edges = end.getIncoming();
     assertEquals(1, edges.size());

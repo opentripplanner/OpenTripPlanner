@@ -162,15 +162,15 @@ public abstract class GraphRoutingTest {
         var onboard = new ElevatorOnboardVertex(
           graph,
           boardLabel,
-          v.getX(),
-          v.getY(),
+          v.getLon(),
+          v.getLat(),
           new NonLocalizedString(boardLabel)
         );
         var offboard = new ElevatorOffboardVertex(
           graph,
           alightLabel,
-          v.getX(),
-          v.getY(),
+          v.getLon(),
+          v.getLat(),
           new NonLocalizedString(alightLabel)
         );
 

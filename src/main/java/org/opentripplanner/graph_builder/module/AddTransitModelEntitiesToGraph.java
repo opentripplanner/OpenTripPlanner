@@ -261,15 +261,15 @@ public class AddTransitModelEntitiesToGraph {
     ElevatorOffboardVertex fromOffboardVertex = new ElevatorOffboardVertex(
       graph,
       fromVertex.getLabel() + "_" + pathway.getId() + "_offboard",
-      fromVertex.getX(),
-      fromVertex.getY(),
+      fromVertex.getLon(),
+      fromVertex.getLat(),
       fromLevel.name()
     );
     ElevatorOffboardVertex toOffboardVertex = new ElevatorOffboardVertex(
       graph,
       toVertex.getLabel() + "_" + pathway.getId() + "_offboard",
-      toVertex.getX(),
-      toVertex.getY(),
+      toVertex.getLon(),
+      toVertex.getLat(),
       toLevel.name()
     );
 
@@ -279,15 +279,15 @@ public class AddTransitModelEntitiesToGraph {
     ElevatorOnboardVertex fromOnboardVertex = new ElevatorOnboardVertex(
       graph,
       fromVertex.getLabel() + "_" + pathway.getId() + "_onboard",
-      fromVertex.getX(),
-      fromVertex.getY(),
+      fromVertex.getLon(),
+      fromVertex.getLat(),
       fromLevel.name()
     );
     ElevatorOnboardVertex toOnboardVertex = new ElevatorOnboardVertex(
       graph,
       toVertex.getLabel() + "_" + pathway.getId() + "_onboard",
-      toVertex.getX(),
-      toVertex.getY(),
+      toVertex.getLon(),
+      toVertex.getLat(),
       toLevel.name()
     );
 
