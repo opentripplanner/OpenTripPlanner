@@ -136,9 +136,9 @@ public class ZipFileDataSourceTest {
    */
   public static void main(String[] args) throws FileNotFoundException, IOException {
     /* cp437 encoded file names in zip */
-    final ZipArchiveOutputStream zos = new ZipArchiveOutputStream(new FileOutputStream(
-      ConstantsForTests.UMLAUT_CP437_ZIP
-    ));
+    final ZipArchiveOutputStream zos = new ZipArchiveOutputStream(
+      new FileOutputStream(ConstantsForTests.UMLAUT_CP437_ZIP)
+    );
     /* set original ZIP character encoding aka OEM-US or DOS-US */
     zos.setEncoding("Cp437");
 
@@ -152,12 +152,11 @@ public class ZipFileDataSourceTest {
     zos.closeArchiveEntry();
 
     zos.close();
- 
- 
+
     /* utf-8 encoded file names in zip */
-    final ZipArchiveOutputStream zos2 = new ZipArchiveOutputStream(new FileOutputStream(
-      ConstantsForTests.UMLAUT_UTF8_ZIP
-    ));
+    final ZipArchiveOutputStream zos2 = new ZipArchiveOutputStream(
+      new FileOutputStream(ConstantsForTests.UMLAUT_UTF8_ZIP)
+    );
     /* explicitely set Apache Commons default for documentation */
     zos2.setEncoding("utf-8");
 
