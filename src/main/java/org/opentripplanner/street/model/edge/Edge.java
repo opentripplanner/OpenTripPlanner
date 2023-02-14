@@ -37,11 +37,6 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     tov.addIncoming(this);
   }
 
-  @Override
-  public State[] multiTraverse(State u) {
-    return State.of(traverse(u));
-  }
-
   public final Vertex getFromVertex() {
     return fromv;
   }
@@ -80,14 +75,6 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   public boolean isRoundabout() {
     return false;
   }
-
-  /**
-   * Traverse this edge.
-   *
-   * @param s0 The State coming into the edge.
-   * @return The State upon exiting the edge.
-   */
-  public abstract State traverse(State s0);
 
   /**
    * Returns the default name of the edge

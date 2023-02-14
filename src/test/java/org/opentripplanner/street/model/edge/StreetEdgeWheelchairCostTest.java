@@ -211,6 +211,6 @@ class StreetEdgeWheelchairCostTest {
     var state = new State(V1, req);
 
     assertEquals(0, state.weight);
-    return edge.traverse(state);
+    return edge.multiTraverse(state)[0];
   }
 }

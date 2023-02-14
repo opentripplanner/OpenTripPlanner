@@ -17,7 +17,9 @@ import org.opentripplanner.transit.model.site.PathwayMode;
 /**
  * A walking pathway as described in GTFS
  */
-public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTraversalInformation {
+public class PathwayEdge
+  extends SingleStateTraversalEdge
+  implements BikeWalkableEdge, WheelchairTraversalInformation {
 
   public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
   private final I18NString name;

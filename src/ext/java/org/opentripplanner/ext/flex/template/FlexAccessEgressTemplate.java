@@ -171,8 +171,8 @@ public abstract class FlexAccessEgressTemplate {
       return null;
     }
     for (Edge e : transferEdges) {
-      state = e.traverse(state);
-      if (state == null) {
+      var states = e.multiTraverse(state);
+      if (state == null || states.length == 0) {
         return null;
       }
     }

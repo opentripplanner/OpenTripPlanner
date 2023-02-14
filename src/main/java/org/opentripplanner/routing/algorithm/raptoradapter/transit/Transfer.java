@@ -77,10 +77,11 @@ public class Transfer {
 
     State s = se.makeState();
     for (Edge e : edges) {
-      s = e.traverse(s);
-      if (s == null) {
+      var states = e.multiTraverse(s);
+      if (State.isEmpty(states)) {
         return Optional.empty();
       }
+      s = states[0];
     }
 
     return Optional.of(

@@ -17,7 +17,9 @@ import org.opentripplanner.street.search.state.StateEditor;
  *
  * @author mattwigway
  */
-public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, ElevatorEdge {
+public class ElevatorBoardEdge
+  extends SingleStateTraversalEdge
+  implements BikeWalkableEdge, ElevatorEdge {
 
   /**
    * The polyline geometry of this edge. It's generally a polyline with two coincident points, but

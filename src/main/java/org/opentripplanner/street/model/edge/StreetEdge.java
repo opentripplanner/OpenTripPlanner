@@ -385,7 +385,7 @@ public class StreetEdge
   }
 
   @Override
-  public State traverse(State s0) {
+  public State[] multiTraverse(State s0) {
     final StateEditor editor;
 
     // if the traversal is banned for the current state because of a GBFS geofencing zone
@@ -421,8 +421,7 @@ public class StreetEdge
         afterTraversal.dropFloatingVehicle();
         afterTraversal.leaveNoRentalDropOffArea();
         var forkState = afterTraversal.makeState();
-        forkState.addToExistingResultChain(state);
-        return forkState;
+        return State.of(forkState, state);
       }
     }
 
@@ -433,8 +432,7 @@ public class StreetEdge
         State forkState = inCar.makeState();
         if (forkState != null) {
           // Return both the original WALK state, along with the new IN_CAR state
-          forkState.addToExistingResultChain(state);
-          return forkState;
+          return State.of(forkState, state);
         }
       }
     }
@@ -448,11 +446,11 @@ public class StreetEdge
       if (dropOff != null) {
         dropOffAfterDriving(s0, dropOff);
         // Only the walk state is returned, since traversing by car was not possible
-        return dropOff.makeState();
+        return State.of(dropOff.makeState());
       }
     }
 
-    return state;
+    return State.of(state);
   }
 
   /**

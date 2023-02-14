@@ -3,13 +3,13 @@ package org.opentripplanner.routing.graph;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.SingleStateTraversalEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
-public class SimpleConcreteEdge extends Edge {
+public class SimpleConcreteEdge extends SingleStateTraversalEdge {
 
   /**
    * Constructor without ID.

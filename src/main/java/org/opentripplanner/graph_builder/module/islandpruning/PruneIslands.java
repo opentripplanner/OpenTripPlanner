@@ -339,11 +339,11 @@ public class PruneIslands implements GraphBuilderModule {
         ) {
           continue;
         }
-        State s1 = e.traverse(s0);
-        if (s1 == null) {
+        State[] states = e.multiTraverse(s0);
+        if (states == null || states.length == 0) {
           continue;
         }
-        Vertex out = s1.getVertex();
+        Vertex out = states[0].getVertex();
 
         var vertexList = neighborsForVertex.computeIfAbsent(gv, k -> new ArrayList<>());
         vertexList.add(out);

@@ -12,7 +12,7 @@ import org.opentripplanner.street.search.state.StateEditor;
  *
  * @author novalis
  */
-public class FreeEdge extends Edge {
+public class FreeEdge extends SingleStateTraversalEdge {
 
   public FreeEdge(Vertex from, Vertex to) {
     super(from, to);

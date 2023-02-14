@@ -15,7 +15,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 /**
  * Parking a vehicle edge.
  */
-public class VehicleParkingEdge extends Edge {
+public class VehicleParkingEdge extends SingleStateTraversalEdge {
 
   private final VehicleParking vehicleParking;
 

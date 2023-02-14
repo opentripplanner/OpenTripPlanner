@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
  * This represents the connection between a street vertex and a transit vertex.
  */
 public abstract class StreetTransitEntityLink<T extends Vertex>
-  extends Edge
+  extends SingleStateTraversalEdge
   implements CarPickupableEdge {
 
   static final int STEL_TRAVERSE_COST = 1;
@@ -45,6 +45,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return false;
   }
 
+  @Override
   public State traverse(State s0) {
     // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
     // avoids spurious leg transitions. As noted in https://github.com/opentripplanner/OpenTripPlanner/issues/2815,

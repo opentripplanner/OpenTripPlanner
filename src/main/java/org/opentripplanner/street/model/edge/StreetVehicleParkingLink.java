@@ -14,7 +14,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 /**
  * This represents the connection between a street vertex and a vehicle parking vertex.
  */
-public class StreetVehicleParkingLink extends Edge {
+public class StreetVehicleParkingLink extends SingleStateTraversalEdge {
 
   private final VehicleParkingEntranceVertex vehicleParkingEntranceVertex;
 

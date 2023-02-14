@@ -56,7 +56,12 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     State state = flexEdge.traverse(accessEgress.state);
 
     for (Edge e : egressEdges) {
-      state = e.traverse(state);
+      var states = e.multiTraverse(state);
+      if (states == null || states.length == 0) {
+        state = null;
+      } else {
+        state = states[0];
+      }
     }
 
     int[] flexTimes = getFlexTimes(flexEdge, state);

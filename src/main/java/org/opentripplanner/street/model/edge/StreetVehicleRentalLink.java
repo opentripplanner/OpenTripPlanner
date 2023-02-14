@@ -10,7 +10,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 /**
  * This represents the connection between a street vertex and a bike rental station vertex.
  */
-public class StreetVehicleRentalLink extends Edge {
+public class StreetVehicleRentalLink extends SingleStateTraversalEdge {
 
   private final VehicleRentalPlaceVertex vehicleRentalPlaceVertex;
 

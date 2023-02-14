@@ -16,7 +16,9 @@ import org.opentripplanner.transit.model.basic.Accessibility;
  *
  * @author mattwigway
  */
-public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTraversalInformation {
+public class ElevatorHopEdge
+  extends SingleStateTraversalEdge
+  implements ElevatorEdge, WheelchairTraversalInformation {
 
   private final StreetTraversalPermission permission;
 

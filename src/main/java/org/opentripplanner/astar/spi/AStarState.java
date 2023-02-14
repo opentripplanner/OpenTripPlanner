@@ -21,8 +21,6 @@ public interface AStarState<
 
   Vertex getVertex();
 
-  State getNextResult();
-
   long getElapsedTimeSeconds();
 
   Instant getTime();

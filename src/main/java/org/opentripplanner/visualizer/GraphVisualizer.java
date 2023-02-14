@@ -631,7 +631,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
           Edge backEdge = lastStateClicked.getBackEdge();
           State backState = lastStateClicked.getBackState();
 
-          backEdge.traverse(backState);
+          backEdge.multiTraverse(backState);
         }
       }
     );

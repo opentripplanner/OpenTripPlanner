@@ -16,7 +16,7 @@ import org.opentripplanner.street.search.state.StateEditor;
  *
  * @author laurent
  */
-public class VehicleRentalEdge extends Edge {
+public class VehicleRentalEdge extends SingleStateTraversalEdge {
 
   public FormFactor formFactor;
 

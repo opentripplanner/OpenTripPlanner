@@ -102,6 +102,18 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     }
   }
 
+  public static State[] of(State... states) {
+    if (states == null) {
+      return EMPTY_STATES;
+    } else {
+      return states;
+    }
+  }
+
+  public static boolean isEmpty(State[] s) {
+    return s == null || s.length == 0;
+  }
+
   /**
    * Create a state editor to produce a child of this state, which will be the result of traversing
    * the given edge.
@@ -237,39 +249,6 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public void initBackEdge(Edge initialBackEdge) {
     this.backEdge = requireNotInitialized(this.backEdge, initialBackEdge);
-  }
-
-  /**
-   * Optional next result that allows {@link Edge} to return multiple results.
-   *
-   * @return the next additional result from an edge traversal, or null if no more results
-   */
-  public State getNextResult() {
-    return next;
-  }
-
-  /**
-   * Extend an exiting result chain by appending this result to the existing chain. The usage model
-   * looks like this:
-   *
-   * <code>
-   * TraverseResult result = null;
-   * <p>
-   * for( ... ) { TraverseResult individualResult = ...; result = individualResult.addToExistingResultChain(result);
-   * }
-   * <p>
-   * return result;
-   * </code>
-   *
-   * @param existingResultChain the tail of an existing result chain, or null if the chain has not
-   *                            been started
-   */
-  public State addToExistingResultChain(State existingResultChain) {
-    if (this.getNextResult() != null) {
-      throw new IllegalStateException("this result already has a next result set");
-    }
-    next = existingResultChain;
-    return this;
   }
 
   public StreetSearchRequest getRequest() {

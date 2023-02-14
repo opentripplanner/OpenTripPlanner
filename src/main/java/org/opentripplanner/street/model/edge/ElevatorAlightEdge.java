@@ -16,7 +16,9 @@ import org.opentripplanner.street.search.state.StateEditor;
  *
  * @author mattwigway
  */
-public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, ElevatorEdge {
+public class ElevatorAlightEdge
+  extends SingleStateTraversalEdge
+  implements BikeWalkableEdge, ElevatorEdge {
 
   /**
    * This is the level of this elevator exit, used in narrative generation.
