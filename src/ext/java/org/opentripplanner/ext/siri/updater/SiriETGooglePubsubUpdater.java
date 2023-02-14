@@ -23,12 +23,12 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import org.apache.commons.io.FileUtils;
 import org.entur.protobuf.mapper.SiriMapper;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.text.FileSizeToTextConverter;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -306,9 +306,9 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
       final long t2 = System.currentTimeMillis();
       LOG.info(
-        "Fetching initial data - finished after {} ms, got {} bytes",
+        "Fetching initial data - finished after {} ms, got {}",
         (t2 - t1),
-        FileUtils.byteCountToDisplaySize(value.size())
+        FileSizeToTextConverter.fileSizeToString(value.size())
       );
 
       final PubsubMessage message = PubsubMessage.newBuilder().setData(value).build();
@@ -324,7 +324,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
               (System.currentTimeMillis() - t2),
               MESSAGE_COUNTER.get(),
               UPDATE_COUNTER.get(),
-              FileUtils.byteCountToDisplaySize(SIZE_COUNTER.get()),
+              FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
               getTimeSinceStartupString()
             );
           }
@@ -378,7 +378,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
             "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
             numberOfMessages,
             numberOfUpdates,
-            FileUtils.byteCountToDisplaySize(SIZE_COUNTER.get()),
+            FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
             java.time.Duration
               .between(siri.getServiceDelivery().getResponseTimestamp(), Instant.now())
               .toMillis(),
