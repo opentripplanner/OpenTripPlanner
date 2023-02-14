@@ -70,7 +70,6 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         return workerState(stdStopArrivalsState());
       case BEST_TIME:
       case MIN_TRAVEL_DURATION:
-      case MIN_TRAVEL_DURATION_BEST_TIME:
         return workerState(bestTimeStopArrivalsState());
     }
     throw new IllegalArgumentException(ctx.profile().toString());
@@ -86,7 +85,6 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
           ctx.calculator()
         );
       case MIN_TRAVEL_DURATION:
-      case MIN_TRAVEL_DURATION_BEST_TIME:
         return new MinTravelDurationRoutingStrategy<>(
           state,
           ctx.createTimeBasedBoardingSupport(),

@@ -32,14 +32,7 @@ public enum RaptorProfile {
    * The path is not kept, because this potentially creates paths witch is not possible; Hence,
    * can not be constructed.
    */
-  MIN_TRAVEL_DURATION("MinTravelDuration", true),
-
-  /**
-   * Same as {@link #MIN_TRAVEL_DURATION}, but no paths are computed/returned.
-   * @deprecated USe {@link #MIN_TRAVEL_DURATION}
-   */
-  @Deprecated
-  MIN_TRAVEL_DURATION_BEST_TIME("MinTravelDurationBT", false);
+  MIN_TRAVEL_DURATION("MinTravelDuration", true);
 
   private final boolean supportsConstrainedTransfers;
 
@@ -72,6 +65,6 @@ public enum RaptorProfile {
    * path construction, but we include it here anyway.
    */
   public boolean useApproximateTripSearch() {
-    return isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME);
+    return is(MIN_TRAVEL_DURATION);
   }
 }
