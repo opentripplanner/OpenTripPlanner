@@ -128,7 +128,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     }
 
     // Trip has to match with at least one predicate in order to be included in search. We only have
-    // to this if we have mode specific filters, and not all trips on hte pattern have the same
+    // to this if we have mode specific filters, and not all trips on the pattern have the same
     // mode, since that's the only thing that is trip specific
     if (withFilters) {
       for (TransitFilter f : filters) {
