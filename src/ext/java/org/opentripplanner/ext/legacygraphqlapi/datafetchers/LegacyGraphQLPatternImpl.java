@@ -19,11 +19,11 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -173,6 +173,11 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   }
 
   @Override
+  public DataFetcher<TripPattern> originalTripPattern() {
+    return environment -> getSource(environment).getOriginalTripPattern();
+  }
+
+  @Override
   public DataFetcher<Geometry> patternGeometry() {
     return environment -> getSource(environment).getGeometry();
   }
@@ -247,9 +252,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
     return getSource(environment).scheduledTripsAsStream().collect(Collectors.toList());
   }
 
-  private RealtimeVehiclePositionService getVehiclePositionsService(
-    DataFetchingEnvironment environment
-  ) {
+  private VehiclePositionService getVehiclePositionsService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().getVehiclePositionService();
   }
 

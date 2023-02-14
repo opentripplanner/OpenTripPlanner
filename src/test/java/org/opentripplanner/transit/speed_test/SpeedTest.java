@@ -21,6 +21,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
+import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -87,7 +88,12 @@ public class SpeedTest {
     this.testCaseDefinitions = tcIO.readTestCaseDefinitions();
     this.expectedResultsByTcId = tcIO.readExpectedResults();
 
-    UpdaterConfigurator.configure(graph, transitModel, config.updatersConfig);
+    UpdaterConfigurator.configure(
+      graph,
+      new DefaultVehiclePositionService(),
+      transitModel,
+      config.updatersConfig
+    );
     if (transitModel.getUpdaterManager() != null) {
       transitModel.getUpdaterManager().startUpdaters();
     }
@@ -103,6 +109,7 @@ public class SpeedTest {
         timer.getRegistry(),
         List::of,
         TestServerContext.createWorldEnvelopeService(),
+        TestServerContext.createVehiclePositionService(),
         config.flexConfig,
         null,
         null

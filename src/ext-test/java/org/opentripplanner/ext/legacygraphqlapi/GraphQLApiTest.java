@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
@@ -23,6 +25,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.service.TransitModel;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -47,7 +50,20 @@ class GraphQLApiTest {
       );
     var transitModel = new TransitModel();
     transitModel.index();
-    transitModel.getTransitModelIndex().addRoutes(TransitModelForTest.route("123").build());
+    Arrays
+      .stream(TransitMode.values())
+      .sorted(Comparator.comparing(Enum::name))
+      .forEach(m ->
+        transitModel
+          .getTransitModelIndex()
+          .addRoutes(
+            TransitModelForTest
+              .route(m.name())
+              .withMode(m)
+              .withLongName(new NonLocalizedString("Long name for %s".formatted(m)))
+              .build()
+          )
+      );
     context = TestServerContext.createServerContext(graph, transitModel);
     resource = new LegacyGraphQLAPI(context, "ignored");
   }

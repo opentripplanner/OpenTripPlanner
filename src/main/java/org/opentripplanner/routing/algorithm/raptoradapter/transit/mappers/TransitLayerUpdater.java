@@ -121,10 +121,7 @@ public class TransitLayerUpdater {
         tripPatternsStartingOnDateMapCache.get(date).put(tripPattern, newTripPatternForDate);
         newTripPatternsForDate.put(tripPattern, newTripPatternForDate);
         datesToBeUpdated.addAll(newTripPatternForDate.getRunningPeriodDates());
-        if (
-          transferIndexGenerator != null &&
-          newTripPatternForDate.getTripPattern().getPattern().isCreatedByRealtimeUpdater()
-        ) {
+        if (transferIndexGenerator != null && tripPattern.isCreatedByRealtimeUpdater()) {
           transferIndexGenerator.addRealtimeTrip(
             tripPattern,
             timetable.getTripTimes().stream().map(TripTimes::getTrip).collect(Collectors.toList())

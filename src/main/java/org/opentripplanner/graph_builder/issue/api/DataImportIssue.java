@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.issue.api;
 
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -38,6 +39,13 @@ public interface DataImportIssue {
    */
   default String getHTMLMessage() {
     return this.getMessage();
+  }
+
+  /**
+   * This method is used by the HTML report builder. It adds all issues with a geometry to a GeoJSON
+   */
+  default Geometry getGeometry() {
+    return null;
   }
 
   /**
