@@ -20,6 +20,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
+  private static final State[] EMPTY_STATES = {};
   private final StreetSearchRequest request;
 
   /* Data which is likely to change at most traversals */
@@ -91,6 +92,14 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       }
     }
     return states;
+  }
+
+  public static State[] of(State u) {
+    if (u == null) {
+      return EMPTY_STATES;
+    } else {
+      return new State[] { u };
+    }
   }
 
   /**

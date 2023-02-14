@@ -37,6 +37,11 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     tov.addIncoming(this);
   }
 
+  @Override
+  public State[] multiTraverse(State u) {
+    return State.of(traverse(u));
+  }
+
   public final Vertex getFromVertex() {
     return fromv;
   }
