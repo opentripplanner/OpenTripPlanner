@@ -194,6 +194,6 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   }
 
   private State traverse() {
-    return vehicleParkingEdge.traverse(new State(vertex, request));
+    return vehicleParkingEdge.traverseSingleState(new State(vertex, request));
   }
 }

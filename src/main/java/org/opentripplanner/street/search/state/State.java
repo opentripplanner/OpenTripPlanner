@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -94,7 +95,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return states;
   }
 
-  public static State[] ofNullable(State u) {
+  /**
+   * Takes a nullable state and returns an array of states, possibly empty.
+   */
+  public static State[] ofNullable(@Nullable State u) {
     if (u == null) {
       return EMPTY_STATES;
     } else {
@@ -109,7 +113,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
    * This method is optimized for a low number of allocations and therefore doesn't use any streams
    * or collections to filter out the nulls.
    */
-  public static State[] ofNullable(State s1, State s2) {
+  public static State[] ofNullable(@Nullable State s1, @Nullable State s2) {
     if (s1 == null && s2 == null) {
       return EMPTY_STATES;
     } else if (s1 == null) {

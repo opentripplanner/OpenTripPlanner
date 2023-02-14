@@ -182,6 +182,6 @@ class StreetEdgeCostTest {
     var state = new State(V1, request);
 
     assertEquals(0, state.weight);
-    return edge.multiTraverse(state)[0];
+    return edge.traverse(state)[0];
   }
 }

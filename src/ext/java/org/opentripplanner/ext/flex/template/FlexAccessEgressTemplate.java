@@ -166,12 +166,12 @@ public abstract class FlexAccessEgressTemplate {
     // this code is a little repetitive but needed as a performance improvement. previously
     // the flex path was checked before this method was called. this meant that every path
     // was traversed twice leading to a noticeable slowdown.
-    State state = flexEdge.traverse(accessEgress.state);
+    State state = flexEdge.traverseSingleState(accessEgress.state);
     if (state == null) {
       return null;
     }
     for (Edge e : transferEdges) {
-      var states = e.multiTraverse(state);
+      var states = e.traverse(state);
       if (State.isEmpty(states)) {
         return null;
       } else {

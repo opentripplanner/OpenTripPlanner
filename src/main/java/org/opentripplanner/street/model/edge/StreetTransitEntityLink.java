@@ -46,7 +46,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
   }
 
   @Override
-  public State traverse(State s0) {
+  public State traverseSingleState(State s0) {
     // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
     // avoids spurious leg transitions. As noted in https://github.com/opentripplanner/OpenTripPlanner/issues/2815,
     // it is possible that two stops can have the same GPS coordinate thus creating a possibility for a

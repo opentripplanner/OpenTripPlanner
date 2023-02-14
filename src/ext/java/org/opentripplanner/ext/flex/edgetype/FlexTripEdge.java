@@ -53,7 +53,7 @@ public class FlexTripEdge extends SingleStateTraversalEdge {
   }
 
   @Override
-  public State traverse(State s0) {
+  public State traverseSingleState(State s0) {
     if (this.flexPath == null) {
       // not routable
       return null;

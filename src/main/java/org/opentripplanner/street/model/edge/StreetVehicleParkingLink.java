@@ -32,7 +32,7 @@ public class StreetVehicleParkingLink extends SingleStateTraversalEdge {
     return "StreetVehicleParkingLink(" + fromv + " -> " + tov + ")";
   }
 
-  public State traverse(State s0) {
+  public State traverseSingleState(State s0) {
     // Disallow traversing two StreetBikeParkLinks in a row.
     // Prevents router using bike rental stations as shortcuts to get around
     // turn restrictions.

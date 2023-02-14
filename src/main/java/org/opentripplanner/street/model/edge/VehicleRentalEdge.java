@@ -25,7 +25,7 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
     this.formFactor = formFactor;
   }
 
-  public State traverse(State s0) {
+  public State traverseSingleState(State s0) {
     if (!s0.getRequest().mode().includesRenting()) {
       return null;
     }

@@ -94,6 +94,6 @@ class StreetTransitEntityLinkTest {
     );
 
     var edge = new StreetTransitStopLink(from, to);
-    return edge.traverse(new State(from, req.build()));
+    return edge.traverseSingleState(new State(from, req.build()));
   }
 }

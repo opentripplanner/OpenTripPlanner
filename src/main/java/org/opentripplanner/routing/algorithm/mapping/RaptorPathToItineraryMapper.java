@@ -288,7 +288,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       ArrayList<State> transferStates = new ArrayList<>();
       transferStates.add(s);
       for (Edge e : edges) {
-        var states = e.multiTraverse(s);
+        var states = e.traverse(s);
         if (State.isEmpty(states)) {
           s = null;
         } else {

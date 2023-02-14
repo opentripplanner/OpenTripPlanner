@@ -78,7 +78,7 @@ public class PathwayEdge
     return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
   }
 
-  public State traverse(State s0) {
+  public State traverseSingleState(State s0) {
     StateEditor s1 = createEditorForWalking(s0, this);
     if (s1 == null) {
       return null;

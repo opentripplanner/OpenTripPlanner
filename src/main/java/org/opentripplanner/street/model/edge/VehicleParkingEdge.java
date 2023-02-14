@@ -48,7 +48,7 @@ public class VehicleParkingEdge extends SingleStateTraversalEdge {
   }
 
   @Override
-  public State traverse(State s0) {
+  public State traverseSingleState(State s0) {
     if (!s0.getRequest().mode().includesParking()) {
       return null;
     }

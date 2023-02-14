@@ -53,10 +53,10 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
 
     FlexTripEdge flexEdge = getFlexEdge(flexToVertex, egress.stop);
 
-    State state = flexEdge.traverse(accessEgress.state);
+    State state = flexEdge.traverseSingleState(accessEgress.state);
 
     for (Edge e : egressEdges) {
-      var states = e.multiTraverse(state);
+      var states = e.traverse(state);
       if (State.isEmpty(states)) {
         state = null;
       } else {

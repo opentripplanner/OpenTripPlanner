@@ -23,7 +23,7 @@ public class FreeEdge extends SingleStateTraversalEdge {
   }
 
   @Override
-  public State traverse(State s0) {
+  public State traverseSingleState(State s0) {
     StateEditor s1 = s0.edit(this);
     s1.incrementWeight(1);
     s1.setBackMode(null);

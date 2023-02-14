@@ -9,5 +9,5 @@ public interface AStarEdge<
 
   Vertex getToVertex();
 
-  State[] multiTraverse(State u);
+  State[] traverse(State u);
 }

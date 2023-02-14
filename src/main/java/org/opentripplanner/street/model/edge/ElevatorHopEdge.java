@@ -83,7 +83,7 @@ public class ElevatorHopEdge
   }
 
   @Override
-  public State traverse(State s0) {
+  public State traverseSingleState(State s0) {
     RoutingPreferences preferences = s0.getPreferences();
 
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);

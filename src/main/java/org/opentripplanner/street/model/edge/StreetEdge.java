@@ -385,7 +385,7 @@ public class StreetEdge
   }
 
   @Override
-  public State[] multiTraverse(State s0) {
+  public State[] traverse(State s0) {
     final StateEditor editor;
 
     // if the traversal is banned for the current state because of a GBFS geofencing zone

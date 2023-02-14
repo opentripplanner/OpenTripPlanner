@@ -41,7 +41,7 @@ public class ElevatorBoardEdge
   }
 
   @Override
-  public State traverse(State s0) {
+  public State traverseSingleState(State s0) {
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
     if (s1 == null) {
       return null;

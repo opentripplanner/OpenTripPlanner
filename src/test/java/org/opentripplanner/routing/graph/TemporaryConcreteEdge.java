@@ -28,7 +28,7 @@ public class TemporaryConcreteEdge extends SingleStateTraversalEdge implements T
   }
 
   @Override
-  public State traverse(State s0) {
+  public State traverseSingleState(State s0) {
     double d = getDistanceMeters();
     TraverseMode mode = s0.getNonTransitMode();
     int t = (int) (d / s0.getPreferences().getSpeed(mode, false));

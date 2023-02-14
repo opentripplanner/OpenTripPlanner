@@ -10,8 +10,8 @@ public abstract class SingleStateTraversalEdge extends Edge {
   }
 
   @Override
-  public State[] multiTraverse(State u) {
-    return State.ofNullable(traverse(u));
+  public State[] traverse(State u) {
+    return State.ofNullable(traverseSingleState(u));
   }
 
   /**
@@ -20,5 +20,5 @@ public abstract class SingleStateTraversalEdge extends Edge {
    * @param s0 The State coming into the edge.
    * @return The State upon exiting the edge.
    */
-  public abstract State traverse(State s0);
+  public abstract State traverseSingleState(State s0);
 }

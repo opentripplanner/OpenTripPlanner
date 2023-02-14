@@ -433,7 +433,7 @@ public class StatesToWalkStepsMapper {
       if (!(out instanceof StreetEdge)) {
         continue;
       }
-      var outStates = out.multiTraverse(state.getBackState());
+      var outStates = out.traverse(state.getBackState());
       if (State.isEmpty(outStates)) {
         continue;
       }
@@ -450,7 +450,7 @@ public class StatesToWalkStepsMapper {
       Vertex tov = outState.getVertex();
       boolean found = false;
       for (Edge out2 : tov.getOutgoing()) {
-        var outStates2 = out2.multiTraverse(outState);
+        var outStates2 = out2.traverse(outState);
         if (
           !State.isEmpty(outStates2) && !Objects.equals(outStates2[0].getBackMode(), requestedMode)
         ) {

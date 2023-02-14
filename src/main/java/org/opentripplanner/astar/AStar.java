@@ -139,10 +139,7 @@ public class AStar<
 
       // Iterate over traversal results. When an edge leads nowhere (as indicated by
       // returning null), the iteration is over.
-      var states = edge.multiTraverse(u);
-      if (states == null) {
-        throw new RuntimeException(edge.toString());
-      }
+      var states = edge.traverse(u);
       for (var v : states) {
         // Could be: for (State v : traverseEdge...)
 

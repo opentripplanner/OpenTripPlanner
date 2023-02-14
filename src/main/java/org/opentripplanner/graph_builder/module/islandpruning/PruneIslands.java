@@ -339,7 +339,7 @@ public class PruneIslands implements GraphBuilderModule {
         ) {
           continue;
         }
-        State[] states = e.multiTraverse(s0);
+        State[] states = e.traverse(s0);
         if (states == null || states.length == 0) {
           continue;
         }

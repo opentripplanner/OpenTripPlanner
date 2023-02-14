@@ -76,7 +76,7 @@ class RentalRestrictionExtensionTest {
       )
     );
 
-    var states = edge1.multiTraverse(editor.makeState());
+    var states = edge1.traverse(editor.makeState());
 
     var continueOnFoot = states[0];
     var continueRenting = states[1];
@@ -88,9 +88,9 @@ class RentalRestrictionExtensionTest {
     assertEquals(BICYCLE, continueRenting.getBackMode());
     assertTrue(continueRenting.isInsideNoRentalDropOffArea());
 
-    var insideZone = restrictedEdge.multiTraverse(continueRenting)[0];
+    var insideZone = restrictedEdge.traverse(continueRenting)[0];
 
-    var leftNoDropOff = edge2.multiTraverse(insideZone)[0];
+    var leftNoDropOff = edge2.traverse(insideZone)[0];
     assertFalse(leftNoDropOff.isInsideNoRentalDropOffArea());
     assertEquals(RENTING_FLOATING, continueRenting.getVehicleRentalState());
   }
@@ -162,7 +162,7 @@ class RentalRestrictionExtensionTest {
 
   private State[] traverse(StreetEdge edge) {
     var state = state(network);
-    return edge.multiTraverse(state);
+    return edge.traverse(state);
   }
 
   @Nonnull

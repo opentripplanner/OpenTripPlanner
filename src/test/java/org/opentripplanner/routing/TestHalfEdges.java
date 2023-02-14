@@ -542,7 +542,7 @@ public class TestHalfEdges {
     StreetSearchRequestBuilder req = StreetSearchRequest.of();
     State traversedOne = new State(start, req.build());
     for (Edge e : start.getOutgoing()) {
-      var states = e.multiTraverse(traversedOne);
+      var states = e.traverse(traversedOne);
       if (!State.isEmpty(states)) {
         traversedOne = states[0];
         break;
@@ -585,7 +585,7 @@ public class TestHalfEdges {
 
     traversedOne = new State(start, req.build());
     for (Edge e : start.getOutgoing()) {
-      var states = e.multiTraverse(traversedOne);
+      var states = e.traverse(traversedOne);
       if (!State.isEmpty(states)) {
         traversedOne = states[0];
         break;

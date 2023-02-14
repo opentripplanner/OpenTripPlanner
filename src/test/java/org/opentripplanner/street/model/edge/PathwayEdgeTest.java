@@ -210,7 +210,7 @@ class PathwayEdgeTest {
       )
     );
 
-    var afterTraversal = edge.traverse(new State(from, req.build()));
+    var afterTraversal = edge.traverseSingleState(new State(from, req.build()));
     assertNotNull(afterTraversal);
 
     assertTrue(afterTraversal.getWeight() > 0);

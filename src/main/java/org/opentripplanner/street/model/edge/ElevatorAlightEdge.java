@@ -54,7 +54,7 @@ public class ElevatorAlightEdge
   }
 
   @Override
-  public State traverse(State s0) {
+  public State traverseSingleState(State s0) {
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
     s1.incrementWeight(1);
     return s1.makeState();
