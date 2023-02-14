@@ -117,16 +117,21 @@ public class ZipFileDataSourceTest {
     CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
     DataSource entry = subject.content().iterator().next();
 
-    assertEquals(ConstantsForTests.UMLAUT_UTF8_TXT, entry.name());
-    assertTrue(entry.exists());
+    assertEquals(ConstantsForTests.UMLAUT_TXT, entry.name());
+
+    // has worked before #4835, for verification remove the attempt to set to code page to cp437
+    target = new File(ConstantsForTests.UMLAUT_UTF8_ZIP_NO_EFS);
+    subject = new ZipFileDataSource(target, GTFS);
+    entry = subject.content().iterator().next();
+
+    assertEquals(ConstantsForTests.UMLAUT_TXT, entry.name());
 
     // only works after #4835, will fail with "Invalid CEN header (bad entry name)" when verifying
     target = new File(ConstantsForTests.UMLAUT_CP437_ZIP);
     subject = new ZipFileDataSource(target, GTFS);
     entry = subject.content().iterator().next();
 
-    assertEquals(ConstantsForTests.UMLAUT_CP437_TXT, entry.name());
-    assertTrue(entry.exists());
+    assertEquals(ConstantsForTests.UMLAUT_TXT, entry.name());
   }
 
   /*
@@ -144,7 +149,7 @@ public class ZipFileDataSourceTest {
 
     final byte[] data = {};
 
-    ZipArchiveEntry entry = new ZipArchiveEntry(ConstantsForTests.UMLAUT_CP437_TXT);
+    ZipArchiveEntry entry = new ZipArchiveEntry(ConstantsForTests.UMLAUT_TXT);
     entry.setSize(data.length);
     entry.setTime(FileTime.fromMillis(0));
     zos.putArchiveEntry(entry);
@@ -160,7 +165,7 @@ public class ZipFileDataSourceTest {
     /* explicitely set Apache Commons default for documentation */
     zos2.setEncoding("utf-8");
 
-    ZipArchiveEntry entry2 = new ZipArchiveEntry(ConstantsForTests.UMLAUT_UTF8_TXT);
+    ZipArchiveEntry entry2 = new ZipArchiveEntry(ConstantsForTests.UMLAUT_TXT);
     entry2.setSize(data.length);
     entry2.setTime(FileTime.fromMillis(0));
     zos2.putArchiveEntry(entry2);
@@ -168,5 +173,28 @@ public class ZipFileDataSourceTest {
     zos2.closeArchiveEntry();
 
     zos2.close();
+
+
+    /*
+     * utf-8 encoded file names in zip, this time without EFS flag
+     * e.g. Java pre 7b57
+     * http://web.archive.org/web/20150718122844/https://blogs.oracle.com/xuemingshen/entry/non_utf_8_encoding_in
+     */
+    final ZipArchiveOutputStream zos3 = new ZipArchiveOutputStream(
+      new FileOutputStream(ConstantsForTests.UMLAUT_UTF8_ZIP_NO_EFS)
+    );
+    /* explicitely set Apache Commons default for documentation */
+    zos3.setEncoding("utf-8");
+    /* no EFS flag! */
+    zos3.setUseLanguageEncodingFlag(false);
+
+    ZipArchiveEntry entry3 = new ZipArchiveEntry(ConstantsForTests.UMLAUT_TXT);
+    entry3.setSize(data.length);
+    entry3.setTime(FileTime.fromMillis(0));
+    zos3.putArchiveEntry(entry3);
+    zos3.write(data);
+    zos3.closeArchiveEntry();
+
+    zos3.close();
   }
 }
