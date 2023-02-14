@@ -40,7 +40,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.collections4.CollectionUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
@@ -1299,7 +1298,8 @@ public class TransmodelGraphQLSchema {
                 lineIds == null || lineIds.isEmpty() || lineIds.contains(t.getRoute().getId())
               )
               .filter(t ->
-                CollectionUtils.isEmpty(privateCodes) ||
+                privateCodes == null ||
+                privateCodes.isEmpty() ||
                 privateCodes.contains(t.getNetexInternalPlanningCode())
               )
               .filter(t ->
