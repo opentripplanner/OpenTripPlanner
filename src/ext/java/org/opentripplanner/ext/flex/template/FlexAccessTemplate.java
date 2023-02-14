@@ -57,7 +57,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
 
     for (Edge e : egressEdges) {
       var states = e.multiTraverse(state);
-      if (states == null || states.length == 0) {
+      if (State.isEmpty(states)) {
         state = null;
       } else {
         state = states[0];
