@@ -174,7 +174,6 @@ public class ZipFileDataSourceTest {
 
     zos2.close();
 
-
     /*
      * utf-8 encoded file names in zip, this time without EFS flag
      * e.g. Java pre 7b57
