@@ -403,7 +403,7 @@ public class StreetEdge
       } else if (canTraverse(TraverseMode.WALK)) {
         editor = doTraverse(s0, TraverseMode.WALK, true);
       } else {
-        return null;
+        return State.empty();
       }
     } else if (canTraverse(s0.getNonTransitMode())) {
       editor = doTraverse(s0, s0.getNonTransitMode(), false);
@@ -446,11 +446,11 @@ public class StreetEdge
       if (dropOff != null) {
         dropOffAfterDriving(s0, dropOff);
         // Only the walk state is returned, since traversing by car was not possible
-        return State.of(dropOff.makeState());
+        return State.ofNullable(dropOff.makeState());
       }
     }
 
-    return State.of(state);
+    return State.ofNullable(state);
   }
 
   /**

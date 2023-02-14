@@ -94,12 +94,16 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return states;
   }
 
-  public static State[] of(State u) {
+  public static State[] ofNullable(State u) {
     if (u == null) {
       return EMPTY_STATES;
     } else {
       return new State[] { u };
     }
+  }
+
+  public static State[] empty() {
+    return EMPTY_STATES;
   }
 
   public static State[] of(State... states) {
