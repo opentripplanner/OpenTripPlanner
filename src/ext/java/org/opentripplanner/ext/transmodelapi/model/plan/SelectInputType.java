@@ -64,7 +64,7 @@ public class SelectInputType {
         .newInputObjectField()
         .name("groupOfLines")
         .description(
-          "Set of ids for group of lines that should be included in/excluded from search"
+          "Set of ids for group of lines that should be included in/excluded from the search"
         )
         .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
         .build()
