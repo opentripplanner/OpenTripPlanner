@@ -421,7 +421,7 @@ public class StreetEdge
         afterTraversal.dropFloatingVehicle();
         afterTraversal.leaveNoRentalDropOffArea();
         var forkState = afterTraversal.makeState();
-        return State.of(forkState, state);
+        return State.ofNullable(forkState, state);
       }
     }
 
@@ -430,10 +430,8 @@ public class StreetEdge
       if (inCar != null) {
         driveAfterPickup(s0, inCar);
         State forkState = inCar.makeState();
-        if (forkState != null) {
-          // Return both the original WALK state, along with the new IN_CAR state
-          return State.of(forkState, state);
-        }
+        // Return both the original WALK state, along with the new IN_CAR state
+        return State.ofNullable(forkState, state);
       }
     }
 

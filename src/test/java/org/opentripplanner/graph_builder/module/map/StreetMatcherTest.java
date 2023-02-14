@@ -9,16 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.SingleStateTraversalEdge;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.state.StateEditor;
 
 public class StreetMatcherTest {
 
@@ -152,45 +147,8 @@ public class StreetMatcherTest {
       StreetVertex vA = (StreetVertex) graph.getVertex(vLabels[i]);
       StreetVertex vB = (StreetVertex) graph.getVertex(vLabels[i + 1]);
 
-      new SimpleEdge(vA, vB);
-      new SimpleEdge(vB, vA);
-    }
-  }
-
-  /* TODO explain why this exists and is "simple" */
-  private static class SimpleEdge extends SingleStateTraversalEdge {
-
-    public SimpleEdge(StreetVertex v1, StreetVertex v2) {
-      super(v1, v2);
-    }
-
-    @Override
-    public State traverse(State s0) {
-      double d = getDistanceMeters();
-      TraverseMode mode = s0.getNonTransitMode();
-      int t = (int) (d / s0.getRequest().preferences().getSpeed(mode, false));
-      StateEditor s1 = s0.edit(this);
-      s1.incrementTimeInSeconds(t);
-      s1.incrementWeight(d);
-      return s1.makeState();
-    }
-
-    @Override
-    public I18NString getName() {
-      return null;
-    }
-
-    @Override
-    public LineString getGeometry() {
-      return gf.createLineString(new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate() });
-    }
-
-    @Override
-    public double getDistanceMeters() {
-      return SphericalDistanceLibrary.distance(
-        getFromVertex().getCoordinate(),
-        getToVertex().getCoordinate()
-      );
+      StreetModelForTest.streetEdge(vA, vB);
+      StreetModelForTest.streetEdge(vB, vA);
     }
   }
 }

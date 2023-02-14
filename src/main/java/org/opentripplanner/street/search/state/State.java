@@ -4,7 +4,9 @@ import static org.opentripplanner.framework.lang.ObjectUtils.requireNotInitializ
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
@@ -106,11 +108,11 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return EMPTY_STATES;
   }
 
-  public static State[] of(State... states) {
+  public static State[] ofNullable(State... states) {
     if (states == null) {
       return EMPTY_STATES;
     } else {
-      return states;
+      return Arrays.stream(states).filter(Objects::nonNull).toArray(State[]::new);
     }
   }
 
