@@ -38,7 +38,8 @@
     },
     {
       "matchPackageNames": [
-        "org.onebusaway:onebusaway-gtfs"
+        "org.onebusaway:onebusaway-gtfs",
+        "com.google.cloud:libraries-bom"
       ],
       "extends": [
         "schedule:monthly"
