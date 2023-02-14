@@ -132,7 +132,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
   /**
    * The board-slack (duration time in seconds) to add to the stop arrival time, before boarding
-   * the given trip pattern. THIS DO NOT INCLUDE THE transfer-slack, and should only be used to
+   * the given trip pattern. THIS DOES NOT INCLUDE THE transfer-slack, and should only be used to
    * time-shift the access-path.
    * <p>
    * Unit: seconds.

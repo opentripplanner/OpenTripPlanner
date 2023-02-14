@@ -25,7 +25,7 @@ public class EgressPaths {
    * Standard and BestTime states do not. To get a deterministic behaviour we filter the paths and
    * return the paths with the shortest duration for non-multi-criteria search. If two paths have
    * the same duration the first one is picked. Note! If the access/egress paths contains flex as
-   * well, then we need to look at mode for arriving at tha stop as well. A Flex arrive-on-board can
+   * well, then we need to look at mode for arriving at that stop as well. A Flex arrive-on-board can
    * be used with a transfer even if the time is worse compared with walking.
    * <p>
    * This method is static and package local to enable unit-testing.
