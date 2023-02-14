@@ -4,9 +4,7 @@ import static org.opentripplanner.framework.lang.ObjectUtils.requireNotInitializ
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
@@ -104,16 +102,27 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     }
   }
 
-  public static State[] empty() {
-    return EMPTY_STATES;
+  /**
+   * Takes two nullable states and returns an array of states (possibly empty) which is guaranteed
+   * to contain no nulls.
+   * <p>
+   * This method is optimized for a low number of allocations and therefore doesn't use any streams
+   * or collections to filter out the nulls.
+   */
+  public static State[] ofNullable(State s1, State s2) {
+    if (s1 == null && s2 == null) {
+      return EMPTY_STATES;
+    } else if (s1 == null) {
+      return new State[] { s2 };
+    } else if (s2 == null) {
+      return new State[] { s1 };
+    } else {
+      return new State[] { s1, s2 };
+    }
   }
 
-  public static State[] ofNullable(State... states) {
-    if (states == null) {
-      return EMPTY_STATES;
-    } else {
-      return Arrays.stream(states).filter(Objects::nonNull).toArray(State[]::new);
-    }
+  public static State[] empty() {
+    return EMPTY_STATES;
   }
 
   public static boolean isEmpty(State[] s) {
