@@ -75,7 +75,7 @@
                   "alertDescriptionText" : "A description",
                   "alertEffect" : "REDUCED_SERVICE",
                   "alertCause" : "MAINTENANCE",
-                  "alertSeverityLevel" : "UNKNOWN_SEVERITY",
+                  "alertSeverityLevel" : "SEVERE",
                   "alertUrl" : "https://example.com",
                   "effectiveStartDate" : 1676459008,
                   "effectiveEndDate" : 1676545408,

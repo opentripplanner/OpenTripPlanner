@@ -18,6 +18,7 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertEffectType;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
@@ -106,7 +107,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   @Override
-  public DataFetcher<String> alertSeverityLevel() {
+  public DataFetcher<LegacyGraphQLAlertSeverityLevelType> alertSeverityLevel() {
     return environment -> getLegacyGraphQLSeverity(getSource(environment).severity());
   }
 

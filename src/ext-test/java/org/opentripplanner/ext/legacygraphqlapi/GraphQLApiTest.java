@@ -36,6 +36,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
+import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -110,6 +111,7 @@ class GraphQLApiTest {
       .withUrl(new NonLocalizedString("https://example.com"))
       .withCause(AlertCause.MAINTENANCE)
       .withEffect(AlertEffect.REDUCED_SERVICE)
+      .withSeverity(AlertSeverity.VERY_SEVERE)
       .addEntity(new EntitySelector.Stop(stop.getId()))
       .addTimePeriod(
         new TimePeriod(ALERT_START_TIME.getEpochSecond(), ALERT_END_TIME.getEpochSecond())
