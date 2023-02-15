@@ -17,7 +17,6 @@ public class LegacyGraphQLCauseMapper {
       return LegacyGraphQLAlertCauseType.UNKNOWN_CAUSE;
     }
     return switch (cause) {
-
       case UNKNOWN_CAUSE -> LegacyGraphQLAlertCauseType.UNKNOWN_CAUSE;
       case OTHER_CAUSE -> LegacyGraphQLAlertCauseType.OTHER_CAUSE;
       case TECHNICAL_PROBLEM -> LegacyGraphQLAlertCauseType.TECHNICAL_PROBLEM;
@@ -26,7 +25,7 @@ public class LegacyGraphQLCauseMapper {
       case ACCIDENT -> LegacyGraphQLAlertCauseType.ACCIDENT;
       case HOLIDAY -> LegacyGraphQLAlertCauseType.HOLIDAY;
       case WEATHER -> LegacyGraphQLAlertCauseType.WEATHER;
-      case MAINTENANCE ->  LegacyGraphQLAlertCauseType.MAINTENANCE;
+      case MAINTENANCE -> LegacyGraphQLAlertCauseType.MAINTENANCE;
       case CONSTRUCTION -> LegacyGraphQLAlertCauseType.CONSTRUCTION;
       case POLICE_ACTIVITY -> LegacyGraphQLAlertCauseType.POLICE_ACTIVITY;
       case MEDICAL_EMERGENCY -> LegacyGraphQLAlertCauseType.MEDICAL_EMERGENCY;

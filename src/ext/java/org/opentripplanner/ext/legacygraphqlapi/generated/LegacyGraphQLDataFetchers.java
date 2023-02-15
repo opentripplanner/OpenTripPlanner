@@ -11,6 +11,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertCauseType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
@@ -73,7 +74,7 @@ public class LegacyGraphQLDataFetchers {
   public interface LegacyGraphQLAlert {
     public DataFetcher<Agency> agency();
 
-    public DataFetcher<String> alertCause();
+    public DataFetcher<LegacyGraphQLAlertCauseType> alertCause();
 
     public DataFetcher<String> alertDescriptionText();
 
