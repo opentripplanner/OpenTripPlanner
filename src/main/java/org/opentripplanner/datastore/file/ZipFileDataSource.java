@@ -78,6 +78,21 @@ public class ZipFileDataSource
     }
   }
 
+  /** 
+  * Map ZipEntries into a DataSource. This does not read the content of each zip entry, only create a 
+  * {@link DataSource} around it.
+  */
+  private static Collection<DataSource> listZipEntries(ZipFileEntryParent parent, ZipFile zipFile) throws IOException, ZipException {
+    Collection<DataSource> content = new ArrayList<DataSource>();
+    Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+    while (entries.hasMoreElements()) {
+      ZipEntry entry = entries.nextElement();
+      content.add(new ZipFileEntryDataSource(parent, entry));
+    }
+    return content;
+  }
+
   private void loadContent() {
     // Load content once
     if (contentLoaded) {
@@ -88,13 +103,7 @@ public class ZipFileDataSource
     try {
       // The get name on ZipFile returns the full path, we want just the name.
       this.zipFile = new ZipFile(file, ZipFile.OPEN_READ);
-
-      Enumeration<? extends ZipEntry> entries = zipFile.entries();
-
-      while (entries.hasMoreElements()) {
-        ZipEntry entry = entries.nextElement();
-        content.add(new ZipFileEntryDataSource(this, entry));
-      }
+      content.addAll(ZipFileDataSource.listZipEntries(this, zipFile));
     } catch (ZipException ze) {
       // Java needs help for standard ZIP files with names encoded in cp437
       // this allows decoding of utf-8 and cp437 at the same time!
@@ -109,13 +118,7 @@ public class ZipFileDataSource
       try {
         Charset charset = Charset.forName("Cp437");
         this.zipFile = new ZipFile(file, ZipFile.OPEN_READ, charset);
-
-        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-
-        while (entries.hasMoreElements()) {
-          ZipEntry entry = entries.nextElement();
-          content.add(new ZipFileEntryDataSource(this, entry));
-        }
+        content.addAll(ZipFileDataSource.listZipEntries(this, zipFile));
       } catch (IOException e) {
         throw new RuntimeException("Failed to load " + path() + ": " + e.getLocalizedMessage(), e);
       }
