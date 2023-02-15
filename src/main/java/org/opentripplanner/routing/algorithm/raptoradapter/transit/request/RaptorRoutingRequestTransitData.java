@@ -25,7 +25,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPatternByStopPos;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -57,9 +57,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
    */
   private final RaptorTransferIndex transferIndex;
 
-  private final List<TransferForPatternByStopPos> forwardConstrainedTransfers;
-
-  private final List<TransferForPatternByStopPos> reverseConstrainedTransfers;
+  private final ConstrainedTransfersForPatterns constrainedTransfers;
 
   private final ZonedDateTime transitSearchTimeZero;
 
@@ -98,9 +96,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.patternIndex = transitDataCreator.createPatternIndex(tripPatterns);
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
     this.transferIndex = transitLayer.getRaptorTransfersForRequest(request);
-
-    this.forwardConstrainedTransfers = transitLayer.getForwardConstrainedTransfers();
-    this.reverseConstrainedTransfers = transitLayer.getReverseConstrainedTransfers();
+    this.constrainedTransfers = transitLayer.getConstrainedTransfers();
 
     var mcCostParams = GeneralizedCostParametersMapper.map(request, patternIndex);
 
@@ -224,21 +220,21 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   public RaptorConstrainedBoardingSearch<TripSchedule> transferConstraintsForwardSearch(
     int routeIndex
   ) {
-    var transfers = forwardConstrainedTransfers.get(routeIndex);
-    if (transfers == null) {
+    var transfersToStop = constrainedTransfers.toStop(routeIndex);
+    if (transfersToStop == null) {
       return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
-    return new ConstrainedBoardingSearch(true, transfers);
+    return new ConstrainedBoardingSearch(true, transfersToStop);
   }
 
   @Override
   public RaptorConstrainedBoardingSearch<TripSchedule> transferConstraintsReverseSearch(
     int routeIndex
   ) {
-    TransferForPatternByStopPos transfers = reverseConstrainedTransfers.get(routeIndex);
-    if (transfers == null) {
+    var transfersFromStop = constrainedTransfers.fromStop(routeIndex);
+    if (transfersFromStop == null) {
       return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
-    return new ConstrainedBoardingSearch(false, transfers);
+    return new ConstrainedBoardingSearch(false, transfersFromStop);
   }
 }
