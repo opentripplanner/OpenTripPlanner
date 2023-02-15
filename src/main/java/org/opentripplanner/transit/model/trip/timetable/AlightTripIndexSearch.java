@@ -110,9 +110,9 @@ class AlightTripIndexSearch {
     final int end,
     final int lat
   ) {
-    for (int i = end; i > start; --i) {
+    for (int i = end - 1; i >= start; --i) {
       if (lat >= a[i]) {
-        return i;
+        return i % (end - start);
       }
     }
     return Timetable.PREV_TIME_TABLE_INDEX;
