@@ -116,6 +116,16 @@ public class ZipFileDataSource
       //
       // See https://github.com/opentripplanner/OpenTripPlanner/pull/4835 for a
       // discussion on this.
+      LOG.info(
+        "Failed to read {}: {}\n" +
+        "Retrying with cp437 charset just in case it was 'bad entry name'.\n" +
+        "Consider sticking to ASCII characters for file names.\n" +
+        "See https://github.com/opentripplanner/OpenTripPlanner/pull/4835 for a discussion on this.",
+        path(),
+        ze.getLocalizedMessage(),
+        ze
+      );
+
       try {
         Charset charset = Charset.forName("Cp437");
         this.zipFile = new ZipFile(file, ZipFile.OPEN_READ, charset);
