@@ -127,7 +127,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   ) {
     // Create a set of tails with the last transit leg in it (one element)
     Set<OptimizedPathTail<T>> tails = Set.of(
-      new OptimizedPathTail<T>(
+      new OptimizedPathTail<>(
         slackProvider,
         costCalculator,
         waitTimeCostCalculator,

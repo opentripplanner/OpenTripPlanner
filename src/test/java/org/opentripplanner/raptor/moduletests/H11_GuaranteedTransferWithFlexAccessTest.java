@@ -2,9 +2,13 @@ package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -14,33 +18,25 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should use reversed transfers when searching in reverse, so that directional transfers are
- * used correctly.
- * <p>
- * The expected result is an itinerary with 2 transit legs and a transfer.
+ * Raptor should support combining multiple features, like Flexible access paths and constrained
+ * transfers. This test has only one path available, and it is expected that it should be returned
+ * irrespective of the profile.
  */
-public class C03_OnStreetTransfersTest implements RaptorTestConstants {
+public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConstants {
 
-  /** The expected result is tha same for all tests */
-  private static final String EXPECTED_RESULT =
-    "Walk 30s ~ B ~ " +
-    "BUS R1 0:02 0:03 ~ C ~ " +
-    "Walk 30s ~ D ~ " +
-    "BUS R2 0:04 0:05 ~ E ~ " +
-    "Walk 20s " +
-    "[0:01:30 0:05:20 3m50s 1tx]";
+  private static final int COST_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
+
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -49,41 +45,46 @@ public class C03_OnStreetTransfersTest implements RaptorTestConstants {
 
   @BeforeEach
   public void setup() {
-    //Given slack: transfer 1m, board 30s, alight 10s
-    data.withSlackProvider(new DefaultSlackProvider(D30s, 0, 0));
+    var r1 = route("R1", STOP_B, STOP_C).withTimetable(schedule("0:30 0:45"));
+    var r2 = route("R2", STOP_C, STOP_D).withTimetable(schedule("0:45 0:55"));
 
-    data.withRoute(
-      route(pattern("R1", STOP_B, STOP_C))
-        .withTimetable(schedule().departures("00:02:00, 00:03:10").arrDepOffset(D10s))
-    );
+    var tripA = r1.timetable().getTripSchedule(0);
+    var tripB = r2.timetable().getTripSchedule(0);
 
-    // It is not possible to transfer from D -> C
-    data.withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D30s));
-
-    data.withRoute(
-      route(pattern("R2", STOP_D, STOP_E))
-        .withTimetable(
-          schedule().departures("00:03:59, 00:05:09").arrDepOffset(D10s), // Missed by 1 second
-          schedule().departures("00:04:00, 00:05:10").arrDepOffset(D10s) // Exact match
-        )
-    );
+    data.withRoutes(r1, r2);
+    data.withGuaranteedTransfer(tripA, STOP_C, tripB, STOP_C);
+    data.withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D10m));
+    data.mcCostParamsBuilder().transferCost(100);
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D30s)) // Start walking 1m before: 30s walk + 30s board-slack
-      .addEgressPaths(TestAccessEgress.walk(STOP_E, D20s)) // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
+      .addAccessPaths(flex(STOP_A, D3m, ONE_RIDE, 2 * COST_ONE_STOP))
+      .addEgressPaths(walk(STOP_D, D1m));
+
+    requestBuilder
+      .searchParams()
       .earliestDepartureTime(T00_00)
-      .latestArrivalTime(T00_30)
-      .searchWindowInSeconds(D3m);
+      .latestArrivalTime(T01_00)
+      .constrainedTransfers(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var expected =
+      "Flex 3m 1x ~ A " +
+      "~ Walk 10m ~ B " +
+      "~ BUS R1 0:30 0:45 ~ C " +
+      "~ BUS R2 0:45 0:55 ~ D " +
+      "~ Walk 1m " +
+      "[0:16 0:56 40m 2tx $3820]";
+
     return RaptorModuleTestCase
       .of()
-      .add(standard(), EXPECTED_RESULT)
-      .add(multiCriteria(), EXPECTED_RESULT.replace("]", " $1510]"))
+      .add(TC_MIN_DURATION, "[0:00 0:40 40m 2tx]")
+      .add(TC_MIN_DURATION_REV, "[0:20 1:00 40m 2tx]")
+      .add(standard(), withoutCost(expected))
+      .add(multiCriteria(), expected)
       .build();
   }
 

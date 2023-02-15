@@ -2,8 +2,8 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import java.time.Instant;
 import java.util.Map;
-import org.entur.gbfs.v2_2.free_bike_status.GBFSBike;
-import org.entur.gbfs.v2_2.free_bike_status.GBFSRentalUris;
+import org.entur.gbfs.v2_3.free_bike_status.GBFSBike;
+import org.entur.gbfs.v2_3.free_bike_status.GBFSRentalUris;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;

@@ -3,7 +3,7 @@ package org.opentripplanner.service.vehiclerental.model;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
+import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -77,7 +77,11 @@ public class RentalVehicleType implements Serializable, Comparable<RentalVehicle
     HUMAN,
     ELECTRIC_ASSIST,
     ELECTRIC,
-    COMBUSTION;
+    COMBUSTION,
+    COMBUSTION_DIESEL,
+    HYBRID,
+    PLUG_IN_HYBRID,
+    HYDROGEN_FUEL_CELL;
 
     public static PropulsionType fromGbfs(GBFSVehicleType.PropulsionType propulsionType) {
       return switch (propulsionType) {
@@ -85,6 +89,10 @@ public class RentalVehicleType implements Serializable, Comparable<RentalVehicle
         case ELECTRIC_ASSIST -> ELECTRIC_ASSIST;
         case ELECTRIC -> ELECTRIC;
         case COMBUSTION -> COMBUSTION;
+        case COMBUSTION_DIESEL -> COMBUSTION_DIESEL;
+        case HYBRID -> HYBRID;
+        case PLUG_IN_HYBRID -> PLUG_IN_HYBRID;
+        case HYDROGEN_FUEL_CELL -> HYDROGEN_FUEL_CELL;
       };
     }
   }

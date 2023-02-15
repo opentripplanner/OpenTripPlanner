@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import org.entur.gbfs.v2_2.system_information.GBFSData;
+import org.entur.gbfs.v2_3.system_information.GBFSData;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystemAppInformation;
 

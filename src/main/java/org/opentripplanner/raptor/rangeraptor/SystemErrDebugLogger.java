@@ -4,6 +4,7 @@ import static org.opentripplanner.framework.text.Table.Align.Center;
 import static org.opentripplanner.framework.text.Table.Align.Left;
 import static org.opentripplanner.framework.text.Table.Align.Right;
 import static org.opentripplanner.framework.time.TimeUtils.timeToStrCompact;
+import static org.opentripplanner.framework.time.TimeUtils.timeToStrLong;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -14,7 +15,6 @@ import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.debug.DebugTopic;
@@ -36,6 +36,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   private static final int NOT_SET = Integer.MIN_VALUE;
 
   private final boolean enableDebugLogging;
+  private final boolean eventLoggingDryRun;
   private final NumberFormat numFormat = NumberFormat.getInstance(Locale.FRANCE);
   private final Table arrivalTable = Table
     .of()
@@ -54,8 +55,15 @@ public class SystemErrDebugLogger implements DebugLogger {
   private int lastRound = NOT_SET;
   private boolean printPathHeader = true;
 
-  public SystemErrDebugLogger(boolean enableDebugLogging) {
+  /**
+   * @param enableDebugLogging Log debug information on {@link DebugTopic}s.
+   * @param eventLoggingDryRun DryRun will do the Raptor event logging, except printing the result.
+   *                           This is used to test the logging framework without logging. To turn
+   *                           off logging completely used the {@link #noop()} logger.
+   */
+  public SystemErrDebugLogger(boolean enableDebugLogging, boolean eventLoggingDryRun) {
     this.enableDebugLogging = enableDebugLogging;
+    this.eventLoggingDryRun = eventLoggingDryRun;
   }
 
   /**
@@ -94,20 +102,22 @@ public class SystemErrDebugLogger implements DebugLogger {
    */
   public void pathFilteringListener(DebugEvent<RaptorPath<?>> e) {
     if (printPathHeader) {
-      System.err.println();
-      System.err.println(pathTable.headerRow());
+      println();
+      println(pathTable.headerRow());
       printPathHeader = false;
     }
 
     RaptorPath<?> p = e.element();
-    System.err.println(
+    var aLeg = p.accessLeg();
+    var eLeg = p.egressLeg();
+    println(
       pathTable.rowAsText(
         e.action().toString(),
         p.numberOfTransfers(),
-        p.accessLeg().toStop(),
-        p.egressLeg().fromStop(),
-        TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
-        TimeUtils.timeToStrLong(p.egressLeg().toTime()),
+        aLeg != null ? aLeg.toStop() : null,
+        eLeg != null ? eLeg.fromStop() : null,
+        aLeg != null ? timeToStrLong(aLeg.fromTime()) : null,
+        eLeg != null ? timeToStrLong(eLeg.toTime()) : null,
         DurationUtils.durationToStr(p.durationInSeconds()),
         OtpNumberFormat.formatCostCenti(p.generalizedCost()),
         details(e.action().toString(), e.reason(), e.element().toString())
@@ -175,19 +185,19 @@ public class SystemErrDebugLogger implements DebugLogger {
     lastIterationTime = iterationTime;
     lastRound = NOT_SET;
     printPathHeader = true;
-    System.err.println("\n**  RUN RAPTOR FOR MINUTE: " + timeToStrCompact(iterationTime) + "  **");
+    println("\n**  RUN RAPTOR FOR MINUTE: " + timeToStrCompact(iterationTime) + "  **");
   }
 
   private void print(ArrivalView<?> a, String action, String optReason) {
     printPathHeader = true;
     String pattern = a.arrivedByTransit() ? a.transitPath().trip().pattern().debugInfo() : "";
-    System.err.println(
+    println(
       arrivalTable.rowAsText(
         action,
         legType(a),
         a.round(),
         IntUtils.intToString(a.stop(), NOT_SET),
-        TimeUtils.timeToStrLong(a.arrivalTime()),
+        timeToStrLong(a.arrivalTime()),
         numFormat.format(a.cost()),
         pattern,
         details(action, optReason, path(a))
@@ -196,13 +206,13 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private void print(PatternRideView<?> p, String action) {
-    System.err.println(
+    println(
       arrivalTable.rowAsText(
         action,
         "OnRide",
         p.prevArrival().round() + 1,
         p.boardStopIndex(),
-        TimeUtils.timeToStrLong(p.boardTime()),
+        timeToStrLong(p.boardTime()),
         numFormat.format(p.relativeCost()),
         p.trip().pattern().debugInfo(),
         p.toString()
@@ -211,23 +221,15 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private String path(ArrivalView<?> a) {
-    return path(a, new PathStringBuilder(null))
-      .space()
-      .space()
-      .append("[ ")
-      .generalizedCostSentiSec(a.cost())
-      .append(" ]")
-      .toString();
+    return path(a, new PathStringBuilder(null)).summary(a.cost()).toString();
   }
 
   private PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {
     if (a.arrivedByAccess()) {
-      return buf.accessEgress(a.accessPath().access()).sep().stop(a.stop());
+      return buf.accessEgress(a.accessPath().access()).stop(a.stop());
     }
     // Recursively call this method to insert arrival in front of this arrival
     path(a.previous(), buf);
-
-    buf.sep();
 
     if (a.arrivedByTransit()) {
       String tripInfo = a.transitPath().trip().pattern().debugInfo();
@@ -247,7 +249,7 @@ public class SystemErrDebugLogger implements DebugLogger {
       buf.accessEgress(a.egressPath().egress());
     }
 
-    return buf.sep().stop(a.stop());
+    return buf.stop(a.stop());
   }
 
   private void printRoundHeader(int round) {
@@ -256,8 +258,8 @@ public class SystemErrDebugLogger implements DebugLogger {
     }
     lastRound = round;
 
-    System.err.println();
-    System.err.println(arrivalTable.headerRow());
+    println();
+    println(arrivalTable.headerRow());
   }
 
   private String legType(ArrivalView<?> a) {
@@ -275,5 +277,17 @@ public class SystemErrDebugLogger implements DebugLogger {
       return "Egress";
     }
     throw new IllegalStateException("Unknown mode for: " + this);
+  }
+
+  private void println() {
+    if (!eventLoggingDryRun) {
+      System.err.println();
+    }
+  }
+
+  private void println(String text) {
+    if (!eventLoggingDryRun) {
+      System.err.println(text);
+    }
   }
 }

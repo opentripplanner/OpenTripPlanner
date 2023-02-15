@@ -29,7 +29,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * On transit options with identical cost, raptor should drop the unpreferred one which is modeled
  * by route penalty.
  */
-public class F02_UnpreferredRouteTest implements RaptorTestConstants {
+public class D03_UnpreferredRouteTest implements RaptorTestConstants {
 
   private static final String EXPECTED =
     "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s 0tx $%d]";

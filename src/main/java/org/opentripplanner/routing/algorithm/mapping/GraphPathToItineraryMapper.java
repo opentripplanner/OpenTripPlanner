@@ -257,11 +257,7 @@ public class GraphPathToItineraryMapper {
         if (mode != null) {
           // Resolve correct mode if renting vehicle
           if (state.isRentingVehicle()) {
-            return switch (state.stateData.rentalVehicleFormFactor) {
-              case BICYCLE, OTHER -> TraverseMode.BICYCLE;
-              case SCOOTER, MOPED -> TraverseMode.SCOOTER;
-              case CAR -> TraverseMode.CAR;
-            };
+            return state.stateData.rentalVehicleFormFactor.traverseMode;
           } else {
             return mode;
           }

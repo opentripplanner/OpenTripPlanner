@@ -2,37 +2,36 @@ package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.raptor._data.transit.TestTransfer;
+import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
+import org.opentripplanner.raptor.spi.UnknownPathString;
 
-/**
+/*
  * FEATURE UNDER TEST
- * <p>
- * Raptor should support combining multiple features, like Flexible access paths and constrained
- * transfers. This test has only one path available, and it is expected that it should be returned
- * irrespective of the profile.
+ *
+ * Raptor should not route if access is "closed", instead it should find the long access path.
  */
-public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConstants {
-
-  private static final int COST_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
+public class G05_ClosedAccessOpeningHoursTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -42,50 +41,41 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
 
   @BeforeEach
   public void setup() {
-    var r1 = route("R1", STOP_B, STOP_C).withTimetable(schedule("0:30 0:45"));
-    var r2 = route("R2", STOP_C, STOP_D).withTimetable(schedule("0:45 0:55"));
-
-    var tripA = r1.timetable().getTripSchedule(0);
-    var tripB = r2.timetable().getTripSchedule(0);
-
-    data.withRoutes(r1, r2);
-    data.withGuaranteedTransfer(tripA, STOP_C, tripB, STOP_C);
-    data.withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D10m));
-    data.mcCostParamsBuilder().transferCost(100);
-
-    requestBuilder
-      .searchParams()
-      .addAccessPaths(flex(STOP_A, D3m, ONE_RIDE, 2 * COST_ONE_STOP))
-      .addEgressPaths(TestAccessEgress.walk(STOP_D, D1m));
+    data.withRoute(route("R1", STOP_A, STOP_E).withTimetable(schedule("00:10 00:20")));
 
     requestBuilder
       .searchParams()
       .earliestDepartureTime(T00_00)
-      .latestArrivalTime(T01_00)
-      .constrainedTransfers(true);
+      .latestArrivalTime(T00_30)
+      .searchWindow(Duration.ofMinutes(30))
+      .timetable(true)
+      .addAccessPaths(walk(STOP_A, D1m).openingHoursClosed(), walk(STOP_A, D7m))
+      .addEgressPaths(free(STOP_E));
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var expMinDuration = UnknownPathString.of("17m", 0);
+    var expected = "Walk 7m ~ A ~ BUS R1 0:10 0:20 ~ E [0:03 0:20 17m 0tx $2040]";
     return RaptorModuleTestCase
       .of()
-      .add(
-        standard(),
-        "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]"
-      )
-      .add(
-        multiCriteria(),
-        "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx $3820]"
-      )
+      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_00))
+      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
+      .add(standard(), PathUtils.withoutCost(expected))
+      .add(multiCriteria(), expected)
       .build();
   }
 
   @ParameterizedTest
   @MethodSource("testCases")
-  void testRaptor(RaptorModuleTestCase testCase) {
+  void verifyAccessWithClosedOptions(RaptorModuleTestCase testCase) {
+    requestBuilder.searchParams().addAccessPaths(walk(STOP_B, D2m));
+
     var request = testCase.withConfig(requestBuilder);
+
     var response = raptorService.route(request, data);
+
     assertEquals(testCase.expected(), pathsToString(response));
   }
 }

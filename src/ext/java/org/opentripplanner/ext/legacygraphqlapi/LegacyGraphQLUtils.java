@@ -102,8 +102,11 @@ public class LegacyGraphQLUtils {
       case BICYCLE -> RentalFormFactor.BICYCLE;
       case SCOOTER -> RentalFormFactor.SCOOTER;
       case CAR -> RentalFormFactor.CAR;
+      case CARGO_BICYCLE -> FormFactor.CARGO_BICYCLE;
       case MOPED -> RentalFormFactor.MOPED;
       case OTHER -> RentalFormFactor.OTHER;
+      case SCOOTER_SEATED -> FormFactor.SCOOTER_SEATED;
+      case SCOOTER_STANDING -> FormFactor.SCOOTER_STANDING;
     };
   }
 

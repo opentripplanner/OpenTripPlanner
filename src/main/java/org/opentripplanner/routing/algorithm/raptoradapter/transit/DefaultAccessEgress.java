@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.street.search.state.State;
@@ -46,18 +46,18 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     return generalizedCost;
   }
 
+  @Nullable
+  @Override
+  public String openingHoursToString() {
+    return null;
+  }
+
   public State getLastState() {
     return lastState;
   }
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(DefaultAccessEgress.class)
-      .addNum("stop", stop)
-      .addNum("durationInSeconds", durationInSeconds)
-      .addNum("generalizedCost", generalizedCost)
-      .addObj("state", lastState)
-      .toString();
+    return asString(true) + (lastState != null ? " (" + lastState + ")" : "");
   }
 }
