@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -32,6 +35,8 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.alertpatch.AlertCause;
+import org.opentripplanner.routing.alertpatch.AlertEffect;
+import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -48,6 +53,11 @@ class GraphQLApiTest {
   static final TestServerRequestContext context;
   static final Graph graph = new Graph();
   static final LegacyGraphQLAPI resource;
+
+  static final Instant ALERT_START_TIME = OffsetDateTime
+    .parse("2023-02-15T12:03:28+01:00")
+    .toInstant();
+  static final Instant ALERT_END_TIME = ALERT_START_TIME.plus(1, ChronoUnit.DAYS);
 
   static {
     graph
@@ -93,6 +103,10 @@ class GraphQLApiTest {
       .withDescriptionText(new NonLocalizedString("A description"))
       .withUrl(new NonLocalizedString("https://example.com"))
       .withCause(AlertCause.MAINTENANCE)
+      .withEffect(AlertEffect.REDUCED_SERVICE)
+      .addTimePeriod(
+        new TimePeriod(ALERT_START_TIME.getEpochSecond(), ALERT_END_TIME.getEpochSecond())
+      )
       .build();
     railLeg.addAlert(alert);
 
