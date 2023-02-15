@@ -1,0 +1,12 @@
+{
+  "data" : {
+    "stops" : [
+      {
+        "gtfsId" : "F:stop1",
+        "lat" : 60.0,
+        "lon" : 10.0,
+        "name" : "stop1"
+      }
+    ]
+  }
+}
