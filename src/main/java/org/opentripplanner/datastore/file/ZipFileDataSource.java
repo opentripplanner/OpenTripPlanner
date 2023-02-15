@@ -78,11 +78,12 @@ public class ZipFileDataSource
     }
   }
 
-  /** 
-  * Map ZipEntries into a DataSource. This does not read the content of each zip entry, only create a 
-  * {@link DataSource} around it.
-  */
-  private static Collection<DataSource> listZipEntries(ZipFileEntryParent parent, ZipFile zipFile) throws IOException, ZipException {
+  /**
+   * Map ZipEntries into a DataSource. This does not read the content of each zip entry, only create a
+   * {@link DataSource} around it.
+   */
+  private static Collection<DataSource> listZipEntries(ZipFileEntryParent parent, ZipFile zipFile)
+    throws IOException, ZipException {
     Collection<DataSource> content = new ArrayList<DataSource>();
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
@@ -113,7 +114,7 @@ public class ZipFileDataSource
       // additional Recommendations for Interoperability can be found at Apache Commons
       // https://commons.apache.org/proper/commons-compress/zip.html
       //
-      // See https://github.com/opentripplanner/OpenTripPlanner/pull/4835 for a  
+      // See https://github.com/opentripplanner/OpenTripPlanner/pull/4835 for a
       // discussion on this.
       try {
         Charset charset = Charset.forName("Cp437");
