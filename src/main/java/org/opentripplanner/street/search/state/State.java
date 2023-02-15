@@ -125,10 +125,16 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     }
   }
 
+  /**
+   * Convenience method to return an empty array of states.
+   */
   public static State[] empty() {
     return EMPTY_STATES;
   }
 
+  /**
+   * Convenience method to check if the state array is null or empty.
+   */
   public static boolean isEmpty(State[] s) {
     return s == null || s.length == 0;
   }
