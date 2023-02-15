@@ -58,7 +58,7 @@ public class EgressPaths {
    * if arriving at the stop by transit.
    */
   public int[] egressesWitchStartByWalking() {
-    return filterPathsAnfGetStops(RaptorAccessEgress::stopReachedByWalking);
+    return filterPathsAndGetStops(RaptorAccessEgress::stopReachedByWalking);
   }
 
   /**
@@ -66,10 +66,10 @@ public class EgressPaths {
    * egress paths can be used when arriving at the stop with both transfer or transit.
    */
   public int[] egressesWitchStartByARide() {
-    return filterPathsAnfGetStops(RaptorAccessEgress::stopReachedOnBoard);
+    return filterPathsAndGetStops(RaptorAccessEgress::stopReachedOnBoard);
   }
 
-  private int[] filterPathsAnfGetStops(Predicate<RaptorAccessEgress> filter) {
+  private int[] filterPathsAndGetStops(Predicate<RaptorAccessEgress> filter) {
     return pathsByStop
       .valueCollection()
       .stream()

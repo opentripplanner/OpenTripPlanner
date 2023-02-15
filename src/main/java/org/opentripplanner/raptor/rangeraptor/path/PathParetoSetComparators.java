@@ -36,7 +36,7 @@ public class PathParetoSetComparators {
     boolean includeRelaxedCost = includeCost && searchParams.relaxCostAtDestination().isPresent();
     boolean includeTimetable = searchParams.timetable();
     boolean preferLatestDeparture =
-      searchParams.preferLateArrival() ^ searchDirection.isInReverse();
+      searchParams.preferLateArrival() != searchDirection.isInReverse();
 
     if (includeRelaxedCost) {
       double relaxedCost = searchParams.relaxCostAtDestination().get();

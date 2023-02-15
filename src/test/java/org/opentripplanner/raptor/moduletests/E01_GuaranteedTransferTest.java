@@ -23,7 +23,6 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
-import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
@@ -70,19 +69,21 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
     // Make sure the slack have values which prevent the normal from happening transfer.
     // The test scenario have zero seconds to transfer, so any slack will do.
-    data.withSlackProvider(new DefaultSlackProvider(30, 20, 10));
+    data.withSlackProvider(new DefaultSlackProvider(D30s, D20s, D10s));
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var expMinDuration = UnknownPathString.of("9m20s", 1);
-
     var path =
       "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R2 0:05 0:10 ~ C ~ Walk 30s " +
       "[0:01:10 0:10:40 9m30s 1tx $1230]";
     return RaptorModuleTestCase
       .of()
+      // TODO - board-slack is added for FORWARD search, while alight-slack is added for
+      //      - REVERSE. We should add both, but that requires a bit of refactoring and
+      //      - providing constraint-transfer information at the place where alight-slack
+      //      - should be added in Raptor.
       .add(TC_MIN_DURATION, "[0:00 0:09:20 9m20s 1tx]")
       .add(TC_MIN_DURATION_REV, "[0:20:50 0:30 9m10s 1tx]")
       .add(standard(), PathUtils.withoutCost(path))
