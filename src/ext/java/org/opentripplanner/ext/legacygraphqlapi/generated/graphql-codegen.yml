@@ -30,7 +30,7 @@ config:
     RouteType: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel#LegacyGraphQLRouteTypeModel
     Alert: org.opentripplanner.routing.alertpatch.TransitAlert#TransitAlert
     AlertCauseType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertCauseType#LegacyGraphQLAlertCauseType
-    AlertEffectType: String
+    AlertEffectType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertEffectType#LegacyGraphQLAlertEffectType
     AlertSeverityLevelType: String
     BikePark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
     BikeRentalStation: org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace#VehicleRentalPlace

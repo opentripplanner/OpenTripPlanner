@@ -74,9 +74,19 @@
                   "alertHeaderText" : "A header",
                   "alertDescriptionText" : "A description",
                   "alertEffect" : "REDUCED_SERVICE",
+                  "alertCause" : "MAINTENANCE",
+                  "alertSeverityLevel" : "UNKNOWN_SEVERITY",
                   "alertUrl" : "https://example.com",
                   "effectiveStartDate" : 1676459008,
-                  "effectiveEndDate" : 1676545408
+                  "effectiveEndDate" : 1676545408,
+                  "entities" : [
+                    {
+                      "name" : "stop1",
+                      "gtfsId" : "F:stop1",
+                      "lat" : 60.0,
+                      "lon" : 10.0
+                    }
+                  ]
                 }
               ]
             }

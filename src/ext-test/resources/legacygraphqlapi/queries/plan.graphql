@@ -28,9 +28,19 @@
                     alertHeaderText
                     alertDescriptionText
                     alertEffect
+                    alertCause
+                    alertSeverityLevel
                     alertUrl
                     effectiveStartDate
                     effectiveEndDate
+                    entities {
+                        ... on Stop {
+                            name
+                            gtfsId
+                            lat
+                            lon
+                        }
+                    }
                 }
             }
         }

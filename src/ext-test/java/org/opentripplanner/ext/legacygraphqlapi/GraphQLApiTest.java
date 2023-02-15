@@ -36,6 +36,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Graph;
@@ -45,6 +46,8 @@ import org.opentripplanner.standalone.server.TestServerRequestContext;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 @Execution(ExecutionMode.CONCURRENT)
@@ -72,7 +75,10 @@ class GraphQLApiTest {
         ),
         List.of()
       );
-    var transitModel = new TransitModel();
+
+    var stop = TransitModelForTest.stop("stop1").build();
+    var stopModel = StopModel.of().withRegularStop(stop).build();
+    var transitModel = new TransitModel(stopModel, new Deduplicator());
     transitModel.initTimeZone(ZoneIds.BERLIN);
     transitModel.index();
     Arrays
@@ -104,6 +110,7 @@ class GraphQLApiTest {
       .withUrl(new NonLocalizedString("https://example.com"))
       .withCause(AlertCause.MAINTENANCE)
       .withEffect(AlertEffect.REDUCED_SERVICE)
+      .addEntity(new EntitySelector.Stop(stop.getId()))
       .addTimePeriod(
         new TimePeriod(ALERT_START_TIME.getEpochSecond(), ALERT_END_TIME.getEpochSecond())
       )

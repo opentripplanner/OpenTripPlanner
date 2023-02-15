@@ -12,6 +12,7 @@ import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertCauseType;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertEffectType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
@@ -80,7 +81,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations();
 
-    public DataFetcher<String> alertEffect();
+    public DataFetcher<LegacyGraphQLAlertEffectType> alertEffect();
 
     public DataFetcher<Integer> alertHash();
 
