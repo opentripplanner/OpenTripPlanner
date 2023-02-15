@@ -188,7 +188,7 @@ public class Place {
   public String toString() {
     return ToStringBuilder
       .of(Place.class)
-      .addStr("name", name.toString())
+      .addObj("name", name)
       .addObj("stop", stop)
       .addObj("coordinate", coordinate)
       .addEnum("vertexType", vertexType)

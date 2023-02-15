@@ -154,6 +154,20 @@ jobs:
           fi
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
+  graphql-code-generation:
+    if: github.repository_owner == 'opentripplanner'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Run code generator
+        working-directory: src/ext/java/org/opentripplanner/ext/legacygraphqlapi/generated
+        run: |
+          yarn install
+          yarn generate
+
   container-image:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
     runs-on: ubuntu-latest

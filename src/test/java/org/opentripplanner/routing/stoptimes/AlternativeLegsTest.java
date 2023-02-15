@@ -53,9 +53,9 @@ class AlternativeLegsTest extends GtfsTest {
     var expectd = String.join(
       ", ",
       List.of(
-        "B ~ BUS 2 0:20 0:30 ~ C [ $-1 ]",
-        "B ~ BUS 1 0:10 0:20 ~ C [ $-1 ]",
-        "B ~ BUS 1 8:20 8:30 ~ C [ $-1 ]" // Previous day
+        "B ~ BUS 2 0:20 0:30 ~ C [$-1]",
+        "B ~ BUS 1 0:10 0:20 ~ C [$-1]",
+        "B ~ BUS 1 8:20 8:30 ~ C [$-1]" // Previous day
       )
     );
 
@@ -89,9 +89,9 @@ class AlternativeLegsTest extends GtfsTest {
     var expectd = String.join(
       ", ",
       List.of(
-        "B ~ BUS 3 1:00 1:10 ~ C [ $-1 ]",
-        "B ~ BUS 1 8:20 8:30 ~ C [ $-1 ]",
-        "B ~ BUS 1 0:10 0:20 ~ C [ $-1 ]" // Next day
+        "B ~ BUS 3 1:00 1:10 ~ C [$-1]",
+        "B ~ BUS 1 8:20 8:30 ~ C [$-1]",
+        "B ~ BUS 1 0:10 0:20 ~ C [$-1]" // Next day
       )
     );
 

@@ -25,7 +25,7 @@ final class Access<T extends RaptorTripSchedule>
 
   @Override
   public ArrivalView<T> previous() {
-    throw new UnsupportedOperationException("Access path arrival is the first path.");
+    return null;
   }
 
   @Override

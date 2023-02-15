@@ -22,7 +22,6 @@ import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -166,9 +165,7 @@ public class ScheduledDeviatedTrip
     for (int i = fromStopIndex; stopTime == MISSING_VALUE && i >= 0; i--) {
       stopTime = stopTimes[i].departureTime;
     }
-    return stopTime != MISSING_VALUE && stopTime >= departureTime
-      ? stopTime
-      : SearchParams.TIME_NOT_SET;
+    return stopTime >= departureTime ? stopTime : MISSING_VALUE;
   }
 
   @Override
@@ -182,9 +179,7 @@ public class ScheduledDeviatedTrip
     for (int i = toStopIndex; stopTime == MISSING_VALUE && i < stopTimes.length; i++) {
       stopTime = stopTimes[i].arrivalTime;
     }
-    return stopTime != MISSING_VALUE && stopTime <= arrivalTime
-      ? stopTime
-      : SearchParams.TIME_NOT_SET;
+    return stopTime <= arrivalTime ? stopTime : MISSING_VALUE;
   }
 
   @Override
