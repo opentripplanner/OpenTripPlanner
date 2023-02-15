@@ -3,9 +3,9 @@ package org.opentripplanner.transit.model.trip.timetable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model.trip.Timetable.NEXT_TIME_TABLE_INDEX;
 import static org.opentripplanner.transit.model.trip.Timetable.PREV_TIME_TABLE_INDEX;
-import static org.opentripplanner.transit.model.trip.timetable.BoardTimeSearch.findBoardTime;
-import static org.opentripplanner.transit.model.trip.timetable.BoardTimeSearch.findBoardTimeBinarySearch;
-import static org.opentripplanner.transit.model.trip.timetable.BoardTimeSearch.findBoardTimeLinearApproximation;
+import static org.opentripplanner.transit.model.trip.timetable.BoardTripIndexSearch.findBoardTime;
+import static org.opentripplanner.transit.model.trip.timetable.BoardTripIndexSearch.findBoardTimeBinarySearch;
+import static org.opentripplanner.transit.model.trip.timetable.BoardTripIndexSearch.findBoardTimeLinearApproximation;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.TimeUtils;
 
-class BoardTimeSearchTest {
+class BoardTimetableTripIndexSearchTest {
 
   private final int[] ONE = { 10 };
   private final int[] FOUR = { 10, 11, 11, 12 };
@@ -53,27 +53,27 @@ class BoardTimeSearchTest {
 
   @Test
   void findDepartureInTimetableWith200Elements() {
-    testSearch(BoardTimeSearch::findBoardTime);
-    testSearch(BoardTimeSearch::findBoardTimeLinearApproximation);
-    testSearch(BoardTimeSearch::findBoardTimeBinarySearch);
+    testSearch(BoardTripIndexSearch::findBoardTime);
+    testSearch(BoardTripIndexSearch::findBoardTimeLinearApproximation);
+    testSearch(BoardTripIndexSearch::findBoardTimeBinarySearch);
   }
 
-  void testSearch(TimeSearch search) {
+  void testSearch(TimetableTripIndexSearch search) {
     // Search the first half of timetable
     int start = 0;
     int end = start + 100;
 
-    assertEquals(PREV_TIME_TABLE_INDEX, search.search(MANY, start, end, 9));
-    assertEquals(0, search.search(MANY, start, end, 10));
-    assertEquals(1, search.search(MANY, start, end, 11));
-    assertEquals(3, search.search(MANY, start, end, 12));
+    assertEquals(PREV_TIME_TABLE_INDEX, search.searchForTripIndex(MANY, start, end, 9));
+    assertEquals(0, search.searchForTripIndex(MANY, start, end, 10));
+    assertEquals(1, search.searchForTripIndex(MANY, start, end, 11));
+    assertEquals(3, search.searchForTripIndex(MANY, start, end, 12));
     // Search time at end
-    assertEquals(99, search.search(MANY, start, end, 108));
-    assertEquals(NEXT_TIME_TABLE_INDEX, search.search(MANY, start, end, 109));
+    assertEquals(99, search.searchForTripIndex(MANY, start, end, 108));
+    assertEquals(NEXT_TIME_TABLE_INDEX, search.searchForTripIndex(MANY, start, end, 109));
 
     // Search for all times to see that thresholds are done right
     for (int i = 4; i < end; ++i) {
-      assertEquals(i, search.search(MANY, start, end, i + 9));
+      assertEquals(i, search.searchForTripIndex(MANY, start, end, i + 9));
     }
 
     // Search the last half of timetable
@@ -81,14 +81,14 @@ class BoardTimeSearchTest {
     end = start + 100;
 
     for (int i = start + 1; i < end; ++i) {
-      assertEquals(i, search.search(MANY, start, end, i + 9));
+      assertEquals(i, search.searchForTripIndex(MANY, start, end, i + 9));
     }
 
-    assertEquals(NEXT_TIME_TABLE_INDEX, search.search(MANY, start, end, 209));
+    assertEquals(NEXT_TIME_TABLE_INDEX, search.searchForTripIndex(MANY, start, end, 209));
   }
 
   /**
-   * Make sure to set the two constants in {@link BoardTimeSearch} to value 10 before running this
+   * Make sure to set the two constants in {@link BoardTripIndexSearch} to value 10 before running this
    * test:
    * <ul>
    *   <li>{@code THRESHOLD_LINEAR_APPROXIMATION}</li>
@@ -122,14 +122,14 @@ class BoardTimeSearchTest {
               "Standard distribution: " +
               stdDeviation +
               ", N=" +
-              BoardTimeSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT
+              BoardTripIndexSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT
             );
             System.out.printf("      %7s  %7s  %7s %n", "Linear", "Approx", "Binary");
 
             List
               .of(10, 12, 15, 20, 30, 50, 75, 100, 150, 200, 250, 350, 500, 750, 1000, 1500)
               .forEach(s -> {
-                if (s <= BoardTimeSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT) {
+                if (s <= BoardTripIndexSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT) {
                   return;
                 }
 

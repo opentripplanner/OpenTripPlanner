@@ -24,7 +24,7 @@ public interface Timetable {
 
   /**
    * Search for the trip index alighting BEFORE the given time at the given stop position.
-   * Return {@link #NEXT_TIME_TABLE_INDEX} if time is before first time in table.
+   * Return {@link #PREV_TIME_TABLE_INDEX} if time is before first time in table.
    */
   int findTripIndexAlightingBefore(int stopPos, int latestAlightTime);
 

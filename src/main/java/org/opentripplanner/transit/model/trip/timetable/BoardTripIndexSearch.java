@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model.trip.timetable;
 
 import org.opentripplanner.transit.model.trip.Timetable;
 
-class BoardTimeSearch {
+class BoardTripIndexSearch {
 
   /**
    * The BoardTimeSearchTest#compareSearchPerformance test is used find the optimal
@@ -30,15 +30,15 @@ class BoardTimeSearch {
    */
   static final int LINEAR_APPROXIMATION_TO_BINARY_THRESHOLD = 250;
 
-  static TimeSearch createSearch(int nTrips) {
+  static TimetableTripIndexSearch createSearch(int nTrips) {
     // The DepartureSearchTest#compareSearchPerformance is used to determine when to use the
     // different searches
     if (nTrips <= THRESHOLD_LINEAR_APPROX_MIN_LIMIT) {
-      return BoardTimeSearch::findBoardTime;
+      return BoardTripIndexSearch::findBoardTime;
     } else if (nTrips <= LINEAR_APPROXIMATION_TO_BINARY_THRESHOLD) {
-      return BoardTimeSearch::findBoardTimeLinearApproximation;
+      return BoardTripIndexSearch::findBoardTimeLinearApproximation;
     } else {
-      return BoardTimeSearch::findBoardTimeBinarySearch;
+      return BoardTripIndexSearch::findBoardTimeBinarySearch;
     }
   }
 
@@ -58,7 +58,7 @@ class BoardTimeSearch {
     }
   }
 
-  /** Implement {@link TimeSearch#search(int[], int, int, int)} */
+  /** Implement {@link TimetableTripIndexSearch#searchForTripIndex(int[], int, int, int)} */
   static int findBoardTime(final int[] a, final int start, final int end, final int edt) {
     if (edt < a[start]) {
       // TODO RTM - Fix this, if we go back, then we should test the last trip and return
@@ -71,7 +71,7 @@ class BoardTimeSearch {
     return findBoardTimeBasic(a, start, end, edt);
   }
 
-  /** Implement {@link TimeSearch#search(int[], int, int, int)} */
+  /** Implement {@link TimetableTripIndexSearch#searchForTripIndex(int[], int, int, int)} */
   static int findBoardTimeLinearApproximation(
     final int[] a,
     final int start,

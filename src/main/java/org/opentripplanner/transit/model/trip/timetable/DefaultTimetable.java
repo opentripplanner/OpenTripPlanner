@@ -26,8 +26,8 @@ public class DefaultTimetable implements Timetable {
   private final int[] boardTimes;
   private final int[] alightTimes;
   private final int maxTripDurationInDays;
-  private final TimeSearch boardSearch;
-  private final TimeSearch alightSearch;
+  private final TimetableTripIndexSearch boardSearch;
+  private final TimetableTripIndexSearch alightSearch;
 
   DefaultTimetable(int nTrips, int nStops, int[] boardTimes, int[] alightTimes) {
     if (nStops * nTrips != alightTimes.length) {
@@ -37,8 +37,8 @@ public class DefaultTimetable implements Timetable {
     this.nStops = nStops;
     this.boardTimes = boardTimes;
     this.alightTimes = alightTimes;
-    this.boardSearch = BoardTimeSearch.createSearch(nTrips);
-    this.alightSearch = AlightTimeSearch.createSearch(nTrips);
+    this.boardSearch = BoardTripIndexSearch.createSearch(nTrips);
+    this.alightSearch = AlightTripIndexSearch.createSearch(nTrips);
     this.hashCode = TimetableIntUtils.matrixHashCode(nTrips, nStops, boardTimes, alightTimes);
     this.maxTripDurationInDays =
       calculateMaxTripDurationInDays(alightTimes, index(nTrips - 1, 0), alightTimes.length);
@@ -103,9 +103,9 @@ public class DefaultTimetable implements Timetable {
     );
   }
 
-  private int findTripIndex(TimeSearch search, int[] times, int stopPos, int edt) {
+  private int findTripIndex(TimetableTripIndexSearch search, int[] times, int stopPos, int edt) {
     int start = offset(stopPos);
-    return search.search(times, start, start + nTrips, edt);
+    return search.searchForTripIndex(times, start, start + nTrips, edt);
   }
 
   private int index(int tripIndex, int stopPos) {

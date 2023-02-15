@@ -2,29 +2,29 @@ package org.opentripplanner.transit.model.trip.timetable;
 
 import org.opentripplanner.transit.model.trip.Timetable;
 
-class AlightTimeSearch {
+class AlightTripIndexSearch {
 
-  static TimeSearch createSearch(int nTrips) {
+  static TimetableTripIndexSearch createSearch(int nTrips) {
     // The DepartureSearchTest#compareSearchPerformance is used to determine when to use the
     // different searches
-    if (nTrips <= BoardTimeSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT) {
-      return AlightTimeSearch::findAlightTime;
+    if (nTrips <= BoardTripIndexSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT) {
+      return AlightTripIndexSearch::findAlightTime;
     }
     if (nTrips <= 500) {
-      return AlightTimeSearch::findAlightTimeLinearApproximation;
+      return AlightTripIndexSearch::findAlightTimeLinearApproximation;
     }
-    return AlightTimeSearch::findAlightTimeBinarySearch;
+    return AlightTripIndexSearch::findAlightTimeBinarySearch;
   }
 
-  /** Implement {@link TimeSearch#search(int[], int, int, int)} */
+  /** Implement {@link TimetableTripIndexSearch#searchForTripIndex(int[], int, int, int)} */
   static int findAlightTime(final int[] a, final int start, final int end, final int lat) {
-    if (lat > a[end]) {
-      return Timetable.NEXT_TIME_TABLE_INDEX;
+    if (lat < a[start]) {
+      return Timetable.PREV_TIME_TABLE_INDEX;
     }
     return findAlightTimeBasic(a, start, end, lat);
   }
 
-  /** Implement {@link TimeSearch#search(int[], int, int, int)} */
+  /** Implement {@link TimetableTripIndexSearch#searchForTripIndex(int[], int, int, int)} */
   static int findAlightTimeLinearApproximation(
     final int[] a,
     final int start,
@@ -47,13 +47,13 @@ class AlightTimeSearch {
     //    trip pattern in the beginning and end of a day
 
     // Skip linear approximation if one of last N elements
-    int e = end - BoardTimeSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT;
+    int e = end - BoardTripIndexSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT;
     if (lat > a[e]) {
       return findAlightTimeBasic(a, start, end, lat);
     }
 
     // Skip linear approximation if one of first N elements
-    int s = (start + 1) + BoardTimeSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT;
+    int s = (start + 1) + BoardTripIndexSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT;
     if (lat < a[s]) {
       return findAlightTimeBasic(a, start, s, lat);
     }
@@ -61,12 +61,12 @@ class AlightTimeSearch {
     // Guess index based on linear approximation
     int i =
       TimetableIntUtils.interpolateCeiling(a[s], s, a[e], e, lat) +
-      BoardTimeSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT /
+      BoardTripIndexSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT /
       2;
 
     // Move to a index which is guaranteed to have a time less than lat
     while (lat > a[i]) {
-      i += BoardTimeSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT;
+      i += BoardTripIndexSearch.THRESHOLD_LINEAR_APPROX_MIN_LIMIT;
     }
     return findAlightTimeBasic(a, start, i, lat);
   }
@@ -75,7 +75,7 @@ class AlightTimeSearch {
    * Do a binary search to find the approximate upper bound index for where to start the search.
    * <p/>
    * This is just a guess, and we return when the trip with a best valid departure is in the range
-   * of the next {@link BoardTimeSearch#BINARY_SEARCH_THRESHOLD}.
+   * of the next {@link BoardTripIndexSearch#BINARY_SEARCH_THRESHOLD}.
    *
    * @return a better upper bound index (exclusive)
    */
@@ -91,7 +91,7 @@ class AlightTimeSearch {
     int lower = start;
     int upper = end;
 
-    while (upper - lower > BoardTimeSearch.BINARY_SEARCH_THRESHOLD) {
+    while (upper - lower > BoardTripIndexSearch.BINARY_SEARCH_THRESHOLD) {
       int m = (lower + upper) / 2;
 
       if (a[m] < lat) {
