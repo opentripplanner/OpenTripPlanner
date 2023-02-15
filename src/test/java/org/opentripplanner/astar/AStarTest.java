@@ -18,9 +18,10 @@ import org.opentripplanner.routing.algorithm.MultiTargetTerminationStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteEdge;
-import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.routing.graph.TemporaryConcreteEdge;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -286,8 +287,8 @@ public class AStarTest {
    * Private Methods
    ****/
 
-  private SimpleConcreteVertex vertex(String label, double lat, double lon) {
-    return new SimpleConcreteVertex(graph, label, lat, lon);
+  private IntersectionVertex vertex(String label, double lat, double lon) {
+    return StreetModelForTest.intersectionVertex(label, lat, lon);
   }
 
   private void edges(String... vLabels) {

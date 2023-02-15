@@ -39,6 +39,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
@@ -78,10 +79,10 @@ public class TestHalfEdges {
     graph = new Graph(deduplicator);
     transitModel = new TransitModel(new StopModel(), deduplicator);
     // a 0.1 degree x 0.1 degree square
-    tl = new IntersectionVertex(graph, "tl", -74.01, 40.01);
-    tr = new IntersectionVertex(graph, "tr", -74.0, 40.01);
-    bl = new IntersectionVertex(graph, "bl", -74.01, 40.0);
-    br = new IntersectionVertex(graph, "br", -74.00, 40.0);
+    tl = new SplitterVertex(graph, "tl", -74.01, 40.01);
+    tr = new SplitterVertex(graph, "tr", -74.0, 40.01);
+    bl = new SplitterVertex(graph, "bl", -74.01, 40.0);
+    br = new SplitterVertex(graph, "br", -74.00, 40.0);
 
     top =
       new StreetEdge(

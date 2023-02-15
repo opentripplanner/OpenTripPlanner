@@ -8,7 +8,7 @@ import org.opentripplanner.routing.graph.Graph;
 /**
  * Represents an ordinary location in space, typically an intersection.
  */
-public class IntersectionVertex extends StreetVertex {
+public abstract class IntersectionVertex extends StreetVertex {
 
   private static final int HIGHWAY_TRAFFIC_LIGHT_INDEX = 0;
 
@@ -21,44 +21,24 @@ public class IntersectionVertex extends StreetVertex {
   private final short flags;
 
   //For testing only
-  public IntersectionVertex(Graph g, String label, double x, double y, String name) {
-    this(g, label, x, y, new NonLocalizedString(name), false, false);
+  public IntersectionVertex(Graph g, double x, double y, String name) {
+    this(g, x, y, new NonLocalizedString(name), false, false);
   }
 
   public IntersectionVertex(
     Graph g,
-    String label,
     double x,
     double y,
     I18NString name,
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {
-    super(g, label, x, y, name);
+    super(g, x, y, name);
     flags = initFlags(hasHighwayTrafficLight, hasCrossingTrafficLight);
   }
 
-  public IntersectionVertex(Graph g, String label, double x, double y) {
-    this(g, label, x, y, new NonLocalizedString(label), false, false);
-  }
-
-  public IntersectionVertex(
-    Graph g,
-    String label,
-    double x,
-    double y,
-    boolean hasHighwayTrafficLight,
-    boolean hasCrossingTrafficLight
-  ) {
-    this(
-      g,
-      label,
-      x,
-      y,
-      new NonLocalizedString(label),
-      hasHighwayTrafficLight,
-      hasCrossingTrafficLight
-    );
+  public IntersectionVertex(Graph g, String name, double x, double y) {
+    this(g, x, y, new NonLocalizedString(name), false, false);
   }
 
   /**

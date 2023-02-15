@@ -15,13 +15,7 @@ public class VehicleRentalPlaceVertex extends Vertex {
   private VehicleRentalPlace station;
 
   public VehicleRentalPlaceVertex(Graph g, VehicleRentalPlace station) {
-    super(
-      g,
-      "vehicle rental station " + station.getId(),
-      station.getLongitude(),
-      station.getLatitude(),
-      station.getName()
-    );
+    super(g, station.getLongitude(), station.getLatitude(), station.getName());
     this.station = station;
   }
 
@@ -31,5 +25,10 @@ public class VehicleRentalPlaceVertex extends Vertex {
 
   public void setStation(VehicleRentalPlace station) {
     this.station = station;
+  }
+
+  @Override
+  public String getLabel() {
+    return "vehicle rental station " + station.getId();
   }
 }

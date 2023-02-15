@@ -16,13 +16,13 @@ public class StreetLocation extends StreetVertex {
   // maybe name should just be pulled from street being split
   public StreetLocation(String id, Coordinate nearestPoint, I18NString name) {
     // calling constructor with null graph means this vertex is temporary
-    super(null, id, nearestPoint.x, nearestPoint.y, name);
+    super(null, nearestPoint.x, nearestPoint.y, name);
   }
 
   //For tests only
   public StreetLocation(String id, Coordinate nearestPoint, String name) {
     // calling constructor with null graph means this vertex is temporary
-    super(null, id, nearestPoint.x, nearestPoint.y, new NonLocalizedString(name));
+    super(null, nearestPoint.x, nearestPoint.y, new NonLocalizedString(name));
   }
 
   public boolean isWheelchairAccessible() {
@@ -49,5 +49,10 @@ public class StreetLocation extends StreetVertex {
       return other.getCoordinate().equals(getCoordinate());
     }
     return false;
+  }
+
+  @Override
+  public String getLabel() {
+    return null;
   }
 }

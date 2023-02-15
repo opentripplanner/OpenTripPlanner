@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
@@ -12,25 +12,35 @@ import org.opentripplanner.routing.graph.Graph;
  */
 public class OsmVertex extends IntersectionVertex {
 
+  private static final String LABEL_FORMAT = "osm:node:%d";
   /** The OSM node ID from whence this came */
   public final long nodeId;
 
-  public OsmVertex(Graph g, String label, double x, double y, long nodeId) {
-    super(g, label, x, y);
-    this.nodeId = nodeId;
+  public OsmVertex(Graph g, double x, double y, long nodeId) {
+    this(g, x, y, nodeId, false, false);
   }
 
   public OsmVertex(
     Graph g,
-    String label,
     double x,
     double y,
     long nodeId,
-    I18NString name,
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {
-    super(g, label, x, y, name, hasHighwayTrafficLight, hasCrossingTrafficLight);
+    super(
+      g,
+      x,
+      y,
+      new NonLocalizedString(LABEL_FORMAT.formatted(nodeId)),
+      hasHighwayTrafficLight,
+      hasCrossingTrafficLight
+    );
     this.nodeId = nodeId;
+  }
+
+  @Override
+  public String getLabel() {
+    return LABEL_FORMAT.formatted(nodeId);
   }
 }

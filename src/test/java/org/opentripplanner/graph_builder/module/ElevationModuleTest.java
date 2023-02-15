@@ -39,8 +39,8 @@ public class ElevationModuleTest {
     var stopModel = new StopModel();
     var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
-    OsmVertex from = new OsmVertex(graph, "from", -122.6932051, 45.5122964, 40513757);
-    OsmVertex to = new OsmVertex(graph, "to", -122.6903532, 45.5115309, 1677595882);
+    OsmVertex from = new OsmVertex(graph, -122.6932051, 45.5122964, 40513757);
+    OsmVertex to = new OsmVertex(graph, -122.6903532, 45.5115309, 1677595882);
     LineString geometry = GeometryUtils.makeLineString(
       -122.6932051,
       45.5122964,

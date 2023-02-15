@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +24,6 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -37,9 +37,9 @@ public class TemporaryVerticesContainerTest {
   // Given:
   // - a graph with 3 intersections/vertexes
   private Graph g = new Graph(new Deduplicator());
-  private final StreetVertex a = new IntersectionVertex(g, "A", 1.0, 1.0);
-  private final StreetVertex b = new IntersectionVertex(g, "B", 0.0, 1.0);
-  private final StreetVertex c = new IntersectionVertex(g, "C", 1.0, 0.0);
+  private final StreetVertex a = intersectionVertex(g, "A", 1.0, 1.0);
+  private final StreetVertex b = intersectionVertex(g, "B", 0.0, 1.0);
+  private final StreetVertex c = intersectionVertex(g, "C", 1.0, 0.0);
   private final List<Vertex> permanentVertexes = Arrays.asList(a, b, c);
   // - And travel *origin* is 0,4 degrees on the road from B to A
   private final GenericLocation from = new GenericLocation(1.0, 0.4);

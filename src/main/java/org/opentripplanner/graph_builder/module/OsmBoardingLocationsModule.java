@@ -164,7 +164,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         var centroid = edgeList.getGeometry().getCentroid();
         var boardingLocation = new OsmBoardingLocationVertex(
           graph,
-          label,
           centroid.getX(),
           centroid.getY(),
           name,

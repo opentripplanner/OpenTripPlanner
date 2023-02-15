@@ -22,12 +22,12 @@ public abstract class StreetVertex extends Vertex {
   /** All locations for flex transit, which this vertex is part of */
   public Set<AreaStop> areaStops;
 
-  public StreetVertex(Graph g, String label, Coordinate coord, I18NString streetName) {
-    this(g, label, coord.x, coord.y, streetName);
+  public StreetVertex(Graph g, Coordinate coord, I18NString streetName) {
+    this(g, coord.x, coord.y, streetName);
   }
 
-  public StreetVertex(Graph g, String label, double x, double y, I18NString streetName) {
-    super(g, label, x, y, streetName);
+  public StreetVertex(Graph g, double x, double y, I18NString streetName) {
+    super(g, x, y, streetName);
   }
 
   /**

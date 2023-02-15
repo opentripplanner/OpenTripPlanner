@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,6 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -43,17 +43,17 @@ public class TurnRestrictionTest {
     graph = new Graph();
 
     // Graph for a fictional grid city with turn restrictions
-    StreetVertex maple1 = vertex("maple_1st", 2.0, 2.0);
-    StreetVertex maple2 = vertex("maple_2nd", 1.0, 2.0);
-    StreetVertex maple3 = vertex("maple_3rd", 0.0, 2.0);
+    StreetVertex maple1 = intersectionVertex(graph, "maple_1st", 2.0, 2.0);
+    StreetVertex maple2 = intersectionVertex(graph, "maple_2nd", 1.0, 2.0);
+    StreetVertex maple3 = intersectionVertex(graph, "maple_3rd", 0.0, 2.0);
 
-    StreetVertex main1 = vertex("main_1st", 2.0, 1.0);
-    StreetVertex main2 = vertex("main_2nd", 1.0, 1.0);
-    StreetVertex main3 = vertex("main_3rd", 0.0, 1.0);
+    StreetVertex main1 = intersectionVertex(graph, "main_1st", 2.0, 1.0);
+    StreetVertex main2 = intersectionVertex(graph, "main_2nd", 1.0, 1.0);
+    StreetVertex main3 = intersectionVertex(graph, "main_3rd", 0.0, 1.0);
 
-    StreetVertex broad1 = vertex("broad_1st", 2.0, 0.0);
-    StreetVertex broad2 = vertex("broad_2nd", 1.0, 0.0);
-    StreetVertex broad3 = vertex("broad_3rd", 0.0, 0.0);
+    StreetVertex broad1 = intersectionVertex(graph, "broad_1st", 2.0, 0.0);
+    StreetVertex broad2 = intersectionVertex(graph, "broad_2nd", 1.0, 0.0);
+    StreetVertex broad3 = intersectionVertex(graph, "broad_3rd", 0.0, 0.0);
 
     // Each block along the main streets has unit length and is one-way
     StreetEdge maple1_2 = edge(maple1, maple2, 100.0, false);
@@ -187,14 +187,6 @@ public class TurnRestrictionTest {
     assertEquals("broad_1st", states.get(2).getVertex().getLabel());
     assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
     assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
-  }
-
-  /****
-   * Private Methods
-   ****/
-
-  private StreetVertex vertex(String label, double lat, double lon) {
-    return new IntersectionVertex(graph, label, lat, lon);
   }
 
   /**

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -15,8 +15,8 @@ public class EdgeTest {
   @Test
   public void testConstruct() {
     Graph graph = new Graph();
-    Vertex head = new SimpleConcreteVertex(graph, "head", 47.669457, -122.387577);
-    Vertex tail = new SimpleConcreteVertex(graph, "tail", 47.669462, -122.384739);
+    Vertex head = new SplitterVertex(graph, "head", 47.669457, -122.387577);
+    Vertex tail = new SplitterVertex(graph, "tail", 47.669462, -122.384739);
     Edge e = new SimpleConcreteEdge(head, tail);
 
     assertEquals(head, e.getFromVertex());
@@ -26,10 +26,10 @@ public class EdgeTest {
   @Test
   public void testEdgeRemoval() {
     Graph graph = new Graph();
-    StreetVertex va = new IntersectionVertex(graph, "A", 10.0, 10.0);
-    StreetVertex vb = new IntersectionVertex(graph, "B", 10.1, 10.1);
-    StreetVertex vc = new IntersectionVertex(graph, "C", 10.2, 10.2);
-    StreetVertex vd = new IntersectionVertex(graph, "D", 10.3, 10.3);
+    StreetVertex va = new SplitterVertex(graph, "A", 10.0, 10.0);
+    StreetVertex vb = new SplitterVertex(graph, "B", 10.1, 10.1);
+    StreetVertex vc = new SplitterVertex(graph, "C", 10.2, 10.2);
+    StreetVertex vd = new SplitterVertex(graph, "D", 10.3, 10.3);
     Edge eab = new StreetEdge(va, vb, null, "AB", 10, StreetTraversalPermission.ALL, false);
     Edge ebc = new StreetEdge(vb, vc, null, "BC", 10, StreetTraversalPermission.ALL, false);
     Edge ecd = new StreetEdge(vc, vd, null, "CD", 10, StreetTraversalPermission.ALL, false);

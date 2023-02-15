@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.vehicle_parking;
 
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
+
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -22,8 +24,8 @@ public class VehicleParkingTestGraphData {
     transitModel = new TransitModel(stopModel, deduplicator);
     graph.hasStreets = true;
 
-    A = new IntersectionVertex(graph, "A", 0, 0);
-    B = new IntersectionVertex(graph, "B", 0.01, 0);
+    A = intersectionVertex(graph, "A", 0, 0);
+    B = intersectionVertex(graph, "B", 0.01, 0);
 
     VehicleParkingTestUtil.createStreet(A, B, StreetTraversalPermission.PEDESTRIAN);
   }

@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.edge;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +36,10 @@ public class TemporaryPartialStreetEdgeTest {
     graph = new Graph();
 
     // Graph for a fictional grid city with turn restrictions
-    v1 = vertex("maple_1st", 2.0, 2.0);
-    v2 = vertex("maple_2nd", 1.0, 2.0);
-    v3 = vertex("maple_3rd", 0.0, 2.0);
-    v4 = vertex("maple_4th", -1.0, 2.0);
+    v1 = intersectionVertex("maple_1st", 2.0, 2.0);
+    v2 = intersectionVertex("maple_2nd", 1.0, 2.0);
+    v3 = intersectionVertex("maple_3rd", 0.0, 2.0);
+    v4 = intersectionVertex("maple_4th", -1.0, 2.0);
 
     e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
     e1Reverse = edge(v2, v1, 1.0, StreetTraversalPermission.ALL);
@@ -255,10 +256,6 @@ public class TemporaryPartialStreetEdgeTest {
       new NonLocalizedString(name),
       length
     );
-  }
-
-  private IntersectionVertex vertex(String label, double lat, double lon) {
-    return new IntersectionVertex(graph, label, lat, lon);
   }
 
   /**

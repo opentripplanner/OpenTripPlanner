@@ -24,7 +24,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -44,8 +43,8 @@ public class LinkingTest {
     double x = -122.123;
     double y = 37.363;
     for (double delta = 0; delta <= 2; delta += 0.005) {
-      StreetVertex v0 = new IntersectionVertex(null, "zero", x, y);
-      StreetVertex v1 = new IntersectionVertex(null, "one", x + delta, y + delta);
+      StreetVertex v0 = new SplitterVertex(null, "zero", x, y);
+      StreetVertex v1 = new SplitterVertex(null, "one", x + delta, y + delta);
       LineString geom = gf.createLineString(
         new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() }
       );

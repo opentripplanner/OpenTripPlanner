@@ -17,6 +17,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -82,8 +83,8 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void carParkingEntranceToAllTraversableStreetLinkingTest() {
-    var C = new IntersectionVertex(graph, "C", 0.0001, 0.0001);
-    var D = new IntersectionVertex(graph, "D", 0.01, 0.01);
+    var C = new SplitterVertex(graph, "C", 0.0001, 0.0001);
+    var D = new SplitterVertex(graph, "D", 0.01, 0.01);
     VehicleParkingTestUtil.createStreet(C, D, StreetTraversalPermission.CAR);
 
     VehicleParkingTestUtil.createStreet(A, C, StreetTraversalPermission.NONE);

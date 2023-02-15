@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.vertex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,17 +26,17 @@ public class IntersectionVertexTest {
     graph = new Graph();
 
     // Graph for a fictional grid city with turn restrictions
-    StreetVertex maple1 = vertex("maple_1st", 2.0, 2.0);
-    StreetVertex maple2 = vertex("maple_2nd", 1.0, 2.0);
-    StreetVertex maple3 = vertex("maple_3rd", 0.0, 2.0);
+    StreetVertex maple1 = intersectionVertex("maple_1st", 2.0, 2.0);
+    StreetVertex maple2 = intersectionVertex("maple_2nd", 1.0, 2.0);
+    StreetVertex maple3 = intersectionVertex("maple_3rd", 0.0, 2.0);
 
-    StreetVertex main1 = vertex("main_1st", 2.0, 1.0);
-    StreetVertex main2 = vertex("main_2nd", 1.0, 1.0);
-    StreetVertex main3 = vertex("main_3rd", 0.0, 1.0);
+    StreetVertex main1 = intersectionVertex("main_1st", 2.0, 1.0);
+    StreetVertex main2 = intersectionVertex("main_2nd", 1.0, 1.0);
+    StreetVertex main3 = intersectionVertex("main_3rd", 0.0, 1.0);
 
-    StreetVertex broad1 = vertex("broad_1st", 2.0, 0.0);
-    StreetVertex broad2 = vertex("broad_2nd", 1.0, 0.0);
-    StreetVertex broad3 = vertex("broad_3rd", 0.0, 0.0);
+    StreetVertex broad1 = intersectionVertex("broad_1st", 2.0, 0.0);
+    StreetVertex broad2 = intersectionVertex("broad_2nd", 1.0, 0.0);
+    StreetVertex broad3 = intersectionVertex("broad_3rd", 0.0, 0.0);
 
     // Each block along the main streets has unit length and is one-way
     StreetEdge maple1_2 = edge(maple1, maple2, 100.0, false);
@@ -63,13 +64,13 @@ public class IntersectionVertexTest {
 
   @Test
   public void testInferredFreeFlowing() {
-    IntersectionVertex iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0);
+    IntersectionVertex iv = new SplitterVertex(graph, "vertex", 1.0, 2.0);
     assertFalse(iv.hasDrivingTrafficLight());
     assertFalse(iv.inferredFreeFlowing());
     assertEquals(0, iv.getDegreeIn());
     assertEquals(0, iv.getDegreeOut());
 
-    iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0, true, false);
+    iv = new OsmVertex(graph, 1.0, 2.0, 1, true, false);
     assertTrue(iv.hasDrivingTrafficLight());
     assertTrue(iv.hasCyclingTrafficLight());
     assertFalse(iv.hasWalkingTrafficLight());
@@ -85,26 +86,18 @@ public class IntersectionVertexTest {
     assertEquals(1, iv.getDegreeOut());
     assertFalse(iv.inferredFreeFlowing());
 
-    iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0);
+    iv = new OsmVertex(graph, 1.0, 2.0, 1);
     iv.addIncoming(fromEdge);
     iv.addOutgoing(straightAheadEdge);
     assertFalse(iv.hasDrivingTrafficLight());
     assertTrue(iv.inferredFreeFlowing());
 
-    iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0, false, true);
+    iv = new OsmVertex(graph, 1.0, 2.0, 1, false, true);
     iv.addIncoming(fromEdge);
     iv.addOutgoing(straightAheadEdge);
     assertTrue(iv.hasWalkingTrafficLight());
     assertTrue(iv.hasCyclingTrafficLight());
     assertFalse(iv.inferredFreeFlowing());
-  }
-
-  /****
-   * Private Methods
-   ****/
-
-  private StreetVertex vertex(String label, double lat, double lon) {
-    return new IntersectionVertex(graph, label, lat, lon);
   }
 
   /**

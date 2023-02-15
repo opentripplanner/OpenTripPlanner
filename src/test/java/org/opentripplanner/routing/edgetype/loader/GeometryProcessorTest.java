@@ -31,6 +31,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -77,13 +78,13 @@ public class GeometryProcessorTest {
     for (String s : stops) {
       TransitStopVertex stop = (TransitStopVertex) (graph.getVertex(s));
 
-      IntersectionVertex front = new IntersectionVertex(
+      IntersectionVertex front = new SplitterVertex(
         graph,
         "near_1_" + stop.getStop().getId(),
         stop.getLon() + 0.0001,
         stop.getLat() + 0.0001
       );
-      IntersectionVertex back = new IntersectionVertex(
+      IntersectionVertex back = new SplitterVertex(
         graph,
         "near_2_" + stop.getStop().getId(),
         stop.getLon() - 0.0001,

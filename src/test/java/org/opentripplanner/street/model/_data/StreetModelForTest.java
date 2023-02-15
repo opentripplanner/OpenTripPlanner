@@ -4,9 +4,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 
 public class StreetModelForTest {
@@ -18,11 +20,20 @@ public class StreetModelForTest {
 
   public static IntersectionVertex intersectionVertex(double lat, double lon) {
     var label = "%s_%s".formatted(lat, lon);
-    return new IntersectionVertex(null, label, lat, lon, label);
+    return new SplitterVertex(null, label, lat, lon, label);
   }
 
   public static IntersectionVertex intersectionVertex(String label, double lat, double lon) {
-    return new IntersectionVertex(null, label, lat, lon, label);
+    return new SplitterVertex(null, label, lat, lon, label);
+  }
+
+  public static IntersectionVertex intersectionVertex(
+    Graph graph,
+    String label,
+    double lat,
+    double lon
+  ) {
+    return new SplitterVertex(graph, label, lat, lon, label);
   }
 
   public static StreetEdge streetEdge(StreetVertex vA, StreetVertex vB) {

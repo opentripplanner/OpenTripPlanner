@@ -34,6 +34,7 @@ import org.opentripplanner.street.model.edge.VehicleRentalEdge;
 import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
@@ -101,7 +102,7 @@ public abstract class GraphRoutingTest {
 
     // -- Street network
     public IntersectionVertex intersection(String label, double latitude, double longitude) {
-      return new IntersectionVertex(graph, label, longitude, latitude);
+      return new SplitterVertex(graph, label, longitude, latitude);
     }
 
     public StreetEdge street(

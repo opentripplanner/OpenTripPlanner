@@ -7,6 +7,7 @@ import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -32,7 +33,7 @@ public class FlexTripEdge extends Edge {
   ) {
     // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.
     // The first parameter in Vertex constructor is graph. If it is null, the vertex isn't added to it.
-    super(new Vertex(null, null, 0.0, 0.0) {}, new Vertex(null, null, 0.0, 0.0) {});
+    super(new OsmVertex(null, 0.0, 0.0, 0) {}, new OsmVertex(null, 0.0, 0.0, 0) {});
     this.s1 = s1;
     this.s2 = s2;
     this.trip = trip;

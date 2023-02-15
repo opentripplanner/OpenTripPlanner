@@ -22,6 +22,7 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.search.TraverseMode;
@@ -49,11 +50,11 @@ public class LinkStopToPlatformTest {
 
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
 
-    vertices.add(new IntersectionVertex(graph, "1", 10.22054, 59.13568, "Platform vertex 1"));
-    vertices.add(new IntersectionVertex(graph, "2", 10.22432, 59.13519, "Platform vertex 2"));
-    vertices.add(new IntersectionVertex(graph, "3", 10.22492, 59.13514, "Platform vertex 3"));
-    vertices.add(new IntersectionVertex(graph, "4", 10.22493, 59.13518, "Platform vertex 4"));
-    vertices.add(new IntersectionVertex(graph, "5", 10.22056, 59.13575, "Platform vertex 5"));
+    vertices.add(new SplitterVertex(graph, "1", 10.22054, 59.13568, "Platform vertex 1"));
+    vertices.add(new SplitterVertex(graph, "2", 10.22432, 59.13519, "Platform vertex 2"));
+    vertices.add(new SplitterVertex(graph, "3", 10.22492, 59.13514, "Platform vertex 3"));
+    vertices.add(new SplitterVertex(graph, "4", 10.22493, 59.13518, "Platform vertex 4"));
+    vertices.add(new SplitterVertex(graph, "5", 10.22056, 59.13575, "Platform vertex 5"));
 
     AreaEdgeList areaEdgeList = new AreaEdgeList(
       GeometryUtils.getGeometryFactory().createPolygon(),

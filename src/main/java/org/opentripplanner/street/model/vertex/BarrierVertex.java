@@ -24,8 +24,8 @@ public class BarrierVertex extends OsmVertex {
     StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
   private StreetTraversalPermission barrierPermissions;
 
-  public BarrierVertex(Graph g, String label, double x, double y, long nodeId) {
-    super(g, label, x, y, nodeId);
+  public BarrierVertex(Graph g, double x, double y, long nodeId) {
+    super(g, x, y, nodeId);
     barrierPermissions = defaultBarrierPermissions;
   }
 

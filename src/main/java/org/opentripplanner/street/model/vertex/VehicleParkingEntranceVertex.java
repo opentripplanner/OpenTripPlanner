@@ -19,7 +19,6 @@ public class VehicleParkingEntranceVertex extends Vertex {
   public VehicleParkingEntranceVertex(Graph g, VehicleParkingEntrance parkingEntrance) {
     super(
       g,
-      "Vehicle parking " + parkingEntrance.getEntranceId(),
       parkingEntrance.getCoordinate().longitude(),
       parkingEntrance.getCoordinate().latitude(),
       parkingEntrance.getName()
@@ -41,5 +40,10 @@ public class VehicleParkingEntranceVertex extends Vertex {
 
   public boolean isWalkAccessible() {
     return parkingEntrance.isWalkAccessible();
+  }
+
+  @Override
+  public String getLabel() {
+    return "Vehicle parking " + parkingEntrance.getEntranceId();
   }
 }

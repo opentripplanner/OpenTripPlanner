@@ -18,7 +18,6 @@ public class TransitBoardingAreaVertex extends StationElementVertex {
   public TransitBoardingAreaVertex(Graph graph, BoardingArea boardingArea) {
     super(
       graph,
-      boardingArea.getId().toString(),
       boardingArea.getCoordinate().longitude(),
       boardingArea.getCoordinate().latitude(),
       boardingArea.getName()
@@ -40,5 +39,10 @@ public class TransitBoardingAreaVertex extends StationElementVertex {
   @Override
   public StationElement getStationElement() {
     return this.boardingArea;
+  }
+
+  @Override
+  public String getLabel() {
+    return boardingArea.getId().toString();
   }
 }

@@ -17,6 +17,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetElevationExtension;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 class MissingElevationHandlerTest {
@@ -188,7 +189,7 @@ class MissingElevationHandlerTest {
   }
 
   private IntersectionVertex vertex(String A) {
-    return new IntersectionVertex(graph, A, 0, 0);
+    return new SplitterVertex(graph, A, 0, 0);
   }
 
   private StreetEdge edge(IntersectionVertex from, IntersectionVertex to, double length) {

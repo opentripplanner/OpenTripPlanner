@@ -29,7 +29,6 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
   private static final NonLocalizedString NO_NAME = new NonLocalizedString("(no name provided)");
 
-  private final String label;
   private final double lon;
   private final double lat;
   /* Longer human-readable name for the client */
@@ -41,8 +40,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
 
   /* CONSTRUCTORS */
 
-  protected Vertex(Graph g, String label, double lon, double lat) {
-    this.label = label;
+  protected Vertex(Graph g, double lon, double lat) {
     this.lon = lon;
     this.lat = lat;
     // null graph means temporary vertex
@@ -52,8 +50,8 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     this.name = NO_NAME;
   }
 
-  protected Vertex(Graph g, String label, double lon, double lat, I18NString name) {
-    this(g, label, lon, lat);
+  protected Vertex(Graph g, double lon, double lat, I18NString name) {
+    this(g, lon, lat);
     this.name = name;
   }
 
@@ -147,9 +145,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /** Every vertex has a label which is globally unique. */
-  public String getLabel() {
-    return label;
-  }
+  public abstract String getLabel();
 
   public Coordinate getCoordinate() {
     return new Coordinate(getLon(), getLat());

@@ -23,19 +23,23 @@ public class OsmBoardingLocationVertex extends IntersectionVertex {
 
   public OsmBoardingLocationVertex(
     Graph g,
-    String label,
     double x,
     double y,
     @Nullable I18NString name,
     Collection<String> references
   ) {
-    super(g, label, x, y, name, false, false);
+    super(g, x, y, name, false, false);
     this.references = Set.copyOf(references);
   }
 
   @Override
   public String toString() {
     return ToStringBuilder.of(getClass()).addCol("references", references).toString();
+  }
+
+  @Override
+  public String getLabel() {
+    return "boarding location for %s a %s,%s".formatted(references, getLat(), getLon());
   }
 
   public boolean isConnectedToStreetNetwork() {

@@ -82,7 +82,6 @@ class OsmBoardingLocationsModuleTest {
       .build();
     var floatingBoardingLocation = new OsmBoardingLocationVertex(
       graph,
-      "floating-bus-stop",
       floatingBusVertex.getLon(),
       floatingBusVertex.getLat(),
       new NonLocalizedString("bus stop not connected to street network"),

@@ -40,7 +40,12 @@ class CalculateWorldEnvelopeModuleTest {
   static class V extends Vertex {
 
     protected V(double x, double y) {
-      super(null, "V-" + x + "-" + y, x, y);
+      super(null, x, y);
+    }
+
+    @Override
+    public String getLabel() {
+      return "%s:%s".formatted(getLat(), getLon());
     }
   }
 }

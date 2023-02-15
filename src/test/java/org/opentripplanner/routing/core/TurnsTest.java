@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -20,8 +21,8 @@ public class TurnsTest {
       new Coordinate[] { new Coordinate(-0.10, 0), new Coordinate(0, 0) }
     );
 
-    IntersectionVertex v1 = new IntersectionVertex(null, "v1", -0.10, 0);
-    IntersectionVertex v2 = new IntersectionVertex(null, "v2", 0, 0);
+    IntersectionVertex v1 = intersectionVertex("v1", -0.10, 0);
+    IntersectionVertex v2 = intersectionVertex("v2", 0, 0);
 
     StreetEdge leftEdge = new StreetEdge(
       v1,

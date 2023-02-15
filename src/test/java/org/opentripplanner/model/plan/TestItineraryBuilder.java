@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import static java.time.ZoneOffset.UTC;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
 import static org.opentripplanner.street.search.TraverseMode.CAR;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
@@ -24,7 +25,6 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -195,13 +195,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
     );
 
     var edge = new FlexTripEdge(
-      new SimpleConcreteVertex(
-        null,
-        "v1",
-        lastPlace.coordinate.latitude(),
-        lastPlace.coordinate.longitude()
-      ),
-      new SimpleConcreteVertex(null, "v2", to.coordinate.latitude(), to.coordinate.longitude()),
+      intersectionVertex("v1", lastPlace.coordinate.latitude(), lastPlace.coordinate.longitude()),
+      intersectionVertex("v2", to.coordinate.latitude(), to.coordinate.longitude()),
       lastPlace.stop,
       to.stop,
       flexTrip,

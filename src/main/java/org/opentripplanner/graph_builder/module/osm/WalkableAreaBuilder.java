@@ -24,6 +24,7 @@ import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -43,6 +44,7 @@ import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
@@ -592,12 +594,14 @@ public class WalkableAreaBuilder {
 
           IntersectionVertex newEndpoint = areaBoundaryVertexForCoordinate.get(edgeCoordinate);
           if (newEndpoint == null) {
+            var name = "area splitter at " + edgeCoordinate;
             newEndpoint =
-              new IntersectionVertex(
+              new SplitterVertex(
                 graph,
-                "area splitter at " + edgeCoordinate,
+                name,
                 edgeCoordinate.x,
-                edgeCoordinate.y
+                edgeCoordinate.y,
+                new NonLocalizedString(name)
               );
             areaBoundaryVertexForCoordinate.put(edgeCoordinate, newEndpoint);
           }

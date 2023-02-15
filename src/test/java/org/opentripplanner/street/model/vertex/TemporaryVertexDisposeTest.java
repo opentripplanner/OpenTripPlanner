@@ -218,13 +218,21 @@ public class TemporaryVertexDisposeTest {
 
   private static class V extends Vertex {
 
+    private String label;
+
     private V(String label) {
-      super(null, label, ANY_LOC, ANY_LOC);
+      super(null, ANY_LOC, ANY_LOC);
+      this.label = label;
     }
 
     @Override
     public String toString() {
       return getLabel();
+    }
+
+    @Override
+    public String getLabel() {
+      return label;
     }
   }
 

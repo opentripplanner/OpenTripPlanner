@@ -46,6 +46,7 @@ import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.ExitVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.LevelVertex;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -158,10 +159,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private record StreetEdgePair(StreetEdge main, StreetEdge back) {}
 
   protected class Handler {
-
-    private static final String nodeLabelFormat = "osm:node:%d";
-
-    private static final String levelnodeLabelFormat = nodeLabelFormat + ":level:%s";
 
     private final Graph graph;
 
@@ -349,12 +346,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       iv = intersectionNodes.get(nid);
       if (iv == null) {
         Coordinate coordinate = getCoordinate(node);
-        String label = String.format(nodeLabelFormat, node.getId());
         String highway = node.getTag("highway");
         if ("motorway_junction".equals(highway)) {
           String ref = node.getTag("ref");
           if (ref != null) {
-            ExitVertex ev = new ExitVertex(graph, label, coordinate.x, coordinate.y, nid);
+            ExitVertex ev = new ExitVertex(graph, coordinate.x, coordinate.y, nid);
             ev.setExitName(ref);
             iv = ev;
           }
@@ -368,7 +364,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             iv =
               new OsmBoardingLocationVertex(
                 graph,
-                label,
                 coordinate.x,
                 coordinate.y,
                 NonLocalizedString.ofNullable(name),
@@ -378,7 +373,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         if (node.isBarrier()) {
-          BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y, nid);
+          BarrierVertex bv = new BarrierVertex(graph, coordinate.x, coordinate.y, nid);
           bv.setBarrierPermissions(
             OSMFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions)
           );
@@ -389,11 +384,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           iv =
             new OsmVertex(
               graph,
-              label,
               coordinate.x,
               coordinate.y,
               node.getId(),
-              new NonLocalizedString(label),
               node.hasHighwayTrafficLight(),
               node.hasCrossingTrafficLight()
             );
@@ -1004,16 +997,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       }
       if (!vertices.containsKey(level)) {
         Coordinate coordinate = getCoordinate(node);
-        String label = String.format(levelnodeLabelFormat, node.getId(), level.shortName);
-        OsmVertex vertex = new OsmVertex(
+        OsmVertex vertex = new LevelVertex(
           graph,
-          label,
           coordinate.x,
           coordinate.y,
           node.getId(),
-          new NonLocalizedString(label),
-          false,
-          false
+          level.shortName
         );
         vertices.put(level, vertex);
 

@@ -5,7 +5,15 @@ import org.opentripplanner.routing.graph.Graph;
 
 public class ElevatorOnboardVertex extends StreetVertex {
 
+  private final String label;
+
   public ElevatorOnboardVertex(Graph g, String label, double x, double y, I18NString name) {
-    super(g, label, x, y, name);
+    super(g, x, y, name);
+    this.label = label;
+  }
+
+  @Override
+  public String getLabel() {
+    return label;
   }
 }
