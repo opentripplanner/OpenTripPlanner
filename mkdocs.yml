@@ -40,6 +40,7 @@ nav:
 - About:
     - Governance: 'Governance.md'
     - History: 'History.md'
+    - Presentations: 'Presentations.md'
     - Deployments: 'Deployments.md'
     - Changelog: 'Changelog.md'
     - Comparing OTP2 to OTP1: 'Version-Comparison.md'
