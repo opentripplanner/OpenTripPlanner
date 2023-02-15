@@ -70,6 +70,9 @@ abstract class AbstractDebugHandlerAdapter<T> implements DebugHandler<T> {
     }
   }
 
+  /**
+   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#NOT_FOUND} not supported.
+   */
   protected abstract int stop(T arrival);
 
   protected abstract Iterable<Integer> stopsVisited(T arrival);

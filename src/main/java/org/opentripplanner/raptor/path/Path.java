@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.path;
 
 import java.util.List;
 import java.util.Objects;
@@ -206,21 +206,21 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
       int prevToTime = 0;
       for (PathLeg<T> leg : accessLeg.iterator()) {
         if (leg == accessLeg) {
-          buf.accessEgress(accessLeg.access());
-          addWalkDetails(detailed, buf, leg);
+          if (!accessLeg.access().isFree()) {
+            buf.accessEgress(accessLeg.access());
+            addWalkDetails(detailed, buf, leg);
+          }
         } else {
-          buf.sep().stop(leg.fromStop());
+          buf.stop(leg.fromStop());
 
           if (detailed) {
             buf.duration(leg.fromTime() - prevToTime);
             // Add Transfer constraints info from the previous transit lag
             if (constraintPrevLeg != null) {
-              buf.space().append(constraintPrevLeg.toString());
+              buf.text(constraintPrevLeg.toString());
               constraintPrevLeg = null;
             }
           }
-
-          buf.sep();
 
           if (leg.isTransitLeg()) {
             TransitPathLeg<T> transitLeg = leg.asTransitLeg();
@@ -243,30 +243,19 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
           }
           // Access and Egress
           else if (leg.isEgressLeg()) {
-            buf.accessEgress(leg.asEgressLeg().egress());
-            addWalkDetails(detailed, buf, leg);
+            var egress = leg.asEgressLeg().egress();
+            if (!egress.isFree()) {
+              buf.accessEgress(egress);
+              addWalkDetails(detailed, buf, leg);
+            }
           }
         }
         prevToTime = leg.toTime();
       }
-      buf.space();
     }
     // Add summary info
-    {
-      buf
-        .append("[")
-        .time(startTime, endTime)
-        .duration(endTime - startTime)
-        .space()
-        .append(numberOfTransfers + "tx")
-        .generalizedCostSentiSec(generalizedCost);
+    buf.summary(startTime, endTime, numberOfTransfers, generalizedCost, appendToSummary);
 
-      if (appendToSummary != null) {
-        appendToSummary.accept(buf);
-      }
-
-      buf.append("]");
-    }
     return buf.toString();
   }
 

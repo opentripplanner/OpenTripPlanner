@@ -1,7 +1,8 @@
 package org.opentripplanner.ext.flex;
 
+import static org.opentripplanner.model.StopTime.MISSING_VALUE;
+
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 
@@ -50,8 +51,8 @@ public class FlexAccessEgress {
       toStopIndex,
       flexTime
     );
-    if (earliestAvailableTransitDepartureTime == SearchParams.TIME_NOT_SET) {
-      return SearchParams.TIME_NOT_SET;
+    if (earliestAvailableTransitDepartureTime == MISSING_VALUE) {
+      return MISSING_VALUE;
     }
     return earliestAvailableTransitDepartureTime - preFlexTime + differenceFromStartOfTime;
   }
@@ -64,8 +65,8 @@ public class FlexAccessEgress {
       toStopIndex,
       flexTime
     );
-    if (latestAvailableTransitArrivalTime == SearchParams.TIME_NOT_SET) {
-      return SearchParams.TIME_NOT_SET;
+    if (latestAvailableTransitArrivalTime == MISSING_VALUE) {
+      return MISSING_VALUE;
     }
     return latestAvailableTransitArrivalTime + postFlexTime + differenceFromStartOfTime;
   }

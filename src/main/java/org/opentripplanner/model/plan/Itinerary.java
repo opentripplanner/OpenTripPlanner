@@ -1,7 +1,5 @@
 package org.opentripplanner.model.plan;
 
-import static java.util.Locale.ROOT;
-
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -14,6 +12,7 @@ import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.core.ItineraryFares;
@@ -70,18 +69,6 @@ public class Itinerary {
     this.streetOnly = totals.streetOnly;
     this.setElevationGained(totals.totalElevationGained);
     this.setElevationLost(totals.totalElevationLost);
-  }
-
-  /**
-   * Used to convert a list of itineraries to a SHORT human readable string.
-   *
-   * @see #toStr()
-   * <p>
-   * It is great for comparing lists of itineraries in a test: {@code
-   * assertEquals(toStr(List.of(it1)), toStr(result))}.
-   */
-  public static String toStr(List<Itinerary> list) {
-    return list.stream().map(Itinerary::toStr).collect(Collectors.joining(", "));
   }
 
   /**
@@ -216,6 +203,18 @@ public class Itinerary {
     return super.equals(o);
   }
 
+  /**
+   * Used to convert a list of itineraries to a SHORT human-readable string.
+   *
+   * @see #toStr()
+   * <p>
+   * It is great for comparing lists of itineraries in a test: {@code
+   * assertEquals(toStr(List.of(it1)), toStr(result))}.
+   */
+  public static String toStr(List<Itinerary> list) {
+    return list.stream().map(Itinerary::toStr).collect(Collectors.joining(", "));
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder
@@ -224,12 +223,14 @@ public class Itinerary {
       .addStr("to", lastLeg().getTo().toStringShort())
       .addTime("start", firstLeg().getStartTime())
       .addTime("end", lastLeg().getEndTime())
-      .addNum("nTransfers", numberOfTransfers, -1)
+      .addNum("nTransfers", numberOfTransfers)
       .addDuration("duration", duration)
-      .addNum("generalizedCost", generalizedCost)
       .addDuration("nonTransitTime", nonTransitDuration)
       .addDuration("transitTime", transitDuration)
       .addDuration("waitingTime", waitingDuration)
+      .addNum("generalizedCost", generalizedCost, UNKNOWN)
+      .addNum("waitTimeOptimizedCost", waitTimeOptimizedCost, UNKNOWN)
+      .addNum("transferPriorityCost", transferPriorityCost, UNKNOWN)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
       .addBool("tooSloped", tooSloped)
       .addNum("elevationLost", elevationLost, 0.0)
@@ -258,7 +259,6 @@ public class Itinerary {
     buf.stop(firstLeg().getFrom().name.toString());
 
     for (Leg leg : legs) {
-      buf.sep();
       if (leg.isWalkingLeg()) {
         buf.walk((int) leg.getDuration().toSeconds());
       } else if (leg instanceof TransitLeg transitLeg) {
@@ -271,12 +271,10 @@ public class Itinerary {
       } else if (leg instanceof StreetLeg streetLeg) {
         buf.street(streetLeg.getMode().name(), leg.getStartTime(), leg.getEndTime());
       }
-
-      buf.sep();
       buf.stop(leg.getTo().name.toString());
     }
 
-    buf.space().append(String.format(ROOT, "[ $%d ]", generalizedCost));
+    buf.summary(RaptorCostConverter.toRaptorCost(generalizedCost));
 
     return buf.toString();
   }
@@ -516,6 +514,8 @@ public class Itinerary {
   /**
    * Get the index of a leg when you want to reference it in an API response, for example when you
    * want to say that a fare is valid for legs 2 and 3.
+   * <p>
+   * Return {@link #UNKNOWN} if not found.
    */
   public int getLegIndex(Leg leg) {
     var index = legs.indexOf(leg);
@@ -533,7 +533,7 @@ public class Itinerary {
           return i;
         }
       }
-      return -1;
+      return UNKNOWN;
     }
   }
 

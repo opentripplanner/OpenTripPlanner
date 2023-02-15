@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.standard.internalapi;
 
 import java.util.Collection;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
@@ -55,7 +54,5 @@ public interface StopArrivalsState<T extends RaptorTripSchedule> extends BestNum
   @Nullable
   TransitArrival<T> previousTransit(int boardStopIndex);
 
-  default Collection<RaptorPath<T>> extractPaths() {
-    return List.of();
-  }
+  Collection<RaptorPath<T>> extractPaths();
 }

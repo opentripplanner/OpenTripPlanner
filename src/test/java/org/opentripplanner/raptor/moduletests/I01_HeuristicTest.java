@@ -26,7 +26,7 @@ import org.opentripplanner.raptor.service.RangeRaptorDynamicSearch;
  * <p>
  * Raptor should return a proper array for heuristic values, i.e, time and transfers
  */
-public class G01_HeuristicTest implements RaptorTestConstants {
+public class I01_HeuristicTest implements RaptorTestConstants {
 
   // Any big negative number will do, but -1 is a legal value
   private static final int UNREACHED = -9999;

@@ -1,17 +1,14 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
-import java.util.Collection;
 import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.response.StopArrivals;
-import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
 import org.opentripplanner.raptor.spi.IntIterator;
 
 /**
- * The contract the state must implement for the {@link RangeRaptorWorker} to do its job. This
+ * The contract the state must implement for the {@link DefaultRangeRaptorWorker} to do its job. This
  * allows us to mix workers and states to implement different versions of the algorithm like
  * Standard, Standard-reversed and multi-criteria and use this with different states keeping only
  * the information needed by the use-case. Some example use-cases are calculating heuristics,
@@ -19,7 +16,7 @@ import org.opentripplanner.raptor.spi.IntIterator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface WorkerState<T extends RaptorTripSchedule> {
+public interface RaptorWorkerState<T extends RaptorTripSchedule> {
   /** Used to signal iteration termination, no more paths can be found for this iteration. */
   boolean isNewRoundAvailable();
 
@@ -56,16 +53,5 @@ public interface WorkerState<T extends RaptorTripSchedule> {
    */
   void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers);
 
-  /**
-   * Extract paths after the search is complete. This method is optional, returning an empty set by
-   * default.
-   *
-   * @return return all paths found in the search.
-   */
-  Collection<RaptorPath<T>> extractPaths();
-
-  /**
-   * Get arrival statistics for each stop reached in the search.
-   */
-  StopArrivals extractStopArrivals();
+  RaptorWorkerResult<T> results();
 }

@@ -29,13 +29,10 @@ public enum RaptorProfile {
   /**
    * Used by Raptor to find the shortest travel duration ignoring wait-time. It also finds number
    * transfers. This profile can only be used with one Raptor iteration - no {code searchWindow}.
+   * The path is not kept, because this potentially creates paths whitch is not possible; Hence,
+   * can not be constructed.
    */
-  MIN_TRAVEL_DURATION("MinTravelDuration", true),
-
-  /**
-   * Same as {@link #MIN_TRAVEL_DURATION}, but no paths are computed/returned.
-   */
-  MIN_TRAVEL_DURATION_BEST_TIME("MinTravelDurationBT", false);
+  MIN_TRAVEL_DURATION("MinTravelDuration", true);
 
   private final boolean supportsConstrainedTransfers;
 
@@ -68,6 +65,6 @@ public enum RaptorProfile {
    * path construction, but we include it here anyway.
    */
   public boolean useApproximateTripSearch() {
-    return isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME);
+    return is(MIN_TRAVEL_DURATION);
   }
 }

@@ -1,7 +1,9 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.raptor.path;
 
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
@@ -13,7 +15,11 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.raptor.api.request.SearchParams;
+import org.opentripplanner.raptor.rangeraptor.transit.ForwardTransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.spi.BoardAndAlightTime;
+import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
  * This is the leg implementation for the {@link PathBuilder}. It is a private inner class which
@@ -22,6 +28,12 @@ import org.opentripplanner.raptor.api.request.SearchParams;
 public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private static final int NOT_SET = -999_999_999;
+
+  /**
+   * The path is not reversed, so we can use the forward transit calculator to calculate the
+   * egress board-time (egress with rides).
+   */
+  private static final TransitCalculator<?> TRANSIT_CALCULATOR = new ForwardTransitCalculator<>();
 
   /** Immutable data for the current leg. */
   private MyLeg leg;
@@ -477,7 +489,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
     newToTime = accessPath.latestArrivalTime(newToTime);
 
-    if (newToTime == SearchParams.TIME_NOT_SET) {
+    if (newToTime == RaptorConstants.TIME_NOT_SET) {
       throw new IllegalStateException("Can not time-shift accessPath: " + accessPath);
     }
 
@@ -499,14 +511,19 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private void timeShiftEgressTime(RaptorSlackProvider slackProvider) {
     var egressPath = asEgressLeg().streetPath;
-    int newFromTime = prev.stopArrivalTime(slackProvider);
+    int stopArrivalTime = prev.stopArrivalTime(slackProvider);
 
-    if (egressPath.hasRides()) {
-      newFromTime += slackProvider.transferSlack();
+    int egressDepartureTime = TRANSIT_CALCULATOR.calculateEgressDepartureTime(
+      stopArrivalTime,
+      egressPath,
+      slackProvider.transferSlack()
+    );
+
+    if (egressDepartureTime == RaptorConstants.TIME_NOT_SET) {
+      throw egressDepartureNotAvailable(stopArrivalTime, egressPath);
     }
-    newFromTime = egressPath.earliestDepartureTime(newFromTime);
 
-    setTime(newFromTime, newFromTime + egressPath.durationInSeconds());
+    setTime(egressDepartureTime, egressDepartureTime + egressPath.durationInSeconds());
   }
 
   private int transitCost(CostCalculator<T> costCalculator, RaptorSlackProvider slackProvider) {
@@ -570,6 +587,19 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return waitCost + egressCost;
   }
 
+  private IllegalStateException egressDepartureNotAvailable(
+    int arrivalTime,
+    RaptorAccessEgress egressPath
+  ) {
+    return new IllegalStateException(
+      "Unable to reconstruct path. Transit does not arrive in time to board flex access." +
+      " Arrived: " +
+      TimeUtils.timeToStrCompact(arrivalTime) +
+      " Egress: " +
+      egressPath
+    );
+  }
+
   /* PRIVATE INTERFACES */
 
   /** This is the common interface for all immutable leg structures. */
@@ -600,7 +630,16 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   /* PRIVATE CLASSES */
 
   /** Abstract access/transfer/egress leg */
-  private abstract static class MyStreetLeg implements MyLeg {
+
+  private abstract static class AbstractMyLeg implements MyLeg {
+
+    @Override
+    public final String toString() {
+      return addToString(new PathStringBuilder(null)).toString();
+    }
+  }
+
+  private abstract static class MyStreetLeg extends AbstractMyLeg {
 
     final RaptorAccessEgress streetPath;
 
@@ -611,11 +650,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     @Override
     public boolean hasRides() {
       return streetPath.hasRides();
-    }
-
-    @Override
-    public final String toString() {
-      return addToString(new PathStringBuilder(null)).toString();
     }
   }
 
@@ -637,11 +671,33 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     @Override
     public PathStringBuilder addToString(PathStringBuilder builder) {
-      return builder.accessEgress(streetPath).sep().stop(toStop()).sep();
+      return builder.accessEgress(streetPath).stop(toStop());
     }
   }
 
-  private static class MyTransferLeg implements MyLeg {
+  private static class MyEgressLeg extends MyStreetLeg {
+
+    MyEgressLeg(RaptorAccessEgress streetPath) {
+      super(streetPath);
+    }
+
+    @Override
+    public boolean isEgress() {
+      return true;
+    }
+
+    @Override
+    public int toStop() {
+      throw new IllegalStateException("Egress leg have no toStop");
+    }
+
+    @Override
+    public PathStringBuilder addToString(PathStringBuilder builder) {
+      return builder.accessEgress(streetPath);
+    }
+  }
+
+  private static class MyTransferLeg extends AbstractMyLeg {
 
     final int toStop;
     final RaptorTransfer transfer;
@@ -668,11 +724,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     @Override
     public PathStringBuilder addToString(PathStringBuilder builder) {
-      return builder.walk(transfer.durationInSeconds()).sep().stop(toStop()).sep();
+      return builder.walk(transfer.durationInSeconds()).stop(toStop());
     }
   }
 
-  private static class MyTransitLeg<T extends RaptorTripSchedule> implements MyLeg {
+  private static class MyTransitLeg<T extends RaptorTripSchedule> extends AbstractMyLeg {
 
     final T trip;
     final BoardAndAlightTime boardAndAlightTime;
@@ -713,11 +769,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     @Override
     public PathStringBuilder addToString(PathStringBuilder builder) {
-      return builder
-        .transit(trip.pattern().debugInfo(), fromTime(), toTime())
-        .sep()
-        .stop(toStop())
-        .sep();
+      return builder.transit(trip.pattern().debugInfo(), fromTime(), toTime()).stop(toStop());
     }
 
     public int fromStop() {
@@ -738,33 +790,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     public int toTime() {
       return boardAndAlightTime.alightTime();
-    }
-
-    @Override
-    public final String toString() {
-      return addToString(new PathStringBuilder(null)).toString();
-    }
-  }
-
-  private static class MyEgressLeg extends MyStreetLeg {
-
-    MyEgressLeg(RaptorAccessEgress streetPath) {
-      super(streetPath);
-    }
-
-    @Override
-    public boolean isEgress() {
-      return true;
-    }
-
-    @Override
-    public int toStop() {
-      throw new IllegalStateException("Egress leg have no toStop");
-    }
-
-    @Override
-    public PathStringBuilder addToString(PathStringBuilder builder) {
-      return builder.accessEgress(streetPath);
     }
   }
 }

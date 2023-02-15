@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.spi;
 
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
@@ -9,7 +10,7 @@ record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTi
   implements RaptorBoardOrAlightEvent<T> {
   @Override
   public int tripIndex() {
-    return NOT_FOUND;
+    return RaptorConstants.NOT_FOUND;
   }
 
   @Override
@@ -19,12 +20,12 @@ record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTi
 
   @Override
   public int stopPositionInPattern() {
-    return NOT_FOUND;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public int time() {
-    return NOT_FOUND;
+    throw new UnsupportedOperationException();
   }
 
   @Nonnull

@@ -27,10 +27,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig;
  * Raptor should return transit option with the lowest cost when to rides are equal, but have
  * different transit-reluctance.
  */
-public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
+public class D02_TransitModeReluctanceTest implements RaptorTestConstants {
 
-  private static final String EXPECTED =
-    "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s 0tx $%d]";
   public static final double[] PREFER_R1 = { 0.99, 1.0 };
   public static final double[] PREFER_R2 = { 0.9, 0.89 };
   private final TestTransitData data = new TestTransitData();

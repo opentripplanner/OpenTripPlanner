@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
+import org.opentripplanner.raptor.api.RaptorConstants;
+
 /**
  * Used to calculate times in a forward trip search.
  * <p>
@@ -39,6 +41,6 @@ public class ForwardTimeCalculator implements TimeCalculator {
 
   @Override
   public final int unreachedTime() {
-    return Integer.MAX_VALUE;
+    return RaptorConstants.TIME_UNREACHED_FORWARD;
   }
 }

@@ -1,20 +1,20 @@
 package org.opentripplanner.raptor.rangeraptor;
 
 import java.util.Collection;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.response.StopArrivals;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
-import org.opentripplanner.raptor.rangeraptor.internalapi.Worker;
-import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
-import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
@@ -25,8 +25,10 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
  * Land Use Sketch Planning Using Interactive Accessibility Methods on Combined Schedule and
  * Headway-Based Networks.” Transportation Research Record 2653 (2017). doi:10.3141/2653-06.
  * <p>
- * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,”
- * January 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
+ * <a href="http://research.microsoft.com/pubs/156567/raptor_alenex.pdf">
+ *   Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing”,
+ *   January 1, 2012.
+ * </a>.
  * <p>
  * This version supports the following features:
  * <ul>
@@ -46,7 +48,8 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 @SuppressWarnings("Duplicates")
-public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Worker<T> {
+public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
+  implements RaptorWorker<T> {
 
   private final RoutingStrategy<T> transitWorker;
 
@@ -56,10 +59,10 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
    * <p/>
    * This also allow us to try out different strategies for storing the result in memory. For a long
    * time we had a state which stored all data as int arrays in addition to the current
-   * object-oriented approach. There were no performance differences(=> GC is not the bottle neck),
+   * object-oriented approach. There were no performance differences(=> GC is not the bottleneck),
    * so we dropped the integer array implementation.
    */
-  private final WorkerState<T> state;
+  private final RaptorWorkerState<T> state;
 
   /**
    * The round tracker keep track for the current Raptor round, and abort the search if the round
@@ -71,7 +74,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
   private final SlackProvider slackProvider;
 
-  private final TransitCalculator<T> calculator;
+  private final RaptorTransitCalculator<T> calculator;
 
   private final RaptorTimers timers;
 
@@ -83,17 +86,16 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
   private final boolean enableTransferConstraints;
 
-  // TODO: this is meaningful only for time-based strategies
   private int iterationDepartureTime;
 
-  public RangeRaptorWorker(
-    WorkerState<T> state,
+  public DefaultRangeRaptorWorker(
+    RaptorWorkerState<T> state,
     RoutingStrategy<T> transitWorker,
     RaptorTransitDataProvider<T> transitData,
     SlackProvider slackProvider,
     AccessPaths accessPaths,
     RoundProvider roundProvider,
-    TransitCalculator<T> calculator,
+    RaptorTransitCalculator<T> calculator,
     LifeCycleEventPublisher lifeCyclePublisher,
     RaptorTimers timers,
     boolean enableTransferConstraints
@@ -118,15 +120,10 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
    * For each iteration (minute), calculate the minimum travel time to each transit stop in
    * seconds.
    * <p/>
-   * Run the scheduled search, round 0 is the street search
-   * <p/>
-   * We are using the Range-RAPTOR extension described in Delling, Daniel, Thomas Pajor, and Renato
-   * Werneck. “Round-Based Public Transit Routing,” January 1, 2012.
-   * http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
-   *
+   * Run the scheduled search, round 0 is the street search.
    */
   @Override
-  public void route() {
+  public RaptorWorkerResult<T> route() {
     timers.route(() -> {
       lifeCycle.notifyRouteSearchStart(calculator.searchForward());
       transitData.setup();
@@ -143,16 +140,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         runRaptorForMinute();
       }
     });
-  }
-
-  @Override
-  public Collection<RaptorPath<T>> paths() {
-    return state.extractPaths();
-  }
-
-  @Override
-  public StopArrivals stopArrivals() {
-    return state.extractStopArrivals();
+    return state.results();
   }
 
   /**
@@ -282,7 +270,12 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     }
 
     for (RaptorAccessEgress it : accessPaths) {
-      transitWorker.setAccessToStop(it, iterationDepartureTime);
+      int departureTime = calculator.departureTime(it, iterationDepartureTime);
+
+      // Access must be available after the iteration departure time
+      if (departureTime != RaptorConstants.TIME_NOT_SET) {
+        transitWorker.setAccessToStop(it, departureTime);
+      }
     }
   }
 
