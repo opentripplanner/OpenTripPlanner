@@ -155,7 +155,7 @@ class BoardTripIndexSearch {
   ) {
     for (int i = start; i < end; ++i) {
       if (edt <= a[i]) {
-        return i % (end - start);
+        return i - start;
       }
     }
     return Timetable.NEXT_TIME_TABLE_INDEX;

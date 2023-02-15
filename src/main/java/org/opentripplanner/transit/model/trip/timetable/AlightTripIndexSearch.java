@@ -112,7 +112,7 @@ class AlightTripIndexSearch {
   ) {
     for (int i = end - 1; i >= start; --i) {
       if (lat >= a[i]) {
-        return i % (end - start);
+        return i - start;
       }
     }
     return Timetable.PREV_TIME_TABLE_INDEX;
