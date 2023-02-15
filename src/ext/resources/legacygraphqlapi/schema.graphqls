@@ -1387,6 +1387,9 @@ type Leg {
 
     pickupBookingInfo: BookingInfo
 
+    """Applicable alerts for this leg."""
+    alerts: [Alert]
+
     """
     Future legs with same origin and destination stops or stations
     """
