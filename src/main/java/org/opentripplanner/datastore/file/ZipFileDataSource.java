@@ -104,6 +104,9 @@ public class ZipFileDataSource
       // https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
       // additional Recommendations for Interoperability can be found at Apache Commons
       // https://commons.apache.org/proper/commons-compress/zip.html
+      //
+      // See https://github.com/opentripplanner/OpenTripPlanner/pull/4835 for a  
+      // discussion on this.
       try {
         Charset charset = Charset.forName("Cp437");
         this.zipFile = new ZipFile(file, ZipFile.OPEN_READ, charset);
