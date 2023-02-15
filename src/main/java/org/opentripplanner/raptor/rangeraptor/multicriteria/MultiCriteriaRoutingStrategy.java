@@ -65,10 +65,17 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void alight(final int stopIndex, final int stopPos, int alightSlack) {
+  public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {
     for (PatternRide<T> ride : patternRides) {
       state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
     }
+  }
+
+  @Override
+  public void alightConstrainedTransferExist(int stopIndex, int stopPos, int alightSlack) {
+    // There is no difference in alight with and without constrained transfers.
+    // The alight-slack is removed at the next boarding if the constrained transfer apply.
+    alightOnlyRegularTransferExist(stopIndex, stopPos, alightSlack);
   }
 
   @Override

@@ -70,19 +70,15 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   }
 
   @Override
-  public void alight(int stopIndex, int stopPos, int alightSlack) {
-    // attempt to alight if we're on board
-    if (onTripIndex != UNBOUNDED_TRIP_INDEX) {
-      // Trip alightTime + alight-slack(forward-search) or board-slack(reverse-search)
-      final int stopArrivalTime0 = calculator.stopArrivalTime(onTrip, stopPos, 0);
+  public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {
+    alight(stopIndex, stopPos, alightSlack);
+  }
 
-      // Remove the wait time from the arrival-time. We don´t need to use the transit
-      // calculator because of the way we compute the time-shift. It is positive in the case
-      // of a forward-search and negative int he case of a reverse-search.
-      final int stopArrivalTime = stopArrivalTime0 - onTripTimeShift;
-
-      state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStop, onTripBoardTime, onTrip);
-    }
+  @Override
+  public void alightConstrainedTransferExist(int stopIndex, int stopPos, int alightSlack) {
+    // Because we do not know if a constrained transfer can be used or not we need to
+    // assume there is a guaranteed transfer; Hence zero alightSlack
+    alight(stopIndex, stopPos, 0);
   }
 
   @Override
@@ -107,6 +103,21 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     // could be a guaranteed or stay-seated transfers. We can not check the two trips and
     // base our decision on that, because the optimal trips is unknown.
     boardWithRegularTransfer(stopIndex, stopPos, 0);
+  }
+
+  private void alight(int stopIndex, int stopPos, int alightSlackApplied) {
+    // attempt to alight if we're on board
+    if (onTripIndex != UNBOUNDED_TRIP_INDEX) {
+      // Trip alightTime + alight-slack(forward-search) or board-slack(reverse-search)
+      final int stopArrivalTime0 = calculator.stopArrivalTime(onTrip, stopPos, alightSlackApplied);
+
+      // Remove the wait time from the arrival-time. We don´t need to use the transit
+      // calculator because of the way we compute the time-shift. It is positive in the case
+      // of a forward-search and negative int he case of a reverse-search.
+      final int stopArrivalTime = stopArrivalTime0 - onTripTimeShift;
+
+      state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStop, onTripBoardTime, onTrip);
+    }
   }
 
   private void board(int stopIndex, RaptorBoardOrAlightEvent<T> boarding) {

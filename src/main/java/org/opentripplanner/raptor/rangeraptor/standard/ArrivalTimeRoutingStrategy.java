@@ -63,11 +63,18 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void alight(int stopIndex, int stopPos, int alightSlack) {
+  public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {
     if (onTripIndex != UNBOUNDED_TRIP_INDEX) {
       final int stopArrivalTime = calculator.stopArrivalTime(onTrip, stopPos, alightSlack);
       state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStop, onTripBoardTime, onTrip);
     }
+  }
+
+  @Override
+  public void alightConstrainedTransferExist(int stopIndex, int stopPos, int alightSlack) {
+    // There is no difference in alight with and without constrained transfers.
+    // The alight-slack is removed at the next boarding if the constrained transfer apply.
+    alightOnlyRegularTransferExist(stopIndex, stopPos, alightSlack);
   }
 
   @Override

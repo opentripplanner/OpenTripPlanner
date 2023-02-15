@@ -28,9 +28,22 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   void prepareForTransitWith(RaptorTimeTable<T> timeTable);
 
   /**
+   * Alight the current trip at the given stop.
+   */
+  void alightOnlyRegularTransferExist(
+    final int stopIndex,
+    final int stopPos,
+    final int alightSlack
+  );
+
+  /**
    * Alight the current trip at the given stop with the arrival times.
    */
-  void alight(final int stopIndex, final int stopPos, final int alightSlack);
+  void alightConstrainedTransferExist(
+    final int stopIndex,
+    final int stopPos,
+    final int alightSlack
+  );
 
   /**
    * Board the given trip(event) at the given stop index.

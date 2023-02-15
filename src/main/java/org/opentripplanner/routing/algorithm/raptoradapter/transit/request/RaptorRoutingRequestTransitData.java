@@ -220,21 +220,25 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   public RaptorConstrainedBoardingSearch<TripSchedule> transferConstraintsForwardSearch(
     int routeIndex
   ) {
-    var transfersToStop = constrainedTransfers.toStop(routeIndex);
-    if (transfersToStop == null) {
+    var fromStopTransfers = constrainedTransfers.fromStop(routeIndex);
+    var toStopTransfers = constrainedTransfers.toStop(routeIndex);
+
+    if (fromStopTransfers == null && toStopTransfers == null) {
       return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
-    return new ConstrainedBoardingSearch(true, transfersToStop);
+    return new ConstrainedBoardingSearch(true, fromStopTransfers, toStopTransfers);
   }
 
   @Override
   public RaptorConstrainedBoardingSearch<TripSchedule> transferConstraintsReverseSearch(
     int routeIndex
   ) {
-    var transfersFromStop = constrainedTransfers.fromStop(routeIndex);
-    if (transfersFromStop == null) {
+    var fromStopTransfers = constrainedTransfers.toStop(routeIndex);
+    var toStopTransfers = constrainedTransfers.fromStop(routeIndex);
+
+    if (fromStopTransfers == null && toStopTransfers == null) {
       return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
-    return new ConstrainedBoardingSearch(false, transfersFromStop);
+    return new ConstrainedBoardingSearch(false, toStopTransfers, fromStopTransfers);
   }
 }
