@@ -1,6 +1,5 @@
 package org.opentripplanner.framework.collection;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -13,11 +12,5 @@ public class ListUtils {
   @SafeVarargs
   public static <T> List<T> combine(Collection<T>... lists) {
     return Arrays.stream(lists).flatMap(Collection::stream).toList();
-  }
-
-  public static <T> List<T> ofIterable(Iterable<T> iterable) {
-    List<T> result = new ArrayList<>();
-    iterable.forEach(result::add);
-    return List.copyOf(result);
   }
 }

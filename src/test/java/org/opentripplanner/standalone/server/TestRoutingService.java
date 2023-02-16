@@ -19,7 +19,8 @@ public class TestRoutingService implements RoutingService {
   private final RoutingResponse routingResponse;
 
   public TestRoutingService(List<Itinerary> results) {
-    routingResponse = new RoutingResponse(
+    routingResponse =
+      new RoutingResponse(
         new TripPlan(PlanTestConstants.A, PlanTestConstants.B, instant, results),
         null,
         null,
@@ -28,7 +29,6 @@ public class TestRoutingService implements RoutingService {
         new DebugTimingAggregator()
       );
   }
-
 
   @Override
   public RoutingResponse route(RouteRequest request) {
@@ -39,5 +39,4 @@ public class TestRoutingService implements RoutingService {
   public ViaRoutingResponse route(RouteViaRequest request) {
     throw new RuntimeException("Not implemented yet!");
   }
-
 }
