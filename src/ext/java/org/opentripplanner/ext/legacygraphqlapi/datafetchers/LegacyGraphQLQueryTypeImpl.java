@@ -33,6 +33,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.GtfsFaresService;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
@@ -1089,8 +1090,10 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<FareRuleSet>> ticketTypes() {
     return environment -> {
-      Map<FareType, Collection<FareRuleSet>> fareRules =
-        ((DefaultFareService) getFareService(environment)).getFareRulesPerType();
+      var fareService = getFareService(environment);
+      Map<FareType, Collection<FareRuleSet>> fareRules = fareService instanceof GtfsFaresService
+        ? ((GtfsFaresService) fareService).faresV1().getFareRulesPerType()
+        : ((DefaultFareService) fareService).getFareRulesPerType();
 
       return fareRules
         .entrySet()

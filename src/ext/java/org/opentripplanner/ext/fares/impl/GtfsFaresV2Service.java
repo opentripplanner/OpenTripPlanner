@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
@@ -151,7 +152,8 @@ public final class GtfsFaresV2Service implements Serializable {
       // if area id is null, the rule applies to all legs UNLESS there is another rule that
       // covers this area
       matchesArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules) &&
-      matchesArea(leg.getTo().stop, rule.toAreadId(), toAreasWithRules)
+      matchesArea(leg.getTo().stop, rule.toAreadId(), toAreasWithRules) &&
+      matchesDistance(leg, rule)
     );
   }
 
@@ -237,25 +239,41 @@ public final class GtfsFaresV2Service implements Serializable {
       routesNetworkIds.contains(rule.networkId())
     );
   }
-}
 
-/**
- * @param itineraryProducts The fare products that cover the entire itinerary, like a daily pass.
- * @param legProducts       The fare products that cover only individual legs.
- */
-record ProductResult(Set<FareProduct> itineraryProducts, Set<LegProducts> legProducts) {
-  public Set<FareProduct> getProducts(Leg leg) {
-    return legProducts
-      .stream()
-      .filter(lp -> lp.leg().equals(leg))
-      .findFirst()
-      .map(l ->
-        l
-          .products()
-          .stream()
-          .map(LegProducts.ProductWithTransfer::product)
-          .collect(Collectors.toSet())
-      )
-      .orElse(Set.of());
+  private boolean matchesDistance(ScheduledTransitLeg leg, FareLegRule rule) {
+    // If no valid distance type is given, do not consider distances in fare computation
+
+    FareDistance distance = rule.fareDistance();
+    if (distance instanceof FareDistance.Stops ruleDistance) {
+      var numStops = leg.getIntermediateStops().size();
+      return numStops >= ruleDistance.min() && ruleDistance.max() >= numStops;
+    } else if (rule.fareDistance() instanceof FareDistance.LinearDistance ruleDistance) {
+      var ruleMax = ruleDistance.max();
+      var ruleMin = ruleDistance.min();
+      var legDistance = leg.getDirectDistanceMeters();
+
+      return legDistance > ruleMin.toMeters() && legDistance < ruleMax.toMeters();
+    } else return true;
+  }
+
+  /**
+   * @param itineraryProducts The fare products that cover the entire itinerary, like a daily pass.
+   * @param legProducts       The fare products that cover only individual legs.
+   */
+  record ProductResult(Set<FareProduct> itineraryProducts, Set<LegProducts> legProducts) {
+    public Set<FareProduct> getProducts(Leg leg) {
+      return legProducts
+        .stream()
+        .filter(lp -> lp.leg().equals(leg))
+        .findFirst()
+        .map(l ->
+          l
+            .products()
+            .stream()
+            .map(LegProducts.ProductWithTransfer::product)
+            .collect(Collectors.toSet())
+        )
+        .orElse(Set.of());
+    }
   }
 }
