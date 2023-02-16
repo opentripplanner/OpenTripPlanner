@@ -25,18 +25,7 @@ public final class FareLegRuleMapper {
       .stream()
       .map(r -> {
         FareProduct productForRule = fareProductMapper.map(r.getFareProduct());
-        FareDistance fareDistance =
-          switch (r.getDistanceType()) {
-            case 0 -> new FareDistance.Stops(
-              r.getMinDistance().intValue(),
-              r.getMaxDistance().intValue()
-            );
-            case 1 -> new FareDistance.LinearDistance(
-              Distance.ofMeters(r.getMinDistance()),
-              Distance.ofMeters(r.getMaxDistance())
-            );
-            default -> null;
-          };
+        FareDistance fareDistance = createFareDistance(r);
 
         if (productForRule != null) {
           return new FareLegRule(
@@ -59,5 +48,19 @@ public final class FareLegRuleMapper {
       })
       .filter(Objects::nonNull)
       .toList();
+  }
+
+  private FareDistance createFareDistance(org.onebusaway.gtfs.model.FareLegRule fareLegRule) {
+    return switch (fareLegRule.getDistanceType()) {
+      case 0 -> new FareDistance.Stops(
+        fareLegRule.getMinDistance().intValue(),
+        fareLegRule.getMaxDistance().intValue()
+      );
+      case 1 -> new FareDistance.LinearDistance(
+        Distance.ofMeters(fareLegRule.getMinDistance()),
+        Distance.ofMeters(fareLegRule.getMaxDistance())
+      );
+      default -> null;
+    };
   }
 }
