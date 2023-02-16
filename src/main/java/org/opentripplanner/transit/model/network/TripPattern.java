@@ -402,7 +402,12 @@ public final class TripPattern
   }
 
   public I18NString getTripHeadsign() {
-    var tripTimes = scheduledTimetable.getRepresentativeTripTimes();
+    var representativeTripTimes = scheduledTimetable.getRepresentativeTripTimes();
+    var tripTimes = representativeTripTimes == null &&
+      originalTripPattern != null &&
+      getStops().equals(originalTripPattern.getStops())
+      ? originalTripPattern.getScheduledTimetable().getRepresentativeTripTimes()
+      : representativeTripTimes;
     if (tripTimes == null) {
       return null;
     }
