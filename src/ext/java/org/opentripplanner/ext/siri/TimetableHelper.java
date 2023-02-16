@@ -93,14 +93,6 @@ public class TimetableHelper {
     List<EstimatedCall> estimatedCalls = getEstimatedCalls(journey);
     List<RecordedCall> recordedCalls = getRecordedCalls(journey);
 
-    EstimatedCall lastEstimatedCall = estimatedCalls.isEmpty()
-      ? null
-      : estimatedCalls.get(estimatedCalls.size() - 1);
-
-    RecordedCall lastRecordedCall = recordedCalls.isEmpty()
-      ? null
-      : recordedCalls.get(recordedCalls.size() - 1);
-
     boolean stopPatternChanged = false;
 
     TripPattern pattern = timetable.getPattern();
