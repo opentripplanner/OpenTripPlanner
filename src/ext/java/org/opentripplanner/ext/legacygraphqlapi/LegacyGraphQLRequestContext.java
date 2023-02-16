@@ -34,7 +34,12 @@ public record LegacyGraphQLRequestContext(
     );
   }
 
+  /**
+   * Returns a clone of the default route request. The clone is necessary because one HTTP
+   * request can lead to several GraphQL queries, for example through batch or alias queries.
+   */
   @Nonnull
+  @Override
   public RouteRequest defaultRouteRequest() {
     return defaultRouteRequest.clone();
   }

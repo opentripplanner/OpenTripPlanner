@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.server;
+package org.opentripplanner.ext.legacygraphqlapi;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
