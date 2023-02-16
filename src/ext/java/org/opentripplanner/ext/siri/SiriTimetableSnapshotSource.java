@@ -2,7 +2,6 @@ package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
-import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
 import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
@@ -11,7 +10,6 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOU
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 import static org.opentripplanner.model.UpdateSuccess.WarningType.NOT_MONITORED;
 
-import com.google.common.base.Preconditions;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -580,7 +578,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
     Trip trip = tripResult.successValue();
 
-    List<StopLocation> addedStops = new ArrayList<>();
     List<StopTime> aimedStopTimes = new ArrayList<>();
     List<EstimatedCall> estimatedCalls;
     List<RecordedCall> recordedCalls;
@@ -611,7 +608,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     stopSequence =
       handleRecordedCalls(
         trip,
-        addedStops,
         aimedStopTimes,
         recordedCalls,
         numStops,
@@ -622,7 +618,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     handleEstimatedCalls(
       trip,
-      addedStops,
       aimedStopTimes,
       estimatedCalls,
       numStops,
@@ -715,7 +710,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return addTripToGraphAndBuffer(
       trip,
       aimedStopTimes,
-      addedStops,
       tripTimes,
       serviceDate,
       estimatedVehicleJourney,
@@ -725,7 +719,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private void handleEstimatedCalls(
     Trip trip,
-    List<StopLocation> addedStops,
     List<StopTime> aimedStopTimes,
     List<EstimatedCall> estimatedCalls,
     int numStops,
@@ -765,7 +758,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       );
       dropOffType.ifPresent(stopTime::setDropOffType);
 
-      addedStops.add(stop);
       aimedStopTimes.add(stopTime);
       stopSequence++;
     }
@@ -801,7 +793,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private int handleRecordedCalls(
     Trip trip,
-    List<StopLocation> addedStops,
     List<StopTime> aimedStopTimes,
     List<RecordedCall> recordedCalls,
     int numStops,
@@ -822,7 +813,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         "" // Destination display not present on recorded call
       );
 
-      addedStops.add(stop);
       aimedStopTimes.add(stopTime);
       stopSequence++;
     }
@@ -999,12 +989,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           removePreviousRealtimeUpdate(trip, serviceDate);
 
           if (!tripTimes.isDeleted()) {
-            // Calculate modified stop-pattern
-            var modifiedStops = createModifiedStops(
-              pattern,
-              estimatedVehicleJourney,
-              getStopLocationById
-            );
             List<StopTime> modifiedStopTimes = createModifiedStopTimes(
               pattern,
               tripTimes,
@@ -1017,22 +1001,16 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               tripTimes.cancelTrip();
             }
 
-            if (modifiedStops != null && modifiedStops.isEmpty()) {
-              // Empty modified stops means that there is no calls for the trip, cancel it
-              tripTimes.cancelTrip();
-            } else {
-              // Add new trip
-              addTripToGraphAndBuffer(
-                trip,
-                modifiedStopTimes,
-                modifiedStops,
-                tripTimes,
-                serviceDate,
-                estimatedVehicleJourney,
-                entityResolver
-              )
-                .ifFailure(errors::add);
-            }
+            // Add new trip
+            addTripToGraphAndBuffer(
+              trip,
+              modifiedStopTimes,
+              tripTimes,
+              serviceDate,
+              estimatedVehicleJourney,
+              entityResolver
+            )
+              .ifFailure(errors::add);
           }
 
           LOG.debug("Applied realtime data for trip {}", trip.getId().getId());
@@ -1092,18 +1070,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(
     final Trip trip,
     final List<StopTime> stopTimes,
-    final List<StopLocation> stops,
     TripTimes updatedTripTimes,
     final LocalDate serviceDate,
     EstimatedVehicleJourney estimatedVehicleJourney,
     EntityResolver entityResolver
   ) {
     // Preconditions
-    Objects.requireNonNull(stops);
-    Preconditions.checkArgument(
-      stopTimes.size() == stops.size(),
-      "number of stop should match the number of stop time updates"
-    );
+    Objects.requireNonNull(updatedTripTimes);
 
     // Create StopPattern
     final StopPattern stopPattern = new StopPattern(stopTimes);
