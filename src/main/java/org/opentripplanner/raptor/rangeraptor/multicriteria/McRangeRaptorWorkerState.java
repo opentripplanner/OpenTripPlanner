@@ -91,7 +91,6 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     return arrivals.hasArrivalsAfterMarker(stopIndex);
   }
 
-  @Override
   public void setAccessToStop(RaptorAccessEgress accessPath, int departureTime) {
     addStopArrival(new AccessStopArrival<>(departureTime, accessPath));
   }
