@@ -26,12 +26,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.alertpatch.AlertCause;
@@ -40,28 +42,33 @@ import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
-import org.opentripplanner.standalone.server.TestServerRequestContext;
+import org.opentripplanner.standalone.server.TestRoutingService;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 @Execution(ExecutionMode.CONCURRENT)
-class GraphQLApiTest {
+class GraphQLIntegrationTest {
 
-  static final TestServerRequestContext context;
   static final Graph graph = new Graph();
-  static final LegacyGraphQLAPI resource;
 
   static final Instant ALERT_START_TIME = OffsetDateTime
     .parse("2023-02-15T12:03:28+01:00")
     .toInstant();
   static final Instant ALERT_END_TIME = ALERT_START_TIME.plus(1, ChronoUnit.DAYS);
+
+  private static final LegacyGraphQLRequestContext context;
 
   static {
     graph
@@ -119,16 +126,33 @@ class GraphQLApiTest {
       .build();
     railLeg.addAlert(alert);
 
-    context = new TestServerRequestContext(graph, transitModel);
-    context.setRoutingResult(List.of(i1));
-    resource = new LegacyGraphQLAPI(context, "ignored");
+    var transitService = new DefaultTransitService(transitModel);
+    context =
+      new LegacyGraphQLRequestContext(
+        new TestRoutingService(List.of(i1)),
+        transitService,
+        new DefaultFareService(),
+        graph.getVehicleParkingService(),
+        new VehicleRentalService(),
+        new DefaultVehiclePositionService(),
+        GraphFinder.getInstance(graph, transitService::findRegularStop),
+        new RouteRequest()
+      );
   }
 
   @FilePatternSource(pattern = "src/ext-test/resources/legacygraphqlapi/queries/*.graphql")
   @ParameterizedTest(name = "Check GraphQL query in {0}")
   void graphQL(Path path) throws IOException {
     var query = Files.readString(path);
-    var response = resource.getGraphQL(query, 2000, 10000, new TestHeaders());
+    var response = LegacyGraphQLIndex.getGraphQLResponse(
+      query,
+      null,
+      null,
+      2000,
+      2000,
+      Locale.ENGLISH,
+      context
+    );
     var actualJson = extracted(response);
     assertEquals(200, response.getStatus());
 

@@ -16,14 +16,11 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 public class TestRoutingService implements RoutingService {
 
   private final Instant instant = OffsetDateTime.parse("2023-01-27T21:08:35+01:00").toInstant();
-  private RoutingResponse routingResponse = null;
+  private final RoutingResponse routingResponse;
 
-  private RouteRequest lastRouteRequest = null;
-
-  public void setRoutingResponse(List<Itinerary> routingResult) {
-    this.routingResponse =
-      new RoutingResponse(
-        new TripPlan(PlanTestConstants.A, PlanTestConstants.B, instant, routingResult),
+  public TestRoutingService(List<Itinerary> results) {
+    routingResponse = new RoutingResponse(
+        new TripPlan(PlanTestConstants.A, PlanTestConstants.B, instant, results),
         null,
         null,
         null,
@@ -32,18 +29,15 @@ public class TestRoutingService implements RoutingService {
       );
   }
 
+
   @Override
   public RoutingResponse route(RouteRequest request) {
-    this.lastRouteRequest = request;
     return routingResponse;
   }
 
   @Override
   public ViaRoutingResponse route(RouteViaRequest request) {
-    return null;
+    throw new RuntimeException("Not implemented yet!");
   }
 
-  public RouteRequest lastRouteRequest() {
-    return lastRouteRequest;
-  }
 }
