@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.api.model.ApiRentalStation;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.model.plan.ElevationProfile;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
@@ -98,13 +98,13 @@ public class StatesToWalkStepsMapper {
       VehicleRentalPlaceVertex vertex = (VehicleRentalPlaceVertex) (
         states.get(states.size() - 1)
       ).getVertex();
-      steps.get(steps.size() - 1).setVehicleRentalOffStation(new VehicleRentalStationInfo(vertex));
+      steps.get(steps.size() - 1).setVehicleRentalOffStation(new ApiRentalStation(vertex));
     }
     if (
       GraphPathToItineraryMapper.isRentalStationDropOff(states.get(0)) &&
       states.get(0).getVertex() instanceof VehicleRentalPlaceVertex rentalVertex
     ) {
-      steps.get(0).setVehicleRentalOffStation(new VehicleRentalStationInfo(rentalVertex));
+      steps.get(0).setVehicleRentalOffStation(new ApiRentalStation(rentalVertex));
     }
 
     return steps;
