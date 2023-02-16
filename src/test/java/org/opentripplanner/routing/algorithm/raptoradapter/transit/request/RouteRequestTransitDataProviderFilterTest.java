@@ -96,7 +96,11 @@ public class RouteRequestTransitDataProviderFilterTest {
 
     boardingPossible.set(0, 2);
 
-    var wheelchairPossible = filter.filterAvailableStops(tripPattern, boardingPossible);
+    var wheelchairPossible = filter.filterAvailableStops(
+      tripPattern,
+      boardingPossible,
+      BoardAlight.BOARD
+    );
 
     assertEquals(wheelchair, wheelchairPossible.get(0), "Wrong boarding value on first stop");
     assertEquals(wheelchair, wheelchairPossible.get(1), "Wrong boarding value on second stop");
