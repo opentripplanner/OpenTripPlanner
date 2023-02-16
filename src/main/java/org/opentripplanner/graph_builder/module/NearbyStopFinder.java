@@ -38,7 +38,6 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -293,7 +292,7 @@ public class NearbyStopFinder {
       )
     ) {
       var strategy = new VehicleToStopSkipEdgeStrategy(
-        transitService::getRoutesForStop,
+        transitService::getPatternsForStop,
         routingRequest.journey().transit().filters()
       );
 

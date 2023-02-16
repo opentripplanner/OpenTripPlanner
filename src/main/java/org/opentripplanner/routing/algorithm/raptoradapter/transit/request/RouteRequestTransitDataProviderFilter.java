@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
@@ -13,11 +11,9 @@ import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.TransitService;
 
 public class RouteRequestTransitDataProviderFilter implements TransitDataProviderFilter {
 
@@ -31,18 +27,17 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
 
   private final boolean includeRealtimeCancellations;
 
-  private final List<TransitFilter> filters;
+  /**
+   * This is stored as an array, as they are iterated over for each trip when filtering transit
+   * data. Iterator creation is relatively expensive compared to iterating over a short array.
+   */
+  private final TransitFilter[] filters;
 
   private final Set<FeedScopedId> bannedTrips;
 
-  private final Set<FeedScopedId> bannedRoutes;
-
   private final boolean hasSubModeFilters;
 
-  public RouteRequestTransitDataProviderFilter(
-    RouteRequest request,
-    TransitService transitService
-  ) {
+  public RouteRequestTransitDataProviderFilter(RouteRequest request) {
     this(
       request.journey().transfer().mode() == StreetMode.BIKE,
       request.wheelchair(),
@@ -50,7 +45,6 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       request.preferences().transit().includePlannedCancellations(),
       request.preferences().transit().includeRealtimeCancellations(),
       Set.copyOf(request.journey().transit().bannedTrips()),
-      bannedRoutes(request.journey().transit().filters(), transitService.getAllRoutes()),
       request.journey().transit().filters()
     );
   }
@@ -63,7 +57,6 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     boolean includePlannedCancellations,
     boolean includeRealtimeCancellations,
     Set<FeedScopedId> bannedTrips,
-    Set<FeedScopedId> bannedRoutes,
     List<TransitFilter> filters
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
@@ -71,9 +64,8 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     this.wheelchairPreferences = wheelchairPreferences;
     this.includePlannedCancellations = includePlannedCancellations;
     this.includeRealtimeCancellations = includeRealtimeCancellations;
-    this.bannedRoutes = Set.copyOf(bannedRoutes);
     this.bannedTrips = bannedTrips;
-    this.filters = filters;
+    this.filters = filters.toArray(TransitFilter[]::new);
     this.hasSubModeFilters = filters.stream().anyMatch(TransitFilter::isSubModePredicate);
   }
 
@@ -92,7 +84,12 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
 
   @Override
   public boolean tripPatternPredicate(TripPatternForDate tripPatternForDate) {
-    return bannedRoutes.isEmpty() || routeIsNotBanned(tripPatternForDate);
+    for (TransitFilter filter : filters) {
+      if (filter.matchTripPattern(tripPatternForDate.getTripPattern().getPattern())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -130,15 +127,16 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       return false;
     }
 
-    // TODO: 2022-12-13 filters: this is expensive
-    //  we only have to do it if we have submodes in the filters
-    //  in the future we will make sure that we have separate routing trip pattern for each submode
-    //  then we do not have to do that at all and it should increase performance a lot
-    // trip has to match with at least one predicate in order to be included in search
+    // Trip has to match with at least one predicate in order to be included in search. We only have
+    // to this if we have mode specific filters, and not all trips on the pattern have the same
+    // mode, since that's the only thing that is trip specific
     if (withFilters) {
-      // we only have to this if we have submode specific filter
-      //  since that's the only thing that is trip specific
-      return filters.stream().anyMatch(f -> f.matchTripTimes(tripTimes));
+      for (TransitFilter f : filters) {
+        if (f.matchTripTimes(tripTimes)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     return true;
@@ -157,24 +155,5 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
       return copy;
     }
     return boardingPossible;
-  }
-
-  public static Set<FeedScopedId> bannedRoutes(
-    List<TransitFilter> filters,
-    Collection<Route> routes
-  ) {
-    Set<FeedScopedId> ret = new HashSet<>();
-    for (Route route : routes) {
-      // Route have to match with at least predicate in order to be included in search
-      if (filters.stream().noneMatch(f -> f.matchRoute(route))) {
-        ret.add(route.getId());
-      }
-    }
-    return ret;
-  }
-
-  private boolean routeIsNotBanned(TripPatternForDate tripPatternForDate) {
-    FeedScopedId routeId = tripPatternForDate.getTripPattern().route().getId();
-    return !bannedRoutes.contains(routeId);
   }
 }
