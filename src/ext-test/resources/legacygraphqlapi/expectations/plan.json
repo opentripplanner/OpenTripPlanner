@@ -81,10 +81,10 @@
                   "effectiveEndDate" : 1676545408,
                   "entities" : [
                     {
-                      "name" : "stop1",
-                      "gtfsId" : "F:stop1",
-                      "lat" : 60.0,
-                      "lon" : 10.0
+                      "name" : "A",
+                      "gtfsId" : "F:A",
+                      "lat" : 5.0,
+                      "lon" : 8.0
                     }
                   ]
                 }

@@ -36,6 +36,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -53,6 +54,7 @@ import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -83,9 +85,9 @@ class GraphQLIntegrationTest {
         List.of()
       );
 
-    var stop = TransitModelForTest.stop("stop1").build();
-    var stopModel = StopModel.of().withRegularStop(stop).build();
-    var transitModel = new TransitModel(stopModel, new Deduplicator());
+    var stopModel = StopModel.of();
+    PlanTestConstants.listStops().forEach(sl -> stopModel.withRegularStop((RegularStop) sl));
+    var transitModel = new TransitModel(stopModel.build(), new Deduplicator());
     transitModel.initTimeZone(ZoneIds.BERLIN);
     transitModel.index();
     Arrays
@@ -118,7 +120,7 @@ class GraphQLIntegrationTest {
       .withCause(AlertCause.MAINTENANCE)
       .withEffect(AlertEffect.REDUCED_SERVICE)
       .withSeverity(AlertSeverity.VERY_SEVERE)
-      .addEntity(new EntitySelector.Stop(stop.getId()))
+      .addEntity(new EntitySelector.Stop(A.stop.getId()))
       .addTimePeriod(
         new TimePeriod(ALERT_START_TIME.getEpochSecond(), ALERT_END_TIME.getEpochSecond())
       )
