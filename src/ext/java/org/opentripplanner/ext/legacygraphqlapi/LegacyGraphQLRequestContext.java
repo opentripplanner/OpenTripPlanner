@@ -11,62 +11,31 @@ import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
-public class LegacyGraphQLRequestContext {
-
-  private final OtpServerRequestContext serverContext;
-  private final RoutingService routingService;
-  private final TransitService transitService;
-  private final FareService fareService;
-
-  public LegacyGraphQLRequestContext(
-    OtpServerRequestContext serverContext,
-    RoutingService routingService,
-    TransitService transitService,
-    FareService fareService
-  ) {
-    this.serverContext = serverContext;
-    this.routingService = routingService;
-    this.transitService = transitService;
-    this.fareService = fareService;
-  }
-
-  @Nonnull
-  public RoutingService routingService() {
-    return routingService;
-  }
-
-  @Nonnull
-  public TransitService transitService() {
-    return transitService;
-  }
-
-  @Nonnull
-  public FareService fareService() {
-    return fareService;
-  }
-
-  @Nonnull
-  public VehicleParkingService vehicleParkingService() {
-    return serverContext.graph().getVehicleParkingService();
-  }
-
-  @Nonnull
-  public VehicleRentalService vehicleRentalService() {
-    return serverContext.graph().getVehicleRentalService();
-  }
-
-  @Nonnull
-  public VehiclePositionService vehiclePositionService() {
-    return serverContext.vehiclePositionService();
+public record LegacyGraphQLRequestContext(
+  RoutingService routingService,
+  TransitService transitService,
+  FareService fareService,
+  VehicleParkingService vehicleParkingService,
+  VehicleRentalService vehicleRentalService,
+  VehiclePositionService vehiclePositionService,
+  GraphFinder graphFinder,
+  RouteRequest defaultRouteRequest
+) {
+  public static LegacyGraphQLRequestContext ofServerContext(OtpServerRequestContext context) {
+    return new LegacyGraphQLRequestContext(
+      context.routingService(),
+      context.transitService(),
+      context.graph().getFareService(),
+      context.graph().getVehicleParkingService(),
+      context.graph().getVehicleRentalService(),
+      context.vehiclePositionService(),
+      context.graphFinder(),
+      context.defaultRouteRequest()
+    );
   }
 
   @Nonnull
   public RouteRequest defaultRouteRequest() {
-    return serverContext.defaultRouteRequest().clone();
-  }
-
-  @Nonnull
-  public GraphFinder graphFinder() {
-    return serverContext.graphFinder();
+    return defaultRouteRequest.clone();
   }
 }

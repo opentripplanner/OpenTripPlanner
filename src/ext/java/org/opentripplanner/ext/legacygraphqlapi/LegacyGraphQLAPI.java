@@ -97,12 +97,7 @@ public class LegacyGraphQLAPI {
       maxResolves,
       timeout,
       locale,
-      new LegacyGraphQLRequestContext(
-        serverContext,
-        serverContext.routingService(),
-        serverContext.transitService(),
-        serverContext.graph().getFareService()
-      )
+      LegacyGraphQLRequestContext.ofServerContext(serverContext)
     );
   }
 
@@ -124,12 +119,7 @@ public class LegacyGraphQLAPI {
       maxResolves,
       timeout,
       locale,
-      new LegacyGraphQLRequestContext(
-        serverContext,
-        serverContext.routingService(),
-        serverContext.transitService(),
-        serverContext.graph().getFareService()
-      )
+      LegacyGraphQLRequestContext.ofServerContext(serverContext)
     );
   }
 
@@ -176,12 +166,7 @@ public class LegacyGraphQLAPI {
           maxResolves,
           timeout,
           locale,
-          new LegacyGraphQLRequestContext(
-            serverContext,
-            serverContext.routingService(),
-            serverContext.transitService(),
-            serverContext.graph().getFareService()
-          )
+          LegacyGraphQLRequestContext.ofServerContext(serverContext)
         )
       );
     }
