@@ -22,6 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -48,17 +49,21 @@ import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.org.siri.siri20.DataFrameRefStructure;
+import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.EstimatedVersionFrameStructure;
 import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
+import uk.org.siri.siri20.OperatorRefStructure;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityCancellationStructure;
 import uk.org.siri.siri20.VehicleActivityStructure;
 import uk.org.siri.siri20.VehicleJourneyRef;
 import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
+import uk.org.siri.siri20.VehicleRef;
 
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
@@ -325,11 +330,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               results.add(res);
             } catch (Throwable t) {
               // Since this is work in progress - catch everything to continue processing updates
-              LOG.warn(
-                "Adding ExtraJourney with id='{}' failed, caused by '{}'.",
-                journey.getEstimatedVehicleJourneyCode(),
-                t.getMessage()
-              );
+              LOG.warn("Adding ExtraJourney {} failed.", debugString(journey), t);
               results.add(Result.failure(UpdateError.noTripId(UNKNOWN)));
             }
           } else {
@@ -864,22 +865,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
     }
 
-    //Values used in logging
-    String operatorRef =
-      (
-        estimatedVehicleJourney.getOperatorRef() != null
-          ? estimatedVehicleJourney.getOperatorRef().getValue()
-          : null
-      );
-    String vehicleModes = "" + estimatedVehicleJourney.getVehicleModes();
-    String lineRef = estimatedVehicleJourney.getLineRef().getValue();
-    String vehicleRef =
-      (
-        estimatedVehicleJourney.getVehicleRef() != null
-          ? estimatedVehicleJourney.getVehicleRef().getValue()
-          : null
-      );
-
     LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
     final Result<UpdateSuccess, List<UpdateError>> successNoWarnings = Result.success(
@@ -931,11 +916,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
       if (trips == null || trips.isEmpty()) {
         LOG.debug(
-          "No trips found for EstimatedVehicleJourney. [operator={}, vehicleModes={}, lineRef={}, vehicleRef={}]",
-          operatorRef,
-          vehicleModes,
-          lineRef,
-          vehicleRef
+          "No trips found for EstimatedVehicleJourney. {}",
+          debugString(estimatedVehicleJourney)
         );
         return Result.failure(List.of(new UpdateError(null, NO_FUZZY_TRIP_MATCH)));
       }
@@ -962,11 +944,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (patterns.isEmpty()) {
       LOG.debug(
-        "Found no matching pattern for SIRI ET (firstStopId, lastStopId, numberOfStops). [operator={}, vehicleModes={}, lineRef={}, vehicleRef={}]",
-        operatorRef,
-        vehicleModes,
-        lineRef,
-        vehicleRef
+        "Found no matching pattern for SIRI ET (firstStopId, lastStopId, numberOfStops). {}",
+        debugString(estimatedVehicleJourney)
       );
       return Result.failure(List.of(new UpdateError(null, TRIP_NOT_FOUND_IN_PATTERN)));
     }
@@ -1381,5 +1360,38 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     return null;
+  }
+
+  private static String debugString(EstimatedVehicleJourney estimatedVehicleJourney) {
+    return ToStringBuilder
+      .of(estimatedVehicleJourney.getClass())
+      .addStr(
+        "EstimatedVehicleJourneyCode",
+        estimatedVehicleJourney.getEstimatedVehicleJourneyCode()
+      )
+      .addObjOp(
+        "DatedVehicleJourney",
+        estimatedVehicleJourney.getDatedVehicleJourneyRef(),
+        DatedVehicleJourneyRef::getValue
+      )
+      .addObjOp(
+        "FramedVehicleJourney",
+        estimatedVehicleJourney.getFramedVehicleJourneyRef(),
+        it ->
+          ToStringBuilder
+            .of(it.getClass())
+            .addStr("VehicleJourney", it.getDatedVehicleJourneyRef())
+            .addObjOp("Date", it.getDataFrameRef(), DataFrameRefStructure::getValue)
+            .toString()
+      )
+      .addObjOp(
+        "Operator",
+        estimatedVehicleJourney.getOperatorRef(),
+        OperatorRefStructure::getValue
+      )
+      .addCol("VehicleModes", estimatedVehicleJourney.getVehicleModes())
+      .addStr("Line", estimatedVehicleJourney.getLineRef().getValue())
+      .addObjOp("Vehicle", estimatedVehicleJourney.getVehicleRef(), VehicleRef::getValue)
+      .toString();
   }
 }
