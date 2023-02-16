@@ -64,6 +64,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix TPoint generation for real-time generated patterns [#4787](https://github.com/opentripplanner/OpenTripPlanner/pull/4787)
 - Do not override network name in the vehicle rental service directory service [#4807](https://github.com/opentripplanner/OpenTripPlanner/pull/4807)
 - Improve resiliency of the Transmodel API [#4806](https://github.com/opentripplanner/OpenTripPlanner/pull/4806)
+- Update GBFS support to v2.3 [#4809](https://github.com/opentripplanner/OpenTripPlanner/pull/4809)
+- Use TripPatterns for filtering [#4820](https://github.com/opentripplanner/OpenTripPlanner/pull/4820)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

@@ -710,12 +710,18 @@ type RentalVehicleType {
 enum FormFactor {
     """A bicycle"""
     BICYCLE
+    """A bicycle with additional space for cargo"""
+    CARGO_BICYCLE
     """An automobile"""
     CAR
     """A moped that the rider sits on. For a disambiguation see https://github.com/NABSA/gbfs/pull/370#issuecomment-982631989"""
     MOPED
-    """A scooter that the rider stands on. For a disambiguation see https://github.com/NABSA/gbfs/pull/370#issuecomment-982631989"""
+    """A kick scooter that the rider either sits or stands on. Will be deprecated in GBFS v3.0."""
     SCOOTER
+    """A kick scooter that the rider stands on"""
+    SCOOTER_STANDING
+    """A kick scooter with a seat"""
+    SCOOTER_SEATED
     """A vehicle that doesn't fit into any other category"""
     OTHER
 }
@@ -723,12 +729,20 @@ enum FormFactor {
 enum PropulsionType {
     """Pedal or foot propulsion"""
     HUMAN
-    """Provides power only alongside human propulsion"""
+    """Provides electric motor assist only in combination with human propulsion - no throttle mode"""
     ELECTRIC_ASSIST
-    """Contains throttle mode with a battery-powered motor"""
+    """Powered by battery-powered electric motor with throttle mode"""
     ELECTRIC
-    """Contains throttle mode with a gas engine-powered motor"""
+    """Powered by gasoline combustion engine"""
     COMBUSTION
+    """Powered by diesel combustion engine"""
+    COMBUSTION_DIESEL
+    """Powered by combined combustion engine and battery-powered motor"""
+    HYBRID
+    """Powered by combined combustion engine and battery-powered motor with plug-in charging"""
+    PLUG_IN_HYBRID
+    """Powered by hydrogen fuel cell powered electric motor"""
+    HYDROGEN_FUEL_CELL
 }
 
 enum BikesAllowed {
