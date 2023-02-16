@@ -294,100 +294,6 @@ public class TimetableHelper {
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
-  public static List<StopLocation> createModifiedStops(
-    TripPattern pattern,
-    EstimatedVehicleJourney journey,
-    Function<FeedScopedId, StopLocation> getStopForId
-  ) {
-    if (journey == null) {
-      return null;
-    }
-
-    List<EstimatedCall> estimatedCalls = getEstimatedCalls(journey);
-    List<RecordedCall> recordedCalls = getRecordedCalls(journey);
-
-    // Keeping track of visited stop-objects to allow multiple visits to a stop.
-    List<Object> alreadyVisited = new ArrayList<>();
-
-    List<StopLocation> modifiedStops = new ArrayList<>();
-
-    for (int i = 0; i < pattern.numberOfStops(); i++) {
-      StopLocation stop = pattern.getStop(i);
-
-      boolean foundMatch = false;
-      if (i < recordedCalls.size()) {
-        for (RecordedCall recordedCall : recordedCalls) {
-          if (alreadyVisited.contains(recordedCall)) {
-            continue;
-          }
-          //Current stop is being updated
-          boolean stopsMatchById = stop
-            .getId()
-            .getId()
-            .equals(recordedCall.getStopPointRef().getValue());
-
-          if (!stopsMatchById && stop.isPartOfStation()) {
-            var alternativeStop = getStopForId.apply(
-              new FeedScopedId(stop.getId().getFeedId(), recordedCall.getStopPointRef().getValue())
-            );
-            if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
-              stopsMatchById = true;
-              stop = alternativeStop;
-            }
-          }
-
-          if (stopsMatchById) {
-            foundMatch = true;
-            modifiedStops.add(stop);
-            alreadyVisited.add(recordedCall);
-            break;
-          }
-        }
-      } else {
-        for (EstimatedCall estimatedCall : estimatedCalls) {
-          if (alreadyVisited.contains(estimatedCall)) {
-            continue;
-          }
-          //Current stop is being updated
-          boolean stopsMatchById = stop
-            .getId()
-            .getId()
-            .equals(estimatedCall.getStopPointRef().getValue());
-
-          if (!stopsMatchById && stop.isPartOfStation()) {
-            var alternativeStop = getStopForId.apply(
-              new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue())
-            );
-            if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
-              stopsMatchById = true;
-              stop = alternativeStop;
-            }
-          }
-
-          if (stopsMatchById) {
-            foundMatch = true;
-            modifiedStops.add(stop);
-            alreadyVisited.add(estimatedCall);
-            break;
-          }
-        }
-      }
-      if (!foundMatch) {
-        modifiedStops.add(stop);
-      }
-    }
-
-    return modifiedStops;
-  }
-
-  /**
-   * Apply the SIRI ET to the appropriate TripTimes from this Timetable. Calculate new stoppattern
-   * based on single stop cancellations
-   *
-   * @param journey SIRI-ET EstimatedVehicleJourney
-   * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
-   * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
-   */
   public static List<StopTime> createModifiedStopTimes(
     TripPattern pattern,
     TripTimes oldTimes,
@@ -401,15 +307,13 @@ public class TimetableHelper {
     List<EstimatedCall> estimatedCalls = getEstimatedCalls(journey);
     List<RecordedCall> recordedCalls = getRecordedCalls(journey);
 
-    var stops = createModifiedStops(pattern, journey, getStopForId);
-
     List<StopTime> modifiedStops = new ArrayList<>();
 
     int numberOfRecordedCalls = recordedCalls.size();
     Set<Object> alreadyVisited = new HashSet<>();
     // modify updated stop-times
-    for (int i = 0; i < stops.size(); i++) {
-      StopLocation stop = stops.get(i);
+    for (int i = 0; i < pattern.numberOfStops(); i++) {
+      StopLocation stop = pattern.getStop(i);
 
       final StopTime stopTime = new StopTime();
       stopTime.setStop(stop);
@@ -422,9 +326,6 @@ public class TimetableHelper {
       stopTime.setStopHeadsign(oldTimes.getHeadsign(i));
       stopTime.setHeadsignVias(oldTimes.getHeadsignVias(i));
       stopTime.setTimepoint(oldTimes.isTimepoint(i) ? 1 : 0);
-
-      // TODO: Do we need to set the StopTime.id?
-      //stopTime.setId(oldTimes.getStopTimeIdByIndex(i));
 
       boolean foundMatch = false;
       if (i < numberOfRecordedCalls) {
@@ -466,14 +367,12 @@ public class TimetableHelper {
           }
 
           //Current stop is being updated
-          boolean stopsMatchById = stop
-            .getId()
-            .getId()
-            .equals(estimatedCall.getStopPointRef().getValue());
+          String callStopRef = estimatedCall.getStopPointRef().getValue();
+          boolean stopsMatchById = stop.getId().getId().equals(callStopRef);
 
           if (!stopsMatchById && stop.isPartOfStation()) {
             var alternativeStop = getStopForId.apply(
-              new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue())
+              new FeedScopedId(stop.getId().getFeedId(), callStopRef)
             );
             if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
               stopsMatchById = true;

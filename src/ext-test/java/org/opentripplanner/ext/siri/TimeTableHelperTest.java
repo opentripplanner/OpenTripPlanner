@@ -112,8 +112,9 @@ public class TimeTableHelperTest {
     Function<FeedScopedId, StopLocation> stopFetcher = s -> this.stopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(
+    var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
+      tripTimes,
       estimatedVehicleJourney,
       stopFetcher
     );
@@ -121,8 +122,9 @@ public class TimeTableHelperTest {
     // Assert
     assertNotNull(result, "The stops should not be null");
     assertNotEquals(0, result.size(), "There should be more than 0 stops created");
-    for (StopLocation location : result) {
+    for (StopTime stopTime : result) {
       assertAll(() -> {
+        StopLocation location = stopTime.getStop();
         assertEquals(SCOPED_STOP_ID, location.getId(), "StopLocation id should be set from input");
         assertEquals(stop, location);
       });
@@ -136,8 +138,9 @@ public class TimeTableHelperTest {
     Function<FeedScopedId, StopLocation> stopFetcher = s -> this.stopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(
+    var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
+      tripTimes,
       estimatedVehicleJourney,
       stopFetcher
     );
@@ -145,8 +148,9 @@ public class TimeTableHelperTest {
     // Assert
     assertNotNull(result, "The stops should not be null");
     assertNotEquals(0, result.size(), "There should be more than 0 stops created");
-    for (StopLocation location : result) {
+    for (StopTime stopTime : result) {
       assertAll(() -> {
+        StopLocation location = stopTime.getStop();
         assertEquals(SCOPED_STOP_ID, location.getId(), "StopLocation id should be set from input");
         assertEquals(stop, location);
       });
@@ -164,8 +168,9 @@ public class TimeTableHelperTest {
     Function<FeedScopedId, StopLocation> stopFetcher = s -> newRecordedStopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(
+    var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
+      tripTimes,
       estimatedVehicleJourney,
       stopFetcher
     );
@@ -173,8 +178,9 @@ public class TimeTableHelperTest {
     // Assert
     assertNotNull(result, "The stops should not be null");
     assertNotEquals(0, result.size(), "There should be more than 0 stopLocations created");
-    for (StopLocation location : result) {
+    for (StopTime stopTime : result) {
       assertAll(() -> {
+        StopLocation location = stopTime.getStop();
         assertEquals(SCOPED_STOP_ID, location.getId(), "StopLocation id should be set from input");
         assertEquals(stop, location);
       });
@@ -195,8 +201,9 @@ public class TimeTableHelperTest {
     Function<FeedScopedId, StopLocation> stopFetcher = s -> newRecordedStopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(
+    var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
+      tripTimes,
       estimatedVehicleJourney,
       stopFetcher
     );
@@ -204,8 +211,9 @@ public class TimeTableHelperTest {
     // Assert
     assertNotNull(result, "The stops should not be null");
     assertNotEquals(0, result.size(), "There should be more than 0 stopLocations created");
-    for (StopLocation location : result) {
+    for (StopTime stopTime : result) {
       assertAll(() -> {
+        StopLocation location = stopTime.getStop();
         assertEquals(
           newStopScopedId,
           location.getId(),
@@ -230,8 +238,9 @@ public class TimeTableHelperTest {
     Function<FeedScopedId, StopLocation> stopFetcher = s -> newRecordedStopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(
+    var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
+      tripTimes,
       estimatedVehicleJourney,
       stopFetcher
     );
@@ -239,8 +248,9 @@ public class TimeTableHelperTest {
     // Assert
     assertNotNull(result, "The stops should not be null");
     assertNotEquals(0, result.size(), "There should be more than 0 stopLocations created");
-    for (StopLocation location : result) {
+    for (StopTime stopTime : result) {
       assertAll(() -> {
+        StopLocation location = stopTime.getStop();
         assertEquals(
           newStopScopedId,
           location.getId(),
@@ -262,8 +272,9 @@ public class TimeTableHelperTest {
     Function<FeedScopedId, StopLocation> stopFetcher = s -> newRecordedStopLocation;
 
     // Act
-    var result = TimetableHelper.createModifiedStops(
+    var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
+      tripTimes,
       estimatedVehicleJourney,
       stopFetcher
     );
@@ -271,8 +282,9 @@ public class TimeTableHelperTest {
     // Assert
     assertNotNull(result, "The stops should not be null");
     assertNotEquals(0, result.size(), "There should be more than 0 stopLocations created");
-    for (StopLocation location : result) {
+    for (StopTime stopTime : result) {
       assertAll(() -> {
+        StopLocation location = stopTime.getStop();
         assertEquals(SCOPED_STOP_ID, location.getId(), "StopLocation id should be set from input");
         assertEquals(stop, location);
       });
