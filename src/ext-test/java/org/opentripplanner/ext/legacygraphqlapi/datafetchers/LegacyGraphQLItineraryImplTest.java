@@ -23,7 +23,6 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 class LegacyGraphQLItineraryImplTest {
 
@@ -33,8 +32,7 @@ class LegacyGraphQLItineraryImplTest {
   static final Instant ALERT_END_TIME = ALERT_START_TIME.plus(1, ChronoUnit.DAYS);
 
   @Test
-  void foo() throws Exception {
-    var stop = TransitModelForTest.stop("stop1").build();
+  void legs() throws Exception {
     Itinerary i1 = newItinerary(A, T11_00)
       .walk(20, B)
       .bus(122, T11_01, T11_15, C)

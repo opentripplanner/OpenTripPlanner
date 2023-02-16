@@ -266,7 +266,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
           .getAlternativeLegs(
             environment.getSource(),
             numberOfLegs,
-            environment.<LegacyGraphQLRequestContext>getContext().getTransitService(),
+            environment.<LegacyGraphQLRequestContext>getContext().transitService(),
             false,
             AlternativeLegsFilter.NO_FILTER,
             limitToExactOriginStop,

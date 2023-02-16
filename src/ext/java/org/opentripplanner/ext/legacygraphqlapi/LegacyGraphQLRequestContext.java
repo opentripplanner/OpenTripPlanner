@@ -2,7 +2,9 @@ package org.opentripplanner.ext.legacygraphqlapi;
 
 import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.RoutingService;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
@@ -28,34 +30,43 @@ public class LegacyGraphQLRequestContext {
     this.fareService = fareService;
   }
 
-  public OtpServerRequestContext getServerContext() {
-    return serverContext;
-  }
-
-  public RoutingService getRoutingService() {
+  @Nonnull
+  public RoutingService routingService() {
     return routingService;
   }
 
-  public TransitService getTransitService() {
+  @Nonnull
+  public TransitService transitService() {
     return transitService;
   }
 
-  public FareService getFareService() {
+  @Nonnull
+  public FareService fareService() {
     return fareService;
   }
 
   @Nonnull
-  public VehicleParkingService getVehicleParkingService() {
+  public VehicleParkingService vehicleParkingService() {
     return serverContext.graph().getVehicleParkingService();
   }
 
   @Nonnull
-  public VehicleRentalService getVehicleRentalService() {
+  public VehicleRentalService vehicleRentalService() {
     return serverContext.graph().getVehicleRentalService();
   }
 
   @Nonnull
-  public VehiclePositionService getVehiclePositionService() {
+  public VehiclePositionService vehiclePositionService() {
     return serverContext.vehiclePositionService();
+  }
+
+  @Nonnull
+  public RouteRequest defaultRouteRequest() {
+    return serverContext.defaultRouteRequest().clone();
+  }
+
+  @Nonnull
+  public GraphFinder graphFinder() {
+    return serverContext.graphFinder();
   }
 }
