@@ -13,7 +13,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.ext.fares.model.Distance;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -224,8 +223,8 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.distanceMeters = DoubleUtils.roundTo2Decimals(distanceMeters);
   }
 
-  public Distance getDirectDistanceMeters() {
-    return Distance.ofMeters(directDistanceMeters);
+  public double getDirectDistanceMeters() {
+    return directDistanceMeters;
   }
 
   @Override

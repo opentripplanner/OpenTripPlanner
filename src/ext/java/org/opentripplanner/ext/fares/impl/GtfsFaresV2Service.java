@@ -252,7 +252,7 @@ public final class GtfsFaresV2Service implements Serializable {
       var ruleMin = ruleDistance.min();
       var legDistance = leg.getDirectDistanceMeters();
 
-      return legDistance.isAbove(ruleMin) && legDistance.isBelow(ruleMax);
+      return legDistance > ruleMin.toMeters() && legDistance < ruleMax.toMeters();
     } else return true;
   }
 
