@@ -29,7 +29,10 @@ class FilterMapper {
     RouteRequest request
   ) {
     if (
-      !GqlUtil.hasArgument(environment, "modes.transportModes") &&
+      !(
+        GqlUtil.hasArgument(environment, "modes") &&
+        ((Map<String, Object>) environment.getArgument("modes")).containsKey("transportModes")
+      ) &&
       !GqlUtil.hasArgument(environment, "whiteListed") &&
       !GqlUtil.hasArgument(environment, "banned")
     ) {

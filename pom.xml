@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>85</otp.serialization.version.id>
+        <otp.serialization.version.id>86</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>28.1</geotools.version>
         <google.dagger.version>2.45</google.dagger.version>
@@ -565,7 +565,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.7.0</version>
+                <version>26.8.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -960,11 +960,6 @@
         </profile>
         <profile>
             <id>prettierSkip</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
             <build>
                 <plugins>
                     <plugin>

@@ -3,7 +3,6 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 import java.util.BitSet;
 import java.util.Collections;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.response.StopArrivals;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
@@ -19,7 +18,7 @@ import org.opentripplanner.raptor.util.BitSetIterator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class McStopArrivals<T extends RaptorTripSchedule> implements StopArrivals {
+public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   private final StopArrivalParetoSet<T>[] arrivals;
   private final BitSet touchedStops;
@@ -45,12 +44,10 @@ public final class McStopArrivals<T extends RaptorTripSchedule> implements StopA
     glueTogetherEgressStopWithDestinationArrivals(egressPaths, paths);
   }
 
-  @Override
   public boolean reached(int stopIndex) {
     return arrivals[stopIndex] != null && !arrivals[stopIndex].isEmpty();
   }
 
-  @Override
   public int bestArrivalTime(int stopIndex) {
     return arrivals[stopIndex].stream()
       .mapToInt(AbstractStopArrival::arrivalTime)
@@ -58,7 +55,6 @@ public final class McStopArrivals<T extends RaptorTripSchedule> implements StopA
       .orElseThrow();
   }
 
-  @Override
   public boolean reachedByTransit(int stopIndex) {
     return (
       arrivals[stopIndex] != null &&
@@ -66,7 +62,6 @@ public final class McStopArrivals<T extends RaptorTripSchedule> implements StopA
     );
   }
 
-  @Override
   public int bestTransitArrivalTime(int stopIndex) {
     return arrivals[stopIndex].stream()
       .filter(ArrivalView::arrivedByTransit)
@@ -75,7 +70,6 @@ public final class McStopArrivals<T extends RaptorTripSchedule> implements StopA
       .orElseThrow();
   }
 
-  @Override
   public int smallestNumberOfTransfers(int stopIndex) {
     return arrivals[stopIndex].stream()
       .filter(ArrivalView::arrivedByTransit)

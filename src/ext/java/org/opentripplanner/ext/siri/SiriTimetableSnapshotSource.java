@@ -638,6 +638,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       .of(id)
       .withRoute(trip.getRoute())
       .withMode(trip.getMode())
+      .withNetexSubmode(trip.getNetexSubMode())
       .withStopPattern(stopPattern)
       .build();
 

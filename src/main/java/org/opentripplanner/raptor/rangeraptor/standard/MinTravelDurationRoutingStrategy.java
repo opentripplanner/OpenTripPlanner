@@ -6,6 +6,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
@@ -39,19 +40,22 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
   private int onTripBoardStop;
   private T onTrip;
   private int onTripTimeShift;
+  private int iterationDepartureTime;
 
   public MinTravelDurationRoutingStrategy(
     StdWorkerState<T> state,
     TimeBasedBoardingSupport<T> boardingSupport,
-    TransitCalculator<T> calculator
+    TransitCalculator<T> calculator,
+    WorkerLifeCycle lifeCycle
   ) {
     this.state = state;
     this.boardingSupport = boardingSupport;
     this.calculator = calculator;
+    lifeCycle.onSetupIteration(it -> this.iterationDepartureTime = it);
   }
 
   @Override
-  public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
+  public void setAccessToStop(RaptorAccessEgress accessPath, int departureTime) {
     state.setAccessToStop(accessPath, iterationDepartureTime);
   }
 
@@ -70,7 +74,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     // attempt to alight if we're on board
     if (onTripIndex != UNBOUNDED_TRIP_INDEX) {
       // Trip alightTime + alight-slack(forward-search) or board-slack(reverse-search)
-      final int stopArrivalTime0 = calculator.stopArrivalTime(onTrip, stopPos, alightSlack);
+      final int stopArrivalTime0 = calculator.stopArrivalTime(onTrip, stopPos, 0);
 
       // Remove the wait time from the arrival-time. We don´t need to use the transit
       // calculator because of the way we compute the time-shift. It is positive in the case
@@ -99,17 +103,10 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     int boardSlack,
     RaptorConstrainedBoardingSearch<T> txSearch
   ) {
-    boardingSupport
-      .searchConstrainedTransfer(
-        previousTransitArrival(stopIndex),
-        prevArrivalTime(stopIndex),
-        boardSlack,
-        txSearch
-      )
-      .boardWithFallback(
-        boarding -> board(stopIndex, boarding),
-        emptyBoarding -> boardWithRegularTransfer(stopIndex, stopPos, boardSlack)
-      );
+    // If a constrained transfer exist we drop the board slack since it potentially
+    // could be a guaranteed or stay-seated transfers. We can not check the two trips and
+    // base our decision on that, because the optimal trips is unknown.
+    boardWithRegularTransfer(stopIndex, stopPos, 0);
   }
 
   private void board(int stopIndex, RaptorBoardOrAlightEvent<T> boarding) {
@@ -124,7 +121,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
 
   /**
    * This method allow the strategy to replace the existing boarding (if it exists) with a better
-   * option. It is left to the implementation to check that a boarding already exist.
+   * option.
    *
    * @param earliestBoardTime - the earliest possible time a boarding can take place
    * @param stopPos           - the pattern stop position

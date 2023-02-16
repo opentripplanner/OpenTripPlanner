@@ -2,12 +2,11 @@ package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -17,24 +16,27 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
+import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should add transit-slack + board-slack after flex access, and transit-slack + alight-slack
- * before flex egress.
+ * Raptor should use reversed transfers when searching in reverse, so that directional transfers are
+ * used correctly.
+ * <p>
+ * The expected result is an itinerary with 2 transit legs and a transfer.
  */
-public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTestConstants {
+public class C02_OnStreetTransfersTest implements RaptorTestConstants {
 
-  /** The expected result is tha same for all tests */
-  private static final String EXPECTED_RESULT =
-    "Flex 2m 1x ~ B ~ " + "BUS R1 0:04 0:06 ~ C ~ " + "Flex 2m 1x " + "[0:00:30 0:09:10 8m40s 2tx]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -43,44 +45,51 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
 
   @BeforeEach
   public void setup() {
-    //Given slack: transfer 1m, board 30s, alight 10s
-    data.withSlackProvider(new DefaultSlackProvider(D1m, D30s, D10s));
+    //Given slack: transfer 30s, board 0s, alight 0s
+    data.withSlackProvider(new DefaultSlackProvider(D30s, D0s, D0s));
 
     data.withRoute(
-      // Pattern arrive at stop 2 at 0:03:00
       route(pattern("R1", STOP_B, STOP_C))
+        .withTimetable(schedule().departures("00:02:00, 00:03:10").arrDepOffset(D10s))
+    );
+
+    // It is not possible to transfer from D -> C
+    data.withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D30s));
+
+    data.withRoute(
+      route(pattern("R2", STOP_D, STOP_E))
         .withTimetable(
-          // First trip is too early: It takes 2m to get to the point of boarding:
-          // --> 00:00:00 + flex 30s + slack(1m + 30s) = 00:02:00
-          schedule().departures("0:03:29, 0:05:29"),
-          // This is the trip we expect to board
-          schedule().departures("0:04:00, 0:10:00").arrivals("0, 00:06:00"),
-          // REVERSE SEARCH: The last trip arrives too late: It takes 1m40s to get to the
-          // point of "boarding" in the reverse search:
-          // --> 00:10:00 - (flex 20s + slack(1m + 10s)) = 00:08:30  (arrival time)
-          schedule().arrivals("0:04:51, 0:06:51")
+          schedule().departures("00:03:59, 00:05:09").arrDepOffset(D10s), // Missed by 1 second
+          schedule().departures("00:04:00, 00:05:10").arrDepOffset(D10s) // Exact match
         )
     );
+
     requestBuilder
       .searchParams()
-      // Start walking 1m before: 30s walk + 30s board-slack
-      .addAccessPaths(flexAndWalk(STOP_B, D2m, ONE_RIDE, 40_000))
-      // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
-      .addEgressPaths(flex(STOP_C, D2m, ONE_RIDE, 56_000))
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D30s)) // Start walking 1m before: 30s walk + 30s board-slack
+      .addEgressPaths(TestAccessEgress.walk(STOP_E, D20s)) // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
       .earliestDepartureTime(T00_00)
-      .latestArrivalTime(T00_10)
-      // Only one iteration is needed - the access should be time-shifted
+      .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D3m);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var expMinDuration = UnknownPathString.of("3m50s", 1);
+    var expected =
+      "Walk 30s ~ B ~ " +
+      "BUS R1 0:02 0:03 ~ C ~ " +
+      "Walk 30s ~ D ~ " +
+      "BUS R2 0:04 0:05 ~ E ~ " +
+      "Walk 20s " +
+      "[0:01:30 0:05:20 3m50s 1tx $1510]";
     return RaptorModuleTestCase
       .of()
-      // TODO - TC_STANDARD_REV does not give tha same results - why?
-      .add(standard().not(TC_STANDARD_REV), EXPECTED_RESULT)
-      .add(multiCriteria(), EXPECTED_RESULT.replace("]", " $1840]"))
+      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_00))
+      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
+      .add(standard(), PathUtils.withoutCost(expected))
+      .add(multiCriteria(), expected)
       .build();
   }
 

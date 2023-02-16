@@ -15,7 +15,7 @@ public class RaptorModuleTestCaseBuilder {
     return add(config, Arrays.asList(expected));
   }
 
-  public RaptorModuleTestCaseBuilder add(RaptorModuleTestConfig config, List<String> expected) {
+  public RaptorModuleTestCaseBuilder add(RaptorModuleTestConfig config, Iterable<String> expected) {
     cases.add(new RaptorModuleTestCase(config, String.join("\n", expected)));
     return this;
   }
