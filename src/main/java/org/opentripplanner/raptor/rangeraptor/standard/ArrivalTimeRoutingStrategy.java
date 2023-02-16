@@ -5,7 +5,6 @@ import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
@@ -50,14 +49,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
-    int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
-
-    // This access is not available after the iteration departure time
-    if (departureTime == SearchParams.TIME_NOT_SET) {
-      return;
-    }
-
+  public void setAccessToStop(RaptorAccessEgress accessPath, int departureTime) {
     state.setAccessToStop(accessPath, departureTime);
   }
 

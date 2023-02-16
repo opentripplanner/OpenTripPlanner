@@ -38,7 +38,8 @@
     },
     {
       "matchPackageNames": [
-        "org.onebusaway:onebusaway-gtfs"
+        "org.onebusaway:onebusaway-gtfs",
+        "com.google.cloud:libraries-bom"
       ],
       "extends": [
         "schedule:monthly"
@@ -59,11 +60,12 @@
       "matchPackageNames": [
         "org.mockito:mockito-core",
         "org.junit.jupiter:",
-        "com.tngtech.archunit:archunit"
+        "com.tngtech.archunit:archunit",
+        "org.apache.maven.plugins:maven-surefire-plugin"
       ],
       "automerge": true,
       "automergeSchedule": "after 11pm and before 5am every weekday",
-      "schedule": "after 10pm and before 5am every weekday"
+      "schedule": "after 11pm and before 5am every weekday"
     }
   ],
   "timezone": "Europe/Berlin"

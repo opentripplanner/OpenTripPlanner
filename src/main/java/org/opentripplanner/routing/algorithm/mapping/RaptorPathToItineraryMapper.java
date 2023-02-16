@@ -17,7 +17,6 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.UnknownTransitPathLeg;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.raptor.api.path.PathLeg;
@@ -143,13 +142,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   private List<Leg> mapAccessLeg(AccessPathLeg<T> accessPathLeg) {
-    if (isEmptyAccessEgress(accessPathLeg.access())) {
+    if (accessPathLeg.access().isFree()) {
       return List.of();
     }
 
     DefaultAccessEgress accessPath = (DefaultAccessEgress) accessPathLeg.access();
 
-    GraphPath graphPath = new GraphPath(accessPath.getLastState());
+    var graphPath = new GraphPath<>(accessPath.getLastState());
 
     Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
 
@@ -171,7 +170,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     // leg given that it is the last leg.
     int lastLegCost = 0;
     PathLeg<T> nextLeg = pathLeg.nextLeg();
-    if (nextLeg.isEgressLeg() && isEmpty(nextLeg.asEgressLeg())) {
+    if (nextLeg.isEgressLeg() && isFree(nextLeg.asEgressLeg())) {
       lastLegCost = pathLeg.nextLeg().generalizedCost();
     }
 
@@ -221,12 +220,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     );
   }
 
-  private boolean isEmpty(EgressPathLeg<T> egressPathLeg) {
-    return isEmptyAccessEgress(egressPathLeg.egress());
-  }
-
-  private boolean isEmptyAccessEgress(RaptorAccessEgress accessEgress) {
-    return accessEgress.isEmpty();
+  private boolean isFree(EgressPathLeg<T> egressPathLeg) {
+    return egressPathLeg.egress().isFree();
   }
 
   private List<Leg> mapTransferLeg(TransferPathLeg<T> pathLeg, TraverseMode transferMode) {
@@ -240,13 +235,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   private Itinerary mapEgressLeg(EgressPathLeg<T> egressPathLeg) {
-    if (isEmpty(egressPathLeg)) {
+    if (isFree(egressPathLeg)) {
       return null;
     }
 
     DefaultAccessEgress egressPath = (DefaultAccessEgress) egressPathLeg.egress();
 
-    GraphPath graphPath = new GraphPath(egressPath.getLastState());
+    var graphPath = new GraphPath<>(egressPath.getLastState());
 
     Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
 
@@ -293,7 +288,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       }
 
       State[] states = transferStates.toArray(new State[0]);
-      GraphPath graphPath = new GraphPath(states[states.length - 1]);
+      var graphPath = new GraphPath<>(states[states.length - 1]);
 
       Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
 

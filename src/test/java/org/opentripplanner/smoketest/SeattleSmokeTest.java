@@ -18,6 +18,9 @@ public class SeattleSmokeTest {
   WgsCoordinate sodo = new WgsCoordinate(47.5811, -122.3290);
   WgsCoordinate clydeHill = new WgsCoordinate(47.6316, -122.2173);
 
+  WgsCoordinate boeingCreekPark = new WgsCoordinate(47.755872, -122.361645);
+  WgsCoordinate ronaldBogPark = new WgsCoordinate(47.75601664, -122.33141);
+
   @Test
   public void acrossTheCity() {
     SmokeTest.basicRouteTest(
@@ -25,6 +28,16 @@ public class SeattleSmokeTest {
       clydeHill,
       Set.of("TRANSIT", "WALK"),
       List.of("WALK", "BUS", "WALK", "BUS", "WALK")
+    );
+  }
+
+  @Test
+  public void flexAndTransit() {
+    SmokeTest.basicRouteTest(
+      boeingCreekPark,
+      ronaldBogPark,
+      Set.of("WALK", "BUS", "FLEX", "FLEX_DIRECT", "FLEX_EGRESS", "FLEX_ACCESS"),
+      List.of("BUS")
     );
   }
 

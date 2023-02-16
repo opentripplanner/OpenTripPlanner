@@ -35,8 +35,8 @@ public final class ModuleTestDebugLogging {
     TestTransitData data,
     RaptorRequestBuilder<TestTripSchedule> requestBuilder
   ) {
-    if (DEBUG) {
-      data.debugToStdErr(requestBuilder);
-    }
+    // We always run with debugging enabled, but be skip logging(dryRun=true).
+    // We do this to make sure the logging works for all test-cases, and do not throw exceptions.
+    data.debugToStdErr(requestBuilder, !DEBUG);
   }
 }

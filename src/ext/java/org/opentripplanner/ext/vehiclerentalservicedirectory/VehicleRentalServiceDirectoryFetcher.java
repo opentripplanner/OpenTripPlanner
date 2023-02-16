@@ -71,7 +71,7 @@ public class VehicleRentalServiceDirectoryFetcher {
             parameters.getLanguage(),
             false,
             parameters.getHeaders(),
-            parameters.getSourceNetworkName(),
+            null,
             false
           )
         );
