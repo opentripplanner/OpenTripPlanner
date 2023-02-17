@@ -19,6 +19,7 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.transit.model.network.Route;
@@ -30,6 +31,11 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<Agency> agency() {
     return environment -> getSource(environment).getAgency();
+  }
+
+  @Override
+  public DataFetcher<Iterable<TransitAlert>> alerts() {
+    return environment -> getSource(environment).getTransitAlerts();
   }
 
   @Override
@@ -260,7 +266,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
           .getAlternativeLegs(
             environment.getSource(),
             numberOfLegs,
-            environment.<LegacyGraphQLRequestContext>getContext().getTransitService(),
+            environment.<LegacyGraphQLRequestContext>getContext().transitService(),
             false,
             AlternativeLegsFilter.NO_FILTER,
             limitToExactOriginStop,
