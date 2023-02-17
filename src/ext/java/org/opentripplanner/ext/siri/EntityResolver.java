@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.siri;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -173,5 +175,61 @@ public class EntityResolver {
 
   public Operator resolveOperator(String operatorRef) {
     return transitService.getOperatorForId(resolveId(operatorRef));
+  }
+
+  public LocalDate resolveServiceDate(EstimatedVehicleJourney vehicleJourney) {
+    if (vehicleJourney.getFramedVehicleJourneyRef() != null) {
+      var dataFrame = vehicleJourney.getFramedVehicleJourneyRef().getDataFrameRef();
+      if (dataFrame != null) {
+        try {
+          return LocalDate.parse(dataFrame.getValue());
+        } catch (DateTimeParseException ignored) {
+          LOG.warn("Invalid dataFrame format: {}", dataFrame.getValue());
+        }
+      }
+    }
+
+    FeedScopedId datedServiceJourneyId = resolveDatedServiceJourneyId(vehicleJourney);
+    if (datedServiceJourneyId != null) {
+      var datedServiceJourney = resolveTripOnServiceDate(datedServiceJourneyId);
+      if (datedServiceJourney != null) {
+        return datedServiceJourney.getServiceDate();
+      }
+    }
+
+    ZonedDateTime date = CallWrapper.of(vehicleJourney).get(0).getAimedDepartureTime();
+
+    if (date == null) {
+      return null;
+    }
+
+    var daysOffset = calculateDayOffset(vehicleJourney);
+
+    return date.toLocalDate().minusDays(daysOffset);
+  }
+
+  /**
+   * Calculate the difference in days between the service date and the departure at the first stop.
+   */
+  private int calculateDayOffset(EstimatedVehicleJourney vehicleJourney) {
+    Trip trip = resolveTrip(vehicleJourney);
+    if (trip == null) {
+      return 0;
+    }
+    var pattern = transitService.getPatternForTrip(trip);
+    if (pattern == null) {
+      return 0;
+    }
+    var tripTimes = pattern.getScheduledTimetable().getTripTimes(trip);
+    if (tripTimes == null) {
+      return 0;
+    }
+    var departureTime = tripTimes.getDepartureTime(0);
+    var days = (int) Duration.ofSeconds(departureTime).toDays();
+    if (departureTime < 0) {
+      return days - 1;
+    } else {
+      return days;
+    }
   }
 }

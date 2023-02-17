@@ -12,7 +12,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -70,6 +69,7 @@ public class TimetableHelper {
     EstimatedVehicleJourney journey,
     FeedScopedId tripId,
     Function<FeedScopedId, StopLocation> getStopById,
+    LocalDate serviceDate,
     ZoneId zoneId,
     Deduplicator deduplicator
   ) {
@@ -114,7 +114,6 @@ public class TimetableHelper {
 
     int callCounter = 0;
 
-    LocalDate serviceDate = getServiceDate(journey, zoneId, oldTimes);
     ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
     Set<Object> alreadyVisited = new HashSet<>();
 
@@ -250,16 +249,6 @@ public class TimetableHelper {
 
     LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
     return Result.success(newTimes);
-  }
-
-  private static int calculateDayOffset(TripTimes oldTimes) {
-    if (oldTimes.getDepartureTime(0) > 86400) {
-      // The "departure-date" for this trip is set to "yesterday" (or before) even though it actually departs "today"
-
-      return oldTimes.getDepartureTime(0) / 86400; // calculate number of offset-days
-    } else {
-      return 0;
-    }
   }
 
   /**
@@ -626,40 +615,6 @@ public class TimetableHelper {
       case NO_BOARDING -> Optional.of(NONE);
       case PASS_THRU -> Optional.of(CANCELLED);
     };
-  }
-
-  private static LocalDate getServiceDate(
-    EstimatedVehicleJourney journey,
-    ZoneId zoneId,
-    TripTimes oldTimes
-  ) {
-    if (
-      journey.getFramedVehicleJourneyRef() != null &&
-      journey.getFramedVehicleJourneyRef().getDataFrameRef() != null
-    ) {
-      var dataFrame = journey.getFramedVehicleJourneyRef().getDataFrameRef();
-      if (dataFrame != null) {
-        try {
-          return LocalDate.parse(dataFrame.getValue());
-        } catch (DateTimeParseException ignored) {
-          LOG.warn("Invalid dataFrame format: {}", dataFrame.getValue());
-        }
-      }
-    }
-
-    var recordedCalls = getRecordedCalls(journey);
-    var estimatedCalls = getEstimatedCalls(journey);
-    ZonedDateTime firstDeparture;
-    if (recordedCalls.isEmpty()) {
-      firstDeparture = estimatedCalls.get(0).getAimedDepartureTime();
-    } else {
-      firstDeparture = recordedCalls.get(0).getAimedDepartureTime();
-    }
-
-    return firstDeparture
-      .minusDays(calculateDayOffset(oldTimes))
-      .withZoneSameInstant(zoneId)
-      .toLocalDate();
   }
 
   /**

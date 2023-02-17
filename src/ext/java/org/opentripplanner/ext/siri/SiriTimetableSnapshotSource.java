@@ -558,7 +558,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       transitModel.getTransitModelIndex().addRoutes(route);
     }
 
-    LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
+    LocalDate serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
     if (serviceDate == null) {
       return Result.failure(new UpdateError(tripId, NO_START_DATE));
     }
@@ -865,7 +865,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
     }
 
-    LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
+    LocalDate serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
 
     final Result<UpdateSuccess, List<UpdateError>> successNoWarnings = Result.success(
       UpdateSuccess.noWarnings()
@@ -892,6 +892,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           estimatedVehicleJourney,
           tripMatchedByServiceJourneyId.getId(),
           getStopLocationById,
+          serviceDate,
           timeZone,
           deduplicator
         );
@@ -931,6 +932,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             estimatedVehicleJourney,
             matchingTrip.getId(),
             getStopLocationById,
+            serviceDate,
             timeZone,
             deduplicator
           );
@@ -1004,39 +1006,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     } else {
       return Result.failure(errors);
     }
-  }
-
-  private LocalDate getServiceDateForEstimatedVehicleJourney(
-    EstimatedVehicleJourney estimatedVehicleJourney
-  ) {
-    ZonedDateTime date;
-    if (
-      estimatedVehicleJourney.getRecordedCalls() != null &&
-      !estimatedVehicleJourney.getRecordedCalls().getRecordedCalls().isEmpty()
-    ) {
-      date =
-        estimatedVehicleJourney
-          .getRecordedCalls()
-          .getRecordedCalls()
-          .get(0)
-          .getAimedDepartureTime();
-    } else {
-      EstimatedCall firstCall = estimatedVehicleJourney
-        .getEstimatedCalls()
-        .getEstimatedCalls()
-        .get(0);
-      date = firstCall.getAimedDepartureTime();
-    }
-
-    if (date == null) {
-      return null;
-    }
-
-    return date.toLocalDate();
-  }
-
-  private int calculateSecondsSinceMidnight(ZonedDateTime dateTime) {
-    return ServiceDateUtils.secondsSinceStartOfService(dateTime, dateTime, timeZone);
   }
 
   private int calculateSecondsSinceMidnight(ZonedDateTime startOfService, ZonedDateTime dateTime) {
