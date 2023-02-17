@@ -60,7 +60,7 @@ public class SmokeTest {
    * before the expiration date of the old one.
    */
   public static LocalDate nextMonday() {
-    var today = LocalDate.now();
+    var today = LocalDate.now().plusWeeks(1);
     return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
   }
 
@@ -101,7 +101,7 @@ public class SmokeTest {
     var otpResponse = RestClient.sendPlanRequest(request);
     var itineraries = otpResponse.getPlan().itineraries;
 
-    assertTrue(itineraries.size() >= 1);
+    assertTrue(itineraries.size() >= 1, "Expected to see some itineraries but got zero.");
 
     assertThatItineraryHasModes(itineraries, expectedModes);
   }

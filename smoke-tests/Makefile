@@ -24,11 +24,8 @@ denver/gtfs.zip:
 septa/osm.pbf:
 	${CURL} http://osm.ibi-transit.com/vex/39.85441086976069,-75.29136657714844,40.0433862595006,-75.06202697753906.pbf -o $@
 
-septa/bus.gtfs.zip:
-	${CURL} https://www3.septa.org/developer/google_bus.zip -o $@
-
-septa/gtfs.zip: septa/bus.gtfs.zip
-	${CURL} https://www3.septa.org/developer/google_rail.zip  -o $@
+septa/gtfs.zip:
+	echo "Downloaded by OTP"
 
 portland/osm.pbf:
 	${CURL} http://osm.ibi-transit.com/vex/45.424388,-122.885443,45.684746,-122.44084.pbf -o $@

@@ -2,12 +2,12 @@
   "transitFeeds": [
     {
       "type": "gtfs",
-      "source": "gtfs.zip",
+      "source": "https://www3.septa.org/developer/google_rail.zip",
       "feedId": "septa-rail"
     },
     {
       "type": "gtfs",
-      "source": "bus.gtfs.zip",
+      "source": "https://www3.septa.org/developer/google_bus.zip",
       "feedId": "septa-bus"
     }
   ],
