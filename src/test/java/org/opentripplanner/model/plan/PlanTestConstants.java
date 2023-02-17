@@ -2,9 +2,12 @@ package org.opentripplanner.model.plan;
 
 import static org.opentripplanner.framework.time.TimeUtils.time;
 
+import java.util.List;
+import java.util.stream.Stream;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public interface PlanTestConstants {
   int NOT_SET = -999_999;
@@ -71,5 +74,9 @@ public interface PlanTestConstants {
     return Place.forStop(
       TransitModelForTest.stop(name).withCoordinate(lat, lon).addFareZones(zone).build()
     );
+  }
+
+  static List<StopLocation> listStops() {
+    return Stream.of(A, B, C, D, E, F, G, H).map(p -> p.stop).toList();
   }
 }
