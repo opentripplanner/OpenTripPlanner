@@ -10,26 +10,17 @@ public class SiriTransportModeMapper {
    * Maps first SIRI-VehicleMode to OTP-mode
    */
   static TransitMode mapTransitMainMode(List<VehicleModesEnumeration> vehicleModes) {
-    if (vehicleModes != null && !vehicleModes.isEmpty()) {
-      VehicleModesEnumeration vehicleModesEnumeration = vehicleModes.get(0);
-      switch (vehicleModesEnumeration) {
-        case RAIL:
-          return TransitMode.RAIL;
-        case COACH:
-          return TransitMode.COACH;
-        case BUS:
-          return TransitMode.BUS;
-        case METRO:
-        case UNDERGROUND:
-          return TransitMode.SUBWAY;
-        case TRAM:
-          return TransitMode.TRAM;
-        case FERRY:
-          return TransitMode.FERRY;
-        case AIR:
-          return TransitMode.AIRPLANE;
-      }
+    if (vehicleModes == null || vehicleModes.isEmpty()) {
+      return TransitMode.BUS;
     }
-    return TransitMode.BUS;
+    return switch (vehicleModes.get(0)) {
+      case RAIL -> TransitMode.RAIL;
+      case COACH -> TransitMode.COACH;
+      case BUS -> TransitMode.BUS;
+      case METRO, UNDERGROUND -> TransitMode.SUBWAY;
+      case TRAM -> TransitMode.TRAM;
+      case FERRY -> TransitMode.FERRY;
+      case AIR -> TransitMode.AIRPLANE;
+    };
   }
 }
