@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.api.model.ApiRentalStation;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
@@ -49,10 +48,6 @@ public class WalkStep {
   private Boolean stayOn = false;
 
   private List<Edge> edges = new ArrayList<>();
-
-  private ApiRentalStation vehicleRentalOnStation;
-
-  private ApiRentalStation vehicleRentalOffStation;
 
   public WalkStep(
     I18NString streetName,
@@ -228,26 +223,6 @@ public class WalkStep {
 
   public void setEdges(List<Edge> edges) {
     this.edges = edges;
-  }
-
-  /**
-   * The vehicle rental on/off station info. Used only in generating the streetEdges array in
-   * StreetSegment; not serialized.
-   */
-  public ApiRentalStation getVehicleRentalOnStation() {
-    return vehicleRentalOnStation;
-  }
-
-  public void setVehicleRentalOnStation(ApiRentalStation vehicleRentalOnStation) {
-    this.vehicleRentalOnStation = vehicleRentalOnStation;
-  }
-
-  public ApiRentalStation getVehicleRentalOffStation() {
-    return vehicleRentalOffStation;
-  }
-
-  public void setVehicleRentalOffStation(ApiRentalStation vehicleRentalOffStation) {
-    this.vehicleRentalOffStation = vehicleRentalOffStation;
   }
 
   @Override
