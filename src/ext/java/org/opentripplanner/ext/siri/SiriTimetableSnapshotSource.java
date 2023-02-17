@@ -866,18 +866,17 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     LocalDate serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
+    Trip tripMatchedByServiceJourneyId = entityResolver.resolveTrip(estimatedVehicleJourney);
 
-    final Result<UpdateSuccess, List<UpdateError>> successNoWarnings = Result.success(
-      UpdateSuccess.noWarnings()
-    );
     if (serviceDate == null) {
-      return successNoWarnings;
+      var tripId = tripMatchedByServiceJourneyId != null
+        ? tripMatchedByServiceJourneyId.getId()
+        : null;
+      return Result.failure(List.of(new UpdateError(tripId, NO_START_DATE)));
     }
 
     Set<TripTimes> times = new HashSet<>();
     Set<TripPattern> patterns = new HashSet<>();
-
-    Trip tripMatchedByServiceJourneyId = entityResolver.resolveTrip(estimatedVehicleJourney);
 
     if (tripMatchedByServiceJourneyId != null) {
       /*
@@ -1002,7 +1001,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     if (errors.isEmpty()) {
-      return successNoWarnings;
+      return Result.success(UpdateSuccess.noWarnings());
     } else {
       return Result.failure(errors);
     }
