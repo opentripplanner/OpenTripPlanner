@@ -173,7 +173,6 @@ jobs:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
     runs-on: ubuntu-latest
     needs:
-      - build-windows
       - build-linux
     env:
       CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
