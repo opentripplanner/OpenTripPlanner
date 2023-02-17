@@ -278,8 +278,8 @@ public abstract class SnapshotTestBase {
     //  but technically this is not right
     List<MainAndSubMode> transportModes = new ArrayList<>();
     var filter = request.journey().transit().filters().get(0);
-    if (filter instanceof TransitFilterRequest) {
-      transportModes = ((TransitFilterRequest) filter).select().get(0).transportModes();
+    if (filter instanceof TransitFilterRequest filterRequest) {
+      transportModes = filterRequest.select().get(0).transportModes();
     } else if (filter instanceof AllowAllTransitFilter) {
       transportModes = MainAndSubMode.all();
     }

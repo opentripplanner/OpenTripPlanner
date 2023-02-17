@@ -4,7 +4,6 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
-import java.time.Instant;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -64,7 +63,7 @@ public class LegacyGraphQLDepartureRowImpl
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
+    return environment.<LegacyGraphQLRequestContext>getContext().transitService();
   }
 
   private PatternAtStop getSource(DataFetchingEnvironment environment) {
