@@ -486,7 +486,7 @@ public final class TripPattern
    * Helper method for getting the trip headsign from the {@link TripTimes}.
    */
   private I18NString getTripHeadSignFromTripTimes(TripTimes tripTimes) {
-    return tripTimes != null ? tripTimes.getTrip().getHeadsign() : null;
+    return tripTimes != null ? tripTimes.getTripHeadsign() : null;
   }
 
   /**
