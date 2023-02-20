@@ -25,6 +25,8 @@ import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -739,8 +741,13 @@ public abstract class RoutingResource {
           useVehicleParkingAvailabilityInformation,
           parking::setUseAvailabilityInformation
         );
-        //setIfNotNull(bannedVehicleParkingTags, parking::setBannedTags);
-        //setIfNotNull(requiredVehicleParkingTags, parking::setRequiredTags);
+
+        parking.setFilter(
+          new VehicleParkingFilterRequest(
+            List.of(new TagsFilter(bannedVehicleParkingTags)),
+            List.of(new TagsFilter(requiredVehicleParkingTags))
+          )
+        );
       }
 
       setIfNotNull(arriveBy, request::setArriveBy);
