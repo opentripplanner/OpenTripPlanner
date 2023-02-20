@@ -253,18 +253,12 @@ public class RouteRequestMapper {
 
     callWith.argument(
       "parking.filters",
-      (Collection<Map<String, Object>> filters) -> {
-        var f = parseFilters(filters);
-        parking.setFilter(f);
-      }
+      (Collection<Map<String, Object>> filters) -> parking.setFilter(parseFilters(filters))
     );
 
     callWith.argument(
       "parking.preferred",
-      (Collection<Map<String, Object>> filters) -> {
-        var f = parseFilters(filters);
-        parking.setPreferred(f);
-      }
+      (Collection<Map<String, Object>> filters) -> parking.setPreferred(parseFilters(filters))
     );
 
     callWith.argument(

@@ -48,26 +48,10 @@ class RouteRequestMapperTest implements PlanTestConstants {
   }
 
   @Test
-  void preferredVehicleParkingTags() {
-    var query =
-      """
-      query {
-        plan(
-          parking: {
-            filters: { not : { tags: ["wheelbender"] }},
-          }
-        ) {
-          itineraries {
-            duration
-          }
-        }
-      }
-      
-      """;
-
+  void parkingFilters() {
     ExecutionInput executionInput = ExecutionInput
       .newExecutionInput()
-      .query(query)
+      .query("")
       .operationName("plan")
       .context(context)
       .locale(Locale.ENGLISH)
@@ -91,7 +75,9 @@ class RouteRequestMapperTest implements PlanTestConstants {
             "select",
             List.of(Map.of("tags", List.of("roof", "locker")))
           )
-        )
+        ),
+        "preferred",
+        List.of(Map.of("select", List.of(Map.of("tags", List.of("a", "b")))))
       )
     );
 
@@ -108,6 +94,10 @@ class RouteRequestMapperTest implements PlanTestConstants {
     assertEquals(
       "VehicleParkingFilterRequest{not: [tags=[wheelbender]], select: [tags=[locker, roof]]}",
       parking.filter().toString()
+    );
+    assertEquals(
+      "VehicleParkingFilterRequest{select: [tags=[a, b]]}",
+      parking.preferred().toString()
     );
     assertEquals(555, parking.unpreferredCost());
   }
