@@ -61,7 +61,7 @@ public class SelectRequest implements Serializable {
 
     if (!groupOfRoutes.isEmpty()) {
       var ids = new ArrayList<FeedScopedId>();
-      for (var gor : route.getGroupsOfRoutes()) {
+      for (var gor : tripPattern.getRoute().getGroupsOfRoutes()) {
         ids.add(gor.getId());
       }
 

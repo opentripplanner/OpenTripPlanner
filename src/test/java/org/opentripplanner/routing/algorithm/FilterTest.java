@@ -16,6 +16,7 @@ import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -706,9 +707,16 @@ public class FilterTest {
 
   @Test
   public void testGroupOfLinesSelectFunctionality() {
-    var routes = List.of(
-      TransitModelForTest.route(ROUTE_ID_1).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1)).build(),
-      TransitModelForTest.route(ROUTE_ID_2).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2)).build()
+    var route1 = TransitModelForTest.route(ROUTE_ID_1).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1)).build();
+    var route2 = TransitModelForTest.route(ROUTE_ID_2).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2)).build();
+
+    var patterns = List.of(
+      TransitModelForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+        .withStopPattern(STOP_PATTERN)
+        .build(),
+      TransitModelForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+        .withStopPattern(STOP_PATTERN)
+        .build()
     );
 
     var filter = TransitFilterRequest
@@ -721,17 +729,24 @@ public class FilterTest {
       )
       .build();
 
-    var bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(List.of(filter), routes);
+    Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filter), patterns);
 
-    assertEquals(1, bannedRoutes.size());
-    assertTrue(bannedRoutes.contains(id(ROUTE_ID_2)));
+    assertEquals(1, bannedPatterns.size());
+    assertTrue(bannedPatterns.contains(id(JOURNEY_PATTERN_ID_2)));
   }
 
   @Test
   public void testGroupOfLinesExcludeFunctionality() {
-    var routes = List.of(
-      TransitModelForTest.route(ROUTE_ID_1).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1)).build(),
-      TransitModelForTest.route(ROUTE_ID_2).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2)).build()
+    var route1 = TransitModelForTest.route(ROUTE_ID_1).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1)).build();
+    var route2 = TransitModelForTest.route(ROUTE_ID_2).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2)).build();
+
+    var patterns = List.of(
+      TransitModelForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+        .withStopPattern(STOP_PATTERN)
+        .build(),
+      TransitModelForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+        .withStopPattern(STOP_PATTERN)
+        .build()
     );
 
     var filter = TransitFilterRequest
@@ -744,9 +759,9 @@ public class FilterTest {
       )
       .build();
 
-    var bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(List.of(filter), routes);
+    Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filter), patterns);
 
-    assertEquals(1, bannedRoutes.size());
-    assertTrue(bannedRoutes.contains(id(ROUTE_ID_1)));
+    assertEquals(1, bannedPatterns.size());
+    assertTrue(bannedPatterns.contains(id(JOURNEY_PATTERN_ID_1)));
   }
 }
