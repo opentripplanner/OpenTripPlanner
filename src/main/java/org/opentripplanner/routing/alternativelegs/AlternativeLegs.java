@@ -53,6 +53,7 @@ public class AlternativeLegs {
       searchBackward,
       filter,
       false,
+      false,
       false
     );
   }
@@ -83,7 +84,8 @@ public class AlternativeLegs {
     boolean searchBackward,
     AlternativeLegsFilter filter,
     boolean exactOriginStop,
-    boolean exactDestinationStop
+    boolean exactDestinationStop,
+    boolean onlyFirstDestinationStop
   ) {
     StopLocation fromStop = leg.getFrom().stop;
     StopLocation toStop = leg.getTo().stop;
@@ -114,7 +116,10 @@ public class AlternativeLegs {
       .flatMap(stop -> transitService.getPatternsForStop(stop, true).stream())
       .filter(tripPattern -> tripPattern.getStops().stream().anyMatch(destinations::contains))
       .filter(tripPatternPredicate)
-      .flatMap(tripPattern -> withBoardingAlightingPositions(origins, destinations, tripPattern))
+      .distinct()
+      .flatMap(tripPattern ->
+        withBoardingAlightingPositions(origins, destinations, tripPattern, onlyFirstDestinationStop)
+      )
       .flatMap(t ->
         generateLegs(transitService, t, leg.getStartTime(), leg.getServiceDate(), searchBackward)
       )
@@ -247,7 +252,8 @@ public class AlternativeLegs {
   private static Stream<TripPatternBetweenStops> withBoardingAlightingPositions(
     Collection<StopLocation> origins,
     Collection<StopLocation> destinations,
-    TripPattern tripPattern
+    TripPattern tripPattern,
+    boolean onlyFirstDestinationStop
   ) {
     List<StopLocation> stops = tripPattern.getStops();
 
@@ -256,6 +262,7 @@ public class AlternativeLegs {
       .iterate(stops.size() - 1, i -> i - 1)
       .limit(stops.size())
       .filter(i -> destinations.contains(stops.get(i)) && tripPattern.canAlight(i))
+      .limit(onlyFirstDestinationStop ? 1 : destinations.size())
       .toArray();
 
     // Find out all boarding positions
