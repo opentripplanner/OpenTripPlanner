@@ -5,8 +5,6 @@ import static org.opentripplanner.ConstantsForTests.buildNewPortlandGraph;
 import static org.opentripplanner.transit.speed_test.model.SpeedTestProfile.best_time;
 import static org.opentripplanner.transit.speed_test.model.SpeedTestProfile.best_time_reverse;
 import static org.opentripplanner.transit.speed_test.model.SpeedTestProfile.min_travel_duration;
-import static org.opentripplanner.transit.speed_test.model.SpeedTestProfile.min_travel_duration_best_time;
-import static org.opentripplanner.transit.speed_test.model.SpeedTestProfile.min_travel_duration_best_time_reverse;
 import static org.opentripplanner.transit.speed_test.model.SpeedTestProfile.min_travel_duration_reverse;
 import static org.opentripplanner.transit.speed_test.model.SpeedTestProfile.multi_criteria;
 import static org.opentripplanner.transit.speed_test.model.SpeedTestProfile.multi_criteria_destination;
@@ -77,16 +75,6 @@ public class SpeedIntegrationTest {
   @Test
   void runMinTravelDurationReverse() {
     runProfile(min_travel_duration_reverse);
-  }
-
-  @Test
-  void runMinTravelDurationBestTime() {
-    runProfile(min_travel_duration_best_time);
-  }
-
-  @Test
-  void runMinTravelDurationBestTimeReverse() {
-    runProfile(min_travel_duration_best_time_reverse);
   }
 
   @Test

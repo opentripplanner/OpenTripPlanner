@@ -57,6 +57,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   protected final LocalDate serviceDate;
   protected final ZoneId zoneId;
   private double distanceMeters;
+  private double directDistanceMeters;
   private final Float accessibilityScore;
 
   public ScheduledTransitLeg(
@@ -99,6 +100,13 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
     setDistanceMeters(getDistanceFromCoordinates(transitLegCoordinates));
+    this.directDistanceMeters =
+      getDistanceFromCoordinates(
+        List.of(
+          transitLegCoordinates.get(0),
+          transitLegCoordinates.get(transitLegCoordinates.size() - 1)
+        )
+      );
   }
 
   public ZoneId getZoneId() {
@@ -213,6 +221,10 @@ public class ScheduledTransitLeg implements TransitLeg {
   /** Only for testing purposes */
   protected void setDistanceMeters(double distanceMeters) {
     this.distanceMeters = DoubleUtils.roundTo2Decimals(distanceMeters);
+  }
+
+  public double getDirectDistanceMeters() {
+    return directDistanceMeters;
   }
 
   @Override

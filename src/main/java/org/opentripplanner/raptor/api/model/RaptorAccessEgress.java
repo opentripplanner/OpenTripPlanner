@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.api.model;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DurationUtils;
 
 /**
@@ -25,6 +26,9 @@ public interface RaptorAccessEgress {
    * <p>
    * This method is called many times, so care needs to be taken that the value is stored, not
    * calculated for each invocation.
+   * <p>
+   * If this is {@link #isFree()}, then this method must return
+   * {@link org.opentripplanner.raptor.api.RaptorConstants#ZERO_COST}.
    */
   int generalizedCost();
 
@@ -48,7 +52,7 @@ public interface RaptorAccessEgress {
    * when the access path can't start immediately, but have to wait for a vehicle arriving. Also DRT
    * systems or bike shares can have operation time limitations.
    * <p>
-   * Returns {@link org.opentripplanner.raptor.api.request.SearchParams#TIME_NOT_SET} if transfer
+   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible after the requested departure time.
    */
   default int earliestDepartureTime(int requestedDepartureTime) {
@@ -59,7 +63,7 @@ public interface RaptorAccessEgress {
    * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares where
    * they can have operation time limitations.
    * <p>
-   * Returns {@link org.opentripplanner.raptor.api.request.SearchParams#TIME_NOT_SET} if transfer
+   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible before the requested arrival time.
    */
   default int latestArrivalTime(int requestedArrivalTime) {
@@ -72,12 +76,21 @@ public interface RaptorAccessEgress {
    */
   boolean hasOpeningHours();
 
+  /**
+   * Return the opening hours in a short human-readable way. Do not parse this, this should
+   * only be used for things like debugging and logging.
+   * <p>
+   * This method return {@code null} if there is no opening hours, see {@link #hasOpeningHours()}.
+   */
+  @Nullable
+  String openingHoursToString();
+
   /*
        ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS
 
-       The methods below should be only overridden when a RaptorTransfer contains information about
-       public services, which were generated outside the RAPTOR algorithm. Examples of such schemes
-       include flexible transit service and TNC. They should not be used for regular
+       The methods below should be only overridden when a RaptorAccessEgress contains information
+       about public services, which were generated outside the RAPTOR algorithm. Examples of such
+       schemes include flexible transit service and TNC. They should not be used for regular
        access/transfer/egress.
     */
 
@@ -120,7 +133,7 @@ public interface RaptorAccessEgress {
   }
 
   /**
-   * Is this {@link RaptorTransfer} is connected to the given {@code stop} directly by
+   * Is this {@link RaptorAccessEgress} is connected to the given {@code stop} directly by
    * <b>transit</b>? For access and egress paths we allow plugging in flexible transit and other
    * means of transport, which might include one or more legs onboard a vehicle. This method should
    * return {@code true} if the leg connecting to the given stop arrives `onBoard` a public
@@ -134,27 +147,50 @@ public interface RaptorAccessEgress {
   }
 
   /**
+   * Is this {@link RaptorAccessEgress} is connected to the given {@code stop} directly by
+   * <b>walking</b>(or other street mode)? This should be {@code true} if the access/egress
+   * is NOT reached on-board.
+   * @see #stopReachedOnBoard()
+   */
+  default boolean stopReachedByWalking() {
+    return !stopReachedOnBoard();
+  }
+
+  /**
    * Is this access or egress without duration.
    * This commonly refers to:
    * An empty access where you board transit directly at the origin
    * An empty egress where you alight transit directly at the destination
    * @return true if the duration is 0;
    */
-  default boolean isEmpty() {
+  default boolean isFree() {
     return durationInSeconds() == 0;
   }
 
   /** Call this from toString */
-  default String asString() {
-    String duration = DurationUtils.durationToStr(durationInSeconds());
-    return hasRides()
-      ? String.format(
-        "Flex%s %s %dx ~ %d",
-        stopReachedOnBoard() ? "" : "+Walk",
-        duration,
-        numberOfRides(),
-        stop()
-      )
-      : String.format("On-Street %s ~ %d", duration, stop());
+  default String asString(boolean includeStop) {
+    StringBuilder buf = new StringBuilder();
+    if (isFree()) {
+      buf.append("Free");
+    } else if (hasRides()) {
+      buf.append(stopReachedOnBoard() ? "Flex" : "Flex+Walk");
+    } else {
+      // This is not always walking, but inside Raptor we do not care if this is
+      // biking, walking or car - any on street is treated the same. So, for
+      // short easy reading in Raptor tests we use "Walk" instead of "On-Street"
+      // which would be more precise.
+      buf.append("Walk");
+    }
+    buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
+    if (hasRides()) {
+      buf.append(' ').append(numberOfRides()).append('x');
+    }
+    if (hasOpeningHours()) {
+      buf.append(' ').append(openingHoursToString());
+    }
+    if (includeStop) {
+      buf.append(" ~ ").append(stop());
+    }
+    return buf.toString();
   }
 }

@@ -1,12 +1,16 @@
 package org.opentripplanner.raptor._data.transit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.api.request.SearchParams;
 
 /**
  * Simple implementation for {@link RaptorAccessEgress} for use in unit-tests.
@@ -24,9 +28,10 @@ public class TestAccessEgress implements RaptorAccessEgress {
   private final int cost;
   private final int numberOfRides;
   private final boolean stopReachedOnBoard;
-  private final boolean isEmpty;
+  private final boolean free;
   private final Integer opening;
   private final Integer closing;
+  private final boolean closed;
 
   private TestAccessEgress(Builder builder) {
     this.stop = builder.stop;
@@ -34,9 +39,34 @@ public class TestAccessEgress implements RaptorAccessEgress {
     this.cost = builder.cost;
     this.numberOfRides = builder.numberOfRides;
     this.stopReachedOnBoard = builder.stopReachedOnBoard;
-    this.isEmpty = builder.isEmpty;
+    this.free = builder.free;
     this.opening = builder.opening;
     this.closing = builder.closing;
+    this.closed = builder.closed;
+
+    if (free) {
+      assertEquals(0, durationInSeconds);
+    } else {
+      assertTrue(durationInSeconds > 0);
+    }
+    if (closed) {
+      assertNull(opening);
+      assertNull(closing);
+    }
+    assertTrue(numberOfRides >= 0);
+  }
+
+  public static TestAccessEgress free(int stop) {
+    return new Builder(stop, 0).withFree().build();
+  }
+
+  /**
+   * @deprecated A stop can not be both free and have a cost - This is not a valid
+   *             access/egress.
+   */
+  @Deprecated
+  public static TestAccessEgress free(int stop, int cost) {
+    return new Builder(stop, 0).withFree().withCost(cost).build();
   }
 
   public static TestAccessEgress walk(int stop, int durationInSeconds) {
@@ -56,33 +86,6 @@ public class TestAccessEgress implements RaptorAccessEgress {
       .withCost(cost)
       .withNRides(1)
       .stopReachedOnBoard()
-      .build();
-  }
-
-  public static TestAccessEgress zeroDurationAccess(int stop, int cost) {
-    return new Builder(stop, 0).withIsEmpty(true).withCost(cost).build();
-  }
-
-  /**
-   * Creates a walk transfer with time restrictions. opening and closing may be specified as seconds
-   * since the start of "RAPTOR time" to limit the time periods that the access is traversable,
-   * which is repeatead every 24 hours. This allows the access to only be traversable between for
-   * example 08:00 and 16:00 every day.
-   */
-  public static TestAccessEgress walk(int stop, int durationInSeconds, int opening, int closing) {
-    return new Builder(stop, durationInSeconds).withOpeningHours(opening, closing).build();
-  }
-
-  public static TestAccessEgress walk(
-    int stop,
-    int durationInSeconds,
-    int cost,
-    int opening,
-    int closing
-  ) {
-    return new Builder(stop, durationInSeconds)
-      .withCost(cost)
-      .withOpeningHours(opening, closing)
       .build();
   }
 
@@ -143,9 +146,28 @@ public class TestAccessEgress implements RaptorAccessEgress {
     return toRaptorCost(durationInSeconds * reluctance);
   }
 
-  /** Set opening and closing hours and return a new object. */
+  /**
+   * Add opening and closing hours and return a new object.
+   * <p>
+   * Opening and closing is specified as seconds since the start of "RAPTOR time" to limit the
+   * time periods that the access is traversable, which is repeatead every 24 hours. This allows
+   * the access to only be traversable between for example 08:00 and 16:00 every day.
+   */
   public TestAccessEgress openingHours(int opening, int closing) {
-    return new Builder(this).withOpeningHours(opening, closing).build();
+    return copyOf().withOpeningHours(opening, closing).build();
+  }
+
+  /** Alias for {@code openingHours(TimeUtils.time(opening), TimeUtils.time(closing))} */
+  public TestAccessEgress openingHours(String opening, String closing) {
+    return openingHours(TimeUtils.time(opening), TimeUtils.time(closing));
+  }
+
+  public TestAccessEgress openingHoursClosed() {
+    return copyOf().withClosed().build();
+  }
+
+  public Builder copyOf() {
+    return new Builder(this);
   }
 
   @Override
@@ -168,8 +190,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
     if (!hasOpeningHours()) {
       return requestedDepartureTime;
     }
-    if (isClosed()) {
-      return SearchParams.TIME_NOT_SET;
+    if (closed) {
+      return RaptorConstants.TIME_NOT_SET;
     }
 
     int days = Math.floorDiv(requestedDepartureTime, SECONDS_IN_DAY);
@@ -190,8 +212,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
     if (!hasOpeningHours()) {
       return requestedArrivalTime;
     }
-    if (isClosed()) {
-      return -1;
+    if (closed) {
+      return RaptorConstants.TIME_NOT_SET;
     }
 
     // opening & closing is relative to the departure
@@ -212,7 +234,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
 
   @Override
   public boolean hasOpeningHours() {
-    return opening != null || closing != null;
+    return closed || opening != null || closing != null;
   }
 
   @Override
@@ -226,18 +248,30 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   @Override
-  public boolean isEmpty() {
-    return this.isEmpty;
+  public boolean isFree() {
+    return this.free;
+  }
+
+  @Override
+  public String openingHoursToString() {
+    if (!hasOpeningHours()) {
+      return null;
+    }
+    if (closed) {
+      return "closed";
+    }
+    return (
+      "Open(" +
+      TimeUtils.timeToStrCompact(opening) +
+      " " +
+      TimeUtils.timeToStrCompact(closing) +
+      ")"
+    );
   }
 
   @Override
   public String toString() {
-    return asString();
-  }
-
-  /** To specify that the transit is closed use an opening AFTER closing */
-  public boolean isClosed() {
-    return opening > closing;
+    return asString(true);
   }
 
   /**
@@ -253,7 +287,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
     boolean stopReachedOnBoard = STOP_REACHED_ON_FOOT;
     Integer opening = null;
     Integer closing = null;
-    private boolean isEmpty;
+    private boolean free = false;
+    private boolean closed = false;
 
     Builder(int stop, int durationInSeconds) {
       this.stop = stop;
@@ -261,18 +296,21 @@ public class TestAccessEgress implements RaptorAccessEgress {
       this.cost = walkCost(durationInSeconds);
     }
 
-    Builder(TestAccessEgress transfer) {
-      this.stop = transfer.stop;
-      this.durationInSeconds = transfer.durationInSeconds;
-      this.stopReachedOnBoard = transfer.stopReachedOnBoard;
-      this.cost = transfer.cost;
-      this.numberOfRides = transfer.numberOfRides;
-      this.opening = transfer.opening;
-      this.closing = transfer.closing;
+    Builder(TestAccessEgress original) {
+      this.free = original.free;
+      this.stop = original.stop;
+      this.durationInSeconds = original.durationInSeconds;
+      this.stopReachedOnBoard = original.stopReachedOnBoard;
+      this.cost = original.cost;
+      this.numberOfRides = original.numberOfRides;
+      this.opening = original.opening;
+      this.closing = original.closing;
+      this.closed = original.closed;
     }
 
-    Builder withIsEmpty(boolean isEmpty) {
-      this.isEmpty = isEmpty;
+    Builder withFree() {
+      this.free = true;
+      this.durationInSeconds = 0;
       return this;
     }
 
@@ -292,8 +330,25 @@ public class TestAccessEgress implements RaptorAccessEgress {
     }
 
     Builder withOpeningHours(int opening, int closing) {
+      if (opening > closing) {
+        throw new IllegalStateException(
+          "Must open before is close. Opens at " +
+          TimeUtils.timeToStrCompact(opening) +
+          " and close at " +
+          TimeUtils.timeToStrCompact(closing) +
+          "."
+        );
+      }
+      this.closed = false;
       this.opening = opening;
       this.closing = closing;
+      return this;
+    }
+
+    Builder withClosed() {
+      this.opening = null;
+      this.closing = null;
+      this.closed = true;
       return this;
     }
 

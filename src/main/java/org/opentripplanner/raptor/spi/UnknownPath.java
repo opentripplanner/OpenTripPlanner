@@ -117,13 +117,12 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
 
   @Override
   public String toString() {
-    return new PathStringBuilder(null)
-      .append("[")
-      .time(startTime(), endTime())
-      .duration(durationInSeconds())
-      .space()
-      .append(numberOfTransfers + "tx")
-      .append("]")
-      .toString();
+    PathStringBuilder pathBuilder = new PathStringBuilder(null);
+    if (departureTime == 0 && arrivalTime == 0) {
+      pathBuilder.summary(generalizedCost());
+    } else {
+      pathBuilder.summary(startTime(), endTime(), numberOfTransfers, generalizedCost());
+    }
+    return pathBuilder.toString();
   }
 }

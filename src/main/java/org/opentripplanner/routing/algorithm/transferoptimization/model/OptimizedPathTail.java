@@ -7,10 +7,10 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.path.PathBuilder;
+import org.opentripplanner.raptor.path.PathBuilderLeg;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.raptor.spi.CostCalculator;
-import org.opentripplanner.raptor.spi.PathBuilder;
-import org.opentripplanner.raptor.spi.PathBuilderLeg;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimized;
@@ -45,7 +45,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     double extraStopBoardAlightCostsFactor,
     RaptorStopNameResolver stopNameResolver
   ) {
-    super(null, slackProvider, costCalculator, stopNameResolver);
+    super(slackProvider, costCalculator, stopNameResolver, null);
     this.waitTimeCostCalculator = waitTimeCostCalculator;
     this.stopPriorityCostCalculator =
       (stopBoardAlightCosts != null && extraStopBoardAlightCostsFactor > 0.01)
@@ -126,7 +126,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   @Override
   public OptimizedPath<T> build(int iterationDepartureTime) {
     return new OptimizedPath<>(
-      createPathLegs(costCalculator, slackProvider),
+      createPathLegs(costCalculator(), slackProvider()),
       iterationDepartureTime,
       generalizedCost,
       transferPriorityCost,
@@ -152,7 +152,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   protected void add(PathBuilderLeg<T> newLeg) {
     addHead(newLeg);
     // Keep from- and to- times up to date by time-shifting access, transfer and egress legs.
-    newLeg.timeShiftThisAndNextLeg(slackProvider);
+    newLeg.timeShiftThisAndNextLeg(slackProvider());
     addTransferPriorityCost(newLeg);
     addOptimizedWaitTimeCost(newLeg);
     updateGeneralizedCost();
@@ -202,7 +202,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
       return;
     }
     this.generalizedCost =
-      legsAsStream().mapToInt(it -> it.generalizedCost(costCalculator, slackProvider)).sum();
+      legsAsStream().mapToInt(it -> it.generalizedCost(costCalculator(), slackProvider())).sum();
   }
 
   /*private methods */

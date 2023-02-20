@@ -63,7 +63,7 @@ class OptimizedPathTest implements RaptorTestConstants {
     assertEquals(transferPriorityCost, path.transferPriorityCost());
 
     var exp = BasicPathTestCase.BASIC_PATH_AS_STRING.replace(
-      "$8184]",
+      "$8154]",
       "$8811 $1201pri " + "$" + (generalizedCostWaitTimeOptimized / 100) + "wtc]"
     );
 

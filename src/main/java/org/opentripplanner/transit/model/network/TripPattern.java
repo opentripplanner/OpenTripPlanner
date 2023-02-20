@@ -18,6 +18,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -61,6 +62,8 @@ public final class TripPattern
   private final StopPattern stopPattern;
   private final Timetable scheduledTimetable;
   private final TransitMode mode;
+  private final SubMode netexSubMode;
+  private final boolean containsMultipleModes;
   private String name;
   /**
    * Geometries of each inter-stop segment of the tripPattern.
@@ -86,6 +89,8 @@ public final class TripPattern
     this.stopPattern = requireNonNull(builder.getStopPattern());
     this.createdByRealtimeUpdater = builder.isCreatedByRealtimeUpdate();
     this.mode = requireNonNullElseGet(builder.getMode(), route::getMode);
+    this.netexSubMode = requireNonNullElseGet(builder.getNetexSubmode(), route::getNetexSubmode);
+    this.containsMultipleModes = builder.getContainsMultipleModes();
 
     this.scheduledTimetable =
       builder.getScheduledTimetable() != null
@@ -123,6 +128,14 @@ public final class TripPattern
    */
   public TransitMode getMode() {
     return mode;
+  }
+
+  public SubMode getNetexSubmode() {
+    return netexSubMode;
+  }
+
+  public boolean getContainsMultipleModes() {
+    return containsMultipleModes;
   }
 
   public LineString getHopGeometry(int stopPosInPattern) {
@@ -442,6 +455,8 @@ public final class TripPattern
       getId().equals(other.getId()) &&
       Objects.equals(this.route, other.route) &&
       Objects.equals(this.mode, other.mode) &&
+      Objects.equals(this.netexSubMode, other.netexSubMode) &&
+      Objects.equals(this.containsMultipleModes, other.containsMultipleModes) &&
       Objects.equals(this.name, other.name) &&
       Objects.equals(this.stopPattern, other.stopPattern) &&
       Objects.equals(this.scheduledTimetable, other.scheduledTimetable)
