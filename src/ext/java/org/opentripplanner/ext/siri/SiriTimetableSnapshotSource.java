@@ -741,6 +741,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
     }
 
+    if (datedServiceJourneyId == null) {
+      return;
+    }
+
     List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
 
     // VehicleJourneyRef is the reference to the serviceJourney being replaced.
