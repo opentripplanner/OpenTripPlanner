@@ -12,7 +12,6 @@ import static org.opentripplanner.model.UpdateSuccess.WarningType.NOT_MONITORED;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -50,14 +49,10 @@ import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.EstimatedVersionFrameStructure;
-import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
-import uk.org.siri.siri20.NaturalLanguageStringStructure;
+import uk.org.siri.siri20.LineRef;
 import uk.org.siri.siri20.OperatorRefStructure;
 import uk.org.siri.siri20.RecordedCall;
-import uk.org.siri.siri20.VehicleActivityCancellationStructure;
-import uk.org.siri.siri20.VehicleActivityStructure;
 import uk.org.siri.siri20.VehicleJourneyRef;
-import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
 import uk.org.siri.siri20.VehicleRef;
 
 /**
@@ -69,7 +64,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriTimetableSnapshotSource.class);
 
-  private static boolean keepLogging = true;
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
    * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
@@ -156,93 +150,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     return snapshotToReturn;
-  }
-
-  /**
-   * Method to apply a trip update list to the most recent version of the timetable snapshot.
-   *
-   * @param transitModel transitModel to update (needed for adding/changing stop patterns)
-   * @param fullDataset  true if the list with updates represent all updates that are active right
-   *                     now, i.e. all previous updates should be disregarded
-   * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
-   */
-  public void applyVehicleMonitoring(
-    TransitModel transitModel,
-    @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
-    EntityResolver entityResolver,
-    String feedId,
-    boolean fullDataset,
-    List<VehicleMonitoringDeliveryStructure> updates
-  ) {
-    if (updates == null) {
-      LOG.warn("updates is null");
-      return;
-    }
-
-    // Acquire lock on buffer
-    bufferLock.lock();
-
-    try {
-      if (fullDataset) {
-        // Remove all updates from the buffer
-        buffer.clear(feedId);
-      }
-
-      for (VehicleMonitoringDeliveryStructure vmDelivery : updates) {
-        LocalDate serviceDate = LocalDate.now(timeZone);
-
-        List<VehicleActivityStructure> activities = vmDelivery.getVehicleActivities();
-        if (activities != null) {
-          //Handle activities
-          LOG.info("Handling {} VM-activities.", activities.size());
-          int handledCounter = 0;
-          int skippedCounter = 0;
-          for (VehicleActivityStructure activity : activities) {
-            boolean handled = handleModifiedTrip(
-              transitModel,
-              fuzzyTripMatcher,
-              activity,
-              serviceDate,
-              entityResolver
-            );
-            if (handled) {
-              handledCounter++;
-            } else {
-              skippedCounter++;
-            }
-          }
-          LOG.info("Applied {} VM-activities, skipped {}.", handledCounter, skippedCounter);
-        }
-        List<VehicleActivityCancellationStructure> cancellations = vmDelivery.getVehicleActivityCancellations();
-        if (cancellations != null && !cancellations.isEmpty()) {
-          //Handle cancellations
-          LOG.info("TODO: Handle {} cancellations.", cancellations.size());
-        }
-
-        List<NaturalLanguageStringStructure> notes = vmDelivery.getVehicleActivityNotes();
-        if (notes != null && !notes.isEmpty()) {
-          //Handle notes
-          LOG.info("TODO: Handle {} notes.", notes.size());
-        }
-      }
-
-      // Make a snapshot after each message in anticipation of incoming requests
-      // Purge data if necessary (and force new snapshot if anything was purged)
-      // Make sure that the public (locking) getTimetableSnapshot function is not called.
-      if (purgeExpiredData) {
-        final boolean modified = purgeExpiredData();
-        getTimetableSnapshot(modified);
-      } else {
-        getTimetableSnapshot(false);
-      }
-    } finally {
-      // Always release lock
-      bufferLock.unlock();
-      if (keepLogging) {
-        LOG.info("Reducing SIRI-VM logging until restart");
-        keepLogging = false;
-      }
-    }
   }
 
   /**
@@ -378,111 +285,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
     }
     return snapshot;
-  }
-
-  private boolean handleModifiedTrip(
-    TransitModel transitModel,
-    SiriFuzzyTripMatcher fuzzyTripMatcher,
-    VehicleActivityStructure activity,
-    LocalDate serviceDate,
-    EntityResolver entityResolver
-  ) {
-    if (activity.getValidUntilTime().isBefore(ZonedDateTime.now())) {
-      //Activity has expired
-      return false;
-    }
-
-    MonitoredVehicleJourneyStructure monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
-    if (
-      monitoredVehicleJourney == null ||
-      monitoredVehicleJourney.getVehicleRef() == null ||
-      monitoredVehicleJourney.getLineRef() == null
-    ) {
-      //No vehicle reference or line reference
-      return false;
-    }
-
-    Boolean isMonitored = monitoredVehicleJourney.isMonitored();
-    if (isMonitored != null && !isMonitored) {
-      //Vehicle is reported as NOT monitored
-      return false;
-    }
-
-    Trip trip = entityResolver.resolveTrip(monitoredVehicleJourney);
-    if (trip == null) {
-      trip = fuzzyTripMatcher.match(monitoredVehicleJourney, entityResolver);
-    }
-
-    if (trip == null) {
-      if (keepLogging) {
-        String lineRef =
-          (
-            monitoredVehicleJourney.getLineRef() != null
-              ? monitoredVehicleJourney.getLineRef().getValue()
-              : null
-          );
-        String vehicleRef =
-          (
-            monitoredVehicleJourney.getVehicleRef() != null
-              ? monitoredVehicleJourney.getVehicleRef().getValue()
-              : null
-          );
-        String tripId =
-          (
-            monitoredVehicleJourney.getCourseOfJourneyRef() != null
-              ? monitoredVehicleJourney.getCourseOfJourneyRef().getValue()
-              : null
-          );
-        LOG.debug(
-          "No trip found for [isMonitored={}, lineRef={}, vehicleRef={}, tripId={}], skipping VehicleActivity.",
-          isMonitored,
-          lineRef,
-          vehicleRef,
-          tripId
-        );
-      }
-
-      return false;
-    }
-
-    final Set<TripPattern> patterns = getPatternsForTrip(Set.of(trip), monitoredVehicleJourney);
-
-    if (patterns == null) {
-      return false;
-    }
-    boolean success = false;
-    for (TripPattern pattern : patterns) {
-      if (handleTripPatternUpdate(transitModel, pattern, activity, trip, serviceDate).isSuccess()) {
-        success = true;
-      }
-    }
-
-    if (!success) {
-      LOG.info("Pattern not updated for trip {}", trip.getId());
-    }
-    return success;
-  }
-
-  private Result<?, UpdateError> handleTripPatternUpdate(
-    TransitModel transitModel,
-    TripPattern pattern,
-    VehicleActivityStructure activity,
-    Trip trip,
-    LocalDate serviceDate
-  ) {
-    // Apply update on the *scheduled* timetable and set the updated trip times in the buffer
-    Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
-    var result = createUpdatedTripTimes(
-      currentTimetable,
-      activity,
-      trip.getId(),
-      transitModel::getStopLocationById
-    );
-    if (result.isFailure()) {
-      return result;
-    } else {
-      return buffer.update(pattern, result.successValue(), serviceDate);
-    }
   }
 
   /**
@@ -843,81 +645,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return buffer.purgeExpiredData(previously);
   }
 
-  private Set<TripPattern> getPatternsForTrip(
-    Set<Trip> matches,
-    MonitoredVehicleJourneyStructure monitoredVehicleJourney
-  ) {
-    if (monitoredVehicleJourney.getOriginRef() == null) {
-      return null;
-    }
-
-    ZonedDateTime date = monitoredVehicleJourney.getOriginAimedDepartureTime();
-    if (date == null) {
-      //If no date is set - assume Realtime-data is reported for 'today'.
-      date = ZonedDateTime.now(timeZone);
-    }
-    LocalDate realTimeReportedServiceDate = date.toLocalDate();
-
-    Set<TripPattern> patterns = new HashSet<>();
-    for (Trip currentTrip : matches) {
-      TripPattern tripPattern = transitService.getPatternForTrip(currentTrip);
-      Set<LocalDate> serviceDates = transitService
-        .getCalendarService()
-        .getServiceDatesForServiceId(currentTrip.getServiceId());
-
-      if (!serviceDates.contains(realTimeReportedServiceDate)) {
-        // Current trip has no service on the date of the 'MonitoredVehicleJourney'
-        continue;
-      }
-
-      var firstStop = tripPattern.getStop(0);
-      var lastStop = tripPattern.lastStop();
-
-      String siriOriginRef = monitoredVehicleJourney.getOriginRef().getValue();
-
-      if (monitoredVehicleJourney.getDestinationRef() != null) {
-        String siriDestinationRef = monitoredVehicleJourney.getDestinationRef().getValue();
-
-        boolean firstStopIsMatch = firstStop.getId().getId().equals(siriOriginRef);
-        boolean lastStopIsMatch = lastStop.getId().getId().equals(siriDestinationRef);
-
-        if (!firstStopIsMatch && firstStop.isPartOfStation()) {
-          var otherFirstStop = transitService.getRegularStop(
-            new FeedScopedId(firstStop.getId().getFeedId(), siriOriginRef)
-          );
-          firstStopIsMatch = firstStop.isPartOfSameStationAs(otherFirstStop);
-        }
-
-        if (!lastStopIsMatch && lastStop.isPartOfStation()) {
-          var otherLastStop = transitService.getRegularStop(
-            new FeedScopedId(lastStop.getId().getFeedId(), siriDestinationRef)
-          );
-          lastStopIsMatch = lastStop.isPartOfSameStationAs(otherLastStop);
-        }
-
-        if (firstStopIsMatch & lastStopIsMatch) {
-          // Origin and destination matches
-          TripPattern realtimeAddedTripPattern = buffer.getRealtimeAddedTripPattern(
-            currentTrip.getId(),
-            realTimeReportedServiceDate
-          );
-          if (realtimeAddedTripPattern != null) {
-            patterns.add(realtimeAddedTripPattern);
-          } else {
-            patterns.add(tripPattern);
-          }
-        }
-      } else {
-        //Match origin only - since destination is not defined
-        if (firstStop.getId().getId().equals(siriOriginRef)) {
-          tripPattern.getScheduledTimetable().getTripTimes().get(0).getDepartureTime(0); // TODO does this line do anything?
-          patterns.add(tripPattern);
-        }
-      }
-    }
-    return patterns;
-  }
-
   private TripPattern getPatternForTrip(Trip trip, EstimatedVehicleJourney journey) {
     Set<LocalDate> serviceDates = transitService
       .getCalendarService()
@@ -1037,7 +764,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         OperatorRefStructure::getValue
       )
       .addCol("VehicleModes", estimatedVehicleJourney.getVehicleModes())
-      .addStr("Line", estimatedVehicleJourney.getLineRef().getValue())
+      .addObjOp("Line", estimatedVehicleJourney.getLineRef(), LineRef::getValue)
       .addObjOp("Vehicle", estimatedVehicleJourney.getVehicleRef(), VehicleRef::getValue)
       .toString();
   }

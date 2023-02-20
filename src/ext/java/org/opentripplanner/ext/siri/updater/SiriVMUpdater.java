@@ -108,14 +108,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         List<VehicleMonitoringDeliveryStructure> vmds = serviceDelivery.getVehicleMonitoringDeliveries();
         if (vmds != null) {
           saveResultOnGraph.execute((graph, transitModel) -> {
-            snapshotSource.applyVehicleMonitoring(
-              transitModel,
-              siriFuzzyTripMatcher,
-              entityResolver,
-              feedId,
-              fullDataset,
-              vmds
-            );
+            LOG.warn("The SIRI-VM Updater does not currently do anything");
             if (markPrimed) primed = true;
           });
         }

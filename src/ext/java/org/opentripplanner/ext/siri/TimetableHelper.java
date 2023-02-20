@@ -2,12 +2,10 @@ package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -37,12 +35,9 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.CallStatusEnumeration;
 import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
-import uk.org.siri.siri20.MonitoredCallStructure;
-import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.OccupancyEnumeration;
 import uk.org.siri.siri20.RecordedCall;
-import uk.org.siri.siri20.VehicleActivityStructure;
 
 public class TimetableHelper {
 
@@ -391,116 +386,6 @@ public class TimetableHelper {
     }
 
     return modifiedStops;
-  }
-
-  /**
-   * Apply the TripUpdate to the appropriate TripTimes from this Timetable. The existing TripTimes
-   * must not be modified directly because they may be shared with the underlying
-   * scheduledTimetable, or other updated Timetables. The {@link TimetableSnapshot} performs the
-   * protective copying of this Timetable. It is not done in this update method to avoid repeatedly
-   * cloning the same Timetable when several updates are applied to it at once. We assume here that
-   * all trips in a timetable are from the same feed, which should always be the case.
-   *
-   * @param activity SIRI-VM VehicleActivity
-   * @return a Result with a copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
-   * with the id specified in the trip descriptor of the TripUpdate; a failed Result if something went wrong
-   */
-  public static Result<TripTimes, UpdateError> createUpdatedTripTimes(
-    Timetable timetable,
-    VehicleActivityStructure activity,
-    FeedScopedId tripId,
-    Function<FeedScopedId, StopLocation> getStopById
-  ) {
-    if (activity == null) {
-      return Result.failure(new UpdateError(tripId, INVALID_INPUT_STRUCTURE));
-    }
-
-    MonitoredVehicleJourneyStructure mvj = activity.getMonitoredVehicleJourney();
-
-    final TripTimes existingTripTimes = timetable.getTripTimes(tripId);
-    if (existingTripTimes == null) {
-      LOG.trace("tripId {} not found in pattern.", tripId);
-      return Result.failure(new UpdateError(tripId, TRIP_NOT_FOUND_IN_PATTERN));
-    }
-
-    TripTimes newTimes = new TripTimes(existingTripTimes);
-
-    MonitoredCallStructure update = mvj.getMonitoredCall();
-    if (update == null) {
-      return Result.failure(new UpdateError(tripId, INVALID_INPUT_STRUCTURE));
-    }
-
-    MonitoredVehicleJourneyStructure monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
-
-    if (monitoredVehicleJourney != null) {
-      Duration delay = monitoredVehicleJourney.getDelay();
-      int updatedDelay = 0;
-      if (delay != null) {
-        updatedDelay = (int) delay.toSeconds();
-      }
-
-      MonitoredCallStructure monitoredCall = monitoredVehicleJourney.getMonitoredCall();
-      if (monitoredCall != null && monitoredCall.getStopPointRef() != null) {
-        boolean matchFound = false;
-
-        int arrivalDelay = 0;
-        int departureDelay = 0;
-        var pattern = timetable.getPattern();
-
-        for (int index = 0; index < newTimes.getNumStops(); ++index) {
-          if (!matchFound) {
-            // Delay is set on a single stop at a time. When match is found - propagate delay on all following stops
-            final var stop = pattern.getStop(index);
-
-            matchFound = stop.getId().getId().equals(monitoredCall.getStopPointRef().getValue());
-
-            if (!matchFound && stop.isPartOfStation()) {
-              FeedScopedId alternativeId = new FeedScopedId(
-                stop.getId().getFeedId(),
-                monitoredCall.getStopPointRef().getValue()
-              );
-              var alternativeStop = getStopById.apply(alternativeId);
-              if (alternativeStop != null && alternativeStop.isPartOfStation()) {
-                matchFound = stop.isPartOfSameStationAs(alternativeStop);
-              }
-            }
-
-            if (matchFound) {
-              arrivalDelay = departureDelay = updatedDelay;
-            } else {
-              /*
-               * If updated delay is less than previously set delay, the existing delay needs to be adjusted to avoid
-               * non-increasing times causing updates to be rejected. Will only affect historical data.
-               */
-              arrivalDelay = Math.min(existingTripTimes.getArrivalDelay(index), updatedDelay);
-              departureDelay = Math.min(existingTripTimes.getDepartureDelay(index), updatedDelay);
-            }
-          }
-          newTimes.updateArrivalDelay(index, arrivalDelay);
-          newTimes.updateDepartureDelay(index, departureDelay);
-        }
-      }
-    }
-
-    var result = newTimes.validateNonIncreasingTimes();
-    if (result.isFailure()) {
-      var error = result.failureValue();
-      LOG.info(
-        "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
-        timetable.getPattern().getRoute().getId(),
-        tripId,
-        error.stopIndex()
-      );
-      return Result.failure(error);
-    }
-
-    //If state is already MODIFIED - keep existing state
-    if (newTimes.getRealTimeState() != RealTimeState.MODIFIED) {
-      // Make sure that updated trip times have the correct real time state
-      newTimes.setRealTimeState(RealTimeState.UPDATED);
-    }
-
-    return Result.success(newTimes);
   }
 
   /**
