@@ -1,12 +1,10 @@
 package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
 import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_TRIP_ID;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 import static org.opentripplanner.model.UpdateSuccess.WarningType.NOT_MONITORED;
 
@@ -386,12 +384,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return updateResult.toFailureResult();
     }
 
-    var tripTimes = updateResult.successValue();
+    var tripTimes = updateResult.successValue().times();
+    var stopPattern = updateResult.successValue().pattern();
 
-    if (tripTimes.getNumStops() != pattern.numberOfStops()) {
-      LOG.debug("Ignoring update since number of stops do not match");
-      return UpdateError.result(trip.getId(), TOO_FEW_STOPS);
-    }
     // All tripTimes should be handled the same way to always allow latest realtime-update to
     // replace previous update regardless of realtimestate
     markScheduledTripAsDeleted(trip, serviceDate);
@@ -399,11 +394,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     // Also check whether trip id has been used for previously ADDED/MODIFIED trip message and
     // remove the previously created trip
     removePreviousRealtimeUpdate(trip, serviceDate);
-
-    // TODO: Create just the stop pattern here, this is duplicated work
-    StopPattern stopPattern = new StopPattern(
-      createModifiedStopTimes(pattern, tripTimes, estimatedVehicleJourney, getStopLocationById)
-    );
 
     // Add new trip
     var result = addTripToGraphAndBuffer(

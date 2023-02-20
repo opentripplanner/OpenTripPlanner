@@ -4,7 +4,6 @@ import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -26,6 +25,7 @@ import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
+import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -53,7 +53,7 @@ public class TimetableHelper {
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
-  public static Result<TripTimes, UpdateError> createUpdatedTripTimes(
+  public static Result<TripTimesAndStopPattern, UpdateError> createUpdatedTripTimes(
     Timetable timetable,
     EstimatedVehicleJourney journey,
     FeedScopedId tripId,
@@ -72,7 +72,9 @@ public class TimetableHelper {
 
     if (journey.isCancellation() != null && journey.isCancellation()) {
       oldTimes.cancelTrip();
-      return Result.success(oldTimes);
+      return Result.success(
+        new TripTimesAndStopPattern(oldTimes, timetable.getPattern().getStopPattern())
+      );
     }
 
     boolean stopPatternChanged = false;
@@ -194,7 +196,9 @@ public class TimetableHelper {
     }
 
     LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
-    return Result.success(newTimes);
+    return Result.success(
+      new TripTimesAndStopPattern(newTimes, new StopPattern(modifiedStopTimes))
+    );
   }
 
   /**
