@@ -4,9 +4,20 @@ import com.google.common.collect.Sets;
 import java.util.Set;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
+/**
+ * A set of conditions that can be used to check if a parking facility should be included/excluded
+ * or preferred/unpreferred.
+ */
 public sealed interface VehicleParkingFilter {
+  /**
+   * Checks if the parking facilities matches the conditions of the filter.
+   */
   boolean matches(VehicleParking p);
-  int size();
+
+  /**
+   * Whether this filter defines any condition.
+   */
+  boolean isEmpty();
 
   record TagsFilter(Set<String> tags) implements VehicleParkingFilter {
     @Override
@@ -15,8 +26,8 @@ public sealed interface VehicleParkingFilter {
     }
 
     @Override
-    public int size() {
-      return tags.size();
+    public boolean isEmpty() {
+      return tags.isEmpty();
     }
 
     @Override

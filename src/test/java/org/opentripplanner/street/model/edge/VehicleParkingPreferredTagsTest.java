@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.edge;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.of;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -85,11 +86,10 @@ class VehicleParkingPreferredTagsTest {
     var edge = new VehicleParkingEdge(fromV);
 
     var parkingReq = new VehicleParkingRequest();
-    parkingReq.setPreferred(
-      VehicleParkingFilterRequest.select(
-        List.of(new VehicleParkingFilter.TagsFilter(preferredTags))
-      )
+    Collection<VehicleParkingFilter> select = List.of(
+      new VehicleParkingFilter.TagsFilter(preferredTags)
     );
+    parkingReq.setPreferred(new VehicleParkingFilterRequest(List.of(), select));
     parkingReq.setUnpreferredCost(EXTRA_COST);
 
     var req = StreetSearchRequest.of();
