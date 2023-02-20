@@ -707,14 +707,22 @@ public class FilterTest {
 
   @Test
   public void testGroupOfLinesSelectFunctionality() {
-    var route1 = TransitModelForTest.route(ROUTE_ID_1).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1)).build();
-    var route2 = TransitModelForTest.route(ROUTE_ID_2).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2)).build();
+    var route1 = TransitModelForTest
+      .route(ROUTE_ID_1)
+      .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1))
+      .build();
+    var route2 = TransitModelForTest
+      .route(ROUTE_ID_2)
+      .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2))
+      .build();
 
     var patterns = List.of(
-      TransitModelForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitModelForTest
+        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TransitModelForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitModelForTest
+        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
@@ -737,14 +745,22 @@ public class FilterTest {
 
   @Test
   public void testGroupOfLinesExcludeFunctionality() {
-    var route1 = TransitModelForTest.route(ROUTE_ID_1).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1)).build();
-    var route2 = TransitModelForTest.route(ROUTE_ID_2).withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2)).build();
+    var route1 = TransitModelForTest
+      .route(ROUTE_ID_1)
+      .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1))
+      .build();
+    var route2 = TransitModelForTest
+      .route(ROUTE_ID_2)
+      .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2))
+      .build();
 
     var patterns = List.of(
-      TransitModelForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TransitModelForTest
+        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TransitModelForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TransitModelForTest
+        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
