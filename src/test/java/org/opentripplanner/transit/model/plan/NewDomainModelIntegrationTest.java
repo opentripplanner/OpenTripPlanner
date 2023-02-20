@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.trip.TripOnDay;
 public class NewDomainModelIntegrationTest implements RaptorTestConstants {
 
   private static final String EXP_PATH =
-    "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s " + "[0:00:30 0:05:20 4m50s 0tx";
+    "Walk 30s ~ B ~ BUS R1 0:03 0:08 ~ D ~ Walk 20s " + "[0:00:30 0:08:20 7m50s 0tx";
   private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
   private static final String EXP_PATH_WITH_COST = EXP_PATH + " $940]";
 

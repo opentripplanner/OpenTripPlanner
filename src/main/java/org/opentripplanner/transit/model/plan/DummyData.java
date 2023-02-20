@@ -79,7 +79,7 @@ public class DummyData {
   private static final List<StopLocation> STOPS_IN_PATTERN = List.of(STOP_B, STOP_C, STOP_D);
   private static final BitSet ROUTE_BOARD_ALIGHT_BIT_SET = createBitSet(3);
   private static final CalendarDays CALENDAR_DAYS = CalendarDays.of().build();
-  private static final RoutingTripPatternV2 ROUTING_TRIP_PATTERN = createRoutingTripPattern();
+  public static final RoutingTripPatternV2 ROUTING_TRIP_PATTERN = createRoutingTripPattern();
   private static final PatternsOnDays PATTERNS_ON_DAYS = createPatternsOnDays();
 
   public static final TransitCalendar TRANSIT_CALENDAR = new TransitCalendar(
@@ -93,7 +93,7 @@ public class DummyData {
       ROUTE_BOARD_ALIGHT_BIT_SET,
       ROUTE_BOARD_ALIGHT_BIT_SET,
       ROUTE.getMode(),
-      "RoutingTripPattern name"
+      "R1"
     );
   }
 

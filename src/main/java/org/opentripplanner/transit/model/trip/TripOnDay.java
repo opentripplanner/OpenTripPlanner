@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.trip;
 import org.apache.commons.lang3.NotImplementedException;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.transit.model.plan.DummyData;
 
 /**
  * TODO RTM - THIS IS A PLACEHOLDER for {@link org.opentripplanner.model.TripTimeOnDate}
@@ -34,7 +35,8 @@ public class TripOnDay implements RaptorTripSchedule {
 
   @Override
   public RaptorTripPattern pattern() {
-    throw new NotImplementedException("TODO RTM");
+    // TODO RTM
+    return DummyData.ROUTING_TRIP_PATTERN;
   }
 
   /**
