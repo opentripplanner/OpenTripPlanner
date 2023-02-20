@@ -30,33 +30,33 @@ public class DummyData {
     .withTimezone("Europe/Oslo")
     .build();
 
+  public static final RegularStop STOP_AT_INDEX_0 = RegularStop
+    .of(id("S_INDEX_0"))
+    .withName("Majorstua")
+    .withCoordinate(0, 0)
+    .build();
   public static final RegularStop STOP_A = RegularStop
     .of(id("SA"))
-    .withName("Majorstua")
+    .withName("Stortinget")
     .withCoordinate(0, 0)
     .build();
   public static final RegularStop STOP_B = RegularStop
     .of(id("SB"))
-    .withName("Stortinget")
+    .withName("Oslo S")
     .withCoordinate(0, 0)
     .build();
   public static final RegularStop STOP_C = RegularStop
     .of(id("SC"))
-    .withName("Oslo S")
-    .withCoordinate(0, 0)
-    .build();
-  public static final RegularStop STOP_D = RegularStop
-    .of(id("SD"))
     .withName("Tøyen")
     .withCoordinate(0, 0)
     .build();
 
   public static final StopModel STOP_MODEL = StopModel
     .of()
+    .withRegularStop(STOP_AT_INDEX_0)
     .withRegularStop(STOP_A)
     .withRegularStop(STOP_B)
     .withRegularStop(STOP_C)
-    .withRegularStop(STOP_D)
     .build();
 
   private static final Route ROUTE = Route
@@ -76,7 +76,7 @@ public class DummyData {
     .schedule("0:07 0:09 0:14")
     .build();
 
-  private static final List<StopLocation> STOPS_IN_PATTERN = List.of(STOP_B, STOP_C, STOP_D);
+  private static final List<StopLocation> STOPS_IN_PATTERN = List.of(STOP_A, STOP_B, STOP_C);
   private static final BitSet ROUTE_BOARD_ALIGHT_BIT_SET = createBitSet(3);
   private static final CalendarDays CALENDAR_DAYS = CalendarDays.of().build();
   public static final RoutingTripPatternV2 ROUTING_TRIP_PATTERN = createRoutingTripPattern();

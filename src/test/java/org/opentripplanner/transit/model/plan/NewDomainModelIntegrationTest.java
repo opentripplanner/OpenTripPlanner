@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.trip.TripOnDay;
 public class NewDomainModelIntegrationTest implements RaptorTestConstants {
 
   private static final String EXP_PATH =
-    "Walk 30s ~ B ~ BUS R1 0:03 0:08 ~ D ~ Walk 20s " + "[0:00:30 0:08:20 7m50s 0tx";
+    "Walk 30s ~ A ~ BUS R1 0:03 0:08 ~ C ~ Walk 20s " + "[0:00:30 0:08:20 7m50s 0tx";
   private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
   private static final String EXP_PATH_WITH_COST = EXP_PATH + " $940]";
 
@@ -78,8 +78,8 @@ public class NewDomainModelIntegrationTest implements RaptorTestConstants {
 */
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(DummyData.STOP_B.getIndex(), D30s))
-      .addEgressPaths(TestAccessEgress.walk(DummyData.STOP_D.getIndex(), D20s))
+      .addAccessPaths(TestAccessEgress.walk(DummyData.STOP_A.getIndex(), D30s))
+      .addEgressPaths(TestAccessEgress.walk(DummyData.STOP_C.getIndex(), D20s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       .timetableEnabled(true);
