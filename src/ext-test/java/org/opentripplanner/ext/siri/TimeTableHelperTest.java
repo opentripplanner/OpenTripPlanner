@@ -41,22 +41,22 @@ import uk.org.siri.siri20.StopPointRef;
 
 public class TimeTableHelperTest {
 
-  private final String FEED_ID = "FEED_ID";
+  private static final String FEED_ID = "FEED_ID";
 
-  private final String PATTERN_ID = "PATTERN_ID";
-  private final String STOP_ID = "STOP_1";
-  private final String STATION_ID = "STOP_PARENT_1";
-  private final String STATION_NAME = "STATION_NAME_1";
-  private final String LINE_ID = "LINE_1";
-  private final String AGENCY_ID = "AGENCY_1";
-  private final String AGENCY_NAME = "AGENCY_ONE";
-  private final String LINE_SHORT_NAME = "LINE_ONE";
+  private static final String PATTERN_ID = "PATTERN_ID";
+  private static final String STOP_ID = "STOP_1";
+  private static final String STATION_ID = "STOP_PARENT_1";
+  private static final String STATION_NAME = "STATION_NAME_1";
+  private static final String LINE_ID = "LINE_1";
+  private static final String AGENCY_ID = "AGENCY_1";
+  private static final String AGENCY_NAME = "AGENCY_ONE";
+  private static final String LINE_SHORT_NAME = "LINE_ONE";
 
-  private final FeedScopedId SCOPED_STATION_ID = new FeedScopedId(FEED_ID, STATION_ID);
-  private final FeedScopedId SCOPED_STOP_ID = new FeedScopedId(FEED_ID, STOP_ID);
-  private final FeedScopedId SCOPED_AGENCY_ID = new FeedScopedId(FEED_ID, AGENCY_ID);
-  private final FeedScopedId SCOPED_LINE_ID = new FeedScopedId(FEED_ID, LINE_ID);
-  private final FeedScopedId SCOPED_PATTERN_ID = new FeedScopedId(FEED_ID, PATTERN_ID);
+  private static final FeedScopedId SCOPED_STATION_ID = new FeedScopedId(FEED_ID, STATION_ID);
+  private static final FeedScopedId SCOPED_STOP_ID = new FeedScopedId(FEED_ID, STOP_ID);
+  private static final FeedScopedId SCOPED_AGENCY_ID = new FeedScopedId(FEED_ID, AGENCY_ID);
+  private static final FeedScopedId SCOPED_LINE_ID = new FeedScopedId(FEED_ID, LINE_ID);
+  private static final FeedScopedId SCOPED_PATTERN_ID = new FeedScopedId(FEED_ID, PATTERN_ID);
 
   private TripPattern tripPattern;
   private Route route;
@@ -312,7 +312,7 @@ public class TimeTableHelperTest {
         tripTimes,
         callCounter,
         false,
-        estimatedCall,
+        CallWrapper.of(estimatedCall),
         null
       );
 
@@ -349,7 +349,7 @@ public class TimeTableHelperTest {
         tripTimes,
         callCounter,
         false,
-        estimatedCall,
+        CallWrapper.of(estimatedCall),
         null
       );
 
@@ -381,7 +381,7 @@ public class TimeTableHelperTest {
         tripTimes,
         callCounter,
         false,
-        recordedCall,
+        CallWrapper.of(recordedCall),
         null
       );
 
@@ -414,7 +414,7 @@ public class TimeTableHelperTest {
         tripTimes,
         callCounter,
         false,
-        recordedCall,
+        CallWrapper.of(recordedCall),
         null
       );
 
@@ -453,7 +453,7 @@ public class TimeTableHelperTest {
         tripTimes,
         callCounter,
         false,
-        recordedCall,
+        CallWrapper.of(recordedCall),
         null
       );
 
