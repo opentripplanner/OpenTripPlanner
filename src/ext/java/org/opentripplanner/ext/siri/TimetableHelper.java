@@ -62,10 +62,6 @@ public class TimetableHelper {
     ZoneId zoneId,
     Deduplicator deduplicator
   ) {
-    if (journey == null) {
-      return null;
-    }
-
     final TripTimes existingTripTimes = timetable.getTripTimes(tripId);
     if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", tripId);
@@ -85,12 +81,9 @@ public class TimetableHelper {
     List<StopTime> modifiedStopTimes = createModifiedStopTimes(
       pattern,
       oldTimes,
-      journey,
+      CallWrapper.of(journey),
       getStopById
     );
-    if (modifiedStopTimes == null) {
-      return UpdateError.result(tripId, UNKNOWN);
-    }
     TripTimes newTimes = new TripTimes(oldTimes.getTrip(), modifiedStopTimes, deduplicator);
 
     //Populate missing data from existing TripTimes
@@ -208,20 +201,15 @@ public class TimetableHelper {
    * Apply the SIRI ET to the appropriate TripTimes from this Timetable. Calculate new stoppattern
    * based on single stop cancellations
    *
-   * @param journey SIRI-ET EstimatedVehicleJourney
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
   public static List<StopTime> createModifiedStopTimes(
     TripPattern pattern,
     TripTimes oldTimes,
-    EstimatedVehicleJourney journey,
+    List<CallWrapper> calls,
     Function<FeedScopedId, StopLocation> getStopForId
   ) {
-    if (journey == null) {
-      return null;
-    }
-
     List<StopTime> modifiedStops = new ArrayList<>();
 
     Set<CallWrapper> alreadyVisited = new HashSet<>();
@@ -242,7 +230,7 @@ public class TimetableHelper {
       stopTime.setTimepoint(oldTimes.isTimepoint(i) ? 1 : 0);
 
       boolean foundMatch = false;
-      for (CallWrapper call : CallWrapper.of(journey)) {
+      for (CallWrapper call : calls) {
         if (alreadyVisited.contains(call)) {
           continue;
         }

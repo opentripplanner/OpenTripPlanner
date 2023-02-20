@@ -116,7 +116,7 @@ public class TimeTableHelperTest {
     var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
       tripTimes,
-      estimatedVehicleJourney,
+      CallWrapper.of(estimatedVehicleJourney),
       stopFetcher
     );
 
@@ -142,7 +142,7 @@ public class TimeTableHelperTest {
     var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
       tripTimes,
-      estimatedVehicleJourney,
+      CallWrapper.of(estimatedVehicleJourney),
       stopFetcher
     );
 
@@ -172,7 +172,7 @@ public class TimeTableHelperTest {
     var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
       tripTimes,
-      estimatedVehicleJourney,
+      CallWrapper.of(estimatedVehicleJourney),
       stopFetcher
     );
 
@@ -205,7 +205,7 @@ public class TimeTableHelperTest {
     var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
       tripTimes,
-      estimatedVehicleJourney,
+      CallWrapper.of(estimatedVehicleJourney),
       stopFetcher
     );
 
@@ -242,7 +242,7 @@ public class TimeTableHelperTest {
     var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
       tripTimes,
-      estimatedVehicleJourney,
+      CallWrapper.of(estimatedVehicleJourney),
       stopFetcher
     );
 
@@ -276,7 +276,7 @@ public class TimeTableHelperTest {
     var result = TimetableHelper.createModifiedStopTimes(
       tripPattern,
       tripTimes,
-      estimatedVehicleJourney,
+      CallWrapper.of(estimatedVehicleJourney),
       stopFetcher
     );
 
