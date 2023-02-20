@@ -141,6 +141,19 @@ public interface CallWrapper {
     public DepartureBoardingActivityEnumeration getDepartureBoardingActivity() {
       return call.getDepartureBoardingActivity();
     }
+
+    @Override
+    public int hashCode() {
+      return call.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof EstimatedCallWrapper estimatedCallWrapper)) {
+        return false;
+      }
+      return call.equals(estimatedCallWrapper.call);
+    }
   }
 
   final class RecordedCallWrapper implements CallWrapper {
@@ -224,6 +237,19 @@ public interface CallWrapper {
     @Override
     public DepartureBoardingActivityEnumeration getDepartureBoardingActivity() {
       return null;
+    }
+
+    @Override
+    public int hashCode() {
+      return call.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof RecordedCallWrapper recordedCallWrapper)) {
+        return false;
+      }
+      return call.equals(recordedCallWrapper.call);
     }
   }
 }
