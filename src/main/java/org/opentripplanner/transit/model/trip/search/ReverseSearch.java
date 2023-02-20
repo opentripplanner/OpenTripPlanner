@@ -100,6 +100,10 @@ public class ReverseSearch
       // TODO RTM - We need to search the timetable for next day
       return;
     }
+    if (index == Timetable.PREV_TIME_TABLE_INDEX) {
+      // TODO RTM - We need to search the timetable for previous day
+      return;
+    }
     if (index == Timetable.NOT_AVAILABLE) {
       return;
     }
