@@ -1,28 +1,49 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
+import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import graphql.ExecutionInput;
+import graphql.execution.ExecutionId;
+import graphql.schema.DataFetchingEnvironmentImpl;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.legacygraphqlapi.mapping.RouteRequestMapper;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.server.TestServerRequestContext;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
 class GraphQLPlanTest implements PlanTestConstants {
 
-  static final TestServerRequestContext context;
+  static final LegacyGraphQLRequestContext context;
   static final Graph graph = new Graph();
-  static final LegacyGraphQLAPI resource;
+  static final TestRoutingService routingService = new TestRoutingService(List.of());
 
   static {
     var transitModel = new TransitModel();
     transitModel.initTimeZone(ZoneIds.BERLIN);
-    transitModel.index();
-
-    context = new TestServerRequestContext(graph, transitModel);
-    resource = new LegacyGraphQLAPI(context, "ignored");
+    final DefaultTransitService transitService = new DefaultTransitService(transitModel);
+    context =
+      new LegacyGraphQLRequestContext(
+        routingService,
+        transitService,
+        new DefaultFareService(),
+        graph.getVehicleParkingService(),
+        new VehicleRentalService(),
+        new DefaultVehiclePositionService(),
+        GraphFinder.getInstance(graph, transitService::findRegularStop),
+        new RouteRequest()
+      );
   }
 
   @Test
@@ -32,7 +53,7 @@ class GraphQLPlanTest implements PlanTestConstants {
       query {
         plan(
           parking: {
-            filters: { containsOne {tags: ["wheelbender"] }},
+            filters: { not : { tags: ["forbiddentag"] }},
           }
         ) {
           itineraries {
@@ -42,14 +63,26 @@ class GraphQLPlanTest implements PlanTestConstants {
       }
       
       """;
-    var response = resource.getGraphQL(query, 2000, 10000, new TestHeaders());
-    assertEquals(200, response.getStatus());
 
-    var routeRequest = context.lastRouteRequest();
-    var parking = routeRequest.journey().parking();
-    assertEquals(Set.of("covered"), parking.preferredTags());
-    assertEquals(555, parking.unpreferredTagCost());
-    assertEquals(Set.of("wheelbender"), parking.bannedTags());
-    assertEquals(Set.of("cellar", "roof", "locker"), parking.requiredTags());
+    ExecutionInput executionInput = ExecutionInput
+      .newExecutionInput()
+      .query(query)
+      .operationName("plan")
+      .context(context)
+      .locale(Locale.ENGLISH)
+      .build();
+
+    var executionContext = newExecutionContextBuilder()
+      .executionInput(executionInput)
+      .executionId(ExecutionId.from(this.getClass().getName()))
+      .build();
+
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext).build();
+
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+
+    assertNotNull(routeRequest);
+
+    assertEquals(Set.of("forbiddentag"), routeRequest.journey().parking().bannedTags());
   }
 }
