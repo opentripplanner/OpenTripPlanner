@@ -3,12 +3,10 @@ package org.opentripplanner.raptor.rangeraptor.standard.configure;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
 
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -44,26 +42,31 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private final SearchContext<T> ctx;
   private final PathConfig<T> pathConfig;
+  private final RaptorWorkerState<T> state;
+  private final RoutingStrategy<T> strategy;
 
-  private BestTimes bestTimes = null;
-  private ArrivedAtDestinationCheck destinationCheck = null;
-  private BestNumberOfTransfers bestNumberOfTransfers = null;
+  private BestTimes bestTimes;
+  private ArrivedAtDestinationCheck destinationCheck;
+  private BestNumberOfTransfers bestNumberOfTransfers;
 
   public StdRangeRaptorConfig(SearchContext<T> context) {
     this.ctx = context;
     this.pathConfig = new PathConfig<>(context);
+    this.state = createState();
+    this.strategy = createWorkerStrategy(state);
   }
 
-  public RaptorWorker<T> createSearch(
-    BiFunction<RaptorWorkerState<T>, RoutingStrategy<T>, RaptorWorker<T>> createWorker
-  ) {
-    StdRangeRaptorWorkerState<T> state = createState();
-    return createWorker.apply(state, createWorkerStrategy(state));
+  public RaptorWorkerState<T> state() {
+    return state;
+  }
+
+  public RoutingStrategy<T> strategy() {
+    return strategy;
   }
 
   /* private factory methods */
 
-  private StdRangeRaptorWorkerState<T> createState() {
+  private RaptorWorkerState<T> createState() {
     new VerifyRequestIsValid(ctx).verify();
     switch (ctx.profile()) {
       case STANDARD:
@@ -75,18 +78,18 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     throw new IllegalArgumentException(ctx.profile().toString());
   }
 
-  private RoutingStrategy<T> createWorkerStrategy(StdWorkerState<T> state) {
+  private RoutingStrategy<T> createWorkerStrategy(RaptorWorkerState<T> state) {
     switch (ctx.profile()) {
       case STANDARD:
       case BEST_TIME:
         return new ArrivalTimeRoutingStrategy<>(
-          state,
+          (StdWorkerState<T>) state,
           ctx.createTimeBasedBoardingSupport(),
           ctx.calculator()
         );
       case MIN_TRAVEL_DURATION:
         return new MinTravelDurationRoutingStrategy<>(
-          state,
+          (StdWorkerState<T>) state,
           ctx.createTimeBasedBoardingSupport(),
           ctx.calculator(),
           ctx.lifeCycle()
