@@ -9,6 +9,7 @@ import static org.opentripplanner.standalone.config.routerequest.TransferConfig.
 import static org.opentripplanner.standalone.config.routerequest.WheelchairConfig.mapWheelchairPreferences;
 
 import java.time.Duration;
+import java.util.List;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -24,6 +25,8 @@ import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferenc
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -152,6 +155,7 @@ public class RouteRequestConfig {
         )
         .asDuration(dft.searchWindow())
     );
+
     vehicleParking.setUnpreferredCost(
       c
         .of("unpreferredVehicleParkingTagCost")
@@ -159,6 +163,35 @@ public class RouteRequestConfig {
         .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
         .description("See `preferredVehicleParkingTags`.")
         .asInt(vehicleParking.unpreferredCost())
+    );
+
+    var bannedTags = c
+      .of("bannedVehicleParkingTags")
+      .since(V2_1)
+      .summary("Tags with which a vehicle parking will not be used. If empty, no tags are banned.")
+      .asStringSet(List.of());
+
+    var requiredTags = c
+      .of("requiredVehicleParkingTags")
+      .since(V2_1)
+      .summary(
+        "Tags without which a vehicle parking will not be used. If empty, no tags are required."
+      )
+      .asStringSet(List.of());
+    vehicleParking.setFilter(
+      new VehicleParkingFilterRequest(new TagsFilter(bannedTags), new TagsFilter(requiredTags))
+    );
+
+    var preferredTags = c
+      .of("preferredVehicleParkingTags")
+      .since(V2_3)
+      .summary(
+        "Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised."
+      )
+      .asStringSet(List.of());
+
+    vehicleParking.setPreferred(
+      new VehicleParkingFilterRequest(List.of(), List.of(new TagsFilter(preferredTags)))
     );
 
     request.setWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));

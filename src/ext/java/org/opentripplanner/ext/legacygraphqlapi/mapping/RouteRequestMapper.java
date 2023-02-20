@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
@@ -286,13 +287,21 @@ public class RouteRequestMapper {
   ) {
     return filters
       .stream()
-      .map(f -> parseOperation((Map<String, Collection<String>>) f.getOrDefault(key, Map.of())))
+      .flatMap(f ->
+        parseOperation((Collection<Map<String, Collection<String>>>) f.getOrDefault(key, List.of()))
+      )
       .collect(Collectors.toSet());
   }
 
-  private static VehicleParkingFilter parseOperation(Map<String, Collection<String>> map) {
-    var tags = map.getOrDefault("tags", List.of());
-    return new TagsFilter(Set.copyOf(tags));
+  private static Stream<VehicleParkingFilter> parseOperation(
+    Collection<Map<String, Collection<String>>> map
+  ) {
+    return map
+      .stream()
+      .map(f -> {
+        var tags = f.getOrDefault("tags", List.of());
+        return new TagsFilter(Set.copyOf(tags));
+      });
   }
 
   private static <T> boolean hasArgument(Map<String, T> m, String name) {

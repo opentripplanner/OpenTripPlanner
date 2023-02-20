@@ -1166,9 +1166,9 @@ input ParkingFilterOperation {
 
 input ParkingFilter {
     """Exclude parking facilities based on their properties. If empty nothing is excluded."""
-    not: [ParkingFilterOperation]
+    not: [ParkingFilterOperation!]
     """Include parking facilities based on their properties. If empty everything is included."""
-    select: [ParkingFilterOperation]
+    select: [ParkingFilterOperation!]
 }
 
 """

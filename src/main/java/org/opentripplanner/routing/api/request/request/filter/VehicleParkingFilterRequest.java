@@ -8,8 +8,8 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
 /**
- * A request object that checks if parking faclities match certain conditions for inclusion/exclusion
- * or preference/unpreference.
+ * A request object that checks if parking faclities match certain conditions for
+ * inclusion/exclusion or preference/unpreference.
  */
 public class VehicleParkingFilterRequest {
 
@@ -22,6 +22,10 @@ public class VehicleParkingFilterRequest {
   ) {
     this.not = makeFilter(not);
     this.select = makeFilter(select);
+  }
+
+  public VehicleParkingFilterRequest(VehicleParkingFilter not, VehicleParkingFilter select) {
+    this(List.of(not), List.of(select));
   }
 
   /**

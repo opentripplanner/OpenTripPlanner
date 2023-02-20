@@ -744,8 +744,8 @@ public abstract class RoutingResource {
 
         parking.setFilter(
           new VehicleParkingFilterRequest(
-            List.of(new TagsFilter(bannedVehicleParkingTags)),
-            List.of(new TagsFilter(requiredVehicleParkingTags))
+            new TagsFilter(bannedVehicleParkingTags),
+            new TagsFilter(requiredVehicleParkingTags)
           )
         );
       }

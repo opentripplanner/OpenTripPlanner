@@ -87,9 +87,9 @@ class RouteRequestMapperTest implements PlanTestConstants {
         List.of(
           Map.of(
             "not",
-            Map.of("tags", List.of("wheelbender")),
+            List.of(Map.of("tags", List.of("wheelbender"))),
             "select",
-            Map.of("tags", List.of("roof", "locker"))
+            List.of(Map.of("tags", List.of("roof", "locker")))
           )
         )
       )

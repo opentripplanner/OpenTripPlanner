@@ -80,6 +80,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | walkSpeed                                                                                            |        `double`        | The user's walking speed in meters/second.                                                                                         | *Optional* | `1.33`                   |  2.0  |
 | [alightSlackForMode](#rd_alightSlackForMode)                                                         | `enum map of duration` | How much extra time should be given when alighting a vehicle for each given mode.                                                  | *Optional* |                          |  2.0  |
 | [allowedVehicleRentalNetworks](#rd_allowedVehicleRentalNetworks)                                     |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                  | *Optional* |                          |  2.1  |
+| [bannedVehicleParkingTags](#rd_bannedVehicleParkingTags)                                             |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned.                                                  | *Optional* |                          |  2.1  |
 | [bannedVehicleRentalNetworks](#rd_bannedVehicleRentalNetworks)                                       |       `string[]`       | he vehicle rental networks which may not be used. If empty, no networks are banned.                                                | *Optional* |                          |  2.1  |
 | [boardSlackForMode](#rd_boardSlackForMode)                                                           | `enum map of duration` | How much extra time should be given when boarding a vehicle for each given mode.                                                   | *Optional* |                          |  2.0  |
 | [itineraryFilters](#rd_itineraryFilters)                                                             |        `object`        | Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results.                       | *Optional* |                          |  2.0  |
@@ -99,6 +100,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                  |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                 | *Optional* | `0.4`                    |  2.2  |
 | [maxAccessEgressDurationForMode](#rd_maxAccessEgressDurationForMode)                                 | `enum map of duration` | Limit access/egress per street mode.                                                                                               | *Optional* |                          |  2.1  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                                 | `enum map of duration` | Limit direct route duration per street mode.                                                                                       | *Optional* |                          |  2.2  |
+| [preferredVehicleParkingTags](#rd_preferredVehicleParkingTags)                                       |       `string[]`       | Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.           | *Optional* |                          |  2.3  |
+| [requiredVehicleParkingTags](#rd_requiredVehicleParkingTags)                                         |       `string[]`       | Tags without which a vehicle parking will not be used. If empty, no tags are required.                                             | *Optional* |                          |  2.1  |
 | [transferOptimization](#rd_transferOptimization)                                                     |        `object`        | Optimize where a transfer between to trip happens.                                                                                 | *Optional* |                          |  2.1  |
 |    [backTravelWaitTimeFactor](#rd_to_backTravelWaitTimeFactor)                                       |        `double`        | To reduce back-travel we favor waiting, this reduces the cost of waiting.                                                          | *Optional* | `1.0`                    |  2.1  |
 |    [extraStopBoardAlightCostsFactor](#rd_to_extraStopBoardAlightCostsFactor)                         |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                         | *Optional* | `0.0`                    |  2.1  |
@@ -383,6 +386,13 @@ Sometimes there is a need to configure a longer alighting times for specific mod
 
 The vehicle rental networks which may be used. If empty all networks may be used.
 
+<h3 id="rd_bannedVehicleParkingTags">bannedVehicleParkingTags</h3>
+
+**Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults 
+
+Tags with which a vehicle parking will not be used. If empty, no tags are banned.
+
 <h3 id="rd_bannedVehicleRentalNetworks">bannedVehicleRentalNetworks</h3>
 
 **Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
@@ -593,6 +603,20 @@ Limit direct route duration per street mode.
 Override the settings in `maxDirectStreetDuration` for specific street modes. This is
 done because some street modes searches are much more resource intensive than others.
 
+
+<h3 id="rd_preferredVehicleParkingTags">preferredVehicleParkingTags</h3>
+
+**Since version:** `2.3` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults 
+
+Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.
+
+<h3 id="rd_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
+
+**Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults 
+
+Tags without which a vehicle parking will not be used. If empty, no tags are required.
 
 <h3 id="rd_transferOptimization">transferOptimization</h3>
 
