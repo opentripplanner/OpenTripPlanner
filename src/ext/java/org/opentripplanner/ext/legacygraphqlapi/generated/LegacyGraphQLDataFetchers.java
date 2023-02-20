@@ -11,6 +11,9 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertCauseType;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertEffectType;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
@@ -73,13 +76,13 @@ public class LegacyGraphQLDataFetchers {
   public interface LegacyGraphQLAlert {
     public DataFetcher<Agency> agency();
 
-    public DataFetcher<String> alertCause();
+    public DataFetcher<LegacyGraphQLAlertCauseType> alertCause();
 
     public DataFetcher<String> alertDescriptionText();
 
     public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations();
 
-    public DataFetcher<String> alertEffect();
+    public DataFetcher<LegacyGraphQLAlertEffectType> alertEffect();
 
     public DataFetcher<Integer> alertHash();
 
@@ -87,7 +90,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Iterable<Map.Entry<String, String>>> alertHeaderTextTranslations();
 
-    public DataFetcher<String> alertSeverityLevel();
+    public DataFetcher<LegacyGraphQLAlertSeverityLevelType> alertSeverityLevel();
 
     public DataFetcher<String> alertUrl();
 
@@ -331,6 +334,8 @@ public class LegacyGraphQLDataFetchers {
 
   public interface LegacyGraphQLLeg {
     public DataFetcher<Agency> agency();
+
+    public DataFetcher<Iterable<TransitAlert>> alerts();
 
     public DataFetcher<Integer> arrivalDelay();
 
