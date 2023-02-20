@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.legacygraphqlapi;
+package org.opentripplanner.ext.legacygraphqlapi.mapping;
 
 import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +13,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
-import org.opentripplanner.ext.legacygraphqlapi.mapping.RouteRequestMapper;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
+import org.opentripplanner.ext.legacygraphqlapi.TestRoutingService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
@@ -24,19 +25,18 @@ import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePosit
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
-class GraphQLPlanTest implements PlanTestConstants {
+class RouteRequestMapperTest implements PlanTestConstants {
 
   static final LegacyGraphQLRequestContext context;
-  static final Graph graph = new Graph();
-  static final TestRoutingService routingService = new TestRoutingService(List.of());
 
   static {
+    Graph graph = new Graph();
     var transitModel = new TransitModel();
     transitModel.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(transitModel);
     context =
       new LegacyGraphQLRequestContext(
-        routingService,
+        new TestRoutingService(List.of()),
         transitService,
         new DefaultFareService(),
         graph.getVehicleParkingService(),

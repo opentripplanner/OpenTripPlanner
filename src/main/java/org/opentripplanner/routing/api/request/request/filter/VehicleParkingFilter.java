@@ -6,6 +6,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
 public sealed interface VehicleParkingFilter {
   boolean matches(VehicleParking p);
+  int size();
 
   record TagsFilter(Set<String> tags) implements VehicleParkingFilter {
     @Override
@@ -14,15 +15,13 @@ public sealed interface VehicleParkingFilter {
     }
 
     @Override
+    public int size() {
+      return tags.size();
+    }
+
+    @Override
     public String toString() {
       return "tags=" + tags.stream().sorted().toList();
-    }
-  }
-
-  record AllowAllFilter() implements VehicleParkingFilter {
-    @Override
-    public boolean matches(VehicleParking p) {
-      return true;
     }
   }
 }

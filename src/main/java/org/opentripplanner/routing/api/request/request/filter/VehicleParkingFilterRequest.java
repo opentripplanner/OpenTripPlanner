@@ -15,8 +15,8 @@ public class VehicleParkingFilterRequest {
     Collection<VehicleParkingFilter> not,
     Collection<VehicleParkingFilter> select
   ) {
-    this.not = not.toArray(new VehicleParkingFilter[0]);
-    this.select = select.toArray(new VehicleParkingFilter[0]);
+    this.not = not.stream().filter(f -> f.size() > 0).toArray(VehicleParkingFilter[]::new);
+    this.select = select.stream().filter(f -> f.size() > 0).toArray(VehicleParkingFilter[]::new);
   }
 
   public boolean matches(VehicleParking p) {

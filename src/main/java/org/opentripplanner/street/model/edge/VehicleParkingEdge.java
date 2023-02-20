@@ -164,12 +164,8 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private void addUnpreferredTagCost(VehicleParkingRequest req, StateEditor s0e) {
-    if (isUnpreferredParking(req, vehicleParking)) {
+    if (!req.preferred().matches(vehicleParking)) {
       s0e.incrementWeight(req.unpreferredCost());
     }
-  }
-
-  private static boolean isUnpreferredParking(VehicleParkingRequest req, VehicleParking parking) {
-    return !req.preferred().matches(parking);
   }
 }
