@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -19,10 +21,8 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
-import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
 /**
@@ -84,7 +84,7 @@ public class SiriFuzzyTripMatcher {
           arrivalTime,
           entityResolver
         );
-        if (trips == null || trips.isEmpty()) {
+        if (trips.isEmpty()) {
           return null;
         }
         return getTripForJourney(trips, monitoredVehicleJourney);
@@ -102,48 +102,26 @@ public class SiriFuzzyTripMatcher {
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
     BiFunction<FeedScopedId, LocalDate, TripPattern> getRealtimeAddedTripPattern
   ) {
+    List<CallWrapper> calls = CallWrapper.of(journey);
+
+    if (calls.isEmpty()) {
+      return null;
+    }
+
     Set<Trip> trips = null;
     if (
       journey.getVehicleRef() != null &&
-      (
-        journey.getVehicleModes() != null &&
-        journey.getVehicleModes().contains(VehicleModesEnumeration.RAIL)
-      )
+      journey.getVehicleModes().contains(VehicleModesEnumeration.RAIL)
     ) {
       trips = getCachedTripsByInternalPlanningCode(journey.getVehicleRef().getValue());
     }
 
     if (trips == null || trips.isEmpty()) {
-      String lastStopPoint = null;
-      ZonedDateTime arrivalTime = null;
-
-      if (
-        journey.getEstimatedCalls() != null &&
-        journey.getEstimatedCalls().getEstimatedCalls() != null &&
-        !journey.getEstimatedCalls().getEstimatedCalls().isEmpty()
-      ) { // Pick last stop from EstimatedCalls
-        List<EstimatedCall> estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
-        EstimatedCall lastStop = estimatedCalls.get(estimatedCalls.size() - 1);
-
-        lastStopPoint = lastStop.getStopPointRef().getValue();
-        arrivalTime =
-          lastStop.getAimedArrivalTime() != null
-            ? lastStop.getAimedArrivalTime()
-            : lastStop.getAimedDepartureTime();
-      } else if (
-        journey.getRecordedCalls() != null &&
-        journey.getRecordedCalls().getRecordedCalls() != null &&
-        !journey.getRecordedCalls().getRecordedCalls().isEmpty()
-      ) { // No EstimatedCalls exist - pick last RecordedCall
-        List<RecordedCall> recordedCalls = journey.getRecordedCalls().getRecordedCalls();
-        final RecordedCall lastStop = recordedCalls.get(recordedCalls.size() - 1);
-
-        lastStopPoint = lastStop.getStopPointRef().getValue();
-        arrivalTime =
-          lastStop.getAimedArrivalTime() != null
-            ? lastStop.getAimedArrivalTime()
-            : lastStop.getAimedDepartureTime();
-      }
+      CallWrapper lastStop = calls.get(calls.size() - 1);
+      String lastStopPoint = lastStop.getStopPointRef();
+      ZonedDateTime arrivalTime = lastStop.getAimedArrivalTime() != null
+        ? lastStop.getAimedArrivalTime()
+        : lastStop.getAimedDepartureTime();
 
       if (arrivalTime != null) {
         trips = getMatchingTripsOnStopOrSiblings(lastStopPoint, arrivalTime, entityResolver);
@@ -153,28 +131,13 @@ public class SiriFuzzyTripMatcher {
       return null;
     }
 
-    trips = getTripForJourney(trips, journey, getCurrentTimetable);
-    if (trips == null || trips.isEmpty()) {
-      return null;
-    }
-
-    var result = new ArrayList<TripAndPattern>();
-
-    for (var trip : trips) {
-      var pattern = getPatternForTrip(trip, journey, getRealtimeAddedTripPattern);
-      if (pattern != null) {
-        result.add(new TripAndPattern(trip, pattern));
-      }
-    }
-
-    if (result.isEmpty()) {
-      return null;
-    } else if (result.size() > 1) {
-      LOG.warn("Multiple trip and pattern combinations found, skipping all, {}", result);
-      return null;
-    } else {
-      return result.get(0);
-    }
+    return getTripAndPatternForJourney(
+      trips,
+      calls,
+      entityResolver,
+      getCurrentTimetable,
+      getRealtimeAddedTripPattern
+    );
   }
 
   /**
@@ -236,6 +199,7 @@ public class SiriFuzzyTripMatcher {
     return lastStopId + ":" + lastStopArrivalTime;
   }
 
+  @Nonnull
   private Set<Trip> getMatchingTripsOnStopOrSiblings(
     String lastStopPoint,
     ZonedDateTime arrivalTime,
@@ -261,24 +225,24 @@ public class SiriFuzzyTripMatcher {
         startStopTripCache.get(createStartStopKey(lastStopPoint, secondsSinceMidnightYesterday));
     }
 
-    if (trips == null || trips.isEmpty()) {
-      //SIRI-data may report other platform, but still on the same Parent-stop
-      var stop = entityResolver.resolveQuay(lastStopPoint);
-      if (stop != null && stop.isPartOfStation()) {
-        // TODO OTP2 resolve stop-station split
-        var allQuays = stop.getParentStation().getChildStops();
-        for (var quay : allQuays) {
-          Set<Trip> tripSet = startStopTripCache.get(
-            createStartStopKey(quay.getId().getId(), secondsSinceMidnight)
-          );
-          if (tripSet != null) {
-            if (trips == null) {
-              trips = tripSet;
-            } else {
-              trips.addAll(tripSet);
-            }
-          }
-        }
+    if (trips != null) {
+      return trips;
+    }
+
+    //SIRI-data may report other platform, but still on the same Parent-stop
+    var stop = entityResolver.resolveQuay(lastStopPoint);
+    if (stop == null || !stop.isPartOfStation()) {
+      return Set.of();
+    }
+
+    trips = new HashSet<>();
+    var allQuays = stop.getParentStation().getChildStops();
+    for (var quay : allQuays) {
+      Set<Trip> tripSet = startStopTripCache.get(
+        createStartStopKey(quay.getId().getId(), secondsSinceMidnight)
+      );
+      if (tripSet != null) {
+        trips.addAll(tripSet);
       }
     }
     return trips;
@@ -294,46 +258,20 @@ public class SiriFuzzyTripMatcher {
   /**
    * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
    */
-  private Set<Trip> getTripForJourney(
+  private TripAndPattern getTripAndPatternForJourney(
     Set<Trip> trips,
-    EstimatedVehicleJourney journey,
-    BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable
+    List<CallWrapper> calls,
+    EntityResolver entityResolver,
+    BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
+    BiFunction<FeedScopedId, LocalDate, TripPattern> getRealtimeAddedTripPattern
   ) {
-    List<RecordedCall> recordedCalls =
-      (
-        journey.getRecordedCalls() != null
-          ? journey.getRecordedCalls().getRecordedCalls()
-          : new ArrayList<>()
-      );
-    List<EstimatedCall> estimatedCalls =
-      (
-        journey.getEstimatedCalls() != null ? journey.getEstimatedCalls().getEstimatedCalls() : null
-      );
-
-    ZonedDateTime date;
-    int stopNumber = 1;
-    String firstStopId;
-    if (recordedCalls != null && !recordedCalls.isEmpty()) {
-      RecordedCall recordedCall = recordedCalls.get(0);
-      date = recordedCall.getAimedDepartureTime();
-      firstStopId = recordedCall.getStopPointRef().getValue();
-    } else if (estimatedCalls != null && !estimatedCalls.isEmpty()) {
-      EstimatedCall estimatedCall = estimatedCalls.get(0);
-      if (estimatedCall.getOrder() != null) {
-        stopNumber = estimatedCall.getOrder().intValue();
-      } else if (estimatedCall.getVisitNumber() != null) {
-        stopNumber = estimatedCall.getVisitNumber().intValue();
-      }
-      firstStopId = estimatedCall.getStopPointRef().getValue();
-      date = estimatedCall.getAimedDepartureTime();
-    } else {
+    var journeyFirstStop = entityResolver.resolveQuay(calls.get(0).getStopPointRef());
+    var journeyLastStop = entityResolver.resolveQuay(calls.get(calls.size() - 1).getStopPointRef());
+    if (journeyFirstStop == null || journeyLastStop == null) {
       return null;
     }
 
-    if (date == null) {
-      //If no date is set - assume Realtime-data is reported for 'today'.
-      date = ZonedDateTime.now(transitService.getTimeZone());
-    }
+    ZonedDateTime date = calls.get(0).getAimedDepartureTime();
     LocalDate serviceDate = date.toLocalDate();
 
     int departureInSecondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
@@ -341,147 +279,51 @@ public class SiriFuzzyTripMatcher {
       date,
       transitService.getTimeZone()
     );
-    Set<Trip> result = new HashSet<>();
+    CalendarService calendarService = transitService.getCalendarService();
+    Set<TripAndPattern> possibleTrips = new HashSet<>();
     for (Trip trip : trips) {
-      Set<LocalDate> serviceDatesForServiceId = transitService
-        .getCalendarService()
-        .getServiceDatesForServiceId(trip.getServiceId());
-      if (serviceDatesForServiceId.contains(serviceDate)) {
-        TripPattern pattern = transitService.getPatternForTrip(trip);
+      if (!calendarService.getServiceDatesForServiceId(trip.getServiceId()).contains(serviceDate)) {
+        continue;
+      }
 
-        if (stopNumber < pattern.numberOfStops()) {
-          boolean firstReportedStopIsFound = false;
-          var stop = pattern.getStop(stopNumber - 1);
-          if (firstStopId.equals(stop.getId().getId())) {
-            firstReportedStopIsFound = true;
-          } else {
-            if (stop.isPartOfStation()) {
-              var alternativeStop = transitService.getRegularStop(
-                new FeedScopedId(stop.getId().getFeedId(), firstStopId)
-              );
-              if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
-                firstReportedStopIsFound = true;
-              }
-            }
-          }
-          if (firstReportedStopIsFound) {
-            for (TripTimes times : getCurrentTimetable.apply(pattern, serviceDate).getTripTimes()) {
-              if (
-                times.getScheduledDepartureTime(stopNumber - 1) == departureInSecondsSinceMidnight
-              ) {
-                if (
-                  transitService
-                    .getCalendarService()
-                    .getServiceDatesForServiceId(times.getTrip().getServiceId())
-                    .contains(serviceDate)
-                ) {
-                  result.add(times.getTrip());
-                }
-              }
-            }
-          }
+      var realtimeAddedTripPattern = getRealtimeAddedTripPattern.apply(trip.getId(), serviceDate);
+      TripPattern tripPattern = realtimeAddedTripPattern != null
+        ? realtimeAddedTripPattern
+        : transitService.getPatternForTrip(trip);
+
+      var firstStop = tripPattern.firstStop();
+      var lastStop = tripPattern.lastStop();
+
+      boolean firstStopIsMatch =
+        firstStop.equals(journeyFirstStop) || firstStop.isPartOfSameStationAs(journeyFirstStop);
+      boolean lastStopIsMatch =
+        lastStop.equals(journeyLastStop) || lastStop.isPartOfSameStationAs(journeyLastStop);
+
+      if (!firstStopIsMatch || !lastStopIsMatch) {
+        continue;
+      }
+
+      for (TripTimes times : getCurrentTimetable.apply(tripPattern, serviceDate).getTripTimes()) {
+        if (
+          times.getScheduledDepartureTime(0) == departureInSecondsSinceMidnight &&
+          calendarService
+            .getServiceDatesForServiceId(times.getTrip().getServiceId())
+            .contains(serviceDate)
+        ) {
+          // Found matches
+          possibleTrips.add(new TripAndPattern(times.getTrip(), tripPattern));
         }
       }
     }
 
-    if (result.size() >= 1) {
-      return result;
-    } else {
+    if (possibleTrips.isEmpty()) {
       return null;
-    }
-  }
-
-  private TripPattern getPatternForTrip(
-    Trip trip,
-    EstimatedVehicleJourney journey,
-    BiFunction<FeedScopedId, LocalDate, TripPattern> getRealtimeAddedTripPattern
-  ) {
-    Set<LocalDate> serviceDates = transitService
-      .getCalendarService()
-      .getServiceDatesForServiceId(trip.getServiceId());
-
-    List<RecordedCall> recordedCalls =
-      (
-        journey.getRecordedCalls() != null
-          ? journey.getRecordedCalls().getRecordedCalls()
-          : new ArrayList<>()
-      );
-    List<EstimatedCall> estimatedCalls;
-    if (journey.getEstimatedCalls() != null) {
-      estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
-    } else {
+    } else if (possibleTrips.size() > 1) {
+      LOG.warn("Multiple trip and pattern combinations found, skipping all, {}", possibleTrips);
       return null;
-    }
-
-    String journeyFirstStopId;
-    String journeyLastStopId;
-    LocalDate journeyDate;
-    //Resolve first stop - check recordedCalls, then estimatedCalls
-    if (recordedCalls != null && !recordedCalls.isEmpty()) {
-      RecordedCall recordedCall = recordedCalls.get(0);
-      journeyFirstStopId = recordedCall.getStopPointRef().getValue();
-      journeyDate = recordedCall.getAimedDepartureTime().toLocalDate();
-    } else if (estimatedCalls != null && !estimatedCalls.isEmpty()) {
-      EstimatedCall estimatedCall = estimatedCalls.get(0);
-      journeyFirstStopId = estimatedCall.getStopPointRef().getValue();
-      journeyDate = estimatedCall.getAimedDepartureTime().toLocalDate();
     } else {
-      return null;
+      return possibleTrips.iterator().next();
     }
-
-    //Resolve last stop - check estimatedCalls, then recordedCalls
-    if (estimatedCalls != null && !estimatedCalls.isEmpty()) {
-      EstimatedCall estimatedCall = estimatedCalls.get(estimatedCalls.size() - 1);
-      journeyLastStopId = estimatedCall.getStopPointRef().getValue();
-    } else if (recordedCalls != null && !recordedCalls.isEmpty()) {
-      RecordedCall recordedCall = recordedCalls.get(recordedCalls.size() - 1);
-      journeyLastStopId = recordedCall.getStopPointRef().getValue();
-    } else {
-      return null;
-    }
-
-    TripPattern realtimeAddedTripPattern = null;
-    if (getRealtimeAddedTripPattern != null) {
-      realtimeAddedTripPattern = getRealtimeAddedTripPattern.apply(trip.getId(), journeyDate);
-    }
-
-    TripPattern tripPattern;
-    if (realtimeAddedTripPattern != null) {
-      tripPattern = realtimeAddedTripPattern;
-    } else {
-      tripPattern = transitService.getPatternForTrip(trip);
-    }
-
-    var firstStop = tripPattern.firstStop();
-    var lastStop = tripPattern.lastStop();
-
-    if (serviceDates.contains(journeyDate)) {
-      boolean firstStopIsMatch = firstStop.getId().getId().equals(journeyFirstStopId);
-      boolean lastStopIsMatch = lastStop.getId().getId().equals(journeyLastStopId);
-
-      if (!firstStopIsMatch && firstStop.isPartOfStation()) {
-        var otherFirstStop = transitService.getRegularStop(
-          new FeedScopedId(firstStop.getId().getFeedId(), journeyFirstStopId)
-        );
-        firstStopIsMatch = firstStop.isPartOfSameStationAs(otherFirstStop);
-      }
-
-      if (!lastStopIsMatch && lastStop.isPartOfStation()) {
-        var otherLastStop = transitService.getRegularStop(
-          new FeedScopedId(lastStop.getId().getFeedId(), journeyLastStopId)
-        );
-        lastStopIsMatch = lastStop.isPartOfSameStationAs(otherLastStop);
-      }
-
-      if (firstStopIsMatch & lastStopIsMatch) {
-        // Found matches
-        return tripPattern;
-      }
-
-      return null;
-    }
-
-    return null;
   }
 
   /**
