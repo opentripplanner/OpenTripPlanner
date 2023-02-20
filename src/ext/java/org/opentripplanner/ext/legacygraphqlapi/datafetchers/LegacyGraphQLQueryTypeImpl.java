@@ -76,8 +76,6 @@ public class LegacyGraphQLQueryTypeImpl
     DataImportIssueStore.NOOP
   );
 
-
-
   @Override
   public DataFetcher<Iterable<Agency>> agencies() {
     return environment -> getTransitService(environment).getAgencies();
@@ -986,9 +984,6 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> new Object();
   }
 
-
-
-
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().transitService();
   }
@@ -1000,6 +995,4 @@ public class LegacyGraphQLQueryTypeImpl
   private GraphFinder getGraphFinder(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().graphFinder();
   }
-
-
 }

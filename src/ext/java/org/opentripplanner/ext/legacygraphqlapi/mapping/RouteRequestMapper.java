@@ -23,74 +23,8 @@ import org.opentripplanner.routing.api.request.request.filter.TransitFilterReque
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+
 public class RouteRequestMapper {
-
-  private static class CallerWithEnvironment {
-
-    private final DataFetchingEnvironment environment;
-
-    public CallerWithEnvironment(DataFetchingEnvironment e) {
-      this.environment = e;
-    }
-
-    private <T> void argument(String name, Consumer<T> consumer) {
-      call(environment, name, consumer);
-    }
-
-    private static <T> void call(
-      DataFetchingEnvironment environment,
-      String name,
-      Consumer<T> consumer
-    ) {
-      if (!name.contains(".")) {
-        if (hasArgument(environment, name)) {
-          consumer.accept(environment.getArgument(name));
-        }
-      } else {
-        String[] parts = name.split("\\.");
-        if (hasArgument(environment, parts[0])) {
-          Map<String, T> nm = environment.getArgument(parts[0]);
-          call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);
-        }
-      }
-    }
-
-    private static <T> void call(Map<String, T> m, String name, Consumer<T> consumer) {
-      if (!name.contains(".")) {
-        if (hasArgument(m, name)) {
-          T v = m.get(name);
-          consumer.accept(v);
-        }
-      } else {
-        String[] parts = name.split("\\.");
-        if (hasArgument(m, parts[0])) {
-          Map<String, T> nm = (Map<String, T>) m.get(parts[0]);
-          call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);
-        }
-      }
-    }
-  }
-
-  private static boolean hasArgument(DataFetchingEnvironment environment, String name) {
-    return environment.containsArgument(name) && environment.getArgument(name) != null;
-  }
-
-  private static GenericLocation toGenericLocation(Map<String, Object> m) {
-    double lat = (double) m.get("lat");
-    double lng = (double) m.get("lon");
-    String address = (String) m.get("address");
-    Integer locationSlack = null; // (Integer) m.get("locationSlack");
-
-    if (address != null) {
-      return new GenericLocation(address, null, lat, lng);
-    }
-
-    return new GenericLocation(lat, lng);
-  }
-
-  public static <T> boolean hasArgument(Map<String, T> m, String name) {
-    return m.containsKey(name) && m.get(name) != null;
-  }
 
   @Nonnull
   public static RouteRequest toRouteRequest(
@@ -320,5 +254,71 @@ public class RouteRequestMapper {
       (String v) -> request.setLocale(LegacyGraphQLUtils.getLocale(environment, v))
     );
     return request;
+  }
+
+  private static <T> boolean hasArgument(Map<String, T> m, String name) {
+    return m.containsKey(name) && m.get(name) != null;
+  }
+
+  private static boolean hasArgument(DataFetchingEnvironment environment, String name) {
+    return environment.containsArgument(name) && environment.getArgument(name) != null;
+  }
+
+  private static GenericLocation toGenericLocation(Map<String, Object> m) {
+    double lat = (double) m.get("lat");
+    double lng = (double) m.get("lon");
+    String address = (String) m.get("address");
+
+    if (address != null) {
+      return new GenericLocation(address, null, lat, lng);
+    }
+
+    return new GenericLocation(lat, lng);
+  }
+
+  private static class CallerWithEnvironment {
+
+    private final DataFetchingEnvironment environment;
+
+    public CallerWithEnvironment(DataFetchingEnvironment e) {
+      this.environment = e;
+    }
+
+    private static <T> void call(
+      DataFetchingEnvironment environment,
+      String name,
+      Consumer<T> consumer
+    ) {
+      if (!name.contains(".")) {
+        if (hasArgument(environment, name)) {
+          consumer.accept(environment.getArgument(name));
+        }
+      } else {
+        String[] parts = name.split("\\.");
+        if (hasArgument(environment, parts[0])) {
+          Map<String, T> nm = environment.getArgument(parts[0]);
+          call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);
+        }
+      }
+    }
+
+    private static <T> void call(Map<String, T> m, String name, Consumer<T> consumer) {
+      if (!name.contains(".")) {
+        if (hasArgument(m, name)) {
+          T v = m.get(name);
+          consumer.accept(v);
+        }
+      } else {
+        String[] parts = name.split("\\.");
+        if (hasArgument(m, parts[0])) {
+          Map<String, T> nm = (Map<String, T>) m.get(parts[0]);
+          call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);
+        }
+      }
+    }
+
+    private <T> void argument(String name, Consumer<T> consumer) {
+      call(environment, name, consumer);
+    }
   }
 }

@@ -53,7 +53,7 @@ class GraphQLPlanTest implements PlanTestConstants {
       query {
         plan(
           parking: {
-            filters: { not : { tags: ["forbiddentag"] }},
+            filters: { not : { tags: ["wheelbender"] }},
           }
         ) {
           itineraries {
