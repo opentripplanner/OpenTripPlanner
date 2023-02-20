@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -15,32 +14,14 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
 import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 
 public abstract class ParkAndRideTest extends GraphRoutingTest {
 
   protected Graph graph;
-
-  public static List<String> graphPath(GraphPath<State, Edge, Vertex> graphPath) {
-    return graphPath.states
-      .stream()
-      .map(s ->
-        String.format(
-          "%s%s - %s (%,.2f, %d)",
-          s.getBackMode(),
-          s.isVehicleParked() ? " (parked)" : "",
-          s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null,
-          s.getWeight(),
-          s.getElapsedTimeSeconds()
-        )
-      )
-      .collect(Collectors.toList());
-  }
 
   protected void assertPathWithParking(
     StreetVertex fromVertex,
