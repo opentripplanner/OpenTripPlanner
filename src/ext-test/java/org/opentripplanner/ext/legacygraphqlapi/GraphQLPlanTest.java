@@ -9,13 +9,14 @@ import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.legacygraphqlapi.mapping.RouteRequestMapper;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
@@ -77,12 +78,37 @@ class GraphQLPlanTest implements PlanTestConstants {
       .executionId(ExecutionId.from(this.getClass().getName()))
       .build();
 
-    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext).build();
+    Map<String, Object> arguments = Map.of(
+      "parking",
+      Map.of(
+        "unpreferredCost",
+        555,
+        "filters",
+        List.of(
+          Map.of(
+            "not",
+            Map.of("tags", List.of("wheelbender")),
+            "select",
+            Map.of("tags", List.of("roof", "locker"))
+          )
+        )
+      )
+    );
+
+    var env = DataFetchingEnvironmentImpl
+      .newDataFetchingEnvironment(executionContext)
+      .arguments(arguments)
+      .build();
 
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
 
     assertNotNull(routeRequest);
 
-    assertEquals(Set.of("forbiddentag"), routeRequest.journey().parking().bannedTags());
+    final VehicleParkingRequest parking = routeRequest.journey().parking();
+    assertEquals(
+      "VehicleParkingFilterRequest{not: [tags=[wheelbender]], select: [tags=[locker, roof]]}",
+      parking.filter().toString()
+    );
+    assertEquals(555, parking.unpreferredCost());
   }
 }

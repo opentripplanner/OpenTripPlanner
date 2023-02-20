@@ -1,8 +1,7 @@
 package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Set;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 
 /**
  * Class that stores information about what kind of parking lots should be used for Park & Ride
@@ -10,33 +9,18 @@ import java.util.Set;
  */
 public class VehicleParkingRequest implements Cloneable, Serializable {
 
-  private Set<String> requiredTags = Set.of();
-  private Set<String> bannedTags = Set.of();
-  private Set<String> preferredTags = Set.of();
+  private VehicleParkingFilterRequest filter = VehicleParkingFilterRequest.empty();
+  private VehicleParkingFilterRequest preferred = VehicleParkingFilterRequest.empty();
   private int unpreferredTagCost = 5 * 60;
 
   private boolean useAvailabilityInformation = false;
 
-  public void setRequiredTags(Collection<String> requiredTags) {
-    this.requiredTags = Set.copyOf(requiredTags);
+  public void setFilter(VehicleParkingFilterRequest filter) {
+    this.filter = filter;
   }
 
-  /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
-  public Set<String> requiredTags() {
-    return requiredTags;
-  }
-
-  public void setBannedTags(Collection<String> bannedTags) {
-    this.bannedTags = Set.copyOf(bannedTags);
-  }
-
-  /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
-  public Set<String> bannedTags() {
-    return bannedTags;
-  }
-
-  public void setPreferredTags(Collection<String> tags) {
-    this.preferredTags = Set.copyOf(tags);
+  public void setPreferred(VehicleParkingFilterRequest filter) {
+    this.preferred = filter;
   }
 
   /**
@@ -45,15 +29,15 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
    * <p>
    * This is useful if you want to use certain kind of facilities, like lockers for expensive e-bikes.
    */
-  public Set<String> preferredTags() {
-    return this.preferredTags;
+  public VehicleParkingFilterRequest preferred() {
+    return this.preferred;
   }
 
-  public void setUnpreferredTagCost(int cost) {
+  public void setUnpreferredCost(int cost) {
     unpreferredTagCost = cost;
   }
 
-  public int unpreferredTagCost() {
+  public int unpreferredCost() {
     return unpreferredTagCost;
   }
 
@@ -71,15 +55,14 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
 
   public VehicleParkingRequest clone() {
     try {
-      var clone = (VehicleParkingRequest) super.clone();
-      clone.requiredTags = Set.copyOf(this.requiredTags);
-      clone.bannedTags = Set.copyOf(this.bannedTags);
-      clone.preferredTags = Set.copyOf(this.preferredTags);
-
-      return clone;
+      return (VehicleParkingRequest) super.clone();
     } catch (CloneNotSupportedException e) {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
+  }
+
+  public VehicleParkingFilterRequest filter() {
+    return filter;
   }
 }

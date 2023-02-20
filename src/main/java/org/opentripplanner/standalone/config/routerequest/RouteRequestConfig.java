@@ -152,56 +152,13 @@ public class RouteRequestConfig {
         )
         .asDuration(dft.searchWindow())
     );
-    vehicleParking.setUseAvailabilityInformation(
-      c
-        .of("useVehicleParkingAvailabilityInformation")
-        .summary(
-          "Whether realtime information about free parking spaces should be taken into consideration."
-        )
-        .since(V2_1)
-        .asBoolean(vehicleParking.useAvailabilityInformation())
-    );
-    vehicleParking.setRequiredTags(
-      c
-        .of("requiredVehicleParkingTags")
-        .since(V2_1)
-        .summary(
-          "Tags which are required to use a vehicle parking. If empty, no tags are required."
-        )
-        .asStringSet(vehicleParking.requiredTags())
-    );
-    vehicleParking.setBannedTags(
-      c
-        .of("bannedVehicleParkingTags")
-        .since(V2_1)
-        .summary("Tags with which a vehicle parking will not be used. If empty, no tags are banned")
-        .asStringSet(vehicleParking.bannedTags())
-    );
-    vehicleParking.setPreferredTags(
-      c
-        .of("preferredVehicleParkingTags")
-        .since(V2_3)
-        .summary(
-          "If a parking facility contains one of these tags it will be used preferably. If empty, no tags are preferred."
-        )
-        .description(
-          """
-          If this is non-empty and a parking facility doesn't contain this tag, then using it will receive an extra cost
-          configured in `unpreferredVehicleParkingTagCost`.
-          
-          This is useful if you want prefer certain facilities, for example bicycle lockers for expensive e-bikes, but
-          you don't want to force their use since they are rare.
-          """
-        )
-        .asStringSet(vehicleParking.preferredTags())
-    );
-    vehicleParking.setUnpreferredTagCost(
+    vehicleParking.setUnpreferredCost(
       c
         .of("unpreferredVehicleParkingTagCost")
         .since(V2_3)
         .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
         .description("See `preferredVehicleParkingTags`.")
-        .asInt(vehicleParking.unpreferredTagCost())
+        .asInt(vehicleParking.unpreferredCost())
     );
 
     request.setWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));

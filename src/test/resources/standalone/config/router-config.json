@@ -29,10 +29,6 @@
     "bikeBoardCost": 600,
     "otherThanPreferredRoutesPenalty": 300,
     "transferSlack": 120,
-    "preferredVehicleParkingTags": ["covered"],
-    "unpreferredVehicleParkingTagCost": 360,
-    "requiredVehicleParkingTags": ["garage"],
-    "bannedVehicleParkingTags": ["lamp-post"],
     // Default slack for any mode is 0 (zero)
     "boardSlackForMode": {
       "AIRPLANE": "35m"

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -20,6 +21,9 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -244,16 +248,51 @@ public class RouteRequestMapper {
     );
 
     var parking = request.journey().parking();
-    callWith.argument("parking.banned.tags", parking::setBannedTags);
-    callWith.argument("parking.required.and.tags", parking::setRequiredTags);
-    callWith.argument("parking.preferred.tags", parking::setPreferredTags);
-    callWith.argument("parking.unpreferredCost", parking::setUnpreferredTagCost);
+    callWith.argument("parking.unpreferredCost", parking::setUnpreferredCost);
+
+    callWith.argument(
+      "parking.filters",
+      (Collection<Map<String, Object>> filters) -> {
+        var f = parseFilters(filters);
+        parking.setFilter(f);
+      }
+    );
+
+    callWith.argument(
+      "parking.preferred",
+      (Collection<Map<String, Object>> filters) -> {
+        var f = parseFilters(filters);
+        parking.setPreferred(f);
+      }
+    );
 
     callWith.argument(
       "locale",
       (String v) -> request.setLocale(LegacyGraphQLUtils.getLocale(environment, v))
     );
     return request;
+  }
+
+  private static VehicleParkingFilterRequest parseFilters(Collection<Map<String, Object>> filters) {
+    var not = parseFilters(filters, "not");
+    var select = parseFilters(filters, "select");
+    return new VehicleParkingFilterRequest(not, select);
+  }
+
+  @Nonnull
+  private static Set<VehicleParkingFilter> parseFilters(
+    Collection<Map<String, Object>> filters,
+    String key
+  ) {
+    return filters
+      .stream()
+      .map(f -> parseOperation((Map<String, Collection<String>>) f.getOrDefault(key, Map.of())))
+      .collect(Collectors.toSet());
+  }
+
+  private static VehicleParkingFilter parseOperation(Map<String, Collection<String>> map) {
+    var tags = map.getOrDefault("tags", List.of());
+    return new TagsFilter(Set.copyOf(tags));
   }
 
   private static <T> boolean hasArgument(Map<String, T> m, String name) {

@@ -739,8 +739,8 @@ public abstract class RoutingResource {
           useVehicleParkingAvailabilityInformation,
           parking::setUseAvailabilityInformation
         );
-        setIfNotNull(bannedVehicleParkingTags, parking::setBannedTags);
-        setIfNotNull(requiredVehicleParkingTags, parking::setRequiredTags);
+        //setIfNotNull(bannedVehicleParkingTags, parking::setBannedTags);
+        //setIfNotNull(requiredVehicleParkingTags, parking::setRequiredTags);
       }
 
       setIfNotNull(arriveBy, request::setArriveBy);

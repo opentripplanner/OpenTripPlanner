@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.edge;
 
-import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -53,10 +52,7 @@ public class StreetVehicleParkingLink extends Edge {
 
     var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
     final VehicleParkingRequest parkingRequest = s0.getRequest().parking();
-    if (
-      hasMissingRequiredTags(vehicleParking, parkingRequest.requiredTags()) ||
-      hasBannedTags(vehicleParking, parkingRequest.bannedTags())
-    ) {
+    if (traversalBanned(parkingRequest, vehicleParking)) {
       return null;
     }
 
@@ -65,6 +61,13 @@ public class StreetVehicleParkingLink extends Edge {
     s1.incrementWeight(1);
     s1.setBackMode(null);
     return s1.makeState();
+  }
+
+  private boolean traversalBanned(
+    VehicleParkingRequest parkingRequest,
+    VehicleParking vehicleParking
+  ) {
+    return !parkingRequest.filter().matches(vehicleParking);
   }
 
   @Override
@@ -78,20 +81,5 @@ public class StreetVehicleParkingLink extends Edge {
 
   public double getDistanceMeters() {
     return 0;
-  }
-
-  private boolean hasBannedTags(VehicleParking vehicleParking, Set<String> bannedTags) {
-    if (bannedTags.isEmpty()) {
-      return false;
-    }
-
-    return vehicleParking.getTags().stream().anyMatch(bannedTags::contains);
-  }
-
-  private boolean hasMissingRequiredTags(VehicleParking vehicleParking, Set<String> requiredTags) {
-    if (requiredTags.isEmpty()) {
-      return false;
-    }
-    return !vehicleParking.getTags().containsAll(requiredTags);
   }
 }
