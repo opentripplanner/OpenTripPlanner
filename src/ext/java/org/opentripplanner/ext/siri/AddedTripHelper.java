@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.ext.siri.SiriTransportModeMapper.mapTransitMainMode;
+import static org.opentripplanner.ext.siri.mapper.SiriTransportModeMapper.mapTransitMainMode;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
 
 import java.time.LocalDate;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import org.opentripplanner.ext.siri.mapper.PickDropMapper;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
@@ -336,13 +337,13 @@ class AddedTripHelper {
     }
 
     // Update pickup / dropoff
-    var pickUpType = TimetableHelper.mapPickUpType(
+    var pickUpType = PickDropMapper.mapPickUpType(
       stopTime.getPickupType(),
       call.getDepartureBoardingActivity()
     );
     pickUpType.ifPresent(stopTime::setPickupType);
 
-    var dropOffType = TimetableHelper.mapDropOffType(
+    var dropOffType = PickDropMapper.mapDropOffType(
       stopTime.getDropOffType(),
       call.getArrivalBoardingActivity()
     );

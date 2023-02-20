@@ -1,9 +1,7 @@
 package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.model.PickDrop.CANCELLED;
 import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
@@ -16,13 +14,13 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.opentripplanner.ext.siri.mapper.OccupancyMapper;
+import org.opentripplanner.ext.siri.mapper.PickDropMapper;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -32,14 +30,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
 import uk.org.siri.siri20.CallStatusEnumeration;
-import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
 import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.MonitoredCallStructure;
@@ -253,22 +248,6 @@ public class TimetableHelper {
   }
 
   /**
-   * Maps the (very limited) SIRI 2.0 OccupancyEnum to internal OccupancyStatus
-   * @param occupancy
-   * @return
-   */
-  private static OccupancyStatus resolveOccupancyStatus(OccupancyEnumeration occupancy) {
-    if (occupancy != null) {
-      return switch (occupancy) {
-        case SEATS_AVAILABLE -> OccupancyStatus.MANY_SEATS_AVAILABLE;
-        case STANDING_AVAILABLE -> OccupancyStatus.STANDING_ROOM_ONLY;
-        case FULL -> OccupancyStatus.FULL;
-      };
-    }
-    return OccupancyStatus.NO_DATA;
-  }
-
-  /**
    * Apply the SIRI ET to the appropriate TripTimes from this Timetable. Calculate new stoppattern
    * based on single stop cancellations
    *
@@ -369,7 +348,7 @@ public class TimetableHelper {
             if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
               stopTime.cancelDropOff();
             }
-            var dropOffType = mapDropOffType(
+            var dropOffType = PickDropMapper.mapDropOffType(
               stopTime.getDropOffType(),
               estimatedCall.getArrivalBoardingActivity()
             );
@@ -379,7 +358,7 @@ public class TimetableHelper {
             if (departureStatus == CallStatusEnumeration.CANCELLED) {
               stopTime.cancelPickup();
             }
-            var pickUpType = mapPickUpType(
+            var pickUpType = PickDropMapper.mapPickUpType(
               stopTime.getPickupType(),
               estimatedCall.getDepartureBoardingActivity()
             );
@@ -569,56 +548,6 @@ public class TimetableHelper {
   }
 
   /**
-   * This method maps an ArrivalBoardingActivity to a pick drop type.
-   *
-   * The Siri ArrivalBoardingActivity includes less information than the pick drop type, therefore is it only
-   * changed if routability has changed.
-   *
-   * @param currentValue The current pick drop value on a stopTime
-   * @param arrivalBoardingActivityEnumeration The incoming boardingActivity to be mapped
-   * @return Mapped PickDrop type, empty if routability is not changed.
-   */
-  public static Optional<PickDrop> mapDropOffType(
-    PickDrop currentValue,
-    ArrivalBoardingActivityEnumeration arrivalBoardingActivityEnumeration
-  ) {
-    if (arrivalBoardingActivityEnumeration == null) {
-      return Optional.empty();
-    }
-
-    return switch (arrivalBoardingActivityEnumeration) {
-      case ALIGHTING -> currentValue.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
-      case NO_ALIGHTING -> Optional.of(NONE);
-      case PASS_THRU -> Optional.of(CANCELLED);
-    };
-  }
-
-  /**
-   * This method maps an departureBoardingActivity to a pick drop type.
-   *
-   * The Siri DepartureBoardingActivity includes less information than the planned data, therefore is it only
-   * changed if routability has changed.
-   *
-   * @param currentValue The current pick drop value on a stopTime
-   * @param departureBoardingActivityEnumeration The incoming departureBoardingActivityEnumeration to be mapped
-   * @return Mapped PickDrop type, empty if routability is not changed.
-   */
-  public static Optional<PickDrop> mapPickUpType(
-    PickDrop currentValue,
-    DepartureBoardingActivityEnumeration departureBoardingActivityEnumeration
-  ) {
-    if (departureBoardingActivityEnumeration == null) {
-      return Optional.empty();
-    }
-
-    return switch (departureBoardingActivityEnumeration) {
-      case BOARDING -> currentValue.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
-      case NO_BOARDING -> Optional.of(NONE);
-      case PASS_THRU -> Optional.of(CANCELLED);
-    };
-  }
-
-  /**
    * Loop through all passed times, return the first non-negative one or the last one
    */
   private static int handleMissingRealtime(int... times) {
@@ -712,7 +641,7 @@ public class TimetableHelper {
       : journeyOccupancy;
 
     if (callOccupancy != null) {
-      tripTimes.setOccupancyStatus(index, resolveOccupancyStatus(callOccupancy));
+      tripTimes.setOccupancyStatus(index, OccupancyMapper.mapOccupancyStatus(callOccupancy));
     }
 
     int arrivalDelay = realtimeArrivalTime - arrivalTime;
@@ -786,7 +715,7 @@ public class TimetableHelper {
       : journeyOccupancy;
 
     if (callOccupancy != null) {
-      tripTimes.setOccupancyStatus(index, resolveOccupancyStatus(callOccupancy));
+      tripTimes.setOccupancyStatus(index, OccupancyMapper.mapOccupancyStatus(callOccupancy));
     }
 
     int arrivalDelay = realtimeArrivalTime - arrivalTime;
@@ -868,7 +797,7 @@ public class TimetableHelper {
       : journeyOccupancy;
 
     if (callOccupancy != null) {
-      tripTimes.setOccupancyStatus(index, resolveOccupancyStatus(callOccupancy));
+      tripTimes.setOccupancyStatus(index, OccupancyMapper.mapOccupancyStatus(callOccupancy));
     }
 
     int arrivalDelay = realtimeArrivalTime - arrivalTime;

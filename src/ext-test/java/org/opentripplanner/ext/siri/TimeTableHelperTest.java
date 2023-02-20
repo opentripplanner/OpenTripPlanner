@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.siri.mapper.PickDropMapper;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -561,7 +562,7 @@ public class TimeTableHelperTest {
   public void testNoRoutabilityChangeDropOff() {
     var originalDropOffType = PickDrop.COORDINATE_WITH_DRIVER;
     var incomingArrivalBoardingActivity = ArrivalBoardingActivityEnumeration.ALIGHTING;
-    var testResult = TimetableHelper.mapDropOffType(
+    var testResult = PickDropMapper.mapDropOffType(
       originalDropOffType,
       incomingArrivalBoardingActivity
     );
@@ -576,7 +577,7 @@ public class TimeTableHelperTest {
   public void testNoRoutabilityChangePickUp() {
     var originalPickUpType = PickDrop.COORDINATE_WITH_DRIVER;
     var incomingDepartureBoardingActivity = DepartureBoardingActivityEnumeration.BOARDING;
-    var testResult = TimetableHelper.mapPickUpType(
+    var testResult = PickDropMapper.mapPickUpType(
       originalPickUpType,
       incomingDepartureBoardingActivity
     );
@@ -591,7 +592,7 @@ public class TimeTableHelperTest {
   public void testChangeInRoutabilityChangePickUp() {
     var originalPickUpType = PickDrop.NONE;
     var incomingDepartureBoardingActivity = DepartureBoardingActivityEnumeration.BOARDING;
-    var testResult = TimetableHelper.mapPickUpType(
+    var testResult = PickDropMapper.mapPickUpType(
       originalPickUpType,
       incomingDepartureBoardingActivity
     );
@@ -607,7 +608,7 @@ public class TimeTableHelperTest {
   public void testChangeInRoutabilityChangeDropOff() {
     var originalDropOffType = PickDrop.NONE;
     var incomingArrivalBoardingActivity = ArrivalBoardingActivityEnumeration.ALIGHTING;
-    var testResult = TimetableHelper.mapDropOffType(
+    var testResult = PickDropMapper.mapDropOffType(
       originalDropOffType,
       incomingArrivalBoardingActivity
     );
@@ -623,7 +624,7 @@ public class TimeTableHelperTest {
   public void testChangeInRoutabilityChangeDropOff_NoAlighting() {
     var originalDropOffType = PickDrop.COORDINATE_WITH_DRIVER;
     var incomingArrivalBoardingActivity = ArrivalBoardingActivityEnumeration.NO_ALIGHTING;
-    var testResult = TimetableHelper.mapDropOffType(
+    var testResult = PickDropMapper.mapDropOffType(
       originalDropOffType,
       incomingArrivalBoardingActivity
     );
@@ -639,7 +640,7 @@ public class TimeTableHelperTest {
   public void testChangeInRoutabilityChangePickUp_NoBoarding() {
     var originalPickUpType = PickDrop.COORDINATE_WITH_DRIVER;
     var incomingDepartureBoardingActivity = DepartureBoardingActivityEnumeration.NO_BOARDING;
-    var testResult = TimetableHelper.mapPickUpType(
+    var testResult = PickDropMapper.mapPickUpType(
       originalPickUpType,
       incomingDepartureBoardingActivity
     );
@@ -655,7 +656,7 @@ public class TimeTableHelperTest {
   public void testNullBoardingActivity() {
     var originalPickUpType = PickDrop.COORDINATE_WITH_DRIVER;
     DepartureBoardingActivityEnumeration incomingDepartureBoardingActivity = null;
-    var testResult = TimetableHelper.mapPickUpType(
+    var testResult = PickDropMapper.mapPickUpType(
       originalPickUpType,
       incomingDepartureBoardingActivity
     );
@@ -667,7 +668,7 @@ public class TimeTableHelperTest {
   public void testNullArrivalActivity() {
     var originalDropOffType = PickDrop.COORDINATE_WITH_DRIVER;
     ArrivalBoardingActivityEnumeration incomingDepartureArrivalActivity = null;
-    var testResult = TimetableHelper.mapDropOffType(
+    var testResult = PickDropMapper.mapDropOffType(
       originalDropOffType,
       incomingDepartureArrivalActivity
     );

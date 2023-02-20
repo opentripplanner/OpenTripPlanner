@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.opentripplanner.ext.siri.mapper.SiriTransportModeMapper;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.model.calendar.CalendarServiceData;
