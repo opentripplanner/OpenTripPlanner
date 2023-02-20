@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri;
 
+import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.model.PickDrop.CANCELLED;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
@@ -643,7 +644,7 @@ public class TimetableHelper {
    * @return a primitive boolean
    */
   public static boolean isTrue(Boolean value) {
-    return Boolean.TRUE.equals(value);
+    return TRUE.equals(value);
   }
 
   public static void applyUpdates(
@@ -782,6 +783,88 @@ public class TimetableHelper {
 
     OccupancyEnumeration callOccupancy = estimatedCall.getOccupancy() != null
       ? estimatedCall.getOccupancy()
+      : journeyOccupancy;
+
+    if (callOccupancy != null) {
+      tripTimes.setOccupancyStatus(index, resolveOccupancyStatus(callOccupancy));
+    }
+
+    int arrivalDelay = realtimeArrivalTime - arrivalTime;
+    tripTimes.updateArrivalDelay(index, arrivalDelay);
+
+    int departureDelay = realtimeDepartureTime - departureTime;
+    tripTimes.updateDepartureDelay(index, departureDelay);
+  }
+
+  public static void applyUpdates(
+    ZonedDateTime departureDate,
+    List<StopTime> stopTimes,
+    TripTimes tripTimes,
+    int index,
+    boolean isJourneyPredictionInaccurate,
+    CallWrapper call,
+    OccupancyEnumeration journeyOccupancy
+  ) {
+    if (call.getActualDepartureTime() != null || call.getActualArrivalTime() != null) {
+      //Flag as recorded
+      tripTimes.setRecorded(index);
+    }
+
+    // Set flag for inaccurate prediction if either call OR journey has inaccurate-flag set.
+    boolean isCallPredictionInaccurate = isTrue(call.isPredictionInaccurate());
+    if (isJourneyPredictionInaccurate || isCallPredictionInaccurate) {
+      tripTimes.setPredictionInaccurate(index);
+    }
+
+    if (TRUE.equals(call.isCancellation())) {
+      stopTimes.get(index).cancel();
+      tripTimes.setCancelled(index);
+    }
+
+    // Update dropoff-/pickuptype only if status is cancelled
+    CallStatusEnumeration arrivalStatus = call.getArrivalStatus();
+    if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
+      stopTimes.get(index).cancelDropOff();
+    }
+
+    CallStatusEnumeration departureStatus = call.getDepartureStatus();
+    if (departureStatus == CallStatusEnumeration.CANCELLED) {
+      stopTimes.get(index).cancelPickup();
+    }
+
+    int arrivalTime = tripTimes.getArrivalTime(index);
+
+    int realtimeArrivalTime = getAvailableTime(
+      departureDate,
+      call::getActualArrivalTime,
+      call::getExpectedArrivalTime,
+      call::getAimedArrivalTime
+    );
+
+    int departureTime = tripTimes.getDepartureTime(index);
+    int realtimeDepartureTime = getAvailableTime(
+      departureDate,
+      call::getActualDepartureTime,
+      call::getExpectedDepartureTime,
+      call::getAimedDepartureTime
+    );
+
+    if (index == 0) {
+      realtimeArrivalTime =
+        handleMissingRealtime(realtimeArrivalTime, realtimeDepartureTime, arrivalTime);
+    } else {
+      realtimeArrivalTime = handleMissingRealtime(realtimeArrivalTime, arrivalTime);
+    }
+
+    if (index == (stopTimes.size() - 1)) {
+      realtimeDepartureTime =
+        handleMissingRealtime(realtimeDepartureTime, realtimeArrivalTime, departureTime);
+    } else {
+      realtimeDepartureTime = handleMissingRealtime(realtimeDepartureTime, departureTime);
+    }
+
+    OccupancyEnumeration callOccupancy = call.getOccupancy() != null
+      ? call.getOccupancy()
       : journeyOccupancy;
 
     if (callOccupancy != null) {

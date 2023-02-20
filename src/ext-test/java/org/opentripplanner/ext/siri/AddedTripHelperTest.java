@@ -1,228 +1,446 @@
 package org.opentripplanner.ext.siri;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.UpdateError;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
-import uk.org.siri.siri20.NaturalLanguageStringStructure;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
 public class AddedTripHelperTest {
 
-  private Agency agency;
-  private Agency externalAgency;
-  private Operator operator;
-  private Trip trip;
-  private FeedScopedId routeId;
-  private Mode transitMode;
-  private NaturalLanguageStringStructure publishedNames;
+  private static final Agency AGENCY = TransitModelForTest.AGENCY;
+  private static final ZoneId TIME_ZONE = AGENCY.getTimezone();
+  private static final Operator OPERATOR = Operator
+    .of(TransitModelForTest.id("OPERATOR_ID"))
+    .withName("OPERATOR_NAME")
+    .build();
+  private static final Route REPLACED_ROUTE = TransitModelForTest
+    .route("REPLACED_ROUTE")
+    .withAgency(AGENCY)
+    .withOperator(OPERATOR)
+    .build();
+  private static final String LINE_REF = "ROUTE_ID";
+  private static final FeedScopedId TRIP_ID = TransitModelForTest.id("TRIP_ID");
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 2, 17);
+  private static final TransitMode TRANSIT_MODE = TransitMode.RAIL;
+  private static final String SUB_MODE = "replacementRailService";
+  private static final String SHORT_NAME = "Hogwarts Express";
+  private static final String HEADSIGN = "TEST TRIP TOWARDS TEST ISLAND";
+
+  /* Transit model */
+  private static final RegularStop STOP_A = TransitModelForTest.stop("A").build();
+  private static final RegularStop STOP_B = TransitModelForTest.stop("B").build();
+  private static final RegularStop STOP_C = TransitModelForTest.stop("C").build();
+  private static final RegularStop STOP_D = TransitModelForTest.stop("D").build();
+  private final StopModel STOP_MODEL = StopModel
+    .of()
+    .withRegularStop(STOP_A)
+    .withRegularStop(STOP_B)
+    .withRegularStop(STOP_C)
+    .withRegularStop(STOP_D)
+    .build();
+
+  private final Deduplicator DEDUPLICATOR = new Deduplicator();
+  private final TransitModel TRANSIT_MODEL = new TransitModel(STOP_MODEL, DEDUPLICATOR);
+  private EntityResolver ENTITY_RESOLVER;
 
   @BeforeEach
-  public void setUp() {
-    agency =
-      Agency
-        .of(new FeedScopedId("FEED_ID", "AGENCY_ID"))
-        .withName("AGENCY_NAME")
-        .withTimezone("CET")
-        .build();
-
-    operator =
-      Operator.of(new FeedScopedId("FEED_ID", "OPERATOR_ID")).withName("OPERATOR_NAME").build();
-
-    var externalId = new FeedScopedId("EXTERNAL", "NOT TO BE USED");
-    externalAgency =
-      Agency
-        .of(externalId)
-        .withName("EXTERNAL UNKNOWN AGENCY")
-        .withTimezone("Europe/Berlin")
-        .build();
-
-    routeId = new FeedScopedId("FEED_ID", "ROUTE_ID");
-    transitMode = new Mode(TransitMode.RAIL, "replacementRailService");
-    publishedNames = new NaturalLanguageStringStructure();
-    publishedNames.setLang("en");
-    publishedNames.setValue("Hogwarts Express");
-
-    var headsign = new NonLocalizedString("TEST TRIP TOWARDS TEST ISLAND");
-    trip =
-      Trip
-        .of(new FeedScopedId("FEED_ID", "TEST_TRIP"))
-        .withRoute(getRouteWithAgency(agency, operator))
-        .withHeadsign(headsign)
-        .build();
-  }
-
-  @Test
-  public void testGetTrip_FailOnMissingServiceId() {
-    var actualTrip = AddedTripHelper.getTrip(null, null, null, null, null, null);
-
-    assertAll(() -> {
-      assertTrue(actualTrip.isFailure(), "Trip creation should fail");
-      assertEquals(
-        UpdateError.UpdateErrorType.NO_START_DATE,
-        actualTrip.failureValue().errorType(),
-        "Trip creation should fail without start date"
-      );
-    });
-  }
-
-  @Test
-  public void testGetTrip() {
-    var route = getRouteWithAgency(agency, operator);
-    var destinationName = new NaturalLanguageStringStructure();
-    var transitMode = new Mode(TransitMode.RAIL, "replacementRailService");
-    var serviceId = new FeedScopedId("FEED ID", "CS ID");
-
-    var actualTrip = AddedTripHelper.getTrip(
-      trip.getId(),
-      route,
-      operator,
-      transitMode,
-      List.of(destinationName),
-      serviceId
-    );
-
-    assertAll(() -> {
-      assertTrue(actualTrip.isSuccess(), "Trip creation should succeed");
-      assertEquals(trip.getId(), actualTrip.successValue().getId(), "Trip is should be mapped");
-      assertEquals(
-        operator,
-        actualTrip.successValue().getOperator(),
-        "operator is should be mapped"
-      );
-      assertEquals(route, actualTrip.successValue().getRoute(), "route is should be mapped");
-      assertEquals(
-        transitMode.mode(),
-        actualTrip.successValue().getMode(),
-        "transitMode is should be mapped"
-      );
-      assertEquals(
-        SubMode.of(transitMode.submode()),
-        actualTrip.successValue().getNetexSubMode(),
-        "submode is should be mapped"
-      );
-      assertEquals(
-        serviceId,
-        actualTrip.successValue().getServiceId(),
-        "serviceId is should be mapped"
-      );
-    });
-  }
-
-  @Test
-  public void testGetRouteEmptyName() {
-    // Arrange
-    var internalRoute = getRouteWithAgency(agency, operator);
-    var replacedRoute = getRouteWithAgency(externalAgency, operator);
-
-    // Act
-    var actualRoute = AddedTripHelper.getRoute(
-      List.of(internalRoute),
-      List.of(),
-      operator,
-      replacedRoute,
-      routeId,
-      transitMode
-    );
-
-    // Assert
-    assertNotNull(actualRoute, "The route should not be null");
-    assertAll(() -> {
-      assertNotNull(actualRoute.getName(), "Name should be empty string not null");
-      assertNotEquals(publishedNames.getValue(), actualRoute.getName(), "Route name differs");
-      assertEquals(routeId, actualRoute.getId(), "Incorrect route id mapped");
-      assertEquals(operator, actualRoute.getOperator(), "Incorrect operator mapped");
-      assertEquals(agency, actualRoute.getAgency(), "Agency should be taken from replaced route");
-    });
-  }
-
-  @Test
-  public void testGetRouteWithAgencyFromReplacedRoute() {
-    // Arrange
-    var internalRoute = getRouteWithAgency(agency, null);
-    var replacedRoute = getRouteWithAgency(externalAgency, operator);
-
-    // Act
-    var actualRoute = AddedTripHelper.getRoute(
-      List.of(internalRoute),
-      List.of(publishedNames),
-      operator,
-      replacedRoute,
-      routeId,
-      transitMode
-    );
-
-    // Assert
-    assertNotNull(actualRoute, "The route should not be null");
-    assertAll(() -> {
-      assertEquals(publishedNames.getValue(), actualRoute.getName(), "Route name differs");
-      assertEquals(routeId, actualRoute.getId(), "Incorrect route id mapped");
-      assertEquals(operator, actualRoute.getOperator(), "Incorrect operator mapped");
-      assertEquals(
-        externalAgency,
-        actualRoute.getAgency(),
-        "Agency should be taken from replaced route"
-      );
-    });
-  }
-
-  @Test
-  public void testGetRoute() {
-    // Arrange
-    var internalRoute = getRouteWithAgency(agency, operator);
-    var externalRoute = getRouteWithAgency(externalAgency, null);
-
-    // Act
-    var actualRoute = AddedTripHelper.getRoute(
-      List.of(internalRoute),
-      List.of(publishedNames),
-      operator,
-      externalRoute,
-      routeId,
-      transitMode
-    );
-
-    // Assert
-    assertNotNull(actualRoute, "The route should not be null");
-    assertAll(() -> {
-      assertEquals(publishedNames.getValue(), actualRoute.getName(), "Route name differs");
-      assertEquals(routeId, actualRoute.getId(), "Incorrect route id mapped");
-      assertEquals(operator, actualRoute.getOperator(), "Incorrect operator mapped");
-      assertEquals(agency, actualRoute.getAgency(), "Agency should be taken from operator");
-      assertNotEquals(
-        externalAgency,
-        actualRoute.getAgency(),
-        "External agency should not be used"
-      );
-    });
-  }
-
-  private Route getRouteWithAgency(Agency agency, Operator operator) {
-    return Route
-      .of(new FeedScopedId("FEED_ID", "LINE_ID"))
-      .withShortName("LINE_SHORT_NAME")
-      .withLongName(new NonLocalizedString("LINE_LONG_NAME"))
-      .withMode(TransitMode.RAIL)
-      .withAgency(agency)
-      .withOperator(operator)
+  void setUp() {
+    // Add entities to transit model for the entity resolver
+    TRANSIT_MODEL.addAgency(AGENCY);
+    final TripPattern pattern = TransitModelForTest
+      .tripPattern("REPLACED_ROUTE_PATTERN_ID", REPLACED_ROUTE)
+      .withStopPattern(TransitModelForTest.stopPattern(STOP_A, STOP_B))
       .build();
+    TRANSIT_MODEL.addTripPattern(pattern.getId(), pattern);
+
+    // Crate a scheduled calendar, to have the SERVICE_DATE be within the transit feed coverage
+    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var cal_id = TransitModelForTest.id("CAL_1");
+    calendarServiceData.putServiceDatesForServiceId(
+      cal_id,
+      List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
+    );
+    TRANSIT_MODEL.getServiceCodes().put(cal_id, 0);
+    TRANSIT_MODEL.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
+
+    // Create transit model index
+    TRANSIT_MODEL.index();
+
+    // Create the entity resolver only after the model has been indexed
+    ENTITY_RESOLVER =
+      new EntityResolver(new DefaultTransitService(TRANSIT_MODEL), TransitModelForTest.FEED_ID);
+  }
+
+  @Test
+  public void testAddedTrip() {
+    var addedTrip = new AddedTripHelper(
+      TRANSIT_MODEL,
+      ENTITY_RESOLVER,
+      AbstractTransitEntity::getId,
+      TRIP_ID,
+      OPERATOR,
+      LINE_REF,
+      REPLACED_ROUTE,
+      SERVICE_DATE,
+      TRANSIT_MODE,
+      SUB_MODE,
+      getCalls(10),
+      false,
+      null,
+      false,
+      SHORT_NAME,
+      HEADSIGN
+    )
+      .build();
+
+    assertTrue(addedTrip.isSuccess(), "Trip creation should succeed");
+
+    // Assert trip
+    Trip trip = addedTrip.successValue().trip();
+    assertEquals(TRIP_ID, trip.getId(), "Trip is should be mapped");
+    assertEquals(OPERATOR, trip.getOperator(), "operator is should be mapped");
+    assertEquals(TRANSIT_MODE, trip.getMode(), "transitMode is should be mapped");
+    assertEquals(SubMode.of(SUB_MODE), trip.getNetexSubMode(), "submode is should be mapped");
+    assertNotNull(trip.getHeadsign(), "Headsign should be mapped");
+    assertEquals(HEADSIGN, trip.getHeadsign().toString(), "Headsign should be mapped");
+    assertEquals(SERVICE_DATE, addedTrip.successValue().serviceDate());
+
+    // Assert route
+    Route route = trip.getRoute();
+    assertEquals(LINE_REF, route.getId().getId(), "route is should be mapped");
+    assertEquals(AGENCY, route.getAgency(), "Agency should be taken from replaced route");
+    assertEquals(SHORT_NAME, route.getShortName());
+    assertEquals(TRANSIT_MODE, route.getMode(), "transitMode is should be mapped");
+    assertEquals(SubMode.of(SUB_MODE), route.getNetexSubmode(), "submode is should be mapped");
+    assertNotEquals(REPLACED_ROUTE, route, "Should not re-use replaced route");
+
+    // Assert transit model index
+    var transitModelIndex = TRANSIT_MODEL.getTransitModelIndex();
+    assertNotNull(transitModelIndex);
+    assertEquals(
+      route,
+      transitModelIndex.getRouteForId(TransitModelForTest.id(LINE_REF)),
+      "Route should be added to transit index"
+    );
+    assertEquals(
+      trip,
+      transitModelIndex.getTripForId().get(TRIP_ID),
+      "Route should be added to transit index"
+    );
+    var pattern = transitModelIndex.getPatternForTrip().get(trip);
+    assertNotNull(pattern);
+    assertEquals(route, pattern.getRoute());
+    assertTrue(
+      transitModelIndex
+        .getServiceCodesRunningForDate()
+        .get(SERVICE_DATE)
+        .contains(TRANSIT_MODEL.getServiceCodes().get(trip.getServiceId())),
+      "serviceId is should be running on service date"
+    );
+
+    // Assert stop pattern
+    var stopPattern = addedTrip.successValue().stopPattern();
+    assertEquals(stopPattern, pattern.getStopPattern());
+    assertEquals(3, stopPattern.getSize());
+    assertEquals(STOP_A, stopPattern.getStop(0));
+    assertEquals(STOP_B, stopPattern.getStop(1));
+    assertEquals(STOP_C, stopPattern.getStop(2));
+
+    // Assert scheduled timetable
+    var scheduledTimes = pattern.getScheduledTimetable().getTripTimes(trip);
+    assertNotNull(scheduledTimes);
+    // TODO - is this correct?
+    assertEquals(RealTimeState.SCHEDULED, scheduledTimes.getRealTimeState());
+    assertTrue(scheduledTimes.isScheduled());
+    assertEquals(secondsInDay(10, 20), scheduledTimes.getArrivalTime(0));
+    assertEquals(secondsInDay(10, 20), scheduledTimes.getDepartureTime(0));
+    assertEquals(0, scheduledTimes.getDepartureDelay(0));
+    assertEquals(HEADSIGN, scheduledTimes.getHeadsign(0).toString());
+    assertFalse(
+      scheduledTimes.isRecordedStop(0),
+      "Scheduled timetable should not have actual departure time"
+    );
+    assertEquals(secondsInDay(10, 30), scheduledTimes.getArrivalTime(1));
+    assertEquals(secondsInDay(10, 30), scheduledTimes.getDepartureTime(1));
+    assertEquals(0, scheduledTimes.getArrivalDelay(1));
+    assertEquals(0, scheduledTimes.getDepartureDelay(1));
+    assertEquals(secondsInDay(10, 40), scheduledTimes.getArrivalTime(2));
+    assertEquals(secondsInDay(10, 40), scheduledTimes.getDepartureTime(2));
+    assertEquals(0, scheduledTimes.getArrivalDelay(2));
+
+    // Assert updated trip times
+    var times = addedTrip.successValue().tripTimes();
+    assertEquals(trip, times.getTrip());
+    assertEquals(RealTimeState.ADDED, times.getRealTimeState());
+    assertFalse(times.isScheduled());
+    assertEquals(secondsInDay(10, 19), times.getArrivalTime(0));
+    assertEquals(secondsInDay(10, 19), times.getDepartureTime(0));
+    assertEquals(-60, times.getDepartureDelay(0));
+    assertEquals(HEADSIGN, times.getHeadsign(0).toString());
+    assertTrue(times.isRecordedStop(0), "First stop has actual departure time");
+    assertEquals(secondsInDay(10, 29), times.getArrivalTime(1));
+    assertEquals(secondsInDay(10, 31), times.getDepartureTime(1));
+    assertEquals(-60, times.getArrivalDelay(1));
+    assertEquals(60, times.getDepartureDelay(1));
+    assertFalse(times.isRecordedStop(1), "First stop has actual departure time");
+    assertEquals(secondsInDay(10, 41), times.getArrivalTime(2));
+    assertEquals(secondsInDay(10, 41), times.getDepartureTime(2));
+    assertEquals(60, times.getArrivalDelay(2));
+    assertFalse(times.isRecordedStop(2), "First stop has actual departure time");
+  }
+
+  @Test
+  void testAddedTripOnAddedRoute() {
+    var firstAddedTrip = new AddedTripHelper(
+      TRANSIT_MODEL,
+      ENTITY_RESOLVER,
+      AbstractTransitEntity::getId,
+      TRIP_ID,
+      OPERATOR,
+      LINE_REF,
+      REPLACED_ROUTE,
+      SERVICE_DATE,
+      TRANSIT_MODE,
+      SUB_MODE,
+      getCalls(10),
+      false,
+      null,
+      false,
+      SHORT_NAME,
+      HEADSIGN
+    )
+      .build();
+
+    assertTrue(firstAddedTrip.isSuccess(), "Trip creation should succeed");
+    var firstTrip = firstAddedTrip.successValue().trip();
+
+    var tripId2 = TransitModelForTest.id("TRIP_ID_2");
+
+    var secondAddedTrip = new AddedTripHelper(
+      TRANSIT_MODEL,
+      ENTITY_RESOLVER,
+      AbstractTransitEntity::getId,
+      tripId2,
+      OPERATOR,
+      LINE_REF,
+      REPLACED_ROUTE,
+      SERVICE_DATE,
+      TRANSIT_MODE,
+      SUB_MODE,
+      getCalls(11),
+      false,
+      null,
+      false,
+      SHORT_NAME,
+      HEADSIGN
+    )
+      .build();
+
+    assertTrue(secondAddedTrip.isSuccess(), "Trip creation should succeed");
+
+    // Assert trip
+    Trip secondTrip = secondAddedTrip.successValue().trip();
+    assertEquals(tripId2, secondTrip.getId(), "Trip is should be mapped");
+    assertNotEquals(firstTrip, secondTrip);
+
+    // Assert route
+    Route route = secondTrip.getRoute();
+    assertSame(firstTrip.getRoute(), route, "route be reused from the first trip");
+
+    // Assert transit model index
+    var transitModelIndex = TRANSIT_MODEL.getTransitModelIndex();
+    assertNotNull(transitModelIndex);
+    assertEquals(2, transitModelIndex.getPatternsForRoute().get(route).size());
+
+    // Assert trip times
+    var times = secondAddedTrip.successValue().tripTimes();
+    assertEquals(secondTrip, times.getTrip());
+    assertEquals(RealTimeState.ADDED, times.getRealTimeState());
+    assertEquals(secondsInDay(11, 19), times.getArrivalTime(0));
+    assertEquals(secondsInDay(11, 19), times.getDepartureTime(0));
+    assertEquals(secondsInDay(11, 29), times.getArrivalTime(1));
+    assertEquals(secondsInDay(11, 31), times.getDepartureTime(1));
+    assertEquals(secondsInDay(11, 41), times.getArrivalTime(2));
+    assertEquals(secondsInDay(11, 41), times.getDepartureTime(2));
+  }
+
+  @Test
+  void testAddedTripOnExistingRoute() {
+    var addedTrip = new AddedTripHelper(
+      TRANSIT_MODEL,
+      ENTITY_RESOLVER,
+      AbstractTransitEntity::getId,
+      TRIP_ID,
+      OPERATOR,
+      REPLACED_ROUTE.getId().getId(),
+      REPLACED_ROUTE,
+      SERVICE_DATE,
+      TRANSIT_MODE,
+      SUB_MODE,
+      getCalls(10),
+      false,
+      null,
+      false,
+      SHORT_NAME,
+      HEADSIGN
+    )
+      .build();
+
+    assertTrue(addedTrip.isSuccess(), "Trip creation should succeed");
+
+    // Assert trip
+    Trip trip = addedTrip.successValue().trip();
+    assertEquals(TRIP_ID, trip.getId(), "Trip is should be mapped");
+    assertSame(REPLACED_ROUTE, trip.getRoute());
+  }
+
+  @Test
+  void testAddedTripWithoutReplacedRoute() {
+    var addedTrip = new AddedTripHelper(
+      TRANSIT_MODEL,
+      ENTITY_RESOLVER,
+      AbstractTransitEntity::getId,
+      TRIP_ID,
+      OPERATOR,
+      LINE_REF,
+      null,
+      SERVICE_DATE,
+      TRANSIT_MODE,
+      null,
+      getCalls(10),
+      false,
+      null,
+      false,
+      SHORT_NAME,
+      HEADSIGN
+    )
+      .build();
+
+    assertTrue(addedTrip.isSuccess(), "Trip creation should succeed");
+
+    // Assert trip
+    Trip trip = addedTrip.successValue().trip();
+    assertEquals(TRIP_ID, trip.getId(), "Trip is should be mapped");
+
+    // Assert route
+    Route route = trip.getRoute();
+    assertEquals(LINE_REF, route.getId().getId(), "route is should be mapped");
+    assertEquals(AGENCY, route.getAgency(), "Agency should be taken from replaced route");
+    assertEquals(SHORT_NAME, route.getShortName());
+    assertEquals(TRANSIT_MODE, route.getMode(), "transitMode is should be mapped");
+    assertEquals(
+      SubMode.UNKNOWN,
+      route.getNetexSubmode(),
+      "submode is should be unknown, when ro replacing route is found"
+    );
+    assertNotEquals(REPLACED_ROUTE, route, "Should not re-use replaced route");
+  }
+
+  @Test
+  public void testAddedTripFailOnMissingServiceId() {
+    var addedTrip = new AddedTripHelper(
+      TRANSIT_MODEL,
+      ENTITY_RESOLVER,
+      AbstractTransitEntity::getId,
+      TRIP_ID,
+      OPERATOR,
+      LINE_REF,
+      REPLACED_ROUTE,
+      null,
+      TRANSIT_MODE,
+      SUB_MODE,
+      List.of(),
+      false,
+      null,
+      false,
+      SHORT_NAME,
+      HEADSIGN
+    )
+      .build();
+
+    assertTrue(addedTrip.isFailure(), "Trip creation should fail");
+    assertEquals(
+      UpdateError.UpdateErrorType.NO_START_DATE,
+      addedTrip.failureValue().errorType(),
+      "Trip creation should fail without start date"
+    );
+  }
+
+  @Test
+  public void testAddedTripFailOnNonIncreasingDwellTime() {
+    List<CallWrapper> calls = List.of(
+      TestCall.from(STOP_A.getId().getId(), t(10, 20), t(10, 20), null),
+      TestCall.intermediate(
+        STOP_B.getId().getId(),
+        t(10, 30),
+        t(10, 31),
+        null,
+        t(10, 30),
+        t(10, 29),
+        null
+      ),
+      // Expected to arrive one minute prior to irrelevant aimed departure time
+      TestCall.to(STOP_C.getId().getId(), t(10, 40), t(10, 40), null)
+    );
+
+    var addedTrip = new AddedTripHelper(
+      TRANSIT_MODEL,
+      ENTITY_RESOLVER,
+      AbstractTransitEntity::getId,
+      TRIP_ID,
+      OPERATOR,
+      LINE_REF,
+      REPLACED_ROUTE,
+      SERVICE_DATE,
+      TRANSIT_MODE,
+      SUB_MODE,
+      calls,
+      false,
+      null,
+      false,
+      SHORT_NAME,
+      HEADSIGN
+    )
+      .build();
+
+    assertTrue(addedTrip.isFailure(), "Trip creation should fail");
+    assertEquals(
+      UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME,
+      addedTrip.failureValue().errorType(),
+      "Trip creation should fail with invalid dwell time"
+    );
   }
 
   @ParameterizedTest
@@ -231,6 +449,7 @@ public class AddedTripHelperTest {
       "air,AIRPLANE,AIRPLANE,",
       "bus,BUS,RAIL,railReplacementBus",
       "rail,RAIL,RAIL,replacementRailService",
+      "ferry,FERRY,RAIL,",
     }
   )
   public void testGetTransportMode(
@@ -241,126 +460,46 @@ public class AddedTripHelperTest {
   ) {
     // Arrange
     var route = Route
-      .of(new FeedScopedId("FEED_ID", "LINE_ID"))
-      .withShortName("LINE_SHORT_NAME")
-      .withAgency(agency)
+      .of(TransitModelForTest.id(LINE_REF))
+      .withShortName(SHORT_NAME)
+      .withAgency(AGENCY)
       .withMode(TransitMode.valueOf(replacedRouteMode))
       .build();
     var modes = List.of(VehicleModesEnumeration.fromValue(siriMode));
 
     // Act
-    var mode = AddedTripHelper.getTransitMode(modes, route);
+    TransitMode transitMode = SiriTransportModeMapper.mapTransitMainMode(modes);
+    String transitSubMode = AddedTripHelper.resolveTransitSubMode(transitMode, route);
 
     //Assert
     var expectedMode = TransitMode.valueOf(internalMode);
-    assertNotNull(mode, "TransitMode response should never be null");
-    assertEquals(expectedMode, mode.mode(), "Mode not mapped to correct internal mode");
-    assertEquals(subMode, mode.submode(), "Mode not mapped to correct sub mode");
+    assertEquals(expectedMode, transitMode, "Mode not mapped to correct internal mode");
+    assertEquals(subMode, transitSubMode, "Mode not mapped to correct sub mode");
   }
 
-  @ParameterizedTest
-  @CsvSource({ "10,11,0,3,true", "10,11,2,3,true", "10,11,1,3,false" })
-  public void testGetTimeForStop(
-    int arrivalTime,
-    int departureTime,
-    int stopIndex,
-    int numStops,
-    boolean expectedEqual
-  ) {
-    var arrivalAndDepartureTime = AddedTripHelper.getTimeForStop(
-      arrivalTime,
-      departureTime,
-      stopIndex,
-      numStops
+  private static List<CallWrapper> getCalls(int hour) {
+    return List.of(
+      // Departed one minute early, prior to irrelevant aimed arrival time
+      TestCall.from(STOP_A.getId().getId(), t(hour, 20), t(hour, 20), t(hour, 19)),
+      TestCall.intermediate(
+        STOP_B.getId().getId(),
+        t(hour, 30),
+        t(hour, 29),
+        null,
+        t(hour, 30),
+        t(hour, 31),
+        null
+      ),
+      // Expected to arrive one minute prior to irrelevant aimed departure time
+      TestCall.to(STOP_C.getId().getId(), t(hour, 40), t(hour, 41), null)
     );
-
-    if (expectedEqual) {
-      assertEquals(
-        arrivalAndDepartureTime.arrivalTime(),
-        arrivalAndDepartureTime.departureTime(),
-        "Arrival and departure time are expected to be equal"
-      );
-    } else {
-      assertNotEquals(
-        arrivalAndDepartureTime.arrivalTime(),
-        arrivalAndDepartureTime.departureTime(),
-        "Arrival and departure time are expected to differ"
-      );
-    }
   }
 
-  @Test
-  public void testCreateStopTime() {
-    var actualStopSequence = 123;
-
-    var regularStop = RegularStop.of(new FeedScopedId("FEED_ID", "TEST_STOP")).build();
-    var stopTime = AddedTripHelper.createStopTime(
-      trip,
-      actualStopSequence,
-      regularStop,
-      1000,
-      1200,
-      ""
-    );
-
-    assertAll(() -> {
-      assertEquals(trip, stopTime.getTrip(), "Trip not mapped correctly");
-      assertEquals(regularStop, stopTime.getStop(), "Stop not mapped correctly");
-      assertEquals(
-        actualStopSequence,
-        stopTime.getStopSequence(),
-        "StopSequence not mapped correctly"
-      );
-      assertEquals(
-        actualStopSequence,
-        stopTime.getStopSequence(),
-        "StopSequence not mapped correctly"
-      );
-      assertEquals(1000, stopTime.getArrivalTime(), "ArrivalTime not mapped correctly");
-      assertEquals(1200, stopTime.getDepartureTime(), "DepartureTime not mapped correctly");
-      assertEquals(
-        trip.getHeadsign(),
-        stopTime.getStopHeadsign(),
-        "DepartureTime not mapped correctly"
-      );
-    });
+  private static ZonedDateTime t(int hour, int minute) {
+    return ZonedDateTime.of(SERVICE_DATE, LocalTime.of(hour, minute), TIME_ZONE);
   }
 
-  @Test
-  public void testCreateStopTimeOverrideHeadsignOnStop() {
-    var actualStopSequence = 123;
-
-    var regularStop = RegularStop.of(new FeedScopedId("FEED_ID", "TEST_STOP")).build();
-    String stop_headsign = "STOP_HEADSIGN";
-    var stopTime = AddedTripHelper.createStopTime(
-      trip,
-      actualStopSequence,
-      regularStop,
-      1000,
-      1200,
-      stop_headsign
-    );
-
-    assertAll(() -> {
-      assertEquals(trip, stopTime.getTrip(), "Trip not mapped correctly");
-      assertEquals(regularStop, stopTime.getStop(), "Stop not mapped correctly");
-      assertEquals(
-        actualStopSequence,
-        stopTime.getStopSequence(),
-        "StopSequence not mapped correctly"
-      );
-      assertEquals(
-        actualStopSequence,
-        stopTime.getStopSequence(),
-        "StopSequence not mapped correctly"
-      );
-      assertEquals(1000, stopTime.getArrivalTime(), "ArrivalTime not mapped correctly");
-      assertEquals(1200, stopTime.getDepartureTime(), "DepartureTime not mapped correctly");
-      assertEquals(
-        stop_headsign,
-        stopTime.getStopHeadsign().toString(),
-        "DepartureTime not mapped correctly"
-      );
-    });
+  private int secondsInDay(int hour, int minute) {
+    return (hour * 60 + minute) * 60;
   }
 }
