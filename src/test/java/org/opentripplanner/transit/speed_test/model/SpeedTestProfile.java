@@ -33,27 +33,15 @@ public enum SpeedTestProfile {
     SearchDirection.REVERSE
   ),
   min_travel_duration(
-    "sd",
-    "Standard Range Raptor without waiting time.",
+    "bd",
+    "Minimum(Best) Duration Range Raptor without waiting time.",
     RaptorProfile.MIN_TRAVEL_DURATION,
     SearchDirection.FORWARD
   ),
   min_travel_duration_reverse(
-    "sdr",
-    "Reverse Standard Range Raptor without waiting time.",
-    RaptorProfile.MIN_TRAVEL_DURATION,
-    SearchDirection.REVERSE
-  ),
-  min_travel_duration_best_time(
-    "bd",
-    "Best Time Range Raptor without waiting time.",
-    RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME,
-    SearchDirection.FORWARD
-  ),
-  min_travel_duration_best_time_reverse(
     "bdr",
-    "Reverse Best Time Range Raptor without waiting time.",
-    RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME,
+    "Minimum(Best) Duration Reverse Range Raptor without waiting time.",
+    RaptorProfile.MIN_TRAVEL_DURATION,
     SearchDirection.REVERSE
   ),
   multi_criteria(

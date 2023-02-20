@@ -6,12 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.SearchParams;
 
 public class AccessStopArrivalTest {
 
@@ -97,15 +95,9 @@ public class AccessStopArrivalTest {
 
   @Test
   public void timeShiftNotAllowed() {
-    AbstractStopArrival<RaptorTripSchedule> original, result;
-    RaptorAccessEgress access = access(SearchParams.TIME_NOT_SET);
-
-    original = new AccessStopArrival<>(DEPARTURE_TIME, access);
-
-    final int dTime = 60;
-    result = original.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
-
-    assertSame(original, result);
+    var access = TestAccessEgress.free(ALIGHT_STOP).openingHoursClosed();
+    var original = new AccessStopArrival<>(DEPARTURE_TIME, access);
+    assertThrows(IllegalStateException.class, () -> original.timeShiftNewArrivalTime(6000));
   }
 
   @Test
@@ -113,47 +105,15 @@ public class AccessStopArrivalTest {
     final int dTime = 60;
     AbstractStopArrival<RaptorTripSchedule> original, result;
 
-    // Allow time-shift, but only by dTime
-    RaptorAccessEgress access = access(ALIGHT_TIME + dTime);
+    // Allow time-shift, but only by dTime (a free edge has zero duration)
+    RaptorAccessEgress access = TestAccessEgress
+      .free(ALIGHT_STOP)
+      .openingHours(0, ALIGHT_TIME + dTime);
 
     original = new AccessStopArrival<>(DEPARTURE_TIME, access);
 
     result = original.timeShiftNewArrivalTime(ALIGHT_TIME + 7200);
 
     assertEquals(ALIGHT_TIME + dTime, result.arrivalTime());
-  }
-
-  private static RaptorAccessEgress access(final int latestArrivalTime) {
-    return new RaptorAccessEgress() {
-      @Override
-      public int stop() {
-        return 0;
-      }
-
-      @Override
-      public boolean stopReachedOnBoard() {
-        throw new NotImplementedException();
-      }
-
-      @Override
-      public int generalizedCost() {
-        return 0;
-      }
-
-      @Override
-      public int durationInSeconds() {
-        return 0;
-      }
-
-      @Override
-      public int latestArrivalTime(int requestedArrivalTime) {
-        return latestArrivalTime;
-      }
-
-      @Override
-      public boolean hasOpeningHours() {
-        return true;
-      }
-    };
   }
 }

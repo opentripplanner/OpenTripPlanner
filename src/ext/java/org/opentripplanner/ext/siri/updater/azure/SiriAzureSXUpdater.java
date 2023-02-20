@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
@@ -76,40 +77,42 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       LOG.info("No history url set up for Siri Azure Sx Updater");
       return;
     }
-    startTime = now();
+    while (!isPrimed()) {
+      startTime = now();
 
-    URI uri = new URIBuilder(url)
-      .addParameter("publishFromDateTime", fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
-      .addParameter("publishToDateTime", toDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
-      .build();
+      URI uri = new URIBuilder(url)
+        .addParameter("publishFromDateTime", fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
+        .addParameter("publishToDateTime", toDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
+        .build();
 
-    LOG.info("Fetching initial Siri SX data from {}, timeout is {}ms", uri, timeout);
+      LOG.info("Fetching initial Siri SX data from {}, timeout is {}ms", uri, timeout);
 
-    final long t1 = System.currentTimeMillis();
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("Accept", "application/xml");
+      final long t1 = System.currentTimeMillis();
+      HashMap<String, String> headers = new HashMap<>();
+      headers.put("Accept", "application/xml");
 
-    final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), headers);
-    final long t2 = System.currentTimeMillis();
+      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), headers);
+      final long t2 = System.currentTimeMillis();
 
-    if (data == null) {
-      throw new IOException("Historical endpoint returned no data from url" + url);
+      if (data == null) {
+        throw new IOException("Historical endpoint returned no data from url" + url);
+      }
+
+      var reader = new InputStreamReader(data);
+      var string = CharStreams.toString(reader);
+
+      LOG.info(
+        "Fetching initial data - finished after {} ms, got {} bytes",
+        (t2 - t1),
+        string.length()
+      );
+
+      // This is fine since runnables are scheduled after each other
+      processHistory(string, "SX-INITIAL-1");
     }
-
-    var reader = new InputStreamReader(data);
-    var string = CharStreams.toString(reader);
-
-    LOG.info(
-      "Fetching initial data - finished after {} ms, got {} bytes",
-      (t2 - t1),
-      string.length()
-    );
-
-    // This is fine since runnables are scheduled after each other
-    processHistory(string, "SX-INITIAL-1");
   }
 
-  private Siri getSiri(String message, String id) throws JAXBException, XMLStreamException {
+  private Siri getSiri(String message, String id) throws XMLStreamException, JAXBException {
     var siri = SiriXml.parseXml(message);
     if (
       siri.getServiceDelivery() == null ||
@@ -150,18 +153,23 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
         return;
       }
 
-      super.saveResultOnGraph.execute((graph, transitModel) -> {
-        long t1 = System.currentTimeMillis();
-        updateHandler.update(siri.getServiceDelivery());
+      var f = super.saveResultOnGraph.execute((graph, transitModel) -> {
+        try {
+          long t1 = System.currentTimeMillis();
+          updateHandler.update(siri.getServiceDelivery());
 
-        setPrimed(true);
-        LOG.info(
-          "Azure SX updater initialized after {} ms: [time since startup: {}]",
-          (System.currentTimeMillis() - t1),
-          DurationFormatUtils.formatDuration((now() - startTime), "HH:mm:ss")
-        );
+          LOG.info(
+            "Azure SX updater initialized after {} ms: [time since startup: {}]",
+            (System.currentTimeMillis() - t1),
+            DurationFormatUtils.formatDuration((now() - startTime), "HH:mm:ss")
+          );
+          setPrimed(true);
+        } catch (Exception e) {
+          LOG.error("Could not process history: {}", e.getMessage());
+        }
       });
-    } catch (JAXBException | XMLStreamException e) {
+      f.get();
+    } catch (JAXBException | XMLStreamException | ExecutionException | InterruptedException e) {
       LOG.error(e.getLocalizedMessage(), e);
     }
   }

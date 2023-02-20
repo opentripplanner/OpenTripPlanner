@@ -417,16 +417,6 @@ Http headers.
     "bikeBoardCost" : 600,
     "otherThanPreferredRoutesPenalty" : 300,
     "transferSlack" : 120,
-    "preferredVehicleParkingTags" : [
-      "covered"
-    ],
-    "unpreferredVehicleParkingTagCost" : 360,
-    "requiredVehicleParkingTags" : [
-      "garage"
-    ],
-    "bannedVehicleParkingTags" : [
-      "lamp-post"
-    ],
     "boardSlackForMode" : {
       "AIRPLANE" : "35m"
     },
@@ -461,6 +451,7 @@ Http headers.
         "HSL:456"
       ]
     },
+    "unpreferredCost" : "600 + 2.0 x",
     "transferOptimization" : {
       "optimizeTransferWaitTime" : true,
       "minSafeWaitTimeFactor" : 5.0,

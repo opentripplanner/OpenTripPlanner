@@ -129,6 +129,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       new SiriTripPatternCache(tripPatternIdGenerator, transitService::getPatternForTrip);
 
     transitModel.initTimetableSnapshotProvider(this);
+
+    // Force commit so that snapshot initializes
+    getTimetableSnapshot(true);
   }
 
   /**
@@ -638,6 +641,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       .of(id)
       .withRoute(trip.getRoute())
       .withMode(trip.getMode())
+      .withNetexSubmode(trip.getNetexSubMode())
       .withStopPattern(stopPattern)
       .build();
 

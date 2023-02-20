@@ -63,9 +63,4 @@ public interface Heuristics {
    * starting point for the search-time-window calculation.
    */
   int minWaitTimeForJourneysReachingDestination();
-
-  /**
-   * Return true if the destination is reached.
-   */
-  boolean destinationReached();
 }

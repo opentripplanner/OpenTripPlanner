@@ -4,17 +4,15 @@ import gnu.trove.map.TIntObjectMap;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
-import java.util.stream.Collectors;
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
-import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
-import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
-import org.opentripplanner.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
+import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 
@@ -25,32 +23,40 @@ import org.opentripplanner.raptor.spi.CostCalculator;
 public class HeuristicsAdapter implements Heuristics {
 
   private static final int NOT_SET = Integer.MAX_VALUE;
-  private final BestTimes times;
-  private final BestNumberOfTransfers transfers;
+  private final SingleCriteriaStopArrivals bestOverallTimes;
+  private final SingleCriteriaStopArrivals bestNumOfTransfers;
   private final TIntObjectMap<List<RaptorAccessEgress>> egressPaths;
   private final TransitCalculator<?> calculator;
   private final CostCalculator<?> costCalculator;
-  private int originDepartureTime = -1;
-  private boolean aggregatedResultsCalculated = false;
-
-  private int minJourneyTravelDuration = NOT_SET;
-  private int minJourneyNumOfTransfers = NOT_SET;
-  private int earliestArrivalTime = NOT_SET;
+  private final int nStops;
+  private final int originDepartureTime;
+  private final AggregatedResults aggregatedResults;
 
   public HeuristicsAdapter(
-    BestTimes times,
-    BestNumberOfTransfers transfers,
+    int nStops,
     EgressPaths egressPaths,
-    TransitCalculator<?> calculator,
+    RaptorTransitCalculator<?> calculator,
     CostCalculator<?> costCalculator,
-    WorkerLifeCycle lifeCycle
+    SingleCriteriaStopArrivals bestOverallTimes,
+    SingleCriteriaStopArrivals bestTransitTimes,
+    SingleCriteriaStopArrivals bestNTransfers
   ) {
-    this.times = times;
-    this.transfers = transfers;
+    this.nStops = nStops;
     this.egressPaths = egressPaths.byStop();
     this.calculator = calculator;
     this.costCalculator = costCalculator;
-    lifeCycle.onSetupIteration(this::setUpIteration);
+    this.bestOverallTimes = bestOverallTimes;
+    this.bestNumOfTransfers = bestNTransfers;
+    this.originDepartureTime = calculator.minIterationDepartureTime();
+    this.aggregatedResults =
+      AggregatedResults.create(
+        calculator,
+        originDepartureTime,
+        bestOverallTimes,
+        bestTransitTimes,
+        bestNTransfers,
+        this.egressPaths
+      );
   }
 
   @Override
@@ -81,31 +87,25 @@ public class HeuristicsAdapter implements Heuristics {
 
   @Override
   public int size() {
-    return times.size();
+    return nStops;
   }
 
   @Override
   public int bestOverallJourneyTravelDuration() {
-    calculateAggregatedResults();
-    return minJourneyTravelDuration;
+    return aggregatedResults.minJourneyTravelDuration();
   }
 
   @Override
   public int bestOverallJourneyNumOfTransfers() {
-    calculateAggregatedResults();
-    return minJourneyNumOfTransfers;
+    return aggregatedResults.minJourneyNumOfTransfers();
   }
 
   @Override
   public int minWaitTimeForJourneysReachingDestination() {
-    calculateAggregatedResults();
-    return Math.abs(earliestArrivalTime - originDepartureTime) - minJourneyTravelDuration;
-  }
-
-  @Override
-  public boolean destinationReached() {
-    calculateAggregatedResults();
-    return minJourneyNumOfTransfers != NOT_SET;
+    return (
+      Math.abs(aggregatedResults.earliestArrivalTime() - originDepartureTime) -
+      aggregatedResults.minJourneyTravelDuration()
+    );
   }
 
   @Override
@@ -113,83 +113,34 @@ public class HeuristicsAdapter implements Heuristics {
     return ToStringBuilder
       .of(Heuristics.class)
       .addServiceTime("originDepartureTime(last iteration)", originDepartureTime)
-      .addBoolIfTrue("resultsExist", aggregatedResultsCalculated)
-      .addDurationSec("minJourneyTravelDuration", minJourneyTravelDuration, NOT_SET)
-      .addDurationSec("minJourneyNumOfTransfers", minJourneyNumOfTransfers, NOT_SET)
-      .addServiceTime("earliestArrivalTime", earliestArrivalTime, NOT_SET)
-      .addObj("times", times)
-      .addCollection(
+      .addObj("aggregatedResults", aggregatedResults)
+      .addCol(
         "egress stops reached",
         Arrays
           .stream(egressPaths.keys())
-          .filter(times::isStopReached)
-          .mapToObj(s -> "[" + s + " " + TimeUtils.timeToStrCompact(times.time(s)) + "]")
-          .collect(Collectors.toList()),
-        20
+          .filter(bestOverallTimes::isReached)
+          .mapToObj(s -> "[" + s + " " + TimeUtils.timeToStrCompact(bestOverallTimes.value(s)) + "]"
+          )
+          .limit(20)
+          .toList()
       )
       .toString();
   }
 
   private boolean reached(int stop) {
-    return times.isStopReached(stop);
+    return bestOverallTimes.isReached(stop);
   }
 
   private int bestTravelDuration(int stop) {
-    return calculator.duration(originDepartureTime, times.time(stop));
+    return calculator.duration(originDepartureTime, bestOverallTimes.value(stop));
   }
 
   private int bestNumOfTransfers(int stop) {
-    return transfers.calculateMinNumberOfTransfers(stop);
+    return bestNumOfTransfers.value(stop);
   }
 
   private int bestGeneralizedCost(int stop) {
     return costCalculator.calculateMinCost(bestTravelDuration(stop), bestNumOfTransfers(stop));
-  }
-
-  private void setUpIteration(int departureTime) {
-    if (this.originDepartureTime > 0) {
-      throw new IllegalStateException(
-        "You should only run one iteration to calculate heuristics, this is because " +
-        "we use the origin departure time to calculate the travel duration at the " +
-        "end of the search."
-      );
-    }
-    this.originDepartureTime = departureTime;
-  }
-
-  /**
-   * Lazy calculate some of the result values.
-   */
-  private void calculateAggregatedResults() {
-    if (aggregatedResultsCalculated) {
-      return;
-    }
-
-    egressPaths.forEachEntry((stop, list) -> {
-      boolean stopReached = times.isStopReached(stop);
-      boolean stopReachedByTransit = times.isStopReachedByTransit(stop);
-
-      if (stopReached || stopReachedByTransit) {
-        for (RaptorAccessEgress it : list) {
-          boolean destinationReached = it.stopReachedOnBoard() ? stopReached : stopReachedByTransit;
-
-          if (!destinationReached) {
-            continue;
-          }
-
-          int t = bestTravelDuration(it.stop()) + it.durationInSeconds();
-          minJourneyTravelDuration = Math.min(minJourneyTravelDuration, t);
-
-          int n = bestNumOfTransfers(it.stop());
-          minJourneyNumOfTransfers = Math.min(minJourneyNumOfTransfers, n);
-
-          int eat = times.time(it.stop()) + it.durationInSeconds();
-          earliestArrivalTime = Math.min(earliestArrivalTime, eat);
-        }
-      }
-      return true;
-    });
-    aggregatedResultsCalculated = true;
   }
 
   /**
@@ -203,5 +154,58 @@ public class HeuristicsAdapter implements Heuristics {
       }
     }
     return a;
+  }
+
+  private record AggregatedResults(
+    int minJourneyTravelDuration,
+    int minJourneyNumOfTransfers,
+    int earliestArrivalTime
+  ) {
+    private static AggregatedResults create(
+      TransitCalculator<?> calculator,
+      int originDepartureTime,
+      SingleCriteriaStopArrivals bestOverallTimes,
+      SingleCriteriaStopArrivals bestTransitTimes,
+      SingleCriteriaStopArrivals bestNumOfTransfers,
+      TIntObjectMap<List<RaptorAccessEgress>> egressPaths
+    ) {
+      int bestJourneyTravelDuration = NOT_SET;
+      int bestJourneyNumOfTransfers = NOT_SET;
+      int bestArrivalTime = NOT_SET;
+
+      for (int stop : egressPaths.keys()) {
+        var list = egressPaths.get(stop);
+        boolean stopReached = bestOverallTimes.isReached(stop);
+        boolean stopReachedByTransit = bestTransitTimes.isReached(stop);
+
+        if (stopReached) {
+          int durationExEgress = calculator.duration(
+            originDepartureTime,
+            bestOverallTimes.value(stop)
+          );
+
+          for (RaptorAccessEgress it : list) {
+            // Prevent transfer(walking) and the egress witch start with walking
+            if (!(it.stopReachedOnBoard() || stopReachedByTransit)) {
+              continue;
+            }
+
+            int d = durationExEgress + it.durationInSeconds();
+            bestJourneyTravelDuration = Math.min(bestJourneyTravelDuration, d);
+
+            int n = bestNumOfTransfers.value(it.stop());
+            bestJourneyNumOfTransfers = Math.min(bestJourneyNumOfTransfers, n);
+
+            int eat = bestOverallTimes.value(it.stop()) + it.durationInSeconds();
+            bestArrivalTime = Math.min(bestArrivalTime, eat);
+          }
+        }
+      }
+      return new AggregatedResults(
+        bestJourneyTravelDuration,
+        bestJourneyNumOfTransfers,
+        bestArrivalTime
+      );
+    }
   }
 }

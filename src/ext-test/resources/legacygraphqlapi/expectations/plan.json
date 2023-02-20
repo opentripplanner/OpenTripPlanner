@@ -3,48 +3,92 @@
     "plan" : {
       "itineraries" : [
         {
-          "duration" : 0,
-          "startTime" : 1580638800000,
-          "endTime" : 1580638800000,
+          "startTime" : 1580641200000,
+          "endTime" : 1580644200000,
+          "generalizedCost" : 3072,
           "legs" : [
             {
               "from" : {
                 "name" : "A",
                 "lat" : 5.0,
-                "lon" : 8.0
+                "lon" : 8.0,
+                "departureTime" : 1580641200000,
+                "arrivalTime" : 1580641200000
               },
               "to" : {
-                "name" : "E",
-                "lat" : 9.0,
-                "lon" : 10.0
+                "name" : "B",
+                "lat" : 6.0,
+                "lon" : 8.5,
+                "departureTime" : 1580641220000,
+                "arrivalTime" : 1580641220000
               },
+              "startTime" : 1580641200000,
+              "endTime" : 1580641220000,
               "mode" : "WALK",
-              "route" : null,
-              "distance" : 28.0,
-              "duration" : 20.0,
-              "legGeometry" : null
+              "generalizedCost" : 40,
+              "alerts" : [ ]
             },
             {
               "from" : {
-                "name" : "E",
-                "lat" : 9.0,
-                "lon" : 10.0
+                "name" : "B",
+                "lat" : 6.0,
+                "lon" : 8.5,
+                "departureTime" : 1580641260000,
+                "arrivalTime" : 1580641260000
               },
               "to" : {
-                "name" : "G",
-                "lat" : 9.5,
-                "lon" : 11.0
+                "name" : "C",
+                "lat" : 7.0,
+                "lon" : 9.0,
+                "departureTime" : 1580642100000,
+                "arrivalTime" : 1580642100000
               },
+              "startTime" : 1580641260000,
+              "endTime" : 1580642100000,
               "mode" : "BUS",
-              "route" : {
-                "shortName" : "122"
+              "generalizedCost" : 992,
+              "alerts" : [ ]
+            },
+            {
+              "from" : {
+                "name" : "C",
+                "lat" : 7.0,
+                "lon" : 9.0,
+                "departureTime" : 1580643000000,
+                "arrivalTime" : 1580643000000
               },
-              "distance" : 0.0,
-              "duration" : 0.0,
-              "legGeometry" : {
-                "points" : "_y|u@_c`|@????_t`B_ibE",
-                "length" : 4
-              }
+              "to" : {
+                "name" : "D",
+                "lat" : 8.0,
+                "lon" : 9.5,
+                "departureTime" : 1580644200000,
+                "arrivalTime" : 1580644200000
+              },
+              "startTime" : 1580643000000,
+              "endTime" : 1580644200000,
+              "mode" : "RAIL",
+              "generalizedCost" : 2040,
+              "alerts" : [
+                {
+                  "id" : "QWxlcnQ6Rjphbi1hbGVydA",
+                  "alertHeaderText" : "A header",
+                  "alertDescriptionText" : "A description",
+                  "alertEffect" : "REDUCED_SERVICE",
+                  "alertCause" : "MAINTENANCE",
+                  "alertSeverityLevel" : "SEVERE",
+                  "alertUrl" : "https://example.com",
+                  "effectiveStartDate" : 1676459008,
+                  "effectiveEndDate" : 1676545408,
+                  "entities" : [
+                    {
+                      "name" : "A",
+                      "gtfsId" : "F:A",
+                      "lat" : 5.0,
+                      "lon" : 8.0
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

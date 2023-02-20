@@ -1,7 +1,0 @@
-tcId,nTransfers,duration,cost,walkDistance,startTime,endTime,agencies,modes,routes,stops,details
-1,2,-4h11m35s,0,1170,05:09:27,00:57:52,TriMet,BUS,9|9|8,prt:634|prt:13178|prt:7588|prt:6548,Walk    4m ~ NE Broadway & 21st(634) ~ BUS 9 5:13:27 5:20 ~ NW Broadway & Everett(13178) ~ BUS 9 5:52 6:01 ~ SW 5th & Broadway(7588) ~ BUS 8 0:37 0:46:36 ~ SW 11th & Gibbs(6548) ~ Walk 11m16s
-1,1,54m22s,0,1688,05:09:27,06:03:49,TriMet,BUS,9|56,prt:634|prt:13171|prt:365,Walk    4m ~ NE Broadway & 21st(634) ~ BUS 9 5:13:27 5:21:53 ~ W Burnside & SW 5th(13171) ~ BUS 56 5:33 5:46:19 ~ SW Beaverton-Hillsdale & 25th(365) ~ Walk 17m30s
-1,0,55m6s,0,1458,09:26:46,10:21:52,TriMet,BUS,8,prt:6789|prt:6548,Walk 7m34s ~ NE 15th & Halsey(6789) ~ BUS 8 9:34:20 10:10:36 ~ SW 11th & Gibbs(6548) ~ Walk 11m16s
-2,2,-4h11m35s,0,1170,05:09:27,00:57:52,TriMet,BUS,9|9|8,prt:634|prt:13178|prt:7588|prt:6548,Walk    4m ~ NE Broadway & 21st(634) ~ BUS 9 5:13:27 5:20 ~ NW Broadway & Everett(13178) ~ BUS 9 5:52 6:01 ~ SW 5th & Broadway(7588) ~ BUS 8 0:37 0:46:36 ~ SW 11th & Gibbs(6548) ~ Walk 11m16s
-2,1,54m22s,0,1688,05:09:27,06:03:49,TriMet,BUS,9|56,prt:634|prt:13171|prt:365,Walk    4m ~ NE Broadway & 21st(634) ~ BUS 9 5:13:27 5:21:53 ~ W Burnside & SW 5th(13171) ~ BUS 56 5:33 5:46:19 ~ SW Beaverton-Hillsdale & 25th(365) ~ Walk 17m30s
-2,0,55m6s,0,1458,09:26:46,10:21:52,TriMet,BUS,8,prt:6789|prt:6548,Walk 7m34s ~ NE 15th & Halsey(6789) ~ BUS 8 9:34:20 10:10:36 ~ SW 11th & Gibbs(6548) ~ Walk 11m16s

@@ -1,36 +1,48 @@
 {
-    plan(
-        from: {lat: 35.445288, lon: -97.39688873291017}
-        to: {lat: 35.4883496629, lon: -97.554473}
-        transportModes: [{mode: TRANSIT}]
-    ) {
+    plan(fromPlace: "from", toPlace: "to", date: "2023-02-15", time: "11:37") {
         itineraries {
-            duration
             startTime
             endTime
+            generalizedCost
             legs {
                 from {
                     name
                     lat
                     lon
+                    departureTime
+                    arrivalTime
                 }
                 to {
                     name
                     lat
                     lon
+                    departureTime
+                    arrivalTime
                 }
+                startTime
+                endTime
                 mode
-                route {
-                    shortName
-                }
-                distance
-                duration
-                legGeometry {
-                    points
-                    length
+                generalizedCost
+                alerts {
+                    id
+                    alertHeaderText
+                    alertDescriptionText
+                    alertEffect
+                    alertCause
+                    alertSeverityLevel
+                    alertUrl
+                    effectiveStartDate
+                    effectiveEndDate
+                    entities {
+                        ... on Stop {
+                            name
+                            gtfsId
+                            lat
+                            lon
+                        }
+                    }
                 }
             }
-
         }
     }
 }

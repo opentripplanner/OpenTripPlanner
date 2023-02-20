@@ -233,6 +233,7 @@ travel time `x` (in seconds).
           .summary(
             "The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`"
           )
+          .description("How much cost is added is configured in `unpreferredCost`.")
           .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
       );
 
@@ -246,6 +247,7 @@ travel time `x` (in seconds).
           .summary(
             "The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`"
           )
+          .description("How much cost is added is configured in `unpreferredCost`.")
           .asFeedScopedIds(request.journey().transit().unpreferredAgencies())
       );
 

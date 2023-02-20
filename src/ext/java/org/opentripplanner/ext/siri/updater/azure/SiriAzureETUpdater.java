@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
@@ -83,31 +84,33 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       .addParameter("fromDateTime", fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
       .build();
 
-    startTime = now();
-    LOG.info("Fetching initial Siri ET data from {}, timeout is {}ms", uri, timeout);
+    while (!isPrimed()) {
+      startTime = now();
+      LOG.info("Fetching initial Siri ET data from {}, timeout is {}ms", uri, timeout);
 
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("Accept", "application/xml");
+      HashMap<String, String> headers = new HashMap<>();
+      headers.put("Accept", "application/xml");
 
-    final long t1 = System.currentTimeMillis();
-    final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), headers);
-    final long t2 = System.currentTimeMillis();
+      final long t1 = System.currentTimeMillis();
+      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), headers);
+      final long t2 = System.currentTimeMillis();
 
-    if (data == null) {
-      throw new IOException("Historical endpoint returned no data from url" + url);
+      if (data == null) {
+        throw new IOException("Historical endpoint returned no data from url" + url);
+      }
+
+      var reader = new InputStreamReader(data);
+      var string = CharStreams.toString(reader);
+
+      LOG.info(
+        "Fetching initial data - finished after {} ms, got {} bytes",
+        (t2 - t1),
+        string.length()
+      );
+
+      // This is fine since runnables are scheduled after each other
+      processHistory(string, "ET-INITIAL-1");
     }
-
-    var reader = new InputStreamReader(data);
-    var string = CharStreams.toString(reader);
-
-    LOG.info(
-      "Fetching initial data - finished after {} ms, got {} bytes",
-      (t2 - t1),
-      string.length()
-    );
-
-    // This is fine since runnables are scheduled after each other
-    processHistory(string, "ET-INITIAL-1");
   }
 
   private void processMessage(String message, String id) {
@@ -118,17 +121,31 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         return;
       }
 
-      super.saveResultOnGraph.execute((graph, transitModel) ->
-        snapshotSource.applyEstimatedTimetable(
-          transitModel,
-          fuzzyTripMatcher(),
-          entityResolver(),
-          feedId,
-          false,
-          updates
-        )
-      );
-    } catch (JAXBException | XMLStreamException e) {
+      var f = super.saveResultOnGraph.execute((graph, transitModel) -> {
+        try {
+          long t1 = System.currentTimeMillis();
+          var result = snapshotSource.applyEstimatedTimetable(
+            transitModel,
+            fuzzyTripMatcher(),
+            entityResolver(),
+            feedId,
+            false,
+            updates
+          );
+          recordMetrics.accept(result);
+
+          LOG.info(
+            "Azure ET updater initialized after {} ms: [time since startup: {}]",
+            (System.currentTimeMillis() - t1),
+            DurationFormatUtils.formatDuration((now() - startTime), "HH:mm:ss")
+          );
+          setPrimed(true);
+        } catch (Exception e) {
+          LOG.error("Could not process history: {}", e.getMessage());
+        }
+      });
+      f.get();
+    } catch (JAXBException | XMLStreamException | ExecutionException | InterruptedException e) {
       LOG.error(e.getLocalizedMessage(), e);
     }
   }

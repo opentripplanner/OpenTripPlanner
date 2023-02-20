@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.raptor.api.RaptorConstants.TIME_UNREACHED_REVERSE;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +39,6 @@ public class ReverseTimeCalculatorTest {
 
   @Test
   public void unreachedTime() {
-    assertEquals(Integer.MIN_VALUE, subject.unreachedTime());
+    assertEquals(TIME_UNREACHED_REVERSE, subject.unreachedTime());
   }
 }

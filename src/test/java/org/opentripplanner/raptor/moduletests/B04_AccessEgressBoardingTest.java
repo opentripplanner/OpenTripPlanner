@@ -4,7 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -20,6 +21,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
+import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
@@ -54,20 +56,6 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
     RaptorConfig.defaultConfigForTest()
   );
 
-  /** Board R1 at stop B and alight at stop E */
-  private static final String OPTIMAL_PATH =
-    "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s 0tx";
-
-  /** Expect the optimal path to be found. */
-  private static final String EXP_PATH_MIN_TRAVEL_DURATION = OPTIMAL_PATH + "]";
-
-  /**
-   * The multi-criteria search should find the best alternative, because it looks at the
-   * arrival-time, generalized-cost, and departure-time(travel-time). In this case the same path as
-   * the min-travel-duration will find.
-   */
-  private static final String EXP_PATH_MC = OPTIMAL_PATH + " $1840]";
-
   @BeforeEach
   void setup() {
     data.withRoute(
@@ -94,8 +82,15 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var expMinDuration = UnknownPathString.of("20m20s", 0);
+
+    var expected =
+      "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s 0tx $1840]";
+
     return RaptorModuleTestCase
       .of()
+      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_00))
+      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T01_00))
       // A test on the standard profile is included to demonstrate that the min-travel-duration
       // and the standard give different results. The boarding stop is different.
       .add(standard().forwardOnly(), EXP_PATH_BEST_ARRIVAL_TIME)
@@ -103,8 +98,7 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
       // min-travel-duration and the standard give different results when searching
       // in reverse. The alight stop is different.
       .add(standard().reverseOnly(), EXP_PATH_BEST_ARRIVAL_TIME_REVERSE)
-      .add(minDuration(), EXP_PATH_MIN_TRAVEL_DURATION)
-      .add(multiCriteria(), EXP_PATH_MC)
+      .add(multiCriteria(), expected)
       .build();
   }
 

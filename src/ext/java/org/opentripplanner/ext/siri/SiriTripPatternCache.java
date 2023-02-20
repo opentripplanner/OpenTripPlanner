@@ -70,6 +70,7 @@ public class SiriTripPatternCache {
         .of(id)
         .withRoute(trip.getRoute())
         .withMode(trip.getMode())
+        .withNetexSubmode(trip.getNetexSubMode())
         .withStopPattern(stopPattern);
 
       // TODO - SIRI: Add pattern to transitModel index?

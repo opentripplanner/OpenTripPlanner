@@ -139,7 +139,7 @@ public class TravelTimeResource {
         startOfTime,
         0,
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
-        new RouteRequestTransitDataProviderFilter(routingRequest, transitService),
+        new RouteRequestTransitDataProviderFilter(routingRequest),
         routingRequest
       );
 
