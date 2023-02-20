@@ -1121,34 +1121,40 @@ input InputPreferred {
     otherThanPreferredRoutesPenalty: Int
 }
 
-input ParkingFilterOperation {
-    oneOfTags: [String]
-    allTags: [String]
-    # the following will be implemented when the need arises
-    oneOfFeeds: [String]
-    feed: String
-}
-
-input ParkingFilter {
-    not: [ParkingFilterOperation]
-    select: [ParkingFilterOperation]
-}
-
+"""
+Preferences for parking facilities used during the routing.
+"""
 input VehicleParkingInput {
     """
-    If non-empty every parking facility that doesn't contain at least one of these conditions will
-    receive an extra cost (defined by `unpreferredVehicleParkingTagCost`) and therefore avoided.
+    Selection filters to include or exclude parking facilities.
+    An empty list will include all facilities in the routing search.
     """
     filters: [ParkingFilter]
 
     """
-    If `preferredVehicleParkingTags` is non-empty, using a parking facility that doesn't contain
+    If `preferred` is non-empty, using a parking facility that doesn't contain
     at least one of the preferred conditions, will receive this extra cost and therefore avoided if
-    there the preferred options are available.
+    preferred options are available.
     """
     unpreferredCost: Int
 
+    """
+    If non-empty every parking facility that doesn't match this set of conditions will
+    receive an extra cost (defined by `unpreferredCost`) and therefore avoided.
+    """
     preferred: [ParkingFilter]
+}
+
+input ParkingFilterOperation {
+    """Filter parking facilities based on their tag"""
+    tags: [String]
+}
+
+input ParkingFilter {
+    """Exclude parking facilities based on their properties. If empty nothing is excluded."""
+    not: [ParkingFilterOperation]
+    """Include parking facilities based on their properties. If empty everything is included."""
+    select: [ParkingFilterOperation]
 }
 
 """
