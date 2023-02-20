@@ -6,7 +6,6 @@ import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTime
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_TRIP_ID;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 import static org.opentripplanner.model.UpdateSuccess.WarningType.NOT_MONITORED;
@@ -401,9 +400,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     // remove the previously created trip
     removePreviousRealtimeUpdate(trip, serviceDate);
 
-    if (tripTimes.isDeleted()) {
-      return UpdateError.result(trip.getId(), NO_UPDATES);
-    }
     // TODO: Create just the stop pattern here, this is duplicated work
     StopPattern stopPattern = new StopPattern(
       createModifiedStopTimes(pattern, tripTimes, estimatedVehicleJourney, getStopLocationById)
