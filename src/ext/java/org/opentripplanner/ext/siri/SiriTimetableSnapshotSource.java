@@ -405,11 +405,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       createModifiedStopTimes(pattern, tripTimes, estimatedVehicleJourney, getStopLocationById)
     );
 
-    // Update realtime state to cancelled, if all stops have been cancelled
-    if (tripTimes.isAllStopsCancelled()) {
-      tripTimes.cancelTrip();
-    }
-
     // Add new trip
     var result = addTripToGraphAndBuffer(
       trip,

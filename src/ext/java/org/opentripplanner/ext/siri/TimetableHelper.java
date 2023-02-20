@@ -179,7 +179,7 @@ public class TimetableHelper {
       newTimes.setRealTimeState(RealTimeState.UPDATED);
     }
 
-    if (journey.isCancellation() != null && journey.isCancellation()) {
+    if (TRUE.equals(journey.isCancellation()) || newTimes.isAllStopsCancelled()) {
       LOG.debug("Trip is cancelled");
       newTimes.cancelTrip();
     }
