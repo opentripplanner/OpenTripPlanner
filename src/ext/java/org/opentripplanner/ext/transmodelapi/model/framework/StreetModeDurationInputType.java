@@ -7,12 +7,12 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLNonNull;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 
-public class DurationPerStreetModeInputType {
+public class StreetModeDurationInputType {
 
   public static GraphQLInputObjectType create(GqlUtil gqlUtil) {
     return GraphQLInputObjectType
       .newInputObject()
-      .name("DurationPerModeInput")
+      .name("StreetModeDurationInput")
       .description("A combination of street mode and corresponding duration")
       .field(
         GraphQLInputObjectField

@@ -34,18 +34,14 @@ class PreferencesMapper {
 
     if (GqlUtil.hasArgument(environment, "maxAccessEgressDurationForMode")) {
       preferences.withStreet(street -> {
-        var maxAccessEgressDuration = StreetPreferences.DEFAULT.maxAccessEgressDuration().copyOf();
-
         for (var entry : (List<Map<String, ?>>) environment.getArgument(
           "maxAccessEgressDurationForMode"
         )) {
-          maxAccessEgressDuration.with(
+          street.withMaxAccessEgressDuration(
             (StreetMode) entry.get("streetMode"),
             (Duration) entry.get("duration")
           );
         }
-
-        street.withMaxAccessEgressDuration(maxAccessEgressDuration.build());
       });
     }
 
