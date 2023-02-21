@@ -28,7 +28,16 @@ public class NewDomainModelIntegrationTest implements RaptorTestConstants {
   private static final String EXP_PATH =
     "Walk 30s ~ A ~ BUS R1 0:03 0:08 ~ C ~ Walk 20s " + "[0:00:30 0:08:20 7m50s 0tx";
   private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
-  private static final String EXP_PATH_WITH_COST = EXP_PATH + " $940]";
+
+  /**
+   *    access: 60
+   *    slack: 120
+   *    boarding: 10
+   *    trip: 300
+   *    egress: 40
+   *   Total cost: 530
+   */
+  private static final String EXP_PATH_WITH_COST = EXP_PATH + " $530]";
 
   private static final int BOARD_COST_SEC = 10;
   private static final int TRANSFER_COST_SEC = 20;
