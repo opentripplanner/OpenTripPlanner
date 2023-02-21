@@ -71,6 +71,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Filter functionality for GroupOfLines/GroupOfRoutes + TransmodelAPI m… [#4812](https://github.com/opentripplanner/OpenTripPlanner/pull/4812)
 - Mapping for maxAccessEgressDurationPerMode in Transmodel API [#4829](https://github.com/opentripplanner/OpenTripPlanner/pull/4829)
 - Use headsign from the original pattern in a realtime added pattern if the stop sequence is unchanged [#4845](https://github.com/opentripplanner/OpenTripPlanner/pull/4845)
+- Remove usage of apache commons [#4840](https://github.com/opentripplanner/OpenTripPlanner/pull/4840)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
