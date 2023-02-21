@@ -16,9 +16,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
  *
  * @author mattwigway
  */
-public class ElevatorHopEdge
-  extends SingleStateTraversalEdge
-  implements ElevatorEdge, WheelchairTraversalInformation {
+public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTraversalInformation {
 
   private final StreetTraversalPermission permission;
 
@@ -83,7 +81,7 @@ public class ElevatorHopEdge
   }
 
   @Override
-  public State traverseSingleState(State s0) {
+  public State[] traverse(State s0) {
     RoutingPreferences preferences = s0.getPreferences();
 
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
@@ -93,7 +91,7 @@ public class ElevatorHopEdge
         wheelchairAccessibility != Accessibility.POSSIBLE &&
         preferences.wheelchair().elevator().onlyConsiderAccessible()
       ) {
-        return null;
+        return State.empty();
       } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
         s1.incrementWeight(preferences.wheelchair().elevator().unknownCost());
       } else if (wheelchairAccessibility == Accessibility.NOT_POSSIBLE) {
@@ -104,15 +102,15 @@ public class ElevatorHopEdge
     TraverseMode mode = s0.getNonTransitMode();
 
     if (mode == TraverseMode.WALK && !permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
-      return null;
+      return State.empty();
     }
 
     if (mode == TraverseMode.BICYCLE && !permission.allows(StreetTraversalPermission.BICYCLE)) {
-      return null;
+      return State.empty();
     }
     // there are elevators which allow cars
     if (mode == TraverseMode.CAR && !permission.allows(StreetTraversalPermission.CAR)) {
-      return null;
+      return State.empty();
     }
 
     s1.incrementWeight(
@@ -125,7 +123,7 @@ public class ElevatorHopEdge
         ? this.travelTime
         : (int) (preferences.street().elevator().hopTime() * this.levels)
     );
-    return s1.makeState();
+    return State.ofNullable(s1.makeState());
   }
 
   @Override

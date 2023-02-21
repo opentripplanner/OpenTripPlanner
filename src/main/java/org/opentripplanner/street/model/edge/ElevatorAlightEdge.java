@@ -16,9 +16,7 @@ import org.opentripplanner.street.search.state.StateEditor;
  *
  * @author mattwigway
  */
-public class ElevatorAlightEdge
-  extends SingleStateTraversalEdge
-  implements BikeWalkableEdge, ElevatorEdge {
+public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, ElevatorEdge {
 
   /**
    * This is the level of this elevator exit, used in narrative generation.
@@ -54,10 +52,10 @@ public class ElevatorAlightEdge
   }
 
   @Override
-  public State traverseSingleState(State s0) {
+  public State[] traverse(State s0) {
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
     s1.incrementWeight(1);
-    return s1.makeState();
+    return State.ofNullable(s1.makeState());
   }
 
   /**

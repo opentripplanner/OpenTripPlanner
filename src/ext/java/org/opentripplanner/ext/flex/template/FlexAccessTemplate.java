@@ -53,18 +53,18 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
 
     FlexTripEdge flexEdge = getFlexEdge(flexToVertex, egress.stop);
 
-    State state = flexEdge.traverseSingleState(accessEgress.state);
+    State[] state = flexEdge.traverse(accessEgress.state);
 
     for (Edge e : egressEdges) {
-      var states = e.traverse(state);
+      var states = e.traverse(state[0]);
       if (State.isEmpty(states)) {
         state = null;
       } else {
-        state = states[0];
+        state = states;
       }
     }
 
-    int[] flexTimes = getFlexTimes(flexEdge, state);
+    int[] flexTimes = getFlexTimes(flexEdge, state[0]);
 
     int preFlexTime = flexTimes[0];
     int flexTime = flexTimes[1];
@@ -106,7 +106,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     ZonedDateTime startTime = startOfTime.plusSeconds(timeShift);
 
     return graphPathToItineraryMapper
-      .generateItinerary(new GraphPath<>(state))
+      .generateItinerary(new GraphPath<>(state[0]))
       .withTimeShiftToStartAt(startTime);
   }
 

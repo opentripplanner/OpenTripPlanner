@@ -6,14 +6,14 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.street.model.edge.SingleStateTraversalEdge;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class FlexTripEdge extends SingleStateTraversalEdge {
+public class FlexTripEdge extends Edge {
 
   private final FlexTrip trip;
   public StopLocation s1;
@@ -53,7 +53,7 @@ public class FlexTripEdge extends SingleStateTraversalEdge {
   }
 
   @Override
-  public State traverseSingleState(State s0) {
+  public State[] traverse(State s0) {
     if (this.flexPath == null) {
       // not routable
       return null;
@@ -66,7 +66,7 @@ public class FlexTripEdge extends SingleStateTraversalEdge {
     editor.incrementTimeInSeconds(timeInSeconds);
     editor.incrementWeight(timeInSeconds);
     editor.resetEnteredNoThroughTrafficArea();
-    return editor.makeState();
+    return State.ofNullable(editor.makeState());
   }
 
   @Override

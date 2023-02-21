@@ -17,9 +17,7 @@ import org.opentripplanner.transit.model.site.PathwayMode;
 /**
  * A walking pathway as described in GTFS
  */
-public class PathwayEdge
-  extends SingleStateTraversalEdge
-  implements BikeWalkableEdge, WheelchairTraversalInformation {
+public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTraversalInformation {
 
   public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
   private final I18NString name;
@@ -78,10 +76,11 @@ public class PathwayEdge
     return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
   }
 
-  public State traverseSingleState(State s0) {
+  @Override
+  public State[] traverse(State s0) {
     StateEditor s1 = createEditorForWalking(s0, this);
     if (s1 == null) {
-      return null;
+      return State.empty();
     }
 
     RoutingPreferences preferences = s0.getPreferences();
@@ -126,7 +125,7 @@ public class PathwayEdge
       s1.incrementWeight(1);
     }
 
-    return s1.makeState();
+    return State.ofNullable(s1.makeState());
   }
 
   @Override

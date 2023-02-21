@@ -15,7 +15,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 /**
  * Parking a vehicle edge.
  */
-public class VehicleParkingEdge extends SingleStateTraversalEdge {
+public class VehicleParkingEdge extends Edge {
 
   private final VehicleParking vehicleParking;
 
@@ -48,9 +48,9 @@ public class VehicleParkingEdge extends SingleStateTraversalEdge {
   }
 
   @Override
-  public State traverseSingleState(State s0) {
+  public State[] traverse(State s0) {
     if (!s0.getRequest().mode().includesParking()) {
-      return null;
+      return State.empty();
     }
 
     if (s0.getRequest().arriveBy()) {
@@ -80,9 +80,9 @@ public class VehicleParkingEdge extends SingleStateTraversalEdge {
     return 0;
   }
 
-  protected State traverseUnPark(State s0) {
+  protected State[] traverseUnPark(State s0) {
     if (s0.getNonTransitMode() != TraverseMode.WALK || !s0.isVehicleParked()) {
-      return null;
+      return State.empty();
     }
 
     StreetMode streetMode = s0.getRequest().mode();
@@ -94,11 +94,11 @@ public class VehicleParkingEdge extends SingleStateTraversalEdge {
       final CarPreferences car = s0.getPreferences().car();
       return traverseUnPark(s0, car.parkCost(), car.parkTime(), TraverseMode.CAR);
     } else {
-      return null;
+      return State.empty();
     }
   }
 
-  private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
+  private State[] traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
     if (
       !vehicleParking.hasSpacesAvailable(
         mode,
@@ -106,39 +106,39 @@ public class VehicleParkingEdge extends SingleStateTraversalEdge {
         s0.getPreferences().parking().useAvailabilityInformation()
       )
     ) {
-      return null;
+      return State.empty();
     }
 
     StateEditor s0e = s0.edit(this);
     s0e.incrementWeight(parkingCost);
     s0e.incrementTimeInSeconds(parkingTime);
     s0e.setVehicleParked(false, mode);
-    return s0e.makeState();
+    return State.ofNullable(s0e.makeState());
   }
 
-  private State traversePark(State s0) {
+  private State[] traversePark(State s0) {
     StreetMode streetMode = s0.getRequest().mode();
     RoutingPreferences preferences = s0.getPreferences();
 
     if (!streetMode.includesWalking() || s0.isVehicleParked()) {
-      return null;
+      return State.empty();
     }
 
     if (streetMode.includesBiking()) {
       // Parking a rented bike is not allowed
       if (s0.isRentingVehicle()) {
-        return null;
+        return State.empty();
       }
 
       return traversePark(s0, preferences.bike().parkCost(), preferences.bike().parkTime());
     } else if (streetMode.includesDriving()) {
       return traversePark(s0, preferences.car().parkCost(), preferences.car().parkTime());
     } else {
-      return null;
+      return State.empty();
     }
   }
 
-  private State traversePark(State s0, int parkingCost, int parkingTime) {
+  private State[] traversePark(State s0, int parkingCost, int parkingTime) {
     if (
       !vehicleParking.hasSpacesAvailable(
         s0.getNonTransitMode(),
@@ -146,13 +146,13 @@ public class VehicleParkingEdge extends SingleStateTraversalEdge {
         s0.getPreferences().parking().useAvailabilityInformation()
       )
     ) {
-      return null;
+      return State.empty();
     }
 
     StateEditor s0e = s0.edit(this);
     s0e.incrementWeight(parkingCost);
     s0e.incrementTimeInSeconds(parkingTime);
     s0e.setVehicleParked(true, TraverseMode.WALK);
-    return s0e.makeState();
+    return State.ofNullable(s0e.makeState());
   }
 }

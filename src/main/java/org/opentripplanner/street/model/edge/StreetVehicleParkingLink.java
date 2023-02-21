@@ -14,7 +14,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 /**
  * This represents the connection between a street vertex and a vehicle parking vertex.
  */
-public class StreetVehicleParkingLink extends SingleStateTraversalEdge {
+public class StreetVehicleParkingLink extends Edge {
 
   private final VehicleParkingEntranceVertex vehicleParkingEntranceVertex;
 
@@ -32,21 +32,22 @@ public class StreetVehicleParkingLink extends SingleStateTraversalEdge {
     return "StreetVehicleParkingLink(" + fromv + " -> " + tov + ")";
   }
 
-  public State traverseSingleState(State s0) {
+  @Override
+  public State[] traverse(State s0) {
     // Disallow traversing two StreetBikeParkLinks in a row.
     // Prevents router using bike rental stations as shortcuts to get around
     // turn restrictions.
     if (s0.getBackEdge() instanceof StreetVehicleParkingLink) {
-      return null;
+      return State.empty();
     }
 
     var entrance = vehicleParkingEntranceVertex.getParkingEntrance();
     if (s0.getNonTransitMode() == TraverseMode.CAR) {
       if (!entrance.isCarAccessible()) {
-        return null;
+        return State.empty();
       }
     } else if (!entrance.isWalkAccessible()) {
-      return null;
+      return State.empty();
     }
 
     var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
@@ -55,13 +56,13 @@ public class StreetVehicleParkingLink extends SingleStateTraversalEdge {
       hasMissingRequiredTags(vehicleParking, parkingRequest.requiredTags()) ||
       hasBannedTags(vehicleParking, parkingRequest.bannedTags())
     ) {
-      return null;
+      return State.empty();
     }
 
     StateEditor s1 = s0.edit(this);
     s1.incrementWeight(1);
     s1.setBackMode(null);
-    return s1.makeState();
+    return State.ofNullable(s1.makeState());
   }
 
   public I18NString getName() {

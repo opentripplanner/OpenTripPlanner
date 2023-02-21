@@ -16,7 +16,7 @@ import org.opentripplanner.street.search.state.StateEditor;
  *
  * @author laurent
  */
-public class VehicleRentalEdge extends SingleStateTraversalEdge {
+public class VehicleRentalEdge extends Edge {
 
   public FormFactor formFactor;
 
@@ -25,14 +25,15 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
     this.formFactor = formFactor;
   }
 
-  public State traverseSingleState(State s0) {
+  @Override
+  public State[] traverse(State s0) {
     if (!s0.getRequest().mode().includesRenting()) {
-      return null;
+      return State.empty();
     }
 
     var allowedRentalFormFactors = allowedModes(s0.getRequest().mode());
     if (!allowedRentalFormFactors.isEmpty() && !allowedRentalFormFactors.contains(formFactor)) {
-      return null;
+      return State.empty();
     }
 
     StateEditor s1 = s0.edit(this);
@@ -44,14 +45,14 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
     boolean realtimeAvailability = preferences.rental().useAvailabilityInformation();
 
     if (station.networkIsNotAllowed(s0.getRequest().rental())) {
-      return null;
+      return State.empty();
     }
 
     boolean pickedUp;
     if (s0.getRequest().arriveBy()) {
       switch (s0.getVehicleRentalState()) {
         case BEFORE_RENTING:
-          return null;
+          return State.empty();
         case HAVE_RENTED:
           if (
             realtimeAvailability &&
@@ -60,7 +61,7 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
               !station.getAvailableDropoffFormFactors(true).contains(formFactor)
             )
           ) {
-            return null;
+            return State.empty();
           }
           s1.dropOffRentedVehicleAtStation(formFactor, network, true);
           pickedUp = false;
@@ -70,13 +71,13 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
             realtimeAvailability &&
             !station.getAvailablePickupFormFactors(true).contains(formFactor)
           ) {
-            return null;
+            return State.empty();
           }
           if (station.isFloatingVehicle()) {
             s1.beginFloatingVehicleRenting(formFactor, network, true);
             pickedUp = true;
           } else {
-            return null;
+            return State.empty();
           }
           break;
         case RENTING_FROM_STATION:
@@ -87,7 +88,7 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
               !station.getAvailablePickupFormFactors(true).contains(formFactor)
             )
           ) {
-            return null;
+            return State.empty();
           }
           // For arriveBy searches mayKeepRentedVehicleAtDestination is only set in State#getInitialStates(),
           // and so here it is checked if this bicycle could have been kept at the destination
@@ -95,10 +96,10 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
             s0.mayKeepRentedVehicleAtDestination() &&
             !station.isArrivingInRentalVehicleAtDestinationAllowed()
           ) {
-            return null;
+            return State.empty();
           }
           if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {
-            return null;
+            return State.empty();
           }
           s1.beginVehicleRentingAtStation(formFactor, network, false, true);
           pickedUp = true;
@@ -116,7 +117,7 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
               !station.getAvailablePickupFormFactors(true).contains(formFactor)
             )
           ) {
-            return null;
+            return State.empty();
           }
           if (station.isFloatingVehicle()) {
             s1.beginFloatingVehicleRenting(formFactor, network, false);
@@ -129,11 +130,11 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
           pickedUp = true;
           break;
         case HAVE_RENTED:
-          return null;
+          return State.empty();
         case RENTING_FLOATING:
         case RENTING_FROM_STATION:
           if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {
-            return null;
+            return State.empty();
           }
           if (
             realtimeAvailability &&
@@ -142,7 +143,7 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
               !station.getAvailableDropoffFormFactors(true).contains(formFactor)
             )
           ) {
-            return null;
+            return State.empty();
           }
           if (
             !allowedRentalFormFactors.isEmpty() &&
@@ -151,7 +152,7 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
               .stream()
               .noneMatch(allowedRentalFormFactors::contains)
           ) {
-            return null;
+            return State.empty();
           }
           s1.dropOffRentedVehicleAtStation(formFactor, network, false);
           pickedUp = false;
@@ -168,7 +169,7 @@ public class VehicleRentalEdge extends SingleStateTraversalEdge {
       pickedUp ? preferences.rental().pickupTime() : preferences.rental().dropoffTime()
     );
     s1.setBackMode(null);
-    return s1.makeState();
+    return State.ofNullable(s1.makeState());
   }
 
   @Override

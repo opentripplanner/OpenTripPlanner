@@ -10,7 +10,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 /**
  * This represents the connection between a street vertex and a bike rental station vertex.
  */
-public class StreetVehicleRentalLink extends SingleStateTraversalEdge {
+public class StreetVehicleRentalLink extends Edge {
 
   private final VehicleRentalPlaceVertex vehicleRentalPlaceVertex;
 
@@ -28,23 +28,24 @@ public class StreetVehicleRentalLink extends SingleStateTraversalEdge {
     return "StreetVehicleRentalLink(" + fromv + " -> " + tov + ")";
   }
 
-  public State traverseSingleState(State s0) {
+  @Override
+  public State[] traverse(State s0) {
     // Disallow traversing two StreetBikeRentalLinks in a row.
     // This prevents the router from using bike rental stations as shortcuts to get around
     // turn restrictions.
     if (s0.getBackEdge() instanceof StreetVehicleRentalLink) {
-      return null;
+      return State.empty();
     }
 
     if (vehicleRentalPlaceVertex.getStation().networkIsNotAllowed(s0.getRequest().rental())) {
-      return null;
+      return State.empty();
     }
 
     StateEditor s1 = s0.edit(this);
     //assume bike rental stations are more-or-less on-street
     s1.incrementWeight(1);
     s1.setBackMode(null);
-    return s1.makeState();
+    return State.ofNullable(s1.makeState());
   }
 
   @Override
