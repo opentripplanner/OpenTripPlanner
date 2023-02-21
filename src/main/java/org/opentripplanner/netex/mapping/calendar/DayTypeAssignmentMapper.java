@@ -17,8 +17,10 @@ import org.opentripplanner.netex.issues.DayTypeScheduleIsEmpty;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
+import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.PropertyOfDay;
+import org.rutebanken.netex.model.UicOperatingPeriod;
 
 /**
  * Map {@link DayTypeAssignment}s to set of {@link LocalDate}s.
@@ -30,7 +32,7 @@ import org.rutebanken.netex.model.PropertyOfDay;
  * To simplify the logic in this class and avoid passing input parameters down the call chain this
  * class perform the mapping by first creating an instance with READ-ONLY input members. The result
  * is added to {@link #dates} and {@link #datesToRemove} during the mapping process. As a final step,
- * the to collections are merged (dates-datesToRemove) and then mapped to {@link LocalDate}s.
+ * the two collections are merged (dates-datesToRemove) and then mapped to {@link LocalDate}s.
  * <p>
  * This class is THREAD-SAFE. A static mapping method is the single point of entry and a private
  * constructor ensure the instance is used in one thread only.
@@ -138,7 +140,7 @@ public class DayTypeAssignmentMapper {
    * once, may have unexpected effects.
    * <p>
    *
-   * @return the list of service dates for all dayTypes mapped.
+   * @return the set of service dates for all dayTypes mapped.
    */
   private Set<LocalDate> mergeAndMapDates() {
     dates.removeAll(datesToRemove);
@@ -156,12 +158,19 @@ public class DayTypeAssignmentMapper {
     OperatingPeriod_VersionStructure period = operatingPeriods.lookup(ref);
 
     if (period != null) {
-      Set<DayOfWeek> daysOfWeek = daysOfWeekForDayType(dayType);
-      // Plus 1 to make the end date exclusive - simplify the loop test
-      LocalDateTime endDate = period.getToDate().plusDays(1);
-      LocalDateTime date = period.getFromDate();
+      if (period instanceof OperatingPeriod operatingPeriod) {
+        Set<DayOfWeek> daysOfWeek = daysOfWeekForDayType(dayType);
+        // Plus 1 to make the end date exclusive - simplify the loop test
+        LocalDateTime endDate = operatingPeriod.getToDate().plusDays(1);
+        LocalDateTime date = operatingPeriod.getFromDate();
 
-      addDates(isAvailable, daysOfWeek, endDate, date);
+        addDates(isAvailable, daysOfWeek, endDate, date);
+      } else if (period instanceof UicOperatingPeriod uicOperatingPeriod) {
+        LocalDateTime endDate = uicOperatingPeriod.getToDate().plusDays(1);
+        LocalDateTime date = uicOperatingPeriod.getFromDate();
+
+        addDates(uicOperatingPeriod.getValidDayBits(), isAvailable, endDate, date);
+      }
     }
   }
 
