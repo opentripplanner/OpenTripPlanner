@@ -73,6 +73,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Use headsign from the original pattern in a realtime added pattern if the stop sequence is unchanged [#4845](https://github.com/opentripplanner/OpenTripPlanner/pull/4845)
 - Remove usage of apache commons [#4840](https://github.com/opentripplanner/OpenTripPlanner/pull/4840)
 - Remove RouteMatcher [#4821](https://github.com/opentripplanner/OpenTripPlanner/pull/4821)
+- Improve boarding location linking on platforms [#4852](https://github.com/opentripplanner/OpenTripPlanner/pull/4852)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
