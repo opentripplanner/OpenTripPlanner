@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import javax.annotation.Nullable;
@@ -28,7 +27,7 @@ import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDateBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -39,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
-import uk.org.siri.siri20.VehicleJourneyRef;
 
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
@@ -398,66 +396,16 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     LOG.debug("Applied realtime data for trip {} on {}", trip, serviceDate);
 
     // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
-    addTripOnServiceDateToBuffer(trip, serviceDate, estimatedVehicleJourney, entityResolver);
-
-    return result;
-  }
-
-  private void addTripOnServiceDateToBuffer(
-    Trip trip,
-    LocalDate serviceDate,
-    EstimatedVehicleJourney estimatedVehicleJourney,
-    EntityResolver entityResolver
-  ) {
-    var datedServiceJourneyId = entityResolver.resolveDatedServiceJourneyId(
+    TripOnServiceDateBuilder tripOnServiceDateBuilder = entityResolver.createTripOnServiceDateBuilder(
       estimatedVehicleJourney
     );
-
-    if (datedServiceJourneyId == null) {
-      if (estimatedVehicleJourney.getFramedVehicleJourneyRef() != null) {
-        var tripOnDate = entityResolver.resolveTripOnServiceDate(
-          estimatedVehicleJourney.getFramedVehicleJourneyRef()
-        );
-        if (tripOnDate == null) {
-          return;
-        }
-        datedServiceJourneyId = tripOnDate.getId();
-      }
-    }
-
-    if (datedServiceJourneyId == null) {
-      return;
-    }
-
-    List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
-
-    // VehicleJourneyRef is the reference to the serviceJourney being replaced.
-    VehicleJourneyRef vehicleJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef();
-    if (vehicleJourneyRef != null) {
-      var replacedDatedServiceJourney = entityResolver.resolveTripOnServiceDate(
-        vehicleJourneyRef.getValue()
+    if (tripOnServiceDateBuilder != null) {
+      buffer.addLastAddedTripOnServiceDate(
+        tripOnServiceDateBuilder.withTrip(trip).withServiceDate(serviceDate).build()
       );
-      if (replacedDatedServiceJourney != null) {
-        listOfReplacedVehicleJourneys.add(replacedDatedServiceJourney);
-      }
     }
 
-    // Add additional replaced service journeys if present.
-    estimatedVehicleJourney
-      .getAdditionalVehicleJourneyReves()
-      .stream()
-      .map(entityResolver::resolveTripOnServiceDate)
-      .filter(Objects::nonNull)
-      .forEach(listOfReplacedVehicleJourneys::add);
-
-    buffer.addLastAddedTripOnServiceDate(
-      TripOnServiceDate
-        .of(datedServiceJourneyId)
-        .withTrip(trip)
-        .withReplacementFor(listOfReplacedVehicleJourneys)
-        .withServiceDate(serviceDate)
-        .build()
-    );
+    return result;
   }
 
   /**

@@ -4,6 +4,9 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -11,6 +14,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDateBuilder;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +22,7 @@ import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
 import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
+import uk.org.siri.siri20.VehicleJourneyRef;
 
 /**
  * This class is responsible for resolving references to various entities in the transit model for
@@ -206,6 +211,51 @@ public class EntityResolver {
     var daysOffset = calculateDayOffset(vehicleJourney);
 
     return date.toLocalDate().minusDays(daysOffset);
+  }
+
+  TripOnServiceDateBuilder createTripOnServiceDateBuilder(
+    EstimatedVehicleJourney estimatedVehicleJourney
+  ) {
+    var datedServiceJourneyId = resolveDatedServiceJourneyId(estimatedVehicleJourney);
+
+    if (datedServiceJourneyId == null) {
+      if (estimatedVehicleJourney.getFramedVehicleJourneyRef() != null) {
+        var tripOnDate = resolveTripOnServiceDate(
+          estimatedVehicleJourney.getFramedVehicleJourneyRef()
+        );
+        if (tripOnDate == null) {
+          return null;
+        }
+        datedServiceJourneyId = tripOnDate.getId();
+      }
+    }
+
+    if (datedServiceJourneyId == null) {
+      return null;
+    }
+
+    List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
+
+    // VehicleJourneyRef is the reference to the serviceJourney being replaced.
+    VehicleJourneyRef vehicleJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef();
+    if (vehicleJourneyRef != null) {
+      var replacedDatedServiceJourney = resolveTripOnServiceDate(vehicleJourneyRef.getValue());
+      if (replacedDatedServiceJourney != null) {
+        listOfReplacedVehicleJourneys.add(replacedDatedServiceJourney);
+      }
+    }
+
+    // Add additional replaced service journeys if present.
+    estimatedVehicleJourney
+      .getAdditionalVehicleJourneyReves()
+      .stream()
+      .map(this::resolveTripOnServiceDate)
+      .filter(Objects::nonNull)
+      .forEach(listOfReplacedVehicleJourneys::add);
+
+    return TripOnServiceDate
+      .of(datedServiceJourneyId)
+      .withReplacementFor(listOfReplacedVehicleJourneys);
   }
 
   /**
