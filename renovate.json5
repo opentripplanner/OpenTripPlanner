@@ -70,7 +70,7 @@
         "com.azure:azure-core",
         "com.azure:azure-messaging-servicebus"
       ],
-      assignees: ["Bartosz-Kruba", "jtorin"],
+      reviewers: ["Bartosz-Kruba", "jtorin"],
       labels: ["skip changelog", "Skanetrafiken"]
     }
   ],
