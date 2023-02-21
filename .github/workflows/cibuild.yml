@@ -35,7 +35,7 @@ jobs:
         run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report -P prettierCheck
 
       - name: Send coverage data to codecov.io
-        if: github.repository_owner == 'opentripplanner' && matrix.os == 'ubuntu-latest'
+        if: github.repository_owner == 'opentripplanner'
         uses: codecov/codecov-action@v3.1.1
         with:
           files: target/site/jacoco/jacoco.xml
@@ -131,6 +131,14 @@ jobs:
         run: |
           yarn install
           yarn generate
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: temurin
+          cache: maven
+      - name: Compile Java code
+        run: mvn --batch-mode compile -DskipTests -P prettierSkip
 
   container-image:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'

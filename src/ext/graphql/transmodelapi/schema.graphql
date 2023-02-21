@@ -1904,6 +1904,8 @@ input TripFilterInput {
 input TripFilterSelectInput {
   "Set of ids for authorities that should be included in/excluded from search"
   authorities: [ID!]
+  "Set of ids for group of lines that should be included in/excluded from the search"
+  groupOfLines: [ID!]
   "Set of ids for lines that should be included in/excluded from search"
   lines: [ID!]
   "Set of ids for service journeys that should be included in/excluded from search"
