@@ -8,6 +8,11 @@
     "skip changelog"
   ],
   "rebaseWhen": "conflicted",
+  "enabledManagers": [
+    "npm",
+    "maven",
+    "pip_requirements"
+  ],
   "packageRules": [
     {
       "matchPackageNames": [
