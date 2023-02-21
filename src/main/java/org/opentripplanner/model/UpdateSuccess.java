@@ -37,6 +37,5 @@ public record UpdateSuccess(List<WarningType> warnings) {
      * stops have been removed.
      */
     UNKNOWN_STOPS_REMOVED_FROM_ADDED_TRIP,
-    NOT_MONITORED,
   }
 }

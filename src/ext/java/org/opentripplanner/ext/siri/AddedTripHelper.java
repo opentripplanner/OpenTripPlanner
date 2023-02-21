@@ -142,7 +142,7 @@ class AddedTripHelper {
     this.headsign = headsign;
   }
 
-  Result<AddedTrip, UpdateError> build() {
+  Result<TripUpdate, UpdateError> build() {
     if (serviceDate == null) {
       return UpdateError.result(tripId, NO_START_DATE);
     }
@@ -225,7 +225,7 @@ class AddedTripHelper {
 
     StopPattern stopPattern = new StopPattern(aimedStopTimes);
 
-    return Result.success(new AddedTrip(trip, stopPattern, updatedTripTimes, serviceDate));
+    return Result.success(new TripUpdate(trip, stopPattern, updatedTripTimes, serviceDate));
   }
 
   /**
