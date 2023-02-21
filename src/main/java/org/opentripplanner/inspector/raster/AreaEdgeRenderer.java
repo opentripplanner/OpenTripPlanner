@@ -18,9 +18,8 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
- * Render bike safety for each edge using a color palette. Display the bike safety factor as label.
+ * Render OSM areas only. Show area edge vertices and OSM boarding locations. Highlight visiblity point vertices.
  *
- * @author laurent
  */
 public class AreaEdgeRenderer implements EdgeVertexRenderer {
 
