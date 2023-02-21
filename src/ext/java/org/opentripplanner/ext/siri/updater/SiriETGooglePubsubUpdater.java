@@ -5,7 +5,6 @@ import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.cloud.pubsub.v1.SubscriptionAdminClient;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.Duration;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.pubsub.v1.ExpirationPolicy;
 import com.google.pubsub.v1.ProjectSubscriptionName;
@@ -16,20 +15,21 @@ import com.google.pubsub.v1.Subscription;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.time.ZonedDateTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.entur.protobuf.mapper.SiriMapper;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.text.FileSizeToTextConverter;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
@@ -103,7 +103,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
    */
   private WriteToGraphCallback saveResultOnGraph;
 
-  private transient long startTime;
+  private transient Instant startTime;
   private boolean primed;
 
   private final Consumer<UpdateResult> recordMetrics;
@@ -189,13 +189,13 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         .setPushConfig(pushConfig)
         .setMessageRetentionDuration(
           // How long will an unprocessed message be kept - minimum 10 minutes
-          Duration.newBuilder().setSeconds(600).build()
+          com.google.protobuf.Duration.newBuilder().setSeconds(600).build()
         )
         .setExpirationPolicy(
           ExpirationPolicy
             .newBuilder()
             // How long will the subscription exist when no longer in use - minimum 1 day
-            .setTtl(Duration.newBuilder().setSeconds(86400).build())
+            .setTtl(com.google.protobuf.Duration.newBuilder().setSeconds(86400).build())
             .build()
         )
         .build()
@@ -203,7 +203,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
     LOG.info("Created subscription {}", subscriptionName);
 
-    startTime = now();
+    startTime = Instant.now();
 
     final EstimatedTimetableMessageReceiver receiver = new EstimatedTimetableMessageReceiver();
 
@@ -256,9 +256,9 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       LOG.info("Deleting subscription {}", subscriptionName);
       subscriptionAdminClient.deleteSubscription(subscriptionName);
       LOG.info(
-        "Subscription deleted {} - time since startup: {} sec",
+        "Subscription deleted {} - time since startup: {}",
         subscriptionName,
-        ((now() - startTime) / 1000)
+        DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
       );
     }
   }
@@ -285,12 +285,8 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     }
   }
 
-  private long now() {
-    return ZonedDateTime.now().toInstant().toEpochMilli();
-  }
-
   private String getTimeSinceStartupString() {
-    return DurationFormatUtils.formatDuration((now() - startTime), "HH:mm:ss");
+    return DurationUtils.durationToStr(Duration.between(startTime, Instant.now()));
   }
 
   private void initializeData(
@@ -310,9 +306,9 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
       final long t2 = System.currentTimeMillis();
       LOG.info(
-        "Fetching initial data - finished after {} ms, got {} bytes",
+        "Fetching initial data - finished after {} ms, got {}",
         (t2 - t1),
-        FileUtils.byteCountToDisplaySize(value.size())
+        FileSizeToTextConverter.fileSizeToString(value.size())
       );
 
       final PubsubMessage message = PubsubMessage.newBuilder().setData(value).build();
@@ -328,7 +324,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
               (System.currentTimeMillis() - t2),
               MESSAGE_COUNTER.get(),
               UPDATE_COUNTER.get(),
-              FileUtils.byteCountToDisplaySize(SIZE_COUNTER.get()),
+              FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
               getTimeSinceStartupString()
             );
           }
@@ -382,8 +378,10 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
             "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
             numberOfMessages,
             numberOfUpdates,
-            FileUtils.byteCountToDisplaySize(SIZE_COUNTER.get()),
-            (now() - siri.getServiceDelivery().getResponseTimestamp().toInstant().toEpochMilli()),
+            FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
+            java.time.Duration
+              .between(siri.getServiceDelivery().getResponseTimestamp(), Instant.now())
+              .toMillis(),
             getTimeSinceStartupString()
           );
         }
