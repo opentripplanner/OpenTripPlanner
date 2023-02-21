@@ -9,12 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -129,6 +131,15 @@ public class SiriFuzzyTripMatcher {
     }
     if (trips == null || trips.isEmpty()) {
       return null;
+    }
+
+    if (journey.getLineRef() != null) {
+      var lineRef = journey.getLineRef().getValue();
+      Route route = entityResolver.resolveRoute(lineRef);
+      if (route != null) {
+        trips =
+          trips.stream().filter(trip -> trip.getRoute().equals(route)).collect(Collectors.toSet());
+      }
     }
 
     return getTripAndPatternForJourney(
