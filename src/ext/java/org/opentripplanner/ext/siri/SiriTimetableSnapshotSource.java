@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
@@ -39,15 +38,10 @@ import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.DataFrameRefStructure;
-import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.EstimatedVersionFrameStructure;
-import uk.org.siri.siri20.LineRef;
-import uk.org.siri.siri20.OperatorRefStructure;
 import uk.org.siri.siri20.VehicleJourneyRef;
-import uk.org.siri.siri20.VehicleRef;
 
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
@@ -221,7 +215,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               results.add(handleAddedTrip(transitModel, journey, entityResolver));
             } catch (Throwable t) {
               // Since this is work in progress - catch everything to continue processing updates
-              LOG.warn("Adding ExtraJourney {} failed.", debugString(journey), t);
+              LOG.warn("Adding ExtraJourney {} failed.", DebugString.of(journey), t);
               results.add(Result.failure(UpdateError.noTripId(UNKNOWN)));
             }
           } else {
@@ -358,7 +352,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       if (tripAndPattern == null) {
         LOG.debug(
           "No trips found for EstimatedVehicleJourney. {}",
-          debugString(estimatedVehicleJourney)
+          DebugString.of(estimatedVehicleJourney)
         );
         return UpdateError.result(null, NO_FUZZY_TRIP_MATCH);
       }
@@ -563,38 +557,5 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     lastPurgeDate = previously;
 
     return buffer.purgeExpiredData(previously);
-  }
-
-  private static String debugString(EstimatedVehicleJourney estimatedVehicleJourney) {
-    return ToStringBuilder
-      .of(estimatedVehicleJourney.getClass())
-      .addStr(
-        "EstimatedVehicleJourneyCode",
-        estimatedVehicleJourney.getEstimatedVehicleJourneyCode()
-      )
-      .addObjOp(
-        "DatedVehicleJourney",
-        estimatedVehicleJourney.getDatedVehicleJourneyRef(),
-        DatedVehicleJourneyRef::getValue
-      )
-      .addObjOp(
-        "FramedVehicleJourney",
-        estimatedVehicleJourney.getFramedVehicleJourneyRef(),
-        it ->
-          ToStringBuilder
-            .of(it.getClass())
-            .addStr("VehicleJourney", it.getDatedVehicleJourneyRef())
-            .addObjOp("Date", it.getDataFrameRef(), DataFrameRefStructure::getValue)
-            .toString()
-      )
-      .addObjOp(
-        "Operator",
-        estimatedVehicleJourney.getOperatorRef(),
-        OperatorRefStructure::getValue
-      )
-      .addCol("VehicleModes", estimatedVehicleJourney.getVehicleModes())
-      .addObjOp("Line", estimatedVehicleJourney.getLineRef(), LineRef::getValue)
-      .addObjOp("Vehicle", estimatedVehicleJourney.getVehicleRef(), VehicleRef::getValue)
-      .toString();
   }
 }
