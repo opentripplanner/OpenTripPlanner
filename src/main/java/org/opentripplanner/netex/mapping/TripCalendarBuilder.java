@@ -25,9 +25,8 @@ import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DayTypeRefStructure;
 import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
 import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.UicOperatingPeriod;
 
 public class TripCalendarBuilder {
 
@@ -63,8 +62,7 @@ public class TripCalendarBuilder {
     ReadOnlyHierarchicalMapById<DayType> dayTypeById,
     ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
     ReadOnlyHierarchicalMapById<OperatingDay> operatingDays,
-    ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById,
-    ReadOnlyHierarchicalMapById<UicOperatingPeriod> uicOperatingPeriodById
+    ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> operatingPeriodById
   ) {
     dayTypeCalendars.addAll(
       DayTypeAssignmentMapper.mapDayTypes(
@@ -72,7 +70,6 @@ public class TripCalendarBuilder {
         dayTypeAssignmentByDayTypeId,
         operatingDays,
         operatingPeriodById,
-        uicOperatingPeriodById,
         issueStore
       )
     );

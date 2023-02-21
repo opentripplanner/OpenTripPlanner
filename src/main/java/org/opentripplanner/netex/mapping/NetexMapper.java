@@ -387,8 +387,7 @@ public class NetexMapper {
       currentNetexIndex.getDayTypeById(),
       currentNetexIndex.getDayTypeAssignmentByDayTypeId(),
       currentNetexIndex.getOperatingDayById(),
-      currentNetexIndex.getOperatingPeriodById(),
-      currentNetexIndex.getUicOperatingPeriodById()
+      currentNetexIndex.getOperatingPeriodById()
     );
   }
 

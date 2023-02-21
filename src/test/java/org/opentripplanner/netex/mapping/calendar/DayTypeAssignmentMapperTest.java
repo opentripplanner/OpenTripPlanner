@@ -21,7 +21,7 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.UicOperatingPeriod;
 
 public class DayTypeAssignmentMapperTest {
@@ -48,7 +48,7 @@ public class DayTypeAssignmentMapperTest {
   private static final Boolean NOT_AVAILABLE = FALSE;
 
   private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS = new HierarchicalMapById<>();
-  private static final HierarchicalMapById<OperatingPeriod> EMPTY_PERIODS = new HierarchicalMapById<>();
+  private static final HierarchicalMapById<OperatingPeriod_VersionStructure> EMPTY_PERIODS = new HierarchicalMapById<>();
   private static final HierarchicalMapById<UicOperatingPeriod> EMPTY_UIC_PERIODS = new HierarchicalMapById<>();
 
   @Test
@@ -73,7 +73,6 @@ public class DayTypeAssignmentMapperTest {
       assignments,
       EMPTY_OPERATING_DAYS,
       EMPTY_PERIODS,
-      EMPTY_UIC_PERIODS,
       null
     );
 
@@ -106,7 +105,6 @@ public class DayTypeAssignmentMapperTest {
       assignments,
       EMPTY_OPERATING_DAYS,
       EMPTY_PERIODS,
-      EMPTY_UIC_PERIODS,
       null
     );
 
@@ -132,7 +130,6 @@ public class DayTypeAssignmentMapperTest {
       assignments,
       operatingDays,
       EMPTY_PERIODS,
-      EMPTY_UIC_PERIODS,
       null
     );
 
@@ -146,7 +143,7 @@ public class DayTypeAssignmentMapperTest {
     // GIVEN
     var dayTypes = new HierarchicalMapById<DayType>();
     var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
-    var periods = new HierarchicalMapById<OperatingPeriod>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
 
     // Schedule in November
     {
@@ -168,7 +165,6 @@ public class DayTypeAssignmentMapperTest {
       assignments,
       EMPTY_OPERATING_DAYS,
       periods,
-      EMPTY_UIC_PERIODS,
       null
     );
 
@@ -185,7 +181,7 @@ public class DayTypeAssignmentMapperTest {
     var dayTypes = new HierarchicalMapById<DayType>();
     var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
     var operatingDays = new HierarchicalMapById<OperatingDay>();
-    var periods = new HierarchicalMapById<OperatingPeriod>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
 
     // All weekdays in December from 22. to 31. except 24.12
     {
@@ -206,7 +202,6 @@ public class DayTypeAssignmentMapperTest {
       assignments,
       operatingDays,
       periods,
-      EMPTY_UIC_PERIODS,
       null
     );
 

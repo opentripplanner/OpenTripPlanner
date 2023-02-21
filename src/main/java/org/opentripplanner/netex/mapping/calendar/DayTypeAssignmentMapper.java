@@ -17,9 +17,8 @@ import org.opentripplanner.netex.issues.DayTypeScheduleIsEmpty;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.PropertyOfDay;
-import org.rutebanken.netex.model.UicOperatingPeriod;
 
 /**
  * Map {@link DayTypeAssignment}s to set of {@link LocalDate}s.
@@ -41,8 +40,7 @@ public class DayTypeAssignmentMapper {
   // Input data
   private final DayType dayType;
   private final ReadOnlyHierarchicalMapById<OperatingDay> operatingDays;
-  private final ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriods;
-  private final ReadOnlyHierarchicalMapById<UicOperatingPeriod> uicOperatingPeriods;
+  private final ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> operatingPeriods;
 
   // Result data
   private final Set<LocalDate> dates = new HashSet<>();
@@ -55,13 +53,11 @@ public class DayTypeAssignmentMapper {
   private DayTypeAssignmentMapper(
     DayType dayType,
     ReadOnlyHierarchicalMapById<OperatingDay> operatingDays,
-    ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriods,
-    ReadOnlyHierarchicalMapById<UicOperatingPeriod> uicOperatingPeriods
+    ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> operatingPeriods
   ) {
     this.dayType = dayType;
     this.operatingDays = operatingDays;
     this.operatingPeriods = operatingPeriods;
-    this.uicOperatingPeriods = uicOperatingPeriods;
   }
 
   /**
@@ -72,8 +68,7 @@ public class DayTypeAssignmentMapper {
     ReadOnlyHierarchicalMapById<DayType> dayTypes,
     ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> assignments,
     ReadOnlyHierarchicalMapById<OperatingDay> operatingDays,
-    ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriods,
-    ReadOnlyHierarchicalMapById<UicOperatingPeriod> uicOperatingPeriods,
+    ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> operatingPeriods,
     DataImportIssueStore issueStore
   ) {
     Map<String, Set<LocalDate>> result = new HashMap<>();
@@ -82,8 +77,7 @@ public class DayTypeAssignmentMapper {
       var mapper = new DayTypeAssignmentMapper(
         dayType,
         operatingDays,
-        operatingPeriods,
-        uicOperatingPeriods
+        operatingPeriods
       );
 
       for (DayTypeAssignment it : assignments.lookup(dayType.getId())) {
@@ -159,8 +153,7 @@ public class DayTypeAssignmentMapper {
     boolean isAvailable = isDayTypeAvailableForAssigment(dayTypeAssignment);
 
     String ref = dayTypeAssignment.getOperatingPeriodRef().getRef();
-    OperatingPeriod period = operatingPeriods.lookup(ref);
-    UicOperatingPeriod uicPeriod = uicOperatingPeriods.lookup(ref);
+    OperatingPeriod_VersionStructure period = operatingPeriods.lookup(ref);
 
     if (period != null) {
       Set<DayOfWeek> daysOfWeek = daysOfWeekForDayType(dayType);
@@ -169,11 +162,6 @@ public class DayTypeAssignmentMapper {
       LocalDateTime date = period.getFromDate();
 
       addDates(isAvailable, daysOfWeek, endDate, date);
-    } else if (uicPeriod != null) {
-      LocalDateTime endDate = uicPeriod.getToDate().plusDays(1);
-      LocalDateTime date = uicPeriod.getFromDate();
-
-      addDates(uicPeriod.getValidDayBits(), isAvailable, endDate, date);
     }
   }
 

@@ -17,7 +17,7 @@ import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.Notice;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
@@ -61,7 +61,7 @@ public interface NetexEntityIndexReadOnlyView {
 
   ReadOnlyHierarchicalMapById<OperatingDay> getOperatingDayById();
 
-  ReadOnlyHierarchicalMapById<OperatingPeriod> getOperatingPeriodById();
+  ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> getOperatingPeriodById();
 
   ReadOnlyHierarchicalMapById<UicOperatingPeriod> getUicOperatingPeriodById();
 

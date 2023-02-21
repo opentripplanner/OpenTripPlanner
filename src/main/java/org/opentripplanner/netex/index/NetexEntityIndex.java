@@ -26,7 +26,7 @@ import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.Notice;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
@@ -86,7 +86,7 @@ public class NetexEntityIndex {
   public final HierarchicalMapById<Notice> noticeById;
   public final HierarchicalMapById<NoticeAssignment> noticeAssignmentById;
   public final HierarchicalMapById<OperatingDay> operatingDayById;
-  public final HierarchicalMapById<OperatingPeriod> operatingPeriodById;
+  public final HierarchicalMapById<OperatingPeriod_VersionStructure> operatingPeriodById;
   public final HierarchicalMapById<UicOperatingPeriod> uicOperatingPeriodById;
   public final HierarchicalMapById<Operator> operatorsById;
   public final HierarchicalVersionMapById<Quay> quayById;
@@ -308,7 +308,7 @@ public class NetexEntityIndex {
       }
 
       @Override
-      public ReadOnlyHierarchicalMapById<OperatingPeriod> getOperatingPeriodById() {
+      public ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> getOperatingPeriodById() {
         return operatingPeriodById;
       }
 

@@ -15,13 +15,11 @@ import org.rutebanken.netex.model.DayTypesInFrame_RelStructure;
 import org.rutebanken.netex.model.DayTypes_RelStructure;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingDaysInFrame_RelStructure;
-import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.OperatingPeriodsInFrame_RelStructure;
 import org.rutebanken.netex.model.OperatingPeriods_RelStructure;
 import org.rutebanken.netex.model.ServiceCalendar;
 import org.rutebanken.netex.model.ServiceCalendarFrame_VersionFrameStructure;
-import org.rutebanken.netex.model.UicOperatingPeriod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +28,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
   private static final Logger LOG = LoggerFactory.getLogger(ServiceCalendarFrameParser.class);
 
   private final Collection<DayType> dayTypes = new ArrayList<>();
-  private final Collection<OperatingPeriod> operatingPeriods = new ArrayList<>();
-  private final Collection<UicOperatingPeriod> uicOperatingPeriods = new ArrayList<>();
+  private final Collection<OperatingPeriod_VersionStructure> operatingPeriods = new ArrayList<>();
   private final Collection<OperatingDay> operatingDays = new ArrayList<>();
   private final Multimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId = ArrayListMultimap.create();
 
@@ -55,7 +52,6 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
   void setResultOnIndex(NetexEntityIndex netexIndex) {
     netexIndex.dayTypeById.addAll(dayTypes);
     netexIndex.operatingPeriodById.addAll(operatingPeriods);
-    netexIndex.uicOperatingPeriodById.addAll(uicOperatingPeriods);
     netexIndex.operatingDayById.addAll(operatingDays);
     netexIndex.dayTypeAssignmentByDayTypeId.addAll(dayTypeAssignmentByDayTypeId);
   }
@@ -110,10 +106,8 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
   }
 
   private void parseOperatingPeriod(Object operatingPeriod) {
-    if (operatingPeriod instanceof OperatingPeriod op) {
+    if (operatingPeriod instanceof OperatingPeriod_VersionStructure op) {
       operatingPeriods.add(op);
-    } else if (operatingPeriod instanceof UicOperatingPeriod op) {
-      uicOperatingPeriods.add(op);
     }
   }
 
