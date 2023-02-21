@@ -777,6 +777,8 @@ type QueryType {
     itineraryFilters: ItineraryFilters,
     "The preferable language to use for text targeted the end user. Note! The data quality is limited, only stop and quay names are translates, and not in all places of the API."
     locale: Locale = no,
+    "Maximum duration for access/egress for street searches per respective mode."
+    maxAccessEgressDurationForMode: [StreetModeDurationInput!],
     "Maximum number of additional transfers compared to the best number of transfers allowed. Note! The best way to reduce the number of transfers is to set the `transferPenalty` parameter."
     maximumAdditionalTransfers: Int = 5,
     "Maximum number of transfers. Note! The best way to reduce the number of transfers is to set the `transferPenalty` parameter."
@@ -1850,6 +1852,12 @@ input Modes {
   egressMode: StreetMode
   "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
   transportModes: [TransportModes]
+}
+
+"A combination of street mode and corresponding duration"
+input StreetModeDurationInput {
+  duration: Duration!
+  streetMode: StreetMode!
 }
 
 "Input format for specifying which modes will be allowed for this search. If this element is not present, it will default to all to foot."

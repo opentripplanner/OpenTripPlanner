@@ -57,6 +57,7 @@ import org.opentripplanner.ext.transmodelapi.model.framework.OperatorType;
 import org.opentripplanner.ext.transmodelapi.model.framework.PointsOnLinkType;
 import org.opentripplanner.ext.transmodelapi.model.framework.RentalVehicleTypeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ServerInfoType;
+import org.opentripplanner.ext.transmodelapi.model.framework.StreetModeDurationInputType;
 import org.opentripplanner.ext.transmodelapi.model.framework.SystemNoticeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ValidityPeriodType;
 import org.opentripplanner.ext.transmodelapi.model.network.DestinationDisplayType;
@@ -347,7 +348,14 @@ public class TransmodelGraphQLSchema {
       gqlUtil
     );
 
-    GraphQLFieldDefinition tripQuery = TripQuery.create(routing, tripType, gqlUtil);
+    GraphQLInputObjectType durationPerStreetModeInput = StreetModeDurationInputType.create(gqlUtil);
+
+    GraphQLFieldDefinition tripQuery = TripQuery.create(
+      routing,
+      tripType,
+      durationPerStreetModeInput,
+      gqlUtil
+    );
 
     GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
     GraphQLInputObjectType viaLocationInputType = ViaLocationInputType.create(gqlUtil);
