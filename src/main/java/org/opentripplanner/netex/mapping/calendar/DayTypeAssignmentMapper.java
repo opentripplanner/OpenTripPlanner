@@ -77,11 +77,7 @@ public class DayTypeAssignmentMapper {
     Map<String, Set<LocalDate>> result = new HashMap<>();
 
     for (var dayType : dayTypes.localValues()) {
-      var mapper = new DayTypeAssignmentMapper(
-        dayType,
-        operatingDays,
-        operatingPeriods
-      );
+      var mapper = new DayTypeAssignmentMapper(dayType, operatingDays, operatingPeriods);
 
       for (DayTypeAssignment it : assignments.lookup(dayType.getId())) {
         mapper.map(it);
