@@ -31,8 +31,9 @@ import org.rutebanken.netex.model.UicOperatingPeriod;
  * <p>
  * To simplify the logic in this class and avoid passing input parameters down the call chain this
  * class perform the mapping by first creating an instance with READ-ONLY input members. The result
- * is added to {@link #dates} and {@link #datesToRemove} during the mapping process. As a final step,
- * the two collections are merged (dates-datesToRemove) and then mapped to {@link LocalDate}s.
+ * is added to {@link #dates} and {@link #datesToRemove} during the mapping process. As a final
+ * step, the two collections are merged (dates-datesToRemove) and then mapped to
+ * {@link LocalDate}s.
  * <p>
  * This class is THREAD-SAFE. A static mapping method is the single point of entry and a private
  * constructor ensure the instance is used in one thread only.
@@ -63,8 +64,8 @@ public class DayTypeAssignmentMapper {
   }
 
   /**
-   * Map all given {@code dayTypeAssignments} into a map of {@link LocalDate} by {@code
-   * dayTypeId}s.
+   * Map all given {@code dayTypeAssignments} into a map of {@link LocalDate} by
+   * {@code dayTypeId}s.
    */
   public static Map<String, Set<LocalDate>> mapDayTypes(
     ReadOnlyHierarchicalMapById<DayType> dayTypes,
