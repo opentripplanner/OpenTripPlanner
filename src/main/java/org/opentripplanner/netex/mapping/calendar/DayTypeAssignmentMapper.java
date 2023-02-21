@@ -50,7 +50,7 @@ public class DayTypeAssignmentMapper {
   private final Set<LocalDate> datesToRemove = new HashSet<>();
 
   /**
-   * This is private to block instantiating this class from outside. This enforce thread-safety
+   * This is private to block instantiating this class from outside. This enforces thread-safety
    * since this class is instantiated inside a static method. All input is READ-ONLY.
    */
   private DayTypeAssignmentMapper(
