@@ -28,6 +28,11 @@ class SelectRequestMapper {
       selectRequestBuilder.withAgencies(mapIDsToDomain(authorities));
     }
 
+    if (input.containsKey("groupOfLines")) {
+      var groupOfLines = (List<String>) input.get("groupOfLines");
+      selectRequestBuilder.withGroupOfRoutes(mapIDsToDomain(groupOfLines));
+    }
+
     if (input.containsKey("transportModes")) {
       var tModes = new ArrayList<MainAndSubMode>();
 
