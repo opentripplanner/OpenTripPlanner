@@ -10,6 +10,7 @@ import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
@@ -100,11 +101,12 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
+    final StreetSearchRequest request = s0.getRequest();
     if (
       !vehicleParking.hasSpacesAvailable(
         mode,
-        s0.getRequest().wheelchair(),
-        s0.getRequest().parking().useAvailabilityInformation()
+        request.wheelchair(),
+        request.parking().useAvailabilityInformation()
       )
     ) {
       return null;
@@ -115,7 +117,7 @@ public class VehicleParkingEdge extends Edge {
     s0e.incrementTimeInSeconds(parkingTime);
     s0e.setVehicleParked(false, mode);
 
-    addUnpreferredTagCost(s0.getRequest().parking(), s0e);
+    addUnpreferredTagCost(request.parking(), s0e);
 
     return s0e.makeState();
   }
