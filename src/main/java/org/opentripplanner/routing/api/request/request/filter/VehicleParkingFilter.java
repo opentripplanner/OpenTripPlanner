@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.api.request.request.filter;
 
-import com.google.common.collect.Sets;
+import java.util.Collections;
 import java.util.Set;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
@@ -22,7 +22,7 @@ public sealed interface VehicleParkingFilter {
   record TagsFilter(Set<String> tags) implements VehicleParkingFilter {
     @Override
     public boolean matches(VehicleParking p) {
-      return tags.isEmpty() || !Sets.intersection(tags, p.getTags()).isEmpty();
+      return !Collections.disjoint(tags, p.getTags());
     }
 
     @Override
