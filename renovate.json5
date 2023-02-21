@@ -3,10 +3,6 @@
   "extends": [
     "config:base"
   ],
-  "enabledManagers": [
-    "maven",
-    "pip_requirements"
-  ],
   "prConcurrentLimit": 3,
   "labels": [
     "skip changelog"
