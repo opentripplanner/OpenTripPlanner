@@ -10,7 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -105,7 +104,7 @@ public class FilterTest {
 
     var filterRequest = TransitFilterRequest
       .of()
-      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_1)).build())
+      .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);
@@ -151,9 +150,7 @@ public class FilterTest {
 
     var filterRequest = TransitFilterRequest
       .of()
-      .addNot(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1))).build()
-      )
+      .addNot(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);
@@ -273,12 +270,12 @@ public class FilterTest {
 
     var filter1 = TransitFilterRequest
       .of()
-      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_1)).build())
+      .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
     var filter2 = TransitFilterRequest
       .of()
-      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_2)).build())
+      .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_2))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filter1, filter2), patterns);
@@ -321,12 +318,12 @@ public class FilterTest {
 
     var filter1 = TransitFilterRequest
       .of()
-      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_1)).build())
+      .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
     var filter2 = TransitFilterRequest
       .of()
-      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_1)).build())
+      .addNot(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filter1, filter2), patterns);
@@ -371,10 +368,8 @@ public class FilterTest {
 
     var filterRequest = TransitFilterRequest
       .of()
-      .addSelect(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1))).build()
-      )
-      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_3)).build())
+      .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
+      .addNot(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_3))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);
@@ -423,17 +418,13 @@ public class FilterTest {
 
     var filter1 = TransitFilterRequest
       .of()
-      .addSelect(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1))).build()
-      )
+      .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
       .build();
 
     var filter2 = TransitFilterRequest
       .of()
-      .addSelect(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_2))).build()
-      )
-      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_3)).build())
+      .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_2))).build())
+      .addNot(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_3))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filter1, filter2), patterns);
@@ -493,7 +484,7 @@ public class FilterTest {
       .addSelect(
         SelectRequest
           .of()
-          .withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1)))
+          .withAgencies(List.of(id(AGENCY_ID_1)))
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
           .build()
       )
@@ -567,11 +558,11 @@ public class FilterTest {
       .addSelect(
         SelectRequest
           .of()
-          .withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1)))
+          .withAgencies(List.of(id(AGENCY_ID_1)))
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
           .build()
       )
-      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_3)).build())
+      .addNot(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_3))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filter), patterns);
@@ -636,14 +627,12 @@ public class FilterTest {
 
     var filter = TransitFilterRequest
       .of()
-      .addSelect(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:" + AGENCY_ID_1))).build()
-      )
+      .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
       .addNot(
         SelectRequest
           .of()
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
-          .withRoutes(RouteMatcher.parse("F__" + ROUTE_ID_3))
+          .withRoutes(List.of(id(ROUTE_ID_3)))
           .build()
       )
       .build();
