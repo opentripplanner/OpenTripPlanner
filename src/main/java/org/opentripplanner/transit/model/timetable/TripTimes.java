@@ -598,7 +598,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         return;
       }
 
-      LOG.warn("Unable to update headsign");
+      this.headsigns = new I18NString[scheduledArrivalTimes.length];
+      this.headsigns[index] = headsign;
       return;
     }
 
