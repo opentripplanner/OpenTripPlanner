@@ -574,6 +574,45 @@ public class TimetableSnapshotSourceTest {
       assertEquals(90, originalTripTimesForToday.getDepartureDelay(2));
     }
 
+    /**
+     * This test just asserts that trip with start date that is outside the service period doesn't
+     * throw an exception and is ignored instead.
+     */
+    @Test
+    public void invalidTripDate() {
+      // GIVEN
+
+      String scheduledTripId = "1.1";
+
+      var serviceDateOutsideService = SERVICE_DATE.minusYears(10);
+      var builder = new TripUpdateBuilder(
+        scheduledTripId,
+        serviceDateOutsideService,
+        SCHEDULED,
+        transitModel.getTimeZone()
+      )
+        .addDelayedStopTime(1, 0)
+        .addDelayedStopTime(2, 60, 80)
+        .addDelayedStopTime(3, 90, 90);
+
+      var tripUpdate = builder.build();
+
+      var updater = defaultUpdater();
+
+      // WHEN
+      updater.applyTripUpdates(
+        TRIP_MATCHER_NOOP,
+        REQUIRED_NO_DATA,
+        fullDataset,
+        List.of(tripUpdate),
+        feedId
+      );
+
+      // THEN
+      final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+      assertNull(snapshot);
+    }
+
     @Test
     public void scheduledTripWithSkippedAndNoData() {
       // GIVEN
