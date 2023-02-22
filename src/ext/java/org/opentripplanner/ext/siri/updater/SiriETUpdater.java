@@ -2,7 +2,6 @@ package org.opentripplanner.ext.siri.updater;
 
 import java.util.List;
 import java.util.function.Consumer;
-import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
@@ -103,9 +102,9 @@ public class SiriETUpdater extends PollingGraphUpdater {
       if (updates != null) {
         boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
         ServiceDelivery serviceDelivery = updates.getServiceDelivery();
-        // Use isTrue in case isMoreData returns null. Mark this updater as primed after last page of updates.
-        // Copy moreData into a final primitive, because the object moreData persists across iterations.
-        moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
+        moreData = Boolean.TRUE.equals(serviceDelivery.isMoreData());
+        // Mark this updater as primed after last page of updates. Copy moreData into a final
+        // primitive, because the object moreData persists across iterations.
         final boolean markPrimed = !moreData;
         List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {

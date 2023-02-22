@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
-import org.apache.commons.io.IOUtils;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
@@ -187,7 +186,7 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
 
   private void uncompressEntry(ZipInputStream zis, ZipEntry entry) throws IOException {
     ByteArrayOutputStream buf = new ByteArrayOutputStream(4048);
-    long nbCopiedBytes = IOUtils.copyLarge(zis, buf, 0, maxZipEntrySizeInMemory + 1L);
+    long nbCopiedBytes = copy(zis, buf, maxZipEntrySizeInMemory + 1L);
     byte[] byteArray = buf.toByteArray();
     if (nbCopiedBytes <= maxZipEntrySizeInMemory) {
       content.add(
@@ -214,5 +213,24 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
       }
       content.add(new TemporaryFileDataSource(entry.getName(), tmpFile, type()));
     }
+  }
+
+  /**
+   * Copies at maximum maxLength bytes from inputStream to outputStream
+   * Inlined partially from IOUtils.copyLarge
+   */
+  private long copy(InputStream inputStream, OutputStream outputStream, long maxLength)
+    throws IOException {
+    byte[] buffer = new byte[8192];
+    int bytesToRead = buffer.length;
+    int read;
+    long totalRead = 0;
+    while (bytesToRead > 0 && (read = inputStream.read(buffer, 0, bytesToRead)) != -1) {
+      outputStream.write(buffer, 0, read);
+      totalRead += read;
+      // Note the cast must work because buffer.length is an integer
+      bytesToRead = (int) Math.min(maxLength - totalRead, buffer.length);
+    }
+    return totalRead;
   }
 }

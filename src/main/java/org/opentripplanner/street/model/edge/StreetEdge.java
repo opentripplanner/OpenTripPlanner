@@ -290,9 +290,9 @@ public class StreetEdge
     final double speed =
       switch (traverseMode) {
         case WALK -> walkingBike ? preferences.bike().walkingSpeed() : preferences.walk().speed();
-        case BICYCLE -> preferences.bike().speed();
+        case BICYCLE, SCOOTER -> preferences.bike().speed();
         case CAR -> getCarSpeed();
-        default -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
+        case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
       };
 
     return isStairs() ? (speed / preferences.walk().stairsTimeFactor()) : speed;
