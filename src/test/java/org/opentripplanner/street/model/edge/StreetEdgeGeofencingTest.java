@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
 import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
+import static org.opentripplanner.street.search.TraverseMode.SCOOTER;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.street.search.state.VehicleRentalState.HAVE_RENTED;
 import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
@@ -99,7 +100,7 @@ class StreetEdgeGeofencingTest {
 
       var continueRenting = continueOnFoot.getNextResult();
       assertEquals(RENTING_FLOATING, continueRenting.getVehicleRentalState());
-      assertEquals(BICYCLE, continueRenting.getBackMode());
+      assertEquals(SCOOTER, continueRenting.getBackMode());
       assertTrue(continueRenting.isInsideNoRentalDropOffArea());
 
       var insideZone = restrictedEdge.traverse(continueRenting);
