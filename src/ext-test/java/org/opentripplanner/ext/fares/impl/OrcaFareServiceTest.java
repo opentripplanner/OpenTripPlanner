@@ -11,9 +11,7 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +93,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateFareForSingleAgency() {
-    List<Leg> rides = Collections.singletonList(getLeg(COMM_TRANS_AGENCY_ID, "400", 0));
+    List<Leg> rides = List.of(getLeg(COMM_TRANS_AGENCY_ID, "400", 0));
     calculateFare(rides, FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS);
     calculateFare(rides, FareType.senior, 200f);
     calculateFare(rides, FareType.youth, 0f);
@@ -111,7 +109,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateFareWithNoFreeTransfer() {
-    List<Leg> rides = Arrays.asList(
+    List<Leg> rides = List.of(
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
       getLeg(WASHINGTON_STATE_FERRIES_AGENCY_ID, 1),
       getLeg(COMM_TRANS_AGENCY_ID, 2)
@@ -138,10 +136,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateFareByLeg() {
-    List<Leg> rides = Arrays.asList(
-      getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
-      getLeg(COMM_TRANS_AGENCY_ID, 2)
-    );
+    List<Leg> rides = List.of(getLeg(KITSAP_TRANSIT_AGENCY_ID, 0), getLeg(COMM_TRANS_AGENCY_ID, 2));
     ItineraryFares fares = new ItineraryFares();
     orcaFareService.populateFare(fares, null, FareType.electronicRegular, rides, null);
 
@@ -157,7 +152,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateFareThatExceedsTwoHourFreeTransferWindow() {
-    List<Leg> rides = Arrays.asList(
+    List<Leg> rides = List.of(
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 30),
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 60),
@@ -185,7 +180,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateFareThatIncludesNoFreeTransfers() {
-    List<Leg> rides = Arrays.asList(
+    List<Leg> rides = List.of(
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
       getLeg(WASHINGTON_STATE_FERRIES_AGENCY_ID, 30, "VashonIsland-Fauntelroy"),
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 60),
@@ -211,7 +206,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateFareThatExceedsTwoHourFreeTransferWindowTwice() {
-    List<Leg> rides = Arrays.asList(
+    List<Leg> rides = List.of(
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 30),
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 60),
@@ -258,7 +253,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateFareThatStartsWithACashFare() {
-    List<Leg> rides = Arrays.asList(
+    List<Leg> rides = List.of(
       getLeg(WASHINGTON_STATE_FERRIES_AGENCY_ID, 0),
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 30),
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 60),
@@ -292,9 +287,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateFareForKitsapFastFerryEastAgency() {
-    List<Leg> rides = Collections.singletonList(
-      getLeg(KITSAP_TRANSIT_AGENCY_ID, 0, 4, "Kitsap Fast Ferry", "east")
-    );
+    List<Leg> rides = List.of(getLeg(KITSAP_TRANSIT_AGENCY_ID, 0, 4, "Kitsap Fast Ferry", "east"));
     calculateFare(rides, FareType.regular, 200f);
     calculateFare(rides, FareType.senior, 200f);
     calculateFare(rides, FareType.youth, 0f);
@@ -309,7 +302,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateFareForWSFPtToTahlequah() {
-    List<Leg> rides = Collections.singletonList(
+    List<Leg> rides = List.of(
       getLeg(WASHINGTON_STATE_FERRIES_AGENCY_ID, 0, "Point Defiance - Tahlequah")
     );
     calculateFare(rides, FareType.regular, 610f);
@@ -326,7 +319,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateFareForLightRailLeg() {
-    List<Leg> rides = Collections.singletonList(
+    List<Leg> rides = List.of(
       getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Roosevelt Station", "Int'l Dist/Chinatown")
     );
     calculateFare(rides, FareType.regular, 250f);
@@ -338,7 +331,7 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicYouth, 0f);
     // Ensure that it works in reverse
     rides =
-      Collections.singletonList(
+      List.of(
         getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Int'l Dist/Chinatown", "Roosevelt Station")
       );
     calculateFare(rides, FareType.regular, 250f);
@@ -352,7 +345,7 @@ public class OrcaFareServiceTest {
 
   @Test
   public void calculateFareForSounderLeg() {
-    List<Leg> rides = Collections.singletonList(
+    List<Leg> rides = List.of(
       getLeg(SOUND_TRANSIT_AGENCY_ID, "S Line", 0, "King Street Station", "Auburn Station")
     );
     calculateFare(rides, FareType.regular, 425f);
@@ -364,7 +357,7 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicYouth, 0f);
     // Ensure that it works in reverse
     rides =
-      Collections.singletonList(
+      List.of(
         getLeg(SOUND_TRANSIT_AGENCY_ID, "N Line", 0, "King Street Station", "Everett Station")
       );
     calculateFare(rides, FareType.regular, 500f);
@@ -383,7 +376,7 @@ public class OrcaFareServiceTest {
    */
   @Test
   public void calculateSoundTransitBusFares() {
-    List<Leg> rides = Arrays.asList(
+    List<Leg> rides = List.of(
       getLeg(COMM_TRANS_AGENCY_ID, "512", 0),
       getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "594", 120),
       getLeg(KC_METRO_AGENCY_ID, "550", 240)
@@ -398,7 +391,7 @@ public class OrcaFareServiceTest {
 
     // Also make sure that PT's 500 and 501 get regular Pierce fare and not ST's fare
     rides =
-      Arrays.asList(
+      List.of(
         getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "500", 0),
         getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "501", 60)
       );
@@ -413,7 +406,7 @@ public class OrcaFareServiceTest {
 
   @Test
   public void calculateCashFreeTransferKCMetro() {
-    List<Leg> rides = Arrays.asList(
+    List<Leg> rides = List.of(
       getLeg(KC_METRO_AGENCY_ID, 0),
       getLeg(KC_METRO_AGENCY_ID, 20),
       getLeg(COMM_TRANS_AGENCY_ID, 45),
@@ -431,7 +424,7 @@ public class OrcaFareServiceTest {
 
   @Test
   public void calculateTransferExtension() {
-    List<Leg> rides = Arrays.asList(
+    List<Leg> rides = List.of(
       getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Int'l Dist/Chinatown", "Roosevelt Station"), // 2.50
       getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 60, "Roosevelt Station", "Angle Lake Station"), // 3.25, should extend transfer
       getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 140, "Int'l Dist/Chinatown", "Angle Lake Station") // 3.00, should be free under extended transfer
