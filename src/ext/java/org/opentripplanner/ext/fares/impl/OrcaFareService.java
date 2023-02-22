@@ -12,6 +12,7 @@ import org.opentripplanner.ext.fares.model.FareContainer;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.RiderCategory;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
@@ -88,7 +89,7 @@ public class OrcaFareService extends DefaultFareService {
 
         if (
           route.getGtfsType() == ROUTE_TYPE_FERRY &&
-          route.getLongName().toString().contains("Water Taxi: West Seattle")
+          routeLongNameFallBack(route).contains("Water Taxi: West Seattle")
         ) {
           yield RideType.KC_WATER_TAXI_WEST_SEATTLE;
         } else if (
@@ -120,6 +121,15 @@ public class OrcaFareService extends DefaultFareService {
       case KITSAP_TRANSIT_AGENCY_ID -> RideType.KITSAP_TRANSIT;
       default -> RideType.UNKNOWN;
     };
+  }
+
+  private static String routeLongNameFallBack(Route route) {
+    var longName = route.getLongName();
+    if(longName == null) {
+      return "";
+    } else {
+      return route.getLongName().toString();
+    }
   }
 
   public OrcaFareService(Collection<FareRuleSet> regularFareRules) {
@@ -227,7 +237,7 @@ public class OrcaFareService extends DefaultFareService {
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> 2.00f;
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> 10.00f;
       case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(
-        route.getLongName().toString(),
+        route.getLongName(),
         fareType,
         defaultFare
       );
@@ -286,7 +296,7 @@ public class OrcaFareService extends DefaultFareService {
         EVERETT_TRANSIT,
         SEATTLE_STREET_CAR -> 1.50f;
       case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(
-        route.getLongName().toString(),
+        route.getLongName(),
         FareType.electronicSpecial,
         defaultFare
       );
@@ -307,7 +317,7 @@ public class OrcaFareService extends DefaultFareService {
     return switch (rideType) {
       case COMM_TRANS_LOCAL_SWIFT -> 1.25f;
       case COMM_TRANS_COMMUTER_EXPRESS -> 2.00f;
-      case EVERETT_TRANSIT -> 0.50f;
+      case EVERETT_TRANSIT, SKAGIT_TRANSIT -> 0.50f;
       case PIERCE_COUNTY_TRANSIT, SEATTLE_STREET_CAR, KITSAP_TRANSIT -> fareType.equals( // Pierce, Seattle Streetcar, and Kitsap only provide discounted senior fare for orca.
           FareType.electronicSenior
         )
@@ -326,9 +336,9 @@ public class OrcaFareService extends DefaultFareService {
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> fareType.equals(FareType.electronicSenior)
         ? 5.00f
         : 10.00f;
-      case SKAGIT_TRANSIT -> 0.50f; // Discount specific to Skagit transit and not Orca.
+      // Discount specific to Skagit transit and not Orca.
       case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(
-        route.getLongName().toString(),
+        route.getLongName(),
         fareType,
         defaultFare
       );
@@ -349,16 +359,17 @@ public class OrcaFareService extends DefaultFareService {
    * the default fare.
    */
   private float getWashingtonStateFerriesFare(
-    String routeLongName,
+    I18NString routeLongName,
     FareType fareType,
     float defaultFare
   ) {
-    if (routeLongName == null || routeLongName.isEmpty()) {
+    if (routeLongName == null || routeLongName.toString().isEmpty()) {
       return defaultFare;
     }
-    Map<FareType, Float> fares = OrcaFaresData.washingtonStateFerriesFares.get(
-      routeLongName.replaceAll(" ", "")
-    );
+
+    var longName = routeLongName.toString().replaceAll(" ", "");
+
+    Map<FareType, Float> fares = OrcaFaresData.washingtonStateFerriesFares.get(longName);
     // WSF doesn't support transfers so we only care about cash fares.
     FareType wsfFareType;
     if (fareType == FareType.electronicRegular) {
