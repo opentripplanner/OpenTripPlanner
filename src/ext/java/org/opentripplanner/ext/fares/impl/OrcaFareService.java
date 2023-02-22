@@ -125,10 +125,10 @@ public class OrcaFareService extends DefaultFareService {
 
   private static String routeLongNameFallBack(Route route) {
     var longName = route.getLongName();
-    if(longName == null) {
+    if (longName == null) {
       return "";
     } else {
-      return route.getLongName().toString();
+      return longName.toString();
     }
   }
 
@@ -175,15 +175,15 @@ public class OrcaFareService extends DefaultFareService {
    * some cases the route description and short name are needed to define inner agency ride types. For Kitsap, the
    * route data is enough to define the agency, but addition trip id checks are needed to define the fast ferry direction.
    */
-  private static RideType classify(Route routeData, String tripId) {
-    var rideType = getRideType(routeData.getAgency().getId().getId(), routeData);
+  private static RideType classify(Route route, String tripId) {
+    var rideType = getRideType(route.getAgency().getId().getId(), route);
     if (rideType == null) {
       return null;
     }
     if (
       rideType == RideType.KITSAP_TRANSIT &&
-      routeData.getId().getId().equalsIgnoreCase("Kitsap Fast Ferry") &&
-      routeData.getGtfsType() == ROUTE_TYPE_FERRY
+      route.getId().getId().equalsIgnoreCase("Kitsap Fast Ferry") &&
+      route.getGtfsType() == ROUTE_TYPE_FERRY
     ) {
       // Additional trip id checks are required to distinguish Kitsap fast ferry routes.
       if (tripId.contains("east")) {
@@ -191,11 +191,11 @@ public class OrcaFareService extends DefaultFareService {
       } else if (tripId.contains("west")) {
         rideType = RideType.KITSAP_TRANSIT_FAST_FERRY_WESTBOUND;
       }
-    } else if (rideType == RideType.SOUND_TRANSIT && checkShortName(routeData, "1 Line")) {
+    } else if (rideType == RideType.SOUND_TRANSIT && checkShortName(route, "1 Line")) {
       rideType = RideType.SOUND_TRANSIT_LINK;
     } else if (
       rideType == RideType.SOUND_TRANSIT &&
-      (checkShortName(routeData, "S Line") || checkShortName(routeData, "N Line"))
+      (checkShortName(route, "S Line") || checkShortName(route, "N Line"))
     ) {
       rideType = RideType.SOUND_TRANSIT_SOUNDER;
     } else if (rideType == RideType.SOUND_TRANSIT) { //if it isn't Link or Sounder, then...
@@ -300,7 +300,6 @@ public class OrcaFareService extends DefaultFareService {
         FareType.electronicSpecial,
         defaultFare
       );
-      case PIERCE_COUNTY_TRANSIT -> defaultFare;
       default -> defaultFare;
     };
   }

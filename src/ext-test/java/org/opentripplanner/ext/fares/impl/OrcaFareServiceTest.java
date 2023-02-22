@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -33,7 +34,6 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -446,10 +446,12 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicYouth, 0f);
   }
 
-  static Stream<Arguments> testCases = Arrays.stream(FareType.values()).map(Arguments::of);
+  static Stream<Arguments> allTypes() {
+    return Arrays.stream(FareType.values()).map(Arguments::of);
+  }
 
   @ParameterizedTest
-  @VariableSource("testCases")
+  @MethodSource("allTypes")
   void nullLongName(FareType type) {
     var legs = List.of(
       createLeg(
@@ -460,6 +462,28 @@ public class OrcaFareServiceTest {
         "route1",
         "trip1",
         null,
+        "first stop",
+        "last stop"
+      )
+    );
+
+    var fare = new ItineraryFares();
+    orcaFareService.populateFare(fare, null, type, legs, null);
+    assertNotNull(fare.getFare(type));
+  }
+
+  @ParameterizedTest
+  @MethodSource("allTypes")
+  void nullShortName(FareType type) {
+    var legs = List.of(
+      createLeg(
+        WASHINGTON_STATE_FERRIES_AGENCY_ID,
+        null,
+        0,
+        1,
+        "route1",
+        "trip1",
+        "long name",
         "first stop",
         "last stop"
       )
