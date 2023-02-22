@@ -8,26 +8,29 @@ import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import java.util.Optional;
 import org.opentripplanner.ext.siri.CallWrapper;
 import org.opentripplanner.model.PickDrop;
-import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
 import uk.org.siri.siri20.CallStatusEnumeration;
-import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
 
 public class PickDropMapper {
 
   /**
-   * This method maps an ArrivalBoardingActivity to a pick drop type.
+   * This method maps a CallWrapper to a pick drop type for the stop arrival.
    *
    * The Siri ArrivalBoardingActivity includes less information than the pick drop type, therefore is it only
    * changed if routability has changed.
    *
    * @param currentValue The current pick drop value on a stopTime
-   * @param arrivalBoardingActivityEnumeration The incoming boardingActivity to be mapped
+   * @param call The incoming call to be mapped
    * @return Mapped PickDrop type, empty if routability is not changed.
    */
-  public static Optional<PickDrop> mapDropOffType(
-    PickDrop currentValue,
-    ArrivalBoardingActivityEnumeration arrivalBoardingActivityEnumeration
-  ) {
+  public static Optional<PickDrop> mapDropOffType(CallWrapper call, PickDrop currentValue) {
+    if (
+      TRUE.equals(call.isCancellation()) ||
+      call.getArrivalStatus() == CallStatusEnumeration.CANCELLED
+    ) {
+      return Optional.of(CANCELLED);
+    }
+
+    var arrivalBoardingActivityEnumeration = call.getArrivalBoardingActivity();
     if (arrivalBoardingActivityEnumeration == null) {
       return Optional.empty();
     }
@@ -40,19 +43,24 @@ public class PickDropMapper {
   }
 
   /**
-   * This method maps an departureBoardingActivity to a pick drop type.
+   * This method maps a CallWrapper to a pick drop type for the stop departure.
    *
    * The Siri DepartureBoardingActivity includes less information than the planned data, therefore is it only
    * changed if routability has changed.
    *
    * @param currentValue The current pick drop value on a stopTime
-   * @param departureBoardingActivityEnumeration The incoming departureBoardingActivityEnumeration to be mapped
+   * @param call The incoming call to be mapped
    * @return Mapped PickDrop type, empty if routability is not changed.
    */
-  public static Optional<PickDrop> mapPickUpType(
-    PickDrop currentValue,
-    DepartureBoardingActivityEnumeration departureBoardingActivityEnumeration
-  ) {
+  public static Optional<PickDrop> mapPickUpType(CallWrapper call, PickDrop currentValue) {
+    if (
+      TRUE.equals(call.isCancellation()) ||
+      call.getDepartureStatus() == CallStatusEnumeration.CANCELLED
+    ) {
+      return Optional.of(CANCELLED);
+    }
+
+    var departureBoardingActivityEnumeration = call.getDepartureBoardingActivity();
     if (departureBoardingActivityEnumeration == null) {
       return Optional.empty();
     }
@@ -62,27 +70,5 @@ public class PickDropMapper {
       case NO_BOARDING -> Optional.of(NONE);
       case PASS_THRU -> Optional.of(CANCELLED);
     };
-  }
-
-  public static Optional<PickDrop> mapDropOffType(CallWrapper call, PickDrop currentValue) {
-    if (
-      TRUE.equals(call.isCancellation()) ||
-      call.getArrivalStatus() == CallStatusEnumeration.CANCELLED
-    ) {
-      return Optional.of(CANCELLED);
-    }
-
-    return mapDropOffType(currentValue, call.getArrivalBoardingActivity());
-  }
-
-  public static Optional<PickDrop> mapPickUpType(CallWrapper call, PickDrop currentValue) {
-    if (
-      TRUE.equals(call.isCancellation()) ||
-      call.getDepartureStatus() == CallStatusEnumeration.CANCELLED
-    ) {
-      return Optional.of(CANCELLED);
-    }
-
-    return mapPickUpType(currentValue, call.getDepartureBoardingActivity());
   }
 }
