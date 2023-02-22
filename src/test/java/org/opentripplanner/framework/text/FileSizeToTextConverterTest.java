@@ -12,9 +12,9 @@ public class FileSizeToTextConverterTest {
     assertEquals("1 byte", fileSizeToString(1));
     assertEquals("12 bytes", fileSizeToString(12));
     assertEquals("123 bytes", fileSizeToString(123));
-    assertEquals("1 kb", fileSizeToString(1234));
-    assertEquals("12 kb", fileSizeToString(12345));
-    assertEquals("123 kb", fileSizeToString(123456));
+    assertEquals("1 kB", fileSizeToString(1234));
+    assertEquals("12 kB", fileSizeToString(12345));
+    assertEquals("123 kB", fileSizeToString(123456));
     assertEquals("1.2 MB", normalize(fileSizeToString(1234567)));
     assertEquals("12.3 MB", normalize(fileSizeToString(12345678)));
     // Round up

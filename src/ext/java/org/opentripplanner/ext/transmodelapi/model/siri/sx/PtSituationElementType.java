@@ -16,7 +16,6 @@ import java.util.AbstractMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.stop.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
@@ -253,7 +252,7 @@ public class PtSituationElementType {
             Long endTime = alert.getEffectiveEndDate() != null
               ? alert.getEffectiveEndDate().toEpochMilli()
               : null;
-            return Pair.of(startTime, endTime);
+            return new ValidityPeriod(startTime, endTime);
           })
           .build()
       )

@@ -253,11 +253,11 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   }
 
   private VehiclePositionService getVehiclePositionsService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getVehiclePositionService();
+    return environment.<LegacyGraphQLRequestContext>getContext().vehiclePositionService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
+    return environment.<LegacyGraphQLRequestContext>getContext().transitService();
   }
 
   private TripPattern getSource(DataFetchingEnvironment environment) {

@@ -60,6 +60,8 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
   /**
    * Earliest departure time from fromStopIndex to toStopIndex, which departs after departureTime,
    * and for which the flex trip has a duration of flexTime seconds.
+   *
+   * @return {@link StopTime#MISSING_VALUE} is returned if a departure does not exist.
    */
   public abstract int earliestDepartureTime(
     int departureTime,
@@ -70,12 +72,16 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
 
   /**
    * Earliest departure time from fromStopIndex.
+   *
+   * @return {@link StopTime#MISSING_VALUE} is returned if a departure does not exist.
    */
   public abstract int earliestDepartureTime(int stopIndex);
 
   /**
    * Latest arrival time to toStopIndex from fromStopIndex, which arrives before arrivalTime,
    * and for which the flex trip has a duration of flexTime seconds.
+   *
+   * @return {@link StopTime#MISSING_VALUE} is returned if a departure does not exist.
    */
   public abstract int latestArrivalTime(
     int arrivalTime,
@@ -86,6 +92,8 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
 
   /**
    * Latest arrival time to toStopIndex.
+   *
+   * @return {@link StopTime#MISSING_VALUE} is returned if a departure does not exist.
    */
   public abstract int latestArrivalTime(int stopIndex);
 

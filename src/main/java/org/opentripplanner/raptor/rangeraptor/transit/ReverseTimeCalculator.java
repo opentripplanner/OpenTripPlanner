@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
+import org.opentripplanner.raptor.api.RaptorConstants;
+
 /**
  * A calculator that will take you back in time not forward, this is the basic logic to implement a
  * reverse search.
@@ -49,6 +51,6 @@ public class ReverseTimeCalculator implements TimeCalculator {
 
   @Override
   public final int unreachedTime() {
-    return Integer.MIN_VALUE;
+    return RaptorConstants.TIME_UNREACHED_REVERSE;
   }
 }

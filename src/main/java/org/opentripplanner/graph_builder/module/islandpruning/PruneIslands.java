@@ -495,9 +495,7 @@ public class PruneIslands implements GraphBuilderModule {
         Collection<Edge> edges = new ArrayList<>(v.getOutgoing());
         edges.addAll(v.getIncoming());
         for (Edge e : edges) {
-          if (e instanceof StreetTransitStopLink || e instanceof StreetTransitEntranceLink) {
-            graph.removeEdge(e);
-          }
+          graph.removeEdge(e);
         }
       }
       if (island.stopSize() > 0) {

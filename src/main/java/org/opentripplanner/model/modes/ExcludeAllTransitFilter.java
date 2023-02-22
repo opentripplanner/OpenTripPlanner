@@ -2,7 +2,7 @@ package org.opentripplanner.model.modes;
 
 import java.io.Serializable;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
-import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
@@ -19,7 +19,7 @@ public final class ExcludeAllTransitFilter implements Serializable, TransitFilte
   }
 
   @Override
-  public boolean matchRoute(Route route) {
+  public boolean matchTripPattern(TripPattern tripPattern) {
     return false;
   }
 

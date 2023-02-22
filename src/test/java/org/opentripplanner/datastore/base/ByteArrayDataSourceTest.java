@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
@@ -55,7 +54,7 @@ public class ByteArrayDataSourceTest {
       .withBytes(BYTES);
 
     assertEquals(BYTES, subject.asBytes());
-    assertEquals(DATA, IOUtils.toString(subject.asInputStream(), UTF_8));
+    assertEquals(DATA, new String(subject.asInputStream().readAllBytes(), UTF_8));
   }
 
   @Test

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.SearchParams;
@@ -94,7 +95,7 @@ public class RaptorSearchWindowCalculatorTest {
     assertEquals(840, subject.getSearchWindowSeconds());
     // Given - verify not changed
     assertEquals(10_200, subject.getEarliestDepartureTime());
-    assertEquals(SearchParams.TIME_NOT_SET, subject.getLatestArrivalTime());
+    assertEquals(RaptorConstants.TIME_NOT_SET, subject.getLatestArrivalTime());
   }
 
   @Test
@@ -120,7 +121,7 @@ public class RaptorSearchWindowCalculatorTest {
     assertEquals(1_800, subject.getSearchWindowSeconds());
     // Given - verify not changed
     assertEquals(12_000, subject.getEarliestDepartureTime());
-    assertEquals(SearchParams.TIME_NOT_SET, subject.getLatestArrivalTime());
+    assertEquals(RaptorConstants.TIME_NOT_SET, subject.getLatestArrivalTime());
   }
 
   @Test

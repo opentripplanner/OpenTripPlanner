@@ -191,13 +191,13 @@ public class TestTransitData
     return routes.get(index);
   }
 
-  public void debugToStdErr(RaptorRequestBuilder<TestTripSchedule> request) {
+  public void debugToStdErr(RaptorRequestBuilder<TestTripSchedule> request, boolean dryRun) {
     var debug = request.debug();
 
     if (debug.stops().isEmpty()) {
       debug.addStops(stopsVisited());
     }
-    var logger = new SystemErrDebugLogger(true);
+    var logger = new SystemErrDebugLogger(true, dryRun);
 
     debug
       .stopArrivalListener(logger::stopArrivalLister)

@@ -40,7 +40,7 @@ public class LegacyGraphQLfareComponentImpl
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
+    return environment.<LegacyGraphQLRequestContext>getContext().transitService();
   }
 
   private FareComponent getSource(DataFetchingEnvironment environment) {
