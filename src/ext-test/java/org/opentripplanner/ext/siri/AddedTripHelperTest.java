@@ -402,18 +402,27 @@ public class AddedTripHelperTest {
   @Test
   public void testAddedTripFailOnNonIncreasingDwellTime() {
     List<CallWrapper> calls = List.of(
-      TestCall.from(STOP_A.getId().getId(), t(10, 20), t(10, 20), null),
-      TestCall.intermediate(
-        STOP_B.getId().getId(),
-        t(10, 30),
-        t(10, 31),
-        null,
-        t(10, 30),
-        t(10, 29),
-        null
-      ),
+      TestCall
+        .of()
+        .withStopPointRef(STOP_A.getId().getId())
+        .withAimedDepartureTime(zonedDatetime(10, 20))
+        .withExpectedDepartureTime(zonedDatetime(10, 20))
+        .build(),
+      TestCall
+        .of()
+        .withStopPointRef(STOP_B.getId().getId())
+        .withAimedArrivalTime(zonedDatetime(10, 30))
+        .withExpectedArrivalTime(zonedDatetime(10, 31))
+        .withAimedDepartureTime(zonedDatetime(10, 30))
+        .withExpectedDepartureTime(zonedDatetime(10, 29))
+        .build(),
       // Expected to arrive one minute prior to irrelevant aimed departure time
-      TestCall.to(STOP_C.getId().getId(), t(10, 40), t(10, 40), null)
+      TestCall
+        .of()
+        .withStopPointRef(STOP_C.getId().getId())
+        .withAimedArrivalTime(zonedDatetime(10, 40))
+        .withExpectedArrivalTime(zonedDatetime(10, 40))
+        .build()
     );
 
     var addedTrip = new AddedTripHelper(
@@ -481,22 +490,32 @@ public class AddedTripHelperTest {
   private static List<CallWrapper> getCalls(int hour) {
     return List.of(
       // Departed one minute early, prior to irrelevant aimed arrival time
-      TestCall.from(STOP_A.getId().getId(), t(hour, 20), t(hour, 20), t(hour, 19)),
-      TestCall.intermediate(
-        STOP_B.getId().getId(),
-        t(hour, 30),
-        t(hour, 29),
-        null,
-        t(hour, 30),
-        t(hour, 31),
-        null
-      ),
+      TestCall
+        .of()
+        .withStopPointRef(STOP_A.getId().getId())
+        .withAimedDepartureTime(zonedDatetime(hour, 20))
+        .withExpectedDepartureTime(zonedDatetime(hour, 20))
+        .withActualDepartureTime(zonedDatetime(hour, 19))
+        .build(),
+      TestCall
+        .of()
+        .withStopPointRef(STOP_B.getId().getId())
+        .withAimedArrivalTime(zonedDatetime(hour, 30))
+        .withExpectedArrivalTime(zonedDatetime(hour, 29))
+        .withAimedDepartureTime(zonedDatetime(hour, 30))
+        .withExpectedDepartureTime(zonedDatetime(hour, 31))
+        .build(),
       // Expected to arrive one minute prior to irrelevant aimed departure time
-      TestCall.to(STOP_C.getId().getId(), t(hour, 40), t(hour, 41), null)
+      TestCall
+        .of()
+        .withStopPointRef(STOP_C.getId().getId())
+        .withAimedArrivalTime(zonedDatetime(hour, 40))
+        .withExpectedArrivalTime(zonedDatetime(hour, 41))
+        .build()
     );
   }
 
-  private static ZonedDateTime t(int hour, int minute) {
+  private static ZonedDateTime zonedDatetime(int hour, int minute) {
     return ZonedDateTime.of(SERVICE_DATE, LocalTime.of(hour, minute), TIME_ZONE);
   }
 
