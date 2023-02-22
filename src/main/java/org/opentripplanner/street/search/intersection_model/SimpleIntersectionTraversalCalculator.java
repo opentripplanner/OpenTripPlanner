@@ -33,7 +33,7 @@ public class SimpleIntersectionTraversalCalculator
 
     if (mode.isDriving()) {
       return computeDrivingTraversalDuration(v, from, to);
-    } else if (mode.isCycling()) {
+    } else if (mode.isCyclingIsh()) {
       return computeCyclingTraversalDuration(v, from, to, toSpeed);
     } else {
       return computeWalkingTraversalDuration(v, from, to, toSpeed);
