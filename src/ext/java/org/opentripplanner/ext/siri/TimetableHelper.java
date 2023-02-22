@@ -3,30 +3,24 @@ package org.opentripplanner.ext.siri;
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import org.opentripplanner.ext.siri.mapper.OccupancyMapper;
 import org.opentripplanner.ext.siri.mapper.PickDropMapper;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -53,47 +47,24 @@ public class TimetableHelper {
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
   public static Result<TripTimesAndStopPattern, UpdateError> createUpdatedTripTimes(
-    Timetable timetable,
+    TripTimes existingTripTimes,
+    TripPattern pattern,
     EstimatedVehicleJourney journey,
-    FeedScopedId tripId,
-    Function<FeedScopedId, StopLocation> getStopById,
     LocalDate serviceDate,
     ZoneId zoneId,
-    Deduplicator deduplicator
+    EntityResolver entityResolver
   ) {
-    final TripTimes existingTripTimes = timetable.getTripTimes(tripId);
-    if (existingTripTimes == null) {
-      LOG.debug("tripId {} not found in pattern.", tripId);
-      return UpdateError.result(tripId, TRIP_NOT_FOUND_IN_PATTERN);
-    }
-
-    TripTimes oldTimes = new TripTimes(existingTripTimes);
-
-    if (journey.isCancellation() != null && journey.isCancellation()) {
-      oldTimes.cancelTrip();
-      return Result.success(
-        new TripTimesAndStopPattern(oldTimes, timetable.getPattern().getStopPattern())
-      );
-    }
-
-    boolean stopPatternChanged = false;
-
-    TripPattern pattern = timetable.getPattern();
+    TripTimes newTimes = new TripTimes(existingTripTimes);
     List<CallWrapper> calls = CallWrapper.of(journey);
-    List<StopTime> modifiedStopTimes = createModifiedStopTimes(
-      pattern,
-      oldTimes,
-      calls,
-      getStopById
-    );
-    TripTimes newTimes = new TripTimes(oldTimes.getTrip(), modifiedStopTimes, deduplicator);
+    StopPattern stopPattern = createStopPattern(pattern, calls, entityResolver);
 
-    //Populate missing data from existing TripTimes
-    newTimes.setServiceCode(oldTimes.getServiceCode());
+    if (TRUE.equals(journey.isCancellation()) || stopPattern.isAllStopsCancelled()) {
+      LOG.debug("Trip is cancelled");
+      newTimes.cancelTrip();
+      return Result.success(new TripTimesAndStopPattern(newTimes, pattern.getStopPattern()));
+    }
 
     OccupancyEnumeration journeyOccupancy = journey.getOccupancy();
-
-    int callCounter = 0;
 
     ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
     Set<CallWrapper> alreadyVisited = new HashSet<>();
@@ -102,9 +73,10 @@ public class TimetableHelper {
       (journey.isPredictionInaccurate() != null && journey.isPredictionInaccurate());
 
     int departureFromPreviousStop = 0;
-    int lastArrivalDelay = 0;
     int lastDepartureDelay = 0;
-    for (var stop : pattern.getStops()) {
+    List<StopLocation> stops = pattern.getStops();
+    for (int callCounter = 0; callCounter < stops.size(); callCounter++) {
+      StopLocation stop = stops.get(callCounter);
       boolean foundMatch = false;
 
       for (CallWrapper call : calls) {
@@ -112,18 +84,8 @@ public class TimetableHelper {
           continue;
         }
         //Current stop is being updated
-        foundMatch = stop.getId().getId().equals(call.getStopPointRef());
-
-        if (!foundMatch && stop.isPartOfStation()) {
-          var alternativeStop = getStopById.apply(
-            new FeedScopedId(stop.getId().getFeedId(), call.getStopPointRef())
-          );
-          if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
-            foundMatch = true;
-            stopPatternChanged = true;
-          }
-        }
-
+        RegularStop stopPoint = entityResolver.resolveQuay(call.getStopPointRef());
+        foundMatch = stop.equals(stopPoint) || stop.isPartOfSameStationAs(stopPoint);
         if (foundMatch) {
           applyUpdates(
             startOfService,
@@ -136,10 +98,13 @@ public class TimetableHelper {
           );
 
           alreadyVisited.add(call);
+
+          lastDepartureDelay = newTimes.getDepartureDelay(callCounter);
           break;
         }
       }
       if (!foundMatch) {
+        // No update found in calls
         if (pattern.isBoardAndAlightAt(callCounter, NONE)) {
           // When newTimes contains stops without pickup/dropoff - set both arrival/departure to previous stop's departure
           // This necessary to accommodate the case when delay is reduced/eliminated between to stops with pickup/dropoff, and
@@ -147,11 +112,10 @@ public class TimetableHelper {
           newTimes.updateArrivalTime(callCounter, departureFromPreviousStop);
           newTimes.updateDepartureTime(callCounter, departureFromPreviousStop);
         } else {
-          int arrivalDelay = lastArrivalDelay;
+          int arrivalDelay = lastDepartureDelay;
           int departureDelay = lastDepartureDelay;
 
-          // TODO - there is something clearly wrong here
-          if (lastArrivalDelay == 0 && lastDepartureDelay == 0) {
+          if (lastDepartureDelay == 0) {
             //No match has been found yet (i.e. still in RecordedCalls) - keep existing delays
             arrivalDelay = existingTripTimes.getArrivalDelay(callCounter);
             departureDelay = existingTripTimes.getDepartureDelay(callCounter);
@@ -160,23 +124,17 @@ public class TimetableHelper {
           newTimes.updateArrivalDelay(callCounter, arrivalDelay);
           newTimes.updateDepartureDelay(callCounter, departureDelay);
         }
-
-        departureFromPreviousStop = newTimes.getDepartureTime(callCounter);
       }
-      callCounter++;
+
+      departureFromPreviousStop = newTimes.getDepartureTime(callCounter);
     }
 
-    if (stopPatternChanged) {
-      // This update modified stopPattern
-      newTimes.setRealTimeState(RealTimeState.MODIFIED);
-    } else {
+    if (pattern.getStopPattern().equals(stopPattern)) {
       // This is the first update, and StopPattern has not been changed
       newTimes.setRealTimeState(RealTimeState.UPDATED);
-    }
-
-    if (TRUE.equals(journey.isCancellation()) || newTimes.isAllStopsCancelled()) {
-      LOG.debug("Trip is cancelled");
-      newTimes.cancelTrip();
+    } else {
+      // This update modified stopPattern
+      newTimes.setRealTimeState(RealTimeState.MODIFIED);
     }
 
     var result = newTimes.validateNonIncreasingTimes();
@@ -185,103 +143,64 @@ public class TimetableHelper {
       LOG.info(
         "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
         journey.getLineRef().getValue(),
-        tripId,
+        existingTripTimes.getTrip().getId(),
         updateError.stopIndex()
       );
       return Result.failure(updateError);
     }
 
     if (newTimes.getNumStops() != pattern.numberOfStops()) {
-      return UpdateError.result(tripId, TOO_FEW_STOPS);
+      return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS);
     }
 
     LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
-    return Result.success(
-      new TripTimesAndStopPattern(newTimes, new StopPattern(modifiedStopTimes))
-    );
+    return Result.success(new TripTimesAndStopPattern(newTimes, stopPattern));
   }
 
-  /**
-   * Apply the SIRI ET to the appropriate TripTimes from this Timetable. Calculate new stoppattern
-   * based on single stop cancellations
-   *
-   * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
-   * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
-   */
-  public static List<StopTime> createModifiedStopTimes(
+  static StopPattern createStopPattern(
     TripPattern pattern,
-    TripTimes oldTimes,
     List<CallWrapper> calls,
-    Function<FeedScopedId, StopLocation> getStopForId
+    EntityResolver entityResolver
   ) {
-    List<StopTime> modifiedStops = new ArrayList<>();
+    int numberOfStops = pattern.numberOfStops();
+    var builder = pattern.getStopPattern().mutate();
 
     Set<CallWrapper> alreadyVisited = new HashSet<>();
     // modify updated stop-times
-    for (int i = 0; i < pattern.numberOfStops(); i++) {
+    for (int i = 0; i < numberOfStops; i++) {
       StopLocation stop = pattern.getStop(i);
+      builder.stops[i] = stop;
+      builder.dropoffs[i] = pattern.getAlightType(i);
+      builder.pickups[i] = pattern.getBoardType(i);
 
-      final StopTime stopTime = new StopTime();
-      stopTime.setStop(stop);
-      stopTime.setTrip(oldTimes.getTrip());
-      stopTime.setStopSequence(i);
-      stopTime.setDropOffType(pattern.getAlightType(i));
-      stopTime.setPickupType(pattern.getBoardType(i));
-      stopTime.setArrivalTime(oldTimes.getScheduledArrivalTime(i));
-      stopTime.setDepartureTime(oldTimes.getScheduledDepartureTime(i));
-      stopTime.setStopHeadsign(oldTimes.getHeadsign(i));
-      stopTime.setHeadsignVias(oldTimes.getHeadsignVias(i));
-      stopTime.setTimepoint(oldTimes.isTimepoint(i) ? 1 : 0);
-
-      boolean foundMatch = false;
       for (CallWrapper call : calls) {
         if (alreadyVisited.contains(call)) {
           continue;
         }
 
         //Current stop is being updated
-        String callStopRef = call.getStopPointRef();
-        boolean stopsMatchById = stop.getId().getId().equals(callStopRef);
-
-        if (!stopsMatchById && stop.isPartOfStation()) {
-          var alternativeStop = getStopForId.apply(
-            new FeedScopedId(stop.getId().getFeedId(), callStopRef)
-          );
-          if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
-            stopsMatchById = true;
-            stopTime.setStop(alternativeStop);
-          }
+        var callStop = entityResolver.resolveQuay(call.getStopPointRef());
+        if (!stop.equals(callStop) && !stop.isPartOfSameStationAs(callStop)) {
+          continue;
         }
 
-        if (stopsMatchById) {
-          foundMatch = true;
+        int stopIndex = i;
+        builder.stops[stopIndex] = callStop;
 
         PickDropMapper
           .mapPickUpType(call, builder.pickups[stopIndex])
           .ifPresent(value -> builder.pickups[stopIndex] = value);
 
-          if (call.getDestinationDisplaies() != null && !call.getDestinationDisplaies().isEmpty()) {
-            NaturalLanguageStringStructure destinationDisplay = call
-              .getDestinationDisplaies()
-              .get(0);
-            stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay.getValue()));
-          }
         PickDropMapper
           .mapDropOffType(call, builder.dropoffs[stopIndex])
           .ifPresent(value -> builder.dropoffs[stopIndex] = value);
 
-          modifiedStops.add(stopTime);
-          alreadyVisited.add(call);
-          break;
-        }
-      }
-
-      if (!foundMatch) {
-        modifiedStops.add(stopTime);
+        alreadyVisited.add(call);
+        break;
       }
     }
 
-    return modifiedStops;
+    return builder.build();
   }
 
   /**
@@ -345,32 +264,33 @@ public class TimetableHelper {
       tripTimes.setCancelled(index);
     }
 
-    int arrivalTime = tripTimes.getArrivalTime(index);
-
+    int scheduledArrivalTime = tripTimes.getArrivalTime(index);
     int realtimeArrivalTime = getAvailableTime(
       departureDate,
       call::getActualArrivalTime,
-      call::getExpectedArrivalTime,
-      call::getAimedArrivalTime
+      call::getExpectedArrivalTime
     );
 
-    int departureTime = tripTimes.getDepartureTime(index);
+    int scheduledDepartureTime = tripTimes.getDepartureTime(index);
     int realtimeDepartureTime = getAvailableTime(
       departureDate,
       call::getActualDepartureTime,
-      call::getExpectedDepartureTime,
-      call::getAimedDepartureTime
+      call::getExpectedDepartureTime
     );
 
     int[] possibleArrivalTimes = index == 0
-      ? new int[] { realtimeArrivalTime, realtimeDepartureTime, arrivalTime }
-      : new int[] { realtimeArrivalTime, arrivalTime };
-    realtimeArrivalTime = handleMissingRealtime(possibleArrivalTimes);
+      ? new int[] { realtimeArrivalTime, realtimeDepartureTime, scheduledArrivalTime }
+      : new int[] { realtimeArrivalTime, scheduledArrivalTime };
+    var arrivalTime = handleMissingRealtime(possibleArrivalTimes);
+    int arrivalDelay = arrivalTime - scheduledArrivalTime;
+    tripTimes.updateArrivalDelay(index, arrivalDelay);
 
     int[] possibleDepartureTimes = isLastStop
-      ? new int[] { realtimeDepartureTime, realtimeArrivalTime, departureTime }
-      : new int[] { realtimeDepartureTime, departureTime };
-    realtimeDepartureTime = handleMissingRealtime(possibleDepartureTimes);
+      ? new int[] { realtimeDepartureTime, realtimeArrivalTime, scheduledDepartureTime }
+      : new int[] { realtimeDepartureTime, scheduledDepartureTime };
+    var departureTime = handleMissingRealtime(possibleDepartureTimes);
+    int departureDelay = departureTime - scheduledDepartureTime;
+    tripTimes.updateDepartureDelay(index, departureDelay);
 
     OccupancyEnumeration callOccupancy = call.getOccupancy() != null
       ? call.getOccupancy()
@@ -380,10 +300,9 @@ public class TimetableHelper {
       tripTimes.setOccupancyStatus(index, OccupancyMapper.mapOccupancyStatus(callOccupancy));
     }
 
-    int arrivalDelay = realtimeArrivalTime - arrivalTime;
-    tripTimes.updateArrivalDelay(index, arrivalDelay);
-
-    int departureDelay = realtimeDepartureTime - departureTime;
-    tripTimes.updateDepartureDelay(index, departureDelay);
+    if (call.getDestinationDisplaies() != null && !call.getDestinationDisplaies().isEmpty()) {
+      NaturalLanguageStringStructure destinationDisplay = call.getDestinationDisplaies().get(0);
+      tripTimes.setHeadsign(index, new NonLocalizedString(destinationDisplay.getValue()));
+    }
   }
 }

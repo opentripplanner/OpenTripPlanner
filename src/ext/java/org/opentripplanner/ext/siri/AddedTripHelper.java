@@ -179,12 +179,13 @@ class AddedTripHelper {
     }
 
     // TODO: We always create a new TripPattern to be able to modify its scheduled timetable
+    StopPattern stopPattern = new StopPattern(aimedStopTimes);
     TripPattern pattern = TripPattern
       .of(getTripPatternId.apply(trip))
       .withRoute(trip.getRoute())
       .withMode(trip.getMode())
       .withNetexSubmode(trip.getNetexSubMode())
-      .withStopPattern(new StopPattern(aimedStopTimes))
+      .withStopPattern(stopPattern)
       .build();
 
     TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, transitModel.getDeduplicator());
@@ -205,7 +206,7 @@ class AddedTripHelper {
       );
     }
 
-    if (cancellation || updatedTripTimes.isAllStopsCancelled()) {
+    if (cancellation || stopPattern.isAllStopsCancelled()) {
       updatedTripTimes.cancelTrip();
     } else {
       updatedTripTimes.setRealTimeState(RealTimeState.ADDED);
@@ -222,8 +223,6 @@ class AddedTripHelper {
     transitModel.getTransitModelIndex().getTripForId().put(tripId, trip);
     transitModel.getTransitModelIndex().getPatternForTrip().put(trip, pattern);
     transitModel.getTransitModelIndex().getPatternsForRoute().put(route, pattern);
-
-    StopPattern stopPattern = new StopPattern(aimedStopTimes);
 
     return Result.success(new TripUpdate(trip, stopPattern, updatedTripTimes, serviceDate));
   }

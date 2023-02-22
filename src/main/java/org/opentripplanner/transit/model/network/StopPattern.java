@@ -133,6 +133,13 @@ public final class StopPattern implements Serializable {
     return stops.length;
   }
 
+  public boolean isAllStopsCancelled() {
+    return (
+      Arrays.stream(pickups).allMatch(PickDrop::isNotRoutable) &&
+      Arrays.stream(dropoffs).allMatch(PickDrop::isNotRoutable)
+    );
+  }
+
   /** Find the given stop position in the sequence, return -1 if not found. */
   int findStopPosition(StopLocation stop) {
     for (int i = 0; i < stops.length; ++i) {

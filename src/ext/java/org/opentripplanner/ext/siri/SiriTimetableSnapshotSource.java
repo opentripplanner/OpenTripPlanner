@@ -6,6 +6,7 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_MONITORE
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_TRIP_ID;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
 import java.time.LocalDate;
@@ -13,7 +14,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -21,11 +21,8 @@ import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.model.UpdateSuccess;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
-import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDateBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -217,17 +214,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           )
             .build();
       } else {
-        result =
-          handleModifiedTrip(
-            fuzzyTripMatcher,
-            entityResolver,
-            journey,
-            transitModel::getStopLocationById,
-            transitModel.getDeduplicator()
-          );
+        result = handleModifiedTrip(fuzzyTripMatcher, entityResolver, journey);
       }
 
       if (result.isFailure()) {
+        if (result.failureValue().errorType() != NO_FUZZY_TRIP_MATCH) {
+          LOG.warn(result.failureValue().toString());
+        }
         return result.toFailureResult();
       }
 
@@ -292,12 +285,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private Result<TripUpdate, UpdateError> handleModifiedTrip(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
-    EstimatedVehicleJourney estimatedVehicleJourney,
-    Function<FeedScopedId, StopLocation> getStopLocationById,
-    Deduplicator deduplicator
+    EstimatedVehicleJourney estimatedVehicleJourney
   ) {
     Trip trip = entityResolver.resolveTrip(estimatedVehicleJourney);
-    FeedScopedId tripId = trip != null ? trip.getId() : null;
 
     // Check if EstimatedVehicleJourney is reported as NOT monitored, ignore the notMonitored-flag
     // if the journey is NOT monitored because it has been cancelled
@@ -305,13 +295,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       !TRUE.equals(estimatedVehicleJourney.isMonitored()) &&
       !TRUE.equals(estimatedVehicleJourney.isCancellation())
     ) {
-      return UpdateError.result(tripId, NOT_MONITORED);
+      return UpdateError.result(trip != null ? trip.getId() : null, NOT_MONITORED);
     }
 
     LocalDate serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
 
     if (serviceDate == null) {
-      return UpdateError.result(tripId, NO_START_DATE);
+      return UpdateError.result(trip != null ? trip.getId() : null, NO_START_DATE);
     }
 
     TripPattern pattern;
@@ -343,14 +333,18 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
+    TripTimes existingTripTimes = currentTimetable.getTripTimes(trip);
+    if (existingTripTimes == null) {
+      LOG.debug("tripId {} not found in pattern.", trip.getId());
+      return UpdateError.result(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
+    }
     var updateResult = createUpdatedTripTimes(
-      currentTimetable,
+      existingTripTimes,
+      pattern,
       estimatedVehicleJourney,
-      trip.getId(),
-      getStopLocationById,
       serviceDate,
       timeZone,
-      deduplicator
+      entityResolver
     );
     if (updateResult.isFailure()) {
       LOG.info("Failed to update TripTimes for trip {}", trip);
