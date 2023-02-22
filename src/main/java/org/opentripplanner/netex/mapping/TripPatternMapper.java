@@ -14,6 +14,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.EntityById;
@@ -214,11 +215,14 @@ class TripPatternMapper {
     );
 
     var tripPatternModes = new HashSet<TransitMode>();
+    var tripPatternSubmodes = new HashSet<SubMode>();
     for (Trip trip : trips) {
       tripPatternModes.add(trip.getMode());
+      tripPatternSubmodes.add(trip.getNetexSubMode());
     }
 
-    if (tripPatternModes.size() > 1) {
+    boolean hasMultipleModes = tripPatternModes.size() > 1;
+    if (hasMultipleModes) {
       issueStore.add(
         "ServiceJourneyPatternHasMultipleModes",
         "ServiceJourneyPattern %s contains multiple modes: %s",
@@ -227,11 +231,23 @@ class TripPatternMapper {
       );
     }
 
+    boolean hasMultipleSubmodes = tripPatternSubmodes.size() > 1;
+    if (hasMultipleSubmodes) {
+      issueStore.add(
+        "ServiceJourneyPatternHasMultipleSubModes",
+        "ServiceJourneyPattern %s contains multiple sub-modes: %s",
+        journeyPattern.getId(),
+        tripPatternSubmodes.stream().map(SubMode::name).collect(Collectors.joining(", "))
+      );
+    }
+
     TripPatternBuilder tripPatternBuilder = TripPattern
       .of(idFactory.createId(journeyPattern.getId()))
       .withRoute(lookupRoute(journeyPattern))
       .withStopPattern(stopPattern)
       .withMode(trips.get(0).getMode())
+      .withNetexSubmode(trips.get(0).getNetexSubMode())
+      .withContainsMultipleModes(hasMultipleModes || hasMultipleSubmodes)
       .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue())
       .withHopGeometries(
         serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)

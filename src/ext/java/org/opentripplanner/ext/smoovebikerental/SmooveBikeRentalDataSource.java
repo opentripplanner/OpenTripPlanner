@@ -8,6 +8,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GenericJsonDataSource;
+import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,9 @@ import org.slf4j.LoggerFactory;
  *
  * @see org.opentripplanner.updater.DataSource
  */
-public class SmooveBikeRentalDataSource extends GenericJsonDataSource<VehicleRentalPlace> {
+public class SmooveBikeRentalDataSource
+  extends GenericJsonDataSource<VehicleRentalPlace>
+  implements VehicleRentalDatasource {
 
   private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 

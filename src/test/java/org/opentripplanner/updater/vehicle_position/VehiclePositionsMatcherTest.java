@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
+import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -53,7 +53,7 @@ public class VehiclePositionsMatcherTest {
   }
 
   private void testVehiclePositions(VehiclePosition pos) {
-    var service = new RealtimeVehiclePositionService();
+    var service = new DefaultVehiclePositionService();
     var trip = TransitModelForTest.trip(tripId).build();
     var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
     var stopPattern = new StopPattern(stopTimes);
@@ -101,7 +101,7 @@ public class VehiclePositionsMatcherTest {
 
   @Test
   public void clearOldTrips() {
-    var service = new RealtimeVehiclePositionService();
+    var service = new DefaultVehiclePositionService();
 
     var tripId1 = "trip1";
     var tripId2 = "trip2";

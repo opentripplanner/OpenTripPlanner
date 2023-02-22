@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
@@ -51,12 +53,12 @@ import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 
 public class TimetableSnapshotSourceTest {
 
+  private static final LocalDate SERVICE_DATE = LocalDate.parse("2009-02-01");
   private TransitModel transitModel;
 
   private final GtfsRealtimeFuzzyTripMatcher TRIP_MATCHER_NOOP = null;
 
   private final boolean fullDataset = false;
-  private LocalDate serviceDate;
   private byte[] cancellation;
   private String feedId;
 
@@ -66,8 +68,6 @@ public class TimetableSnapshotSourceTest {
     transitModel = model.transitModel();
 
     feedId = transitModel.getFeedIds().stream().findFirst().get();
-
-    serviceDate = LocalDate.now(transitModel.getTimeZone());
 
     final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
@@ -83,10 +83,7 @@ public class TimetableSnapshotSourceTest {
 
   @Test
   public void testGetSnapshot() throws InvalidProtocolBufferException {
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel
-    );
+    var updater = defaultUpdater();
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
@@ -144,7 +141,8 @@ public class TimetableSnapshotSourceTest {
 
     var updater = new TimetableSnapshotSource(
       TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel
+      transitModel,
+      () -> SERVICE_DATE
     );
 
     updater.applyTripUpdates(
@@ -156,7 +154,7 @@ public class TimetableSnapshotSourceTest {
     );
 
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-    final Timetable forToday = snapshot.resolve(pattern, serviceDate);
+    final Timetable forToday = snapshot.resolve(pattern, SERVICE_DATE);
     final Timetable schedule = snapshot.resolve(pattern, null);
     assertNotSame(forToday, schedule);
     assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
@@ -176,10 +174,7 @@ public class TimetableSnapshotSourceTest {
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel
-    );
+    var updater = defaultUpdater();
 
     final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
@@ -201,7 +196,7 @@ public class TimetableSnapshotSourceTest {
     );
 
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-    final Timetable forToday = snapshot.resolve(pattern, serviceDate);
+    final Timetable forToday = snapshot.resolve(pattern, SERVICE_DATE);
     final Timetable schedule = snapshot.resolve(pattern, null);
     assertNotSame(forToday, schedule);
     assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
@@ -252,8 +247,6 @@ public class TimetableSnapshotSourceTest {
   public void testHandleModifiedTrip() {
     // GIVEN
 
-    // Get service date of today because old dates will be purged after applying updates
-    LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
     String modifiedTripId = "10.1";
 
     TripUpdate tripUpdate;
@@ -262,10 +255,10 @@ public class TimetableSnapshotSourceTest {
 
       tripDescriptorBuilder.setTripId(modifiedTripId);
       tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.REPLACEMENT);
-      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
+      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(SERVICE_DATE));
 
       final long midnightSecondsSinceEpoch = ServiceDateUtils
-        .asStartOfService(serviceDate, transitModel.getTimeZone())
+        .asStartOfService(SERVICE_DATE, transitModel.getTimeZone())
         .toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
@@ -357,10 +350,7 @@ public class TimetableSnapshotSourceTest {
       tripUpdate = tripUpdateBuilder.build();
     }
 
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel
-    );
+    var updater = defaultUpdater();
 
     // WHEN
     updater.applyTripUpdates(
@@ -385,7 +375,7 @@ public class TimetableSnapshotSourceTest {
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        serviceDate
+        SERVICE_DATE
       );
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -426,11 +416,11 @@ public class TimetableSnapshotSourceTest {
     {
       final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
         new FeedScopedId(feedId, modifiedTripId),
-        serviceDate
+        SERVICE_DATE
       );
       assertNotNull(newTripPattern, "New trip pattern should be found");
 
-      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
+      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, SERVICE_DATE);
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);
@@ -469,7 +459,7 @@ public class TimetableSnapshotSourceTest {
 
       var tripUpdateBuilder = new TripUpdateBuilder(
         tripId.getId(),
-        LocalDate.now(),
+        SERVICE_DATE,
         ScheduleRelationship.SCHEDULED,
         transitModel.getTimeZone()
       );
@@ -480,10 +470,7 @@ public class TimetableSnapshotSourceTest {
 
       final TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-      var updater = new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT,
-        transitModel
-      );
+      var updater = defaultUpdater();
 
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
@@ -494,7 +481,7 @@ public class TimetableSnapshotSourceTest {
       );
 
       final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-      final Timetable forToday = snapshot.resolve(pattern, serviceDate);
+      final Timetable forToday = snapshot.resolve(pattern, SERVICE_DATE);
       final Timetable schedule = snapshot.resolve(pattern, null);
       assertNotSame(forToday, schedule);
       assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
@@ -513,13 +500,11 @@ public class TimetableSnapshotSourceTest {
     public void scheduled() {
       // GIVEN
 
-      // Get service date of today because old dates will be purged after applying updates
-      LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
       String scheduledTripId = "1.1";
 
       var builder = new TripUpdateBuilder(
         scheduledTripId,
-        serviceDate,
+        SERVICE_DATE,
         SCHEDULED,
         transitModel.getTimeZone()
       )
@@ -529,10 +514,7 @@ public class TimetableSnapshotSourceTest {
 
       var tripUpdate = builder.build();
 
-      var updater = new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT,
-        transitModel
-      );
+      var updater = defaultUpdater();
 
       // WHEN
       updater.applyTripUpdates(
@@ -555,7 +537,7 @@ public class TimetableSnapshotSourceTest {
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        serviceDate
+        SERVICE_DATE
       );
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -596,13 +578,11 @@ public class TimetableSnapshotSourceTest {
     public void scheduledTripWithSkippedAndNoData() {
       // GIVEN
 
-      // Get service date of today because old dates will be purged after applying updates
-      LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
       String scheduledTripId = "1.1";
 
       var builder = new TripUpdateBuilder(
         scheduledTripId,
-        serviceDate,
+        SERVICE_DATE,
         SCHEDULED,
         transitModel.getTimeZone()
       )
@@ -612,10 +592,7 @@ public class TimetableSnapshotSourceTest {
 
       var tripUpdate = builder.build();
 
-      var updater = new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT,
-        transitModel
-      );
+      var updater = defaultUpdater();
 
       // WHEN
       updater.applyTripUpdates(
@@ -640,7 +617,7 @@ public class TimetableSnapshotSourceTest {
 
         final Timetable originalTimetableForToday = snapshot.resolve(
           originalTripPattern,
-          serviceDate
+          SERVICE_DATE
         );
         final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -680,11 +657,11 @@ public class TimetableSnapshotSourceTest {
       {
         final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
           new FeedScopedId(feedId, scheduledTripId),
-          serviceDate
+          SERVICE_DATE
         );
         assertNotNull(newTripPattern, "New trip pattern should be found");
 
-        final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
+        final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, SERVICE_DATE);
         final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
         assertNotSame(newTimetableForToday, newTimetableScheduled);
@@ -692,6 +669,12 @@ public class TimetableSnapshotSourceTest {
         assertTrue(newTripPattern.canBoard(0));
         assertFalse(newTripPattern.canBoard(1));
         assertTrue(newTripPattern.canBoard(2));
+
+        assertEquals(new NonLocalizedString("foo"), newTripPattern.getTripHeadsign());
+        assertEquals(
+          newTripPattern.getOriginalTripPattern().getTripHeadsign(),
+          newTripPattern.getTripHeadsign()
+        );
 
         final int newTimetableForTodayModifiedTripIndex = newTimetableForToday.getTripIndex(
           scheduledTripId
@@ -726,13 +709,11 @@ public class TimetableSnapshotSourceTest {
     public void scheduledTripWithSkippedAndScheduled() {
       // GIVEN
 
-      // Get service date of today because old dates will be purged after applying updates
-      LocalDate serviceDate = LocalDate.now();
       String scheduledTripId = "1.1";
 
       var builder = new TripUpdateBuilder(
         scheduledTripId,
-        serviceDate,
+        SERVICE_DATE,
         SCHEDULED,
         transitModel.getTimeZone()
       )
@@ -742,10 +723,7 @@ public class TimetableSnapshotSourceTest {
 
       var tripUpdate = builder.build();
 
-      var updater = new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT,
-        transitModel
-      );
+      var updater = defaultUpdater();
 
       // WHEN
       updater.applyTripUpdates(
@@ -770,7 +748,7 @@ public class TimetableSnapshotSourceTest {
 
         final Timetable originalTimetableForToday = snapshot.resolve(
           originalTripPattern,
-          serviceDate
+          SERVICE_DATE
         );
         final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -792,10 +770,10 @@ public class TimetableSnapshotSourceTest {
       {
         final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
           new FeedScopedId(feedId, scheduledTripId),
-          serviceDate
+          SERVICE_DATE
         );
 
-        final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
+        final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, SERVICE_DATE);
         final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
         assertNotSame(newTimetableForToday, newTimetableScheduled);
@@ -837,12 +815,9 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void addedTrip() {
-      // Get service date of today because old dates will be purged after applying updates
-      final LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
-
       var builder = new TripUpdateBuilder(
         addedTripId,
-        serviceDate,
+        SERVICE_DATE,
         ADDED,
         transitModel.getTimeZone()
       );
@@ -851,10 +826,7 @@ public class TimetableSnapshotSourceTest {
 
       var tripUpdate = builder.build();
 
-      var updater = new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT,
-        transitModel
-      );
+      var updater = defaultUpdater();
 
       // WHEN
       updater.applyTripUpdates(
@@ -866,7 +838,7 @@ public class TimetableSnapshotSourceTest {
       );
 
       // THEN
-      assertAddedTrip(serviceDate, this.addedTripId, updater);
+      assertAddedTrip(SERVICE_DATE, this.addedTripId, updater);
     }
 
     private TripPattern assertAddedTrip(
@@ -907,12 +879,9 @@ public class TimetableSnapshotSourceTest {
     public void addedTripWithNewRoute() {
       // GIVEN
 
-      // Get service date of today because old dates will be purged after applying updates
-      final LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
-
       final var builder = new TripUpdateBuilder(
         addedTripId,
-        serviceDate,
+        SERVICE_DATE,
         ADDED,
         transitModel.getTimeZone()
       );
@@ -926,10 +895,7 @@ public class TimetableSnapshotSourceTest {
 
       var tripUpdate = builder.build();
 
-      var updater = new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT,
-        transitModel
-      );
+      var updater = defaultUpdater();
 
       // WHEN
       var result = updater.applyTripUpdates(
@@ -944,7 +910,7 @@ public class TimetableSnapshotSourceTest {
 
       assertTrue(result.warnings().isEmpty());
 
-      var pattern = assertAddedTrip(serviceDate, addedTripId, updater);
+      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
 
       var route = pattern.getRoute();
       assertEquals(TripUpdateBuilder.ROUTE_URL, route.getUrl());
@@ -966,7 +932,7 @@ public class TimetableSnapshotSourceTest {
       // GIVEN
       final var builder = new TripUpdateBuilder(
         addedTripId,
-        serviceDate,
+        SERVICE_DATE,
         ADDED,
         transitModel.getTimeZone()
       );
@@ -980,10 +946,7 @@ public class TimetableSnapshotSourceTest {
 
       var tripUpdate = builder.build();
 
-      var updater = new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT,
-        transitModel
-      );
+      var updater = defaultUpdater();
 
       // WHEN
       var result = updater.applyTripUpdates(
@@ -1000,7 +963,7 @@ public class TimetableSnapshotSourceTest {
 
       assertEquals(List.of(WarningType.UNKNOWN_STOPS_REMOVED_FROM_ADDED_TRIP), result.warnings());
 
-      var pattern = assertAddedTrip(serviceDate, addedTripId, updater);
+      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
 
       assertEquals(2, pattern.getStops().size());
     }
@@ -1008,11 +971,10 @@ public class TimetableSnapshotSourceTest {
     @Test
     public void repeatedlyAddedTripWithNewRoute() {
       // GIVEN
-      final LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
 
       final var builder = new TripUpdateBuilder(
         addedTripId,
-        serviceDate,
+        SERVICE_DATE,
         ADDED,
         transitModel.getTimeZone()
       );
@@ -1026,10 +988,7 @@ public class TimetableSnapshotSourceTest {
 
       var tripUpdate = builder.build();
 
-      var updater = new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT,
-        transitModel
-      );
+      var updater = defaultUpdater();
 
       // WHEN
       updater.applyTripUpdates(
@@ -1039,7 +998,7 @@ public class TimetableSnapshotSourceTest {
         List.of(tripUpdate),
         feedId
       );
-      var pattern = assertAddedTrip(serviceDate, addedTripId, updater);
+      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
       var firstRoute = pattern.getRoute();
 
       // apply the update a second time to check that no new route instance is created but the old one is reused
@@ -1050,7 +1009,7 @@ public class TimetableSnapshotSourceTest {
         List.of(tripUpdate),
         feedId
       );
-      var secondPattern = assertAddedTrip(serviceDate, addedTripId, updater);
+      var secondPattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
       var secondRoute = secondPattern.getRoute();
 
       // THEN
@@ -1058,6 +1017,15 @@ public class TimetableSnapshotSourceTest {
       assertSame(firstRoute, secondRoute);
       assertNotNull(transitModel.getTransitModelIndex().getRouteForId(firstRoute.getId()));
     }
+  }
+
+  @Nonnull
+  private TimetableSnapshotSource defaultUpdater() {
+    return new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel,
+      () -> SERVICE_DATE
+    );
   }
 
   enum SameAssert {
@@ -1101,8 +1069,8 @@ public class TimetableSnapshotSourceTest {
 
     // We will simulate the clock turning midnight into tomorrow, data on
     // yesterday is candidate to expire
-    final LocalDate yesterday = serviceDate.minusDays(1);
-    final LocalDate tomorrow = serviceDate.plusDays(1);
+    final LocalDate yesterday = SERVICE_DATE.minusDays(1);
+    final LocalDate tomorrow = SERVICE_DATE.plusDays(1);
     final AtomicReference<LocalDate> clock = new AtomicReference<>(yesterday);
 
     var tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -1113,7 +1081,7 @@ public class TimetableSnapshotSourceTest {
     var tripUpdateYesterday = TripUpdate.newBuilder().setTrip(tripDescriptorBuilder).build();
 
     // Update pattern on today, even if the time the update is performed is tomorrow
-    tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
+    tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(SERVICE_DATE));
     var tripUpdateToday = TripUpdate.newBuilder().setTrip(tripDescriptorBuilder).build();
 
     var updater = new TimetableSnapshotSource(

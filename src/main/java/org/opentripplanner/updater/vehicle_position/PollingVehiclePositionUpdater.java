@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitModel;
@@ -41,7 +41,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
 
   public PollingVehiclePositionUpdater(
     VehiclePositionsUpdaterParameters params,
-    RealtimeVehiclePositionService vehiclePositionService,
+    VehiclePositionRepository vehiclePositionService,
     TransitModel transitModel
   ) {
     super(params);

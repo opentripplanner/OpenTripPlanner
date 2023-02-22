@@ -4,8 +4,8 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public record PublicTransportRelationSkipped(OSMWithTags entity) implements DataImportIssue {
-  private static String FMT = "Unable to process public transportation relation %s";
-  private static String HTMLFMT =
+  private static final String FMT = "Unable to process public transportation relation %s";
+  private static final String HTMLFMT =
     "Unable to process public transportation relation <a href='%s'>'%s'</a>";
 
   @Override

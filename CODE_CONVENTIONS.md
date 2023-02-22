@@ -16,6 +16,7 @@ review.
 
 - [ ] Document `public` interfaces, classes and methods - especially those part of a module api.
 - [ ] Leave Things BETTER than you found them - clean up code you visit or/and add unit tests.
+- [ ] [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) - Do not repeat yourself. Avoid implementing the same business rule in two places -> refactor.
 - [ ] [Feature envy](https://refactoring.guru/smells/feature-envy)
 - [ ] Make types immutable if possible. References to other Entities might need to be mutable, if
       so try to init them once, and throw an exception if set again.
@@ -81,7 +82,11 @@ These prefixes are also "allowed", but not preferred - they have some kind of ne
 | `setStop(Stop stop)`                        | Set a mutable stop reference. Avoid if not part of natural lifecycle. Use `initStop(...)` if possible |
 | `getStop() : Stop`                          | Old style accessor, use the shorter form `stop() : Stop`                                              |
 
-### Services, Models, Editors and Builders
+### Service, Model and Repository
+
+![MainModelOverview](docs/images/ServiceModelOverview.png) 
+
+
 
 Naming convention for builders with and without a context.
 

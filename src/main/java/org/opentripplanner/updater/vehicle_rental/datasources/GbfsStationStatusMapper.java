@@ -3,7 +3,7 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.entur.gbfs.v2_2.station_status.GBFSStation;
+import org.entur.gbfs.v2_3.station_status.GBFSStation;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 

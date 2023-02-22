@@ -97,6 +97,12 @@ public class ConstantsForTests {
     "src/test/resources/germany/herrenberg-island-prune-nothru.osm.pbf";
   public static final String ADAPTIVE_PRUNE_OSM = "src/test/resources/isoiiluoto.pbf";
 
+  /* filenames encoded with cp437 and utf8 */
+  public static final String UMLAUT_CP437_ZIP = "src/test/resources/umlaut-cp437.zip";
+  public static final String UMLAUT_TXT = "ümläüt.txt";
+  public static final String UMLAUT_UTF8_ZIP = "src/test/resources/umlaut-utf8.zip";
+  public static final String UMLAUT_UTF8_ZIP_NO_EFS = "src/test/resources/umlaut-utf8-no-efs.zip";
+
   private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
     new File(NETEX_DIR, NETEX_FILENAME),
     FileType.NETEX

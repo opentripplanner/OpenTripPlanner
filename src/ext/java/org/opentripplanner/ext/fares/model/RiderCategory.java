@@ -1,3 +1,5 @@
 package org.opentripplanner.ext.fares.model;
 
-public record RiderCategory(String id, String name, String url) {}
+import javax.annotation.Nullable;
+
+public record RiderCategory(String id, String name, @Nullable String url) {}

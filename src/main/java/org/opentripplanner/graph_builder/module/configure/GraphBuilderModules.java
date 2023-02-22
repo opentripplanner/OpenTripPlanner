@@ -16,11 +16,11 @@ import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issue.report.DataImportIssuesToHTML;
+import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
-import org.opentripplanner.graph_builder.module.PruneIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
@@ -242,12 +242,12 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static DataImportIssuesToHTML provideDataImportIssuesToHTML(
+  static DataImportIssueReporter provideDataImportIssuesToHTML(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     DataImportIssueStore issueStore
   ) {
-    return new DataImportIssuesToHTML(
+    return new DataImportIssueReporter(
       issueStore,
       dataSources.getBuildReportDir(),
       config.maxDataImportIssuesPerFile

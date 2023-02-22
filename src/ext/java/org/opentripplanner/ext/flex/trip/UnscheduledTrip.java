@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex.trip;
 
 import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,7 +21,6 @@ import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -151,7 +151,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       fromStopTime.flexWindowEnd < departureTime ||
       toStopTime.flexWindowEnd < (departureTime + flexTime)
     ) {
-      return SearchParams.TIME_NOT_SET;
+      return MISSING_VALUE;
     }
 
     return Math.max(departureTime, fromStopTime.flexWindowStart);
@@ -170,7 +170,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       toStopTime.flexWindowStart > arrivalTime ||
       fromStopTime.flexWindowStart > (arrivalTime - flexTime)
     ) {
-      return SearchParams.TIME_NOT_SET;
+      return MISSING_VALUE;
     }
 
     return Math.min(arrivalTime, toStopTime.flexWindowEnd);

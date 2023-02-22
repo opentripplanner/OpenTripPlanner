@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.GtfsFaresService;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
@@ -43,7 +45,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -55,6 +56,7 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -73,6 +75,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -181,12 +184,9 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      VehicleParkingService vehicleParkingService = getRoutingService(environment)
-        .getVehicleParkingService();
-
-      if (vehicleParkingService == null) {
-        return null;
-      }
+      VehicleParkingService vehicleParkingService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleParkingService();
 
       return vehicleParkingService
         .getBikeParks()
@@ -199,12 +199,9 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<VehicleParking>> bikeParks() {
     return environment -> {
-      VehicleParkingService vehicleParkingService = getRoutingService(environment)
-        .getVehicleParkingService();
-
-      if (vehicleParkingService == null) {
-        return null;
-      }
+      VehicleParkingService vehicleParkingService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleParkingService();
 
       return vehicleParkingService.getBikeParks().collect(Collectors.toList());
     };
@@ -217,12 +214,9 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalService();
-
-      if (vehicleRentalStationService == null) {
-        return null;
-      }
+      VehicleRentalService vehicleRentalStationService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleRentalService();
 
       return vehicleRentalStationService
         .getVehicleRentalPlaces()
@@ -238,12 +232,9 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations() {
     return environment -> {
-      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalService();
-
-      if (vehicleRentalStationService == null) {
-        return null;
-      }
+      VehicleRentalService vehicleRentalStationService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleRentalService();
 
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeRentalStationsArgs(
         environment.getArguments()
@@ -282,12 +273,9 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      VehicleParkingService vehicleParkingService = getRoutingService(environment)
-        .getVehicleParkingService();
-
-      if (vehicleParkingService == null) {
-        return null;
-      }
+      VehicleParkingService vehicleParkingService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleParkingService();
 
       return vehicleParkingService
         .getCarParks()
@@ -300,12 +288,9 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<VehicleParking>> carParks() {
     return environment -> {
-      VehicleParkingService vehicleParkingService = getRoutingService(environment)
-        .getVehicleParkingService();
-
-      if (vehicleParkingService == null) {
-        return null;
-      }
+      VehicleParkingService vehicleParkingService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleParkingService();
 
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeCarParksArgs(
         environment.getArguments()
@@ -439,7 +424,7 @@ public class LegacyGraphQLQueryTypeImpl
       try {
         places =
           new ArrayList<>(
-            getRoutingService(environment)
+            getGraphFinder(environment)
               .findClosestPlaces(
                 args.getLegacyGraphQLLat(),
                 args.getLegacyGraphQLLon(),
@@ -450,8 +435,6 @@ public class LegacyGraphQLQueryTypeImpl
                 filterByStops,
                 filterByRoutes,
                 filterByBikeRentalStations,
-                filterByBikeParks,
-                filterByCarParks,
                 getTransitService(environment)
               )
           );
@@ -469,14 +452,10 @@ public class LegacyGraphQLQueryTypeImpl
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeNodeArgs(environment.getArguments());
       String type = args.getLegacyGraphQLId().getType();
       String id = args.getLegacyGraphQLId().getId();
-      RoutingService routingService = environment
-        .<LegacyGraphQLRequestContext>getContext()
-        .getRoutingService();
-      TransitService transitService = environment
-        .<LegacyGraphQLRequestContext>getContext()
-        .getTransitService();
-      VehicleParkingService vehicleParkingService = routingService.getVehicleParkingService();
-      VehicleRentalService vehicleRentalStationService = routingService.getVehicleRentalService();
+      final LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
+      TransitService transitService = context.transitService();
+      VehicleParkingService vehicleParkingService = context.vehicleParkingService();
+      VehicleRentalService vehicleRentalStationService = context.vehicleRentalService();
 
       switch (type) {
         case "Agency":
@@ -591,9 +570,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
-      // we need to clone the default request as it is request-scoped and this method
-      // can be used by a batch query, causing several invocations to use the same instance
-      RouteRequest request = context.getServerContext().defaultRouteRequest().clone();
+      RouteRequest request = context.defaultRouteRequest();
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
@@ -612,7 +589,7 @@ public class LegacyGraphQLQueryTypeImpl
       request.setDateTime(
         environment.getArgument("date"),
         environment.getArgument("time"),
-        context.getServerContext().transitService().getTimeZone()
+        context.transitService().getTimeZone()
       );
 
       // TODO VIA: double check that
@@ -837,7 +814,7 @@ public class LegacyGraphQLQueryTypeImpl
         "locale",
         (String v) -> request.setLocale(LegacyGraphQLUtils.getLocale(environment, v))
       );
-      RoutingResponse res = context.getRoutingService().route(request);
+      RoutingResponse res = context.routingService().route(request);
       return DataFetcherResult
         .<RoutingResponse>newResult()
         .data(res)
@@ -853,12 +830,9 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalService();
-
-      if (vehicleRentalStationService == null) {
-        return null;
-      }
+      VehicleRentalService vehicleRentalStationService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleRentalService();
 
       return vehicleRentalStationService
         .getVehicleRentalVehicles()
@@ -874,12 +848,9 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<VehicleRentalVehicle>> rentalVehicles() {
     return environment -> {
-      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalService();
-
-      if (vehicleRentalStationService == null) {
-        return null;
-      }
+      VehicleRentalService vehicleRentalStationService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleRentalService();
 
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeRentalVehiclesArgs(
         environment.getArguments()
@@ -939,7 +910,6 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      RoutingService routingService = getRoutingService(environment);
       TransitService transitService = getTransitService(environment);
 
       if (args.getLegacyGraphQLIds() != null) {
@@ -1003,7 +973,6 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      RoutingService routingService = getRoutingService(environment);
       TransitService transitService = getTransitService(environment);
 
       if (args.getLegacyGraphQLIds() != null) {
@@ -1055,7 +1024,10 @@ public class LegacyGraphQLQueryTypeImpl
           .collect(Collectors.toList());
       }
 
-      var stopStream = transitService.listStopLocations().stream();
+      var stopStream = transitService
+        .listStopLocations()
+        .stream()
+        .sorted(Comparator.comparing(StopLocation::getId));
 
       if (args.getLegacyGraphQLName() != null) {
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
@@ -1105,7 +1077,7 @@ public class LegacyGraphQLQueryTypeImpl
       List<NearbyStop> stops;
       try {
         stops =
-          getRoutingService(environment)
+          getGraphFinder(environment)
             .findClosestStops(
               new Coordinate(args.getLegacyGraphQLLon(), args.getLegacyGraphQLLat()),
               args.getLegacyGraphQLRadius()
@@ -1121,8 +1093,10 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<FareRuleSet>> ticketTypes() {
     return environment -> {
-      Map<FareType, Collection<FareRuleSet>> fareRules =
-        ((DefaultFareService) getFareService(environment)).getFareRulesPerType();
+      var fareService = getFareService(environment);
+      Map<FareType, Collection<FareRuleSet>> fareRules = fareService instanceof GtfsFaresService
+        ? ((GtfsFaresService) fareService).faresV1().getFareRulesPerType()
+        : ((DefaultFareService) fareService).getFareRulesPerType();
 
       return fareRules
         .entrySet()
@@ -1156,7 +1130,7 @@ public class LegacyGraphQLQueryTypeImpl
       if (args.getLegacyGraphQLFeeds() != null) {
         List<String> feeds = StreamSupport
           .stream(args.getLegacyGraphQLFeeds().spliterator(), false)
-          .collect(Collectors.toList());
+          .toList();
         tripStream = tripStream.filter(trip -> feeds.contains(trip.getId().getFeedId()));
       }
 
@@ -1171,12 +1145,9 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      VehicleParkingService vehicleParkingService = getRoutingService(environment)
-        .getVehicleParkingService();
-
-      if (vehicleParkingService == null) {
-        return null;
-      }
+      VehicleParkingService vehicleParkingService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleParkingService();
 
       var vehicleParkingId = FeedScopedId.parseId(args.getLegacyGraphQLId());
       return vehicleParkingService
@@ -1190,12 +1161,9 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<VehicleParking>> vehicleParkings() {
     return environment -> {
-      VehicleParkingService vehicleParkingService = getRoutingService(environment)
-        .getVehicleParkingService();
-
-      if (vehicleParkingService == null) {
-        return null;
-      }
+      VehicleParkingService vehicleParkingService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleParkingService();
 
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeVehicleParkingsArgs(
         environment.getArguments()
@@ -1224,12 +1192,9 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalService();
-
-      if (vehicleRentalStationService == null) {
-        return null;
-      }
+      VehicleRentalService vehicleRentalStationService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleRentalService();
 
       return vehicleRentalStationService
         .getVehicleRentalStations()
@@ -1245,12 +1210,9 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations() {
     return environment -> {
-      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalService();
-
-      if (vehicleRentalStationService == null) {
-        return null;
-      }
+      VehicleRentalService vehicleRentalStationService = environment
+        .<LegacyGraphQLRequestContext>getContext()
+        .vehicleRentalService();
 
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeVehicleRentalStationsArgs(
         environment.getArguments()
@@ -1331,16 +1293,16 @@ public class LegacyGraphQLQueryTypeImpl
     return environment.containsArgument(name) && environment.getArgument(name) != null;
   }
 
-  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
-  }
-
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
+    return environment.<LegacyGraphQLRequestContext>getContext().transitService();
   }
 
   private FareService getFareService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getFareService();
+    return environment.<LegacyGraphQLRequestContext>getContext().fareService();
+  }
+
+  private GraphFinder getGraphFinder(DataFetchingEnvironment environment) {
+    return environment.<LegacyGraphQLRequestContext>getContext().graphFinder();
   }
 
   private static class CallerWithEnvironment {

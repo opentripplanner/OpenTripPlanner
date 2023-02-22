@@ -242,4 +242,28 @@ public class GeometryUtilsTest {
 
     assertEquals(4, line.getCoordinates().length);
   }
+
+  @Test
+  void toEnvelopes() {
+    Coordinate[] coordinates = List
+      .of(
+        new Coordinate(0, 0),
+        new Coordinate(1, 1),
+        new Coordinate(2, 2),
+        new Coordinate(3, 3),
+        new Coordinate(4, 4),
+        new Coordinate(5, 5),
+        new Coordinate(6, 6)
+      )
+      .toArray(new Coordinate[0]);
+
+    LineString line = GeometryUtils.makeLineString(coordinates);
+
+    var envelopes = GeometryUtils.toEnvelopes(line).toList();
+
+    assertEquals(
+      "[Env[0.0 : 1.0, 0.0 : 1.0], Env[1.0 : 2.0, 1.0 : 2.0], Env[2.0 : 3.0, 2.0 : 3.0], Env[3.0 : 4.0, 3.0 : 4.0], Env[4.0 : 5.0, 4.0 : 5.0], Env[5.0 : 6.0, 5.0 : 6.0]]",
+      envelopes.toString()
+    );
+  }
 }

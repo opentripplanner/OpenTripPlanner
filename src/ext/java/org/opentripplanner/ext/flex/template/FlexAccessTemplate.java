@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.flex.template;
 
+import static org.opentripplanner.model.StopTime.MISSING_VALUE;
+
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -10,7 +12,6 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
@@ -76,7 +77,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
         flexTime
       );
 
-      if (latestArrivalTime == SearchParams.TIME_NOT_SET) {
+      if (latestArrivalTime == MISSING_VALUE) {
         return null;
       }
 
@@ -91,7 +92,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
         flexTime
       );
 
-      if (earliestDepartureTime == SearchParams.TIME_NOT_SET) {
+      if (earliestDepartureTime == MISSING_VALUE) {
         return null;
       }
 

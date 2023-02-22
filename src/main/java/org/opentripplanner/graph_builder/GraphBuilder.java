@@ -149,7 +149,7 @@ public class GraphBuilder implements Runnable {
     }
 
     if (config.dataImportReport) {
-      graphBuilder.addModule(factory.dataImportIssuesToHTML());
+      graphBuilder.addModule(factory.dataImportIssueReporter());
     }
 
     if (OTPFeature.DataOverlay.isOn()) {

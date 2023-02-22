@@ -14,24 +14,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.entur.gbfs.v2_2.free_bike_status.GBFSFreeBikeStatus;
-import org.entur.gbfs.v2_2.geofencing_zones.GBFSGeofencingZones;
-import org.entur.gbfs.v2_2.station_information.GBFSStation;
-import org.entur.gbfs.v2_2.station_information.GBFSStationInformation;
-import org.entur.gbfs.v2_2.station_status.GBFSStationStatus;
-import org.entur.gbfs.v2_2.system_alerts.GBFSSystemAlerts;
-import org.entur.gbfs.v2_2.system_calendar.GBFSSystemCalendar;
-import org.entur.gbfs.v2_2.system_hours.GBFSSystemHours;
-import org.entur.gbfs.v2_2.system_information.GBFSSystemInformation;
-import org.entur.gbfs.v2_2.system_pricing_plans.GBFSSystemPricingPlans;
-import org.entur.gbfs.v2_2.system_regions.GBFSSystemRegions;
-import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
-import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
+import org.entur.gbfs.v2_3.free_bike_status.GBFSFreeBikeStatus;
+import org.entur.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
+import org.entur.gbfs.v2_3.station_information.GBFSStation;
+import org.entur.gbfs.v2_3.station_information.GBFSStationInformation;
+import org.entur.gbfs.v2_3.station_status.GBFSStationStatus;
+import org.entur.gbfs.v2_3.system_alerts.GBFSSystemAlerts;
+import org.entur.gbfs.v2_3.system_calendar.GBFSSystemCalendar;
+import org.entur.gbfs.v2_3.system_hours.GBFSSystemHours;
+import org.entur.gbfs.v2_3.system_information.GBFSSystemInformation;
+import org.entur.gbfs.v2_3.system_pricing_plans.GBFSSystemPricingPlans;
+import org.entur.gbfs.v2_3.system_regions.GBFSSystemRegions;
+import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
+import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.io.HttpUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS correctly,
@@ -42,7 +40,6 @@ class GbfsFeedLoaderTest {
 
   public static final String LANGUAGE_NB = "nb";
   public static final String LANGUAGE_EN = "en";
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoaderTest.class);
 
   @Test
   void getV22FeedWithExplicitLanguage() {
@@ -120,6 +117,21 @@ class GbfsFeedLoaderTest {
     new GbfsFeedLoader("https://gbfs.spin.pm/api/gbfs/v2_2/edmonton/gbfs", Map.of(), null).update();
   }
 
+  @Test
+  void geofencingZones() {
+    GbfsFeedLoader loader = new GbfsFeedLoader(
+      "file:src/test/resources/gbfs/tieroslo/gbfs.json",
+      Map.of(),
+      LANGUAGE_EN
+    );
+
+    loader.update();
+    var zones = loader.getFeed(GBFSGeofencingZones.class);
+    var features = zones.getData().getGeofencingZones().getFeatures();
+    var f = features.get(0);
+    assertNotNull(f);
+  }
+
   private void validateV22Feed(GbfsFeedLoader loader) {
     assertTrue(loader.update());
 
@@ -153,7 +165,7 @@ class GbfsFeedLoaderTest {
 
     GBFSStationStatus stationStatus = loader.getFeed(GBFSStationStatus.class);
     assertNotNull(stationStatus);
-    List<org.entur.gbfs.v2_2.station_status.GBFSStation> stationStatuses = stationStatus
+    List<org.entur.gbfs.v2_3.station_status.GBFSStation> stationStatuses = stationStatus
       .getData()
       .getStations();
     assertEquals(6, stationStatuses.size());
@@ -200,7 +212,7 @@ class GbfsFeedLoaderTest {
 
     GBFSStationStatus stationStatus = loader.getFeed(GBFSStationStatus.class);
     assertNotNull(stationStatus);
-    List<org.entur.gbfs.v2_2.station_status.GBFSStation> stationStatuses = stationStatus
+    List<org.entur.gbfs.v2_3.station_status.GBFSStation> stationStatuses = stationStatus
       .getData()
       .getStations();
     assertEquals(10, stationStatuses.size());

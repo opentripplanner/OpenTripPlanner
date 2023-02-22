@@ -1,11 +1,13 @@
 package org.opentripplanner.graph_builder.issues;
 
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
 
 public record ParkAndRideEntranceRemoved(VehicleParkingEntrance vehicleParkingEntrance)
   implements DataImportIssue {
-  private static String FMT =
+  private static final String FMT =
     "Park and ride entrance '%s' is removed because it's StreetVertex ('%s') is removed in a previous step.";
 
   @Override
@@ -15,5 +17,12 @@ public record ParkAndRideEntranceRemoved(VehicleParkingEntrance vehicleParkingEn
       vehicleParkingEntrance.getEntranceId().toString(),
       vehicleParkingEntrance.getVertex().getDefaultName()
     );
+  }
+
+  @Override
+  public Geometry getGeometry() {
+    return GeometryUtils
+      .getGeometryFactory()
+      .createPoint(vehicleParkingEntrance.getVertex().getCoordinate());
   }
 }

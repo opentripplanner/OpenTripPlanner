@@ -8,6 +8,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.Leg
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLTransitMode;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.response.InputField;
@@ -15,6 +16,7 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class LegacyGraphQLUtils {
 
@@ -74,14 +76,37 @@ public class LegacyGraphQLUtils {
     };
   }
 
+  public static LegacyGraphQLTransitMode toGraphQL(TransitMode mode) {
+    if (mode == null) return null;
+    return switch (mode) {
+      case RAIL -> LegacyGraphQLTransitMode.RAIL;
+      case COACH -> LegacyGraphQLTransitMode.COACH;
+      case SUBWAY -> LegacyGraphQLTransitMode.SUBWAY;
+      case BUS -> LegacyGraphQLTransitMode.BUS;
+      case TRAM -> LegacyGraphQLTransitMode.TRAM;
+      case FERRY -> LegacyGraphQLTransitMode.FERRY;
+      case AIRPLANE -> LegacyGraphQLTransitMode.AIRPLANE;
+      case CABLE_CAR -> LegacyGraphQLTransitMode.CABLE_CAR;
+      case GONDOLA -> LegacyGraphQLTransitMode.GONDOLA;
+      case FUNICULAR -> LegacyGraphQLTransitMode.FUNICULAR;
+      case TROLLEYBUS -> LegacyGraphQLTransitMode.TROLLEYBUS;
+      case MONORAIL -> LegacyGraphQLTransitMode.MONORAIL;
+      case CARPOOL -> LegacyGraphQLTransitMode.CARPOOL;
+      case TAXI -> LegacyGraphQLTransitMode.TAXI;
+    };
+  }
+
   public static FormFactor toModel(LegacyGraphQLFormFactor formFactor) {
     if (formFactor == null) return null;
     return switch (formFactor) {
       case BICYCLE -> FormFactor.BICYCLE;
       case SCOOTER -> FormFactor.SCOOTER;
       case CAR -> FormFactor.CAR;
+      case CARGO_BICYCLE -> FormFactor.CARGO_BICYCLE;
       case MOPED -> FormFactor.MOPED;
       case OTHER -> FormFactor.OTHER;
+      case SCOOTER_SEATED -> FormFactor.SCOOTER_SEATED;
+      case SCOOTER_STANDING -> FormFactor.SCOOTER_STANDING;
     };
   }
 

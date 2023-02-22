@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.text.SimpleDateFormat;
-import org.apache.commons.io.IOUtils;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.framework.text.FileSizeToTextConverter;
 
@@ -113,8 +112,8 @@ public interface DataSource {
    * Calling this method is the same as reading everything off the {@link #asInputStream()}.
    */
   default byte[] asBytes() {
-    try {
-      return IOUtils.toByteArray(asInputStream());
+    try (var is = asInputStream()) {
+      return is.readAllBytes();
     } catch (IOException e) {
       throw new RuntimeException("Failed to read " + path() + ": " + e.getLocalizedMessage(), e);
     }

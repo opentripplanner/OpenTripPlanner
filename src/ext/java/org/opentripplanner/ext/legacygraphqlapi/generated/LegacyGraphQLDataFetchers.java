@@ -11,9 +11,13 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertCauseType;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertEffectType;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLTransitMode;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -22,8 +26,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.core.FareComponent;
@@ -38,6 +40,8 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
+import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -72,13 +76,13 @@ public class LegacyGraphQLDataFetchers {
   public interface LegacyGraphQLAlert {
     public DataFetcher<Agency> agency();
 
-    public DataFetcher<String> alertCause();
+    public DataFetcher<LegacyGraphQLAlertCauseType> alertCause();
 
     public DataFetcher<String> alertDescriptionText();
 
     public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations();
 
-    public DataFetcher<String> alertEffect();
+    public DataFetcher<LegacyGraphQLAlertEffectType> alertEffect();
 
     public DataFetcher<Integer> alertHash();
 
@@ -86,7 +90,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Iterable<Map.Entry<String, String>>> alertHeaderTextTranslations();
 
-    public DataFetcher<String> alertSeverityLevel();
+    public DataFetcher<LegacyGraphQLAlertSeverityLevelType> alertSeverityLevel();
 
     public DataFetcher<String> alertUrl();
 
@@ -331,6 +335,8 @@ public class LegacyGraphQLDataFetchers {
   public interface LegacyGraphQLLeg {
     public DataFetcher<Agency> agency();
 
+    public DataFetcher<Iterable<TransitAlert>> alerts();
+
     public DataFetcher<Integer> arrivalDelay();
 
     public DataFetcher<Integer> departureDelay();
@@ -447,6 +453,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
     public DataFetcher<String> name();
+
+    public DataFetcher<TripPattern> originalTripPattern();
 
     public DataFetcher<Geometry> patternGeometry();
 
@@ -667,7 +675,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> longName();
 
-    public DataFetcher<String> mode();
+    public DataFetcher<LegacyGraphQLTransitMode> mode();
 
     public DataFetcher<Iterable<TripPattern>> patterns();
 
