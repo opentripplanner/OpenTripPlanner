@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
+import static org.opentripplanner.ext.siri.ModifiedTripBuilder.createUpdatedTripTimes;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_MONITORED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
