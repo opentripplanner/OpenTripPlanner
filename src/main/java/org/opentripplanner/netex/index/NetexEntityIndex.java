@@ -35,7 +35,6 @@ import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone_VersionStructure;
-import org.rutebanken.netex.model.UicOperatingPeriod;
 
 /**
  * This class holds indexes of Netex objects for lookup during the NeTEx import using the {@link
@@ -87,7 +86,6 @@ public class NetexEntityIndex {
   public final HierarchicalMapById<NoticeAssignment> noticeAssignmentById;
   public final HierarchicalMapById<OperatingDay> operatingDayById;
   public final HierarchicalMapById<OperatingPeriod_VersionStructure> operatingPeriodById;
-  public final HierarchicalMapById<UicOperatingPeriod> uicOperatingPeriodById;
   public final HierarchicalMapById<Operator> operatorsById;
   public final HierarchicalVersionMapById<Quay> quayById;
   public final HierarchicalMap<String, String> flexibleStopPlaceByStopPointRef;
@@ -132,7 +130,6 @@ public class NetexEntityIndex {
     this.noticeAssignmentById = new HierarchicalMapById<>();
     this.operatingDayById = new HierarchicalMapById<>();
     this.operatingPeriodById = new HierarchicalMapById<>();
-    this.uicOperatingPeriodById = new HierarchicalMapById<>();
     this.operatorsById = new HierarchicalMapById<>();
     this.quayById = new HierarchicalVersionMapById<>();
     this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>();
@@ -173,7 +170,6 @@ public class NetexEntityIndex {
     this.noticeAssignmentById = new HierarchicalMapById<>(parent.noticeAssignmentById);
     this.operatingDayById = new HierarchicalMapById<>(parent.operatingDayById);
     this.operatingPeriodById = new HierarchicalMapById<>(parent.operatingPeriodById);
-    this.uicOperatingPeriodById = new HierarchicalMapById<>(parent.uicOperatingPeriodById);
     this.operatorsById = new HierarchicalMapById<>(parent.operatorsById);
     this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
     this.flexibleStopPlaceByStopPointRef =
@@ -310,11 +306,6 @@ public class NetexEntityIndex {
       @Override
       public ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> getOperatingPeriodById() {
         return operatingPeriodById;
-      }
-
-      @Override
-      public ReadOnlyHierarchicalMapById<UicOperatingPeriod> getUicOperatingPeriodById() {
-        return uicOperatingPeriodById;
       }
 
       @Override

@@ -26,7 +26,6 @@ import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone_VersionStructure;
-import org.rutebanken.netex.model.UicOperatingPeriod;
 
 public interface NetexEntityIndexReadOnlyView {
   Network lookupNetworkForLine(String groupOfLineOrNetworkId);
@@ -62,8 +61,6 @@ public interface NetexEntityIndexReadOnlyView {
   ReadOnlyHierarchicalMapById<OperatingDay> getOperatingDayById();
 
   ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> getOperatingPeriodById();
-
-  ReadOnlyHierarchicalMapById<UicOperatingPeriod> getUicOperatingPeriodById();
 
   ReadOnlyHierarchicalMapById<Operator> getOperatorsById();
 

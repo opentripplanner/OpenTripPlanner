@@ -122,7 +122,7 @@ public class DayTypeAssignmentMapper {
     }
     // Add or remove periods
     else if (dayTypeAssignment.getOperatingPeriodRef() != null) {
-      addOperationPeriod(dayTypeAssignment);
+      addOperatingPeriod(dayTypeAssignment);
     } else if (dayTypeAssignment.getOperatingDayRef() != null) {
       var opd = operatingDays.lookup(dayTypeAssignment.getOperatingDayRef().getRef());
       addDate(true, opd.getCalendarDate());
@@ -148,7 +148,7 @@ public class DayTypeAssignmentMapper {
     addDate(isDayTypeAvailableForAssigment(dayTypeAssignment), dayTypeAssignment.getDate());
   }
 
-  private void addOperationPeriod(DayTypeAssignment dayTypeAssignment) {
+  private void addOperatingPeriod(DayTypeAssignment dayTypeAssignment) {
     boolean isAvailable = isDayTypeAvailableForAssigment(dayTypeAssignment);
 
     String ref = dayTypeAssignment.getOperatingPeriodRef().getRef();
