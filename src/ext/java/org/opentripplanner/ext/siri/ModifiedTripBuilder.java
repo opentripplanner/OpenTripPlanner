@@ -29,6 +29,60 @@ import uk.org.siri.siri20.OccupancyEnumeration;
 public class ModifiedTripBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableHelper.class);
+  private final TripTimes existingTripTimes;
+  private final TripPattern pattern;
+  private final LocalDate serviceDate;
+  private final ZoneId zoneId;
+  private final EntityResolver entityResolver;
+  private final List<CallWrapper> calls;
+  private final Boolean cancellation;
+  private final OccupancyEnumeration occupancy;
+  private final boolean predictionInaccurate;
+
+  public ModifiedTripBuilder(
+    TripTimes existingTripTimes,
+    TripPattern pattern,
+    EstimatedVehicleJourney journey,
+    LocalDate serviceDate,
+    ZoneId zoneId,
+    EntityResolver entityResolver
+  ) {
+    this.existingTripTimes = existingTripTimes;
+    this.pattern = pattern;
+    this.serviceDate = serviceDate;
+    this.zoneId = zoneId;
+    this.entityResolver = entityResolver;
+
+    calls = CallWrapper.of(journey);
+    cancellation = TRUE.equals(journey.isCancellation());
+    predictionInaccurate = TRUE.equals(journey.isPredictionInaccurate());
+    occupancy = journey.getOccupancy();
+  }
+
+  /**
+   * Constructor for tests
+   */
+  public ModifiedTripBuilder(
+    TripTimes existingTripTimes,
+    TripPattern pattern,
+    LocalDate serviceDate,
+    ZoneId zoneId,
+    EntityResolver entityResolver,
+    List<CallWrapper> calls,
+    Boolean cancellation,
+    OccupancyEnumeration occupancy,
+    boolean predictionInaccurate
+  ) {
+    this.existingTripTimes = existingTripTimes;
+    this.pattern = pattern;
+    this.serviceDate = serviceDate;
+    this.zoneId = zoneId;
+    this.entityResolver = entityResolver;
+    this.calls = calls;
+    this.cancellation = cancellation;
+    this.occupancy = occupancy;
+    this.predictionInaccurate = predictionInaccurate;
+  }
 
   /**
    * Apply the TripUpdate to the appropriate TripTimes from this Timetable. The existing TripTimes
@@ -38,35 +92,22 @@ public class ModifiedTripBuilder {
    * cloning the same Timetable when several updates are applied to it at once. We assume here that
    * all trips in a timetable are from the same feed, which should always be the case.
    *
-   * @param journey SIRI-ET EstimatedVehicleJourney
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
-  public static Result<TripUpdate, UpdateError> createUpdatedTripTimes(
-    TripTimes existingTripTimes,
-    TripPattern pattern,
-    EstimatedVehicleJourney journey,
-    LocalDate serviceDate,
-    ZoneId zoneId,
-    EntityResolver entityResolver
-  ) {
+  public Result<TripUpdate, UpdateError> build() {
     TripTimes newTimes = new TripTimes(existingTripTimes);
-    List<CallWrapper> calls = CallWrapper.of(journey);
+
     StopPattern stopPattern = createStopPattern(pattern, calls, entityResolver);
 
-    if (TRUE.equals(journey.isCancellation()) || stopPattern.isAllStopsCancelled()) {
+    if (cancellation || stopPattern.isAllStopsCancelled()) {
       LOG.debug("Trip is cancelled");
       newTimes.cancelTrip();
       return Result.success(new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate));
     }
 
-    OccupancyEnumeration journeyOccupancy = journey.getOccupancy();
-
     ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
     Set<CallWrapper> alreadyVisited = new HashSet<>();
-
-    boolean isJourneyPredictionInaccurate =
-      (journey.isPredictionInaccurate() != null && journey.isPredictionInaccurate());
 
     int departureFromPreviousStop = 0;
     int lastDepartureDelay = 0;
@@ -88,9 +129,9 @@ public class ModifiedTripBuilder {
             newTimes,
             callCounter,
             callCounter == (calls.size() - 1),
-            isJourneyPredictionInaccurate,
+            predictionInaccurate,
             call,
-            journeyOccupancy
+            occupancy
           );
 
           alreadyVisited.add(call);
@@ -137,9 +178,8 @@ public class ModifiedTripBuilder {
     if (result.isFailure()) {
       var updateError = result.failureValue();
       LOG.info(
-        "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
-        journey.getLineRef().getValue(),
-        existingTripTimes.getTrip().getId(),
+        "TripTimes are non-increasing after applying SIRI delay propagation - Trip {}. Stop index {}",
+        updateError.tripId(),
         updateError.stopIndex()
       );
       return Result.failure(updateError);

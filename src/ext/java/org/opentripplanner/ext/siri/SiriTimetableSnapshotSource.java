@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.ext.siri.ModifiedTripBuilder.createUpdatedTripTimes;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_MONITORED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
@@ -335,14 +334,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       LOG.debug("tripId {} not found in pattern.", trip.getId());
       return UpdateError.result(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
     }
-    var updateResult = createUpdatedTripTimes(
+    var updateResult = new ModifiedTripBuilder(
       existingTripTimes,
       pattern,
       estimatedVehicleJourney,
       serviceDate,
       timeZone,
       entityResolver
-    );
+    )
+      .build();
     if (updateResult.isFailure()) {
       LOG.info("Failed to update TripTimes for trip {}", trip);
       return updateResult.toFailureResult();
