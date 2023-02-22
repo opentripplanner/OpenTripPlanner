@@ -12,7 +12,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      JAVA_OPTS: -Xmx4g
       MAVEN_OPTS: -Xmx3g
 
     strategy:

@@ -60,7 +60,7 @@ public class SmokeTest {
    * before the expiration date of the old one.
    */
   public static LocalDate nextMonday() {
-    var today = LocalDate.now().plusWeeks(1);
+    var today = LocalDate.now();
     return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
   }
 
