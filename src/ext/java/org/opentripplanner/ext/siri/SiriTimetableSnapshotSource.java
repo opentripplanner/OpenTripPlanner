@@ -206,7 +206,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       Result<TripUpdate, UpdateError> result;
       if (shouldAddNewTrip) {
         result =
-          new AddedTripHelper(
+          new AddedTripBuilder(
             journey,
             transitModel,
             entityResolver,

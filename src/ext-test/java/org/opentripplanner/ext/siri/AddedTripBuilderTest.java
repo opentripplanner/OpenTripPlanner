@@ -38,7 +38,7 @@ import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
-public class AddedTripHelperTest {
+public class AddedTripBuilderTest {
 
   private static final Agency AGENCY = TransitModelForTest.AGENCY;
   private static final ZoneId TIME_ZONE = AGENCY.getTimezone();
@@ -106,7 +106,7 @@ public class AddedTripHelperTest {
 
   @Test
   public void testAddedTrip() {
-    var addedTrip = new AddedTripHelper(
+    var addedTrip = new AddedTripBuilder(
       TRANSIT_MODEL,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
@@ -224,7 +224,7 @@ public class AddedTripHelperTest {
 
   @Test
   void testAddedTripOnAddedRoute() {
-    var firstAddedTrip = new AddedTripHelper(
+    var firstAddedTrip = new AddedTripBuilder(
       TRANSIT_MODEL,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
@@ -249,7 +249,7 @@ public class AddedTripHelperTest {
 
     var tripId2 = TransitModelForTest.id("TRIP_ID_2");
 
-    var secondAddedTrip = new AddedTripHelper(
+    var secondAddedTrip = new AddedTripBuilder(
       TRANSIT_MODEL,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
@@ -299,7 +299,7 @@ public class AddedTripHelperTest {
 
   @Test
   void testAddedTripOnExistingRoute() {
-    var addedTrip = new AddedTripHelper(
+    var addedTrip = new AddedTripBuilder(
       TRANSIT_MODEL,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
@@ -329,7 +329,7 @@ public class AddedTripHelperTest {
 
   @Test
   void testAddedTripWithoutReplacedRoute() {
-    var addedTrip = new AddedTripHelper(
+    var addedTrip = new AddedTripBuilder(
       TRANSIT_MODEL,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
@@ -371,7 +371,7 @@ public class AddedTripHelperTest {
 
   @Test
   public void testAddedTripFailOnMissingServiceId() {
-    var addedTrip = new AddedTripHelper(
+    var addedTrip = new AddedTripBuilder(
       TRANSIT_MODEL,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
@@ -425,7 +425,7 @@ public class AddedTripHelperTest {
         .build()
     );
 
-    var addedTrip = new AddedTripHelper(
+    var addedTrip = new AddedTripBuilder(
       TRANSIT_MODEL,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
@@ -479,7 +479,7 @@ public class AddedTripHelperTest {
 
     // Act
     TransitMode transitMode = SiriTransportModeMapper.mapTransitMainMode(modes);
-    String transitSubMode = AddedTripHelper.resolveTransitSubMode(transitMode, route);
+    String transitSubMode = AddedTripBuilder.resolveTransitSubMode(transitMode, route);
 
     //Assert
     var expectedMode = TransitMode.valueOf(internalMode);

@@ -37,9 +37,9 @@ import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.OccupancyEnumeration;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
-class AddedTripHelper {
+class AddedTripBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AddedTripHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AddedTripBuilder.class);
   private final TransitModel transitModel;
   private final EntityResolver entityResolver;
   private final ZoneId timeZone;
@@ -58,7 +58,7 @@ class AddedTripHelper {
   private final String shortName;
   private final String headsign;
 
-  AddedTripHelper(
+  AddedTripBuilder(
     EstimatedVehicleJourney estimatedVehicleJourney,
     TransitModel transitModel,
     EntityResolver entityResolver,
@@ -105,7 +105,7 @@ class AddedTripHelper {
     timeZone = transitModel.getTimeZone();
   }
 
-  AddedTripHelper(
+  AddedTripBuilder(
     TransitModel transitModel,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId,
