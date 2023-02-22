@@ -9,6 +9,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
+import org.opentripplanner.netex.support.JourneyPatternHelper;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -179,8 +180,7 @@ class TripMapper {
       JourneyPattern_VersionStructure journeyPattern = journeyPatternsById.lookup(
         serviceJourney.getJourneyPatternRef().getValue().getRef()
       );
-      String routeRef = journeyPattern.getRouteRef().getRef();
-      lineRef = routeById.lookup(routeRef).getLineRef().getValue().getRef();
+      lineRef = JourneyPatternHelper.getLineFromRoute(routeById, journeyPattern);
     }
     org.opentripplanner.transit.model.network.Route route = otpRouteById.get(
       idFactory.createId(lineRef)
