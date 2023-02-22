@@ -314,16 +314,10 @@ public class SiriFuzzyTripMatcher {
         continue;
       }
 
-      for (TripTimes times : getCurrentTimetable.apply(tripPattern, serviceDate).getTripTimes()) {
-        if (
-          times.getScheduledDepartureTime(0) == departureInSecondsSinceMidnight &&
-          calendarService
-            .getServiceDatesForServiceId(times.getTrip().getServiceId())
-            .contains(serviceDate)
-        ) {
-          // Found matches
-          possibleTrips.add(new TripAndPattern(times.getTrip(), tripPattern));
-        }
+      TripTimes times = getCurrentTimetable.apply(tripPattern, serviceDate).getTripTimes(trip);
+      if (times != null && times.getScheduledDepartureTime(0) == departureInSecondsSinceMidnight) {
+        // Found matches
+        possibleTrips.add(new TripAndPattern(times.getTrip(), tripPattern));
       }
     }
 
