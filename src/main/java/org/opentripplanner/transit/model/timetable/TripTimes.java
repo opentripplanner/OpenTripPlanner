@@ -182,6 +182,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     this.realTimeState = object.realTimeState;
     this.timepoints = object.timepoints;
     this.wheelchairAccessibility = object.wheelchairAccessibility;
+    this.occupancyStatus = object.occupancyStatus;
   }
 
   /**
