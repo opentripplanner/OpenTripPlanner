@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
+import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 

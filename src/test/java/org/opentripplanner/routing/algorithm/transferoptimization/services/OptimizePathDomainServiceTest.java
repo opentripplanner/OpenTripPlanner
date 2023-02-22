@@ -25,7 +25,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   /**
    * The exact start time to walk to stop A to catch Trip_1 with 40s board slack
    */
-  private static final int START_TIME_T1 = time("10:00:20");
+  private static final int ITERATION_START_TIME = time("10:00");
   private static final int TRANSFER_SLACK = D1m;
   private static final int BOARD_SLACK = D40s;
   private static final int ALIGHT_SLACK = D20s;
@@ -72,7 +72,10 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var transfers = dummyTransferGenerator();
 
     // and a path: Walk ~ B ~ T1 ~ C ~ Walk
-    var original = pathBuilder().access(START_TIME_T1, D1m, STOP_B).bus(trip1, STOP_C).egress(D1m);
+    var original = pathBuilder()
+      .access(ITERATION_START_TIME, STOP_B, D1m)
+      .bus(trip1, STOP_C)
+      .egress(D1m);
 
     var subject = subject(transfers, null);
 
@@ -113,7 +116,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     // Path:  Access ~ B ~ T1 ~ C ~ Walk 30s ~ D ~ T2 ~ E ~ Egress
     var original = pathBuilder()
-      .access(START_TIME_T1, D1m, STOP_B)
+      .access(ITERATION_START_TIME, STOP_B, D1m)
       .bus(trip1, STOP_C)
       .walk(D30s, STOP_F)
       .bus(trip2, STOP_G)
@@ -127,7 +130,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     // Insert wait-time cost summary info
     var expected = original
       .toStringDetailed(this::stopIndexToName)
-      .replace("$3250]", "$3250 $33pri $3583.81wtc]");
+      .replace("$2770]", "$2770 $33pri $3103.81wtc]");
 
     assertEquals(expected, first(result).toStringDetailed(this::stopIndexToName));
     assertEquals(1, result.size());
@@ -173,7 +176,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     );
 
     var original = pathBuilder()
-      .access(START_TIME_T1, D0s, STOP_A)
+      .access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
       .walk(D30s, STOP_E)
@@ -190,8 +193,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var result = subject.findBestTransitPath(original);
 
     assertEquals(
-      "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ " +
-      "BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m 2tx $3010 $66pri]",
+      "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ BUS T3 10:37 10:49 ~ G " +
+      "[10:01:20 10:49:20 48m 2tx $2950 $66pri]",
       PathUtils.pathsToString(result)
     );
 
@@ -205,8 +208,10 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     result = subject.findBestTransitPath(original);
 
     assertEquals(
-      "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C ~ BUS T2 10:15 10:35 ~ F " +
-      "~ BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m 2tx $3040 $66pri $3354.05wtc]",
+      "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C " +
+      "~ BUS T2 10:15 10:35 ~ F " +
+      "~ BUS T3 10:37 10:49 ~ G " +
+      "[10:01:20 10:49:20 48m 2tx $2980 $66pri $3294.05wtc]",
       PathUtils.pathsToString(result)
     );
   }
@@ -244,7 +249,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     );
 
     var original = pathBuilder()
-      .access(START_TIME_T1, 0, STOP_A)
+      .access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
       .egress(D0s);
@@ -259,7 +264,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var it = result.iterator().next();
 
     assertEquals(
-      "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:00:20 10:30:20 30m 1tx $1810 $23pri]",
+      "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:01:20 10:30:20 29m 1tx $1750 $23pri]",
       it.toString(this::stopIndexToName)
     );
     // Verify the attached Transfer is exist and is valid
@@ -270,7 +275,10 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   }
 
   static TestPathBuilder pathBuilder() {
-    return new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
+    return new TestPathBuilder(
+      new DefaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK),
+      COST_CALCULATOR
+    );
   }
 
   /* private methods */

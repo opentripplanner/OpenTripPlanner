@@ -8,6 +8,7 @@ import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 
@@ -105,6 +106,11 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule>
   @Override
   public Collection<RaptorPath<T>> extractPaths() {
     return delegate.extractPaths();
+  }
+
+  @Override
+  public SingleCriteriaStopArrivals extractBestNumberOfTransfers() {
+    return delegate.extractBestNumberOfTransfers();
   }
 
   @Override

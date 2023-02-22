@@ -122,7 +122,7 @@ public class GermanyMapperTest {
 
   @Test
   public void lcnAndRcnShouldNotBeAddedUp() {
-    // https://www.openstreetmap.org/way/26443041 is part of both an lcn and rnc but that shouldn't mean that
+    // https://www.openstreetmap.org/way/26443041 is part of both an lcn and rcn but that shouldn't mean that
     // it is to be more heavily favoured than other ways that are part of just one.
 
     var both = new OSMWithTags();
@@ -136,6 +136,65 @@ public class GermanyMapperTest {
 
     var residential = new OSMWithTags();
     residential.addTag("highway", "residential");
+
+    assertEquals(
+      wps.getDataForWay(both).getBicycleSafetyFeatures().forward(),
+      wps.getDataForWay(justLcn).getBicycleSafetyFeatures().forward(),
+      epsilon
+    );
+
+    assertEquals(wps.getDataForWay(both).getBicycleSafetyFeatures().forward(), 0.6859, epsilon);
+
+    assertEquals(
+      wps.getDataForWay(residential).getBicycleSafetyFeatures().forward(),
+      0.98,
+      epsilon
+    );
+  }
+
+  @Test
+  public void bicycleRoadAndLcnShouldNotBeAddedUp() {
+    // https://www.openstreetmap.org/way/22201321 was tagged as bicycle_road without lcn
+    // make it so all ways tagged as some kind of cyclestreets are considered as equally safe
+
+    var both = new OSMWithTags();
+    both.addTag("highway", "residential");
+    both.addTag("bicycle_road", "yes");
+    both.addTag("cyclestreet", "yes");
+    both.addTag("lcn", "yes");
+
+    var justBicycleRoad = new OSMWithTags();
+    justBicycleRoad.addTag("bicycle_road", "yes");
+    justBicycleRoad.addTag("highway", "residential");
+
+    var justCyclestreet = new OSMWithTags();
+    justCyclestreet.addTag("cyclestreet", "yes");
+    justCyclestreet.addTag("highway", "residential");
+
+    var justLcn = new OSMWithTags();
+    justLcn.addTag("lcn", "yes");
+    justLcn.addTag("highway", "residential");
+
+    var residential = new OSMWithTags();
+    residential.addTag("highway", "residential");
+
+    assertEquals(
+      wps.getDataForWay(justCyclestreet).getBicycleSafetyFeatures().forward(),
+      wps.getDataForWay(justLcn).getBicycleSafetyFeatures().forward(),
+      epsilon
+    );
+
+    assertEquals(
+      wps.getDataForWay(both).getBicycleSafetyFeatures().forward(),
+      wps.getDataForWay(justBicycleRoad).getBicycleSafetyFeatures().forward(),
+      epsilon
+    );
+
+    assertEquals(
+      wps.getDataForWay(both).getBicycleSafetyFeatures().forward(),
+      wps.getDataForWay(justCyclestreet).getBicycleSafetyFeatures().forward(),
+      epsilon
+    );
 
     assertEquals(
       wps.getDataForWay(both).getBicycleSafetyFeatures().forward(),

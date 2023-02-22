@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.Collection;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -70,7 +69,7 @@ public class GsIntegrationTest {
     assertTrue(dir.exists());
     assertTrue(content.size() > 0, content.toString());
     // And the new file have the expected content
-    assertEquals(DATA, IOUtils.toString(dir.entry("a.txt").asInputStream(), UTF_8));
+    assertEquals(DATA, new String(dir.entry("a.txt").asInputStream().readAllBytes(), UTF_8));
 
     // Delete all files in dir
     dir.delete();
@@ -125,7 +124,7 @@ public class GsIntegrationTest {
     assertTrue(ds.lastModified() > 0, "LastModified: " + ds.lastModified());
     assertTrue(ds.size() > 0, "Size: " + ds.size());
     assertTrue(ds.isWritable());
-    assertEquals(DATA, IOUtils.toString(ds.asInputStream(), UTF_8));
+    assertEquals(DATA, new String(ds.asInputStream().readAllBytes(), UTF_8));
 
     // Cleanup
     cleanUpDir(tempDir);
@@ -137,7 +136,7 @@ public class GsIntegrationTest {
     CompositeDataSource ds = repo.findCompositeSource(GTFS_URI, FileType.GTFS);
 
     DataSource stops = ds.entry("stops.txt");
-    String text = IOUtils.toString(stops.asInputStream(), UTF_8);
+    String text = new String(stops.asInputStream().readAllBytes(), UTF_8);
     assertTrue(text.contains("stop"), text);
   }
 
@@ -151,7 +150,7 @@ public class GsIntegrationTest {
 
   private void writeDataToDataSource(DataSource entry) throws IOException {
     try (OutputStream output = entry.asOutputStream()) {
-      IOUtils.write(DATA, output, UTF_8);
+      output.write(DATA.getBytes(UTF_8));
       output.flush();
     }
   }

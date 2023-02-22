@@ -62,7 +62,7 @@ class OsmBoardingLocationsModuleTest {
         "osm:node:302563839"
       )
     ),
-    Arguments.of(true, Set.of("osm:node:768590748"))
+    Arguments.of(true, Set.of("osm:node:3223067049", "osm:node:768590748"))
   );
 
   @ParameterizedTest(

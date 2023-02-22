@@ -207,9 +207,9 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
 
   public static String flexCaseAWithOpeningHoursText() {
     return String.format(
-      "Flex 5m15s 1x 9:50 9:55:15 %s ~ A 12m45s ~ " +
+      "Flex 5m15s 1x Open(9:00 9:50) 9:50 9:55:15 %s ~ A 12m45s ~ " +
       "BUS A 10:08 10:20 12m %s ~ D 10m ~ " +
-      "Flex 6m 1x 10:30 10:36 %s " +
+      "Flex 6m 1x Open(10:30 11:00) 10:30 10:36 %s " +
       "[9:50 10:36 46m 2tx %s]",
       RaptorCostConverter.toString(ACCESS_COST),
       RaptorCostConverter.toString(L1_COST_INC_WAIT_W_OPENING_HOURS_A),
@@ -224,11 +224,11 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
 
   public static String flexCaseBWithOpeningHoursText() {
     return String.format(
-      "Flex 5m15s 1x 9:50 9:55:15 %s ~ A 0s ~ " +
+      "Flex 5m15s 1x Open(9:00 9:50) 9:50 9:55:15 %s ~ A 0s ~ " +
       "Walk 1m 9:55:15 9:56:15 $120 ~ B 11m45s ~ " +
       "BUS B 10:08 10:20 12m %s ~ C 15s ~ " +
       "Walk 2m 10:20:15 10:22:15 $240 ~ D 7m45s ~ " +
-      "Flex 6m 1x 10:30 10:36 %s" +
+      "Flex 6m 1x Open(10:30 11:00) 10:30 10:36 %s" +
       " [9:50 10:36 46m 2tx %s]",
       RaptorCostConverter.toString(ACCESS_COST),
       RaptorCostConverter.toString(L1_COST_INC_WAIT_W_OPENING_HOURS_B),

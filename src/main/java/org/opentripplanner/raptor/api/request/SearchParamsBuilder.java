@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
@@ -76,7 +77,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
 
   public SearchParamsBuilder<T> searchWindow(Duration searchWindow) {
     this.searchWindowInSeconds =
-      searchWindow == null ? SearchParams.NOT_SET : (int) searchWindow.toSeconds();
+      searchWindow == null ? RaptorConstants.NOT_SET : (int) searchWindow.toSeconds();
     return this;
   }
 
@@ -194,8 +195,8 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   public String toString() {
     return ToStringBuilder
       .of(SearchParams.class)
-      .addServiceTime("earliestDepartureTime", earliestDepartureTime, SearchParams.TIME_NOT_SET)
-      .addServiceTime("latestArrivalTime", latestArrivalTime, SearchParams.TIME_NOT_SET)
+      .addServiceTime("earliestDepartureTime", earliestDepartureTime, RaptorConstants.TIME_NOT_SET)
+      .addServiceTime("latestArrivalTime", latestArrivalTime, RaptorConstants.TIME_NOT_SET)
       .addDurationSec("searchWindow", searchWindowInSeconds)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)

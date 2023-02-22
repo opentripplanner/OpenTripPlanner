@@ -59,6 +59,15 @@ public class SelectInputType {
         .type(new GraphQLList(new GraphQLNonNull(ModeAndSubModeInputType.INPUT_TYPE)))
         .build()
     )
-    // TODO: 2022-11-29 filters: groups of lines
+    .field(
+      GraphQLInputObjectField
+        .newInputObjectField()
+        .name("groupOfLines")
+        .description(
+          "Set of ids for group of lines that should be included in/excluded from the search"
+        )
+        .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
+        .build()
+    )
     .build();
 }

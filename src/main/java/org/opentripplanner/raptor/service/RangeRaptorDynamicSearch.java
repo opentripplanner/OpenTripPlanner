@@ -19,7 +19,7 @@ import org.opentripplanner.raptor.api.request.SearchParamsBuilder;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
-import org.opentripplanner.raptor.rangeraptor.internalapi.Worker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
@@ -129,20 +129,25 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
   private RaptorResponse<T> createAndRunDynamicRRWorker(RaptorRequest<T> request) {
     LOG.debug("Main request: {}", request);
-    Worker<T> worker;
+    RaptorWorker<T> raptorWorker;
 
     // Create worker
     if (request.profile().is(MULTI_CRITERIA)) {
-      worker = config.createMcWorker(transitData, request, getDestinationHeuristics());
+      raptorWorker = config.createMcWorker(transitData, request, getDestinationHeuristics());
     } else {
-      worker = config.createStdWorker(transitData, request);
+      raptorWorker = config.createStdWorker(transitData, request);
     }
 
     // Route
-    worker.route();
+    var result = raptorWorker.route();
 
     // create and return response
-    return new RaptorResponse<>(worker.paths(), worker.stopArrivals(), originalRequest, request);
+    return new RaptorResponse<>(
+      result.extractPaths(),
+      new DefaultStopArrivals(result),
+      originalRequest,
+      request
+    );
   }
 
   private boolean isItPossibleToRunHeuristicsInParallel() {

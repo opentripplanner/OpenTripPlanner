@@ -7,11 +7,11 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -130,7 +130,7 @@ public class RaptorRequestMapper {
 
     if (raptorDebugging.isEnabled()) {
       var debug = builder.debug();
-      var debugLogger = new SystemErrDebugLogger(true);
+      var debugLogger = new SystemErrDebugLogger(true, false);
 
       debug
         .addStops(raptorDebugging.stops())
@@ -160,7 +160,7 @@ public class RaptorRequestMapper {
 
   private int relativeTime(Instant time) {
     if (time == null) {
-      return SearchParams.TIME_NOT_SET;
+      return RaptorConstants.TIME_NOT_SET;
     }
     return (int) (time.getEpochSecond() - transitSearchTimeZeroEpocSecond);
   }
