@@ -218,9 +218,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       if (result.isFailure()) {
-        if (result.failureValue().errorType() != NO_FUZZY_TRIP_MATCH) {
-          LOG.warn(result.failureValue().toString());
-        }
         return result.toFailureResult();
       }
 
