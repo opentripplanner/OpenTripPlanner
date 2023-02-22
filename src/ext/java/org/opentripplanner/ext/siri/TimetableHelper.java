@@ -8,14 +8,10 @@ import org.opentripplanner.ext.siri.mapper.OccupancyMapper;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.OccupancyEnumeration;
 
 public class TimetableHelper {
-
-  private static final Logger LOG = LoggerFactory.getLogger(TimetableHelper.class);
 
   /**
    * Get the first non-null time from a list of suppliers, and convert that to seconds past start of
