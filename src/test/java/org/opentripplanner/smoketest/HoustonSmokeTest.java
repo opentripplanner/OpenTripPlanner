@@ -5,6 +5,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 /**
  * This smoke test expects an OTP installation running at localhost:8080
@@ -20,26 +21,27 @@ public class HoustonSmokeTest {
 
   @Test
   public void routeFromSouthToNorth() {
+    Set<String> modes = Set.of("TRANSIT", "WALK");
     SmokeTest.basicRouteTest(
-      galvestonRoad,
-      northLindale,
-      Set.of("TRANSIT", "WALK"),
+      new SmokeTestRequest(galvestonRoad, northLindale, modes),
       List.of("WALK", "BUS", "BUS", "WALK", "TRAM", "WALK")
     );
   }
 
   @Test
   public void selectOnlyBusses() {
+    Set<String> modes = Set.of("BUS", "WALK");
     SmokeTest.basicRouteTest(
-      galvestonRoad,
-      northLindale,
-      Set.of("BUS", "WALK"),
+      new SmokeTestRequest(galvestonRoad, northLindale, modes),
       List.of("WALK", "BUS", "BUS", "WALK", "BUS", "WALK")
     );
   }
 
   @Test
   public void bikeRoute() {
-    SmokeTest.basicRouteTest(galvestonRoad, northLindale, Set.of("BICYCLE"), List.of("BICYCLE"));
+    SmokeTest.basicRouteTest(
+      new SmokeTestRequest(galvestonRoad, northLindale, Set.of("BICYCLE")),
+      List.of("BICYCLE")
+    );
   }
 }

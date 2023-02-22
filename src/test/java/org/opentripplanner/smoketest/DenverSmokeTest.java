@@ -5,6 +5,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 /**
  * This smoke test expects an OTP installation running at localhost:8080
@@ -20,10 +21,9 @@ public class DenverSmokeTest {
 
   @Test
   public void routeFromSouthToNorth() {
+    Set<String> modes = Set.of("TRANSIT", "WALK");
     SmokeTest.basicRouteTest(
-      southBroadway,
-      twinLakes,
-      Set.of("TRANSIT", "WALK"),
+      new SmokeTestRequest(southBroadway, twinLakes, modes),
       List.of("WALK", "TRAM", "WALK", "BUS", "WALK")
     );
   }

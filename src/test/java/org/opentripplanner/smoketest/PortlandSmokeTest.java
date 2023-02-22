@@ -5,6 +5,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 @Tag("smoke-test")
 @Tag("portland")
@@ -15,10 +16,9 @@ public class PortlandSmokeTest {
 
   @Test
   public void railRouteAcrossTheCity() {
+    Set<String> modes = Set.of("TRAM", "WALK");
     SmokeTest.basicRouteTest(
-      cennentenial,
-      hillside,
-      Set.of("TRAM", "WALK"),
+      new SmokeTestRequest(cennentenial, hillside, modes),
       List.of("WALK", "TRAM", "WALK")
     );
   }
@@ -29,10 +29,9 @@ public class PortlandSmokeTest {
    */
   @Test
   public void geofencingZone() {
+    Set<String> modes = Set.of("SCOOTER_RENT", "WALK");
     SmokeTest.basicRouteTest(
-      cennentenial,
-      hillside,
-      Set.of("SCOOTER_RENT", "WALK"),
+      new SmokeTestRequest(cennentenial, hillside, modes),
       List.of("WALK", "SCOOTER", "WALK")
     );
   }
