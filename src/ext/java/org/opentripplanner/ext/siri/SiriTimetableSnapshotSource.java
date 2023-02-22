@@ -348,10 +348,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return updateResult.toFailureResult();
     }
 
-    var tripTimes = updateResult.successValue().times();
-    var stopPattern = updateResult.successValue().pattern();
-
-    if (!stopPattern.equals(pattern.getStopPattern())) {
+    if (!updateResult.successValue().stopPattern().equals(pattern.getStopPattern())) {
       // Replace scheduled trip pattern, if pattern has changed
       markScheduledTripAsDeleted(trip, serviceDate);
     }
@@ -360,7 +357,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     // remove the previously created trip
     removePreviousRealtimeUpdate(trip, serviceDate);
 
-    return Result.success(new TripUpdate(trip, stopPattern, tripTimes, serviceDate));
+    return updateResult;
   }
 
   /**
@@ -371,7 +368,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     EstimatedVehicleJourney estimatedVehicleJourney,
     EntityResolver entityResolver
   ) {
-    Trip trip = tripUpdate.trip();
+    Trip trip = tripUpdate.tripTimes().getTrip();
     LocalDate serviceDate = tripUpdate.serviceDate();
 
     // Get cached trip pattern or create one if it doesn't exist yet

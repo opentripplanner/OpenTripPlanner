@@ -46,7 +46,7 @@ public class TimetableHelper {
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
-  public static Result<TripTimesAndStopPattern, UpdateError> createUpdatedTripTimes(
+  public static Result<TripUpdate, UpdateError> createUpdatedTripTimes(
     TripTimes existingTripTimes,
     TripPattern pattern,
     EstimatedVehicleJourney journey,
@@ -61,7 +61,7 @@ public class TimetableHelper {
     if (TRUE.equals(journey.isCancellation()) || stopPattern.isAllStopsCancelled()) {
       LOG.debug("Trip is cancelled");
       newTimes.cancelTrip();
-      return Result.success(new TripTimesAndStopPattern(newTimes, pattern.getStopPattern()));
+      return Result.success(new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate));
     }
 
     OccupancyEnumeration journeyOccupancy = journey.getOccupancy();
@@ -154,7 +154,7 @@ public class TimetableHelper {
     }
 
     LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
-    return Result.success(new TripTimesAndStopPattern(newTimes, stopPattern));
+    return Result.success(new TripUpdate(stopPattern, newTimes, serviceDate));
   }
 
   static StopPattern createStopPattern(

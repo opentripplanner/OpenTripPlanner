@@ -224,7 +224,7 @@ class AddedTripHelper {
     transitModel.getTransitModelIndex().getPatternForTrip().put(trip, pattern);
     transitModel.getTransitModelIndex().getPatternsForRoute().put(route, pattern);
 
-    return Result.success(new TripUpdate(trip, stopPattern, updatedTripTimes, serviceDate));
+    return Result.success(new TripUpdate(stopPattern, updatedTripTimes, serviceDate));
   }
 
   /**
