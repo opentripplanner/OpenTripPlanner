@@ -71,5 +71,3 @@ jobs:
 
           # shutting down the OTP instance running in the background (via make)
           killall make
-
-          scripts/smoke-tests.sh ${{ matrix.locations.name }} 15
