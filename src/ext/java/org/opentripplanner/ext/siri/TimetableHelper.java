@@ -32,7 +32,6 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.CallStatusEnumeration;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.OccupancyEnumeration;
@@ -80,10 +79,11 @@ public class TimetableHelper {
     boolean stopPatternChanged = false;
 
     TripPattern pattern = timetable.getPattern();
+    List<CallWrapper> calls = CallWrapper.of(journey);
     List<StopTime> modifiedStopTimes = createModifiedStopTimes(
       pattern,
       oldTimes,
-      CallWrapper.of(journey),
+      calls,
       getStopById
     );
     TripTimes newTimes = new TripTimes(oldTimes.getTrip(), modifiedStopTimes, deduplicator);
@@ -107,7 +107,7 @@ public class TimetableHelper {
     for (var stop : pattern.getStops()) {
       boolean foundMatch = false;
 
-      for (CallWrapper call : CallWrapper.of(journey)) {
+      for (CallWrapper call : calls) {
         if (alreadyVisited.contains(call)) {
           continue;
         }
@@ -127,9 +127,9 @@ public class TimetableHelper {
         if (foundMatch) {
           applyUpdates(
             startOfService,
-            modifiedStopTimes,
             newTimes,
             callCounter,
+            callCounter == (calls.size() - 1),
             isJourneyPredictionInaccurate,
             call,
             journeyOccupancy
@@ -256,29 +256,7 @@ public class TimetableHelper {
         if (stopsMatchById) {
           foundMatch = true;
 
-          CallStatusEnumeration arrivalStatus = call.getArrivalStatus();
-          if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
-            stopTime.cancelDropOff();
-          }
-          var dropOffType = PickDropMapper.mapDropOffType(
-            stopTime.getDropOffType(),
-            call.getArrivalBoardingActivity()
-          );
-          dropOffType.ifPresent(stopTime::setDropOffType);
-
-          CallStatusEnumeration departureStatus = call.getDepartureStatus();
-          if (departureStatus == CallStatusEnumeration.CANCELLED) {
-            stopTime.cancelPickup();
-          }
-          var pickUpType = PickDropMapper.mapPickUpType(
-            stopTime.getPickupType(),
-            call.getDepartureBoardingActivity()
-          );
-          pickUpType.ifPresent(stopTime::setPickupType);
-
-          if (call.isCancellation() != null && call.isCancellation()) {
-            stopTime.cancel();
-          }
+          PickDropMapper.updatePickDrop(call, stopTime);
 
           if (call.getDestinationDisplaies() != null && !call.getDestinationDisplaies().isEmpty()) {
             NaturalLanguageStringStructure destinationDisplay = call
@@ -340,9 +318,9 @@ public class TimetableHelper {
 
   public static void applyUpdates(
     ZonedDateTime departureDate,
-    List<StopTime> stopTimes,
     TripTimes tripTimes,
     int index,
+    boolean isLastStop,
     boolean isJourneyPredictionInaccurate,
     CallWrapper call,
     OccupancyEnumeration journeyOccupancy
@@ -359,19 +337,7 @@ public class TimetableHelper {
     }
 
     if (TRUE.equals(call.isCancellation())) {
-      stopTimes.get(index).cancel();
       tripTimes.setCancelled(index);
-    }
-
-    // Update dropoff-/pickuptype only if status is cancelled
-    CallStatusEnumeration arrivalStatus = call.getArrivalStatus();
-    if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
-      stopTimes.get(index).cancelDropOff();
-    }
-
-    CallStatusEnumeration departureStatus = call.getDepartureStatus();
-    if (departureStatus == CallStatusEnumeration.CANCELLED) {
-      stopTimes.get(index).cancelPickup();
     }
 
     int arrivalTime = tripTimes.getArrivalTime(index);
@@ -391,19 +357,15 @@ public class TimetableHelper {
       call::getAimedDepartureTime
     );
 
-    if (index == 0) {
-      realtimeArrivalTime =
-        handleMissingRealtime(realtimeArrivalTime, realtimeDepartureTime, arrivalTime);
-    } else {
-      realtimeArrivalTime = handleMissingRealtime(realtimeArrivalTime, arrivalTime);
-    }
+    int[] possibleArrivalTimes = index == 0
+      ? new int[] { realtimeArrivalTime, realtimeDepartureTime, arrivalTime }
+      : new int[] { realtimeArrivalTime, arrivalTime };
+    realtimeArrivalTime = handleMissingRealtime(possibleArrivalTimes);
 
-    if (index == (stopTimes.size() - 1)) {
-      realtimeDepartureTime =
-        handleMissingRealtime(realtimeDepartureTime, realtimeArrivalTime, departureTime);
-    } else {
-      realtimeDepartureTime = handleMissingRealtime(realtimeDepartureTime, departureTime);
-    }
+    int[] possibleDepartureTimes = isLastStop
+      ? new int[] { realtimeDepartureTime, realtimeArrivalTime, departureTime }
+      : new int[] { realtimeDepartureTime, departureTime };
+    realtimeDepartureTime = handleMissingRealtime(possibleDepartureTimes);
 
     OccupancyEnumeration callOccupancy = call.getOccupancy() != null
       ? call.getOccupancy()

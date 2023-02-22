@@ -196,9 +196,9 @@ class AddedTripHelper {
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
       TimetableHelper.applyUpdates(
         departureDate,
-        aimedStopTimes,
         updatedTripTimes,
         stopSequence,
+        stopSequence == (calls.size() - 1),
         isJourneyPredictionInaccurate,
         calls.get(stopSequence),
         occupancy
@@ -337,17 +337,7 @@ class AddedTripHelper {
     }
 
     // Update pickup / dropoff
-    var pickUpType = PickDropMapper.mapPickUpType(
-      stopTime.getPickupType(),
-      call.getDepartureBoardingActivity()
-    );
-    pickUpType.ifPresent(stopTime::setPickupType);
-
-    var dropOffType = PickDropMapper.mapDropOffType(
-      stopTime.getDropOffType(),
-      call.getArrivalBoardingActivity()
-    );
-    dropOffType.ifPresent(stopTime::setDropOffType);
+    PickDropMapper.updatePickDrop(call, stopTime);
 
     return stopTime;
   }

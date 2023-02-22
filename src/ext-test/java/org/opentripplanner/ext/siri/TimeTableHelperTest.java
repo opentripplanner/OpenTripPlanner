@@ -308,9 +308,9 @@ public class TimeTableHelperTest {
       // Act
       TimetableHelper.applyUpdates(
         startOfService,
-        stopTimes,
         tripTimes,
         callCounter,
+        callCounter == (stopTimes.size() - 1),
         false,
         CallWrapper.of(estimatedCall),
         null
@@ -345,9 +345,9 @@ public class TimeTableHelperTest {
       // Act
       TimetableHelper.applyUpdates(
         startOfService,
-        stopTimes,
         tripTimes,
         callCounter,
+        callCounter == (stopTimes.size() - 1),
         false,
         CallWrapper.of(estimatedCall),
         null
@@ -377,9 +377,9 @@ public class TimeTableHelperTest {
       // Act
       TimetableHelper.applyUpdates(
         startOfService,
-        stopTimes,
         tripTimes,
         callCounter,
+        callCounter == (stopTimes.size() - 1),
         false,
         CallWrapper.of(recordedCall),
         null
@@ -410,9 +410,9 @@ public class TimeTableHelperTest {
       // Act
       TimetableHelper.applyUpdates(
         startOfService,
-        stopTimes,
         tripTimes,
         callCounter,
+        callCounter == (stopTimes.size() - 1),
         false,
         CallWrapper.of(recordedCall),
         null
@@ -449,9 +449,9 @@ public class TimeTableHelperTest {
       // Act
       TimetableHelper.applyUpdates(
         startOfService,
-        stopTimes,
         tripTimes,
         callCounter,
+        callCounter == (stopTimes.size() - 1),
         false,
         CallWrapper.of(recordedCall),
         null
