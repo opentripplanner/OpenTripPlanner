@@ -129,7 +129,7 @@ public class AddedTripBuilderTest {
     assertTrue(addedTrip.isSuccess(), "Trip creation should succeed");
 
     // Assert trip
-    Trip trip = addedTrip.successValue().trip();
+    Trip trip = addedTrip.successValue().tripTimes().getTrip();
     assertEquals(TRIP_ID, trip.getId(), "Trip is should be mapped");
     assertEquals(OPERATOR, trip.getOperator(), "operator is should be mapped");
     assertEquals(TRANSIT_MODE, trip.getMode(), "transitMode is should be mapped");
@@ -245,7 +245,7 @@ public class AddedTripBuilderTest {
       .build();
 
     assertTrue(firstAddedTrip.isSuccess(), "Trip creation should succeed");
-    var firstTrip = firstAddedTrip.successValue().trip();
+    var firstTrip = firstAddedTrip.successValue().tripTimes().getTrip();
 
     var tripId2 = TransitModelForTest.id("TRIP_ID_2");
 
@@ -272,7 +272,7 @@ public class AddedTripBuilderTest {
     assertTrue(secondAddedTrip.isSuccess(), "Trip creation should succeed");
 
     // Assert trip
-    Trip secondTrip = secondAddedTrip.successValue().trip();
+    Trip secondTrip = secondAddedTrip.successValue().tripTimes().getTrip();
     assertEquals(tripId2, secondTrip.getId(), "Trip is should be mapped");
     assertNotEquals(firstTrip, secondTrip);
 
@@ -322,7 +322,7 @@ public class AddedTripBuilderTest {
     assertTrue(addedTrip.isSuccess(), "Trip creation should succeed");
 
     // Assert trip
-    Trip trip = addedTrip.successValue().trip();
+    Trip trip = addedTrip.successValue().tripTimes().getTrip();
     assertEquals(TRIP_ID, trip.getId(), "Trip is should be mapped");
     assertSame(REPLACED_ROUTE, trip.getRoute());
   }
@@ -352,7 +352,7 @@ public class AddedTripBuilderTest {
     assertTrue(addedTrip.isSuccess(), "Trip creation should succeed");
 
     // Assert trip
-    Trip trip = addedTrip.successValue().trip();
+    Trip trip = addedTrip.successValue().tripTimes().getTrip();
     assertEquals(TRIP_ID, trip.getId(), "Trip is should be mapped");
 
     // Assert route
