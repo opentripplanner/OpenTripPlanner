@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.NotSame;
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.Same;
@@ -600,7 +601,7 @@ public class TimetableSnapshotSourceTest {
       var updater = defaultUpdater();
 
       // WHEN
-      updater.applyTripUpdates(
+      var result = updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
         fullDataset,
@@ -611,6 +612,9 @@ public class TimetableSnapshotSourceTest {
       // THEN
       final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
       assertNull(snapshot);
+      assertEquals(1, result.failed());
+      var errors = result.failures();
+      assertEquals(1, errors.get(NO_SERVICE_ON_DATE).size());
     }
 
     @Test
