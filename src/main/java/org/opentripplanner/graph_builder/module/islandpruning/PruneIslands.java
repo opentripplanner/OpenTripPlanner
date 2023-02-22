@@ -340,7 +340,7 @@ public class PruneIslands implements GraphBuilderModule {
           continue;
         }
         State[] states = e.traverse(s0);
-        if (states == null || states.length == 0) {
+        if (State.isEmpty(states)) {
           continue;
         }
         Vertex out = states[0].getVertex();
