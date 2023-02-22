@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.ext.siri.mapper.PickDropMapper;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -26,6 +25,10 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.OccupancyEnumeration;
 
+/**
+ * A helper class for creating new StopPattern and TripTimes based on a SIRI-ET
+ * EstimatedVehicleJourney.
+ */
 public class ModifiedTripBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableHelper.class);
@@ -85,15 +88,8 @@ public class ModifiedTripBuilder {
   }
 
   /**
-   * Apply the TripUpdate to the appropriate TripTimes from this Timetable. The existing TripTimes
-   * must not be modified directly because they may be shared with the underlying
-   * scheduledTimetable, or other updated Timetables. The {@link TimetableSnapshot} performs the
-   * protective copying of this Timetable. It is not done in this update method to avoid repeatedly
-   * cloning the same Timetable when several updates are applied to it at once. We assume here that
-   * all trips in a timetable are from the same feed, which should always be the case.
-   *
-   * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
-   * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
+   * Create a new StopPattern and TripTimes for the trip based on the calls, and other fields read
+   * in form the SIRI-ET update.
    */
   public Result<TripUpdate, UpdateError> build() {
     TripTimes newTimes = new TripTimes(existingTripTimes);
@@ -106,6 +102,39 @@ public class ModifiedTripBuilder {
       return Result.success(new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate));
     }
 
+    if (pattern.getStopPattern().equals(stopPattern)) {
+      // This is the first update, and StopPattern has not been changed
+      newTimes.setRealTimeState(RealTimeState.UPDATED);
+    } else {
+      // This update modified stopPattern
+      newTimes.setRealTimeState(RealTimeState.MODIFIED);
+    }
+
+    applyUpdates(newTimes);
+
+    var result = newTimes.validateNonIncreasingTimes();
+    if (result.isFailure()) {
+      var updateError = result.failureValue();
+      LOG.info(
+        "TripTimes are non-increasing after applying SIRI delay propagation - Trip {}. Stop index {}",
+        updateError.tripId(),
+        updateError.stopIndex()
+      );
+      return Result.failure(updateError);
+    }
+
+    if (newTimes.getNumStops() != pattern.numberOfStops()) {
+      return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS);
+    }
+
+    LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
+    return Result.success(new TripUpdate(stopPattern, newTimes, serviceDate));
+  }
+
+  /**
+   * Applies real-time updates from the calls into newTimes.
+   */
+  private void applyUpdates(TripTimes newTimes) {
     ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
     Set<CallWrapper> alreadyVisited = new HashSet<>();
 
@@ -165,34 +194,13 @@ public class ModifiedTripBuilder {
 
       departureFromPreviousStop = newTimes.getDepartureTime(callCounter);
     }
-
-    if (pattern.getStopPattern().equals(stopPattern)) {
-      // This is the first update, and StopPattern has not been changed
-      newTimes.setRealTimeState(RealTimeState.UPDATED);
-    } else {
-      // This update modified stopPattern
-      newTimes.setRealTimeState(RealTimeState.MODIFIED);
-    }
-
-    var result = newTimes.validateNonIncreasingTimes();
-    if (result.isFailure()) {
-      var updateError = result.failureValue();
-      LOG.info(
-        "TripTimes are non-increasing after applying SIRI delay propagation - Trip {}. Stop index {}",
-        updateError.tripId(),
-        updateError.stopIndex()
-      );
-      return Result.failure(updateError);
-    }
-
-    if (newTimes.getNumStops() != pattern.numberOfStops()) {
-      return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS);
-    }
-
-    LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
-    return Result.success(new TripUpdate(stopPattern, newTimes, serviceDate));
   }
 
+  /**
+   * Creates a new StopPattern, based on an existing pattern, and list of calls. The stops can be
+   * replaced with stops belonging to the same Station/StopPlace. The PickDrop values are updated
+   * as well.
+   */
   static StopPattern createStopPattern(
     TripPattern pattern,
     List<CallWrapper> calls,
