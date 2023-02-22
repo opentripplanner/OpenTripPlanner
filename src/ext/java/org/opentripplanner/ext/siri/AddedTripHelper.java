@@ -337,7 +337,10 @@ class AddedTripHelper {
     }
 
     // Update pickup / dropoff
-    PickDropMapper.updatePickDrop(call, stopTime);
+    PickDropMapper.mapPickUpType(call, stopTime.getPickupType()).ifPresent(stopTime::setPickupType);
+    PickDropMapper
+      .mapDropOffType(call, stopTime.getDropOffType())
+      .ifPresent(stopTime::setDropOffType);
 
     return stopTime;
   }

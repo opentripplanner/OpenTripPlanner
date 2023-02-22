@@ -256,7 +256,9 @@ public class TimetableHelper {
         if (stopsMatchById) {
           foundMatch = true;
 
-          PickDropMapper.updatePickDrop(call, stopTime);
+        PickDropMapper
+          .mapPickUpType(call, builder.pickups[stopIndex])
+          .ifPresent(value -> builder.pickups[stopIndex] = value);
 
           if (call.getDestinationDisplaies() != null && !call.getDestinationDisplaies().isEmpty()) {
             NaturalLanguageStringStructure destinationDisplay = call
@@ -264,6 +266,9 @@ public class TimetableHelper {
               .get(0);
             stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay.getValue()));
           }
+        PickDropMapper
+          .mapDropOffType(call, builder.dropoffs[stopIndex])
+          .ifPresent(value -> builder.dropoffs[stopIndex] = value);
 
           modifiedStops.add(stopTime);
           alreadyVisited.add(call);

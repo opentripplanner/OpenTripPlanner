@@ -8,7 +8,6 @@ import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import java.util.Optional;
 import org.opentripplanner.ext.siri.CallWrapper;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopTime;
 import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
 import uk.org.siri.siri20.CallStatusEnumeration;
 import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
@@ -65,25 +64,25 @@ public class PickDropMapper {
     };
   }
 
-  public static void updatePickDrop(CallWrapper call, StopTime stopTime) {
-    var pickUpType = mapPickUpType(stopTime.getPickupType(), call.getDepartureBoardingActivity());
-    pickUpType.ifPresent(stopTime::setPickupType);
-
-    CallStatusEnumeration departureStatus = call.getDepartureStatus();
-    if (departureStatus == CallStatusEnumeration.CANCELLED) {
-      stopTime.cancelPickup();
+  public static Optional<PickDrop> mapDropOffType(CallWrapper call, PickDrop currentValue) {
+    if (
+      TRUE.equals(call.isCancellation()) ||
+      call.getArrivalStatus() == CallStatusEnumeration.CANCELLED
+    ) {
+      return Optional.of(CANCELLED);
     }
 
-    var dropOffType = mapDropOffType(stopTime.getDropOffType(), call.getArrivalBoardingActivity());
-    dropOffType.ifPresent(stopTime::setDropOffType);
+    return mapDropOffType(currentValue, call.getArrivalBoardingActivity());
+  }
 
-    CallStatusEnumeration arrivalStatus = call.getArrivalStatus();
-    if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
-      stopTime.cancelDropOff();
+  public static Optional<PickDrop> mapPickUpType(CallWrapper call, PickDrop currentValue) {
+    if (
+      TRUE.equals(call.isCancellation()) ||
+      call.getDepartureStatus() == CallStatusEnumeration.CANCELLED
+    ) {
+      return Optional.of(CANCELLED);
     }
 
-    if (TRUE.equals(call.isCancellation())) {
-      stopTime.cancel();
-    }
+    return mapPickUpType(currentValue, call.getDepartureBoardingActivity());
   }
 }
