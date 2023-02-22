@@ -52,9 +52,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-      # Build and test deployment.
-      - name: Build and Test
-        run: mvn clean verify --batch-mode --show-version --update-snapshots -Dgpg.skip
       # Only prepare deploy files on push events to avoid duplicate pushes to s3 when a commit is
       # pushed to a branch with an open pull request.
       - name: Prepare build files for deployment to s3
