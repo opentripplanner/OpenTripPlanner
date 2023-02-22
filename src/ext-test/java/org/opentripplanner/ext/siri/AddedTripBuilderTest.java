@@ -405,23 +405,23 @@ public class AddedTripBuilderTest {
       TestCall
         .of()
         .withStopPointRef(STOP_A.getId().getId())
-        .withAimedDepartureTime(zonedDatetime(10, 20))
-        .withExpectedDepartureTime(zonedDatetime(10, 20))
+        .withAimedDepartureTime(zonedDateTime(10, 20))
+        .withExpectedDepartureTime(zonedDateTime(10, 20))
         .build(),
       TestCall
         .of()
         .withStopPointRef(STOP_B.getId().getId())
-        .withAimedArrivalTime(zonedDatetime(10, 30))
-        .withExpectedArrivalTime(zonedDatetime(10, 31))
-        .withAimedDepartureTime(zonedDatetime(10, 30))
-        .withExpectedDepartureTime(zonedDatetime(10, 29))
+        .withAimedArrivalTime(zonedDateTime(10, 30))
+        .withExpectedArrivalTime(zonedDateTime(10, 31))
+        .withAimedDepartureTime(zonedDateTime(10, 30))
+        .withExpectedDepartureTime(zonedDateTime(10, 29))
         .build(),
       // Expected to arrive one minute prior to irrelevant aimed departure time
       TestCall
         .of()
         .withStopPointRef(STOP_C.getId().getId())
-        .withAimedArrivalTime(zonedDatetime(10, 40))
-        .withExpectedArrivalTime(zonedDatetime(10, 40))
+        .withAimedArrivalTime(zonedDateTime(10, 40))
+        .withExpectedArrivalTime(zonedDateTime(10, 40))
         .build()
     );
 
@@ -493,29 +493,29 @@ public class AddedTripBuilderTest {
       TestCall
         .of()
         .withStopPointRef(STOP_A.getId().getId())
-        .withAimedDepartureTime(zonedDatetime(hour, 20))
-        .withExpectedDepartureTime(zonedDatetime(hour, 20))
-        .withActualDepartureTime(zonedDatetime(hour, 19))
+        .withAimedDepartureTime(zonedDateTime(hour, 20))
+        .withExpectedDepartureTime(zonedDateTime(hour, 20))
+        .withActualDepartureTime(zonedDateTime(hour, 19))
         .build(),
       TestCall
         .of()
         .withStopPointRef(STOP_B.getId().getId())
-        .withAimedArrivalTime(zonedDatetime(hour, 30))
-        .withExpectedArrivalTime(zonedDatetime(hour, 29))
-        .withAimedDepartureTime(zonedDatetime(hour, 30))
-        .withExpectedDepartureTime(zonedDatetime(hour, 31))
+        .withAimedArrivalTime(zonedDateTime(hour, 30))
+        .withExpectedArrivalTime(zonedDateTime(hour, 29))
+        .withAimedDepartureTime(zonedDateTime(hour, 30))
+        .withExpectedDepartureTime(zonedDateTime(hour, 31))
         .build(),
       // Expected to arrive one minute prior to irrelevant aimed departure time
       TestCall
         .of()
         .withStopPointRef(STOP_C.getId().getId())
-        .withAimedArrivalTime(zonedDatetime(hour, 40))
-        .withExpectedArrivalTime(zonedDatetime(hour, 41))
+        .withAimedArrivalTime(zonedDateTime(hour, 40))
+        .withExpectedArrivalTime(zonedDateTime(hour, 41))
         .build()
     );
   }
 
-  private static ZonedDateTime zonedDatetime(int hour, int minute) {
+  private static ZonedDateTime zonedDateTime(int hour, int minute) {
     return ZonedDateTime.of(SERVICE_DATE, LocalTime.of(hour, minute), TIME_ZONE);
   }
 

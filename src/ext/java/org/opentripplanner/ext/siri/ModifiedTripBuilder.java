@@ -38,7 +38,7 @@ public class ModifiedTripBuilder {
   private final ZoneId zoneId;
   private final EntityResolver entityResolver;
   private final List<CallWrapper> calls;
-  private final Boolean cancellation;
+  private final boolean cancellation;
   private final OccupancyEnumeration occupancy;
   private final boolean predictionInaccurate;
 
@@ -72,7 +72,7 @@ public class ModifiedTripBuilder {
     ZoneId zoneId,
     EntityResolver entityResolver,
     List<CallWrapper> calls,
-    Boolean cancellation,
+    boolean cancellation,
     OccupancyEnumeration occupancy,
     boolean predictionInaccurate
   ) {
@@ -102,6 +102,8 @@ public class ModifiedTripBuilder {
       return Result.success(new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate));
     }
 
+    applyUpdates(newTimes);
+
     if (pattern.getStopPattern().equals(stopPattern)) {
       // This is the first update, and StopPattern has not been changed
       newTimes.setRealTimeState(RealTimeState.UPDATED);
@@ -109,8 +111,6 @@ public class ModifiedTripBuilder {
       // This update modified stopPattern
       newTimes.setRealTimeState(RealTimeState.MODIFIED);
     }
-
-    applyUpdates(newTimes);
 
     var result = newTimes.validateNonIncreasingTimes();
     if (result.isFailure()) {
@@ -157,7 +157,7 @@ public class ModifiedTripBuilder {
             startOfService,
             newTimes,
             callCounter,
-            callCounter == (calls.size() - 1),
+            callCounter == (stops.size() - 1),
             predictionInaccurate,
             call,
             occupancy
