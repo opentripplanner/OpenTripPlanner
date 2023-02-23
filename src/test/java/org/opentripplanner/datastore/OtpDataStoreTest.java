@@ -1,5 +1,6 @@
 package org.opentripplanner.datastore;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,7 +18,6 @@ import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONF
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +46,6 @@ public class OtpDataStoreTest {
   private static final String GRAPH_FILENAME = "graph.obj";
   private static final String STREET_GRAPH_FILENAME = "streetGraph.obj";
   private static final String REPORT_FILENAME = "report";
-  private static final String UTF_8 = "UTF-8";
   private static final long D2000_01_01 = ZonedDateTime
     .parse("2000-01-01T12:00+01:00")
     .toInstant()
@@ -200,18 +198,18 @@ public class OtpDataStoreTest {
   private static void writeToDir(File parentDir, String dir, String oneFile) throws IOException {
     File reportDir = new File(parentDir, dir);
     reportDir.mkdirs();
-    FileUtils.write(new File(reportDir, oneFile), "{}", UTF_8);
+    Files.writeString(new File(reportDir, oneFile).toPath(), "{}", UTF_8);
   }
 
   private static void write(File dir, String filename, String data) throws IOException {
-    FileUtils.write(new File(dir, filename), data, OtpDataStoreTest.UTF_8);
+    Files.writeString(new File(dir, filename).toPath(), data, UTF_8);
   }
 
   private static void writeZip(File dir, String filename) throws IOException {
     ZipOutputStream out = new ZipOutputStream(new FileOutputStream(new File(dir, filename)));
     ZipEntry e = new ZipEntry("stop.txt");
     out.putNextEntry(e);
-    out.write("data".getBytes(StandardCharsets.UTF_8));
+    out.write("data".getBytes(UTF_8));
     out.closeEntry();
     out.finish();
     out.close();

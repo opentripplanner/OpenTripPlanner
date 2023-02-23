@@ -401,12 +401,18 @@ public final class TripPattern
     return originalTripPattern;
   }
 
+  /**
+   * Returns trip headsign from the scheduled timetables or from the original pattern's scheduled
+   * timetables if this pattern is added by realtime and the stop sequence has not changed apart
+   * from pickup/dropoff values.
+   *
+   * @return trip headsign
+   */
   public I18NString getTripHeadsign() {
     var tripTimes = scheduledTimetable.getRepresentativeTripTimes();
-    if (tripTimes == null) {
-      return null;
-    }
-    return tripTimes.getTrip().getHeadsign();
+    return tripTimes == null
+      ? getTripHeadsignFromOriginalPattern()
+      : getTripHeadSignFromTripTimes(tripTimes);
   }
 
   public I18NString getStopHeadsign(int stopIndex) {
@@ -466,5 +472,31 @@ public final class TripPattern
   @Override
   public TripPatternBuilder copy() {
     return new TripPatternBuilder(this);
+  }
+
+  /**
+   * Checks if the stops in this trip pattern are the same as in the original pattern (if this trip
+   * is added through a realtime update. The pickup and dropoff values don't have to be the same.
+   */
+  private boolean containsSameStopsAsOriginalPattern() {
+    return originalTripPattern != null && getStops().equals(originalTripPattern.getStops());
+  }
+
+  /**
+   * Helper method for getting the trip headsign from the {@link TripTimes}.
+   */
+  private I18NString getTripHeadSignFromTripTimes(TripTimes tripTimes) {
+    return tripTimes != null ? tripTimes.getTripHeadsign() : null;
+  }
+
+  /**
+   * Returns trip headsign from the original pattern if one exists.
+   */
+  private I18NString getTripHeadsignFromOriginalPattern() {
+    if (containsSameStopsAsOriginalPattern()) {
+      var tripTimes = originalTripPattern.getScheduledTimetable().getRepresentativeTripTimes();
+      return getTripHeadSignFromTripTimes(tripTimes);
+    }
+    return null;
   }
 }

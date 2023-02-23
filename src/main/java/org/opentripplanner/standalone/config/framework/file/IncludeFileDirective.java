@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.io.IOUtils;
 import org.opentripplanner.framework.application.OtpAppException;
 
 /**
@@ -56,8 +55,8 @@ public class IncludeFileDirective {
   }
 
   private static String loadFile(File file, String directive, String source) {
-    try {
-      return IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+    try (var is = new FileInputStream(file)) {
+      return new String(is.readAllBytes(), StandardCharsets.UTF_8);
     } catch (FileNotFoundException ex) {
       throw new OtpAppException(
         "File '{}' is not present. Can not include " + "directive '{}' in config file '{}'.",

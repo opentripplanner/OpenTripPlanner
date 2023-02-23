@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
-import org.apache.commons.io.FileUtils;
+import java.nio.file.Files;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.lang.StringUtils;
@@ -61,6 +61,6 @@ public class IncludeFileDirectiveTest {
   }
 
   private static void savePartialFile(String text) throws IOException {
-    FileUtils.write(PART_FILE, text, UTF_8);
+    Files.writeString(PART_FILE.toPath(), text, UTF_8);
   }
 }
