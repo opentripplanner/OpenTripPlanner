@@ -112,10 +112,14 @@ public class TransitLayerUpdater {
         datesToBeUpdated.addAll(oldTripPatternForDate.getRunningPeriodDates());
       }
 
-      TripPatternForDate newTripPatternForDate = tripPatternForDateMapper.map(
-        timetable,
-        timetable.getServiceDate()
-      );
+      TripPatternForDate newTripPatternForDate;
+
+      try {
+        newTripPatternForDate = tripPatternForDateMapper.map(timetable, timetable.getServiceDate());
+      } catch (IllegalArgumentException exception) {
+        // There is some issue with finding the correct running period, using old pattern instead
+        newTripPatternForDate = oldTripPatternForDate;
+      }
 
       if (newTripPatternForDate != null) {
         tripPatternsStartingOnDateMapCache.get(date).put(tripPattern, newTripPatternForDate);

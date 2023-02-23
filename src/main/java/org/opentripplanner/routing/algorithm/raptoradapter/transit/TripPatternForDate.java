@@ -12,12 +12,16 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A TripPattern with its TripSchedules filtered by validity on a particular date. This is to avoid
  * having to do any filtering by date during the search itself.
  */
 public class TripPatternForDate implements Comparable<TripPatternForDate> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(TripPatternForDate.class);
 
   /**
    * The original TripPattern whose TripSchedules were filtered to produce this.tripSchedules. Its
@@ -97,6 +101,28 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
         ServiceDateUtils
           .asDateTime(localDate, last.getArrivalTime(last.getNumStops() - 1))
           .toLocalDate();
+    }
+    if (startOfRunningPeriod.isAfter(endOfRunningPeriod)) {
+      if (hasFrequencies()) {
+        var tripId = frequencies.get(0).tripTimes.getTrip().getId();
+        LOG.warn(
+          "Could not construct as start of the running period {} is after the end {} in frequency trip {}",
+          startOfRunningPeriod,
+          endOfRunningPeriod,
+          tripId
+        );
+      } else {
+        var tripId = tripTimes.get(0).getTrip().getId();
+        LOG.warn(
+          "Could not construct as start of the running period {} is after the end {} in trip {}",
+          startOfRunningPeriod,
+          endOfRunningPeriod,
+          tripId
+        );
+      }
+      throw new IllegalArgumentException(
+        "Start of the running period is after end of the running period"
+      );
     }
   }
 
