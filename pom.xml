@@ -931,7 +931,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.4.2</version>
+            <version>7.13.2</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
