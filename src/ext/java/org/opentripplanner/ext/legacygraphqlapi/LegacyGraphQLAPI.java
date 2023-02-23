@@ -92,12 +92,12 @@ public class LegacyGraphQLAPI {
     }
     return LegacyGraphQLIndex.getGraphQLResponse(
       query,
-      serverContext,
       variables,
       operationName,
       maxResolves,
       timeout,
-      locale
+      locale,
+      LegacyGraphQLRequestContext.ofServerContext(serverContext)
     );
   }
 
@@ -114,12 +114,12 @@ public class LegacyGraphQLAPI {
       : serverContext.defaultLocale();
     return LegacyGraphQLIndex.getGraphQLResponse(
       query,
-      serverContext,
       null,
       null,
       maxResolves,
       timeout,
-      locale
+      locale,
+      LegacyGraphQLRequestContext.ofServerContext(serverContext)
     );
   }
 
@@ -161,12 +161,12 @@ public class LegacyGraphQLAPI {
       futures.add(() ->
         LegacyGraphQLIndex.getGraphQLExecutionResult(
           (String) query.get("query"),
-          serverContext,
           variables,
           operationName,
           maxResolves,
           timeout,
-          locale
+          locale,
+          LegacyGraphQLRequestContext.ofServerContext(serverContext)
         )
       );
     }

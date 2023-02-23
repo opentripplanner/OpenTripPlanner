@@ -2,6 +2,8 @@ package org.opentripplanner.gtfs.mapping;
 
 import java.util.Collection;
 import java.util.Objects;
+import org.opentripplanner.ext.fares.model.Distance;
+import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -23,12 +25,15 @@ public final class FareLegRuleMapper {
       .stream()
       .map(r -> {
         FareProduct productForRule = fareProductMapper.map(r.getFareProduct());
+        FareDistance fareDistance = createFareDistance(r);
+
         if (productForRule != null) {
           return new FareLegRule(
             r.getLegGroupId(),
             r.getNetworkId(),
             r.getFromAreaId(),
             r.getToAreaId(),
+            fareDistance,
             productForRule
           );
         } else {
@@ -43,5 +48,19 @@ public final class FareLegRuleMapper {
       })
       .filter(Objects::nonNull)
       .toList();
+  }
+
+  private FareDistance createFareDistance(org.onebusaway.gtfs.model.FareLegRule fareLegRule) {
+    return switch (fareLegRule.getDistanceType()) {
+      case 0 -> new FareDistance.Stops(
+        fareLegRule.getMinDistance().intValue(),
+        fareLegRule.getMaxDistance().intValue()
+      );
+      case 1 -> new FareDistance.LinearDistance(
+        Distance.ofMeters(fareLegRule.getMinDistance()),
+        Distance.ofMeters(fareLegRule.getMaxDistance())
+      );
+      default -> null;
+    };
   }
 }

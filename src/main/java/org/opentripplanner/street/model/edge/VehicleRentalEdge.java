@@ -4,7 +4,6 @@ import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
@@ -209,9 +208,13 @@ public class VehicleRentalEdge extends Edge {
 
   private static Set<FormFactor> allowedModes(StreetMode streetMode) {
     return switch (streetMode) {
-      case BIKE_RENTAL -> Set.of(RentalVehicleType.FormFactor.BICYCLE);
-      case SCOOTER_RENTAL -> Set.of(RentalVehicleType.FormFactor.SCOOTER);
-      case CAR_RENTAL -> Set.of(RentalVehicleType.FormFactor.CAR);
+      case BIKE_RENTAL -> Set.of(FormFactor.BICYCLE, FormFactor.CARGO_BICYCLE);
+      case SCOOTER_RENTAL -> Set.of(
+        FormFactor.SCOOTER,
+        FormFactor.SCOOTER_SEATED,
+        FormFactor.SCOOTER_STANDING
+      );
+      case CAR_RENTAL -> Set.of(FormFactor.CAR);
       default -> Set.of();
     };
   }

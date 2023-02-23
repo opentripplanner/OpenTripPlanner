@@ -15,11 +15,9 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
-import java.util.Set;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.smoketest.util.GraphQLClient;
 import org.opentripplanner.smoketest.util.RestClient;
@@ -61,7 +59,7 @@ public class SmokeTest {
    */
   public static LocalDate nextMonday() {
     var today = LocalDate.now();
-    return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+    return today.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
   }
 
   public static void assertThatThereAreVehicleRentalStations() {
@@ -91,17 +89,11 @@ public class SmokeTest {
     );
   }
 
-  static void basicRouteTest(
-    WgsCoordinate start,
-    WgsCoordinate end,
-    Set<String> modes,
-    List<String> expectedModes
-  ) {
-    var request = new SmokeTestRequest(start, end, modes);
-    var otpResponse = RestClient.sendPlanRequest(request);
+  static void basicRouteTest(SmokeTestRequest req, List<String> expectedModes) {
+    var otpResponse = RestClient.sendPlanRequest(req);
     var itineraries = otpResponse.getPlan().itineraries;
 
-    assertTrue(itineraries.size() >= 1);
+    assertTrue(itineraries.size() >= 1, "Expected to see some itineraries but got zero.");
 
     assertThatItineraryHasModes(itineraries, expectedModes);
   }

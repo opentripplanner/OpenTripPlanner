@@ -33,10 +33,9 @@ public class AtlantaSmokeTest {
 
   @Test
   public void regularRouteFromCentralAtlantaToPowderSprings() {
+    Set<String> modes = Set.of("TRANSIT", "WALK");
     SmokeTest.basicRouteTest(
-      nearGeorgiaStateStation,
-      powderSpringsInsideFlexZone1,
-      Set.of("TRANSIT", "WALK"),
+      new SmokeTestRequest(nearGeorgiaStateStation, powderSpringsInsideFlexZone1, modes),
       List.of("WALK", "SUBWAY", "WALK", "BUS", "WALK", "BUS", "WALK")
     );
   }

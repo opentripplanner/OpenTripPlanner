@@ -2,8 +2,8 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.entur.gbfs.v2_2.station_information.GBFSRentalUris;
-import org.entur.gbfs.v2_2.station_information.GBFSStation;
+import org.entur.gbfs.v2_3.station_information.GBFSRentalUris;
+import org.entur.gbfs.v2_3.station_information.GBFSStation;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;

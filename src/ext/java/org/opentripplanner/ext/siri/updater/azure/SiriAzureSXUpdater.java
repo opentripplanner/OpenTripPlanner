@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -17,10 +18,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -39,7 +40,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
   private static final transient AtomicLong messageCounter = new AtomicLong(0);
   private final LocalDate fromDateTime;
   private final LocalDate toDateTime;
-  private long startTime;
+  private Instant startTime;
 
   public SiriAzureSXUpdater(SiriAzureSXUpdaterParameters config, TransitModel transitModel) {
     super(config, transitModel);
@@ -78,7 +79,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       return;
     }
     while (!isPrimed()) {
-      startTime = now();
+      startTime = Instant.now();
 
       URI uri = new URIBuilder(url)
         .addParameter("publishFromDateTime", fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
@@ -161,7 +162,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
           LOG.info(
             "Azure SX updater initialized after {} ms: [time since startup: {}]",
             (System.currentTimeMillis() - t1),
-            DurationFormatUtils.formatDuration((now() - startTime), "HH:mm:ss")
+            DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
           );
           setPrimed(true);
         } catch (Exception e) {

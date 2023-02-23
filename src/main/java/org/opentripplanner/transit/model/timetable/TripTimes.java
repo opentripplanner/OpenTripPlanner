@@ -212,6 +212,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     return List.of(headsignVias[stop]);
   }
 
+  /**
+   * @return the whole trip's headsign. Individual stops can have different headsigns.
+   */
+  public I18NString getTripHeadsign() {
+    return trip.getHeadsign();
+  }
+
   /** @return the time in seconds after midnight that the vehicle arrives at the stop. */
   public int getScheduledArrivalTime(final int stop) {
     return scheduledArrivalTimes[stop] + timeShift;

@@ -9,57 +9,65 @@ on:
       - ibi-dev
       - ibi-dev-2.x
 jobs:
-  smoke-tests:
+  test:
     runs-on: ubuntu-latest
-
     env:
-      MAVEN_OPTS: -Xmx2g
+      MAVEN_OPTS: -Xmx3g
+
+    strategy:
+      matrix:
+        locations:
+          - name: seattle
+            sleep: 15
+          - name: atlanta
+            sleep: 15
+          - name: houston
+            sleep: 15
+          - name: denver
+            sleep: 15
+          - name: septa
+            sleep: 15
+          - name: portland
+            # have to sleep longer since computing geofencing zones takes a while
+            sleep: 70
+
     steps:
-
       - uses: actions/checkout@v3
-
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: temurin
-
-      - name: Cache local Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Cache OSM files
-        uses: actions/cache@v3
-        with:
-          path: smoke-tests/**/*.pbf
-          key: osm-2022-10-04
-          restore-keys: |
-            osm-
+          cache: maven
 
       - name: Build jar file, compile tests
         run: |
           mvn --batch-mode clean package -Dmaven.test.skip -P prettierSkip
           mvn org.apache.maven.plugins:maven-compiler-plugin:testCompile
-        
-      - name: "[Seattle] Run smoke tests"
-        run: scripts/smoke-tests.sh seattle 15
-        
-      - name: "[Atlanta] Run smoke tests"
-        run: scripts/smoke-tests.sh atlanta 15
 
-      - name: "[Houston] Run smoke tests"
-        run: scripts/smoke-tests.sh houston 15
+      - name: Cache OSM files
+        uses: actions/cache@v3
+        with:
+          path: smoke-tests/**/*.pbf
+          key: osm-${{ matrix.locations.name }}-2023-02-22
+          restore-keys: |
+            osm-${{ matrix.locations.name }}
 
-      - name: "[Denver] Run smoke tests"
-        run: scripts/smoke-tests.sh denver 15
+      - name: Run smoke tests
+        run: |
+          cd smoke-tests
+          make build-${{ matrix.locations.name }}
 
-      - name: "[SEPTA] Run smoke tests"
-        run: scripts/smoke-tests.sh septa 15
+          make run-${{ matrix.locations.name }} &
 
-      - name: "[Portland] Run smoke tests"
-        # have to sleep longer since computing geofencing zones takes a while
-        run: scripts/smoke-tests.sh portland 70
+          # OTP needs a little while to start up so we sleep
+          sleep ${{ matrix.locations.sleep }}
+
+          cd ..
+
+          # run the actual smoke tests
+          # we run surefire:test in order to not recompile the tests for each city
+          mvn surefire:test -Djunit.tags.included="${{ matrix.locations.name }}" -Djunit.tags.excluded="" -P prettierSkip
+
+          # shutting down the OTP instance running in the background (via make)
+          killall make

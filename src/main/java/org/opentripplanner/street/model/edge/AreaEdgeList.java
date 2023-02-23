@@ -39,6 +39,14 @@ public class AreaEdgeList implements Serializable {
     this.references = references;
   }
 
+  public String toString() {
+    return String.format(
+      "AreaEdgeList: visibilityVertices=%s, %s",
+      visibilityVertices,
+      originalEdges
+    );
+  }
+
   /**
    * Safely add a vertex to this area. This creates edges to all other vertices unless those edges
    * would cross one of the original edges.

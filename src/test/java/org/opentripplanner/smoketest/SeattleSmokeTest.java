@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.smoketest.util.GraphQLClient;
+import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 @Tag("smoke-test")
 @Tag("seattle")
@@ -23,20 +24,18 @@ public class SeattleSmokeTest {
 
   @Test
   public void acrossTheCity() {
+    Set<String> modes = Set.of("TRANSIT", "WALK");
     SmokeTest.basicRouteTest(
-      sodo,
-      clydeHill,
-      Set.of("TRANSIT", "WALK"),
+      new SmokeTestRequest(sodo, clydeHill, modes),
       List.of("WALK", "BUS", "WALK", "BUS", "WALK")
     );
   }
 
   @Test
   public void flexAndTransit() {
+    Set<String> modes = Set.of("WALK", "BUS", "FLEX", "FLEX_DIRECT", "FLEX_EGRESS", "FLEX_ACCESS");
     SmokeTest.basicRouteTest(
-      boeingCreekPark,
-      ronaldBogPark,
-      Set.of("WALK", "BUS", "FLEX", "FLEX_DIRECT", "FLEX_EGRESS", "FLEX_ACCESS"),
+      new SmokeTestRequest(boeingCreekPark, ronaldBogPark, modes),
       List.of("BUS")
     );
   }

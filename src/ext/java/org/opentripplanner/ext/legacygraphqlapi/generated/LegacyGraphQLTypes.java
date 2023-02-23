@@ -244,9 +244,12 @@ public class LegacyGraphQLTypes {
   public enum LegacyGraphQLFormFactor {
     BICYCLE,
     CAR,
+    CARGO_BICYCLE,
     MOPED,
     OTHER,
     SCOOTER,
+    SCOOTER_SEATED,
+    SCOOTER_STANDING,
   }
 
   public static class LegacyGraphQLInputBannedInput {
@@ -842,9 +845,13 @@ public class LegacyGraphQLTypes {
 
   public enum LegacyGraphQLPropulsionType {
     COMBUSTION,
+    COMBUSTION_DIESEL,
     ELECTRIC,
     ELECTRIC_ASSIST,
     HUMAN,
+    HYBRID,
+    HYDROGEN_FUEL_CELL,
+    PLUG_IN_HYBRID,
   }
 
   /**
