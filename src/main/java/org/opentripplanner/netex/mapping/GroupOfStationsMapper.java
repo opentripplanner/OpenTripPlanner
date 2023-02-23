@@ -15,7 +15,6 @@ import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
-import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.StopPlaceRefStructure;
 import org.rutebanken.netex.model.StopPlaceRefs_RelStructure;
 
@@ -47,6 +46,11 @@ class GroupOfStationsMapper {
     if (groupOfStopPlaces.getName() != null) {
       name = NonLocalizedString.ofNullable(groupOfStopPlaces.getName().getValue());
     } else {
+      issueStore.add(
+        "GroupOfStopPlacesWithoutName",
+        "GroupOfStopPlaces {} does not contain a name.",
+        groupOfStopPlaces.getId()
+      );
       StopPlaceRefStructure ref = groupOfStopPlaces.getMembers().getStopPlaceRef().get(0);
       name = stations.get(idFactory.createId(ref.getRef())).getName();
     }

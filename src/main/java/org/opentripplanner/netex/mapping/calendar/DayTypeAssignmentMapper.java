@@ -3,6 +3,7 @@ package org.opentripplanner.netex.mapping.calendar;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -190,16 +191,14 @@ public class DayTypeAssignmentMapper {
     LocalDateTime endDate,
     LocalDateTime date
   ) {
-    int i = 0;
-    for (; date.isBefore(endDate); date = date.plusDays(1)) {
+    for (int i = 0; i < ChronoUnit.DAYS.between(date.toLocalDate(), endDate.toLocalDate()); i++) {
       if (i >= validDayBits.length() || validDayBits.charAt(i) == '1') {
-        addDate(isAvailable, date);
+        addDate(isAvailable, date.plusDays(i));
       } else if (validDayBits.charAt(i) != '0') {
         throw new IllegalArgumentException(
           "Invalid character '" + validDayBits.charAt(i) + "' in validDayBits"
         );
       }
-      i++;
     }
   }
 
