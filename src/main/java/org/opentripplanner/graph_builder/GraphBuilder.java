@@ -175,7 +175,10 @@ public class GraphBuilder implements Runnable {
       load.buildGraph();
     }
 
-    new SummarizeDataImportIssues(issueStore.listIssues()).summarize();
+    var issueSummary = new SummarizeDataImportIssues(issueStore.listIssues());
+    issueSummary.printSummary();
+
+    graph.setIssueSummary(issueSummary.summary());
 
     validate();
 
