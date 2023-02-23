@@ -714,10 +714,10 @@
     "@graphql-codegen/plugin-helpers" "^4.1.0"
     tslib "~2.5.0"
 
-"@graphql-codegen/cli@3.2.0":
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/@graphql-codegen/cli/-/cli-3.2.0.tgz#1d21081628201beea4980e485fcb0e7a0211d0a8"
-  integrity sha512-o+oTOIMlBF4PE+JDo3m37W/xQNYUIASFOc5K9DHkWh4zW/qVHVkGyyu2fEgI8PbscODALyNYWG/ArGXoIAy2/A==
+"@graphql-codegen/cli@3.2.1":
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/cli/-/cli-3.2.1.tgz#7cd14ba5fdab02fc8d60bf20060bb78de57a2fdf"
+  integrity sha512-AeXzOvhSgAyMC0TzIoc6/HIc2Fy2rCZJcs5pt1LDypn1k4gpGRzqZ5JOjYx+XIna2hLfB9NbAkcO5dcdHwFdJA==
   dependencies:
     "@babel/generator" "^7.18.13"
     "@babel/template" "^7.18.10"
@@ -747,6 +747,7 @@
     json-to-pretty-yaml "^1.2.2"
     listr2 "^4.0.5"
     log-symbols "^4.0.0"
+    micromatch "^4.0.5"
     shell-quote "^1.7.3"
     string-env-interpolation "^1.0.1"
     ts-log "^2.2.3"
