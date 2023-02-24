@@ -170,8 +170,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           name,
           edgeList.references
         );
-        edgeList.addVertex(boardingLocation);
-
+        linker.addPermanentAreaVertex(boardingLocation, edgeList);
         linkBoardingLocationToStop(ts, stopCode, boardingLocation);
         return true;
       }

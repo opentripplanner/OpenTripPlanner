@@ -33,6 +33,10 @@ public class DisposableEdgeCollection {
     this.edges.add(edge);
   }
 
+  public int edgeCount() {
+    return this.edges.size();
+  }
+
   /**
    * Removes all the edges in this collection from the graph.
    */
