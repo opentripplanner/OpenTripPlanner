@@ -1426,13 +1426,6 @@ type Leg {
         """
         destinationModesWithParentStation: [TransitMode!]
 
-        """
-        Whether all possible visits to the destination stops parent station should be treated as a new alternative leg.
-        If true, only the first visit is used to generate an alternative.
-        Otherwise a single trip might yield multiple alternative legs.
-        """
-        onlyFirstDestinationStop: Boolean = true
-
         ): [Leg!]
 }
 

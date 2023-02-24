@@ -241,7 +241,6 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
         var originModesWithParentStation = args.getLegacyGraphQLOriginModesWithParentStation();
         var destinationModesWithParentStation = args.getLegacyGraphQLDestinationModesWithParentStation();
-        var onlyFirstDestinationStop = args.getLegacyGraphQLOnlyFirstDestinationStop();
 
         boolean limitToExactOriginStop =
           originModesWithParentStation == null ||
@@ -272,7 +271,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
             AlternativeLegsFilter.NO_FILTER,
             limitToExactOriginStop,
             limitToExactDestinationStop,
-            onlyFirstDestinationStop
+            true
           )
           .stream()
           .map(Leg.class::cast)

@@ -659,7 +659,6 @@ public class LegacyGraphQLTypes {
 
     private Iterable<LegacyGraphQLTransitMode> destinationModesWithParentStation;
     private Integer numberOfLegs;
-    private Boolean onlyFirstDestinationStop;
     private Iterable<LegacyGraphQLTransitMode> originModesWithParentStation;
 
     public LegacyGraphQLLegNextLegsArgs(Map<String, Object> args) {
@@ -676,7 +675,6 @@ public class LegacyGraphQLTypes {
               .collect(Collectors.toList());
         }
         this.numberOfLegs = (Integer) args.get("numberOfLegs");
-        this.onlyFirstDestinationStop = (Boolean) args.get("onlyFirstDestinationStop");
         if (args.get("originModesWithParentStation") != null) {
           this.originModesWithParentStation =
             ((List<Object>) args.get("originModesWithParentStation")).stream()
@@ -699,10 +697,6 @@ public class LegacyGraphQLTypes {
       return this.numberOfLegs;
     }
 
-    public Boolean getLegacyGraphQLOnlyFirstDestinationStop() {
-      return this.onlyFirstDestinationStop;
-    }
-
     public Iterable<LegacyGraphQLTransitMode> getLegacyGraphQLOriginModesWithParentStation() {
       return this.originModesWithParentStation;
     }
@@ -715,10 +709,6 @@ public class LegacyGraphQLTypes {
 
     public void setLegacyGraphQLNumberOfLegs(Integer numberOfLegs) {
       this.numberOfLegs = numberOfLegs;
-    }
-
-    public void setLegacyGraphQLOnlyFirstDestinationStop(Boolean onlyFirstDestinationStop) {
-      this.onlyFirstDestinationStop = onlyFirstDestinationStop;
     }
 
     public void setLegacyGraphQLOriginModesWithParentStation(
