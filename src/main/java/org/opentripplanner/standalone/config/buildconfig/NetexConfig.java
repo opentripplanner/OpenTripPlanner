@@ -31,6 +31,7 @@ public class NetexConfig {
   static NetexFeedParameters mapNetexFeed(NodeAdapter feedNode, NetexFeedParameters original) {
     return mapFilePatternParameters(feedNode, original)
       .withFeedId(readFeedId(feedNode).asString())
+      .withcodeTagKey(feedNode.of("codeTagKey").asString(""))
       .withSource(
         feedNode
           .of("source")
@@ -164,6 +165,17 @@ public class NetexConfig {
           .summary("Ignore contents of the FareFrame")
           .docDefaultValue(base.ignoreFareFrame())
           .asBoolean(base.ignoreFareFrame())
+      )
+      .withcodeTagKey(
+        config
+          .of("codeTagKey")
+          .since(V2_3)
+          .summary(
+            "Which NeTEx KeyValue should be looked on for the source of matching stops to platforms and stops, in addition to the ID."
+          )
+          .description("[Detailed documentation](BoardingLocations.md)")
+          .docDefaultValue("no key")
+          .asString(base.codeTagKey())
       );
   }
 

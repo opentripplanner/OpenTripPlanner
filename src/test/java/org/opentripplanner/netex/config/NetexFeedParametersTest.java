@@ -19,6 +19,7 @@ class NetexFeedParametersTest {
   private static final String GROUP_FILE = "[groupFile]+";
   private static final Set<String> FERRY_IDS = Set.of("Ferry:Id");
   private static final String IGNORE_FILE = "[ignoreFl]+";
+  private static final String CODE_TAG_KEY = "Key";
 
   private final NetexFeedParameters subject = NetexFeedParameters
     .of()
@@ -29,6 +30,7 @@ class NetexFeedParametersTest {
     .withGroupFilePattern(Pattern.compile(GROUP_FILE))
     .withIgnoreFilePattern(Pattern.compile(IGNORE_FILE))
     .addFerryIdsNotAllowedForBicycle(FERRY_IDS)
+    .withcodeTagKey(CODE_TAG_KEY)
     .build();
 
   NetexFeedParametersTest() throws Exception {}
@@ -98,7 +100,8 @@ class NetexFeedParametersTest {
       "sharedGroupFilePattern: '[sharedGoupFil]+', " +
       "groupFilePattern: '[groupFile]+', " +
       "ignoreFilePattern: '[ignoreFl]+', " +
-      "ferryIdsNotAllowedForBicycle: [Ferry:Id]" +
+      "ferryIdsNotAllowedForBicycle: [Ferry:Id], " +
+      "codeTagKey: 'Key'" +
       "}",
       subject.toString()
     );

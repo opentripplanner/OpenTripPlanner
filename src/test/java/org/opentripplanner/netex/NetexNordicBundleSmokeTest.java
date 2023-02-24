@@ -139,6 +139,7 @@ public class NetexNordicBundleSmokeTest {
     assertEquals("EN:NSR:StopPlace:3995", quay.getParentStation().getId().toString());
     assertEquals("L", quay.getPlatformCode());
     assertEquals(16, stops.size());
+    assertEquals(null, quay.getCode());
   }
 
   private void assertStations(Collection<Station> stations) {
@@ -150,6 +151,7 @@ public class NetexNordicBundleSmokeTest {
     assertEquals(59.866297, station.getLat(), 0.000001);
     assertEquals(10.821484, station.getLon(), 0.000001);
     assertEquals(5, stations.size());
+    assertEquals(null, station.getCode());
   }
 
   private void assertTripPatterns(Collection<TripPattern> patterns) {

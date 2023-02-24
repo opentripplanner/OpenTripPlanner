@@ -75,6 +75,7 @@ Sections follow that describe particular settings in more depth.
 |    [netex](#lfp_netex)                                                   |   `regexp`  | Patterns for matching NeTEx zip files or directories.                                                                                                          | *Optional* | `"(?i)netex"`                     |  2.0  |
 |    [osm](#lfp_osm)                                                       |   `regexp`  | Pattern for matching Open Street Map input files.                                                                                                              | *Optional* | `"(?i)(\.pbf¦\.osm¦\.osm\.xml)$"` |  2.0  |
 | netexDefaults                                                            |   `object`  | The netexDefaults section allows you to specify default properties for NeTEx files.                                                                            | *Optional* |                                   |  2.2  |
+|    [codeTagKey](#nd_codeTagKey)                                          |   `string`  | Which NeTEx KeyValue should be looked on for the source of matching stops to platforms and stops, in addition to the ID.                                       | *Optional* | `"no key"`                        |  2.3  |
 |    feedId                                                                |   `string`  | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt.                                    | *Optional* | `"NETEX"`                         |  2.2  |
 |    [groupFilePattern](#nd_groupFilePattern)                              |   `regexp`  | Pattern for matching group NeTEx files.                                                                                                                        | *Optional* | `"(\w{3})-.*\.xml"`               |  2.0  |
 |    ignoreFareFrame                                                       |  `boolean`  | Ignore contents of the FareFrame                                                                                                                               | *Optional* | `false`                           |  2.3  |
@@ -104,6 +105,7 @@ Sections follow that describe particular settings in more depth.
 |       [stationTransferPreference](#tf_0_stationTransferPreference)       |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station. Overrides the value specified in `gtfsDefaults`.                | *Optional* | `"allowed"`                       |  2.3  |
 |    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
 |       type = "NETEX"                                                     |    `enum`   | The feed input format.                                                                                                                                         | *Required* |                                   |  2.2  |
+|       [codeTagKey](#tf_1_codeTagKey)                                     |   `string`  | Which NeTEx KeyValue should be looked on for the source of matching stops to platforms and stops, in addition to the ID.                                       | *Optional* | `"no key"`                        |  2.3  |
 |       feedId                                                             |   `string`  | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt.                                    | *Required* |                                   |  2.2  |
 |       [groupFilePattern](#tf_1_groupFilePattern)                         |   `regexp`  | Pattern for matching group NeTEx files.                                                                                                                        | *Optional* | `"(\w{3})-.*\.xml"`               |  2.0  |
 |       ignoreFareFrame                                                    |  `boolean`  | Ignore contents of the FareFrame                                                                                                                               | *Optional* | `false`                           |  2.3  |
@@ -872,6 +874,15 @@ If the filename contains the given pattern
 it is considered a match. Any legal Java Regular expression is allowed.
 
 
+<h3 id="nd_codeTagKey">codeTagKey</h3>
+
+**Since version:** `2.3` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"no key"`   
+**Path:** /netexDefaults 
+
+Which NeTEx KeyValue should be looked on for the source of matching stops to platforms and stops, in addition to the ID.
+
+[Detailed documentation](BoardingLocations.md)
+
 <h3 id="nd_groupFilePattern">groupFilePattern</h3>
 
 **Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})-.*\.xml"`   
@@ -1016,6 +1027,15 @@ Should there be some preference or aversion for transfers at stops that are part
 This parameter sets the generic level of preference. What is the actual cost can be changed
 with the `stopTransferCost` parameter in the router configuration.
 
+
+<h3 id="tf_1_codeTagKey">codeTagKey</h3>
+
+**Since version:** `2.3` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"no key"`   
+**Path:** /transitFeeds/[1] 
+
+Which NeTEx KeyValue should be looked on for the source of matching stops to platforms and stops, in addition to the ID.
+
+[Detailed documentation](BoardingLocations.md)
 
 <h3 id="tf_1_groupFilePattern">groupFilePattern</h3>
 

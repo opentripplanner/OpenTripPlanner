@@ -6,7 +6,8 @@
   "subwayAccessTime": 0,
   "netexDefaults": {
     "groupFilePattern": "(.*)_.*\\.xml",
-    "feedId": "HH"
+    "feedId": "HH",
+    "codeTagKey": "GlobalID"
   },
   "osmDefaults": {
     "osmTagMapping": "germany",

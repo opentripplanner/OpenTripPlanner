@@ -53,6 +53,14 @@ add the following to `build-config.json`:
 
 ```
 
+Your NeTEx transit data feed may have the matching references in a KeyValue instead of the ID. If you want to make use of an additional KeyValue you can specify the key for each NeTEx source. For example, the country wide NeTEx feed in Germany stores it under the key `GlobalID`. To use it add the following to your NeTEx source in `build-config.json`:
+
+```json
+{
+  "codeTagKey": "GlobalID"
+}
+```
+
 ## Multiple stops on the same platform
 
 Some stations have a middle platform with a stop on either side of it. In such a case, you can 
