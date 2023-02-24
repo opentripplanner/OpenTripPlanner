@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.flex;
+package org.opentripplanner.ext.flex.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -9,8 +9,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
+import org.opentripplanner.ext.flex.FlexTest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
