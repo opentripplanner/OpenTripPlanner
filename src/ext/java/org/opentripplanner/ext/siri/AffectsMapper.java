@@ -23,6 +23,7 @@ import uk.org.siri.siri20.AffectedStopPointStructure;
 import uk.org.siri.siri20.AffectedVehicleJourneyStructure;
 import uk.org.siri.siri20.AffectsScopeStructure;
 import uk.org.siri.siri20.DataFrameRefStructure;
+import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
 import uk.org.siri.siri20.LineRef;
 import uk.org.siri.siri20.NetworkRefStructure;
@@ -94,6 +95,17 @@ public class AffectsMapper {
       List<VehicleJourneyRef> vehicleJourneyReves = affectedVehicleJourney.getVehicleJourneyReves();
 
       if (isNotEmpty(vehicleJourneyReves)) {
+        ZonedDateTime originAimedDepartureTime = affectedVehicleJourney.getOriginAimedDepartureTime() !=
+          null
+          ? affectedVehicleJourney.getOriginAimedDepartureTime()
+          : ZonedDateTime.now();
+
+        ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(originAimedDepartureTime);
+
+        LocalDate serviceDate = startOfService.toLocalDate();
+
+        List<FeedScopedId> affectedTripIds = new ArrayList<>();
+
         for (VehicleJourneyRef vehicleJourneyRef : vehicleJourneyReves) {
           List<FeedScopedId> tripIds = new ArrayList<>();
 
@@ -103,25 +115,15 @@ public class AffectsMapper {
             transitService
           );
 
-          ZonedDateTime originAimedDepartureTime = affectedVehicleJourney.getOriginAimedDepartureTime() !=
-            null
-            ? affectedVehicleJourney.getOriginAimedDepartureTime()
-            : ZonedDateTime.now();
-
-          ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
-            originAimedDepartureTime
-          );
-
-          LocalDate serviceDate = startOfService.toLocalDate();
-
           if (tripIdFromVehicleJourney != null) {
             tripIds.add(tripIdFromVehicleJourney);
           } else if (siriFuzzyTripMatcher != null) {
-            tripIds =
+            tripIds.addAll(
               siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDate(
                 vehicleJourneyRef.getValue(),
                 serviceDate
-              );
+              )
+            );
           }
 
           if (tripIds.isEmpty()) {
@@ -130,33 +132,12 @@ public class AffectsMapper {
                 "Alert affects unknown vehicle journey %s".formatted(vehicleJourneyRef.getValue())
               )
             );
-          }
-
-          for (FeedScopedId tripId : tripIds) {
-            if (!affectedStops.isEmpty()) {
-              for (AffectedStopPointStructure affectedStop : affectedStops) {
-                FeedScopedId stop = getStop(
-                  affectedStop.getStopPointRef().getValue(),
-                  feedId,
-                  transitService
-                );
-                if (stop == null) {
-                  stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
-                }
-                // Creating unique, deterministic id for the alert
-                EntitySelector.StopAndTrip entitySelector = new EntitySelector.StopAndTrip(
-                  stop,
-                  tripId,
-                  serviceDate,
-                  resolveStopConditions(affectedStop.getStopConditions())
-                );
-                selectors.add(entitySelector);
-              }
-            } else {
-              selectors.add(new EntitySelector.Trip(tripId, serviceDate));
-            }
+          } else {
+            affectedTripIds.addAll(tripIds);
           }
         }
+
+        selectors.addAll(mapTripSelectors(affectedStops, affectedTripIds, serviceDate));
       }
 
       final FramedVehicleJourneyRefStructure framedVehicleJourneyRef = affectedVehicleJourney.getFramedVehicleJourneyRef();
@@ -172,29 +153,7 @@ public class AffectsMapper {
             serviceDate = LocalDate.parse(dataFrameRef.getValue());
           }
 
-          if (!affectedStops.isEmpty()) {
-            for (AffectedStopPointStructure affectedStop : affectedStops) {
-              FeedScopedId stop = getStop(
-                affectedStop.getStopPointRef().getValue(),
-                feedId,
-                transitService
-              );
-              if (stop == null) {
-                stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
-              }
-
-              selectors.add(
-                new EntitySelector.StopAndTrip(
-                  stop,
-                  tripId,
-                  serviceDate,
-                  resolveStopConditions(affectedStop.getStopConditions())
-                )
-              );
-            }
-          } else {
-            selectors.add(new EntitySelector.Trip(tripId, serviceDate));
-          }
+          selectors.addAll(mapTripSelectors(affectedStops, List.of(tripId), serviceDate));
         } else {
           selectors.add(
             new EntitySelector.Unknown(
@@ -202,6 +161,69 @@ public class AffectsMapper {
             )
           );
         }
+      }
+
+      final List<DatedVehicleJourneyRef> datedVehicleJourneyReves = affectedVehicleJourney.getDatedVehicleJourneyReves();
+      if (isNotEmpty(datedVehicleJourneyReves)) {
+        List<FeedScopedId> tripIds = new ArrayList<>();
+        for (DatedVehicleJourneyRef datedVehicleJourneyRef : datedVehicleJourneyReves) {
+          FeedScopedId tripIdFromDatedVehicleJourney = getTripId(
+            datedVehicleJourneyRef.getValue(),
+            feedId,
+            transitService
+          );
+
+          if (tripIdFromDatedVehicleJourney != null) {
+            tripIds.add(tripIdFromDatedVehicleJourney);
+          } else {
+            selectors.add(
+              new EntitySelector.Unknown(
+                "Alert affects unknown vehicle journey %s".formatted(
+                    datedVehicleJourneyRef.getValue()
+                  )
+              )
+            );
+          }
+        }
+        if (!tripIds.isEmpty()) {
+          // This should be a DatedServiceJourney-ID - serviceDate is implicit
+          LocalDate serviceDate = null;
+          selectors.addAll(mapTripSelectors(affectedStops, tripIds, serviceDate));
+        }
+      }
+    }
+    return selectors;
+  }
+
+  private List<EntitySelector> mapTripSelectors(
+    List<AffectedStopPointStructure> affectedStops,
+    List<FeedScopedId> tripIds,
+    LocalDate serviceDate
+  ) {
+    List<EntitySelector> selectors = new ArrayList<>();
+
+    for (FeedScopedId tripId : tripIds) {
+      if (!affectedStops.isEmpty()) {
+        for (AffectedStopPointStructure affectedStop : affectedStops) {
+          FeedScopedId stop = getStop(
+            affectedStop.getStopPointRef().getValue(),
+            feedId,
+            transitService
+          );
+          if (stop == null) {
+            stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
+          }
+          // Creating unique, deterministic id for the alert
+          EntitySelector.StopAndTrip entitySelector = new EntitySelector.StopAndTrip(
+            stop,
+            tripId,
+            serviceDate,
+            resolveStopConditions(affectedStop.getStopConditions())
+          );
+          selectors.add(entitySelector);
+        }
+      } else {
+        selectors.add(new EntitySelector.Trip(tripId, serviceDate));
       }
     }
     return selectors;
