@@ -545,7 +545,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       situationNumber,
       startTime,
       endTime,
-      createAffectsDatedVehicleJourney(tripId.getId(),  null)
+      createAffectsDatedVehicleJourney(tripId.getId(), null)
     );
 
     alertsUpdateHandler.update(createServiceDelivery(ptSituation));
