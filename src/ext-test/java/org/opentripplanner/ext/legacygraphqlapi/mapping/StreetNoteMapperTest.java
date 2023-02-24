@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,15 @@ class StreetNoteMapperTest {
     note.url = null;
     TransitAlert alert = StreetNoteMapper.mapStreetNoteToAlert(note);
     assertNull(alert.url());
+  }
+
+  @Test
+  void noTime() {
+    var note = note();
+    note.effectiveStartDate = null;
+    note.effectiveEndDate = null;
+    TransitAlert alert = StreetNoteMapper.mapStreetNoteToAlert(note);
+    assertEquals(Collections.emptyList(), alert.timePeriods());
   }
 
   private static StreetNote note() {
