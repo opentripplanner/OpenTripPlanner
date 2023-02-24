@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -68,14 +69,13 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> noExplicitTimes = Predicate.not(st ->
-      st.isArrivalTimeSet() || st.isDepartureTimeSet()
-    );
+    Predicate<StopTime> hasFlexWindow = st ->
+      st.getFlexWindowStart() != MISSING_VALUE || st.getFlexWindowEnd() != MISSING_VALUE;
     Predicate<StopTime> notContinuousStop = stopTime ->
       stopTime.getFlexContinuousDropOff() == NONE && stopTime.getFlexContinuousPickup() == NONE;
     return (
       N_STOPS.contains(stopTimes.size()) &&
-      stopTimes.stream().allMatch(noExplicitTimes) &&
+      stopTimes.stream().anyMatch(hasFlexWindow) &&
       stopTimes.stream().allMatch(notContinuousStop)
     );
   }
@@ -140,21 +140,24 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   @Override
   public int earliestDepartureTime(
-    int departureTime,
+    int requestedDepartureTime,
     int fromStopIndex,
     int toStopIndex,
     int flexTime
   ) {
     UnscheduledStopTime fromStopTime = stopTimes[fromStopIndex];
     UnscheduledStopTime toStopTime = stopTimes[toStopIndex];
+
+    int earliestDepartureTime = Math.max(requestedDepartureTime, fromStopTime.flexWindowStart);
+
     if (
-      fromStopTime.flexWindowEnd < departureTime ||
-      toStopTime.flexWindowEnd < (departureTime + flexTime)
+      fromStopTime.flexWindowEnd < earliestDepartureTime ||
+      toStopTime.flexWindowEnd < (earliestDepartureTime + flexTime)
     ) {
       return MISSING_VALUE;
     }
 
-    return Math.max(departureTime, fromStopTime.flexWindowStart);
+    return earliestDepartureTime;
   }
 
   @Override
@@ -166,14 +169,17 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   public int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime) {
     UnscheduledStopTime fromStopTime = stopTimes[fromStopIndex];
     UnscheduledStopTime toStopTime = stopTimes[toStopIndex];
+
+    int latestArrivalTime = Math.min(arrivalTime, toStopTime.flexWindowEnd);
+
     if (
-      toStopTime.flexWindowStart > arrivalTime ||
-      fromStopTime.flexWindowStart > (arrivalTime - flexTime)
+      toStopTime.flexWindowStart > latestArrivalTime ||
+      fromStopTime.flexWindowStart > (latestArrivalTime - flexTime)
     ) {
       return MISSING_VALUE;
     }
 
-    return Math.min(arrivalTime, toStopTime.flexWindowEnd);
+    return latestArrivalTime;
   }
 
   @Override
@@ -300,11 +306,37 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     private UnscheduledStopTime(StopTime st) {
       stop = st.getStop();
 
-      flexWindowStart = st.getFlexWindowStart();
-      flexWindowEnd = st.getFlexWindowEnd();
+      // Fallback to what times are available
+      flexWindowStart =
+        getAvailableTime(
+          st::getFlexWindowStart,
+          st::getDepartureTime,
+          st::getFlexWindowEnd,
+          st::getArrivalTime
+        );
 
-      pickupType = st.getPickupType();
-      dropOffType = st.getDropOffType();
+      flexWindowEnd =
+        getAvailableTime(
+          st::getFlexWindowEnd,
+          st::getArrivalTime,
+          st::getFlexWindowStart,
+          st::getDepartureTime
+        );
+
+      // Do not allow for pickup/dropoff if times are not available
+      pickupType = flexWindowStart == MISSING_VALUE ? PickDrop.NONE : st.getPickupType();
+      dropOffType = flexWindowEnd == MISSING_VALUE ? PickDrop.NONE : st.getDropOffType();
+    }
+
+    private static int getAvailableTime(IntSupplier... times) {
+      for (var supplier : times) {
+        int time = supplier.getAsInt();
+        if (time != MISSING_VALUE) {
+          return time;
+        }
+      }
+
+      return MISSING_VALUE;
     }
   }
 }
