@@ -58,6 +58,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   // paths with the same path tail.
   private PathBuilderLeg<T> head = null;
   private PathBuilderLeg<T> tail = null;
+  private int iterationDepartureTime;
 
   protected PathBuilder(PathBuilder<T> other) {
     this(
@@ -163,6 +164,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   }
 
   public RaptorPath<T> build(int iterationDepartureTime) {
+    this.iterationDepartureTime = iterationDepartureTime;
     updateAggregatedFields();
     return new Path<>(iterationDepartureTime, createPathLegs(costCalculator, slackProvider));
   }
@@ -229,7 +231,8 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   }
 
   private void timeShiftAllStreetLegs() {
-    legsAsStream().forEach(leg -> leg.timeShiftThisAndNextLeg(slackProvider));
+    legsAsStream()
+      .forEach(leg -> leg.timeShiftThisAndNextLeg(slackProvider, iterationDepartureTime));
   }
 
   private void insertConstrainedTransfers() {

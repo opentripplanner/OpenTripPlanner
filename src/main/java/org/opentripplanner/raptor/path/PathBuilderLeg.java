@@ -174,15 +174,18 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    * egress. So, if the NEXT leg is a transit or egress leg it is time-shifted. This make it safe to
    * call this method on any leg - just make sure the legs are linked first.
    */
-  public void timeShiftThisAndNextLeg(RaptorSlackProvider slackProvider) {
+  public void timeShiftThisAndNextLeg(
+    RaptorSlackProvider slackProvider,
+    int iterationDepartureTime
+  ) {
     if (isAccess()) {
-      timeShiftAccessTime(slackProvider);
+      timeShiftAccessTime(slackProvider, iterationDepartureTime);
     }
     if (next != null) {
       if (next.isTransfer()) {
         next.timeShiftTransferTime(slackProvider);
         if (next.next().isEgress()) {
-          next.timeShiftThisAndNextLeg(slackProvider);
+          next.timeShiftThisAndNextLeg(slackProvider, iterationDepartureTime);
         }
       } else if (next.isEgress()) {
         next.timeShiftEgressTime(slackProvider);
@@ -249,6 +252,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     // Add wait-time before and after transfer(the next leg)
     return waitTimeBeforeNextLegIncludingSlack() + next.waitTimeBeforeNextLegIncludingSlack();
   }
+
+  public void iterationDepartureTime() {}
 
   static <T extends RaptorTripSchedule> PathBuilderLeg<T> accessLeg(RaptorAccessEgress access) {
     return new PathBuilderLeg<>(new MyAccessLeg(access));
@@ -477,16 +482,24 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    * </ol>
    * Flex access may or may not be time-shifted.
    */
-  private void timeShiftAccessTime(RaptorSlackProvider slackProvider) {
+  private void timeShiftAccessTime(RaptorSlackProvider slackProvider, int iterationDepartureTime) {
     var accessPath = asAccessLeg().streetPath;
     var nextTransitLeg = nextTransitLeg();
 
-    @SuppressWarnings("ConstantConditions")
-    int newToTime = nextTransitLeg.transitStopArrivalTimeBefore(slackProvider, hasRides());
+    int newToTime;
 
-    if (next.isTransfer()) {
-      newToTime -= next.asTransferLeg().transfer.durationInSeconds();
+    if (nextTransitLeg == null) {
+      newToTime = iterationDepartureTime + accessPath.durationInSeconds();
+      if (next.isTransfer()) {
+        newToTime += next.asTransferLeg().transfer.durationInSeconds();
+      }
+    } else {
+      newToTime = nextTransitLeg.transitStopArrivalTimeBefore(slackProvider, hasRides());
+      if (next.isTransfer()) {
+        newToTime -= next.asTransferLeg().transfer.durationInSeconds();
+      }
     }
+
     newToTime = accessPath.latestArrivalTime(newToTime);
 
     if (newToTime == RaptorConstants.TIME_NOT_SET) {
