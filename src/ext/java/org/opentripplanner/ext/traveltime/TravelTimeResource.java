@@ -23,17 +23,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import javax.media.jai.RasterFactory;
-import org.geojson.MultiPolygon;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.geojson.GeoJSONWriter;
-import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffWriteParams;
 import org.geotools.gce.geotiff.GeoTiffWriter;
@@ -41,7 +36,6 @@ import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.locationtech.jts.geom.Coordinate;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opentripplanner.api.common.LocationStringParser;
@@ -84,8 +78,6 @@ import org.opentripplanner.transit.service.TransitService;
 
 @Path("/traveltime")
 public class TravelTimeResource {
-
-  private static final SimpleFeatureType contourSchema = makeContourSchema();
 
   private final RouteRequest routingRequest;
   private final RaptorRoutingRequestTransitData requestTransitDataProvider;
@@ -166,8 +158,7 @@ public class TravelTimeResource {
     ZSampleGrid<WTWD> sampleGrid = getSampleGrid();
 
     var isochrones = IsochroneRenderer.renderIsochrones(sampleGrid, traveltimeRequest);
-
-    var features = makeContourFeatures(isochrones);
+    var features = IsochroneRenderer.makeContourFeatures(isochrones);
 
     StreamingOutput out = outputStream -> {
       try (final GeoJSONWriter geoJSONWriter = new GeoJSONWriter(outputStream)) {
@@ -365,32 +356,5 @@ public class TravelTimeResource {
     return routingRequest.arriveBy()
       ? accessRequest.journey().access()
       : accessRequest.journey().egress();
-  }
-
-  static SimpleFeatureType makeContourSchema() {
-    /* Create the output feature schema. */
-    SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-    typeBuilder.setName("contours");
-    typeBuilder.setCRS(DefaultGeographicCRS.WGS84);
-    typeBuilder.setDefaultGeometry("the_geom");
-    // Do not use "geom" or "geometry" below, it seems to broke shapefile generation
-    typeBuilder.add("the_geom", MultiPolygon.class);
-    typeBuilder.add("time", Long.class);
-    return typeBuilder.buildFeatureType();
-  }
-
-  /**
-   * Create a geotools feature collection from a list of isochrones in the OTPA internal format.
-   * Once in a FeatureCollection, they can for example be exported as GeoJSON.
-   */
-  private static SimpleFeatureCollection makeContourFeatures(List<IsochroneData> isochrones) {
-    DefaultFeatureCollection featureCollection = new DefaultFeatureCollection(null, contourSchema);
-    SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(contourSchema);
-    for (IsochroneData isochrone : isochrones) {
-      fbuilder.add(isochrone.geometry());
-      fbuilder.add(isochrone.cutoffSec());
-      featureCollection.add(fbuilder.buildFeature(null));
-    }
-    return featureCollection;
   }
 }
