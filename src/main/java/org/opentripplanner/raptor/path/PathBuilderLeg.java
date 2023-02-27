@@ -498,9 +498,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       if (next.isTransfer()) {
         newToTime -= next.asTransferLeg().transfer.durationInSeconds();
       }
+      newToTime = accessPath.latestArrivalTime(newToTime);
     }
-
-    newToTime = accessPath.latestArrivalTime(newToTime);
 
     if (newToTime == RaptorConstants.TIME_NOT_SET) {
       throw new IllegalStateException("Can not time-shift accessPath: " + accessPath);
