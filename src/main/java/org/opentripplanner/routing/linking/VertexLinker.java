@@ -382,8 +382,27 @@ public class VertexLinker {
     ) {
       start = (IntersectionVertex) edge.getToVertex();
     } else {
-      // split the edge, get the split vertex
-      start = (IntersectionVertex) split(edge, ll, scope, direction, tempEdges);
+      boolean split = true;
+      // if vertex is inside an area, no need to snap to nearest edge and split it
+      if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
+        if (
+          aEdge
+            .getArea()
+            .getGeometry()
+            .contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))
+        ) {
+          if (vertex instanceof IntersectionVertex iv) {
+            start = iv;
+          } else {
+            start = splitVertex(aEdge, scope, direction, vertex.getLon(), vertex.getLat());
+          }
+          split = false;
+        }
+      }
+      if (split) {
+        // split the edge, get the split vertex
+        start = (IntersectionVertex) split(edge, ll, scope, direction, tempEdges);
+      }
     }
 
     if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
@@ -418,32 +437,7 @@ public class VertexLinker {
 
     // create the geometries
     Coordinate splitPoint = ll.getCoordinate(geometry);
-
-    SplitterVertex v;
-    String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
-
-    if (scope != Scope.PERMANENT) {
-      TemporarySplitterVertex tsv = new TemporarySplitterVertex(
-        uniqueSplitLabel,
-        splitPoint.x,
-        splitPoint.y,
-        originalEdge,
-        direction == LinkingDirection.OUTGOING
-      );
-      tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
-      v = tsv;
-    } else {
-      v =
-        new SplitterVertex(
-          graph,
-          uniqueSplitLabel,
-          splitPoint.x,
-          splitPoint.y,
-          originalEdge.getName()
-        );
-    }
-
-    v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
+    SplitterVertex v = splitVertex(originalEdge, scope, direction, splitPoint.x, splitPoint.y);
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
@@ -471,6 +465,33 @@ public class VertexLinker {
       }
     }
 
+    return v;
+  }
+
+  private SplitterVertex splitVertex(
+    StreetEdge originalEdge,
+    Scope scope,
+    LinkingDirection direction,
+    double x,
+    double y
+  ) {
+    SplitterVertex v;
+    String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
+
+    if (scope != Scope.PERMANENT) {
+      TemporarySplitterVertex tsv = new TemporarySplitterVertex(
+        uniqueSplitLabel,
+        x,
+        y,
+        originalEdge,
+        direction == LinkingDirection.OUTGOING
+      );
+      tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
+      v = tsv;
+    } else {
+      v = new SplitterVertex(graph, uniqueSplitLabel, x, y, originalEdge.getName());
+    }
+    v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
     return v;
   }
 
