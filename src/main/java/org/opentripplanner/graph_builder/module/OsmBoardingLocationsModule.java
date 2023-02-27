@@ -123,6 +123,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
             new TraverseModeSet(TraverseMode.WALK),
             LinkingDirection.BOTH_WAYS,
             (osmBoardingLocationVertex, splitVertex) -> {
+              if (osmBoardingLocationVertex == splitVertex) {
+                return List.of();
+              }
               // the OSM boarding location vertex is not connected to the street network, so we
               // need to link it first
               return List.of(
