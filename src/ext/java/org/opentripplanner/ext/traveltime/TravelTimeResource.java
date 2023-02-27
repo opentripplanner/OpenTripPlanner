@@ -65,6 +65,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RouteRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -76,6 +78,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateData;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -106,7 +109,12 @@ public class TravelTimeResource {
     routingRequest = serverContext.defaultRouteRequest();
     routingRequest.setFrom(LocationStringParser.fromOldStyleString(location));
     if (modes != null) {
-      routingRequest.journey().setModes(new QualifiedModeSet(modes).getRequestModes());
+      var modeSet = new QualifiedModeSet(modes);
+      routingRequest.journey().setModes(modeSet.getRequestModes());
+      var transitModes = modeSet.getTransitModes().stream().map(MainAndSubMode::new).toList();
+      var select = SelectRequest.of().withTransportModes(transitModes).build();
+      var request = TransitFilterRequest.of().addSelect(select).build();
+      routingRequest.journey().transit().setFilters(List.of(request));
     }
 
     traveltimeRequest =
