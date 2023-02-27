@@ -44,9 +44,9 @@ class DebugStopArrivalsStatistics {
         "Debug stop arrivals statistics. The number logged are: \n" +
         "  - For each stop the number of arrivals logged with:\n" +
         "    - Avarage number of arrivals for stops visited.\n" +
-        "    - The maximum numbers of arriavels for any stop.\n" +
+        "    - The maximum numbers of arrivals for any stop.\n" +
         "    - The total number of stop arrivals.\n" +
-        "  - The capasity(array length) used.\n" +
+        "  - The capacity(array length) used.\n" +
         "    - The avarage array length for stops visited.\n" +
         "    - The total array length allocated.\n" +
         "  - The number of stops:\n" +
