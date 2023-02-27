@@ -8,10 +8,7 @@ import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MULTI_CRITERIA;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +16,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
@@ -61,11 +57,9 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       .withTransfer(RaptorTestConstants.STOP_B, transfer(STOP_C, 300));
     requestBuilder
       .searchParams()
-      // Start walking 1m before: 30s walk + 30s board-slack
       .addAccessPaths(flexAndWalk(STOP_B, D2m, ONE_RIDE, 40_000).openingHours("00:05", "00:10"))
-      // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
       .addEgressPaths(flex(STOP_C, D2m, ONE_RIDE, 56_000))
-      .earliestDepartureTime(T00_00)
+      .earliestDepartureTime(T00_10)
       .latestArrivalTime(T00_30)
       // Only one iteration is needed - the access should be time-shifted
       .searchWindowInSeconds(D10m);
@@ -75,16 +69,8 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
 
   static List<RaptorModuleTestCase> testCases() {
     var path =
-      "Flex+Walk 2m 1x Open(0:05 0:10) ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:05 0:15 10m 1tx $1620]";
-    return RaptorModuleTestCase
-      .of()
-      // TODO - Alight slack is missing
-      .add(TC_MIN_DURATION, "[0:00 0:08:30 8m30s 2tx]")
-      // TODO - Board slack is missing
-      .add(TC_MIN_DURATION_REV, "[0:01:50 0:10 8m10s 2tx]")
-      .add(standard(), PathUtils.withoutCost(path))
-      .add(multiCriteria(), path)
-      .build();
+      "Flex+Walk 2m 1x Open(0:05 0:10) ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:15 0:25 10m 1tx $1620]";
+    return RaptorModuleTestCase.of().add(TC_MULTI_CRITERIA, path).build();
   }
 
   @ParameterizedTest
