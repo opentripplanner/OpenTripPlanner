@@ -2,6 +2,7 @@ package org.opentripplanner.street.search.state;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.street.search.TraverseMode;
@@ -48,7 +49,7 @@ public class StateData implements Cloneable {
   protected boolean insideNoRentalDropOffArea = false;
 
   /** Private constructor, use static methods to get a set of initial states. */
-  private StateData(StreetMode requestMode) {
+  protected StateData(StreetMode requestMode) {
     if (requestMode.includesDriving()) {
       currentMode = TraverseMode.CAR;
     } else if (requestMode.includesWalking()) {
@@ -64,11 +65,23 @@ public class StateData implements Cloneable {
    * Returns a set of initial StateDatas based on the options from the RouteRequest
    */
   public static List<StateData> getInitialStateDatas(StreetSearchRequest request) {
+    return getInitialStateDatas(request, StateData::new);
+  }
+
+  /**
+   * Returns a set of initial StateDatas based on the options from the RouteRequest, with a custom
+   * StateData implementation.
+   */
+  public static List<StateData> getInitialStateDatas(
+    StreetSearchRequest request,
+    Function<StreetMode, StateData> stateDataConstructor
+  ) {
     return getInitialStateDatas(
       request.mode(),
       request.arriveBy(),
       request.rental().allowArrivingInRentedVehicleAtDestination(),
-      false
+      false,
+      stateDataConstructor
     );
   }
 
@@ -81,7 +94,8 @@ public class StateData implements Cloneable {
       request.mode(),
       request.arriveBy(),
       request.rental().allowArrivingInRentedVehicleAtDestination(),
-      true
+      true,
+      StateData::new
     );
     if (stateDatas.size() != 1) {
       throw new IllegalStateException("Unable to create only a single state");
@@ -97,10 +111,11 @@ public class StateData implements Cloneable {
     StreetMode requestMode,
     boolean arriveBy,
     boolean allowArrivingInRentedVehicleAtDestination,
-    boolean forceSingleState
+    boolean forceSingleState,
+    Function<StreetMode, StateData> stateDataConstructor
   ) {
     List<StateData> res = new ArrayList<>();
-    var proto = new StateData(requestMode);
+    var proto = stateDataConstructor.apply(requestMode);
 
     // carPickup searches may start and end in two distinct states:
     //   - CAR / IN_CAR where pickup happens directly at the bus stop

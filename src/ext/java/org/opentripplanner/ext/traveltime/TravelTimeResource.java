@@ -46,7 +46,6 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -117,14 +116,12 @@ public class TravelTimeResource {
       routingRequest.journey().transit().setFilters(List.of(request));
     }
 
+    var durationForMode = routingRequest.preferences().street().maxAccessEgressDuration();
     traveltimeRequest =
       new TravelTimeRequest(
         cutoffs.stream().map(DurationUtils::duration).toList(),
-        routingRequest
-          .preferences()
-          .street()
-          .maxAccessEgressDuration()
-          .valueOf(routingRequest.journey().access().mode())
+        durationForMode.valueOf(routingRequest.journey().access().mode()),
+        durationForMode.valueOf(routingRequest.journey().egress().mode())
       );
 
     if (time != null) {
@@ -253,7 +250,12 @@ public class TravelTimeResource {
 
       var spt = StreetSearchBuilder
         .of()
-        .setSkipEdgeStrategy(new DurationSkipEdgeStrategy(traveltimeRequest.maxCutoff))
+        .setSkipEdgeStrategy(
+          new PostTransitSkipEdgeStrategy(
+            traveltimeRequest.maxEgressDuration,
+            routingRequest.dateTime()
+          )
+        )
         .setRequest(routingRequest)
         .setStreetRequest(accessRequest.journey().access())
         .setVerticesContainer(temporaryVertices)
@@ -287,20 +289,26 @@ public class TravelTimeResource {
   ) {
     List<State> initialStates = new ArrayList<>();
 
-    StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper
+    StreetSearchRequest directStreetSearchRequest = StreetSearchRequestMapper
+      .map(routingRequest)
+      .withMode(routingRequest.journey().direct().mode())
+      .withArriveBy(false)
+      .build();
+
+    List<StateData> directStateDatas = StateData.getInitialStateDatas(directStreetSearchRequest);
+
+    for (var vertex : temporaryVertices.getFromVertices()) {
+      for (var stateData : directStateDatas) {
+        initialStates.add(new State(vertex, startTime, stateData, directStreetSearchRequest));
+      }
+    }
+
+    StreetSearchRequest egressStreetSearchRequest = StreetSearchRequestMapper
       .map(routingRequest)
       .withMode(routingRequest.journey().egress().mode())
       .withArriveBy(false)
       .build();
 
-    StateData stateData = StateData.getInitialStateData(streetSearchRequest);
-
-    for (var vertex : temporaryVertices.getFromVertices()) {
-      // TODO StateData should be of direct mode here
-      initialStates.add(new State(vertex, startTime, stateData, streetSearchRequest));
-    }
-
-    // TODO - Add a method to return all Stops, not StopLocations
     for (RegularStop stop : transitService.listRegularStops()) {
       int index = stop.getIndex();
       if (arrivals.reachedByTransit(index)) {
@@ -308,9 +316,15 @@ public class TravelTimeResource {
         Vertex v = graph.getStopVertexForStopId(stop.getId());
         if (v != null) {
           Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
-          State s = new State(v, time, stateData.clone(), streetSearchRequest);
-          s.weight = startTime.until(time, ChronoUnit.SECONDS);
-          initialStates.add(s);
+          List<StateData> egressStateDatas = StateData.getInitialStateDatas(
+            egressStreetSearchRequest,
+            mode -> new TravelTimeStateData(mode, time.getEpochSecond())
+          );
+          for (var stopStateData : egressStateDatas) {
+            State s = new State(v, time, stopStateData, directStreetSearchRequest);
+            s.weight = startTime.until(time, ChronoUnit.SECONDS);
+            initialStates.add(s);
+          }
         }
       }
     }
