@@ -36,6 +36,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   private int transferPriorityCost = TransferConstraint.ZERO_COST;
   private int waitTimeOptimizedCost = TransferWaitTimeCostCalculator.ZERO_COST;
   private int generalizedCost = CostCalculator.ZERO_COST;
+  private int iterationDepartureTime;
 
   public OptimizedPathTail(
     RaptorSlackProvider slackProvider,
@@ -125,6 +126,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 
   @Override
   public OptimizedPath<T> build(int iterationDepartureTime) {
+    this.iterationDepartureTime = iterationDepartureTime;
     return new OptimizedPath<>(
       createPathLegs(costCalculator(), slackProvider()),
       iterationDepartureTime,
@@ -152,7 +154,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   protected void add(PathBuilderLeg<T> newLeg) {
     addHead(newLeg);
     // Keep from- and to- times up to date by time-shifting access, transfer and egress legs.
-    newLeg.timeShiftThisAndNextLeg(slackProvider(), -1000009);
+    newLeg.timeShiftThisAndNextLeg(slackProvider(), iterationDepartureTime);
     addTransferPriorityCost(newLeg);
     addOptimizedWaitTimeCost(newLeg);
     updateGeneralizedCost();
