@@ -58,11 +58,12 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   // paths with the same path tail.
   private PathBuilderLeg<T> head = null;
   private PathBuilderLeg<T> tail = null;
-  private int iterationDepartureTime;
+  protected final int iterationDepartureTime;
 
   protected PathBuilder(PathBuilder<T> other) {
     this(
       other.slackProvider,
+      other.iterationDepartureTime,
       other.costCalculator,
       other.stopNameResolver,
       other.transferConstraintsSearch
@@ -73,6 +74,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
 
   protected PathBuilder(
     RaptorSlackProvider slackProvider,
+    int iterationDepartureTime,
     @Nullable CostCalculator<T> costCalculator,
     @Nullable RaptorStopNameResolver stopNameResolver,
     @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch
@@ -81,6 +83,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     this.costCalculator = costCalculator;
     this.stopNameResolver = stopNameResolver;
     this.transferConstraintsSearch = transferConstraintsSearch;
+    this.iterationDepartureTime = iterationDepartureTime;
   }
 
   /**
@@ -92,6 +95,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
    */
   public static <T extends RaptorTripSchedule> PathBuilder<T> headPathBuilder(
     RaptorSlackProvider slackProvider,
+    int iterationDepartureTime,
     @Nullable CostCalculator<T> costCalculator,
     @Nullable RaptorStopNameResolver stopNameResolver,
     @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch
@@ -99,6 +103,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     return new HeadPathBuilder<>(
       slackProvider,
       costCalculator,
+      iterationDepartureTime,
       stopNameResolver,
       transferConstraintsSearch
     );
@@ -113,6 +118,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
    */
   public static <T extends RaptorTripSchedule> PathBuilder<T> tailPathBuilder(
     RaptorSlackProvider slackProvider,
+    int iterationDepartureTime,
     @Nullable CostCalculator<T> costCalculator,
     @Nullable RaptorStopNameResolver stopNameResolver,
     @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch
@@ -120,6 +126,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     return new TailPathBuilder<>(
       slackProvider,
       costCalculator,
+      iterationDepartureTime,
       stopNameResolver,
       transferConstraintsSearch
     );
@@ -163,8 +170,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     add(PathBuilderLeg.egress(egress));
   }
 
-  public RaptorPath<T> build(int iterationDepartureTime) {
-    this.iterationDepartureTime = iterationDepartureTime;
+  public RaptorPath<T> build() {
     updateAggregatedFields();
     return new Path<>(iterationDepartureTime, createPathLegs(costCalculator, slackProvider));
   }
@@ -276,10 +282,17 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     private HeadPathBuilder(
       RaptorSlackProvider slackProvider,
       CostCalculator<T> costCalculator,
+      int iterationDepartureTime,
       @Nullable RaptorStopNameResolver stopNameResolver,
       @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch
     ) {
-      super(slackProvider, costCalculator, stopNameResolver, transferConstraintsSearch);
+      super(
+        slackProvider,
+        iterationDepartureTime,
+        costCalculator,
+        stopNameResolver,
+        transferConstraintsSearch
+      );
     }
 
     @Override
@@ -293,10 +306,17 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     private TailPathBuilder(
       RaptorSlackProvider slackProvider,
       CostCalculator<T> costCalculator,
+      int iterationDepartureTime,
       @Nullable RaptorStopNameResolver stopNameResolver,
       @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch
     ) {
-      super(slackProvider, costCalculator, stopNameResolver, transferConstraintsSearch);
+      super(
+        slackProvider,
+        iterationDepartureTime,
+        costCalculator,
+        stopNameResolver,
+        transferConstraintsSearch
+      );
     }
 
     @Override
