@@ -279,9 +279,9 @@ public class VertexLinker {
       return Set.of();
     }
 
-    Set<DistanceTo<StreetEdge>> closesEdges = getClosestEdgesPerMode(traverseModes, candidateEdges);
+    Set<DistanceTo<StreetEdge>> closestEdges = getClosestEdgesPerMode(traverseModes, candidateEdges);
     Set<AreaEdgeList> linkedAreas = new HashSet<>();
-    return closesEdges
+    return closestEdges
       .stream()
       .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
       .filter(v -> v != null)
