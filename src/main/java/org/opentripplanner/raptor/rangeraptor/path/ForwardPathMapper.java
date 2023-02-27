@@ -45,6 +45,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
   public RaptorPath<T> mapToPath(final DestinationArrival<T> destinationArrival) {
     var pathBuilder = PathBuilder.headPathBuilder(
       slackProvider,
+      iterationDepartureTime,
       costCalculator,
       stopNameResolver,
       transferConstraintsSearch
@@ -68,7 +69,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
       arrival = arrival.previous();
     }
 
-    return pathBuilder.build(iterationDepartureTime);
+    return pathBuilder.build();
   }
 
   private static BoardAndAlightTimeSearch forwardSearch(boolean useApproximateTimeSearch) {

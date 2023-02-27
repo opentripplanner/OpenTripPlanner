@@ -52,6 +52,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
   public RaptorPath<T> mapToPath(final DestinationArrival<T> destinationArrival) {
     var pathBuilder = PathBuilder.tailPathBuilder(
       slackProvider,
+      iterationDepartureTime,
       costCalculator,
       stopNameResolver,
       transferConstraintsSearch
@@ -63,7 +64,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
     while (true) {
       if (arrival.arrivedByAccess()) {
         pathBuilder.egress(arrival.accessPath().access());
-        return pathBuilder.build(iterationDepartureTime);
+        return pathBuilder.build();
       } else if (arrival.arrivedByTransit()) {
         var times = tripSearch.find(arrival);
         var transit = arrival.transitPath();
