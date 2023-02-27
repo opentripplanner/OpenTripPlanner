@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- NodeJS (version 10 or newer)
+- NodeJS (version 16 or newer)
 
 ## Running
 

@@ -9,7 +9,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -29,10 +28,8 @@ public class TestBanning {
 
     var filterRequest = TransitFilterRequest
       .of()
-      .addNot(SelectRequest.of().withRoutes(RouteMatcher.parse("F__RUT:Route:1")).build())
-      .addNot(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2"))).build()
-      )
+      .addNot(SelectRequest.of().withRoutes(List.of(id("RUT:Route:1"))).build())
+      .addNot(SelectRequest.of().withAgencies(List.of(id("RUT:Agency:2"))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);
@@ -48,10 +45,8 @@ public class TestBanning {
 
     var filterRequest = TransitFilterRequest
       .of()
-      .addSelect(SelectRequest.of().withRoutes(RouteMatcher.parse("F__RUT:Route:1")).build())
-      .addSelect(
-        SelectRequest.of().withAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2"))).build()
-      )
+      .addSelect(SelectRequest.of().withRoutes(List.of(id("RUT:Route:1"))).build())
+      .addSelect(SelectRequest.of().withAgencies(List.of(id("RUT:Agency:2"))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);
