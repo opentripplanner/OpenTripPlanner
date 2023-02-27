@@ -10,10 +10,16 @@ public class PostTransitSkipEdgeStrategy implements SkipEdgeStrategy<State, Edge
 
   private final long maxDurationSeconds;
   private final long departureTime;
+  private final boolean arriveBy;
 
-  public PostTransitSkipEdgeStrategy(Duration maxEgressTime, Instant departureTime) {
+  public PostTransitSkipEdgeStrategy(
+    Duration maxEgressTime,
+    Instant departureTime,
+    boolean arriveBy
+  ) {
     this.maxDurationSeconds = maxEgressTime.toSeconds();
     this.departureTime = departureTime.getEpochSecond();
+    this.arriveBy = arriveBy;
   }
 
   @Override
@@ -24,6 +30,14 @@ public class PostTransitSkipEdgeStrategy implements SkipEdgeStrategy<State, Edge
     } else {
       postTransitDepartureTime = departureTime;
     }
-    return current.getTimeSeconds() - postTransitDepartureTime > maxDurationSeconds;
+    long duration;
+
+    if (arriveBy) {
+      duration = postTransitDepartureTime - current.getTimeSeconds();
+    } else {
+      duration = current.getTimeSeconds() - postTransitDepartureTime;
+    }
+
+    return duration > maxDurationSeconds;
   }
 }

@@ -21,7 +21,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import javax.media.jai.RasterFactory;
 import org.geojson.MultiPolygon;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -51,8 +51,8 @@ import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
-import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.api.response.StopArrivals;
@@ -64,6 +64,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RouteRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -101,12 +102,14 @@ public class TravelTimeResource {
     @QueryParam("location") String location,
     @QueryParam("time") String time,
     @QueryParam("cutoff") @DefaultValue("60m") List<String> cutoffs,
-    @QueryParam("modes") String modes
+    @QueryParam("modes") String modes,
+    @QueryParam("arriveBy") @DefaultValue("false") boolean arriveBy
   ) {
     this.graph = serverContext.graph();
     this.transitService = serverContext.transitService();
     routingRequest = serverContext.defaultRouteRequest();
-    routingRequest.setFrom(LocationStringParser.fromOldStyleString(location));
+    routingRequest.setArriveBy(arriveBy);
+
     if (modes != null) {
       var modeSet = new QualifiedModeSet(modes);
       routingRequest.journey().setModes(modeSet.getRequestModes());
@@ -120,18 +123,23 @@ public class TravelTimeResource {
     traveltimeRequest =
       new TravelTimeRequest(
         cutoffs.stream().map(DurationUtils::duration).toList(),
-        durationForMode.valueOf(routingRequest.journey().access().mode()),
-        durationForMode.valueOf(routingRequest.journey().egress().mode())
+        durationForMode.valueOf(getAccessRequest(routingRequest).mode()),
+        durationForMode.valueOf(getEgressRequest(routingRequest).mode())
       );
 
-    if (time != null) {
-      startTime = Instant.parse(time);
-    } else {
-      startTime = Instant.now();
-    }
+    var parsedLocation = LocationStringParser.fromOldStyleString(location);
+    var requestTime = time != null ? Instant.parse(time) : Instant.now();
+    routingRequest.setDateTime(requestTime);
 
-    routingRequest.setDateTime(startTime);
-    endTime = startTime.plus(traveltimeRequest.maxCutoff);
+    if (routingRequest.arriveBy()) {
+      startTime = requestTime.minus(traveltimeRequest.maxCutoff);
+      endTime = requestTime;
+      routingRequest.setTo(parsedLocation);
+    } else {
+      startTime = requestTime;
+      endTime = startTime.plus(traveltimeRequest.maxCutoff);
+      routingRequest.setFrom(parsedLocation);
+    }
 
     ZoneId zoneId = transitService.getTimeZone();
     LocalDate startDate = LocalDate.ofInstant(startTime, zoneId);
@@ -225,27 +233,15 @@ public class TravelTimeResource {
   }
 
   private ZSampleGrid<WTWD> getSampleGrid() {
-    final RouteRequest accessRequest = routingRequest.clone();
-
-    accessRequest.withPreferences(preferences ->
-      preferences.withStreet(it ->
-        it.withMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration, Map.of())
-      )
-    );
-
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
-        accessRequest,
-        accessRequest.journey().access().mode(),
+        routingRequest,
+        getAccessRequest(routingRequest).mode(),
         StreetMode.NOT_SET
       )
     ) {
-      final Collection<DefaultAccessEgress> accessList = getAccess(
-        accessRequest,
-        temporaryVertices
-      );
-
+      var accessList = getAccess(temporaryVertices);
       var arrivals = route(accessList).getArrivals();
 
       var spt = StreetSearchBuilder
@@ -253,11 +249,12 @@ public class TravelTimeResource {
         .setSkipEdgeStrategy(
           new PostTransitSkipEdgeStrategy(
             traveltimeRequest.maxEgressDuration,
-            routingRequest.dateTime()
+            routingRequest.dateTime(),
+            routingRequest.arriveBy()
           )
         )
         .setRequest(routingRequest)
-        .setStreetRequest(accessRequest.journey().access())
+        .setStreetRequest(getEgressRequest(routingRequest))
         .setVerticesContainer(temporaryVertices)
         .setDominanceFunction(new DominanceFunctions.EarliestArrival())
         .setInitialStates(getInitialStates(arrivals, temporaryVertices))
@@ -267,20 +264,17 @@ public class TravelTimeResource {
     }
   }
 
-  private Collection<DefaultAccessEgress> getAccess(
-    RouteRequest accessRequest,
-    TemporaryVerticesContainer temporaryVertices
-  ) {
+  private Collection<DefaultAccessEgress> getAccess(TemporaryVerticesContainer temporaryVertices) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-      accessRequest,
+      routingRequest,
       temporaryVertices,
       transitService,
-      routingRequest.journey().access(),
+      getAccessRequest(routingRequest),
       null,
-      false,
+      routingRequest.arriveBy(),
       traveltimeRequest.maxAccessDuration
     );
-    return new AccessEgressMapper().mapNearbyStops(accessStops, false);
+    return new AccessEgressMapper().mapNearbyStops(accessStops, routingRequest.arriveBy());
   }
 
   private List<State> getInitialStates(
@@ -292,12 +286,15 @@ public class TravelTimeResource {
     StreetSearchRequest directStreetSearchRequest = StreetSearchRequestMapper
       .map(routingRequest)
       .withMode(routingRequest.journey().direct().mode())
-      .withArriveBy(false)
+      .withArriveBy(routingRequest.arriveBy())
       .build();
 
     List<StateData> directStateDatas = StateData.getInitialStateDatas(directStreetSearchRequest);
 
-    for (var vertex : temporaryVertices.getFromVertices()) {
+    Set<Vertex> vertices = routingRequest.arriveBy()
+      ? temporaryVertices.getToVertices()
+      : temporaryVertices.getFromVertices();
+    for (var vertex : vertices) {
       for (var stateData : directStateDatas) {
         initialStates.add(new State(vertex, startTime, stateData, directStreetSearchRequest));
       }
@@ -305,46 +302,69 @@ public class TravelTimeResource {
 
     StreetSearchRequest egressStreetSearchRequest = StreetSearchRequestMapper
       .map(routingRequest)
-      .withMode(routingRequest.journey().egress().mode())
-      .withArriveBy(false)
+      .withMode(getEgressRequest(routingRequest).mode())
+      .withArriveBy(routingRequest.arriveBy())
       .build();
 
     for (RegularStop stop : transitService.listRegularStops()) {
       int index = stop.getIndex();
-      if (arrivals.reachedByTransit(index)) {
-        final int arrivalTime = arrivals.bestTransitArrivalTime(index);
-        Vertex v = graph.getStopVertexForStopId(stop.getId());
-        if (v != null) {
-          Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
-          List<StateData> egressStateDatas = StateData.getInitialStateDatas(
-            egressStreetSearchRequest,
-            mode -> new TravelTimeStateData(mode, time.getEpochSecond())
-          );
-          for (var stopStateData : egressStateDatas) {
-            State s = new State(v, time, stopStateData, directStreetSearchRequest);
-            s.weight = startTime.until(time, ChronoUnit.SECONDS);
-            initialStates.add(s);
-          }
-        }
+      if (!arrivals.reachedByTransit(index)) {
+        continue;
+      }
+      final int arrivalTime = arrivals.bestTransitArrivalTime(index);
+      Vertex v = graph.getStopVertexForStopId(stop.getId());
+      if (v == null) {
+        continue;
+      }
+      Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
+      List<StateData> egressStateDatas = StateData.getInitialStateDatas(
+        egressStreetSearchRequest,
+        mode -> new TravelTimeStateData(mode, time.getEpochSecond())
+      );
+      for (var stopStateData : egressStateDatas) {
+        State s = new State(v, time, stopStateData, directStreetSearchRequest);
+        s.weight =
+          routingRequest.arriveBy()
+            ? time.until(endTime, ChronoUnit.SECONDS)
+            : startTime.until(time, ChronoUnit.SECONDS);
+        initialStates.add(s);
       }
     }
     return initialStates;
   }
 
   private RaptorResponse<TripSchedule> route(Collection<? extends RaptorAccessEgress> accessList) {
-    final RaptorRequest<TripSchedule> request = new RaptorRequestBuilder<TripSchedule>()
+    RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
+
+    builder
       .profile(RaptorProfile.BEST_TIME)
       .searchParams()
       .earliestDepartureTime(ServiceDateUtils.secondsSinceStartOfTime(startOfTime, startTime))
       .latestArrivalTime(ServiceDateUtils.secondsSinceStartOfTime(startOfTime, endTime))
-      .addAccessPaths(accessList)
       .searchOneIterationOnly()
       .timetable(false)
-      .allowEmptyEgressPaths(true)
-      .constrainedTransfers(false) // TODO: Not compatible with best times
-      .build();
+      .allowEmptyAccessEgressPaths(true)
+      .constrainedTransfers(false); // TODO: Not compatible with best times
 
-    return raptorService.route(request, requestTransitDataProvider);
+    if (routingRequest.arriveBy()) {
+      builder.searchDirection(SearchDirection.REVERSE).searchParams().addEgressPaths(accessList);
+    } else {
+      builder.searchDirection(SearchDirection.FORWARD).searchParams().addAccessPaths(accessList);
+    }
+
+    return raptorService.route(builder.build(), requestTransitDataProvider);
+  }
+
+  private StreetRequest getAccessRequest(RouteRequest accessRequest) {
+    return routingRequest.arriveBy()
+      ? accessRequest.journey().egress()
+      : accessRequest.journey().access();
+  }
+
+  private StreetRequest getEgressRequest(RouteRequest accessRequest) {
+    return routingRequest.arriveBy()
+      ? accessRequest.journey().access()
+      : accessRequest.journey().egress();
   }
 
   static SimpleFeatureType makeContourSchema() {
