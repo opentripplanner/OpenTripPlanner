@@ -40,7 +40,15 @@ public class LinkStopToPlatformTest {
 
   @BeforeEach
   public void before() {
-    // Set up transit platform
+    /* Set up transit platform with 5 corners and a stop outside the platform. It looks like this:
+         ________________________________________
+        |                                        |
+	|                                        |
+        |                                       /
+        |                                      /
+	 -------------------------------------
+                        *
+       */
 
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
@@ -56,7 +64,18 @@ public class LinkStopToPlatformTest {
     vertices.add(new IntersectionVertex(graph, "5", 10.22056, 59.13575, "Platform vertex 5"));
 
     AreaEdgeList areaEdgeList = new AreaEdgeList(
-      GeometryUtils.getGeometryFactory().createPolygon(),
+      GeometryUtils
+        .getGeometryFactory()
+        .createPolygon(
+          new Coordinate[] {
+            new Coordinate(59.13568, 10.22054),
+            new Coordinate(59.13519, 10.22432),
+            new Coordinate(59.13514, 10.22492),
+            new Coordinate(59.13518, 10.22493),
+            new Coordinate(59.13575, 10.22056),
+            new Coordinate(59.13568, 10.22054),
+          }
+        ),
       Set.of()
     );
 
