@@ -51,7 +51,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     fromVertices = index.getVerticesForLocation(opt.from(), accessMode, false, tempEdges);
     toVertices = index.getVerticesForLocation(opt.to(), egressMode, true, tempEdges);
 
-    checkIfVerticesFound(opt.arriveBy());
+    checkIfVerticesFound();
 
     if (fromVertices != null && toVertices != null) {
       for (Vertex fromVertex : fromVertices) {
@@ -82,21 +82,18 @@ public class TemporaryVerticesContainer implements AutoCloseable {
 
   /* PRIVATE METHODS */
 
-  private void checkIfVerticesFound(boolean arriveBy) {
+  private void checkIfVerticesFound() {
     List<RoutingError> routingErrors = new ArrayList<>();
 
-    var from = arriveBy ? toVertices : fromVertices;
-    var to = arriveBy ? fromVertices : toVertices;
-
     // check that vertices where found if from-location was specified
-    if (opt.from().isSpecified() && isDisconnected(from, true)) {
+    if (opt.from().isSpecified() && isDisconnected(fromVertices, true)) {
       routingErrors.add(
         new RoutingError(getRoutingErrorCodeForDisconnected(opt.from()), InputField.FROM_PLACE)
       );
     }
 
     // check that vertices where found if to-location was specified
-    if (opt.to().isSpecified() && isDisconnected(to, false)) {
+    if (opt.to().isSpecified() && isDisconnected(toVertices, false)) {
       routingErrors.add(
         new RoutingError(getRoutingErrorCodeForDisconnected(opt.to()), InputField.TO_PLACE)
       );
@@ -104,7 +101,11 @@ public class TemporaryVerticesContainer implements AutoCloseable {
 
     // if from and to share any vertices, the user is already at their destination, and the result
     // is a trivial path
-    if (from != null && to != null && !Sets.intersection(from, to).isEmpty()) {
+    if (
+      fromVertices != null &&
+      toVertices != null &&
+      !Sets.intersection(fromVertices, toVertices).isEmpty()
+    ) {
       routingErrors.add(new RoutingError(RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, null));
     }
 
@@ -125,7 +126,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
 
     // Not connected if linking did not create incoming/outgoing edges depending on the
     // direction and the end.
-    Predicate<Vertex> isNotConnected = (isFrom == opt.arriveBy()) ? hasNoIncoming : hasNoOutgoing;
+    Predicate<Vertex> isNotConnected = isFrom ? hasNoOutgoing : hasNoIncoming;
 
     return vertices.stream().allMatch(isNotTransit.and(isNotConnected));
   }
