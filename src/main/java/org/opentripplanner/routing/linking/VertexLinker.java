@@ -280,10 +280,11 @@ public class VertexLinker {
     }
 
     Set<DistanceTo<StreetEdge>> closesEdges = getClosestEdgesPerMode(traverseModes, candidateEdges);
-
+    Set<AreaEdgeList> linkedAreas = new HashSet<>();
     return closesEdges
       .stream()
-      .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges))
+      .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
+      .filter(v -> v != null)
       .collect(Collectors.toSet());
   }
 
@@ -349,7 +350,8 @@ public class VertexLinker {
     double xScale,
     Scope scope,
     LinkingDirection direction,
-    DisposableEdgeCollection tempEdges
+    DisposableEdgeCollection tempEdges,
+    Set<AreaEdgeList> linkedAreas
   ) {
     // TODO: we've already built this line string, we should save it
     LineString orig = edge.getGeometry();
@@ -385,6 +387,11 @@ public class VertexLinker {
       boolean split = true;
       // if vertex is inside an area, no need to snap to nearest edge and split it
       if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
+        // do not relink again to same area when many edges are equally close
+        if (linkedAreas.contains(aEdge.getArea())) {
+          return null;
+        }
+
         if (
           aEdge
             .getArea()
@@ -597,6 +604,13 @@ public class VertexLinker {
     Scope scope,
     DisposableEdgeCollection tempEdges
   ) {
+    // Check that vertices are not yet linked
+    for (Edge e : from.getOutgoing()) {
+      if (e.getToVertex() == to) {
+        return;
+      }
+    }
+
     LineString line = GEOMETRY_FACTORY.createLineString(
       new Coordinate[] { from.getCoordinate(), to.getCoordinate() }
     );
