@@ -11,6 +11,7 @@ public class DefaultStopArrivals implements StopArrivals {
 
   private SingleCriteriaStopArrivals bestOverallArrivalTime = null;
   private SingleCriteriaStopArrivals bestTransitArrivalTime = null;
+  private SingleCriteriaStopArrivals bestTransitArrivalDuration = null;
   private SingleCriteriaStopArrivals bestNumberOfTransfers = null;
 
   private final RaptorWorkerResult<?> results;
@@ -40,6 +41,11 @@ public class DefaultStopArrivals implements StopArrivals {
   }
 
   @Override
+  public int bestTransitArrivalDuration(int stopIndex) {
+    return bestTransitArrivalDuration().value(stopIndex);
+  }
+
+  @Override
   public int smallestNumberOfTransfers(int stopIndex) {
     return bestNumberOfTransfers().value(stopIndex);
   }
@@ -56,6 +62,13 @@ public class DefaultStopArrivals implements StopArrivals {
       this.bestTransitArrivalTime = results.extractBestTransitArrivals();
     }
     return bestTransitArrivalTime;
+  }
+
+  private SingleCriteriaStopArrivals bestTransitArrivalDuration() {
+    if (bestTransitArrivalDuration == null) {
+      this.bestTransitArrivalDuration = results.extractBestTransitDurations();
+    }
+    return bestTransitArrivalDuration;
   }
 
   private SingleCriteriaStopArrivals bestNumberOfTransfers() {

@@ -4,6 +4,7 @@ import static org.opentripplanner.framework.lang.IntUtils.intArray;
 
 import java.util.BitSet;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.support.IntArraySingleCriteriaArrivals;
@@ -27,6 +28,9 @@ import org.opentripplanner.raptor.util.BitSetIterator;
  */
 public final class BestTimes {
 
+  /** Duration is always positive, and negative is lower so use unreached high value. */
+  private static final int UNREACHED_DURATION = RaptorConstants.UNREACHED_HIGH;
+
   /** The best times to reach a stop, across rounds and iterations. */
   private final int[] times;
 
@@ -35,12 +39,17 @@ public final class BestTimes {
    * both transit arrivals and access-on-board arrivals.
    */
   private final int[] transitArrivalTimes;
+  /**
+   * The best duration from the departure time of the raptor round to the arrival at the stop
+   */
+  private final int[] transitArrivalDurations;
   private final BitSet reachedByTransitCurrentRound;
   private final TransitCalculator<?> calculator;
   /** Stops touched in the CURRENT round. */
   private BitSet reachedCurrentRound;
   /** Stops touched by in LAST round. */
   private BitSet reachedLastRound;
+  private int departureTime;
 
   public BestTimes(int nStops, TransitCalculator<?> calculator, WorkerLifeCycle lifeCycle) {
     this.calculator = calculator;
@@ -49,10 +58,11 @@ public final class BestTimes {
     this.reachedLastRound = new BitSet(nStops);
 
     this.transitArrivalTimes = intArray(nStops, calculator.unreachedTime());
+    this.transitArrivalDurations = intArray(nStops, UNREACHED_DURATION);
     this.reachedByTransitCurrentRound = new BitSet(nStops);
 
     // Attach to Worker life cycle
-    lifeCycle.onSetupIteration(ignore -> setupIteration());
+    lifeCycle.onSetupIteration(this::setupIteration);
     lifeCycle.onPrepareForNextRound(round -> prepareForNextRound());
   }
 
@@ -112,6 +122,7 @@ public final class BestTimes {
   public boolean updateBestTransitArrivalTime(int stop, int time) {
     if (isBestTransitArrivalTime(stop, time)) {
       setBestTransitTime(stop, time);
+      setBestTransitDuration(stop, time);
       return true;
     }
     return false;
@@ -138,6 +149,10 @@ public final class BestTimes {
 
   public SingleCriteriaStopArrivals extractBestTransitArrivals() {
     return new IntArraySingleCriteriaArrivals(calculator.unreachedTime(), transitArrivalTimes);
+  }
+
+  public SingleCriteriaStopArrivals extractBestTransitDurations() {
+    return new IntArraySingleCriteriaArrivals(UNREACHED_DURATION, transitArrivalDurations);
   }
 
   @Override
@@ -171,10 +186,11 @@ public final class BestTimes {
    * Clear all reached flags before we start a new iteration. This is important so stops visited in
    * the previous iteration in the last round does not "overflow" into the next iteration.
    */
-  private void setupIteration() {
+  private void setupIteration(int departureTime) {
     // clear all touched stops to avoid constant reëxploration
     reachedCurrentRound.clear();
     reachedByTransitCurrentRound.clear();
+    this.departureTime = departureTime;
   }
 
   /**
@@ -204,6 +220,13 @@ public final class BestTimes {
   private void setBestTransitTime(int stop, int time) {
     transitArrivalTimes[stop] = time;
     reachedByTransitCurrentRound.set(stop);
+  }
+
+  private void setBestTransitDuration(int stop, int time) {
+    int duration = calculator.duration(departureTime, time);
+    if (duration < transitArrivalDurations[stop]) {
+      transitArrivalDurations[stop] = duration;
+    }
   }
 
   private void swapReachedCurrentAndLastRound() {
