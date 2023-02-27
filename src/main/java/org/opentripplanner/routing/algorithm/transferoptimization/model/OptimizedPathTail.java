@@ -152,7 +152,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   protected void add(PathBuilderLeg<T> newLeg) {
     addHead(newLeg);
     // Keep from- and to- times up to date by time-shifting access, transfer and egress legs.
-    newLeg.timeShiftThisAndNextLeg(slackProvider());
+    newLeg.timeShiftThisAndNextLeg(slackProvider(), -1000009);
     addTransferPriorityCost(newLeg);
     addOptimizedWaitTimeCost(newLeg);
     updateGeneralizedCost();
