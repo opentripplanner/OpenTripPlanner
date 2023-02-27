@@ -22,6 +22,7 @@ import java.util.Set;
 import org.geotools.data.geojson.GeoJSONWriter;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -46,6 +47,7 @@ import org.opentripplanner.routing.api.request.request.filter.TransitFilterReque
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
@@ -171,23 +173,7 @@ public class TravelTimeResource {
     ) {
       var accessList = getAccess(temporaryVertices);
       var arrivals = route(accessList).getArrivals();
-
-      var spt = StreetSearchBuilder
-        .of()
-        .setSkipEdgeStrategy(
-          new PostTransitSkipEdgeStrategy(
-            traveltimeRequest.maxEgressDuration,
-            routingRequest.dateTime(),
-            routingRequest.arriveBy()
-          )
-        )
-        .setRequest(routingRequest)
-        .setStreetRequest(getEgressRequest(routingRequest))
-        .setVerticesContainer(temporaryVertices)
-        .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-        .setInitialStates(getInitialStates(arrivals, temporaryVertices))
-        .getShortestPathTree();
-
+      var spt = getShortestPathTree(temporaryVertices, arrivals);
       return SampleGridRenderer.getSampleGrid(spt, traveltimeRequest);
     }
   }
@@ -203,6 +189,27 @@ public class TravelTimeResource {
       traveltimeRequest.maxAccessDuration
     );
     return new AccessEgressMapper().mapNearbyStops(accessStops, routingRequest.arriveBy());
+  }
+
+  private ShortestPathTree<State, Edge, Vertex> getShortestPathTree(
+    TemporaryVerticesContainer temporaryVertices,
+    StopArrivals arrivals
+  ) {
+    return StreetSearchBuilder
+      .of()
+      .setSkipEdgeStrategy(
+        new PostTransitSkipEdgeStrategy(
+          traveltimeRequest.maxEgressDuration,
+          routingRequest.dateTime(),
+          routingRequest.arriveBy()
+        )
+      )
+      .setRequest(routingRequest)
+      .setStreetRequest(getEgressRequest(routingRequest))
+      .setVerticesContainer(temporaryVertices)
+      .setDominanceFunction(new DominanceFunctions.EarliestArrival())
+      .setInitialStates(getInitialStates(arrivals, temporaryVertices))
+      .getShortestPathTree();
   }
 
   private List<State> getInitialStates(
