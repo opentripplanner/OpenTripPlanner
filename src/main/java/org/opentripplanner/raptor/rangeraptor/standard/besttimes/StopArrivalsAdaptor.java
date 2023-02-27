@@ -32,9 +32,4 @@ public class StopArrivalsAdaptor implements StopArrivals {
   public int bestTransitArrivalTime(int stopIndex) {
     return bestTimes.transitArrivalTime(stopIndex);
   }
-
-  @Override
-  public int smallestNumberOfTransfers(int stopIndex) {
-    return nTransfers.calculateMinNumberOfTransfers(stopIndex);
-  }
 }
