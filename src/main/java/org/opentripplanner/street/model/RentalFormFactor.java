@@ -7,9 +7,9 @@ public enum RentalFormFactor {
   CARGO_BICYCLE(TraverseMode.BICYCLE),
   CAR(TraverseMode.CAR),
   MOPED(TraverseMode.BICYCLE),
-  SCOOTER(TraverseMode.BICYCLE),
-  SCOOTER_STANDING(TraverseMode.BICYCLE),
-  SCOOTER_SEATED(TraverseMode.BICYCLE),
+  SCOOTER(TraverseMode.SCOOTER),
+  SCOOTER_STANDING(TraverseMode.SCOOTER),
+  SCOOTER_SEATED(TraverseMode.SCOOTER),
   OTHER(TraverseMode.BICYCLE);
 
   public final TraverseMode traverseMode;
