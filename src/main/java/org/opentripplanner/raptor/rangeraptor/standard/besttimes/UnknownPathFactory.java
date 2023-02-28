@@ -10,6 +10,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
+import org.opentripplanner.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.UnknownPath;
@@ -23,7 +24,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 public class UnknownPathFactory<T extends RaptorTripSchedule> {
 
   private final BestTimes bestTimes;
-  private final SimpleBestNumberOfTransfers bestNumberOfTransfers;
+  private final BestNumberOfTransfers bestNumberOfTransfers;
   private final TransitCalculator<T> transitCalculator;
   private final int transferSlack;
   private final List<RaptorAccessEgress> egressPaths;
@@ -34,7 +35,7 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
 
   public UnknownPathFactory(
     BestTimes bestTimes,
-    SimpleBestNumberOfTransfers bestNumberOfTransfers,
+    BestNumberOfTransfers bestNumberOfTransfers,
     TransitCalculator<T> transitCalculator,
     int transferSlack,
     EgressPaths egressPaths,

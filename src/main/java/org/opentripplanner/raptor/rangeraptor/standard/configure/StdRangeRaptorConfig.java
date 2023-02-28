@@ -3,7 +3,8 @@ package org.opentripplanner.raptor.rangeraptor.standard.configure;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
 
-import java.util.function.Supplier;
+import java.util.HashSet;
+import java.util.Set;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
@@ -42,54 +43,60 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private final SearchContext<T> ctx;
   private final PathConfig<T> pathConfig;
-  private final RaptorWorkerState<T> state;
   private final RoutingStrategy<T> strategy;
+  private final Set<Class<?>> oneOfInstanceTypes = new HashSet<>();
 
+  private RaptorWorkerState<T> state;
   private BestTimes bestTimes;
-  private ArrivedAtDestinationCheck destinationCheck;
-  private BestNumberOfTransfers bestNumberOfTransfers;
+  private StdStopArrivals<T> stopArrivals;
+  private ArrivedAtDestinationCheck arrivedAtDestinationCheck;
+
+  private SimpleBestNumberOfTransfers simpleBestNumberOfTransfers;
 
   public StdRangeRaptorConfig(SearchContext<T> context) {
+    new VerifyRequestIsValid(context).verify();
     this.ctx = context;
     this.pathConfig = new PathConfig<>(context);
-    this.state = createState();
-    this.strategy = createWorkerStrategy(state);
+    this.strategy = createWorkerStrategy();
   }
 
   public RaptorWorkerState<T> state() {
-    return state;
+    return resolveState();
   }
 
   public RoutingStrategy<T> strategy() {
     return strategy;
   }
 
-  /* private factory methods */
-
-  private RaptorWorkerState<T> createState() {
-    new VerifyRequestIsValid(ctx).verify();
-    switch (ctx.profile()) {
-      case STANDARD:
-        return workerState(stdStopArrivalsState());
-      case BEST_TIME:
-      case MIN_TRAVEL_DURATION:
-        return workerState(bestTimeStopArrivalsState());
-    }
-    throw new IllegalArgumentException(ctx.profile().toString());
+  public Heuristics createHeuristics(RaptorWorkerResult<T> results) {
+    return oneOf(
+      new HeuristicsAdapter(
+        ctx.nStops(),
+        ctx.egressPaths(),
+        ctx.calculator(),
+        ctx.costCalculator(),
+        results.extractBestOverallArrivals(),
+        results.extractBestTransitArrivals(),
+        results.extractBestNumberOfTransfers()
+      ),
+      Heuristics.class
+    );
   }
 
-  private RoutingStrategy<T> createWorkerStrategy(RaptorWorkerState<T> state) {
+  /* private factory methods */
+
+  private RoutingStrategy<T> createWorkerStrategy() {
     switch (ctx.profile()) {
       case STANDARD:
       case BEST_TIME:
         return new ArrivalTimeRoutingStrategy<>(
-          (StdWorkerState<T>) state,
+          resolveState(),
           ctx.createTimeBasedBoardingSupport(),
           ctx.calculator()
         );
       case MIN_TRAVEL_DURATION:
         return new MinTravelDurationRoutingStrategy<>(
-          (StdWorkerState<T>) state,
+          resolveState(),
           ctx.createTimeBasedBoardingSupport(),
           ctx.calculator(),
           ctx.lifeCycle()
@@ -98,42 +105,62 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     throw new IllegalArgumentException(ctx.profile().toString());
   }
 
-  public Heuristics createHeuristics(RaptorWorkerResult<T> results) {
-    return new HeuristicsAdapter(
-      ctx.nStops(),
-      ctx.egressPaths(),
-      ctx.calculator(),
-      ctx.costCalculator(),
-      results.extractBestOverallArrivals(),
-      results.extractBestTransitArrivals(),
-      results.extractBestNumberOfTransfers()
-    );
-  }
-
-  private StdRangeRaptorWorkerState<T> workerState(StopArrivalsState<T> stopArrivalsState) {
-    return new StdRangeRaptorWorkerState<>(
-      ctx.calculator(),
-      bestTimes(),
-      stopArrivalsState,
-      destinationCheck()
-    );
-  }
-
-  private StopArrivalsState<T> bestTimeStopArrivalsState() {
-    return new BestTimesOnlyStopArrivalsState<>(
-      bestTimes(),
-      simpleBestNumberOfTransfers(),
-      unknownPathFactory()
-    );
+  private StdRangeRaptorWorkerState<T> resolveState() {
+    if (state == null) {
+      this.state =
+        oneOf(
+          new StdRangeRaptorWorkerState<>(
+            ctx.calculator(),
+            resolveBestTimes(),
+            createStopArrivals(),
+            resolveArrivedAtDestinationCheck()
+          ),
+          StdWorkerState.class
+        );
+    }
+    return (StdRangeRaptorWorkerState<T>) state;
   }
 
   /**
    * Return instance if created by heuristics or null if not needed.
    */
-  private SimpleBestNumberOfTransfers simpleBestNumberOfTransfers() {
-    return withBestNumberOfTransfers(
-      SimpleBestNumberOfTransfers.class,
-      () -> new SimpleBestNumberOfTransfers(ctx.nStops(), ctx.roundProvider())
+  private SimpleBestNumberOfTransfers resolveSimpleBestNumberOfTransfers() {
+    if (simpleBestNumberOfTransfers == null) {
+      simpleBestNumberOfTransfers =
+        oneOf(
+          new SimpleBestNumberOfTransfers(ctx.nStops(), ctx.roundProvider()),
+          BestNumberOfTransfers.class
+        );
+    }
+    return simpleBestNumberOfTransfers;
+  }
+
+  /**
+   *  Cache best times; request scope
+   */
+  private BestTimes resolveBestTimes() {
+    if (bestTimes == null) {
+      bestTimes = new BestTimes(ctx.nStops(), ctx.calculator(), ctx.lifeCycle());
+    }
+    return bestTimes;
+  }
+
+  private StopArrivalsState<T> createStopArrivals() {
+    return switch (ctx.profile()) {
+      case STANDARD -> stdStopArrivalsState();
+      case BEST_TIME, MIN_TRAVEL_DURATION -> createBestTimeStopArrivalsState();
+      default -> throw new IllegalArgumentException(ctx.profile().toString());
+    };
+  }
+
+  private StopArrivalsState<T> createBestTimeStopArrivalsState() {
+    return oneOf(
+      new BestTimesOnlyStopArrivalsState<>(
+        resolveBestTimes(),
+        resolveSimpleBestNumberOfTransfers(),
+        unknownPathFactory()
+      ),
+      StopArrivalsState.class
     );
   }
 
@@ -142,9 +169,9 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
    * arrival state is wrapped.
    */
   private StopArrivalsState<T> stdStopArrivalsState() {
-    StdStopArrivalsState<T> state = new StdStopArrivalsState<>(
-      stopArrivals(),
-      destinationArrivalPaths()
+    var state = oneOf(
+      new StdStopArrivalsState<>(resolveStopArrivals(), destinationArrivalPaths()),
+      StopArrivalsState.class
     );
     return wrapStopArrivalsStateWithDebugger(state);
   }
@@ -162,103 +189,111 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     }
   }
 
-  private StdStopArrivals<T> stopArrivals() {
-    //noinspection unchecked
-    return withBestNumberOfTransfers(
-      StdStopArrivals.class,
-      () -> new StdStopArrivals<T>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider())
-    );
-  }
-
-  @SuppressWarnings("unchecked")
-  private <S extends BestNumberOfTransfers> S withBestNumberOfTransfers(
-    Class<S> type,
-    Supplier<S> newValueFactory
-  ) {
-    if (this.bestNumberOfTransfers == null) {
-      this.bestNumberOfTransfers = newValueFactory.get();
-    } else if (this.bestNumberOfTransfers.getClass() != type) {
-      throw new IllegalStateException(
-        "There is more than one type of 'bestNumberOfTransfers': " +
-        type.getSimpleName() +
-        ", " +
-        this.bestNumberOfTransfers.getClass().getSimpleName()
-      );
-    }
-    return (S) this.bestNumberOfTransfers;
-  }
-
-  private StopsCursor<T> stopsCursor() {
-    // Always create new cursors
-    return new StopsCursor<>(stopArrivals(), ctx.calculator(), ctx.boardSlackProvider());
-  }
-
   private DestinationArrivalPaths<T> destinationArrivalPaths() {
     var destinationArrivalPaths = pathConfig.createDestArrivalPathsWithoutGeneralizedCost();
 
     // Add egressArrivals to stops and bind them to the destination arrival paths. The
     // adapter notify the destination on each new egress stop arrival.
-    EgressArrivalToPathAdapter<T> pathsAdapter = new EgressArrivalToPathAdapter<>(
-      destinationArrivalPaths,
-      ctx.calculator(),
-      ctx.slackProvider(),
-      stopsCursor(),
-      ctx.lifeCycle()
-    );
+    var pathsAdapter = createEgressArrivalToPathAdapter(destinationArrivalPaths);
 
-    // Use the  adapter to play the role of the destination arrival check
-    setDestinationCheck(pathsAdapter);
-
-    stopArrivals().setupEgressStopStates(ctx.egressPaths(), pathsAdapter);
+    resolveStopArrivals().setupEgressStopStates(ctx.egressPaths(), pathsAdapter);
 
     return destinationArrivalPaths;
   }
 
-  private BestTimes bestTimes() {
-    // Cache best times; request scope
-    if (bestTimes == null) {
-      bestTimes = new BestTimes(ctx.nStops(), ctx.calculator(), ctx.lifeCycle());
+  private EgressArrivalToPathAdapter<T> createEgressArrivalToPathAdapter(
+    DestinationArrivalPaths<T> destinationArrivalPaths
+  ) {
+    return withArrivedAtDestinationCheck(
+      new EgressArrivalToPathAdapter<>(
+        destinationArrivalPaths,
+        ctx.calculator(),
+        ctx.slackProvider(),
+        stopsCursor(),
+        ctx.lifeCycle()
+      )
+    );
+  }
+
+  /**
+   * Always create new cursors - it has state local to the caller
+   */
+  private StopsCursor<T> stopsCursor() {
+    return new StopsCursor<>(resolveStopArrivals(), ctx.calculator(), ctx.boardSlackProvider());
+  }
+
+  private StdStopArrivals<T> resolveStopArrivals() {
+    if (stopArrivals == null) {
+      this.stopArrivals =
+        oneOf(
+          new StdStopArrivals<T>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider()),
+          BestNumberOfTransfers.class,
+          StdStopArrivals.class
+        );
     }
-    return bestTimes;
+    return stopArrivals;
   }
 
   private UnknownPathFactory<T> unknownPathFactory() {
-    return new UnknownPathFactory<>(
-      bestTimes(),
-      simpleBestNumberOfTransfers(),
-      ctx.calculator(),
-      ctx.slackProvider().transferSlack(),
-      ctx.egressPaths(),
-      MIN_TRAVEL_DURATION.is(ctx.profile()),
-      paretoComparator(ctx.searchParams(), false, ctx.searchDirection()),
-      ctx.lifeCycle()
+    return oneOf(
+      new UnknownPathFactory<>(
+        resolveBestTimes(),
+        resolveSimpleBestNumberOfTransfers(),
+        ctx.calculator(),
+        ctx.slackProvider().transferSlack(),
+        ctx.egressPaths(),
+        MIN_TRAVEL_DURATION.is(ctx.profile()),
+        paretoComparator(ctx.searchParams(), false, ctx.searchDirection()),
+        ctx.lifeCycle()
+      ),
+      UnknownPathFactory.class
     );
   }
 
-  private ArrivedAtDestinationCheck destinationCheck() {
-    // Cache best times; request scope
-    if (destinationCheck == null) {
-      setDestinationCheck(simpleDestinationCheck());
+  private ArrivedAtDestinationCheck resolveArrivedAtDestinationCheck() {
+    if (arrivedAtDestinationCheck == null) {
+      withArrivedAtDestinationCheck(createSimpleArrivedAtDestinationCheck());
     }
-    return destinationCheck;
+    return arrivedAtDestinationCheck;
   }
 
-  private void setDestinationCheck(ArrivedAtDestinationCheck check) {
-    // Cache best times; request scope
-    if (destinationCheck != null) {
-      throw new IllegalStateException(
-        "ArrivedAtDestinationCheck is already initialized: " +
-        destinationCheck.getClass().getSimpleName()
-      );
-    }
-    destinationCheck = check;
-  }
-
-  private SimpleArrivedAtDestinationCheck simpleDestinationCheck() {
+  private SimpleArrivedAtDestinationCheck createSimpleArrivedAtDestinationCheck() {
     return new SimpleArrivedAtDestinationCheck(
-      bestTimes(),
+      resolveBestTimes(),
       ctx.egressPaths().egressesWitchStartByWalking(),
       ctx.egressPaths().egressesWitchStartByARide()
     );
+  }
+
+  private <S extends ArrivedAtDestinationCheck> S withArrivedAtDestinationCheck(S value) {
+    this.arrivedAtDestinationCheck = oneOf(value, ArrivedAtDestinationCheck.class);
+    return value;
+  }
+
+  /**
+   * Verify only one {@code instance} of the given types exist, all types are request scoped. A
+   * class may implement more than one role(interface); Hence a list of types, not just one type
+   * argument. Skip types for the {@code instance} where the instance just wrap another instance
+   * delegating all calls to it.
+   */
+  private <V> V oneOf(V instance, Class<?>... types) {
+    for (Class<?> type : types) {
+      if (!type.isInstance(instance)) {
+        throw new IllegalArgumentException(
+          "The instance of type " +
+          instance.getClass().getSimpleName() +
+          " is not an instance of type " +
+          type.getSimpleName() +
+          "."
+        );
+      }
+      if (oneOfInstanceTypes.contains(type)) {
+        throw new IllegalStateException(
+          "An instance for is already initialized for type: " + type.getSimpleName()
+        );
+      }
+      oneOfInstanceTypes.add(type);
+    }
+    return instance;
   }
 }
