@@ -253,8 +253,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return waitTimeBeforeNextLegIncludingSlack() + next.waitTimeBeforeNextLegIncludingSlack();
   }
 
-  public void iterationDepartureTime() {}
-
   static <T extends RaptorTripSchedule> PathBuilderLeg<T> accessLeg(RaptorAccessEgress access) {
     return new PathBuilderLeg<>(new MyAccessLeg(access));
   }
@@ -479,6 +477,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    *     <li>Normal case: Walk ~ boardSlack ~ transit (access can be time-shifted)</li>
    *     <li>Flex and transit: Flex ~ (transferSlack + boardSlack) ~ transit</li>
    *     <li>Flex, walk and transit: Flex ~ Walk ~ (transferSlack + boardSlack) ~ transit</li>
+   *     <li>Flex, walk and Flex: Flex ~ Walk ~ Flex (will be timeshifted in relation to the iteration departure time)</li>
    * </ol>
    * Flex access may or may not be time-shifted.
    */
@@ -488,6 +487,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     int newToTime;
 
+    // if there is no next transit leg then it's a Flex ~ Transfer/Walk ~ Flex path
     if (nextTransitLeg == null) {
       newToTime = iterationDepartureTime + accessPath.durationInSeconds();
       if (next.isTransfer()) {
