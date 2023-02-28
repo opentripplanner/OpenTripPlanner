@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model;
 
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import org.opentripplanner.service.vehiclerental.street.CompositeRentalRestrictionExtension;
 import org.opentripplanner.service.vehiclerental.street.NoRestriction;
 import org.opentripplanner.street.search.state.State;
@@ -28,7 +28,7 @@ public interface RentalRestrictionExtension {
   /**
    * Return the types of restrictions in this extension for debugging purposes.
    */
-  Set<RestrictionType> debugTypes();
+  EnumSet<RestrictionType> debugTypes();
 
   /**
    * Add another extension to this one and returning the combined one.

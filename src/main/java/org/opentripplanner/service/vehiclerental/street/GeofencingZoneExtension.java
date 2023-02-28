@@ -1,8 +1,7 @@
 package org.opentripplanner.service.vehiclerental.street;
 
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.search.state.State;
@@ -45,15 +44,15 @@ public final class GeofencingZoneExtension implements RentalRestrictionExtension
   }
 
   @Override
-  public Set<RestrictionType> debugTypes() {
-    var set = new HashSet<RestrictionType>();
+  public EnumSet<RestrictionType> debugTypes() {
+    var set = EnumSet.noneOf(RestrictionType.class);
     if (zone.traversalBanned()) {
       set.add(RestrictionType.NO_TRAVERSAL);
     }
     if (zone.dropOffBanned()) {
       set.add(RestrictionType.NO_DROP_OFF);
     }
-    return Set.copyOf(set);
+    return set;
   }
 
   @Override

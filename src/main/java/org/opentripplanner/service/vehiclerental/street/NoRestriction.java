@@ -1,7 +1,7 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.search.state.State;
 
@@ -21,8 +21,8 @@ public final class NoRestriction implements RentalRestrictionExtension {
   }
 
   @Override
-  public Set<RestrictionType> debugTypes() {
-    return Set.of();
+  public EnumSet<RestrictionType> debugTypes() {
+    return EnumSet.noneOf(RestrictionType.class);
   }
 
   @Override

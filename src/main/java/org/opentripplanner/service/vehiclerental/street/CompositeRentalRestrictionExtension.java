@@ -1,9 +1,9 @@
 package org.opentripplanner.service.vehiclerental.street;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.search.state.State;
@@ -48,12 +48,12 @@ public final class CompositeRentalRestrictionExtension implements RentalRestrict
   }
 
   @Override
-  public Set<RestrictionType> debugTypes() {
-    var set = new HashSet<RestrictionType>();
+  public EnumSet<RestrictionType> debugTypes() {
+    var set = EnumSet.noneOf(RestrictionType.class);
     for (var ext : extensions) {
       set.addAll(ext.debugTypes());
     }
-    return Set.copyOf(set);
+    return set;
   }
 
   @Override

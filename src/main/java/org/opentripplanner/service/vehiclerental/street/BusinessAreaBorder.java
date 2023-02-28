@@ -1,7 +1,7 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.search.state.State;
 
@@ -27,8 +27,8 @@ public final class BusinessAreaBorder implements RentalRestrictionExtension {
   }
 
   @Override
-  public Set<RestrictionType> debugTypes() {
-    return Set.of(RestrictionType.BUSINESS_AREA_BORDER);
+  public EnumSet<RestrictionType> debugTypes() {
+    return EnumSet.of(RestrictionType.BUSINESS_AREA_BORDER);
   }
 
   @Override
