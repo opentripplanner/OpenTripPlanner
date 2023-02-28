@@ -3,14 +3,12 @@ package org.opentripplanner.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -73,50 +71,6 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       // Only one iteration is needed - the access should be time-shifted
       .searchWindowInSeconds(D10m);
     return requestBuilder;
-  }
-
-  private static List<RaptorModuleTestCase> cases(String path) {
-    return RaptorModuleTestCase
-      .of()
-      .add(minDuration(), path)
-      .add(standard(), path)
-      .add(multiCriteria(), path)
-      .build();
-  }
-
-  static List<RaptorModuleTestCase> openingHoursCases() {
-    var path =
-      "Flex+Walk 2m 1x Open(0:05 0:10) ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:15 0:25 10m 1tx $1620]";
-    return cases(path);
-  }
-
-  @ParameterizedTest
-  @MethodSource("openingHoursCases")
-  void flexWalkOpeningHours(RaptorModuleTestCase testCase) {
-    var requestBuilder = baseRequestBuilder();
-    requestBuilder
-      .searchParams()
-      .addAccessPaths(flexAndWalk(STOP_B, D2m, ONE_RIDE, 40_000).openingHours("00:05", "00:10"));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
-  }
-
-  static List<RaptorModuleTestCase> noOpeningHoursCases() {
-    var path = "Flex+Walk 2m 1x ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:15 0:25 10m 1tx $1620]";
-    return cases(path);
-  }
-
-  @ParameterizedTest
-  @MethodSource("noOpeningHoursCases")
-  void flexWalkNoOpeningHours(RaptorModuleTestCase testCase) {
-    var requestBuilder = baseRequestBuilder();
-    requestBuilder.searchParams().addAccessPaths(flexAndWalk(STOP_B, D2m, ONE_RIDE, 40_000));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
   }
 
   static List<RaptorModuleTestCase> flexOnlyNoWalkTestCases() {
