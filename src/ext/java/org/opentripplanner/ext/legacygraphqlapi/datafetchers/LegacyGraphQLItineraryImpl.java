@@ -48,12 +48,12 @@ public class LegacyGraphQLItineraryImpl
         return null;
       }
       return fare
-        .getTypes()
+        .getItineraryProducts()
         .stream()
-        .map(fareKey -> {
+        .map(fareProduct -> {
           Map<String, Object> result = new HashMap<>();
-          result.put("name", fareKey);
-          result.put("fare", fare.getFare(fareKey));
+          result.put("name", fareProduct.name());
+          result.put("fare", fareProduct.amount());
           result.put("details", List.of());
           return result;
         })

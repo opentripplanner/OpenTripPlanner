@@ -1,12 +1,10 @@
 package org.opentripplanner.api.mapping;
 
 import com.google.common.collect.Multimap;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -98,13 +96,9 @@ public class FareMapper {
 
   private Map<String, ApiMoney> toApiMoneys(ItineraryFares fare) {
     return fare
-      .getTypes()
+      .getItineraryProducts()
       .stream()
-      .map(key -> {
-        var money = toApiMoney(fare.getFare(key));
-        return new SimpleEntry<>(key, money);
-      })
-      .collect(Collectors.toMap(e -> e.getKey().name(), Entry::getValue));
+      .collect(Collectors.toMap(FareProduct::name, f -> toApiMoney(f.amount())));
   }
 
   private ApiMoney toApiMoney(Money m) {

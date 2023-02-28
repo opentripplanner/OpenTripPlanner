@@ -4,8 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.ext.fares.model.FareProduct;
@@ -13,6 +12,7 @@ import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.basic.Money;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * <p>
@@ -21,18 +21,12 @@ import org.opentripplanner.transit.model.basic.Money;
  */
 public class ItineraryFares {
 
-  private final Set<FareProduct> itineraryProducts = new HashSet<>();
+  private static final String FARES_V1_FEED_ID = "faresv1";
+  private final Set<FareProduct> itineraryProducts = new LinkedHashSet<>();
   private final Multimap<Leg, FareProduct> legProducts = ArrayListMultimap.create();
 
-  /**
-   * A mapping from {@link FareType} to {@link Money}.
-   */
-  private HashMap<FareType, Money> fare = new HashMap<>();
-
   public ItineraryFares(ItineraryFares aFare) {
-    if (aFare != null) {
-      fare.putAll(aFare.fare);
-    }
+    itineraryProducts.addAll(aFare.itineraryProducts);
   }
 
   public ItineraryFares() {}
@@ -49,8 +43,20 @@ public class ItineraryFares {
     return ImmutableMultimap.copyOf(legProducts);
   }
 
+  /**
+   * Backwards-compatible method to add a fare product that is valid for the entire itinerary.
+   */
   public void addFare(FareType fareType, Money money) {
-    fare.put(fareType, money);
+    itineraryProducts.add(
+      new FareProduct(
+        new FeedScopedId(FARES_V1_FEED_ID, fareType.name()),
+        fareType.name(),
+        money,
+        null,
+        null,
+        null
+      )
+    );
   }
 
   public void addItineraryProducts(Collection<FareProduct> products) {
@@ -58,16 +64,17 @@ public class ItineraryFares {
   }
 
   public Money getFare(FareType type) {
-    return fare.get(type);
-  }
-
-  public Set<FareType> getTypes() {
-    return fare.keySet();
+    return itineraryProducts
+      .stream()
+      .filter(f -> f.name().equals(type.name()))
+      .findAny()
+      .map(FareProduct::amount)
+      .orElse(null);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(fare, itineraryProducts, legProducts);
+    return Objects.hash(itineraryProducts, legProducts);
   }
 
   @Override

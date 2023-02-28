@@ -188,7 +188,6 @@ public class DefaultFareService implements FareService {
       float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
 
-      var routes = new ArrayList<FeedScopedId>();
       for (int i = start; i <= via; ++i) {
         final Leg leg = legs.get(i);
         var product = new FareProduct(fareId, null, getMoney(currency, cost), null, null, null);
