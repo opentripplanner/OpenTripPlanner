@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
@@ -104,6 +105,58 @@ public class RouteRequestTransitDataProviderFilterTest {
 
     assertEquals(wheelchair, wheelchairPossible.get(0), "Wrong boarding value on first stop");
     assertEquals(wheelchair, wheelchairPossible.get(1), "Wrong boarding value on second stop");
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = { "true", "false" })
+  void testRealtimeCancelledStops(boolean includeRealtimeCancellations) {
+    var stop1 = TransitModelForTest.stopForTest("TEST:1", 0.0, 0.0);
+    var stop2 = TransitModelForTest.stopForTest("TEST:2", 0.0, 0.0);
+    var stop3 = TransitModelForTest.stopForTest("TEST:3", 0.0, 0.0);
+
+    var stopTime1 = new StopTime();
+    var stopTime2 = new StopTime();
+    var stopTime3 = new StopTime();
+
+    stopTime1.setStop(stop1);
+    stopTime2.setStop(stop2);
+    stopTime2.setDropOffType(PickDrop.CANCELLED);
+    stopTime2.setPickupType(PickDrop.CANCELLED);
+    stopTime3.setStop(stop3);
+
+    var stopPattern = new StopPattern(List.of(stopTime1, stopTime2, stopTime3));
+    var tripPattern = TripPattern
+      .of(TransitModelForTest.id("P1"))
+      .withRoute(TransitModelForTest.route("1").build())
+      .withStopPattern(stopPattern)
+      .build()
+      .getRoutingTripPattern();
+
+    var filter = new RouteRequestTransitDataProviderFilter(
+      false,
+      false,
+      DEFAULT_ACCESSIBILITY,
+      false,
+      includeRealtimeCancellations,
+      Set.of(),
+      List.of(AllowAllTransitFilter.of())
+    );
+
+    BitSet possible = new BitSet(3);
+    possible.set(0, true);
+    possible.set(1, false);
+    possible.set(2, true);
+
+    var boardingPossible = filter.filterAvailableStops(tripPattern, possible, BoardAlight.BOARD);
+
+    assertEquals(includeRealtimeCancellations, boardingPossible.get(1));
+
+    // Assert no change in original bitset
+    assertFalse(possible.get(1));
+
+    var alightingPossible = filter.filterAvailableStops(tripPattern, possible, BoardAlight.ALIGHT);
+
+    assertEquals(includeRealtimeCancellations, alightingPossible.get(1));
   }
 
   @Test
