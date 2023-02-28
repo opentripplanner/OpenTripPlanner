@@ -6,7 +6,6 @@ import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.ext.fares.model.FareProduct;
@@ -22,10 +21,6 @@ import org.opentripplanner.transit.model.basic.Money;
  */
 public class ItineraryFares {
 
-  /**
-   * A mapping from {@link FareType} to a list of {@link FareComponent}.
-   */
-  private final HashMap<FareType, List<FareComponent>> details = new HashMap<>();
   private final Set<FareProduct> itineraryProducts = new HashSet<>();
   private final Multimap<Leg, FareProduct> legProducts = ArrayListMultimap.create();
 
@@ -58,10 +53,6 @@ public class ItineraryFares {
     fare.put(fareType, money);
   }
 
-  public void addFareDetails(FareType fareType, List<FareComponent> newDetails) {
-    details.put(fareType, newDetails);
-  }
-
   public void addItineraryProducts(Collection<FareProduct> products) {
     itineraryProducts.addAll(products);
   }
@@ -70,17 +61,13 @@ public class ItineraryFares {
     return fare.get(type);
   }
 
-  public List<FareComponent> getDetails(FareType type) {
-    return details.getOrDefault(type, List.of());
-  }
-
   public Set<FareType> getTypes() {
     return fare.keySet();
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(fare, details, itineraryProducts, legProducts);
+    return Objects.hash(fare, itineraryProducts, legProducts);
   }
 
   @Override
@@ -89,7 +76,6 @@ public class ItineraryFares {
     if (o == null || getClass() != o.getClass()) return false;
     ItineraryFares fare1 = (ItineraryFares) o;
     return (
-      Objects.equals(details, fare1.details) &&
       Objects.equals(itineraryProducts, fare1.itineraryProducts) &&
       Objects.equals(legProducts, fare1.legProducts)
     );
@@ -97,7 +83,7 @@ public class ItineraryFares {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(this.getClass()).addObj("details", details).toString();
+    return ToStringBuilder.of(this.getClass()).addObj("legProducts", legProducts).toString();
   }
 
   public void addLegProducts(Collection<LegProducts> legProducts) {

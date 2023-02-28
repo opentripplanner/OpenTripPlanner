@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ext.fares.model.FareAttribute;
+import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
@@ -35,7 +36,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
   ) {
     Assertions.assertArrayEquals(
       expectedFareIds.toArray(),
-      fareService.getCost(i).getDetails(FareType.regular).stream().map(f -> f.fareId()).toArray()
+      fareService.getCost(i).getLegProducts().values().stream().map(FareProduct::id).toArray()
     );
   }
 

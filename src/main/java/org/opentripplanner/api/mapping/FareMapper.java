@@ -22,7 +22,6 @@ import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.model.basic.Money;
 
@@ -37,7 +36,7 @@ public class FareMapper {
   public ApiItineraryFares mapFare(Itinerary itinerary) {
     var fares = itinerary.getFares();
     Map<String, ApiMoney> apiFare = toApiMoneys(fares);
-    Map<String, List<ApiFareComponent>> apiComponent = toApiFareComponents(fares);
+    Map<String, List<ApiFareComponent>> apiComponent = Map.of();
 
     return new ApiItineraryFares(
       apiFare,
@@ -97,17 +96,6 @@ public class FareMapper {
     }
   }
 
-  private Map<String, List<ApiFareComponent>> toApiFareComponents(ItineraryFares fare) {
-    return fare
-      .getTypes()
-      .stream()
-      .map(key -> {
-        var money = fare.getDetails(key).stream().map(this::toApiFareComponent).toList();
-        return new SimpleEntry<>(key, money);
-      })
-      .collect(Collectors.toMap(e -> e.getKey().name(), Entry::getValue));
-  }
-
   private Map<String, ApiMoney> toApiMoneys(ItineraryFares fare) {
     return fare
       .getTypes()
@@ -130,9 +118,5 @@ public class FareMapper {
         c.getSymbol(locale)
       )
     );
-  }
-
-  private ApiFareComponent toApiFareComponent(FareComponent m) {
-    return new ApiFareComponent(m.fareId(), m.name(), toApiMoney(m.price()), m.routes());
   }
 }

@@ -12,12 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.fares.model.FareAttribute;
+import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
+import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.fares.FareService;
@@ -169,7 +170,7 @@ public class DefaultFareService implements FareService {
   ) {
     FareSearch r = performSearch(fareType, legs, fareRules);
 
-    List<FareComponent> details = new ArrayList<>();
+    List<LegProducts> legProducts = new ArrayList<>();
     int count = 0;
     int start = 0;
     int end = legs.size() - 1;
@@ -189,16 +190,16 @@ public class DefaultFareService implements FareService {
 
       var routes = new ArrayList<FeedScopedId>();
       for (int i = start; i <= via; ++i) {
-        routes.add(legs.get(i).getRoute().getId());
+        final Leg leg = legs.get(i);
+        var product = new FareProduct(fareId, null, getMoney(currency, cost), null, null, null);
+        fare.addFareProduct(leg, product);
       }
-      var component = new FareComponent(fareId, null, getMoney(currency, cost), routes);
-      details.add(component);
+
       ++count;
       start = via + 1;
     }
 
     fare.addFare(fareType, getMoney(currency, r.resultTable[0][legs.size() - 1]));
-    fare.addFareDetails(fareType, details);
     return count > 0;
   }
 

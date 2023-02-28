@@ -49,7 +49,7 @@ config:
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
     elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step
     fare: java.util.Map#Map<String, Object>
-    fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
+    fareComponent: Object
     Feed: String
     Geometry: org.locationtech.jts.geom.Geometry#Geometry
     InputField: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField#LegacyGraphQLInputField
