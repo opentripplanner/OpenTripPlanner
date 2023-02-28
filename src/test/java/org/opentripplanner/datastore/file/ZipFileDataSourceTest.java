@@ -6,17 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 import java.util.List;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.datastore.api.CompositeDataSource;
@@ -75,7 +76,11 @@ public class ZipFileDataSourceTest {
 
     DataSource entry = subject.entry("agency.txt");
 
-    List<String> lines = IOUtils.readLines(entry.asInputStream(), StandardCharsets.UTF_8);
+    List<String> lines = new BufferedReader(
+      new InputStreamReader(entry.asInputStream(), StandardCharsets.UTF_8)
+    )
+      .lines()
+      .toList();
     assertEquals("agency_id,agency_name,agency_url,agency_timezone", lines.get(0));
     assertEquals("Caltrain,Caltrain,http://www.caltrain.com,America/Los_Angeles", lines.get(1));
 

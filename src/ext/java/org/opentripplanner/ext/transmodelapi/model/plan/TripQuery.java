@@ -4,6 +4,7 @@ import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
@@ -21,6 +22,7 @@ public class TripQuery {
   public static GraphQLFieldDefinition create(
     DefaultRouteRequestType routing,
     GraphQLOutputType tripType,
+    GraphQLInputObjectType durationPerStreetModeType,
     GqlUtil gqlUtil
   ) {
     RoutingPreferences preferences = routing.request.preferences();
@@ -501,6 +503,16 @@ public class TripQuery {
             "FOR SERVER-SIDE TUNING AND IS AVAILABLE HERE FOR TESTING ONLY."
           )
           .type(ItineraryFiltersInputType.create(gqlUtil, preferences.itineraryFilter()))
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name("maxAccessEgressDurationForMode")
+          .description(
+            "Maximum duration for access/egress for street searches per respective mode."
+          )
+          .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
           .build()
       )
       .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))

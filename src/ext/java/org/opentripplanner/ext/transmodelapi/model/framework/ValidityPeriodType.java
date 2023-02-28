@@ -2,7 +2,7 @@ package org.opentripplanner.ext.transmodelapi.model.framework;
 
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import org.apache.commons.lang3.tuple.Pair;
+import org.opentripplanner.ext.transmodelapi.model.siri.sx.ValidityPeriod;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 
 public class ValidityPeriodType {
@@ -18,8 +18,8 @@ public class ValidityPeriodType {
           .type(gqlUtil.dateTimeScalar)
           .description("Start of validity period")
           .dataFetcher(environment -> {
-            Pair<Long, Long> period = environment.getSource();
-            return period != null ? period.getLeft() : null;
+            ValidityPeriod period = environment.getSource();
+            return period != null ? period.startTime() : null;
           })
           .build()
       )
@@ -30,8 +30,8 @@ public class ValidityPeriodType {
           .type(gqlUtil.dateTimeScalar)
           .description("End of validity period. Will return 'null' if validity is open-ended.")
           .dataFetcher(environment -> {
-            Pair<Long, Long> period = environment.getSource();
-            return period != null ? period.getRight() : null;
+            ValidityPeriod period = environment.getSource();
+            return period != null ? period.endTime() : null;
           })
           .build()
       )

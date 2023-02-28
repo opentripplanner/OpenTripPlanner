@@ -1,5 +1,6 @@
 package org.opentripplanner.datastore.file;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,9 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
-import java.util.stream.Collectors;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +19,6 @@ import org.opentripplanner.datastore.api.DataSource;
 public class DirectoryDataSourceTest {
 
   private static final String DIRNAME = "the_wall";
-  private static final String UTF_8 = "UTF-8";
   private File tempDir;
 
   @BeforeEach
@@ -73,7 +70,7 @@ public class DirectoryDataSourceTest {
 
     // Write something to a file in the directory
     try (var outputStream = subject.entry(child.getName()).asOutputStream()) {
-      IOUtils.write("Go, go, go!", outputStream, UTF_8);
+      outputStream.write("Go, go, go!".getBytes(UTF_8));
     }
 
     // Verify the subject directory is created and still is writable
@@ -84,7 +81,7 @@ public class DirectoryDataSourceTest {
     assertEquals("[a.txt]", toString(subject.content()));
 
     // Assert content can be read using the subject and file
-    assertEquals("Go, go, go!", FileUtils.readFileToString(child, UTF_8));
+    assertEquals("Go, go, go!", Files.readString(child.toPath(), UTF_8));
 
     // Then delete subject with all content
     subject.delete();

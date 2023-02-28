@@ -68,6 +68,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Use TripPatterns for filtering [#4820](https://github.com/opentripplanner/OpenTripPlanner/pull/4820)
 - Add Fares V2 distance-based computation [#4798](https://github.com/opentripplanner/OpenTripPlanner/pull/4798)
 - Remove all edges from stop vertex in island pruning [#4846](https://github.com/opentripplanner/OpenTripPlanner/pull/4846)
+- Filter functionality for GroupOfLines/GroupOfRoutes + TransmodelAPI m… [#4812](https://github.com/opentripplanner/OpenTripPlanner/pull/4812)
+- Mapping for maxAccessEgressDurationPerMode in Transmodel API [#4829](https://github.com/opentripplanner/OpenTripPlanner/pull/4829)
+- Use headsign from the original pattern in a realtime added pattern if the stop sequence is unchanged [#4845](https://github.com/opentripplanner/OpenTripPlanner/pull/4845)
+- Remove usage of apache commons [#4840](https://github.com/opentripplanner/OpenTripPlanner/pull/4840)
+- Remove RouteMatcher [#4821](https://github.com/opentripplanner/OpenTripPlanner/pull/4821)
+- Improve boarding location linking on platforms [#4852](https://github.com/opentripplanner/OpenTripPlanner/pull/4852)
+- Always check allowed modes in VehicleRentalEdge [#4810](https://github.com/opentripplanner/OpenTripPlanner/pull/4810)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

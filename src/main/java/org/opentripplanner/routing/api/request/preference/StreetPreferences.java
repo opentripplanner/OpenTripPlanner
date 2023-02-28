@@ -52,7 +52,7 @@ public final class StreetPreferences implements Serializable {
     this.elevator = requireNonNull(builder.elevator);
     this.intersectionTraversalModel = requireNonNull(builder.intersectionTraversalModel);
     this.maxDirectDuration = requireNonNull(builder.maxDirectDuration);
-    this.maxAccessEgressDuration = requireNonNull(builder.maxAccessEgressDuration);
+    this.maxAccessEgressDuration = requireNonNull(builder.maxAccessEgressDuration.build());
   }
 
   public static Builder of() {
@@ -142,7 +142,7 @@ public final class StreetPreferences implements Serializable {
     private DrivingDirection drivingDirection;
     private ElevatorPreferences elevator;
     private IntersectionTraversalModel intersectionTraversalModel;
-    private DurationForEnum<StreetMode> maxAccessEgressDuration;
+    private DurationForEnum.Builder<StreetMode> maxAccessEgressDuration;
     private DurationForEnum<StreetMode> maxDirectDuration;
 
     public Builder(StreetPreferences original) {
@@ -151,7 +151,7 @@ public final class StreetPreferences implements Serializable {
       this.drivingDirection = original.drivingDirection;
       this.elevator = original.elevator;
       this.intersectionTraversalModel = original.intersectionTraversalModel;
-      this.maxAccessEgressDuration = original.maxAccessEgressDuration;
+      this.maxAccessEgressDuration = original.maxAccessEgressDuration.copyOf();
       this.maxDirectDuration = original.maxDirectDuration;
     }
 
@@ -179,12 +179,16 @@ public final class StreetPreferences implements Serializable {
       return this;
     }
 
+    public Builder withMaxAccessEgressDuration(StreetMode mode, Duration duration) {
+      this.maxAccessEgressDuration.with(mode, duration);
+      return this;
+    }
+
     public Builder withMaxAccessEgressDuration(
       Duration defaultValue,
       Map<StreetMode, Duration> values
     ) {
-      this.maxAccessEgressDuration =
-        maxAccessEgressDuration.copyOf().withDefault(defaultValue).withValues(values).build();
+      this.maxAccessEgressDuration.withDefault(defaultValue).withValues(values).build();
       return this;
     }
 

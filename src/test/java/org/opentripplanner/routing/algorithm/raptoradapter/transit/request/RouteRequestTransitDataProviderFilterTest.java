@@ -25,7 +25,6 @@ import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFil
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -232,9 +231,7 @@ public class RouteRequestTransitDataProviderFilterTest {
       List.of(
         TransitFilterRequest
           .of()
-          .addNot(
-            SelectRequest.of().withRoutes(RouteMatcher.idMatcher(List.of(ROUTE.getId()))).build()
-          )
+          .addNot(SelectRequest.of().withRoutes(List.of(ROUTE.getId())).build())
           .build()
       )
     );
