@@ -77,7 +77,8 @@ class StationMapper {
         "InvalidTimeZone",
         "Invalid ID for ZoneOffset at StopPlace with ID: %s and value %s",
         stopPlaceId,
-        zoneId);
+        zoneId
+      );
     }
     return null;
   }

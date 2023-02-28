@@ -1,12 +1,10 @@
 package org.opentripplanner.netex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.google.common.collect.Multimap;
-import java.io.Serializable;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,18 +19,15 @@ import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.Notice;
-import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -40,7 +35,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * from line coverage. The focus of this test is to test that the different parts of the NeTEx works
  * together.
  */
-public class NetexEpipBundleSmokeTest {
+class NetexEpipBundleSmokeTest {
 
   /**
    * This test load a very simple Netex data set and do assertions on it. For each type we assert
@@ -49,31 +44,29 @@ public class NetexEpipBundleSmokeTest {
    * entities and Netex import integration.
    */
   @Test
-  public void smokeTestOfNetexEpipLoadData() {
+  void smokeTestOfNetexEpipLoadData() {
     // Given
-    NetexBundle netexBundle = ConstantsForTests.createMinimalNetexEpipBundle();
+    OtpTransitServiceBuilder transitBuilder;
+    try (NetexBundle netexBundle = ConstantsForTests.createMinimalNetexEpipBundle()) {
+      // Run the check to make sure it does not throw an exception
+      netexBundle.checkInputs();
 
-    // Run the check to make sure it does not throw an exception
-    netexBundle.checkInputs();
-
-    // When
-    OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(
-      new Deduplicator(),
-      DataImportIssueStore.NOOP
-    );
+      // When
+      transitBuilder = netexBundle.loadBundle(new Deduplicator(), DataImportIssueStore.NOOP);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
 
     // Then - smoke test model
     OtpTransitService otpModel = transitBuilder.build();
 
     assertAgencies(otpModel.getAllAgencies());
-    assertMultiModalStations(otpModel.stopModel().listMultiModalStations());
     assertOperators(otpModel.getAllOperators());
     assertStops(otpModel.stopModel().listRegularStops());
     assertStations(otpModel.stopModel().listStations());
     assertTripPatterns(otpModel.getTripPatterns());
     assertTrips(otpModel.getAllTrips());
     assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());
-    assertNoticeAssignments(otpModel.getNoticeAssignments());
 
     // And then - smoke test service calendar
     assetServiceCalendar(transitBuilder.buildCalendarServiceData());
@@ -85,12 +78,8 @@ public class NetexEpipBundleSmokeTest {
     return new ArrayList<>(collection);
   }
 
-  private static StopTimeKey stId(String id, int stopSequenceNr) {
-    return StopTimeKey.of(fId(id), stopSequenceNr).build();
-  }
-
   private static FeedScopedId fId(String id) {
-    return new FeedScopedId("EN", id);
+    return new FeedScopedId("HH", id);
   }
 
   private void assertAgencies(Collection<Agency> agencies) {
@@ -99,22 +88,11 @@ public class NetexEpipBundleSmokeTest {
     assertEquals("DE::Authority:41::", a.getId().getId());
     assertEquals("HOCHBAHN, Bus", a.getName());
     assertNull(a.getUrl());
-    assertNull(a.getTimezone());
+    assertEquals("Europe/Berlin", a.getTimezone().toString());
     assertNull(a.getLang());
     assertNull(a.getPhone());
     assertNull(a.getFareUrl());
     assertNull(a.getBrandingUrl());
-  }
-
-  private void assertMultiModalStations(Collection<MultiModalStation> multiModalStations) {
-    Map<FeedScopedId, MultiModalStation> map = multiModalStations
-      .stream()
-      .collect(Collectors.toMap(MultiModalStation::getId, s -> s));
-    MultiModalStation multiModalStation = map.get(fId("NSR:StopPlace:58243"));
-    assertEquals("Bergkrystallen", multiModalStation.getName().toString());
-    assertEquals(59.866603, multiModalStation.getLat(), 0.000001);
-    assertEquals(10.821614, multiModalStation.getLon(), 0.000001);
-    assertEquals(3, multiModalStations.size());
   }
 
   private void assertOperators(Collection<Operator> operators) {
@@ -132,10 +110,10 @@ public class NetexEpipBundleSmokeTest {
       .collect(Collectors.toMap(RegularStop::getId, s -> s));
 
     RegularStop quay = map.get(fId("DE::Quay:800091_MastM::"));
-    assertEquals("Ankunft", quay.getName().toString());
+    assertEquals("Bf. Altona", quay.getName().toString());
     assertEquals(53.5515679274852, quay.getLat(), 0.000001);
     assertEquals(9.93422080466927, quay.getLon(), 0.000001);
-    assertEquals("DE::StopPlace:80026_Master::", quay.getParentStation().getId().toString());
+    assertEquals("HH:DE::StopPlace:80026_Master::", quay.getParentStation().getId().toString());
     assertNull(quay.getPlatformCode());
     assertEquals(4, stops.size());
   }
@@ -144,11 +122,13 @@ public class NetexEpipBundleSmokeTest {
     Map<FeedScopedId, Station> map = stations
       .stream()
       .collect(Collectors.toMap(Station::getId, s -> s));
-    Station station = map.get(fId(""));
-    assertEquals("Bergkrystallen T", station.getName().toString());
-    assertEquals(59.866297, station.getLat(), 0.000001);
-    assertEquals(10.821484, station.getLon(), 0.000001);
-    assertEquals(5, stations.size());
+    Station station = map.get(fId("DE::StopPlace:80026_Master::"));
+    assertEquals("Bf. Altona", station.getName().toString());
+    assertEquals(53.5515403864306, station.getLat(), 0.000001);
+    assertEquals(9.9342956397828, station.getLon(), 0.000001);
+    assertEquals("Europe/Berlin", station.getTimezone().toString());
+    assertEquals(2, station.getChildStops().size());
+    assertEquals(2, stations.size());
   }
 
   private void assertTripPatterns(Collection<TripPattern> patterns) {
@@ -156,66 +136,31 @@ public class NetexEpipBundleSmokeTest {
       .stream()
       .collect(Collectors.toMap(TripPattern::getId, s -> s));
     TripPattern p = map.get(fId("DE::ServiceJourneyPattern:2234991_0::"));
-    assertNull(p.getTripHeadsign());
+    assertEquals("", p.getTripHeadsign().toString());
     assertEquals("HH", p.getFeedId());
+    assertEquals(TransitMode.BUS, p.getMode());
     assertEquals(
-      "[RegularStop{EN:NSR:Quay:7203 N/A}, RegularStop{EN:NSR:Quay:8027 N/A}]",
+      "[RegularStop{HH:DE::Quay:800018_MastM:: Teufelsbrück (Fähre)}, RegularStop{HH:DE::Quay:800091_MastM:: Bf. Altona}]",
       p.getStops().toString()
     );
-    assertEquals(
-      "[Trip{EN:RUT:ServiceJourney:12-101375-1000 12}]",
-      p.scheduledTripsAsStream().toList().toString()
-    );
-
-    assertEquals(4, patterns.size());
+    List<Trip> trips = p.scheduledTripsAsStream().toList();
+    assertEquals("Trip{HH:DE::ServiceJourney:36439031_0:: X86}", trips.get(0).toString());
+    assertEquals(55, trips.size());
+    assertEquals(2, patterns.size());
   }
 
   private void assertTrips(Collection<Trip> trips) {
     Map<FeedScopedId, Trip> map = trips.stream().collect(Collectors.toMap(Trip::getId, t -> t));
     Trip t = map.get(fId("DE::ServiceJourney:36439032_0::"));
 
-    assertNull(t.getHeadsign());
+    assertNotNull(t.getHeadsign());
+    assertEquals("", t.getHeadsign().toString());
     assertNull(t.getShortName());
-    assertNull(t.getServiceId());
+    assertNotNull(t.getServiceId());
+    assertEquals("X86", t.getRoute().getName());
     assertEquals(BikeAccess.UNKNOWN, t.getBikesAllowed());
     assertEquals(Accessibility.NO_INFORMATION, t.getWheelchairBoarding());
     assertEquals(98, trips.size());
-  }
-
-  private void assertNoticeAssignments(Multimap<AbstractTransitEntity, Notice> map) {
-    assertNote(
-      map,
-      stId("DE::ServiceJourneyPattern:2234991_0::", 1).getId(),
-      "BEHIN",
-      "Behindertengerecht"
-    );
-    assertEquals(32, map.size());
-  }
-
-  private void assertNote(
-    Multimap<AbstractTransitEntity, Notice> map,
-    Serializable entityKey,
-    String code,
-    String text
-  ) {
-    AbstractTransitEntity key = map
-      .keySet()
-      .stream()
-      .filter(it -> entityKey.equals(it.getId()))
-      .findFirst()
-      .orElseThrow(IllegalStateException::new);
-
-    List<Notice> list = list(map.get(key));
-    assertNotEquals(
-      0,
-      list.size(),
-      "Notice not found: " + key + " -> <Notice " + code + ", " + text + ">\n\t" + map
-    );
-    Notice n = list.get(0);
-    assertTrue(n.getId().toString().startsWith("DE::Notice:"));
-    assertEquals(code, n.publicCode());
-    assertEquals(text, n.text());
-    assertEquals(8, list.size());
   }
 
   private void assertServiceIds(Collection<Trip> trips, Collection<FeedScopedId> serviceIds) {
@@ -228,17 +173,13 @@ public class NetexEpipBundleSmokeTest {
 
   private void assetServiceCalendar(CalendarServiceData cal) {
     ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());
-    assertEquals(2, sIds.size());
+    assertEquals(1, sIds.size());
     FeedScopedId serviceId1 = sIds.get(0);
-    FeedScopedId serviceId2 = sIds.get(1);
 
-    List<LocalDate> dates1 = cal.getServiceDatesForServiceId(serviceId1);
-    List<LocalDate> dates2 = cal.getServiceDatesForServiceId(serviceId2);
+    List<LocalDate> dates = cal.getServiceDatesForServiceId(serviceId1);
 
-    assertEquals(dates1, dates2);
-    assertEquals("2023-02-02", dates1.get(0).toString());
-    assertEquals("2023-12-08", dates1.get(dates1.size() - 1).toString());
-
-    assertEquals(2, cal.getServiceIds().size());
+    assertEquals("2023-02-02", dates.get(0).toString());
+    assertEquals("2023-12-08", dates.get(dates.size() - 1).toString());
+    assertEquals(214, dates.size());
   }
 }
