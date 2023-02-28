@@ -2,7 +2,7 @@ package org.opentripplanner.street.model;
 
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.service.vehiclerental.street.Composite;
+import org.opentripplanner.service.vehiclerental.street.CompositeRentalRestrictionExtension;
 import org.opentripplanner.service.vehiclerental.street.NoRestriction;
 import org.opentripplanner.street.search.state.State;
 
@@ -34,7 +34,7 @@ public interface RentalRestrictionExtension {
    * Add another extension to this one and returning the combined one.
    */
   default RentalRestrictionExtension add(RentalRestrictionExtension other) {
-    return Composite.of(this, other);
+    return CompositeRentalRestrictionExtension.of(this, other);
   }
 
   /**

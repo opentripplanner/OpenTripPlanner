@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.street.BusinessAreaBorder;
-import org.opentripplanner.service.vehiclerental.street.Composite;
+import org.opentripplanner.service.vehiclerental.street.CompositeRentalRestrictionExtension;
 import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
@@ -198,27 +198,27 @@ class RentalRestrictionExtensionTest {
     @Test
     void add() {
       var composite = a.add(b);
-      assertInstanceOf(Composite.class, composite);
+      assertInstanceOf(CompositeRentalRestrictionExtension.class, composite);
     }
 
     @Test
     void differentType() {
       var composite = a.add(c);
-      assertInstanceOf(Composite.class, composite);
+      assertInstanceOf(CompositeRentalRestrictionExtension.class, composite);
     }
 
     @Test
     void composite() {
       var composite = a.add(b);
-      assertInstanceOf(Composite.class, composite);
+      assertInstanceOf(CompositeRentalRestrictionExtension.class, composite);
       var newComposite = composite.add(c);
-      assertInstanceOf(Composite.class, newComposite);
+      assertInstanceOf(CompositeRentalRestrictionExtension.class, newComposite);
 
-      var c1 = (Composite) newComposite;
+      var c1 = (CompositeRentalRestrictionExtension) newComposite;
       var exts = c1.toList();
       assertEquals(3, exts.size());
 
-      var c2 = (Composite) c1.add(a);
+      var c2 = (CompositeRentalRestrictionExtension) c1.add(a);
       assertEquals(3, c2.toList().size());
       // convert to sets so the order doesn't matter
       assertEquals(Set.of(a, b, c), Set.copyOf(c2.toList()));

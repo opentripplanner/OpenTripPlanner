@@ -11,25 +11,25 @@ import org.opentripplanner.street.search.state.State;
 /**
  * Combines multiple restrictions into one.
  */
-public final class Composite implements RentalRestrictionExtension {
+public final class CompositeRentalRestrictionExtension implements RentalRestrictionExtension {
 
-  private final RentalRestrictionExtension[] exts;
+  private final RentalRestrictionExtension[] extensions;
 
-  private Composite(RentalRestrictionExtension... exts) {
-    for (var ext : exts) {
-      if (ext instanceof org.opentripplanner.service.vehiclerental.street.Composite) {
+  private CompositeRentalRestrictionExtension(RentalRestrictionExtension... extensions) {
+    for (var ext : extensions) {
+      if (ext instanceof CompositeRentalRestrictionExtension) {
         throw new IllegalArgumentException(
           "Composite extension cannot be nested into one another."
         );
       }
     }
-    var set = new HashSet<>(Arrays.asList(exts));
-    this.exts = set.toArray(RentalRestrictionExtension[]::new);
+    var set = new HashSet<>(Arrays.asList(extensions));
+    this.extensions = set.toArray(RentalRestrictionExtension[]::new);
   }
 
   @Override
   public boolean traversalBanned(State state) {
-    for (var ext : exts) {
+    for (var ext : extensions) {
       if (ext.traversalBanned(state)) {
         return true;
       }
@@ -39,7 +39,7 @@ public final class Composite implements RentalRestrictionExtension {
 
   @Override
   public boolean dropOffBanned(State state) {
-    for (var ext : exts) {
+    for (var ext : extensions) {
       if (ext.dropOffBanned(state)) {
         return true;
       }
@@ -50,15 +50,15 @@ public final class Composite implements RentalRestrictionExtension {
   @Override
   public Set<RestrictionType> debugTypes() {
     var set = new HashSet<RestrictionType>();
-    for (var e : exts) {
-      set.addAll(e.debugTypes());
+    for (var ext : extensions) {
+      set.addAll(ext.debugTypes());
     }
     return Set.copyOf(set);
   }
 
   @Override
   public RentalRestrictionExtension add(RentalRestrictionExtension other) {
-    return org.opentripplanner.service.vehiclerental.street.Composite.of(this, other);
+    return CompositeRentalRestrictionExtension.of(this, other);
   }
 
   public static RentalRestrictionExtension of(RentalRestrictionExtension... exts) {
@@ -66,7 +66,7 @@ public final class Composite implements RentalRestrictionExtension {
     if (set.size() == 1) {
       return List.copyOf(set).get(0);
     } else {
-      return new org.opentripplanner.service.vehiclerental.street.Composite(
+      return new CompositeRentalRestrictionExtension(
         set.toArray(RentalRestrictionExtension[]::new)
       );
     }
@@ -75,23 +75,23 @@ public final class Composite implements RentalRestrictionExtension {
   @Override
   public RentalRestrictionExtension remove(RentalRestrictionExtension toRemove) {
     var newExts = Arrays
-      .stream(exts)
+      .stream(extensions)
       .filter(e -> !e.equals(toRemove))
       .toArray(RentalRestrictionExtension[]::new);
     if (newExts.length == 0) {
       return null;
     } else {
-      return org.opentripplanner.service.vehiclerental.street.Composite.of(newExts);
+      return CompositeRentalRestrictionExtension.of(newExts);
     }
   }
 
   @Override
   public List<RentalRestrictionExtension> toList() {
-    return List.copyOf(Arrays.asList(exts));
+    return List.copyOf(Arrays.asList(extensions));
   }
 
   @Override
   public List<String> networks() {
-    return Arrays.stream(exts).flatMap(e -> e.networks().stream()).toList();
+    return Arrays.stream(extensions).flatMap(e -> e.networks().stream()).toList();
   }
 }
