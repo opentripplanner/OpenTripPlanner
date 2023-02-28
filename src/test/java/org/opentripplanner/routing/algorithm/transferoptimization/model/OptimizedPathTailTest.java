@@ -14,6 +14,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.services.Trans
 
 class OptimizedPathTailTest implements RaptorTestConstants {
 
+  public static final int ITERATION_DEPARTURE_TIME_ZERO = 0;
   private final RaptorPath<TestTripSchedule> orgPath = BasicPathTestCase.basicTripAsPath();
 
   private final RaptorPath<TestTripSchedule> flexPath = BasicPathTestCase.flexTripAsPath();
@@ -60,7 +61,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
   private final OptimizedPathTail<TestTripSchedule> subject = new OptimizedPathTail<>(
     SLACK_PROVIDER,
     BasicPathTestCase.COST_CALCULATOR,
-    0,
+    ITERATION_DEPARTURE_TIME_ZERO,
     waitTimeCalc,
     stopBoardAlightCost,
     2.0,
