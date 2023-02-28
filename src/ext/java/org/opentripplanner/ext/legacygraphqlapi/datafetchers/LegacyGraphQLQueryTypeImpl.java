@@ -118,26 +118,26 @@ public class LegacyGraphQLQueryTypeImpl
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(
         environment.getArguments()
       );
-      List<String> severities = args.getLegacyGraphQLSeverityLevel() == null
+      List<LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType> severities = args.getLegacyGraphQLSeverityLevel() ==
+        null
         ? null
         : (
           (List<LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType>) args.getLegacyGraphQLSeverityLevel()
         ).stream()
-          .map(Enum::name)
           .toList();
-      List<String> effects = args.getLegacyGraphQLEffect() == null
+      List<LegacyGraphQLTypes.LegacyGraphQLAlertEffectType> effects = args.getLegacyGraphQLEffect() ==
+        null
         ? null
         : (
           (List<LegacyGraphQLTypes.LegacyGraphQLAlertEffectType>) args.getLegacyGraphQLEffect()
         ).stream()
-          .map(Enum::name)
           .toList();
-      List<String> causes = args.getLegacyGraphQLCause() == null
+      List<LegacyGraphQLTypes.LegacyGraphQLAlertCauseType> causes = args.getLegacyGraphQLCause() ==
+        null
         ? null
         : (
           (List<LegacyGraphQLTypes.LegacyGraphQLAlertCauseType>) args.getLegacyGraphQLCause()
         ).stream()
-          .map(Enum::name)
           .toList();
       return alerts
         .stream()
