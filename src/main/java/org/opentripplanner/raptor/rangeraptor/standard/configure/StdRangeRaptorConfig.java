@@ -50,8 +50,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   private BestTimes bestTimes;
   private StdStopArrivals<T> stopArrivals;
   private ArrivedAtDestinationCheck arrivedAtDestinationCheck;
-
-  private SimpleBestNumberOfTransfers simpleBestNumberOfTransfers;
+  private BestNumberOfTransfers bestNumberOfTransfers;
 
   public StdRangeRaptorConfig(SearchContext<T> context) {
     new VerifyRequestIsValid(context).verify();
@@ -86,23 +85,20 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   /* private factory methods */
 
   private RoutingStrategy<T> createWorkerStrategy() {
-    switch (ctx.profile()) {
-      case STANDARD:
-      case BEST_TIME:
-        return new ArrivalTimeRoutingStrategy<>(
-          resolveState(),
-          ctx.createTimeBasedBoardingSupport(),
-          ctx.calculator()
-        );
-      case MIN_TRAVEL_DURATION:
-        return new MinTravelDurationRoutingStrategy<>(
-          resolveState(),
-          ctx.createTimeBasedBoardingSupport(),
-          ctx.calculator(),
-          ctx.lifeCycle()
-        );
-    }
-    throw new IllegalArgumentException(ctx.profile().toString());
+    return switch (ctx.profile()) {
+      case STANDARD, BEST_TIME -> new ArrivalTimeRoutingStrategy<>(
+        resolveState(),
+        ctx.createTimeBasedBoardingSupport(),
+        ctx.calculator()
+      );
+      case MIN_TRAVEL_DURATION -> new MinTravelDurationRoutingStrategy<>(
+        resolveState(),
+        ctx.createTimeBasedBoardingSupport(),
+        ctx.calculator(),
+        ctx.lifeCycle()
+      );
+      case MULTI_CRITERIA -> throw new IllegalArgumentException(ctx.profile().toString());
+    };
   }
 
   private StdRangeRaptorWorkerState<T> resolveState() {
@@ -113,26 +109,13 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
             ctx.calculator(),
             resolveBestTimes(),
             createStopArrivals(),
+            resolveBestNumberOfTransfers(),
             resolveArrivedAtDestinationCheck()
           ),
           StdWorkerState.class
         );
     }
     return (StdRangeRaptorWorkerState<T>) state;
-  }
-
-  /**
-   * Return instance if created by heuristics or null if not needed.
-   */
-  private SimpleBestNumberOfTransfers resolveSimpleBestNumberOfTransfers() {
-    if (simpleBestNumberOfTransfers == null) {
-      simpleBestNumberOfTransfers =
-        oneOf(
-          new SimpleBestNumberOfTransfers(ctx.nStops(), ctx.roundProvider()),
-          BestNumberOfTransfers.class
-        );
-    }
-    return simpleBestNumberOfTransfers;
   }
 
   /**
@@ -149,7 +132,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     return switch (ctx.profile()) {
       case STANDARD -> stdStopArrivalsState();
       case BEST_TIME, MIN_TRAVEL_DURATION -> createBestTimeStopArrivalsState();
-      default -> throw new IllegalArgumentException(ctx.profile().toString());
+      case MULTI_CRITERIA -> throw new IllegalArgumentException(ctx.profile().toString());
     };
   }
 
@@ -157,7 +140,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     return oneOf(
       new BestTimesOnlyStopArrivalsState<>(
         resolveBestTimes(),
-        resolveSimpleBestNumberOfTransfers(),
+        createSimpleBestNumberOfTransfers(),
         unknownPathFactory()
       ),
       StopArrivalsState.class
@@ -215,6 +198,14 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     );
   }
 
+  private ArrivedAtDestinationCheck resolveArrivedAtDestinationCheck() {
+    if (arrivedAtDestinationCheck == null) {
+      // Default to simple version
+      withArrivedAtDestinationCheck(createSimpleArrivedAtDestinationCheck());
+    }
+    return arrivedAtDestinationCheck;
+  }
+
   /**
    * Always create new cursors - it has state local to the caller
    */
@@ -225,20 +216,37 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   private StdStopArrivals<T> resolveStopArrivals() {
     if (stopArrivals == null) {
       this.stopArrivals =
-        oneOf(
-          new StdStopArrivals<T>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider()),
-          BestNumberOfTransfers.class,
-          StdStopArrivals.class
+        withBestNumberOfTransfers(
+          oneOf(
+            new StdStopArrivals<T>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider()),
+            StdStopArrivals.class
+          )
         );
     }
     return stopArrivals;
+  }
+
+  /**
+   * Return instance if created by heuristics or null if not needed.
+   */
+  private SimpleBestNumberOfTransfers createSimpleBestNumberOfTransfers() {
+    return withBestNumberOfTransfers(
+      new SimpleBestNumberOfTransfers(ctx.nStops(), ctx.roundProvider())
+    );
+  }
+
+  private BestNumberOfTransfers resolveBestNumberOfTransfers() {
+    if (bestNumberOfTransfers == null) {
+      withBestNumberOfTransfers(createSimpleBestNumberOfTransfers());
+    }
+    return bestNumberOfTransfers;
   }
 
   private UnknownPathFactory<T> unknownPathFactory() {
     return oneOf(
       new UnknownPathFactory<>(
         resolveBestTimes(),
-        resolveSimpleBestNumberOfTransfers(),
+        resolveBestNumberOfTransfers(),
         ctx.calculator(),
         ctx.slackProvider().transferSlack(),
         ctx.egressPaths(),
@@ -250,19 +258,17 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     );
   }
 
-  private ArrivedAtDestinationCheck resolveArrivedAtDestinationCheck() {
-    if (arrivedAtDestinationCheck == null) {
-      withArrivedAtDestinationCheck(createSimpleArrivedAtDestinationCheck());
-    }
-    return arrivedAtDestinationCheck;
-  }
-
   private SimpleArrivedAtDestinationCheck createSimpleArrivedAtDestinationCheck() {
     return new SimpleArrivedAtDestinationCheck(
       resolveBestTimes(),
       ctx.egressPaths().egressesWitchStartByWalking(),
       ctx.egressPaths().egressesWitchStartByARide()
     );
+  }
+
+  private <S extends BestNumberOfTransfers> S withBestNumberOfTransfers(S value) {
+    this.bestNumberOfTransfers = oneOf(value, BestNumberOfTransfers.class);
+    return value;
   }
 
   private <S extends ArrivedAtDestinationCheck> S withArrivedAtDestinationCheck(S value) {
