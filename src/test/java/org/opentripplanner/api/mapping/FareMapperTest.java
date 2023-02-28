@@ -3,8 +3,8 @@ package org.opentripplanner.api.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
-import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -29,6 +29,6 @@ class FareMapperTest implements PlanTestConstants {
     var apiMoney = apiFare.fare().get(FareType.regular.name());
     assertEquals(500, apiMoney.cents());
     assertEquals("USD", apiMoney.currency().currency());
-    assertEquals(List.of(), apiFare.details().get(FareType.regular.name()));
+    assertEquals(Map.of(), apiFare.details());
   }
 }

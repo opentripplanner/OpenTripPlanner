@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.core;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -23,7 +23,7 @@ public class ItineraryFares {
 
   private static final String FARES_V1_FEED_ID = "faresv1";
   private final Set<FareProduct> itineraryProducts = new LinkedHashSet<>();
-  private final Multimap<Leg, FareProduct> legProducts = ArrayListMultimap.create();
+  private final Multimap<Leg, FareProduct> legProducts = LinkedHashMultimap.create();
 
   public ItineraryFares(ItineraryFares aFare) {
     itineraryProducts.addAll(aFare.itineraryProducts);
