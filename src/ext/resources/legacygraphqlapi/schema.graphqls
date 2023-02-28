@@ -1283,14 +1283,11 @@ type RoutingError {
 type Money {
     "ISO formatted currency"
     currency: String!
-    "Cents "
-    cents: Int!
     """
     Money amount in cents. **Note:** this value is dependent on the currency used,
     as one cent is not necessarily ¹/₁₀₀ of the basic monetary unit.
     """
     cents: Int
-
 }
 
 type RiderCategory {
@@ -1311,9 +1308,22 @@ type FareProduct {
     fareContainer: FareContainer
 }
 
+type LegProducts {
+    "The fare products that apply to a limited set of legs but not the entire itinerary."
+    products: [FareProducts]!
+    "The indices of the legs that the fare products apply to. If there are multiple indices listed, then the fare product covers several legs."
+    legIndices: [Int]!
+}
+
 type FareProducts {
-    """Fare products that apply to the entire itinerary. If they are products that only cover part of the leg."""
-    itinerary: [FareProducts]
+    """
+    Fare products that apply to the entire itinerary.
+    If there are products that only cover part of the itinerary they can be found in `legs`.
+    """
+    itinerary: [FareProduct]
+
+    "Fare products that apply only to individual legs, not the entire itinerary."
+    legs: [LegProducts]
 }
 
 type Itinerary {
@@ -1352,6 +1362,8 @@ type Itinerary {
 
     """Information about the fares for this itinerary"""
     fares: [fare]
+
+    fareProducts: FareProducts
 
     """
     How much elevation is gained, in total, over the course of the itinerary, in meters.

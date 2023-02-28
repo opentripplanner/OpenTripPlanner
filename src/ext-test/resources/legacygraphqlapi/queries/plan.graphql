@@ -52,6 +52,11 @@
                     }
                 }
             }
+            fareProducts {
+                itinerary {
+                    name
+                }
+            }
         }
     }
 }
