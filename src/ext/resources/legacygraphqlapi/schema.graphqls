@@ -1279,6 +1279,43 @@ type RoutingError {
     description: String!
 }
 
+"An amount of money."
+type Money {
+    "ISO formatted currency"
+    currency: String!
+    "Cents "
+    cents: Int!
+    """
+    Money amount in cents. **Note:** this value is dependent on the currency used,
+    as one cent is not necessarily ¹/₁₀₀ of the basic monetary unit.
+    """
+    cents: Int
+
+}
+
+type RiderCategory {
+    id: String!
+    name: String
+}
+
+type FareContainer {
+    id: String!
+    name: String
+}
+
+type FareProduct {
+    id: String!
+    name: String!
+    amount: Money!
+    riderCategory: RiderCategory
+    fareContainer: FareContainer
+}
+
+type FareProducts {
+    """Fare products that apply to the entire itinerary. If they are products that only cover part of the leg."""
+    itinerary: [FareProducts]
+}
+
 type Itinerary {
     """
     Time when the user leaves from the origin. Format: Unix timestamp in milliseconds.
