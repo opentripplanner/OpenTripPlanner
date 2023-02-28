@@ -173,6 +173,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    * This method operate on the current leg for access legs and the NEXT leg for transfer and
    * egress. So, if the NEXT leg is a transit or egress leg it is time-shifted. This make it safe to
    * call this method on any leg - just make sure the legs are linked first.
+   * <p>
+   *
+   * The given {@code iterationDepartureTime} is used to time-shift access if the path does not have
+   * any transit legs.
    */
   public void timeShiftThisAndNextLeg(
     RaptorSlackProvider slackProvider,
