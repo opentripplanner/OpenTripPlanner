@@ -12,7 +12,6 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.netex.issues.InvalidTimeZone;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
@@ -74,7 +73,11 @@ class StationMapper {
     try {
       return ZoneId.of(zoneId);
     } catch (DateTimeException e) {
-      issueStore.add(new InvalidTimeZone(stopPlaceId, zoneId));
+      issueStore.add(
+        "InvalidTimeZone",
+        "Invalid ID for ZoneOffset at StopPlace with ID: %s and value %s",
+        stopPlaceId,
+        zoneId);
     }
     return null;
   }
@@ -103,8 +106,8 @@ class StationMapper {
   }
 
   /**
-   * Map the centroid to coordinate, if not present the mean coordinate for the
-   * child quays is returned. If the station do not have any quays an exception is thrown.
+   * Map the centroid to coordinate, if not present the mean coordinate for the child quays is
+   * returned. If the station do not have any quays an exception is thrown.
    */
   private WgsCoordinate mapCoordinate(StopPlace stopPlace) {
     if (stopPlace.getCentroid() != null) {

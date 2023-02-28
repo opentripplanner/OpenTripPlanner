@@ -244,8 +244,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     if (journeyPatterns == null) return;
 
     for (JAXBElement<?> pattern : journeyPatterns.getJourneyPattern_OrJourneyPatternView()) {
-      if (pattern.getValue() instanceof JourneyPattern_VersionStructure) {
-        this.journeyPatterns.add((JourneyPattern_VersionStructure) pattern.getValue());
+      if (pattern.getValue() instanceof JourneyPattern_VersionStructure journeyPattern) {
+        this.journeyPatterns.add(journeyPattern);
       } else {
         warnOnMissingMapping(LOG, pattern.getValue());
       }

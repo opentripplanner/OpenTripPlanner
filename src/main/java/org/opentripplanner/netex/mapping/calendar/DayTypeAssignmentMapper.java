@@ -155,20 +155,18 @@ public class DayTypeAssignmentMapper {
     String ref = dayTypeAssignment.getOperatingPeriodRef().getRef();
     OperatingPeriod_VersionStructure period = operatingPeriods.lookup(ref);
 
-    if (period != null) {
-      if (period instanceof OperatingPeriod operatingPeriod) {
-        Set<DayOfWeek> daysOfWeek = daysOfWeekForDayType(dayType);
-        // Plus 1 to make the end date exclusive - simplify the loop test
-        LocalDateTime endDate = operatingPeriod.getToDate().plusDays(1);
-        LocalDateTime date = operatingPeriod.getFromDate();
+    if (period instanceof OperatingPeriod operatingPeriod) {
+      Set<DayOfWeek> daysOfWeek = daysOfWeekForDayType(dayType);
+      // Plus 1 to make the end date exclusive - simplify the loop test
+      LocalDateTime endDate = operatingPeriod.getToDate().plusDays(1);
+      LocalDateTime date = operatingPeriod.getFromDate();
 
-        addDates(isAvailable, daysOfWeek, endDate, date);
-      } else if (period instanceof UicOperatingPeriod uicOperatingPeriod) {
-        LocalDateTime endDate = uicOperatingPeriod.getToDate().plusDays(1);
-        LocalDateTime date = uicOperatingPeriod.getFromDate();
+      addDates(isAvailable, daysOfWeek, endDate, date);
+    } else if (period instanceof UicOperatingPeriod uicOperatingPeriod) {
+      LocalDateTime endDate = uicOperatingPeriod.getToDate().plusDays(1);
+      LocalDateTime date = uicOperatingPeriod.getFromDate();
 
-        addDates(uicOperatingPeriod.getValidDayBits(), isAvailable, endDate, date);
-      }
+      addDates(uicOperatingPeriod.getValidDayBits(), isAvailable, endDate, date);
     }
   }
 
