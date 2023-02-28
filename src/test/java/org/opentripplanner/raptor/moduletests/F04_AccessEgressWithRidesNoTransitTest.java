@@ -8,6 +8,8 @@ import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
@@ -19,11 +21,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
+import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
@@ -88,7 +92,7 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
 
   @ParameterizedTest
   @MethodSource("openingHoursCases")
-  void openingHours(RaptorModuleTestCase testCase) {
+  void flexWalkOpeningHours(RaptorModuleTestCase testCase) {
     var requestBuilder = baseRequestBuilder();
     requestBuilder
       .searchParams()
@@ -106,9 +110,47 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
 
   @ParameterizedTest
   @MethodSource("noOpeningHoursCases")
-  void noOpeningHours(RaptorModuleTestCase testCase) {
+  void flexWalkNoOpeningHours(RaptorModuleTestCase testCase) {
     var requestBuilder = baseRequestBuilder();
     requestBuilder.searchParams().addAccessPaths(flexAndWalk(STOP_B, D2m, ONE_RIDE, 40_000));
+
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
+  }
+
+  static List<RaptorModuleTestCase> flexOnlyNoWalkTestCases() {
+    var path = "Flex 2m 1x ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:15 0:25 10m 1tx $1620]";
+    var minDurationPath = UnknownPathString.of(D10m, 1);
+    return RaptorModuleTestCase
+      .of()
+      .add(TC_MIN_DURATION, minDurationPath.departureAt(T00_10))
+      .add(TC_MIN_DURATION_REV, minDurationPath.arrivalAt(T00_30))
+      .add(standard().forwardOnly(), PathUtils.withoutCost(path))
+      .add(
+        standard().reverseOnly(),
+        "Flex 2m 1x ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:35 0:45 10m 1tx]"
+      )
+      .add(multiCriteria(), path)
+      .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource("flexOnlyNoWalkTestCases")
+  void flexOnlyNoWalk(RaptorModuleTestCase testCase) {
+    var requestBuilder = baseRequestBuilder();
+    requestBuilder.searchParams().addAccessPaths(flex(STOP_B, D2m, ONE_RIDE, 40_000));
+
+    var request = testCase.withConfig(requestBuilder);
+    var response = raptorService.route(request, data);
+    assertEquals(testCase.expected(), pathsToString(response));
+  }
+
+  @ParameterizedTest
+  @MethodSource("flexOnlyNoWalkTestCases")
+  void flexOnlyNoWalkWithOpening(RaptorModuleTestCase testCase) {
+    var requestBuilder = baseRequestBuilder();
+    requestBuilder.searchParams().addAccessPaths(flex(STOP_B, D2m, ONE_RIDE, 40_000));
 
     var request = testCase.withConfig(requestBuilder);
     var response = raptorService.route(request, data);
