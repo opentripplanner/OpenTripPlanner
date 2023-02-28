@@ -279,7 +279,10 @@ public class VertexLinker {
       return Set.of();
     }
 
-    Set<DistanceTo<StreetEdge>> closestEdges = getClosestEdgesPerMode(traverseModes, candidateEdges);
+    Set<DistanceTo<StreetEdge>> closestEdges = getClosestEdgesPerMode(
+      traverseModes,
+      candidateEdges
+    );
     Set<AreaEdgeList> linkedAreas = new HashSet<>();
     return closestEdges
       .stream()
@@ -616,26 +619,26 @@ public class VertexLinker {
     );
 
     List<NamedArea> intersects = new ArrayList<>();
+    NamedArea hit = null;
     for (NamedArea area : areas) {
       Geometry polygon = area.getPolygon();
       Geometry intersection = polygon.intersection(line);
       if (intersection.getLength() > 0.000001) {
-        intersects.add(area);
+        hit = area;
+        break;
       }
     }
-    if (!intersects.isEmpty()) {
+    if (hit != null) {
       // If more than one area intersects, we pick one by random for the name & properties
-      NamedArea area = intersects.get(0);
-
       double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
 
       AreaEdge ae = new AreaEdge(
         from,
         to,
         line,
-        area.getName(),
+        hit.getName(),
         length,
-        area.getPermission(),
+        hit.getPermission(),
         false,
         ael
       );
@@ -648,9 +651,9 @@ public class VertexLinker {
           to,
           from,
           line.reverse(),
-          area.getName(),
+          hit.getName(),
           length,
-          area.getPermission(),
+          hit.getPermission(),
           true,
           ael
         );
