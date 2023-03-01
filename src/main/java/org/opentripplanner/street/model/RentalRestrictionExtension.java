@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model;
 
-import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.service.vehiclerental.street.CompositeRentalRestrictionExtension;
 import org.opentripplanner.service.vehiclerental.street.NoRestriction;
 import org.opentripplanner.street.search.state.State;

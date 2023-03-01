@@ -2,6 +2,7 @@ package org.opentripplanner.service.vehiclerental.street;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.search.state.State;
