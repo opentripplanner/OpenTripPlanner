@@ -475,6 +475,7 @@
                                 <architecture>arm64</architecture>
                                 <os>linux</os>
                             </platform>
+                        </platforms>
                     </from>
                     <to>
                         <image>${env.CONTAINER_REPO}</image>
