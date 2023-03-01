@@ -517,7 +517,7 @@ public class StreetEdge
   }
 
   /**
-   * If the reverse search has starte in a no-drop off rental zone and you are exiting
+   * If the reverse search has started in a no-drop off rental zone and you are exiting
    * it .
    */
   private boolean hasStartedSearchInNoDropOffZoneAndIsExitingIt(State s0) {
