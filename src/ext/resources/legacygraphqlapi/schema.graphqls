@@ -1164,6 +1164,20 @@ input ParkingFilterOperation {
     tags: [String]
 }
 
+"""
+The filter definition to include or exclude parking facilities used during routing.
+
+Logically, the filter algorithm work as follows:
+
+- The starting point is the set of all facilities, lets call it `A`.
+- Then all `select` filters are applied to `A`, potentially reducing the number of facilities used.
+  Let's call the result of this `B`.
+  An empty `select` will lead to `A` being equal to `B`.
+- Lastly, the `not` filters are applied to `B`, reducing the set further.
+  Lets call this final set `C`.
+  An empty `not` will lead to `B` being equal to `C`.
+- The remaining parking facilities in `C` are used for routing.
+"""
 input ParkingFilter {
     """Exclude parking facilities based on their properties. If empty nothing is excluded."""
     not: [ParkingFilterOperation!]
