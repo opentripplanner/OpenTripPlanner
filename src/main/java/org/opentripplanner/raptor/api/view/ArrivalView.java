@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.api.view;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
@@ -147,42 +146,45 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
 
   /** Use this to easy create a to String implementation. */
   default String asString() {
+    String arrival =
+      "[" +
+      TimeUtils.timeToStrCompact(arrivalTime()) +
+      " " +
+      OtpNumberFormat.formatCostCenti(cost()) +
+      "]";
     if (arrivedByAccess()) {
       return String.format(
-        "Access { stop: %d, duration: %s, arrival-time: %s %s }",
+        "Access { stop: %d, arrival: %s, path: %s }",
         stop(),
-        DurationUtils.durationToStr(accessPath().access().durationInSeconds()),
-        TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCostCenti(cost())
+        arrival,
+        accessPath().access()
       );
     }
     if (arrivedByTransit()) {
       return String.format(
-        "Transit { round: %d, stop: %d, pattern: %s, arrival-time: %s %s }",
+        "Transit { round: %d, stop: %d, arrival: %s, pattern: %s }",
         round(),
         stop(),
-        transitPath().trip().pattern().debugInfo(),
-        TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCostCenti(cost())
+        arrival,
+        transitPath().trip().pattern().debugInfo()
       );
     }
     if (arrivedByTransfer()) {
       return String.format(
-        "Walk { round: %d, stop: %d, arrival-time: %s %s }",
+        "Walk { round: %d, stop: %d, arrival: %s, path: %s }",
         round(),
         stop(),
-        TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCostCenti(cost())
+        arrival,
+        transferPath().transfer()
       );
     }
     if (arrivedAtDestination()) {
       return String.format(
-        "Egress { round: %d, from-stop: %d, duration: %s, arrival-time: %s %s }",
+        "Egress { round: %d, from-stop: %d, arrival: %s, path: %s }",
         round(),
         previous().stop(),
-        DurationUtils.durationToStr(egressPath().egress().durationInSeconds()),
-        TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCostCenti(cost())
+        arrival,
+        egressPath().egress()
       );
     }
     throw new IllegalStateException("Unknown type of stop-arrival: " + getClass());
