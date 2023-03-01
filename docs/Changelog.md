@@ -77,6 +77,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Always check allowed modes in VehicleRentalEdge [#4810](https://github.com/opentripplanner/OpenTripPlanner/pull/4810)
 - Improve support for EPIP NeTex profile [#4863](https://github.com/opentripplanner/OpenTripPlanner/pull/4863)
 - Include cancelled stops when including cancelled trips in trip search [#4851](https://github.com/opentripplanner/OpenTripPlanner/pull/4851)
+- Build a Docker image that support multiple architectures [#4915](https://github.com/opentripplanner/OpenTripPlanner/pull/4915)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
