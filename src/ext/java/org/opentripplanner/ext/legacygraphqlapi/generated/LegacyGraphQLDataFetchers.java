@@ -291,20 +291,22 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
   }
 
+  /** A 'container' that a fare product applies to, for example 'Oyster Card' or 'DB Navigator App'. */
   public interface LegacyGraphQLFareContainer {
     public DataFetcher<String> id();
 
     public DataFetcher<String> name();
   }
 
+  /** A fare product (ticket) to cover thi entire or a subset of an itinerary. */
   public interface LegacyGraphQLFareProduct {
-    public DataFetcher<Object> amount();
-
-    public DataFetcher<Object> fareContainer();
+    public DataFetcher<Object> container();
 
     public DataFetcher<String> id();
 
     public DataFetcher<String> name();
+
+    public DataFetcher<Object> price();
 
     public DataFetcher<Object> riderCategory();
   }
@@ -692,6 +694,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType> propulsionType();
   }
 
+  /** Category of riders a fare product applies to, for example students or pensioners. */
   public interface LegacyGraphQLRiderCategory {
     public DataFetcher<String> id();
 

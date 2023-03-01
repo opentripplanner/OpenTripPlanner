@@ -1325,7 +1325,7 @@ type FareProduct {
 
     This communicates to riders that a specific way of buying or keeping this product is required.
     """
-    fareContainer: FareContainer
+    container: FareContainer
 }
 
 type LegProducts {

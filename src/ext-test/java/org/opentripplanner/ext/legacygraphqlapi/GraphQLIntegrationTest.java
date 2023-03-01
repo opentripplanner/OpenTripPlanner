@@ -34,7 +34,9 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.model.FareContainer;
 import org.opentripplanner.ext.fares.model.FareProduct;
+import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -116,7 +118,14 @@ class GraphQLIntegrationTest {
     var railLeg = i1.getTransitLeg(2);
 
     var fares = new ItineraryFares();
-    var dayPass = new FareProduct(id("fare-1"), "day pass", Money.euros(10), null, null, null);
+    var dayPass = new FareProduct(
+      id("fare-1"),
+      "day pass",
+      Money.euros(10),
+      null,
+      new RiderCategory("senior-citizens", "Senior citizens", null),
+      new FareContainer("oyster", "TfL Oyster Card")
+    );
     fares.addItineraryProducts(List.of(dayPass));
     fares.addFareProduct(railLeg, dayPass);
     i1.setFare(fares);

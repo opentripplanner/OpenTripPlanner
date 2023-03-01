@@ -59,6 +59,14 @@
                         cents
                         currency
                     }
+                    riderCategory {
+                        name
+                        id
+                    }
+                    container {
+                        name
+                        id
+                    }
                 }
                 legs {
                     products {
@@ -66,6 +74,14 @@
                         price {
                             currency
                             cents
+                        }
+                        riderCategory {
+                            id
+                            name
+                        }
+                        container {
+                            id
+                            name
                         }
                     }
                     legIndices
