@@ -1281,7 +1281,7 @@ type RoutingError {
 
 "An amount of money."
 type Money {
-    "ISO formatted currency"
+    "ISO-4217 currency code"
     currency: String!
     """
     Money amount in cents. **Note:** this value is dependent on the currency used,
@@ -1290,28 +1290,51 @@ type Money {
     cents: Int
 }
 
+"Category of riders a fare product applies to, for example students or pensioners."
 type RiderCategory {
+    "ID of the category"
     id: String!
+    "Human readable name of the category."
     name: String
 }
 
+"""
+A 'container' that a fare product applies to, for example 'Oyster Card' or 'DB Navigator App'.
+"""
 type FareContainer {
+    "ID of the container"
     id: String!
+    "Human readable name of the container."
     name: String
 }
 
+"A fare product (ticket) to cover thi entire or a subset of an itinerary."
 type FareProduct {
+    "Identifier for the product."
     id: String!
+    """
+    Human readable name of the product, for example example "Day pass".
+    """
     name: String!
-    amount: Money!
+    "The price of the product"
+    price: Money!
+    "The category of riders this product applies to, for example students or pensioners."
     riderCategory: RiderCategory
+    """
+    The 'container' that this product applies to, for example "Oyster Card" or "DB Navigator App".
+
+    This communicates to riders that a specific way of buying or keeping this product is required.
+    """
     fareContainer: FareContainer
 }
 
 type LegProducts {
     "The fare products that apply to a limited set of legs but not the entire itinerary."
     products: [FareProduct]!
-    "The indices of the legs that the fare products apply to. If there are multiple indices listed, then the fare product covers several legs."
+    """
+    The indices of the legs that the fare products apply to. If there are multiple indices listed,
+    then the fare product covers several legs (but not the entire itinerary).
+    """
     legIndices: [Int]!
 }
 

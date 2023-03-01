@@ -55,7 +55,7 @@
             fareProducts {
                 itinerary {
                     name
-                    amount {
+                    price {
                         cents
                         currency
                     }
@@ -63,7 +63,7 @@
                 legs {
                     products {
                         name
-                        amount {
+                        price {
                             currency
                             cents
                         }
