@@ -465,6 +465,18 @@
                             <port>8081</port>
                         </ports>
                     </container>
+                    <from>
+                        <platforms>
+                            <platform>
+                                <architecture>amd64</architecture>
+                                <os>linux</os>
+                            </platform>
+                            <platform>
+                                <architecture>arm64</architecture>
+                                <os>linux</os>
+                            </platform>
+                        </platforms>
+                    </from>
                     <to>
                         <image>${env.CONTAINER_REPO}</image>
                         <auth>
