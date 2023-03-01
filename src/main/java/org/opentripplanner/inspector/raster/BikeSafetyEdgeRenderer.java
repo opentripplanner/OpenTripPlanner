@@ -5,11 +5,11 @@ import java.util.Optional;
 import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.VertexVisualAttributes;
+import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
-import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 

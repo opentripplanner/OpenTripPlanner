@@ -1,7 +1,7 @@
 package org.opentripplanner.street.search.state;
 
 import java.util.Set;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -237,7 +237,11 @@ public class StateEditor {
     child.stateData.backWalkingBike = walkingBike;
   }
 
-  public void beginFloatingVehicleRenting(FormFactor formFactor, String network, boolean reverse) {
+  public void beginFloatingVehicleRenting(
+    RentalFormFactor formFactor,
+    String network,
+    boolean reverse
+  ) {
     cloneStateDataAsNeeded();
     if (reverse) {
       child.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
@@ -254,7 +258,7 @@ public class StateEditor {
   }
 
   public void beginVehicleRentingAtStation(
-    FormFactor formFactor,
+    RentalFormFactor formFactor,
     String network,
     boolean mayKeep,
     boolean reverse
@@ -277,7 +281,7 @@ public class StateEditor {
   }
 
   public void dropOffRentedVehicleAtStation(
-    FormFactor formFactor,
+    RentalFormFactor formFactor,
     String network,
     boolean reverse
   ) {
@@ -298,7 +302,7 @@ public class StateEditor {
     }
   }
 
-  public void dropFloatingVehicle(FormFactor formFactor, String network, boolean reverse) {
+  public void dropFloatingVehicle(RentalFormFactor formFactor, String network, boolean reverse) {
     cloneStateDataAsNeeded();
     if (reverse) {
       child.stateData.mayKeepRentedVehicleAtDestination = false;

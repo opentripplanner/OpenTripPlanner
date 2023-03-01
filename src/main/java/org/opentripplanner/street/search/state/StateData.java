@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
@@ -41,7 +41,7 @@ public class StateData implements Cloneable {
 
   public String vehicleRentalNetwork;
 
-  public FormFactor rentalVehicleFormFactor;
+  public RentalFormFactor rentalVehicleFormFactor;
 
   /** This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
   protected boolean enteredNoThroughTrafficArea;
@@ -172,11 +172,11 @@ public class StateData implements Cloneable {
     return res;
   }
 
-  private static FormFactor toFormFactor(StreetMode streetMode) {
+  private static RentalFormFactor toFormFactor(StreetMode streetMode) {
     return switch (streetMode) {
-      case BIKE_RENTAL -> FormFactor.BICYCLE;
-      case SCOOTER_RENTAL -> FormFactor.SCOOTER;
-      case CAR_RENTAL -> FormFactor.CAR;
+      case BIKE_RENTAL -> RentalFormFactor.BICYCLE;
+      case SCOOTER_RENTAL -> RentalFormFactor.SCOOTER;
+      case CAR_RENTAL -> RentalFormFactor.CAR;
       // there is no default here so you get a compiler error when you add a new value to the enum
       case NOT_SET,
         WALK,

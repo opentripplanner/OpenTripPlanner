@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
-import static org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor.BICYCLE;
-import static org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor.CARGO_BICYCLE;
-import static org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor.SCOOTER;
-import static org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor.SCOOTER_SEATED;
-import static org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor.SCOOTER_STANDING;
+import static org.opentripplanner.street.model.RentalFormFactor.BICYCLE;
+import static org.opentripplanner.street.model.RentalFormFactor.CARGO_BICYCLE;
+import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
+import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER_SEATED;
+import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER_STANDING;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
 
@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -55,7 +55,7 @@ public class StreetEdgeRentalTraversalTest {
   )
   @VariableSource("allowedToTraverse")
   void scooterBicycleTraversal(
-    RentalVehicleType.FormFactor formFactor,
+    RentalFormFactor formFactor,
     StreetMode streetMode,
     StreetTraversalPermission permission
   ) {
@@ -83,7 +83,7 @@ public class StreetEdgeRentalTraversalTest {
   )
   @VariableSource("noTraversal")
   void noTraversal(
-    RentalVehicleType.FormFactor formFactor,
+    RentalFormFactor formFactor,
     StreetMode streetMode,
     StreetTraversalPermission permission
   ) {

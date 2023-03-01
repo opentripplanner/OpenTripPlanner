@@ -1,9 +1,9 @@
-package org.opentripplanner.routing.vehicle_rental;
+package org.opentripplanner.service.vehiclerental.model;
 
 import java.time.Instant;
 import java.util.Set;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -101,16 +101,16 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
 
   @Override
   public boolean isCarStation() {
-    return vehicleType.formFactor.equals(RentalVehicleType.FormFactor.CAR);
+    return vehicleType.formFactor.equals(RentalFormFactor.CAR);
   }
 
   @Override
-  public Set<FormFactor> getAvailablePickupFormFactors(boolean includeRealtimeAvailability) {
+  public Set<RentalFormFactor> getAvailablePickupFormFactors(boolean includeRealtimeAvailability) {
     return Set.of(vehicleType.formFactor);
   }
 
   @Override
-  public Set<FormFactor> getAvailableDropoffFormFactors(boolean includeRealtimeAvailability) {
+  public Set<RentalFormFactor> getAvailableDropoffFormFactors(boolean includeRealtimeAvailability) {
     return Set.of();
   }
 

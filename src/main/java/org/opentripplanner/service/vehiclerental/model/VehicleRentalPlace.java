@@ -1,9 +1,9 @@
-package org.opentripplanner.routing.vehicle_rental;
+package org.opentripplanner.service.vehiclerental.model;
 
 import java.util.Set;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -62,10 +62,10 @@ public interface VehicleRentalPlace {
   boolean isCarStation();
 
   /** What form factors are currently available for pick up */
-  Set<FormFactor> getAvailablePickupFormFactors(boolean includeRealtimeAvailability);
+  Set<RentalFormFactor> getAvailablePickupFormFactors(boolean includeRealtimeAvailability);
 
   /** What form factors are currently available for drop off */
-  Set<FormFactor> getAvailableDropoffFormFactors(boolean includeRealtimeAvailability);
+  Set<RentalFormFactor> getAvailableDropoffFormFactors(boolean includeRealtimeAvailability);
 
   /** Is it possible to arrive at the destination with a rented bicycle, without dropping it off */
   boolean isArrivingInRentalVehicleAtDestinationAllowed();

@@ -17,10 +17,11 @@ import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.BusinessAreaBorder;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.street.BusinessAreaBorder;
+import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
+import org.opentripplanner.street.model.RentalFormFactor;
+import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -32,10 +33,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 class StreetEdgeGeofencingTest {
 
   static String network = "tier-oslo";
-  static RentalRestrictionExtension NO_DROP_OFF = new RentalRestrictionExtension.GeofencingZoneExtension(
+  static RentalRestrictionExtension NO_DROP_OFF = new GeofencingZoneExtension(
     new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
   );
-  static RentalRestrictionExtension NO_TRAVERSAL = new RentalRestrictionExtension.GeofencingZoneExtension(
+  static RentalRestrictionExtension NO_TRAVERSAL = new GeofencingZoneExtension(
     new GeofencingZone(new FeedScopedId(network, "a-park"), null, false, true)
   );
   StreetVertex V1 = intersectionVertex("V1", 0, 0);
@@ -69,7 +70,7 @@ class StreetEdgeGeofencingTest {
     public void dontEnterGeofencingZoneOnFoot() {
       var edge = streetEdge(V1, V2);
       V2.addRentalRestriction(
-        new RentalRestrictionExtension.GeofencingZoneExtension(
+        new GeofencingZoneExtension(
           new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, true)
         )
       );
@@ -86,9 +87,9 @@ class StreetEdgeGeofencingTest {
 
       var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
       var editor = new StateEditor(edge1.getFromVertex(), req);
-      editor.beginFloatingVehicleRenting(RentalVehicleType.FormFactor.SCOOTER, network, false);
+      editor.beginFloatingVehicleRenting(RentalFormFactor.SCOOTER, network, false);
       restrictedEdge.addRentalRestriction(
-        new RentalRestrictionExtension.GeofencingZoneExtension(
+        new GeofencingZoneExtension(
           new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
         )
       );
@@ -135,7 +136,7 @@ class StreetEdgeGeofencingTest {
         .build();
 
       var editor = new StateEditor(restrictedEdge.getToVertex(), req);
-      editor.dropFloatingVehicle(RentalVehicleType.FormFactor.SCOOTER, network, true);
+      editor.dropFloatingVehicle(RentalFormFactor.SCOOTER, network, true);
 
       var result = restrictedEdge.traverse(editor.makeState());
 
@@ -255,7 +256,7 @@ class StreetEdgeGeofencingTest {
       .withArriveBy(arriveBy)
       .build();
     var editor = new StateEditor(startVertex, req);
-    editor.beginFloatingVehicleRenting(RentalVehicleType.FormFactor.SCOOTER, network, false);
+    editor.beginFloatingVehicleRenting(RentalFormFactor.SCOOTER, network, false);
     return editor.makeState();
   }
 }

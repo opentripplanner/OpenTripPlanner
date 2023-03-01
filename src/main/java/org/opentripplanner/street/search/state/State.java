@@ -11,10 +11,10 @@ import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.VehicleRentalEdge;
-import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
@@ -201,7 +201,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return vehicleRentingOk && vehicleParkAndRideOk;
   }
 
-  public RentalVehicleType.FormFactor vehicleRentalFormFactor() {
+  public RentalFormFactor vehicleRentalFormFactor() {
     return stateData.rentalVehicleFormFactor;
   }
 
