@@ -12,6 +12,7 @@ import java.util.Set;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.basic.Money;
 
@@ -52,6 +53,19 @@ public class ItineraryFares {
 
   public Multimap<Leg, FareProduct> getLegProducts() {
     return ImmutableMultimap.copyOf(legProducts);
+  }
+
+  public List<IndexedLegProducts> indexedLegProducts(Itinerary itinerary) {
+    return legProducts
+      .keySet()
+      .stream()
+      .map(leg -> {
+        var index = itinerary.getLegIndex(leg);
+        // eventually we want to implement products that span multiple legs (but not the entire itinerary)
+        var products = legProducts.get(leg);
+        return new IndexedLegProducts(products, leg, index);
+      })
+      .toList();
   }
 
   public void addFare(FareType fareType, Money money) {

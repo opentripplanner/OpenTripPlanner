@@ -30,6 +30,7 @@ import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.core.FareComponent;
+import org.opentripplanner.routing.core.IndexedLegProducts;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -311,7 +312,7 @@ public class LegacyGraphQLDataFetchers {
   public interface LegacyGraphQLFareProducts {
     public DataFetcher<Iterable<FareProduct>> itinerary();
 
-    public DataFetcher<Iterable<Object>> legs();
+    public DataFetcher<Iterable<IndexedLegProducts>> legs();
   }
 
   /** A feed provides routing data (stops, routes, timetables, etc.) from one or more public transport agencies. */
@@ -340,7 +341,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Long> endTime();
 
-    public DataFetcher<Object> fareProducts();
+    public DataFetcher<Itinerary> fareProducts();
 
     public DataFetcher<Iterable<Map<String, Object>>> fares();
 
@@ -426,7 +427,7 @@ public class LegacyGraphQLDataFetchers {
   public interface LegacyGraphQLLegProducts {
     public DataFetcher<Iterable<Integer>> legIndices();
 
-    public DataFetcher<Iterable<Object>> products();
+    public DataFetcher<Iterable<FareProduct>> products();
   }
 
   /** A span of time. */

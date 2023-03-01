@@ -34,6 +34,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -44,6 +45,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -52,6 +54,7 @@ import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalSe
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -110,8 +113,14 @@ class GraphQLIntegrationTest {
       .bus(122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
       .build();
-
     var railLeg = i1.getTransitLeg(2);
+
+    var fares = new ItineraryFares();
+    var dayPass = new FareProduct(id("fare-1"), "day pass", Money.euros(10), null, null, null);
+    fares.addItineraryProducts(List.of(dayPass));
+    fares.addFareProduct(railLeg, dayPass);
+    i1.setFare(fares);
+
     var alert = TransitAlert
       .of(id("an-alert"))
       .withHeaderText(new NonLocalizedString("A header"))

@@ -55,6 +55,20 @@
             fareProducts {
                 itinerary {
                     name
+                    amount {
+                        cents
+                        currency
+                    }
+                }
+                legs {
+                    products {
+                        name
+                        amount {
+                            currency
+                            cents
+                        }
+                    }
+                    legIndices
                 }
             }
         }

@@ -90,7 +90,34 @@
                 }
               ]
             }
-          ]
+          ],
+          "fareProducts" : {
+            "itinerary" : [
+              {
+                "name" : "day pass",
+                "amount" : {
+                  "cents" : 10,
+                  "currency" : "EUR"
+                }
+              }
+            ],
+            "legs" : [
+              {
+                "products" : [
+                  {
+                    "name" : "day pass",
+                    "amount" : {
+                      "currency" : "EUR",
+                      "cents" : 10
+                    }
+                  }
+                ],
+                "legIndices" : [
+                  2
+                ]
+              }
+            ]
+          }
         }
       ]
     }

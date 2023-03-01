@@ -1310,7 +1310,7 @@ type FareProduct {
 
 type LegProducts {
     "The fare products that apply to a limited set of legs but not the entire itinerary."
-    products: [FareProducts]!
+    products: [FareProduct]!
     "The indices of the legs that the fare products apply to. If there are multiple indices listed, then the fare product covers several legs."
     legIndices: [Int]!
 }
