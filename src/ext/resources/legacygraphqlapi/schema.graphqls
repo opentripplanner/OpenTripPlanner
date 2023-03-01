@@ -1383,9 +1383,16 @@ type Itinerary {
     """
     legs: [Leg]!
 
-    """Information about the fares for this itinerary"""
+    """
+    Information about the fares for this itinerary. This is primarily a GTFS Fares V1 interface
+    will be deprecated in the near future.
+    """
     fares: [fare]
 
+
+    """
+    Contains prices and information about available fare for this itinerary and its legs.
+    """
     fareProducts: FareProducts
 
     """
