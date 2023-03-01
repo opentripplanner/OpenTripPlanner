@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -143,17 +144,39 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
   }
 
   @Override
-  public BitSet filterAvailableStops(RoutingTripPattern tripPattern, BitSet boardingPossible) {
+  public BitSet filterAvailableStops(
+    RoutingTripPattern tripPattern,
+    BitSet boardingPossible,
+    BoardAlight boardAlight
+  ) {
+    var result = boardingPossible;
+
+    // if the user wants to include realtime cancellations, include cancelled stops as available
+    if (includeRealtimeCancellations) {
+      var pattern = tripPattern.getPattern();
+      var nStops = pattern.numberOfStops();
+      result = new BitSet(nStops);
+
+      for (int i = 0; i < nStops; i++) {
+        PickDrop pickDrop =
+          switch (boardAlight) {
+            case BOARD -> pattern.getBoardType(i);
+            case ALIGHT -> pattern.getAlightType(i);
+          };
+        result.set(i, pickDrop.isRoutable() || pickDrop.is(PickDrop.CANCELLED));
+      }
+    }
+
     // if the user wants wheelchair-accessible routes and the configuration requires us to only
     // consider those stops which have the correct accessibility values then use only this for
     // checking whether to board/alight
     if (wheelchairEnabled && wheelchairPreferences.stop().onlyConsiderAccessible()) {
-      var copy = (BitSet) boardingPossible.clone();
+      result = (BitSet) result.clone();
       // Use the and bitwise operator to add false flag to all stops that are not accessible by wheelchair
-      copy.and(tripPattern.getWheelchairAccessible());
+      result.and(tripPattern.getWheelchairAccessible());
 
-      return copy;
+      return result;
     }
-    return boardingPossible;
+    return result;
   }
 }
