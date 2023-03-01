@@ -8,7 +8,7 @@ import java.util.List;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
@@ -31,7 +31,7 @@ public class VehicleRentalServiceDirectoryFetcher {
   public static List<GraphUpdater> createUpdatersFromEndpoint(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
     VertexLinker vertexLinker,
-    VehicleRentalService vehicleRentalStationService
+    VehicleRentalRepository repository
   ) {
     LOG.info("Fetching list of updaters from {}", parameters.getUrl());
 
@@ -84,7 +84,7 @@ public class VehicleRentalServiceDirectoryFetcher {
           vehicleRentalParameters,
           dataSource,
           vertexLinker,
-          vehicleRentalStationService
+          repository
         );
         updaters.add(updater);
       }

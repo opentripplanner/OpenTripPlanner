@@ -6,7 +6,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.ModeMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -33,9 +33,9 @@ public class ApiRouterInfo {
     String routerId,
     Graph graph,
     TransitService transitService,
+    VehicleRentalService vehicleRentalService,
     WorldEnvelope envelope
   ) {
-    VehicleRentalService vehicleRentalService = graph.getVehicleRentalService();
     VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
 
     this.routerId = routerId;
@@ -50,7 +50,8 @@ public class ApiRouterInfo {
     this.hasCarPark = mapHasCarPark(vehicleParkingService);
     this.hasParkRide = this.hasCarPark;
     this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
-    this.travelOptions = ApiTravelOptionsMaker.makeOptions(graph, transitService);
+    this.travelOptions =
+      ApiTravelOptionsMaker.makeOptions(graph, vehicleRentalService, transitService);
   }
 
   public boolean mapHasBikeSharing(VehicleRentalService service) {

@@ -1,13 +1,13 @@
-package org.opentripplanner.street.model.edge;
+package org.opentripplanner.service.vehiclerental.street;
 
 import java.util.Collections;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.street.model.RentalFormFactor;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
@@ -18,9 +18,9 @@ import org.opentripplanner.street.search.state.StateEditor;
  */
 public class VehicleRentalEdge extends Edge {
 
-  public FormFactor formFactor;
+  public RentalFormFactor formFactor;
 
-  public VehicleRentalEdge(VehicleRentalPlaceVertex vertex, FormFactor formFactor) {
+  public VehicleRentalEdge(VehicleRentalPlaceVertex vertex, RentalFormFactor formFactor) {
     super(vertex, vertex);
     this.formFactor = formFactor;
   }
@@ -189,15 +189,15 @@ public class VehicleRentalEdge extends Edge {
     return rentedNetwork.equals(stationNetwork);
   }
 
-  private static Set<FormFactor> allowedModes(StreetMode streetMode) {
+  private static Set<RentalFormFactor> allowedModes(StreetMode streetMode) {
     return switch (streetMode) {
-      case BIKE_RENTAL -> Set.of(FormFactor.BICYCLE, FormFactor.CARGO_BICYCLE);
+      case BIKE_RENTAL -> Set.of(RentalFormFactor.BICYCLE, RentalFormFactor.CARGO_BICYCLE);
       case SCOOTER_RENTAL -> Set.of(
-        FormFactor.SCOOTER,
-        FormFactor.SCOOTER_SEATED,
-        FormFactor.SCOOTER_STANDING
+        RentalFormFactor.SCOOTER,
+        RentalFormFactor.SCOOTER_SEATED,
+        RentalFormFactor.SCOOTER_STANDING
       );
-      case CAR_RENTAL -> Set.of(FormFactor.CAR);
+      case CAR_RENTAL -> Set.of(RentalFormFactor.CAR);
       default -> Set.of();
     };
   }

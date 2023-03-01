@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vehicle_rental;
+package org.opentripplanner.service.vehiclerental.model;
 
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
