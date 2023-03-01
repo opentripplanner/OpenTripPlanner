@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.core;
 
-import java.util.Collection;
+import java.util.List;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.model.plan.Leg;
 
@@ -10,4 +10,4 @@ import org.opentripplanner.model.plan.Leg;
  * @param leg The leg that the fare products are valid for.
  * @param legIndex The index of the leg in the itinerary that the fare products are valid for.
  */
-public record IndexedLegProducts(Collection<FareProduct> products, Leg leg, int legIndex) {}
+public record IndexedLegProducts(List<FareProduct> products, Leg leg, int legIndex) {}

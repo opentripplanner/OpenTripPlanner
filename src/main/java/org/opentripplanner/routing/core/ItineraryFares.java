@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.core;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,7 +28,9 @@ public class ItineraryFares {
    */
   private final HashMap<FareType, List<FareComponent>> details = new HashMap<>();
   private final Set<FareProduct> itineraryProducts = new HashSet<>();
-  private final Multimap<Leg, FareProduct> legProducts = ArrayListMultimap.create();
+
+  // LinkedHashMultimap keeps the insertion order
+  private final Multimap<Leg, FareProduct> legProducts = LinkedHashMultimap.create();
 
   /**
    * A mapping from {@link FareType} to {@link Money}.
@@ -62,7 +64,7 @@ public class ItineraryFares {
       .map(leg -> {
         var index = itinerary.getLegIndex(leg);
         // eventually we want to implement products that span multiple legs (but not the entire itinerary)
-        var products = legProducts.get(leg);
+        var products = List.copyOf(legProducts.get(leg));
         return new IndexedLegProducts(products, leg, index);
       })
       .toList();
