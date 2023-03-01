@@ -9,6 +9,7 @@ import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
+import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertCauseType;
@@ -289,6 +290,30 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
   }
 
+  public interface LegacyGraphQLFareContainer {
+    public DataFetcher<String> id();
+
+    public DataFetcher<String> name();
+  }
+
+  public interface LegacyGraphQLFareProduct {
+    public DataFetcher<Object> amount();
+
+    public DataFetcher<Object> fareContainer();
+
+    public DataFetcher<String> id();
+
+    public DataFetcher<String> name();
+
+    public DataFetcher<Object> riderCategory();
+  }
+
+  public interface LegacyGraphQLFareProducts {
+    public DataFetcher<Iterable<FareProduct>> itinerary();
+
+    public DataFetcher<Iterable<Object>> legs();
+  }
+
   /** A feed provides routing data (stops, routes, timetables, etc.) from one or more public transport agencies. */
   public interface LegacyGraphQLFeed {
     public DataFetcher<Iterable<Agency>> agencies();
@@ -314,6 +339,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Double> elevationLost();
 
     public DataFetcher<Long> endTime();
+
+    public DataFetcher<Object> fareProducts();
 
     public DataFetcher<Iterable<Map<String, Object>>> fares();
 
@@ -396,6 +423,12 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Boolean> walkingBike();
   }
 
+  public interface LegacyGraphQLLegProducts {
+    public DataFetcher<Iterable<Integer>> legIndices();
+
+    public DataFetcher<Iterable<Object>> products();
+  }
+
   /** A span of time. */
   public interface LegacyGraphQLLocalTimeSpan {
     public DataFetcher<Integer> from();
@@ -408,6 +441,13 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> date();
 
     public DataFetcher<Iterable<Object>> timeSpans();
+  }
+
+  /** An amount of money. */
+  public interface LegacyGraphQLMoney {
+    public DataFetcher<Integer> cents();
+
+    public DataFetcher<String> currency();
   }
 
   /** An object with an ID */
@@ -649,6 +689,12 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor> formFactor();
 
     public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType> propulsionType();
+  }
+
+  public interface LegacyGraphQLRiderCategory {
+    public DataFetcher<String> id();
+
+    public DataFetcher<String> name();
   }
 
   /**
