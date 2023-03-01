@@ -74,12 +74,9 @@ public class ConstantsForTests {
 
   public static final String SHAPE_DIST_GTFS = "src/test/resources/gtfs/shape_dist_traveled/";
 
-  private static final String NETEX_NORDIC_DIR = "src/test/resources/netex/nordic";
+  private static final String NETEX_DIR = "src/test/resources/netex";
 
-  private static final String NETEX_NORDIC_FILENAME = "netex_minimal.zip";
-  private static final String NETEX_EPIP_DIR = "src/test/resources/netex/epip";
-
-  private static final String NETEX_EPIP_FILENAME = "netex_epip_minimal.zip";
+  private static final String NETEX_FILENAME = "netex_minimal.zip";
 
   /* Stuttgart area, Germany */
   public static final String DEUFRINGEN_OSM =
@@ -107,7 +104,7 @@ public class ConstantsForTests {
   public static final String UMLAUT_UTF8_ZIP_NO_EFS = "src/test/resources/umlaut-utf8-no-efs.zip";
 
   private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
-    new File(NETEX_NORDIC_DIR, NETEX_NORDIC_FILENAME),
+    new File(NETEX_DIR, NETEX_FILENAME),
     FileType.NETEX
   );
 
@@ -124,18 +121,9 @@ public class ConstantsForTests {
     return instance;
   }
 
-  public static NetexBundle createMinimalNetexNordicBundle() {
-    var buildConfig = createNetexNordicBuilderParameters();
-    var netexZipFile = new File(NETEX_NORDIC_DIR, NETEX_NORDIC_FILENAME);
-
-    var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
-    var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
-    return new NetexConfigure(buildConfig).netexBundle(configuredDataSource);
-  }
-
-  public static NetexBundle createMinimalNetexEpipBundle() {
-    var buildConfig = createNetexEpipBuilderParameters();
-    var netexZipFile = new File(NETEX_EPIP_DIR, NETEX_EPIP_FILENAME);
+  public static NetexBundle createMinimalNetexBundle() {
+    var buildConfig = createNetexBuilderParameters();
+    var netexZipFile = new File(NETEX_DIR, NETEX_FILENAME);
 
     var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
@@ -273,7 +261,7 @@ public class ConstantsForTests {
       }
       // Add transit data from Netex
       {
-        var buildConfig = createNetexNordicBuilderParameters();
+        var buildConfig = createNetexBuilderParameters();
         var netexConfig = buildConfig.netexDefaults
           .copyOf()
           .withSource(NETEX_MINIMAL_DATA_SOURCE.uri())
@@ -375,11 +363,7 @@ public class ConstantsForTests {
     }
   }
 
-  private static BuildConfig createNetexNordicBuilderParameters() {
-    return new OtpConfigLoader(new File(ConstantsForTests.NETEX_NORDIC_DIR)).loadBuildConfig();
-  }
-
-  private static BuildConfig createNetexEpipBuilderParameters() {
-    return new OtpConfigLoader(new File(ConstantsForTests.NETEX_EPIP_DIR)).loadBuildConfig();
+  private static BuildConfig createNetexBuilderParameters() {
+    return new OtpConfigLoader(new File(ConstantsForTests.NETEX_DIR)).loadBuildConfig();
   }
 }

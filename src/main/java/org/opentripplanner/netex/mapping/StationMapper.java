@@ -1,6 +1,5 @@
 package org.opentripplanner.netex.mapping;
 
-import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,7 +55,7 @@ class StationMapper {
         Optional
           .ofNullable(stopPlace.getLocale())
           .map(LocaleStructure::getTimeZone)
-          .map(zoneId -> ofZoneId(stopPlace.getId(), zoneId))
+          .map(ZoneId::of)
           .orElse(defaultTimeZone)
       );
 
@@ -67,20 +66,6 @@ class StationMapper {
     }
 
     return builder.build();
-  }
-
-  private ZoneId ofZoneId(String stopPlaceId, String zoneId) {
-    try {
-      return ZoneId.of(zoneId);
-    } catch (DateTimeException e) {
-      issueStore.add(
-        "InvalidTimeZone",
-        "Invalid ID for ZoneOffset at StopPlace with ID: %s and value %s",
-        stopPlaceId,
-        zoneId
-      );
-    }
-    return null;
   }
 
   private I18NString resolveName(StopPlace stopPlace) {
@@ -107,8 +92,8 @@ class StationMapper {
   }
 
   /**
-   * Map the centroid to coordinate, if not present the mean coordinate for the child quays is
-   * returned. If the station do not have any quays an exception is thrown.
+   * Map the centroid to coordinate, if not present the mean coordinate for the
+   * child quays is returned. If the station do not have any quays an exception is thrown.
    */
   private WgsCoordinate mapCoordinate(StopPlace stopPlace) {
     if (stopPlace.getCentroid() != null) {
@@ -121,7 +106,7 @@ class StationMapper {
       );
       List<WgsCoordinate> coordinates = new ArrayList<>();
       for (Object it : stopPlace.getQuays().getQuayRefOrQuay()) {
-        if (it instanceof Quay quay && quay.getCentroid() != null) {
+        if (it instanceof Quay quay) {
           coordinates.add(WgsCoordinateMapper.mapToDomain(quay.getCentroid()));
         }
       }
