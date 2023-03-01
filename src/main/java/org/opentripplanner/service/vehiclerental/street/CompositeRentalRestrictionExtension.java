@@ -48,7 +48,7 @@ public final class CompositeRentalRestrictionExtension implements RentalRestrict
   }
 
   @Override
-  public EnumSet<RestrictionType> debugTypes() {
+  public Set<RestrictionType> debugTypes() {
     var set = EnumSet.noneOf(RestrictionType.class);
     for (var ext : extensions) {
       set.addAll(ext.debugTypes());

@@ -21,7 +21,7 @@ public final class NoRestriction implements RentalRestrictionExtension {
   }
 
   @Override
-  public EnumSet<RestrictionType> debugTypes() {
+  public Set<RestrictionType> debugTypes() {
     return EnumSet.noneOf(RestrictionType.class);
   }
 

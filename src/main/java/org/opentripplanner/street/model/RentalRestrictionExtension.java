@@ -28,7 +28,7 @@ public interface RentalRestrictionExtension {
   /**
    * Return the types of restrictions in this extension for debugging purposes.
    */
-  EnumSet<RestrictionType> debugTypes();
+  Set<RestrictionType> debugTypes();
 
   /**
    * Add another extension to this one and returning the combined one.

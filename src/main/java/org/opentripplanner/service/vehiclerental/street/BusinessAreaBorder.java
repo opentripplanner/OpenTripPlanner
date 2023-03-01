@@ -27,7 +27,7 @@ public final class BusinessAreaBorder implements RentalRestrictionExtension {
   }
 
   @Override
-  public EnumSet<RestrictionType> debugTypes() {
+  public Set<RestrictionType> debugTypes() {
     return EnumSet.of(RestrictionType.BUSINESS_AREA_BORDER);
   }
 

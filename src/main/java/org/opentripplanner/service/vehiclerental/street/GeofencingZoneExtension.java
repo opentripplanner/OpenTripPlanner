@@ -44,7 +44,7 @@ public final class GeofencingZoneExtension implements RentalRestrictionExtension
   }
 
   @Override
-  public EnumSet<RestrictionType> debugTypes() {
+  public Set<RestrictionType> debugTypes() {
     var set = EnumSet.noneOf(RestrictionType.class);
     if (zone.traversalBanned()) {
       set.add(RestrictionType.NO_TRAVERSAL);
