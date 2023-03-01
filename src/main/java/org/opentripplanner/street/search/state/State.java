@@ -56,7 +56,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   /**
    * Create an initial state, forcing vertex to the specified value. Useful for tests, etc.
    */
-  public State(@Nonnull Vertex vertex, StreetSearchRequest streetSearchRequest) {
+  public State(@Nonnull Vertex vertex, @Nonnull StreetSearchRequest streetSearchRequest) {
     this(
       vertex,
       streetSearchRequest.startTime(),
@@ -67,9 +67,9 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public State(
     @Nonnull Vertex vertex,
-    Instant startTime,
-    StateData stateData,
-    StreetSearchRequest request
+    @Nonnull Instant startTime,
+    @Nonnull StateData stateData,
+    @Nonnull StreetSearchRequest request
   ) {
     this.request = request;
     this.weight = 0;
