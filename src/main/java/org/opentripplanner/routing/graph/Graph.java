@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
@@ -114,11 +113,6 @@ public class Graph implements Serializable {
    */
   public DataOverlayParameterBindings dataOverlayParameterBindings;
   private LuceneIndex luceneIndex;
-
-  /**
-   * Issues encountered during graph build summarized by type.
-   */
-  private Map<String, Long> issueSummary = Map.of();
 
   @Inject
   public Graph(
@@ -369,22 +363,6 @@ public class Graph implements Serializable {
 
   public void setLuceneIndex(LuceneIndex luceneIndex) {
     this.luceneIndex = luceneIndex;
-  }
-
-  /**
-   * Set the summary of issues that have been recorded during graph build.
-   */
-  public void setIssueSummary(Map<String, Long> issueSummary) {
-    Objects.requireNonNull(issueSummary);
-    this.issueSummary = issueSummary;
-  }
-
-  /**
-   * Returns the summary of the issues that have been recorded during graph build.
-   */
-  @Nonnull
-  public Map<String, Long> issueSummary() {
-    return this.issueSummary;
   }
 
   private void indexIfNotIndexed(StopModel stopModel) {

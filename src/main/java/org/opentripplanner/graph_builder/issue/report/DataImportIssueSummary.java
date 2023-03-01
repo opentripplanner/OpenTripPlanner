@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.issue.report;
 
 import static org.opentripplanner.graph_builder.issue.api.DataImportIssueStore.ISSUES_LOG_NAME;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -11,13 +12,12 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SummarizeDataImportIssues {
+public class DataImportIssueSummary implements Serializable {
 
   private static final Logger ISSUE_LOG = LoggerFactory.getLogger(ISSUES_LOG_NAME);
-
   private final Map<String, Long> summary;
 
-  public SummarizeDataImportIssues(List<DataImportIssue> issues) {
+  public DataImportIssueSummary(List<DataImportIssue> issues) {
     summary =
       issues
         .stream()
@@ -25,7 +25,11 @@ public class SummarizeDataImportIssues {
         .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
   }
 
-  public void printSummary() {
+  public static DataImportIssueSummary empty() {
+    return new DataImportIssueSummary(List.of());
+  }
+
+  public void logSummary() {
     int maxLength = summary.keySet().stream().mapToInt(String::length).max().orElse(10);
     final String FMT = "  - %-" + maxLength + "s  %,7d";
 
@@ -39,7 +43,7 @@ public class SummarizeDataImportIssues {
   }
 
   @Nonnull
-  public Map<String, Long> summary() {
+  public Map<String, Long> asMap() {
     return summary;
   }
 }

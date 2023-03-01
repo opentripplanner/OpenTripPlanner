@@ -8,6 +8,7 @@ import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
+import org.opentripplanner.graph_builder.issue.report.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -66,7 +67,8 @@ public class ConstructApplication {
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
-    GraphBuilderDataSources graphBuilderDataSources
+    GraphBuilderDataSources graphBuilderDataSources,
+    DataImportIssueSummary issueSummary
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -85,6 +87,7 @@ public class ConstructApplication {
         .transitModel(transitModel)
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
+        .dataImportIssueSummary(issueSummary)
         .build();
   }
 

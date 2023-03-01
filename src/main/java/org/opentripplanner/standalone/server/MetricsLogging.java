@@ -19,9 +19,9 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
+import org.opentripplanner.graph_builder.issue.report.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -34,7 +34,7 @@ public class MetricsLogging {
   public MetricsLogging(
     TransitModel transitModel,
     RaptorConfig<TripSchedule> raptorConfig,
-    Graph graph
+    DataImportIssueSummary issueSummary
   ) {
     new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
     new FileDescriptorMetrics().bindTo(Metrics.globalRegistry);
@@ -88,12 +88,12 @@ public class MetricsLogging {
         .bindTo(Metrics.globalRegistry);
     }
 
-    final Map<String, Long> issueSummary = graph.issueSummary();
+    final Map<String, Long> issueCount = issueSummary.asMap();
 
-    var totalIssues = issueSummary.values().stream().mapToLong(i -> i).sum();
+    var totalIssues = issueCount.values().stream().mapToLong(i -> i).sum();
     Metrics.globalRegistry.gauge("graph_build_issues_total", totalIssues);
 
-    issueSummary.forEach((issueType, number) ->
+    issueCount.forEach((issueType, number) ->
       Metrics.globalRegistry.gauge("graph_build_issues", List.of(Tag.of("type", issueType)), number)
     );
   }

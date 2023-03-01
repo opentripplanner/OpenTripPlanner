@@ -147,7 +147,8 @@ public class OTPMain {
         app.transitModel(),
         app.worldEnvelopeRepository(),
         config.buildConfig(),
-        config.routerConfig()
+        config.routerConfig(),
+        graphBuilder.issueSummary()
       )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator

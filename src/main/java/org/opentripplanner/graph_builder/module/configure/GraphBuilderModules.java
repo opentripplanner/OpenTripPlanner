@@ -17,6 +17,7 @@ import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
+import org.opentripplanner.graph_builder.issue.report.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
@@ -252,6 +253,11 @@ public class GraphBuilderModules {
       dataSources.getBuildReportDir(),
       config.maxDataImportIssuesPerFile
     );
+  }
+
+  @Provides
+  static DataImportIssueSummary providesDataImportIssueSummary(DataImportIssueStore issueStore) {
+    return new DataImportIssueSummary(issueStore.listIssues());
   }
 
   /* private methods */

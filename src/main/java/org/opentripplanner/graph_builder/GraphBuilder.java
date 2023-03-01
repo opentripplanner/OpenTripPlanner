@@ -14,7 +14,7 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issue.report.SummarizeDataImportIssues;
+import org.opentripplanner.graph_builder.issue.report.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -175,10 +175,7 @@ public class GraphBuilder implements Runnable {
       load.buildGraph();
     }
 
-    var issueSummary = new SummarizeDataImportIssues(issueStore.listIssues());
-    issueSummary.printSummary();
-
-    graph.setIssueSummary(issueSummary.summary());
+    new DataImportIssueSummary(issueStore.listIssues()).logSummary();
 
     validate();
 
@@ -197,6 +194,10 @@ public class GraphBuilder implements Runnable {
 
   private boolean hasTransitData() {
     return hasTransitData;
+  }
+
+  public DataImportIssueSummary issueSummary() {
+    return new DataImportIssueSummary(issueStore.listIssues());
   }
 
   /**
