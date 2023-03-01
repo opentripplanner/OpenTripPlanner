@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -21,7 +19,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
@@ -84,12 +81,9 @@ public class A04_BoardingTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var uPath = UnknownPathString.of("23m", 2);
-
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, uPath.departureAt("0:00"))
-      .add(TC_MIN_DURATION_REV, uPath.arrivalAt("1:00"))
+      .addMinDuration("23m", TX_2, T00_00, T01_00)
       // A test on the standard profile is included to demonstrate that the
       // min-travel-duration and the standard give different results. The L2
       // boarding stop is different.

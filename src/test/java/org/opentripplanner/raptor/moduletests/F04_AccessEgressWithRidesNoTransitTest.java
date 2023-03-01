@@ -7,8 +7,6 @@ import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -25,7 +23,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
@@ -75,11 +72,9 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
 
   static List<RaptorModuleTestCase> flexOnlyNoWalkTestCases() {
     var path = "Flex 2m 1x ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:15 0:25 10m 1tx $1620]";
-    var minDurationPath = UnknownPathString.of(D10m, 1);
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, minDurationPath.departureAt(T00_10))
-      .add(TC_MIN_DURATION_REV, minDurationPath.arrivalAt(T00_30))
+      .addMinDuration("10m", TX_1, T00_10, T00_30)
       .add(standard().forwardOnly(), PathUtils.withoutCost(path))
       .add(
         standard().reverseOnly(),

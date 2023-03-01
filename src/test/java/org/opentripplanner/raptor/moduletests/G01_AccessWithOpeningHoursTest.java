@@ -7,8 +7,6 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
@@ -32,7 +30,6 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.ExpectedList;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCaseBuilder;
-import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /*
  * FEATURE UNDER TEST
@@ -305,10 +302,8 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
     int earliestDepartureTime,
     int latestArrivalTime
   ) {
-    var expMinDuration = UnknownPathString.of("18m", 0);
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, expMinDuration.departureAt(earliestDepartureTime))
-      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(latestArrivalTime));
+      .addMinDuration("18m", TX_0, earliestDepartureTime, latestArrivalTime);
   }
 }

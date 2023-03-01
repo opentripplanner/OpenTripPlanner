@@ -7,8 +7,6 @@ import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
@@ -86,8 +84,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, "[0:10 0:22 12m 0tx]")
-      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.first(3)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
       .add(TC_STANDARD_REV, withoutCost(expected.last()))
@@ -119,8 +116,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, "[0:10 0:22 12m 0tx]")
-      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.first(3)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
       .add(TC_STANDARD_REV, withoutCost(expected.last()))
@@ -145,8 +141,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, "[0:10+1d 0:22+1d 12m 0tx]")
-      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .addMinDuration("12m", TX_0, T24_10, T25_00)
       .add(standard(), withoutCost(expected))
       .add(multiCriteria(), expected)
       .build();
@@ -173,8 +168,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, "[0:10 0:22 12m 0tx]")
-      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.all()))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
       .add(TC_STANDARD_REV, withoutCost(expected.last()))
@@ -199,8 +193,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, "[0:10+1d 0:22+1d 12m 0tx]")
-      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .addMinDuration("12m", TX_0, T24_10, T25_00)
       .add(standard(), withoutCost(expected))
       .add(multiCriteria(), expected)
       .build();
@@ -231,8 +224,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, "[0:10 0:22 12m 0tx]")
-      .add(TC_MIN_DURATION_REV, "[0:48+1d 1:00+1d 12m 0tx]")
+      .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.first(3)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
       .add(TC_STANDARD_REV, withoutCost(expected.last()))

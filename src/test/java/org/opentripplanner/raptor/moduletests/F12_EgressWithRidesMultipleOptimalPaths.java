@@ -30,7 +30,6 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
-import org.opentripplanner.raptor.spi.UnknownPathString;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
@@ -123,12 +122,9 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
   }
 
   static List<RaptorModuleTestCase> withWalkingAsBestOptionTestCase() {
-    var expMinDuration = UnknownPathString.of("21m", 0);
-
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_00))
-      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
+      .addMinDuration("21m", TX_0, T00_00, T00_30)
       .add(standard().forwardOnly(), withoutCost(EXPECTED_PATH_WALK_5M))
       // Walk egress is best on num-of-transfers, while Flex has the latest departure time
       .add(

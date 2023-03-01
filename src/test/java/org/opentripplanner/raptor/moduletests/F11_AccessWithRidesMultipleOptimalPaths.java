@@ -9,8 +9,6 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
@@ -28,7 +26,6 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
-import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
@@ -89,7 +86,6 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
    * With 3m walk from Stop E to the destination.
    */
   static List<RaptorModuleTestCase> testCase3mWalkAccess() {
-    var expMinDuration = UnknownPathString.of("19m", 1);
     var startFlexAccess = "Flex 11m 1x ~ C ";
     var startWalkAndL1 = "A ~ BUS L1 0:02 0:10 ~ B ~ Walk 2m ~ C ";
     var endWalkAndL3 = "~ Walk 2m ~ D ~ BUS L3 0:16 0:22 ~ F ";
@@ -104,8 +100,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_02))
-      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
+      .addMinDuration("19m", TX_1, T00_02, T00_30)
       .add(standard().manyIterations(), withoutCost(flexTransferTransit, flexAndTransit))
       .add(TC_STANDARD_ONE, withoutCost(flexTransferTransit))
       .add(TC_STANDARD_REV_ONE, withoutCost(flexAndTransit))
@@ -128,8 +123,6 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
    * With 1m walk from Stop E to the destination.
    */
   static List<RaptorModuleTestCase> testCase1mWalkAccess() {
-    var expMinDuration = UnknownPathString.of("17m", 1);
-
     var startFlexAccess = "Flex 11m 1x ~ C ";
     var startWalkAndL1 = "A ~ BUS L1 0:02 0:10 ~ B ~ Walk 2m ~ C ";
     var endWalkAndL3 = "~ Walk 2m ~ D ~ BUS L3 0:16 0:22 ~ F ";
@@ -144,8 +137,7 @@ public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConsta
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_02))
-      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
+      .addMinDuration("17m", TX_1, T00_02, T00_30)
       .add(standard().manyIterations(), withoutCost(flexAndTransit))
       .add(TC_STANDARD_ONE, withoutCost(transitAndTransit))
       .add(TC_STANDARD_REV_ONE, withoutCost(flexAndTransit))
