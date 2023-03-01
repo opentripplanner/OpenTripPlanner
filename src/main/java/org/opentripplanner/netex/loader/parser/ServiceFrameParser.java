@@ -18,7 +18,7 @@ import org.rutebanken.netex.model.FlexibleStopAssignment;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.GroupsOfLinesInFrame_RelStructure;
-import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.JourneyPatternsInFrame_RelStructure;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.LinesInFrame_RelStructure;
@@ -53,7 +53,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
   private final Map<String, String> networkIdByGroupOfLineId = new HashMap<>();
 
-  private final Collection<JourneyPattern> journeyPatterns = new ArrayList<>();
+  private final Collection<JourneyPattern_VersionStructure> journeyPatterns = new ArrayList<>();
 
   private final Collection<DestinationDisplay> destinationDisplays = new ArrayList<>();
 
@@ -244,8 +244,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     if (journeyPatterns == null) return;
 
     for (JAXBElement<?> pattern : journeyPatterns.getJourneyPattern_OrJourneyPatternView()) {
-      if (pattern.getValue() instanceof JourneyPattern) {
-        this.journeyPatterns.add((JourneyPattern) pattern.getValue());
+      if (pattern.getValue() instanceof JourneyPattern_VersionStructure journeyPattern) {
+        this.journeyPatterns.add(journeyPattern);
       } else {
         warnOnMissingMapping(LOG, pattern.getValue());
       }

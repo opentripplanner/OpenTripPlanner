@@ -21,6 +21,7 @@ import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
+import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.RouteRefStructure;
@@ -117,7 +118,7 @@ public class TripMapperTest {
 
     HierarchicalMapById<org.rutebanken.netex.model.Route> routeById = new HierarchicalMapById<>();
     routeById.add(netexRoute);
-    HierarchicalMapById<JourneyPattern> journeyPatternById = new HierarchicalMapById<>();
+    HierarchicalMapById<JourneyPattern_VersionStructure> journeyPatternById = new HierarchicalMapById<>();
     journeyPatternById.add(journeyPattern);
 
     TripMapper tripMapper = new TripMapper(

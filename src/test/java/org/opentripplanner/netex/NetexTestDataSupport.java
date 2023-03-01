@@ -20,6 +20,7 @@ import org.rutebanken.netex.model.OperatingPeriodRefStructure;
 import org.rutebanken.netex.model.PropertiesOfDay_RelStructure;
 import org.rutebanken.netex.model.PropertyOfDay;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
+import org.rutebanken.netex.model.UicOperatingPeriod;
 
 public final class NetexTestDataSupport {
 
@@ -109,6 +110,19 @@ public final class NetexTestDataSupport {
       .withId(id)
       .withFromDate(createLocalDateTime(fromDate))
       .withToDate(createLocalDateTime(toDate));
+  }
+
+  public static UicOperatingPeriod createUicOperatingPeriod(
+    String id,
+    LocalDate fromDate,
+    LocalDate toDate,
+    String validDayBits
+  ) {
+    return new UicOperatingPeriod()
+      .withId(id)
+      .withFromDate(createLocalDateTime(fromDate))
+      .withToDate(createLocalDateTime(toDate))
+      .withValidDayBits(validDayBits);
   }
 
   public static DatedServiceJourney createDatedServiceJourney(
