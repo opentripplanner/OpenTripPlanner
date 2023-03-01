@@ -41,7 +41,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * from line coverage. The focus of this test is to test that the different parts of the NeTEx works
  * together.
  */
-public class NetexBundleSmokeTest {
+public class NetexNordicBundleSmokeTest {
 
   /**
    * This test load a very simple Netex data set and do assertions on it. For each type we assert
@@ -50,9 +50,9 @@ public class NetexBundleSmokeTest {
    * entities and Netex import integration.
    */
   @Test
-  public void smokeTestOfNetexLoadData() {
+  public void smokeTestOfNetexNordicLoadData() {
     // Given
-    NetexBundle netexBundle = ConstantsForTests.createMinimalNetexBundle();
+    NetexBundle netexBundle = ConstantsForTests.createMinimalNetexNordicBundle();
 
     // Run the check to make sure it does not throw an exception
     netexBundle.checkInputs();
