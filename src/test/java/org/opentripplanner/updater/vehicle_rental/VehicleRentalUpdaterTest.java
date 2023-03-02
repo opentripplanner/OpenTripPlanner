@@ -10,8 +10,8 @@ import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -27,7 +27,7 @@ class VehicleRentalUpdaterTest {
       new VehicleRentalUpdaterParameters("A", 1, new FakeParams()),
       source,
       null,
-      new VehicleRentalService()
+      new DefaultVehicleRentalService()
     );
 
     assertFalse(updater.isPrimed());

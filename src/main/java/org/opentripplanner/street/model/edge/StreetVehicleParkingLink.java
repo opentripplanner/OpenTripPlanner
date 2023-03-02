@@ -1,8 +1,8 @@
 package org.opentripplanner.street.model.edge;
 
-import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -28,8 +28,9 @@ public class StreetVehicleParkingLink extends Edge {
     vehicleParkingEntranceVertex = fromv;
   }
 
+  @Override
   public String toString() {
-    return "StreetVehicleParkingLink(" + fromv + " -> " + tov + ")";
+    return ToStringBuilder.of(this.getClass()).addObj("fromv", fromv).addObj("tov", tov).toString();
   }
 
   public State traverse(State s0) {
@@ -51,19 +52,25 @@ public class StreetVehicleParkingLink extends Edge {
 
     var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
     final VehicleParkingRequest parkingRequest = s0.getRequest().parking();
-    if (
-      hasMissingRequiredTags(vehicleParking, parkingRequest.requiredTags()) ||
-      hasBannedTags(vehicleParking, parkingRequest.bannedTags())
-    ) {
+    if (traversalBanned(parkingRequest, vehicleParking)) {
       return null;
     }
 
     StateEditor s1 = s0.edit(this);
+
     s1.incrementWeight(1);
     s1.setBackMode(null);
     return s1.makeState();
   }
 
+  private boolean traversalBanned(
+    VehicleParkingRequest parkingRequest,
+    VehicleParking vehicleParking
+  ) {
+    return !parkingRequest.filter().matches(vehicleParking);
+  }
+
+  @Override
   public I18NString getName() {
     return vehicleParkingEntranceVertex.getName();
   }
@@ -74,20 +81,5 @@ public class StreetVehicleParkingLink extends Edge {
 
   public double getDistanceMeters() {
     return 0;
-  }
-
-  private boolean hasBannedTags(VehicleParking vehicleParking, Set<String> bannedTags) {
-    if (bannedTags.isEmpty()) {
-      return false;
-    }
-
-    return vehicleParking.getTags().stream().anyMatch(bannedTags::contains);
-  }
-
-  private boolean hasMissingRequiredTags(VehicleParking vehicleParking, Set<String> requiredTags) {
-    if (requiredTags.isEmpty()) {
-      return false;
-    }
-    return !vehicleParking.getTags().containsAll(requiredTags);
   }
 }
