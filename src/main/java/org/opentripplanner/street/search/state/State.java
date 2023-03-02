@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
@@ -13,6 +14,7 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -56,7 +58,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   /**
    * Create an initial state, forcing vertex to the specified value. Useful for tests, etc.
    */
-  public State(Vertex vertex, StreetSearchRequest streetSearchRequest) {
+  public State(@Nonnull Vertex vertex, @Nonnull StreetSearchRequest streetSearchRequest) {
     this(
       vertex,
       streetSearchRequest.startTime(),
@@ -65,12 +67,21 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     );
   }
 
-  public State(Vertex vertex, Instant startTime, StateData stateData, StreetSearchRequest request) {
+  public State(
+    @Nonnull Vertex vertex,
+    @Nonnull Instant startTime,
+    @Nonnull StateData stateData,
+    @Nonnull StreetSearchRequest request
+  ) {
     this.request = request;
     this.weight = 0;
     this.vertex = vertex;
     this.backState = null;
     this.stateData = stateData;
+    if (!vertex.rentalRestrictions().noDropOffNetworks().isEmpty()) {
+      this.stateData.noRentalDropOffZonesAtStartOfReverseSearch =
+        vertex.rentalRestrictions().noDropOffNetworks();
+    }
     this.walkDistance = 0;
     this.time = startTime.getEpochSecond();
   }
@@ -236,6 +247,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return vehicleRentingOk && vehicleParkAndRideOk;
   }
 
+  public RentalFormFactor vehicleRentalFormFactor() {
+    return stateData.rentalVehicleFormFactor;
+  }
+
   public double getWalkDistance() {
     return walkDistance;
   }
@@ -304,6 +319,16 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   /**
+   * Whether we know or don't know the rental network (yet).
+   * <p>
+   * When doing a arriveBy search it is possible to be in a renting state without knowing which
+   * network it is.
+   */
+  public boolean unknownRentalNetwork() {
+    return stateData.vehicleRentalNetwork == null;
+  }
+
+  /**
    * Reverse the path implicit in the given state, the path will be reversed but will have the same
    * duration. This is the result of combining the functions from GraphPath optimize and reverse.
    *
@@ -334,12 +359,19 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       editor.setBackMode(orig.getBackMode());
 
       if (orig.isRentingVehicle() && !orig.getBackState().isRentingVehicle()) {
-        var stationVertex = ((VehicleRentalPlaceVertex) orig.vertex);
-        editor.dropOffRentedVehicleAtStation(
-          ((VehicleRentalEdge) edge).formFactor,
-          stationVertex.getStation().getNetwork(),
-          false
-        );
+        if (orig.vertex instanceof VehicleRentalPlaceVertex stationVertex) {
+          editor.dropOffRentedVehicleAtStation(
+            ((VehicleRentalEdge) edge).formFactor,
+            stationVertex.getStation().getNetwork(),
+            false
+          );
+        } else {
+          editor.dropFloatingVehicle(
+            orig.stateData.rentalVehicleFormFactor,
+            orig.getVehicleRentalNetwork(),
+            false
+          );
+        }
       } else if (!orig.isRentingVehicle() && orig.getBackState().isRentingVehicle()) {
         var stationVertex = ((VehicleRentalPlaceVertex) orig.vertex);
         if (orig.getBackState().isRentingVehicleFromStation()) {

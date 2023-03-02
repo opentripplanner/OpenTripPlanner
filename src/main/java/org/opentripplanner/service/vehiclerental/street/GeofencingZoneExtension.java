@@ -1,5 +1,9 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+/**
+ * Traversal is restricted by the properties of the geofencing zone.
+ */
+
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +30,11 @@ public final class GeofencingZoneExtension implements RentalRestrictionExtension
   public boolean traversalBanned(State state) {
     if (state.isRentingVehicle()) {
       return (
-        zone.traversalBanned() && zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
+        zone.traversalBanned() &&
+        (
+          state.unknownRentalNetwork() ||
+          zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
+        )
       );
     } else {
       return false;
@@ -37,7 +45,11 @@ public final class GeofencingZoneExtension implements RentalRestrictionExtension
   public boolean dropOffBanned(State state) {
     if (state.isRentingVehicle()) {
       return (
-        zone.dropOffBanned() && zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
+        zone.dropOffBanned() &&
+        (
+          state.unknownRentalNetwork() ||
+          zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
+        )
       );
     } else {
       return false;
@@ -64,6 +76,20 @@ public final class GeofencingZoneExtension implements RentalRestrictionExtension
   @Override
   public List<String> networks() {
     return List.of(zone.id().getFeedId());
+  }
+
+  @Override
+  public boolean hasRestrictions() {
+    return true;
+  }
+
+  @Override
+  public Set<String> noDropOffNetworks() {
+    if (zone.dropOffBanned()) {
+      return Set.of(zone.id().getFeedId());
+    } else {
+      return Set.of();
+    }
   }
 
   @Override
