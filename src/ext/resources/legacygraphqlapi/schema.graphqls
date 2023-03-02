@@ -1179,9 +1179,19 @@ Logically, the filter algorithm work as follows:
 - The remaining parking facilities in `C` are used for routing.
 """
 input ParkingFilter {
-    """Exclude parking facilities based on their properties. If empty nothing is excluded."""
+    """
+    Exclude parking facilities based on their properties.
+
+    If empty nothing is excluded from the initial set of facilities but may be filtered down
+    further by the `select` filter.
+    """
     not: [ParkingFilterOperation!]
-    """Include parking facilities based on their properties. If empty everything is included."""
+    """
+    Include parking facilities based on their properties.
+
+    If empty everything is included from the initial set of facilities but may be filtered down
+    further by the `not` filter.
+    """
     select: [ParkingFilterOperation!]
 }
 
