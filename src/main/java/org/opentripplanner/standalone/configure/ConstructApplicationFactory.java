@@ -55,6 +55,7 @@ public interface ConstructApplicationFactory {
   VehiclePositionService vehiclePositionService();
   VehicleRentalRepository vehicleRentalRepository();
   VehicleRentalService vehicleRentalService();
+  DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
   GraphVisualizer graphVisualizer();

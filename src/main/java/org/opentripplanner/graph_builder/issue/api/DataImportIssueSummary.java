@@ -8,20 +8,41 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A summarised version of the {@see DataImportIssueStore} which doesn't contain all the issues
+ * instances but only the names and their counts.
+ */
 public class DataImportIssueSummary implements Serializable {
 
   private static final Logger ISSUE_LOG = LoggerFactory.getLogger(ISSUES_LOG_NAME);
-  private final Map<String, Long> summary;
+  private Map<String, Long> summary;
 
   public DataImportIssueSummary(List<DataImportIssue> issues) {
-    summary =
+    this(
       issues
         .stream()
         .map(DataImportIssue::getType)
-        .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+    );
+  }
+
+  private DataImportIssueSummary(Map<String, Long> summary) {
+    this.summary = summary;
+  }
+
+  /**
+   * Take two summaries and combine them into a single one.
+   */
+  public static DataImportIssueSummary combine(
+    DataImportIssueSummary first,
+    DataImportIssueSummary second
+  ) {
+    var combined = MapUtils.combine(first.asMap(), second.asMap());
+    return new DataImportIssueSummary(combined);
   }
 
   public static DataImportIssueSummary empty() {

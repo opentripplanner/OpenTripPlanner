@@ -203,6 +203,9 @@ public class ConstructApplication {
   public TransitModel transitModel() {
     return factory.transitModel();
   }
+  public DataImportIssueSummary dataImportIssueSummary() {
+    return factory.dataImportIssueSummary();
+  }
 
   public VehiclePositionRepository vehiclePositionRepository() {
     return factory.vehiclePositionRepository();
