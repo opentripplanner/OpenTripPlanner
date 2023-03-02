@@ -3,7 +3,6 @@ package org.opentripplanner.routing.vehicle_parking;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -368,7 +367,7 @@ public class VehicleParking implements Serializable {
     VehicleParkingBuilder() {}
 
     public VehicleParkingBuilder tags(Collection<String> tags) {
-      this.tags = new HashSet<>(tags);
+      this.tags = Set.copyOf(tags);
       return this;
     }
 
