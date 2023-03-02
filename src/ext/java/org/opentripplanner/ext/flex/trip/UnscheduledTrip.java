@@ -309,7 +309,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       final int earliestPossibleDepartureTime = st.getEarliestPossibleDepartureTime();
       final int latestPossibleArrivalTime = st.getLatestPossibleArrivalTime();
 
-      // We need to make sure that both start and end times are set, if wither is set.
+      // We need to make sure that both start and end times are set, if either is set.
       flexWindowStart = getAvailableTime(earliestPossibleDepartureTime, latestPossibleArrivalTime);
       flexWindowEnd = getAvailableTime(latestPossibleArrivalTime, earliestPossibleDepartureTime);
 
