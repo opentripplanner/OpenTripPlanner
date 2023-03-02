@@ -128,14 +128,16 @@ class StopTimesMapper {
 
       StopPointInJourneyPattern stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
 
+      StopLocation stop = lookUpStopLocation(stopPoint);
       if (
         stopPoint != null &&
-        (isFalse(stopPoint.isForAlighting()) && isFalse(stopPoint.isForBoarding()))
+        stop == null &&
+        isFalse(stopPoint.isForAlighting()) &&
+        isFalse(stopPoint.isForBoarding())
       ) {
         continue;
       }
 
-      StopLocation stop = lookUpStopLocation(stopPoint);
       if (stop == null) {
         issueStore.add(
           "JourneyPatternStopNotFound",
