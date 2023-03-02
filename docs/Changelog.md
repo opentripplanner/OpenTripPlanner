@@ -79,6 +79,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Include cancelled stops when including cancelled trips in trip search [#4851](https://github.com/opentripplanner/OpenTripPlanner/pull/4851)
 - Build a Docker image that support multiple architectures [#4915](https://github.com/opentripplanner/OpenTripPlanner/pull/4915)
 - Unpreferred vehicle parking tags [#4873](https://github.com/opentripplanner/OpenTripPlanner/pull/4873)
+- Ignore UnrestrictedPublicTransportAreas that do not contain regular stops [#4919](https://github.com/opentripplanner/OpenTripPlanner/pull/4919)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
