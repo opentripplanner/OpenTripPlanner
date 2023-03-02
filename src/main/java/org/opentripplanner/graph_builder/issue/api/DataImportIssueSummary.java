@@ -3,12 +3,12 @@ package org.opentripplanner.graph_builder.issue.api;
 import static org.opentripplanner.graph_builder.issue.api.DataImportIssueStore.ISSUES_LOG_NAME;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opentripplanner.framework.collection.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,17 +31,29 @@ public class DataImportIssueSummary implements Serializable {
   }
 
   private DataImportIssueSummary(Map<String, Long> summary) {
-    this.summary = summary;
+    this.summary = Map.copyOf(summary);
   }
 
   /**
-   * Take two summaries and combine them into a single one.
+   * Takes two summaries and combine them into a single one. If there are types that
+   * are in both summaries their counts are added.
    */
   public static DataImportIssueSummary combine(
     DataImportIssueSummary first,
     DataImportIssueSummary second
   ) {
-    var combined = MapUtils.combine(first.asMap(), second.asMap());
+    var combined = new HashMap<>(first.asMap());
+    second
+      .asMap()
+      .forEach((type, count) -> {
+        if (combined.containsKey(type)) {
+          var countSoFar = combined.get(type);
+          combined.put(type, count + countSoFar);
+        } else {
+          combined.put(type, count);
+        }
+      });
+
     return new DataImportIssueSummary(combined);
   }
 
@@ -64,6 +76,6 @@ public class DataImportIssueSummary implements Serializable {
 
   @Nonnull
   public Map<String, Long> asMap() {
-    return Map.copyOf(summary);
+    return summary;
   }
 }
