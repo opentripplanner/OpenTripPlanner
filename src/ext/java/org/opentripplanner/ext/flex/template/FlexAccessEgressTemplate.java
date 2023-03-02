@@ -170,6 +170,7 @@ public abstract class FlexAccessEgressTemplate {
     if (State.isEmpty(state)) {
       return null;
     }
+
     for (Edge e : transferEdges) {
       var states = e.traverse(state[0]);
       if (State.isEmpty(states)) {
