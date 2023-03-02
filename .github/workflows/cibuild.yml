@@ -172,4 +172,4 @@ jobs:
           image_date=`date +%Y-%m-%dT%H-%M`
           image_version="${version}_${image_date}"
           
-          mvn --batch-mode compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,${{ github.sha }},$image_version
+          mvn --batch-mode -P prettierSkip compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,${{ github.sha }},$image_version

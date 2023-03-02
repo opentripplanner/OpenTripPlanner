@@ -135,8 +135,16 @@ class RaptorRoutingRequestTransitDataCreator {
           tripPattern,
           patternsSorted,
           offsets,
-          filter.filterAvailableStops(tripPattern, tripPattern.getBoardingPossible()),
-          filter.filterAvailableStops(tripPattern, tripPattern.getAlightingPossible())
+          filter.filterAvailableStops(
+            tripPattern,
+            tripPattern.getBoardingPossible(),
+            BoardAlight.BOARD
+          ),
+          filter.filterAvailableStops(
+            tripPattern,
+            tripPattern.getAlightingPossible(),
+            BoardAlight.ALIGHT
+          )
         )
       );
     }

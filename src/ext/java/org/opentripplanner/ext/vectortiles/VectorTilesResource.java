@@ -28,9 +28,7 @@ import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalVeh
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.service.TransitService;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
@@ -70,8 +68,7 @@ public class VectorTilesResource {
       Arrays.asList(requestedLayers.split(",")),
       serverContext.vectorTileLayers().layers(),
       VectorTilesResource::crateLayerBuilder,
-      serverContext.graph(),
-      serverContext.transitService()
+      serverContext
     );
   }
 
@@ -106,29 +103,32 @@ public class VectorTilesResource {
   private static LayerBuilder<?> crateLayerBuilder(
     LayerParameters<LayerType> layerParameters,
     Locale locale,
-    Graph graph,
-    TransitService transitService
+    OtpServerRequestContext context
   ) {
     return switch (layerParameters.type()) {
-      case Stop -> new StopsLayerBuilder(transitService, layerParameters, locale);
-      case Station -> new StationsLayerBuilder(transitService, layerParameters, locale);
+      case Stop -> new StopsLayerBuilder(context.transitService(), layerParameters, locale);
+      case Station -> new StationsLayerBuilder(context.transitService(), layerParameters, locale);
       case VehicleRental -> new VehicleRentalPlacesLayerBuilder(
-        graph.getVehicleRentalService(),
+        context.vehicleRentalService(),
         layerParameters,
         locale
       );
       case VehicleRentalStation -> new VehicleRentalStationsLayerBuilder(
-        graph.getVehicleRentalService(),
+        context.vehicleRentalService(),
         layerParameters,
         locale
       );
       case VehicleRentalVehicle -> new VehicleRentalVehiclesLayerBuilder(
-        graph.getVehicleRentalService(),
+        context.vehicleRentalService(),
         layerParameters
       );
-      case VehicleParking -> new VehicleParkingsLayerBuilder(graph, layerParameters, locale);
+      case VehicleParking -> new VehicleParkingsLayerBuilder(
+        context.graph(),
+        layerParameters,
+        locale
+      );
       case VehicleParkingGroup -> new VehicleParkingGroupsLayerBuilder(
-        graph,
+        context.graph(),
         layerParameters,
         locale
       );
