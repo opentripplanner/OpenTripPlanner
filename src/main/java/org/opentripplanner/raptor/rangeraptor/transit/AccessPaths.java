@@ -63,8 +63,6 @@ public class AccessPaths {
     return new AccessPaths(
       groupByRound(paths, RaptorAccessEgress::stopReachedByWalking),
       groupByRound(paths, RaptorAccessEgress::stopReachedOnBoard)
-      //groupByRound(paths, Predicate.not(RaptorAccessEgress::hasRides)),
-      //groupByRound(paths, RaptorAccessEgress::hasRides)
     );
   }
 
