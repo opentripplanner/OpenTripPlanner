@@ -54,6 +54,10 @@ public interface RentalRestrictionExtension {
    */
   List<String> networks();
 
+  boolean hasRestrictions();
+
+  Set<String> noDropOffNetworks();
+
   enum RestrictionType {
     NO_TRAVERSAL,
     NO_DROP_OFF,

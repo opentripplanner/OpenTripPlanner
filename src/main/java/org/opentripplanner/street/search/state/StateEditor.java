@@ -1,5 +1,6 @@
 package org.opentripplanner.street.search.state;
 
+import java.util.Set;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -247,6 +248,7 @@ public class StateEditor {
       child.stateData.currentMode = TraverseMode.WALK;
       child.stateData.vehicleRentalNetwork = null;
       child.stateData.rentalVehicleFormFactor = null;
+      child.stateData.insideNoRentalDropOffArea = false;
     } else {
       child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
       child.stateData.currentMode = formFactor.traverseMode;
@@ -300,6 +302,25 @@ public class StateEditor {
     }
   }
 
+  public void dropFloatingVehicle(RentalFormFactor formFactor, String network, boolean reverse) {
+    cloneStateDataAsNeeded();
+    if (reverse) {
+      child.stateData.mayKeepRentedVehicleAtDestination = false;
+      child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
+      child.stateData.currentMode =
+        formFactor != null ? formFactor.traverseMode : TraverseMode.BICYCLE;
+      child.stateData.vehicleRentalNetwork = network;
+      child.stateData.rentalVehicleFormFactor = formFactor;
+    } else {
+      child.stateData.mayKeepRentedVehicleAtDestination = false;
+      child.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
+      child.stateData.currentMode = TraverseMode.WALK;
+      child.stateData.vehicleRentalNetwork = null;
+      child.stateData.rentalVehicleFormFactor = null;
+      child.stateData.backWalkingBike = false;
+    }
+  }
+
   /**
    * This has two effects: marks the vehicle as parked, and switches the current mode. Marking the
    * vehicle parked is important for allowing co-dominance of walking and driving states.
@@ -341,13 +362,9 @@ public class StateEditor {
     return child.getBackState();
   }
 
-  public void dropFloatingVehicle() {
+  public void resetStartedInNoDropOffZone() {
     cloneStateDataAsNeeded();
-    child.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
-    child.stateData.currentMode = TraverseMode.WALK;
-    child.stateData.vehicleRentalNetwork = null;
-    child.stateData.rentalVehicleFormFactor = null;
-    child.stateData.backWalkingBike = false;
+    child.stateData.noRentalDropOffZonesAtStartOfReverseSearch = Set.of();
   }
 
   /* PRIVATE METHODS */
