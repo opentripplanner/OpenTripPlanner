@@ -6,8 +6,8 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLSchema;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 public class PlaceInterfaceType {
