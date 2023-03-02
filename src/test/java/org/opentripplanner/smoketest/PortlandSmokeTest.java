@@ -29,10 +29,11 @@ public class PortlandSmokeTest {
    * Checks that a scooter rental finishes at the edge of the business area and is continued on
    * foot rather than scootering all the way to the destination.
    */
-  @Test
-  public void geofencingZone() {
+  @ParameterizedTest(name = "scooter rental with arriveBy={0}")
+  @ValueSource(booleans = { true, false })
+  public void geofencingZone(boolean arriveBy) {
     SmokeTest.basicRouteTest(
-      new SmokeTestRequest(cennentenial, hillside, Set.of("SCOOTER_RENT", "WALK")),
+      new SmokeTestRequest(cennentenial, hillside, Set.of("SCOOTER_RENT", "WALK"), arriveBy),
       List.of("WALK", "SCOOTER", "WALK")
     );
   }
