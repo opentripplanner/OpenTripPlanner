@@ -20,8 +20,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -40,7 +40,7 @@ class RouteRequestMapperTest implements PlanTestConstants {
         transitService,
         new DefaultFareService(),
         graph.getVehicleParkingService(),
-        new VehicleRentalService(),
+        new DefaultVehicleRentalService(),
         new DefaultVehiclePositionService(),
         GraphFinder.getInstance(graph, transitService::findRegularStop),
         new RouteRequest()
