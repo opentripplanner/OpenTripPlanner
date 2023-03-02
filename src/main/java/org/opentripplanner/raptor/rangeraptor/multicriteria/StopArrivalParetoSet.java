@@ -47,7 +47,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
     @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
   ) {
     return new StopArrivalParetoSet<>(
-      AbstractStopArrival.compareArrivalTimeRoundAndCost(),
+      AbstractStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(),
       paretoSetEventListener
     );
   }
