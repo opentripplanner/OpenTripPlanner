@@ -50,7 +50,7 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
  * <p>
  * Note! The 'earliest-departure-time' is set to 00:02, and the board and alight slacks are zero.
  */
-public class F11_AccessWithRidesMultipleOptimalPaths implements RaptorTestConstants {
+public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestConstants {
 
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()

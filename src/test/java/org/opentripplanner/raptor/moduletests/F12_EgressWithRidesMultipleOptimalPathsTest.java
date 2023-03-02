@@ -54,7 +54,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
  * is better than the path with flex) and 7 minutes (the path with flex egress becomes the fastest
  * option). Note! There is 1 minute transfer slack.
  */
-public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConstants {
+public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestConstants {
 
   private static final String EXPECTED_PATH_FLEX_7M =
     "A ~ BUS R2 0:05 0:16 ~ B ~ Walk 2m ~ C ~ Flex 7m 1x [0:05 0:26 21m 1tx $2160]";
