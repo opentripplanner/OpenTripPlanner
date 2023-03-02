@@ -43,4 +43,9 @@ public class Walk extends AbstractStopArrival {
   public TransferPathView transferPath() {
     return () -> transfer;
   }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return false;
+  }
 }

@@ -127,7 +127,10 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   private StopArrivalParetoSet<T> findOrCreateSet(final int stop) {
     if (arrivals[stop] == null) {
-      arrivals[stop] = StopArrivalParetoSet.createStopArrivalSet(stop, debugHandlerFactory);
+      arrivals[stop] =
+        StopArrivalParetoSet.createStopArrivalSetWithListener(
+          debugHandlerFactory.paretoSetStopArrivalListener(stop)
+        );
     }
     return arrivals[stop];
   }
@@ -145,7 +148,11 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
       .forEachEntry((stop, list) -> {
         // The factory is creating the actual "glue"
         this.arrivals[stop] =
-          StopArrivalParetoSet.createEgressStopArrivalSet(stop, list, paths, debugHandlerFactory);
+          StopArrivalParetoSet.createEgressStopArrivalSet(
+            list,
+            paths,
+            debugHandlerFactory.paretoSetStopArrivalListener(stop)
+          );
         return true;
       });
   }

@@ -51,4 +51,9 @@ final class Transit<T extends RaptorTripSchedule>
   public int boardTime() {
     return arrival.boardTime();
   }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return true;
+  }
 }

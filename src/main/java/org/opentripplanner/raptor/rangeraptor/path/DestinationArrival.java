@@ -82,6 +82,11 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   }
 
   @Override
+  public boolean arrivedOnBoard() {
+    return false;
+  }
+
+  @Override
   public String toString() {
     return asString();
   }

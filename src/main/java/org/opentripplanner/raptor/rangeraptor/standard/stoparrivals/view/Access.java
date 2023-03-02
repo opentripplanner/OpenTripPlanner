@@ -42,4 +42,9 @@ final class Access<T extends RaptorTripSchedule>
   public RaptorAccessEgress access() {
     return access;
   }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return access.stopReachedOnBoard();
+  }
 }

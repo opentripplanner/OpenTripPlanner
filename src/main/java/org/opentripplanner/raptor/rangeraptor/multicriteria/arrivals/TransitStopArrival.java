@@ -54,4 +54,9 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
   public TransitPathView<T> transitPath() {
     return this;
   }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return true;
+  }
 }

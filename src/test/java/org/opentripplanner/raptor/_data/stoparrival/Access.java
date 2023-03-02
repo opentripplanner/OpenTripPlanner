@@ -30,4 +30,9 @@ public class Access extends AbstractStopArrival {
   public AccessPathView accessPath() {
     return () -> access;
   }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return access.stopReachedOnBoard();
+  }
 }

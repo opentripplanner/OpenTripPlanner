@@ -39,4 +39,9 @@ public class Bus extends AbstractStopArrival implements TransitPathView<TestTrip
   public TestTripSchedule trip() {
     return trip;
   }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return true;
+  }
 }

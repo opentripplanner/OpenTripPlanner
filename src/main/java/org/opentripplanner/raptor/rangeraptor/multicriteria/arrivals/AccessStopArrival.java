@@ -51,4 +51,9 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
 
     return new AccessStopArrival<>(newDepartureTime, access);
   }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return access.stopReachedOnBoard();
+  }
 }

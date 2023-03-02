@@ -144,6 +144,8 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
     throw new UnsupportedOperationException();
   }
 
+  boolean arrivedOnBoard();
+
   /** Use this to easy create a to String implementation. */
   default String asString() {
     String arrival =

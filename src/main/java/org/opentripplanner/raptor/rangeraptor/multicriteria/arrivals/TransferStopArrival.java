@@ -42,4 +42,9 @@ public final class TransferStopArrival<T extends RaptorTripSchedule>
   public TransferPathView transferPath() {
     return () -> transfer;
   }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return false;
+  }
 }

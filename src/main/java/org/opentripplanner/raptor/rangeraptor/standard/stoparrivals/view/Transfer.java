@@ -48,4 +48,9 @@ final class Transfer<T extends RaptorTripSchedule>
   public int durationInSeconds() {
     return arrival.transferPath().durationInSeconds();
   }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return false;
+  }
 }
