@@ -14,6 +14,11 @@ import org.opentripplanner.transit.service.TransitModel;
 
 class VectorTileResponseFactoryTest {
 
+  public static final OtpServerRequestContext SERVER_CONTEXT = TestServerContext.createServerContext(
+    new Graph(),
+    new TransitModel()
+  );
+
   enum LayerType {
     RED,
     GREEN,
@@ -39,39 +44,45 @@ class VectorTileResponseFactoryTest {
     return new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
   }
 
-  @Test
-  void return404WhenLayerNotFound() {
-    var x = VectorTileResponseFactory.create(
+  private static Response computeResponse(List<String> layers) {
+    return VectorTileResponseFactory.create(
       1,
       1,
       1,
       Locale.ENGLISH,
-      List.of("yellow", "blue"),
+      layers,
       LAYERS,
       VectorTileResponseFactoryTest::createLayerBuilder,
-      TestServerContext.createServerContext(new Graph(), new TransitModel())
+      SERVER_CONTEXT
     );
+  }
 
-    assertEquals(404, x.getStatus());
+  @Test
+  void return404WhenAllLayersNotFound() {
+    var resp = computeResponse(List.of("yellow", "blue"));
+
+    assertEquals(404, resp.getStatus());
     assertEquals(
       "Could not find vector tile layer(s). Requested layers: [yellow, blue]. Available layers: [red, green].",
-      x.getEntity()
+      resp.getEntity()
+    );
+  }
+
+  @Test
+  void return404WhenOneLayerNotFound() {
+    var resp = computeResponse(List.of("red", "blue"));
+
+    assertEquals(404, resp.getStatus());
+    assertEquals(
+      "Could not find vector tile layer(s). Requested layers: [red, blue]. Available layers: [red, green].",
+      resp.getEntity()
     );
   }
 
   @Test
   void return200WhenAllLayersFound() {
-    var x = VectorTileResponseFactory.create(
-      1,
-      1,
-      1,
-      Locale.ENGLISH,
-      List.of("red", "green"),
-      LAYERS,
-      VectorTileResponseFactoryTest::createLayerBuilder,
-      TestServerContext.createServerContext(new Graph(), new TransitModel())
-    );
+    var resp = computeResponse(List.of("red", "green"));
 
-    assertEquals(Response.Status.OK.getStatusCode(), x.getStatus());
+    assertEquals(Response.Status.OK.getStatusCode(), resp.getStatus());
   }
 }
