@@ -21,7 +21,7 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.logging.ProgressTracker;
-import org.opentripplanner.graph_builder.issue.report.DataImportIssueSummary;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;

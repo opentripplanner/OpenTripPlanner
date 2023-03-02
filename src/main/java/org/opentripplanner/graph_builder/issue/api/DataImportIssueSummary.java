@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.issue.report;
+package org.opentripplanner.graph_builder.issue.api;
 
 import static org.opentripplanner.graph_builder.issue.api.DataImportIssueStore.ISSUES_LOG_NAME;
 
@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +43,6 @@ public class DataImportIssueSummary implements Serializable {
 
   @Nonnull
   public Map<String, Long> asMap() {
-    return summary;
+    return Map.copyOf(summary);
   }
 }
