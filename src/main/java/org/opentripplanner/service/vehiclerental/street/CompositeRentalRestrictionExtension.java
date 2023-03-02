@@ -54,7 +54,7 @@ public final class CompositeRentalRestrictionExtension implements RentalRestrict
     for (var ext : extensions) {
       set.addAll(ext.debugTypes());
     }
-    return Set.copyOf(set);
+    return set;
   }
 
   @Override

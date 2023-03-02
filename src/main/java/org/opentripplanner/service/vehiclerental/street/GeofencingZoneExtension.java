@@ -65,7 +65,7 @@ public final class GeofencingZoneExtension implements RentalRestrictionExtension
     if (zone.dropOffBanned()) {
       set.add(RestrictionType.NO_DROP_OFF);
     }
-    return Set.copyOf(set);
+    return set;
   }
 
   @Override

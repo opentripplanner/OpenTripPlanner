@@ -22,7 +22,7 @@ public final class NoRestriction implements RentalRestrictionExtension {
 
   @Override
   public Set<RestrictionType> debugTypes() {
-    return Set.of();
+    return EnumSet.noneOf(RestrictionType.class);
   }
 
   @Override
