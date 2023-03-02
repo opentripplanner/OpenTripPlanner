@@ -1,5 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
