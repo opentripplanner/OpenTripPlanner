@@ -9,6 +9,7 @@ import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssign
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignmentWithPeriod;
 import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingDay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingPeriod;
+import static org.opentripplanner.netex.NetexTestDataSupport.createUicOperatingPeriod;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.EVERYDAY;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKDAYS;
 
@@ -21,7 +22,7 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 
 public class DayTypeAssignmentMapperTest {
 
@@ -43,11 +44,13 @@ public class DayTypeAssignmentMapperTest {
   private static final String DAY_TYPE_1 = "DT-1";
   private static final String DAY_TYPE_2 = "DT-2";
 
+  private static final String VALID_DAY_BITS_WORKDAYS_2020_11 = "011111001111100111110011111001";
+
   private static final Boolean AVAILABLE = TRUE;
   private static final Boolean NOT_AVAILABLE = FALSE;
 
   private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS = new HierarchicalMapById<>();
-  private static final HierarchicalMapById<OperatingPeriod> EMPTY_PERIODS = new HierarchicalMapById<>();
+  private static final HierarchicalMapById<OperatingPeriod_VersionStructure> EMPTY_PERIODS = new HierarchicalMapById<>();
 
   @Test
   public void mapDayTypesToLocalDatesForAGivenDate() {
@@ -135,12 +138,13 @@ public class DayTypeAssignmentMapperTest {
     assertEquals("[2020-10-21]", toStr(result, DAY_TYPE_1));
   }
 
+  // TODO add test for uicOperatingPeriods
   @Test
   public void mapDayTypesToLocalDatesWithPeriods() {
     // GIVEN
     var dayTypes = new HierarchicalMapById<DayType>();
     var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
-    var periods = new HierarchicalMapById<OperatingPeriod>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
 
     // Schedule in November
     {
@@ -178,7 +182,7 @@ public class DayTypeAssignmentMapperTest {
     var dayTypes = new HierarchicalMapById<DayType>();
     var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
     var operatingDays = new HierarchicalMapById<OperatingDay>();
-    var periods = new HierarchicalMapById<OperatingPeriod>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
 
     // All weekdays in December from 22. to 31. except 24.12
     {
@@ -205,6 +209,43 @@ public class DayTypeAssignmentMapperTest {
     // THEN - verify
     assertEquals(
       "[2020-12-22, 2020-12-23, 2020-12-25, 2020-12-28, 2020-12-29, 2020-12-30, 2020-12-31]",
+      toStr(result, DAY_TYPE_1)
+    );
+  }
+
+  @Test
+  public void mapDayTypesToLocalDatesWithUicPeriods() {
+    // GIVEN
+    var dayTypes = new HierarchicalMapById<DayType>();
+    var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
+
+    // Schedule in November
+    {
+      // Every workday in November
+      dayTypes.add(createDayType(DAY_TYPE_1, EVERYDAY));
+      periods.add(
+        createUicOperatingPeriod(OP_1, D2020_11_01, D2020_11_30, VALID_DAY_BITS_WORKDAYS_2020_11)
+      );
+      assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
+    }
+
+    // WHEN - create calendar
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+      dayTypes,
+      assignments,
+      EMPTY_OPERATING_DAYS,
+      periods,
+      null
+    );
+
+    // THEN - verify
+    assertEquals(
+      "[2020-11-02, 2020-11-03, 2020-11-04, 2020-11-05, 2020-11-06, " +
+      "2020-11-09, 2020-11-10, 2020-11-11, 2020-11-12, 2020-11-13, " +
+      "2020-11-16, 2020-11-17, 2020-11-18, 2020-11-19, 2020-11-20, " +
+      "2020-11-23, 2020-11-24, 2020-11-25, 2020-11-26, 2020-11-27, " +
+      "2020-11-30]",
       toStr(result, DAY_TYPE_1)
     );
   }

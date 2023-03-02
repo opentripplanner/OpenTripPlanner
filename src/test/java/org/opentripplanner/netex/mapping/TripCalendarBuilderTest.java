@@ -31,7 +31,7 @@ import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.JourneyRefStructure;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingDayRefStructure;
-import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 
 public class TripCalendarBuilderTest {
@@ -52,7 +52,7 @@ public class TripCalendarBuilderTest {
   private static final String SJ_3 = "SJ-3";
 
   private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS = new HierarchicalMapById<>();
-  private static final HierarchicalMapById<OperatingPeriod> EMPTY_PERIODS = new HierarchicalMapById<>();
+  private static final HierarchicalMapById<OperatingPeriod_VersionStructure> EMPTY_PERIODS = new HierarchicalMapById<>();
   public static final String OD_1 = "OD-1";
 
   private final DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
