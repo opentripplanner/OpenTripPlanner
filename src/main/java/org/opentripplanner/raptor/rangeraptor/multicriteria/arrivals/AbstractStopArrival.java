@@ -85,9 +85,10 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     // This is important with respect to performance. Using the short-circuit logical OR(||) is
     // faster than bitwise inclusive OR(|) (even between boolean expressions)
     return (l, r) ->
-      l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound || l.generalizedCost < r.generalizedCost;
+      l.arrivalTime < r.arrivalTime ||
+      l.paretoRound < r.paretoRound ||
+      l.generalizedCost < r.generalizedCost;
   }
-
 
   /**
    * This include {@code arrivedOnBoard} in the comparison compared with

@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.path;
 
+import java.util.function.IntUnaryOperator;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -487,24 +488,30 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     int newToTime;
 
-    // if there is no next transit leg then it's a Flex ~ Transfer/Walk ~ Flex path
+    // if there is no next transit leg then it's a Flex ~ Transfer/Walk ~ Flex path and we
+    // move the access as early as possible
     if (nextTransitLeg == null) {
       newToTime = iterationDepartureTime + accessPath.durationInSeconds();
+      newToTime =
+        timeShiftAccessPathWithOpeningHours(
+          newToTime,
+          accessPath,
+          accessPath::earliestDepartureTime
+        );
+
       if (next.isTransfer()) {
         newToTime += next.asTransferLeg().transfer.durationInSeconds();
       }
-    } else {
+    }
+    // For transit, we time-shift the access as late as possible to fit with the transit.
+    else {
       newToTime = nextTransitLeg.transitStopArrivalTimeBefore(slackProvider, hasRides());
       if (next.isTransfer()) {
         newToTime -= next.asTransferLeg().transfer.durationInSeconds();
       }
-      newToTime = accessPath.latestArrivalTime(newToTime);
+      newToTime =
+        timeShiftAccessPathWithOpeningHours(newToTime, accessPath, accessPath::latestArrivalTime);
     }
-
-    if (newToTime == RaptorConstants.TIME_NOT_SET) {
-      throw new IllegalStateException("Can not time-shift accessPath: " + accessPath);
-    }
-
     setTime(newToTime - accessPath.durationInSeconds(), newToTime);
   }
 
@@ -599,7 +606,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return waitCost + egressCost;
   }
 
-  private IllegalStateException egressDepartureNotAvailable(
+  private static IllegalStateException egressDepartureNotAvailable(
     int arrivalTime,
     RaptorAccessEgress egressPath
   ) {
@@ -610,6 +617,19 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       " Egress: " +
       egressPath
     );
+  }
+
+  private static int timeShiftAccessPathWithOpeningHours(
+    int time,
+    RaptorAccessEgress accessPath,
+    IntUnaryOperator timeShiftOp
+  ) {
+    int newTime = timeShiftOp.applyAsInt(time);
+
+    if (newTime == RaptorConstants.TIME_NOT_SET) {
+      throw new IllegalStateException("Can not time-shift accessPath: " + accessPath);
+    }
+    return newTime;
   }
 
   /* PRIVATE INTERFACES */
