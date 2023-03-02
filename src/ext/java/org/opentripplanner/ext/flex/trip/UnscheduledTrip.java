@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -307,30 +306,20 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       stop = st.getStop();
 
       // Fallback to what times are available
-      flexWindowStart =
-        getAvailableTime(
-          st::getFlexWindowStart,
-          st::getDepartureTime,
-          st::getFlexWindowEnd,
-          st::getArrivalTime
-        );
+      final int earliestPossibleDepartureTime = st.getEarliestPossibleDepartureTime();
+      final int latestPossibleArrivalTime = st.getLatestPossibleArrivalTime();
 
-      flexWindowEnd =
-        getAvailableTime(
-          st::getFlexWindowEnd,
-          st::getArrivalTime,
-          st::getFlexWindowStart,
-          st::getDepartureTime
-        );
+      // We need to make sure that both start and end times are set, if wither is set.
+      flexWindowStart = getAvailableTime(earliestPossibleDepartureTime, latestPossibleArrivalTime);
+      flexWindowEnd = getAvailableTime(latestPossibleArrivalTime, earliestPossibleDepartureTime);
 
       // Do not allow for pickup/dropoff if times are not available
       pickupType = flexWindowStart == MISSING_VALUE ? PickDrop.NONE : st.getPickupType();
       dropOffType = flexWindowEnd == MISSING_VALUE ? PickDrop.NONE : st.getDropOffType();
     }
 
-    private static int getAvailableTime(IntSupplier... times) {
-      for (var supplier : times) {
-        int time = supplier.getAsInt();
+    private static int getAvailableTime(int... times) {
+      for (var time : times) {
         if (time != MISSING_VALUE) {
           return time;
         }
