@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 
 public class JsonAssertions {
 
@@ -16,7 +17,7 @@ public class JsonAssertions {
     try {
       var act = MAPPER.readTree(actual);
       var exp = MAPPER.readTree(expected);
-      assertEquals(act.toPrettyString(), exp.toPrettyString());
+      assertEquals(JsonSupport.prettyPrint(act), JsonSupport.prettyPrint(exp));
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

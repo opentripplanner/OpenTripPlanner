@@ -20,6 +20,7 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -98,28 +99,57 @@ public class LinkStopToPlatformTest {
   }
 
   /**
-   * Tests that extra edges are added when linking stops to platform areas to prevent detours around
+   * Link stop outside platform area to platform. Adds direct connection to closest edges.
    */
   @Test
   public void testLinkStopOutsideArea() {
     // test platform is a simple rectangle. It creates a graph of 8 edges.
     Coordinate platform[] = {
-      new Coordinate(60.0001, 10),
-      new Coordinate(60.0001, 10.0002),
-      new Coordinate(60, 10.0002),
-      new Coordinate(60, 10),
+      new Coordinate(10, 60.001),
+      new Coordinate(10.002, 60.001),
+      new Coordinate(10.002, 60),
+      new Coordinate(10, 60),
     };
     // add entrance to every corner of the platform (this array defines indices)
     int visibilityPoints[] = { 0, 1, 2, 3 };
 
     // place one stop outside the platform, halway under the bottom edge
-    Coordinate stop = new Coordinate(59.9999, 10.0001);
+    Coordinate stop = new Coordinate(10.001, 59.9999);
 
     Graph graph = prepareTest(platform, visibilityPoints, stop);
     linkStops(graph);
 
-    // bottom edge gets split into half and split point connects to the stop. 4 new eges get added.
-    assertEquals(12, graph.getEdges().size());
+    // Two bottom edges gets split into half and both split points
+    // connected to the stop bidirectonally. 6 new eges get added.
+    assertEquals(14, graph.getEdges().size());
+  }
+
+  /**
+   * Link stop inside platform area to platform. Connects stop with visibility points.
+   */
+  @Test
+  public void testLinkStopInsideArea() {
+    // test platform is a simple rectangle. It creates a graph of 8 edges.
+    Coordinate platform[] = {
+      new Coordinate(10, 60.002),
+      new Coordinate(10.004, 60.002),
+      new Coordinate(10.004, 60),
+      new Coordinate(10, 60),
+    };
+    // add entrance to every corner of the platform (this array defines indices)
+    int visibilityPoints[] = { 0, 1, 2, 3 };
+
+    // place one stop inside the platform, near bottom left corner
+    Coordinate stop = new Coordinate(10.001, 60.001);
+
+    Graph graph = prepareTest(platform, visibilityPoints, stop);
+    linkStops(graph);
+
+    for (Edge e : graph.getEdges()) {
+      LOG.info("Edge {}", e);
+    }
+    // stop connects to all 4 visibility points and 4*2 new edges will be added
+    assertEquals(16, graph.getEdges().size());
   }
 
   private void linkStops(Graph graph) {
@@ -149,14 +179,11 @@ public class LinkStopToPlatformTest {
       new Coordinate[] { v1.getCoordinate(), v2.getCoordinate() }
     );
     I18NString name = new LocalizedString(nameString);
-
-    LOG.info("edgelen {}", line.getLength());
     return new AreaEdge(
       v1,
       v2,
       line,
       name,
-      line.getLength(),
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
       false,
       area

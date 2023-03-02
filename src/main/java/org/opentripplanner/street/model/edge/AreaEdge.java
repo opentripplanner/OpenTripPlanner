@@ -23,6 +23,20 @@ public class AreaEdge extends StreetEdge {
     this.area = area;
   }
 
+  // constructor without precomputed length
+  public AreaEdge(
+    IntersectionVertex startEndpoint,
+    IntersectionVertex endEndpoint,
+    LineString geometry,
+    I18NString name,
+    StreetTraversalPermission permissions,
+    boolean back,
+    AreaEdgeList area
+  ) {
+    super(startEndpoint, endEndpoint, geometry, name, permissions, back);
+    this.area = area;
+  }
+
   public AreaEdgeList getArea() {
     return area;
   }
