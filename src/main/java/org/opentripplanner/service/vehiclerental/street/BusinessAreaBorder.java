@@ -19,7 +19,13 @@ public final class BusinessAreaBorder implements RentalRestrictionExtension {
 
   @Override
   public boolean traversalBanned(State state) {
-    return state.isRentingVehicle() && network.equals(state.getVehicleRentalNetwork());
+    if (state.getRequest().arriveBy()) {
+      // TODO: since in the arrive by search we don't know the rental network yet, we disallow it for _all_ networks
+      // there will be another PR fixing this
+      return state.isRentingVehicle();
+    } else {
+      return state.isRentingVehicle() && network.equals(state.getVehicleRentalNetwork());
+    }
   }
 
   @Override
@@ -35,6 +41,16 @@ public final class BusinessAreaBorder implements RentalRestrictionExtension {
   @Override
   public List<RentalRestrictionExtension> toList() {
     return List.of(this);
+  }
+
+  @Override
+  public boolean hasRestrictions() {
+    return true;
+  }
+
+  @Override
+  public Set<String> noDropOffNetworks() {
+    return Set.of();
   }
 
   @Override
