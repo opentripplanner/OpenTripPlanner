@@ -133,15 +133,15 @@ class StopTimesMapper {
       if (stop == null) {
         if (
           stopPoint != null &&
-            isFalse(stopPoint.isForAlighting()) &&
-            isFalse(stopPoint.isForBoarding())
+          isFalse(stopPoint.isForAlighting()) &&
+          isFalse(stopPoint.isForBoarding())
         ) {
           continue;
         }
         issueStore.add(
           "JourneyPatternStopNotFound",
           "Stop with id %s not found for StopPoint %s in JourneyPattern %s. " +
-            "Trip %s will not be mapped.",
+          "Trip %s will not be mapped.",
           stopPoint != null && stopPoint.getScheduledStopPointRef() != null
             ? stopPoint.getScheduledStopPointRef().getValue().getRef()
             : "null",
