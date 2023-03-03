@@ -10,6 +10,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareType;
@@ -51,7 +52,10 @@ public class AtlantaFareService extends DefaultFareService {
       this.routeNames = Arrays.stream(members).map(String::toLowerCase).collect(Collectors.toSet());
     }
 
-    public boolean routeNamesContains(String s) {
+    public boolean routeNamesContains(@Nullable String s) {
+      if (s == null) {
+        return false;
+      }
       return routeNames.contains(s.toLowerCase());
     }
   }
@@ -194,7 +198,10 @@ public class AtlantaFareService extends DefaultFareService {
 
   private static RideType classify(Leg ride) {
     Route getRoute = ride.getRoute();
-    String shortName = getRoute.getShortName().toLowerCase();
+    String shortName = getRoute.getShortName();
+    if (shortName != null) {
+      shortName = shortName.toLowerCase();
+    }
 
     switch (getRoute.getAgency().getId().getId()) {
       case COBB_AGENCY_ID -> {

@@ -6,8 +6,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -27,7 +27,7 @@ public record LegacyGraphQLRequestContext(
       context.transitService(),
       context.graph().getFareService(),
       context.graph().getVehicleParkingService(),
-      context.graph().getVehicleRentalService(),
+      context.vehicleRentalService(),
       context.vehiclePositionService(),
       context.graphFinder(),
       context.defaultRouteRequest()

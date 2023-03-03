@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vehicle_rental;
+package org.opentripplanner.service.vehiclerental.model;
 
 /**
  * Based on the field rental_apps in {@ https://github.com/NABSA/gbfs/blob/master/gbfs.md#system_informationjson

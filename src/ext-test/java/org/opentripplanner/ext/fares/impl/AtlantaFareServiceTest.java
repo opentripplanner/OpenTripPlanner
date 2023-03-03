@@ -61,6 +61,12 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   }
 
   @Test
+  void nullShortName() {
+    var legs = List.of(getLeg(GCT_AGENCY_ID, null, 1));
+    calculateFare(legs, 349);
+  }
+
+  @Test
   public void fromCobbTransfers() {
     List<Leg> rides = List.of(getLeg(COBB_AGENCY_ID, 0), getLeg(MARTA_AGENCY_ID, 1));
     calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS);
@@ -255,7 +261,12 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
 
     @Override
     protected float getLegPrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
-      String routeShortName = leg.getRoute().getShortName().toLowerCase();
+      var routeShortName = leg.getRoute().getShortName();
+      if (routeShortName == null) {
+        return DEFAULT_TEST_RIDE_PRICE;
+      }
+      routeShortName = leg.getRoute().getShortName().toLowerCase();
+
       // Testing, return default test ride price.
       return switch (routeShortName) {
         case "101" -> DEFAULT_TEST_RIDE_PRICE + 1;
