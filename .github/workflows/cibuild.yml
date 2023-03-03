@@ -18,10 +18,6 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      # Fix CI timeouts which is caused by Maven keeping connections open for a very long time
-      # https://github.com/actions/runner-images/issues/1499#issuecomment-718396233
-      MAVEN_OPTS: -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
       - uses: actions/checkout@v3.3.0
@@ -37,7 +33,13 @@ jobs:
           cache: maven
 
       - name: Prepare coverage agent, build and test
-        run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report -P prettierCheck
+        # these are split into two steps because otherwise maven keeps long-running HTTP connections
+        # to Maven Central open which then hang during the package phase because the Azure (Github Actions)
+        # NAT drops them
+        # https://github.com/actions/runner-images/issues/1499
+        run: |
+          mvn --batch-mode jacoco:prepare-agent test jacoco:report -P prettierCheck
+          mvn --batch-mode package -Dmaven.test.skip -P prettierSkip
 
       - name: Send coverage data to codecov.io
         if: github.repository_owner == 'opentripplanner'
@@ -49,7 +51,7 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierCheck -P deployGitHub
+        run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip -P deployGitHub
 
   build-windows:
     timeout-minutes: 20
