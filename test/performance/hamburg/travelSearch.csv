@@ -1,0 +1,481 @@
+testCaseId,description,departure,fromLat,fromLon,toLat,toLon,origin,destination,modes,category
+1,Lüneburg to Stade (transit),10:00,53.2497728,10.4197721,53.5960704,9.4775887,Lüneburg,Stade,TRANSIT|WALK,transit
+2,Lüneburg to Stade (flex),10:00,53.2497728,10.4197721,53.5960704,9.4775887,Lüneburg,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+3,Lüneburg to Bad Oldesloe (transit),10:00,53.2497728,10.4197721,53.8052678,10.3822381,Lüneburg,Bad Oldesloe,TRANSIT|WALK,transit
+4,Lüneburg to Bad Oldesloe (flex),10:00,53.2497728,10.4197721,53.8052678,10.3822381,Lüneburg,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+5,Lüneburg to Henstedt-Ulzburg (transit),10:00,53.2497728,10.4197721,53.7952480,9.9822267,Lüneburg,Henstedt-Ulzburg,TRANSIT|WALK,transit
+6,Lüneburg to Henstedt-Ulzburg (flex),10:00,53.2497728,10.4197721,53.7952480,9.9822267,Lüneburg,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+7,Lüneburg to Elmshorn (transit),10:00,53.2497728,10.4197721,53.7542251,9.6592636,Lüneburg,Elmshorn,TRANSIT|WALK,transit
+8,Lüneburg to Elmshorn (flex),10:00,53.2497728,10.4197721,53.7542251,9.6592636,Lüneburg,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+9,Lüneburg to Pinneberg (transit),10:00,53.2497728,10.4197721,53.6550342,9.7976864,Lüneburg,Pinneberg,TRANSIT|WALK,transit
+10,Lüneburg to Pinneberg (flex),10:00,53.2497728,10.4197721,53.6550342,9.7976864,Lüneburg,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+11,Lüneburg to Buchholz (transit),10:00,53.2497728,10.4197721,53.3243628,9.8749387,Lüneburg,Buchholz,TRANSIT|WALK,transit
+12,Lüneburg to Buchholz (flex),10:00,53.2497728,10.4197721,53.3243628,9.8749387,Lüneburg,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+13,Lüneburg to HH Hbf (transit),10:00,53.2497728,10.4197721,53.5531993,10.0064364,Lüneburg,HH Hbf,TRANSIT|WALK,transit
+14,Lüneburg to HH Hbf (flex),10:00,53.2497728,10.4197721,53.5531993,10.0064364,Lüneburg,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+15,Lüneburg to HH Flughafen (transit),10:00,53.2497728,10.4197721,53.6326466,10.0066778,Lüneburg,HH Flughafen,TRANSIT|WALK,transit
+16,Lüneburg to HH Flughafen (flex),10:00,53.2497728,10.4197721,53.6326466,10.0066778,Lüneburg,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+17,Lüneburg to HH Landungsbrücken (S) (transit),10:00,53.2497728,10.4197721,53.5462334,9.9711435,Lüneburg,HH Landungsbrücken (S),TRANSIT|WALK,transit
+18,Lüneburg to HH Landungsbrücken (S) (flex),10:00,53.2497728,10.4197721,53.5462334,9.9711435,Lüneburg,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+19,Lüneburg to HH Harburg (transit),10:00,53.2497728,10.4197721,53.4557227,9.9917669,Lüneburg,HH Harburg,TRANSIT|WALK,transit
+20,Lüneburg to HH Harburg (flex),10:00,53.2497728,10.4197721,53.4557227,9.9917669,Lüneburg,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+21,Lüneburg to HH Schlump (transit),10:00,53.2497728,10.4197721,53.5675879,9.9700757,Lüneburg,HH Schlump,TRANSIT|WALK,transit
+22,Lüneburg to HH Schlump (flex),10:00,53.2497728,10.4197721,53.5675879,9.9700757,Lüneburg,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+23,Lüneburg to HH Kirschenallee (transit),10:00,53.2497728,10.4197721,53.6246134,10.0726482,Lüneburg,HH Kirschenallee,TRANSIT|WALK,transit
+24,Lüneburg to HH Kirschenallee (flex),10:00,53.2497728,10.4197721,53.6246134,10.0726482,Lüneburg,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+25,Lüneburg to HH Wasserturm (transit),10:00,53.2497728,10.4197721,53.6196717,10.0500744,Lüneburg,HH Wasserturm,TRANSIT|WALK,transit
+26,Lüneburg to HH Wasserturm (flex),10:00,53.2497728,10.4197721,53.6196717,10.0500744,Lüneburg,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+27,Lüneburg to HH Finkenwerder (transit),10:00,53.2497728,10.4197721,53.5364482,9.8789390,Lüneburg,HH Finkenwerder,TRANSIT|WALK,transit
+28,Lüneburg to HH Finkenwerder (flex),10:00,53.2497728,10.4197721,53.5364482,9.8789390,Lüneburg,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+29,Lüneburg to HH Mümmelmannsberg (transit),10:00,53.2497728,10.4197721,53.5281075,10.1500277,Lüneburg,HH Mümmelmannsberg,TRANSIT|WALK,transit
+30,Lüneburg to HH Mümmelmannsberg (flex),10:00,53.2497728,10.4197721,53.5281075,10.1500277,Lüneburg,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+31,Stade to Lüneburg (transit),10:00,53.5960704,9.4775887,53.2497728,10.4197721,Stade,Lüneburg,TRANSIT|WALK,transit
+32,Stade to Lüneburg (flex),10:00,53.5960704,9.4775887,53.2497728,10.4197721,Stade,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+33,Stade to Bad Oldesloe (transit),10:00,53.5960704,9.4775887,53.8052678,10.3822381,Stade,Bad Oldesloe,TRANSIT|WALK,transit
+34,Stade to Bad Oldesloe (flex),10:00,53.5960704,9.4775887,53.8052678,10.3822381,Stade,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+35,Stade to Henstedt-Ulzburg (transit),10:00,53.5960704,9.4775887,53.7952480,9.9822267,Stade,Henstedt-Ulzburg,TRANSIT|WALK,transit
+36,Stade to Henstedt-Ulzburg (flex),10:00,53.5960704,9.4775887,53.7952480,9.9822267,Stade,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+37,Stade to Elmshorn (transit),10:00,53.5960704,9.4775887,53.7542251,9.6592636,Stade,Elmshorn,TRANSIT|WALK,transit
+38,Stade to Elmshorn (flex),10:00,53.5960704,9.4775887,53.7542251,9.6592636,Stade,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+39,Stade to Pinneberg (transit),10:00,53.5960704,9.4775887,53.6550342,9.7976864,Stade,Pinneberg,TRANSIT|WALK,transit
+40,Stade to Pinneberg (flex),10:00,53.5960704,9.4775887,53.6550342,9.7976864,Stade,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+41,Stade to Buchholz (transit),10:00,53.5960704,9.4775887,53.3243628,9.8749387,Stade,Buchholz,TRANSIT|WALK,transit
+42,Stade to Buchholz (flex),10:00,53.5960704,9.4775887,53.3243628,9.8749387,Stade,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+43,Stade to HH Hbf (transit),10:00,53.5960704,9.4775887,53.5531993,10.0064364,Stade,HH Hbf,TRANSIT|WALK,transit
+44,Stade to HH Hbf (flex),10:00,53.5960704,9.4775887,53.5531993,10.0064364,Stade,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+45,Stade to HH Flughafen (transit),10:00,53.5960704,9.4775887,53.6326466,10.0066778,Stade,HH Flughafen,TRANSIT|WALK,transit
+46,Stade to HH Flughafen (flex),10:00,53.5960704,9.4775887,53.6326466,10.0066778,Stade,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+47,Stade to HH Landungsbrücken (S) (transit),10:00,53.5960704,9.4775887,53.5462334,9.9711435,Stade,HH Landungsbrücken (S),TRANSIT|WALK,transit
+48,Stade to HH Landungsbrücken (S) (flex),10:00,53.5960704,9.4775887,53.5462334,9.9711435,Stade,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+49,Stade to HH Harburg (transit),10:00,53.5960704,9.4775887,53.4557227,9.9917669,Stade,HH Harburg,TRANSIT|WALK,transit
+50,Stade to HH Harburg (flex),10:00,53.5960704,9.4775887,53.4557227,9.9917669,Stade,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+51,Stade to HH Schlump (transit),10:00,53.5960704,9.4775887,53.5675879,9.9700757,Stade,HH Schlump,TRANSIT|WALK,transit
+52,Stade to HH Schlump (flex),10:00,53.5960704,9.4775887,53.5675879,9.9700757,Stade,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+53,Stade to HH Kirschenallee (transit),10:00,53.5960704,9.4775887,53.6246134,10.0726482,Stade,HH Kirschenallee,TRANSIT|WALK,transit
+54,Stade to HH Kirschenallee (flex),10:00,53.5960704,9.4775887,53.6246134,10.0726482,Stade,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+55,Stade to HH Wasserturm (transit),10:00,53.5960704,9.4775887,53.6196717,10.0500744,Stade,HH Wasserturm,TRANSIT|WALK,transit
+56,Stade to HH Wasserturm (flex),10:00,53.5960704,9.4775887,53.6196717,10.0500744,Stade,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+57,Stade to HH Finkenwerder (transit),10:00,53.5960704,9.4775887,53.5364482,9.8789390,Stade,HH Finkenwerder,TRANSIT|WALK,transit
+58,Stade to HH Finkenwerder (flex),10:00,53.5960704,9.4775887,53.5364482,9.8789390,Stade,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+59,Stade to HH Mümmelmannsberg (transit),10:00,53.5960704,9.4775887,53.5281075,10.1500277,Stade,HH Mümmelmannsberg,TRANSIT|WALK,transit
+60,Stade to HH Mümmelmannsberg (flex),10:00,53.5960704,9.4775887,53.5281075,10.1500277,Stade,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+61,Bad Oldesloe to Lüneburg (transit),10:00,53.8052678,10.3822381,53.2497728,10.4197721,Bad Oldesloe,Lüneburg,TRANSIT|WALK,transit
+62,Bad Oldesloe to Lüneburg (flex),10:00,53.8052678,10.3822381,53.2497728,10.4197721,Bad Oldesloe,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+63,Bad Oldesloe to Stade (transit),10:00,53.8052678,10.3822381,53.5960704,9.4775887,Bad Oldesloe,Stade,TRANSIT|WALK,transit
+64,Bad Oldesloe to Stade (flex),10:00,53.8052678,10.3822381,53.5960704,9.4775887,Bad Oldesloe,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+65,Bad Oldesloe to Henstedt-Ulzburg (transit),10:00,53.8052678,10.3822381,53.7952480,9.9822267,Bad Oldesloe,Henstedt-Ulzburg,TRANSIT|WALK,transit
+66,Bad Oldesloe to Henstedt-Ulzburg (flex),10:00,53.8052678,10.3822381,53.7952480,9.9822267,Bad Oldesloe,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+67,Bad Oldesloe to Elmshorn (transit),10:00,53.8052678,10.3822381,53.7542251,9.6592636,Bad Oldesloe,Elmshorn,TRANSIT|WALK,transit
+68,Bad Oldesloe to Elmshorn (flex),10:00,53.8052678,10.3822381,53.7542251,9.6592636,Bad Oldesloe,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+69,Bad Oldesloe to Pinneberg (transit),10:00,53.8052678,10.3822381,53.6550342,9.7976864,Bad Oldesloe,Pinneberg,TRANSIT|WALK,transit
+70,Bad Oldesloe to Pinneberg (flex),10:00,53.8052678,10.3822381,53.6550342,9.7976864,Bad Oldesloe,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+71,Bad Oldesloe to Buchholz (transit),10:00,53.8052678,10.3822381,53.3243628,9.8749387,Bad Oldesloe,Buchholz,TRANSIT|WALK,transit
+72,Bad Oldesloe to Buchholz (flex),10:00,53.8052678,10.3822381,53.3243628,9.8749387,Bad Oldesloe,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+73,Bad Oldesloe to HH Hbf (transit),10:00,53.8052678,10.3822381,53.5531993,10.0064364,Bad Oldesloe,HH Hbf,TRANSIT|WALK,transit
+74,Bad Oldesloe to HH Hbf (flex),10:00,53.8052678,10.3822381,53.5531993,10.0064364,Bad Oldesloe,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+75,Bad Oldesloe to HH Flughafen (transit),10:00,53.8052678,10.3822381,53.6326466,10.0066778,Bad Oldesloe,HH Flughafen,TRANSIT|WALK,transit
+76,Bad Oldesloe to HH Flughafen (flex),10:00,53.8052678,10.3822381,53.6326466,10.0066778,Bad Oldesloe,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+77,Bad Oldesloe to HH Landungsbrücken (S) (transit),10:00,53.8052678,10.3822381,53.5462334,9.9711435,Bad Oldesloe,HH Landungsbrücken (S),TRANSIT|WALK,transit
+78,Bad Oldesloe to HH Landungsbrücken (S) (flex),10:00,53.8052678,10.3822381,53.5462334,9.9711435,Bad Oldesloe,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+79,Bad Oldesloe to HH Harburg (transit),10:00,53.8052678,10.3822381,53.4557227,9.9917669,Bad Oldesloe,HH Harburg,TRANSIT|WALK,transit
+80,Bad Oldesloe to HH Harburg (flex),10:00,53.8052678,10.3822381,53.4557227,9.9917669,Bad Oldesloe,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+81,Bad Oldesloe to HH Schlump (transit),10:00,53.8052678,10.3822381,53.5675879,9.9700757,Bad Oldesloe,HH Schlump,TRANSIT|WALK,transit
+82,Bad Oldesloe to HH Schlump (flex),10:00,53.8052678,10.3822381,53.5675879,9.9700757,Bad Oldesloe,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+83,Bad Oldesloe to HH Kirschenallee (transit),10:00,53.8052678,10.3822381,53.6246134,10.0726482,Bad Oldesloe,HH Kirschenallee,TRANSIT|WALK,transit
+84,Bad Oldesloe to HH Kirschenallee (flex),10:00,53.8052678,10.3822381,53.6246134,10.0726482,Bad Oldesloe,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+85,Bad Oldesloe to HH Wasserturm (transit),10:00,53.8052678,10.3822381,53.6196717,10.0500744,Bad Oldesloe,HH Wasserturm,TRANSIT|WALK,transit
+86,Bad Oldesloe to HH Wasserturm (flex),10:00,53.8052678,10.3822381,53.6196717,10.0500744,Bad Oldesloe,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+87,Bad Oldesloe to HH Finkenwerder (transit),10:00,53.8052678,10.3822381,53.5364482,9.8789390,Bad Oldesloe,HH Finkenwerder,TRANSIT|WALK,transit
+88,Bad Oldesloe to HH Finkenwerder (flex),10:00,53.8052678,10.3822381,53.5364482,9.8789390,Bad Oldesloe,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+89,Bad Oldesloe to HH Mümmelmannsberg (transit),10:00,53.8052678,10.3822381,53.5281075,10.1500277,Bad Oldesloe,HH Mümmelmannsberg,TRANSIT|WALK,transit
+90,Bad Oldesloe to HH Mümmelmannsberg (flex),10:00,53.8052678,10.3822381,53.5281075,10.1500277,Bad Oldesloe,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+91,Henstedt-Ulzburg to Lüneburg (transit),10:00,53.7952480,9.9822267,53.2497728,10.4197721,Henstedt-Ulzburg,Lüneburg,TRANSIT|WALK,transit
+92,Henstedt-Ulzburg to Lüneburg (flex),10:00,53.7952480,9.9822267,53.2497728,10.4197721,Henstedt-Ulzburg,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+93,Henstedt-Ulzburg to Stade (transit),10:00,53.7952480,9.9822267,53.5960704,9.4775887,Henstedt-Ulzburg,Stade,TRANSIT|WALK,transit
+94,Henstedt-Ulzburg to Stade (flex),10:00,53.7952480,9.9822267,53.5960704,9.4775887,Henstedt-Ulzburg,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+95,Henstedt-Ulzburg to Bad Oldesloe (transit),10:00,53.7952480,9.9822267,53.8052678,10.3822381,Henstedt-Ulzburg,Bad Oldesloe,TRANSIT|WALK,transit
+96,Henstedt-Ulzburg to Bad Oldesloe (flex),10:00,53.7952480,9.9822267,53.8052678,10.3822381,Henstedt-Ulzburg,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+97,Henstedt-Ulzburg to Elmshorn (transit),10:00,53.7952480,9.9822267,53.7542251,9.6592636,Henstedt-Ulzburg,Elmshorn,TRANSIT|WALK,transit
+98,Henstedt-Ulzburg to Elmshorn (flex),10:00,53.7952480,9.9822267,53.7542251,9.6592636,Henstedt-Ulzburg,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+99,Henstedt-Ulzburg to Pinneberg (transit),10:00,53.7952480,9.9822267,53.6550342,9.7976864,Henstedt-Ulzburg,Pinneberg,TRANSIT|WALK,transit
+100,Henstedt-Ulzburg to Pinneberg (flex),10:00,53.7952480,9.9822267,53.6550342,9.7976864,Henstedt-Ulzburg,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+101,Henstedt-Ulzburg to Buchholz (transit),10:00,53.7952480,9.9822267,53.3243628,9.8749387,Henstedt-Ulzburg,Buchholz,TRANSIT|WALK,transit
+102,Henstedt-Ulzburg to Buchholz (flex),10:00,53.7952480,9.9822267,53.3243628,9.8749387,Henstedt-Ulzburg,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+103,Henstedt-Ulzburg to HH Hbf (transit),10:00,53.7952480,9.9822267,53.5531993,10.0064364,Henstedt-Ulzburg,HH Hbf,TRANSIT|WALK,transit
+104,Henstedt-Ulzburg to HH Hbf (flex),10:00,53.7952480,9.9822267,53.5531993,10.0064364,Henstedt-Ulzburg,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+105,Henstedt-Ulzburg to HH Flughafen (transit),10:00,53.7952480,9.9822267,53.6326466,10.0066778,Henstedt-Ulzburg,HH Flughafen,TRANSIT|WALK,transit
+106,Henstedt-Ulzburg to HH Flughafen (flex),10:00,53.7952480,9.9822267,53.6326466,10.0066778,Henstedt-Ulzburg,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+107,Henstedt-Ulzburg to HH Landungsbrücken (S) (transit),10:00,53.7952480,9.9822267,53.5462334,9.9711435,Henstedt-Ulzburg,HH Landungsbrücken (S),TRANSIT|WALK,transit
+108,Henstedt-Ulzburg to HH Landungsbrücken (S) (flex),10:00,53.7952480,9.9822267,53.5462334,9.9711435,Henstedt-Ulzburg,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+109,Henstedt-Ulzburg to HH Harburg (transit),10:00,53.7952480,9.9822267,53.4557227,9.9917669,Henstedt-Ulzburg,HH Harburg,TRANSIT|WALK,transit
+110,Henstedt-Ulzburg to HH Harburg (flex),10:00,53.7952480,9.9822267,53.4557227,9.9917669,Henstedt-Ulzburg,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+111,Henstedt-Ulzburg to HH Schlump (transit),10:00,53.7952480,9.9822267,53.5675879,9.9700757,Henstedt-Ulzburg,HH Schlump,TRANSIT|WALK,transit
+112,Henstedt-Ulzburg to HH Schlump (flex),10:00,53.7952480,9.9822267,53.5675879,9.9700757,Henstedt-Ulzburg,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+113,Henstedt-Ulzburg to HH Kirschenallee (transit),10:00,53.7952480,9.9822267,53.6246134,10.0726482,Henstedt-Ulzburg,HH Kirschenallee,TRANSIT|WALK,transit
+114,Henstedt-Ulzburg to HH Kirschenallee (flex),10:00,53.7952480,9.9822267,53.6246134,10.0726482,Henstedt-Ulzburg,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+115,Henstedt-Ulzburg to HH Wasserturm (transit),10:00,53.7952480,9.9822267,53.6196717,10.0500744,Henstedt-Ulzburg,HH Wasserturm,TRANSIT|WALK,transit
+116,Henstedt-Ulzburg to HH Wasserturm (flex),10:00,53.7952480,9.9822267,53.6196717,10.0500744,Henstedt-Ulzburg,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+117,Henstedt-Ulzburg to HH Finkenwerder (transit),10:00,53.7952480,9.9822267,53.5364482,9.8789390,Henstedt-Ulzburg,HH Finkenwerder,TRANSIT|WALK,transit
+118,Henstedt-Ulzburg to HH Finkenwerder (flex),10:00,53.7952480,9.9822267,53.5364482,9.8789390,Henstedt-Ulzburg,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+119,Henstedt-Ulzburg to HH Mümmelmannsberg (transit),10:00,53.7952480,9.9822267,53.5281075,10.1500277,Henstedt-Ulzburg,HH Mümmelmannsberg,TRANSIT|WALK,transit
+120,Henstedt-Ulzburg to HH Mümmelmannsberg (flex),10:00,53.7952480,9.9822267,53.5281075,10.1500277,Henstedt-Ulzburg,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+121,Elmshorn to Lüneburg (transit),10:00,53.7542251,9.6592636,53.2497728,10.4197721,Elmshorn,Lüneburg,TRANSIT|WALK,transit
+122,Elmshorn to Lüneburg (flex),10:00,53.7542251,9.6592636,53.2497728,10.4197721,Elmshorn,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+123,Elmshorn to Stade (transit),10:00,53.7542251,9.6592636,53.5960704,9.4775887,Elmshorn,Stade,TRANSIT|WALK,transit
+124,Elmshorn to Stade (flex),10:00,53.7542251,9.6592636,53.5960704,9.4775887,Elmshorn,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+125,Elmshorn to Bad Oldesloe (transit),10:00,53.7542251,9.6592636,53.8052678,10.3822381,Elmshorn,Bad Oldesloe,TRANSIT|WALK,transit
+126,Elmshorn to Bad Oldesloe (flex),10:00,53.7542251,9.6592636,53.8052678,10.3822381,Elmshorn,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+127,Elmshorn to Henstedt-Ulzburg (transit),10:00,53.7542251,9.6592636,53.7952480,9.9822267,Elmshorn,Henstedt-Ulzburg,TRANSIT|WALK,transit
+128,Elmshorn to Henstedt-Ulzburg (flex),10:00,53.7542251,9.6592636,53.7952480,9.9822267,Elmshorn,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+129,Elmshorn to Pinneberg (transit),10:00,53.7542251,9.6592636,53.6550342,9.7976864,Elmshorn,Pinneberg,TRANSIT|WALK,transit
+130,Elmshorn to Pinneberg (flex),10:00,53.7542251,9.6592636,53.6550342,9.7976864,Elmshorn,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+131,Elmshorn to Buchholz (transit),10:00,53.7542251,9.6592636,53.3243628,9.8749387,Elmshorn,Buchholz,TRANSIT|WALK,transit
+132,Elmshorn to Buchholz (flex),10:00,53.7542251,9.6592636,53.3243628,9.8749387,Elmshorn,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+133,Elmshorn to HH Hbf (transit),10:00,53.7542251,9.6592636,53.5531993,10.0064364,Elmshorn,HH Hbf,TRANSIT|WALK,transit
+134,Elmshorn to HH Hbf (flex),10:00,53.7542251,9.6592636,53.5531993,10.0064364,Elmshorn,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+135,Elmshorn to HH Flughafen (transit),10:00,53.7542251,9.6592636,53.6326466,10.0066778,Elmshorn,HH Flughafen,TRANSIT|WALK,transit
+136,Elmshorn to HH Flughafen (flex),10:00,53.7542251,9.6592636,53.6326466,10.0066778,Elmshorn,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+137,Elmshorn to HH Landungsbrücken (S) (transit),10:00,53.7542251,9.6592636,53.5462334,9.9711435,Elmshorn,HH Landungsbrücken (S),TRANSIT|WALK,transit
+138,Elmshorn to HH Landungsbrücken (S) (flex),10:00,53.7542251,9.6592636,53.5462334,9.9711435,Elmshorn,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+139,Elmshorn to HH Harburg (transit),10:00,53.7542251,9.6592636,53.4557227,9.9917669,Elmshorn,HH Harburg,TRANSIT|WALK,transit
+140,Elmshorn to HH Harburg (flex),10:00,53.7542251,9.6592636,53.4557227,9.9917669,Elmshorn,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+141,Elmshorn to HH Schlump (transit),10:00,53.7542251,9.6592636,53.5675879,9.9700757,Elmshorn,HH Schlump,TRANSIT|WALK,transit
+142,Elmshorn to HH Schlump (flex),10:00,53.7542251,9.6592636,53.5675879,9.9700757,Elmshorn,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+143,Elmshorn to HH Kirschenallee (transit),10:00,53.7542251,9.6592636,53.6246134,10.0726482,Elmshorn,HH Kirschenallee,TRANSIT|WALK,transit
+144,Elmshorn to HH Kirschenallee (flex),10:00,53.7542251,9.6592636,53.6246134,10.0726482,Elmshorn,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+145,Elmshorn to HH Wasserturm (transit),10:00,53.7542251,9.6592636,53.6196717,10.0500744,Elmshorn,HH Wasserturm,TRANSIT|WALK,transit
+146,Elmshorn to HH Wasserturm (flex),10:00,53.7542251,9.6592636,53.6196717,10.0500744,Elmshorn,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+147,Elmshorn to HH Finkenwerder (transit),10:00,53.7542251,9.6592636,53.5364482,9.8789390,Elmshorn,HH Finkenwerder,TRANSIT|WALK,transit
+148,Elmshorn to HH Finkenwerder (flex),10:00,53.7542251,9.6592636,53.5364482,9.8789390,Elmshorn,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+149,Elmshorn to HH Mümmelmannsberg (transit),10:00,53.7542251,9.6592636,53.5281075,10.1500277,Elmshorn,HH Mümmelmannsberg,TRANSIT|WALK,transit
+150,Elmshorn to HH Mümmelmannsberg (flex),10:00,53.7542251,9.6592636,53.5281075,10.1500277,Elmshorn,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+151,Pinneberg to Lüneburg (transit),10:00,53.6550342,9.7976864,53.2497728,10.4197721,Pinneberg,Lüneburg,TRANSIT|WALK,transit
+152,Pinneberg to Lüneburg (flex),10:00,53.6550342,9.7976864,53.2497728,10.4197721,Pinneberg,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+153,Pinneberg to Stade (transit),10:00,53.6550342,9.7976864,53.5960704,9.4775887,Pinneberg,Stade,TRANSIT|WALK,transit
+154,Pinneberg to Stade (flex),10:00,53.6550342,9.7976864,53.5960704,9.4775887,Pinneberg,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+155,Pinneberg to Bad Oldesloe (transit),10:00,53.6550342,9.7976864,53.8052678,10.3822381,Pinneberg,Bad Oldesloe,TRANSIT|WALK,transit
+156,Pinneberg to Bad Oldesloe (flex),10:00,53.6550342,9.7976864,53.8052678,10.3822381,Pinneberg,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+157,Pinneberg to Henstedt-Ulzburg (transit),10:00,53.6550342,9.7976864,53.7952480,9.9822267,Pinneberg,Henstedt-Ulzburg,TRANSIT|WALK,transit
+158,Pinneberg to Henstedt-Ulzburg (flex),10:00,53.6550342,9.7976864,53.7952480,9.9822267,Pinneberg,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+159,Pinneberg to Elmshorn (transit),10:00,53.6550342,9.7976864,53.7542251,9.6592636,Pinneberg,Elmshorn,TRANSIT|WALK,transit
+160,Pinneberg to Elmshorn (flex),10:00,53.6550342,9.7976864,53.7542251,9.6592636,Pinneberg,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+161,Pinneberg to Buchholz (transit),10:00,53.6550342,9.7976864,53.3243628,9.8749387,Pinneberg,Buchholz,TRANSIT|WALK,transit
+162,Pinneberg to Buchholz (flex),10:00,53.6550342,9.7976864,53.3243628,9.8749387,Pinneberg,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+163,Pinneberg to HH Hbf (transit),10:00,53.6550342,9.7976864,53.5531993,10.0064364,Pinneberg,HH Hbf,TRANSIT|WALK,transit
+164,Pinneberg to HH Hbf (flex),10:00,53.6550342,9.7976864,53.5531993,10.0064364,Pinneberg,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+165,Pinneberg to HH Flughafen (transit),10:00,53.6550342,9.7976864,53.6326466,10.0066778,Pinneberg,HH Flughafen,TRANSIT|WALK,transit
+166,Pinneberg to HH Flughafen (flex),10:00,53.6550342,9.7976864,53.6326466,10.0066778,Pinneberg,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+167,Pinneberg to HH Landungsbrücken (S) (transit),10:00,53.6550342,9.7976864,53.5462334,9.9711435,Pinneberg,HH Landungsbrücken (S),TRANSIT|WALK,transit
+168,Pinneberg to HH Landungsbrücken (S) (flex),10:00,53.6550342,9.7976864,53.5462334,9.9711435,Pinneberg,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+169,Pinneberg to HH Harburg (transit),10:00,53.6550342,9.7976864,53.4557227,9.9917669,Pinneberg,HH Harburg,TRANSIT|WALK,transit
+170,Pinneberg to HH Harburg (flex),10:00,53.6550342,9.7976864,53.4557227,9.9917669,Pinneberg,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+171,Pinneberg to HH Schlump (transit),10:00,53.6550342,9.7976864,53.5675879,9.9700757,Pinneberg,HH Schlump,TRANSIT|WALK,transit
+172,Pinneberg to HH Schlump (flex),10:00,53.6550342,9.7976864,53.5675879,9.9700757,Pinneberg,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+173,Pinneberg to HH Kirschenallee (transit),10:00,53.6550342,9.7976864,53.6246134,10.0726482,Pinneberg,HH Kirschenallee,TRANSIT|WALK,transit
+174,Pinneberg to HH Kirschenallee (flex),10:00,53.6550342,9.7976864,53.6246134,10.0726482,Pinneberg,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+175,Pinneberg to HH Wasserturm (transit),10:00,53.6550342,9.7976864,53.6196717,10.0500744,Pinneberg,HH Wasserturm,TRANSIT|WALK,transit
+176,Pinneberg to HH Wasserturm (flex),10:00,53.6550342,9.7976864,53.6196717,10.0500744,Pinneberg,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+177,Pinneberg to HH Finkenwerder (transit),10:00,53.6550342,9.7976864,53.5364482,9.8789390,Pinneberg,HH Finkenwerder,TRANSIT|WALK,transit
+178,Pinneberg to HH Finkenwerder (flex),10:00,53.6550342,9.7976864,53.5364482,9.8789390,Pinneberg,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+179,Pinneberg to HH Mümmelmannsberg (transit),10:00,53.6550342,9.7976864,53.5281075,10.1500277,Pinneberg,HH Mümmelmannsberg,TRANSIT|WALK,transit
+180,Pinneberg to HH Mümmelmannsberg (flex),10:00,53.6550342,9.7976864,53.5281075,10.1500277,Pinneberg,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+181,Buchholz to Lüneburg (transit),10:00,53.3243628,9.8749387,53.2497728,10.4197721,Buchholz,Lüneburg,TRANSIT|WALK,transit
+182,Buchholz to Lüneburg (flex),10:00,53.3243628,9.8749387,53.2497728,10.4197721,Buchholz,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+183,Buchholz to Stade (transit),10:00,53.3243628,9.8749387,53.5960704,9.4775887,Buchholz,Stade,TRANSIT|WALK,transit
+184,Buchholz to Stade (flex),10:00,53.3243628,9.8749387,53.5960704,9.4775887,Buchholz,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+185,Buchholz to Bad Oldesloe (transit),10:00,53.3243628,9.8749387,53.8052678,10.3822381,Buchholz,Bad Oldesloe,TRANSIT|WALK,transit
+186,Buchholz to Bad Oldesloe (flex),10:00,53.3243628,9.8749387,53.8052678,10.3822381,Buchholz,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+187,Buchholz to Henstedt-Ulzburg (transit),10:00,53.3243628,9.8749387,53.7952480,9.9822267,Buchholz,Henstedt-Ulzburg,TRANSIT|WALK,transit
+188,Buchholz to Henstedt-Ulzburg (flex),10:00,53.3243628,9.8749387,53.7952480,9.9822267,Buchholz,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+189,Buchholz to Elmshorn (transit),10:00,53.3243628,9.8749387,53.7542251,9.6592636,Buchholz,Elmshorn,TRANSIT|WALK,transit
+190,Buchholz to Elmshorn (flex),10:00,53.3243628,9.8749387,53.7542251,9.6592636,Buchholz,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+191,Buchholz to Pinneberg (transit),10:00,53.3243628,9.8749387,53.6550342,9.7976864,Buchholz,Pinneberg,TRANSIT|WALK,transit
+192,Buchholz to Pinneberg (flex),10:00,53.3243628,9.8749387,53.6550342,9.7976864,Buchholz,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+193,Buchholz to HH Hbf (transit),10:00,53.3243628,9.8749387,53.5531993,10.0064364,Buchholz,HH Hbf,TRANSIT|WALK,transit
+194,Buchholz to HH Hbf (flex),10:00,53.3243628,9.8749387,53.5531993,10.0064364,Buchholz,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+195,Buchholz to HH Flughafen (transit),10:00,53.3243628,9.8749387,53.6326466,10.0066778,Buchholz,HH Flughafen,TRANSIT|WALK,transit
+196,Buchholz to HH Flughafen (flex),10:00,53.3243628,9.8749387,53.6326466,10.0066778,Buchholz,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+197,Buchholz to HH Landungsbrücken (S) (transit),10:00,53.3243628,9.8749387,53.5462334,9.9711435,Buchholz,HH Landungsbrücken (S),TRANSIT|WALK,transit
+198,Buchholz to HH Landungsbrücken (S) (flex),10:00,53.3243628,9.8749387,53.5462334,9.9711435,Buchholz,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+199,Buchholz to HH Harburg (transit),10:00,53.3243628,9.8749387,53.4557227,9.9917669,Buchholz,HH Harburg,TRANSIT|WALK,transit
+200,Buchholz to HH Harburg (flex),10:00,53.3243628,9.8749387,53.4557227,9.9917669,Buchholz,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+201,Buchholz to HH Schlump (transit),10:00,53.3243628,9.8749387,53.5675879,9.9700757,Buchholz,HH Schlump,TRANSIT|WALK,transit
+202,Buchholz to HH Schlump (flex),10:00,53.3243628,9.8749387,53.5675879,9.9700757,Buchholz,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+203,Buchholz to HH Kirschenallee (transit),10:00,53.3243628,9.8749387,53.6246134,10.0726482,Buchholz,HH Kirschenallee,TRANSIT|WALK,transit
+204,Buchholz to HH Kirschenallee (flex),10:00,53.3243628,9.8749387,53.6246134,10.0726482,Buchholz,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+205,Buchholz to HH Wasserturm (transit),10:00,53.3243628,9.8749387,53.6196717,10.0500744,Buchholz,HH Wasserturm,TRANSIT|WALK,transit
+206,Buchholz to HH Wasserturm (flex),10:00,53.3243628,9.8749387,53.6196717,10.0500744,Buchholz,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+207,Buchholz to HH Finkenwerder (transit),10:00,53.3243628,9.8749387,53.5364482,9.8789390,Buchholz,HH Finkenwerder,TRANSIT|WALK,transit
+208,Buchholz to HH Finkenwerder (flex),10:00,53.3243628,9.8749387,53.5364482,9.8789390,Buchholz,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+209,Buchholz to HH Mümmelmannsberg (transit),10:00,53.3243628,9.8749387,53.5281075,10.1500277,Buchholz,HH Mümmelmannsberg,TRANSIT|WALK,transit
+210,Buchholz to HH Mümmelmannsberg (flex),10:00,53.3243628,9.8749387,53.5281075,10.1500277,Buchholz,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+211,HH Hbf to Lüneburg (transit),10:00,53.5531993,10.0064364,53.2497728,10.4197721,HH Hbf,Lüneburg,TRANSIT|WALK,transit
+212,HH Hbf to Lüneburg (flex),10:00,53.5531993,10.0064364,53.2497728,10.4197721,HH Hbf,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+213,HH Hbf to Stade (transit),10:00,53.5531993,10.0064364,53.5960704,9.4775887,HH Hbf,Stade,TRANSIT|WALK,transit
+214,HH Hbf to Stade (flex),10:00,53.5531993,10.0064364,53.5960704,9.4775887,HH Hbf,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+215,HH Hbf to Bad Oldesloe (transit),10:00,53.5531993,10.0064364,53.8052678,10.3822381,HH Hbf,Bad Oldesloe,TRANSIT|WALK,transit
+216,HH Hbf to Bad Oldesloe (flex),10:00,53.5531993,10.0064364,53.8052678,10.3822381,HH Hbf,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+217,HH Hbf to Henstedt-Ulzburg (transit),10:00,53.5531993,10.0064364,53.7952480,9.9822267,HH Hbf,Henstedt-Ulzburg,TRANSIT|WALK,transit
+218,HH Hbf to Henstedt-Ulzburg (flex),10:00,53.5531993,10.0064364,53.7952480,9.9822267,HH Hbf,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+219,HH Hbf to Elmshorn (transit),10:00,53.5531993,10.0064364,53.7542251,9.6592636,HH Hbf,Elmshorn,TRANSIT|WALK,transit
+220,HH Hbf to Elmshorn (flex),10:00,53.5531993,10.0064364,53.7542251,9.6592636,HH Hbf,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+221,HH Hbf to Pinneberg (transit),10:00,53.5531993,10.0064364,53.6550342,9.7976864,HH Hbf,Pinneberg,TRANSIT|WALK,transit
+222,HH Hbf to Pinneberg (flex),10:00,53.5531993,10.0064364,53.6550342,9.7976864,HH Hbf,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+223,HH Hbf to Buchholz (transit),10:00,53.5531993,10.0064364,53.3243628,9.8749387,HH Hbf,Buchholz,TRANSIT|WALK,transit
+224,HH Hbf to Buchholz (flex),10:00,53.5531993,10.0064364,53.3243628,9.8749387,HH Hbf,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+225,HH Hbf to HH Flughafen (transit),10:00,53.5531993,10.0064364,53.6326466,10.0066778,HH Hbf,HH Flughafen,TRANSIT|WALK,transit
+226,HH Hbf to HH Flughafen (flex),10:00,53.5531993,10.0064364,53.6326466,10.0066778,HH Hbf,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+227,HH Hbf to HH Landungsbrücken (S) (transit),10:00,53.5531993,10.0064364,53.5462334,9.9711435,HH Hbf,HH Landungsbrücken (S),TRANSIT|WALK,transit
+228,HH Hbf to HH Landungsbrücken (S) (flex),10:00,53.5531993,10.0064364,53.5462334,9.9711435,HH Hbf,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+229,HH Hbf to HH Harburg (transit),10:00,53.5531993,10.0064364,53.4557227,9.9917669,HH Hbf,HH Harburg,TRANSIT|WALK,transit
+230,HH Hbf to HH Harburg (flex),10:00,53.5531993,10.0064364,53.4557227,9.9917669,HH Hbf,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+231,HH Hbf to HH Schlump (transit),10:00,53.5531993,10.0064364,53.5675879,9.9700757,HH Hbf,HH Schlump,TRANSIT|WALK,transit
+232,HH Hbf to HH Schlump (flex),10:00,53.5531993,10.0064364,53.5675879,9.9700757,HH Hbf,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+233,HH Hbf to HH Kirschenallee (transit),10:00,53.5531993,10.0064364,53.6246134,10.0726482,HH Hbf,HH Kirschenallee,TRANSIT|WALK,transit
+234,HH Hbf to HH Kirschenallee (flex),10:00,53.5531993,10.0064364,53.6246134,10.0726482,HH Hbf,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+235,HH Hbf to HH Wasserturm (transit),10:00,53.5531993,10.0064364,53.6196717,10.0500744,HH Hbf,HH Wasserturm,TRANSIT|WALK,transit
+236,HH Hbf to HH Wasserturm (flex),10:00,53.5531993,10.0064364,53.6196717,10.0500744,HH Hbf,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+237,HH Hbf to HH Finkenwerder (transit),10:00,53.5531993,10.0064364,53.5364482,9.8789390,HH Hbf,HH Finkenwerder,TRANSIT|WALK,transit
+238,HH Hbf to HH Finkenwerder (flex),10:00,53.5531993,10.0064364,53.5364482,9.8789390,HH Hbf,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+239,HH Hbf to HH Mümmelmannsberg (transit),10:00,53.5531993,10.0064364,53.5281075,10.1500277,HH Hbf,HH Mümmelmannsberg,TRANSIT|WALK,transit
+240,HH Hbf to HH Mümmelmannsberg (flex),10:00,53.5531993,10.0064364,53.5281075,10.1500277,HH Hbf,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+241,HH Flughafen to Lüneburg (transit),10:00,53.6326466,10.0066778,53.2497728,10.4197721,HH Flughafen,Lüneburg,TRANSIT|WALK,transit
+242,HH Flughafen to Lüneburg (flex),10:00,53.6326466,10.0066778,53.2497728,10.4197721,HH Flughafen,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+243,HH Flughafen to Stade (transit),10:00,53.6326466,10.0066778,53.5960704,9.4775887,HH Flughafen,Stade,TRANSIT|WALK,transit
+244,HH Flughafen to Stade (flex),10:00,53.6326466,10.0066778,53.5960704,9.4775887,HH Flughafen,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+245,HH Flughafen to Bad Oldesloe (transit),10:00,53.6326466,10.0066778,53.8052678,10.3822381,HH Flughafen,Bad Oldesloe,TRANSIT|WALK,transit
+246,HH Flughafen to Bad Oldesloe (flex),10:00,53.6326466,10.0066778,53.8052678,10.3822381,HH Flughafen,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+247,HH Flughafen to Henstedt-Ulzburg (transit),10:00,53.6326466,10.0066778,53.7952480,9.9822267,HH Flughafen,Henstedt-Ulzburg,TRANSIT|WALK,transit
+248,HH Flughafen to Henstedt-Ulzburg (flex),10:00,53.6326466,10.0066778,53.7952480,9.9822267,HH Flughafen,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+249,HH Flughafen to Elmshorn (transit),10:00,53.6326466,10.0066778,53.7542251,9.6592636,HH Flughafen,Elmshorn,TRANSIT|WALK,transit
+250,HH Flughafen to Elmshorn (flex),10:00,53.6326466,10.0066778,53.7542251,9.6592636,HH Flughafen,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+251,HH Flughafen to Pinneberg (transit),10:00,53.6326466,10.0066778,53.6550342,9.7976864,HH Flughafen,Pinneberg,TRANSIT|WALK,transit
+252,HH Flughafen to Pinneberg (flex),10:00,53.6326466,10.0066778,53.6550342,9.7976864,HH Flughafen,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+253,HH Flughafen to Buchholz (transit),10:00,53.6326466,10.0066778,53.3243628,9.8749387,HH Flughafen,Buchholz,TRANSIT|WALK,transit
+254,HH Flughafen to Buchholz (flex),10:00,53.6326466,10.0066778,53.3243628,9.8749387,HH Flughafen,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+255,HH Flughafen to HH Hbf (transit),10:00,53.6326466,10.0066778,53.5531993,10.0064364,HH Flughafen,HH Hbf,TRANSIT|WALK,transit
+256,HH Flughafen to HH Hbf (flex),10:00,53.6326466,10.0066778,53.5531993,10.0064364,HH Flughafen,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+257,HH Flughafen to HH Landungsbrücken (S) (transit),10:00,53.6326466,10.0066778,53.5462334,9.9711435,HH Flughafen,HH Landungsbrücken (S),TRANSIT|WALK,transit
+258,HH Flughafen to HH Landungsbrücken (S) (flex),10:00,53.6326466,10.0066778,53.5462334,9.9711435,HH Flughafen,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+259,HH Flughafen to HH Harburg (transit),10:00,53.6326466,10.0066778,53.4557227,9.9917669,HH Flughafen,HH Harburg,TRANSIT|WALK,transit
+260,HH Flughafen to HH Harburg (flex),10:00,53.6326466,10.0066778,53.4557227,9.9917669,HH Flughafen,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+261,HH Flughafen to HH Schlump (transit),10:00,53.6326466,10.0066778,53.5675879,9.9700757,HH Flughafen,HH Schlump,TRANSIT|WALK,transit
+262,HH Flughafen to HH Schlump (flex),10:00,53.6326466,10.0066778,53.5675879,9.9700757,HH Flughafen,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+263,HH Flughafen to HH Kirschenallee (transit),10:00,53.6326466,10.0066778,53.6246134,10.0726482,HH Flughafen,HH Kirschenallee,TRANSIT|WALK,transit
+264,HH Flughafen to HH Kirschenallee (flex),10:00,53.6326466,10.0066778,53.6246134,10.0726482,HH Flughafen,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+265,HH Flughafen to HH Wasserturm (transit),10:00,53.6326466,10.0066778,53.6196717,10.0500744,HH Flughafen,HH Wasserturm,TRANSIT|WALK,transit
+266,HH Flughafen to HH Wasserturm (flex),10:00,53.6326466,10.0066778,53.6196717,10.0500744,HH Flughafen,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+267,HH Flughafen to HH Finkenwerder (transit),10:00,53.6326466,10.0066778,53.5364482,9.8789390,HH Flughafen,HH Finkenwerder,TRANSIT|WALK,transit
+268,HH Flughafen to HH Finkenwerder (flex),10:00,53.6326466,10.0066778,53.5364482,9.8789390,HH Flughafen,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+269,HH Flughafen to HH Mümmelmannsberg (transit),10:00,53.6326466,10.0066778,53.5281075,10.1500277,HH Flughafen,HH Mümmelmannsberg,TRANSIT|WALK,transit
+270,HH Flughafen to HH Mümmelmannsberg (flex),10:00,53.6326466,10.0066778,53.5281075,10.1500277,HH Flughafen,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+271,HH Landungsbrücken (S) to Lüneburg (transit),10:00,53.5462334,9.9711435,53.2497728,10.4197721,HH Landungsbrücken (S),Lüneburg,TRANSIT|WALK,transit
+272,HH Landungsbrücken (S) to Lüneburg (flex),10:00,53.5462334,9.9711435,53.2497728,10.4197721,HH Landungsbrücken (S),Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+273,HH Landungsbrücken (S) to Stade (transit),10:00,53.5462334,9.9711435,53.5960704,9.4775887,HH Landungsbrücken (S),Stade,TRANSIT|WALK,transit
+274,HH Landungsbrücken (S) to Stade (flex),10:00,53.5462334,9.9711435,53.5960704,9.4775887,HH Landungsbrücken (S),Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+275,HH Landungsbrücken (S) to Bad Oldesloe (transit),10:00,53.5462334,9.9711435,53.8052678,10.3822381,HH Landungsbrücken (S),Bad Oldesloe,TRANSIT|WALK,transit
+276,HH Landungsbrücken (S) to Bad Oldesloe (flex),10:00,53.5462334,9.9711435,53.8052678,10.3822381,HH Landungsbrücken (S),Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+277,HH Landungsbrücken (S) to Henstedt-Ulzburg (transit),10:00,53.5462334,9.9711435,53.7952480,9.9822267,HH Landungsbrücken (S),Henstedt-Ulzburg,TRANSIT|WALK,transit
+278,HH Landungsbrücken (S) to Henstedt-Ulzburg (flex),10:00,53.5462334,9.9711435,53.7952480,9.9822267,HH Landungsbrücken (S),Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+279,HH Landungsbrücken (S) to Elmshorn (transit),10:00,53.5462334,9.9711435,53.7542251,9.6592636,HH Landungsbrücken (S),Elmshorn,TRANSIT|WALK,transit
+280,HH Landungsbrücken (S) to Elmshorn (flex),10:00,53.5462334,9.9711435,53.7542251,9.6592636,HH Landungsbrücken (S),Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+281,HH Landungsbrücken (S) to Pinneberg (transit),10:00,53.5462334,9.9711435,53.6550342,9.7976864,HH Landungsbrücken (S),Pinneberg,TRANSIT|WALK,transit
+282,HH Landungsbrücken (S) to Pinneberg (flex),10:00,53.5462334,9.9711435,53.6550342,9.7976864,HH Landungsbrücken (S),Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+283,HH Landungsbrücken (S) to Buchholz (transit),10:00,53.5462334,9.9711435,53.3243628,9.8749387,HH Landungsbrücken (S),Buchholz,TRANSIT|WALK,transit
+284,HH Landungsbrücken (S) to Buchholz (flex),10:00,53.5462334,9.9711435,53.3243628,9.8749387,HH Landungsbrücken (S),Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+285,HH Landungsbrücken (S) to HH Hbf (transit),10:00,53.5462334,9.9711435,53.5531993,10.0064364,HH Landungsbrücken (S),HH Hbf,TRANSIT|WALK,transit
+286,HH Landungsbrücken (S) to HH Hbf (flex),10:00,53.5462334,9.9711435,53.5531993,10.0064364,HH Landungsbrücken (S),HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+287,HH Landungsbrücken (S) to HH Flughafen (transit),10:00,53.5462334,9.9711435,53.6326466,10.0066778,HH Landungsbrücken (S),HH Flughafen,TRANSIT|WALK,transit
+288,HH Landungsbrücken (S) to HH Flughafen (flex),10:00,53.5462334,9.9711435,53.6326466,10.0066778,HH Landungsbrücken (S),HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+289,HH Landungsbrücken (S) to HH Harburg (transit),10:00,53.5462334,9.9711435,53.4557227,9.9917669,HH Landungsbrücken (S),HH Harburg,TRANSIT|WALK,transit
+290,HH Landungsbrücken (S) to HH Harburg (flex),10:00,53.5462334,9.9711435,53.4557227,9.9917669,HH Landungsbrücken (S),HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+291,HH Landungsbrücken (S) to HH Schlump (transit),10:00,53.5462334,9.9711435,53.5675879,9.9700757,HH Landungsbrücken (S),HH Schlump,TRANSIT|WALK,transit
+292,HH Landungsbrücken (S) to HH Schlump (flex),10:00,53.5462334,9.9711435,53.5675879,9.9700757,HH Landungsbrücken (S),HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+293,HH Landungsbrücken (S) to HH Kirschenallee (transit),10:00,53.5462334,9.9711435,53.6246134,10.0726482,HH Landungsbrücken (S),HH Kirschenallee,TRANSIT|WALK,transit
+294,HH Landungsbrücken (S) to HH Kirschenallee (flex),10:00,53.5462334,9.9711435,53.6246134,10.0726482,HH Landungsbrücken (S),HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+295,HH Landungsbrücken (S) to HH Wasserturm (transit),10:00,53.5462334,9.9711435,53.6196717,10.0500744,HH Landungsbrücken (S),HH Wasserturm,TRANSIT|WALK,transit
+296,HH Landungsbrücken (S) to HH Wasserturm (flex),10:00,53.5462334,9.9711435,53.6196717,10.0500744,HH Landungsbrücken (S),HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+297,HH Landungsbrücken (S) to HH Finkenwerder (transit),10:00,53.5462334,9.9711435,53.5364482,9.8789390,HH Landungsbrücken (S),HH Finkenwerder,TRANSIT|WALK,transit
+298,HH Landungsbrücken (S) to HH Finkenwerder (flex),10:00,53.5462334,9.9711435,53.5364482,9.8789390,HH Landungsbrücken (S),HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+299,HH Landungsbrücken (S) to HH Mümmelmannsberg (transit),10:00,53.5462334,9.9711435,53.5281075,10.1500277,HH Landungsbrücken (S),HH Mümmelmannsberg,TRANSIT|WALK,transit
+300,HH Landungsbrücken (S) to HH Mümmelmannsberg (flex),10:00,53.5462334,9.9711435,53.5281075,10.1500277,HH Landungsbrücken (S),HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+301,HH Harburg to Lüneburg (transit),10:00,53.4557227,9.9917669,53.2497728,10.4197721,HH Harburg,Lüneburg,TRANSIT|WALK,transit
+302,HH Harburg to Lüneburg (flex),10:00,53.4557227,9.9917669,53.2497728,10.4197721,HH Harburg,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+303,HH Harburg to Stade (transit),10:00,53.4557227,9.9917669,53.5960704,9.4775887,HH Harburg,Stade,TRANSIT|WALK,transit
+304,HH Harburg to Stade (flex),10:00,53.4557227,9.9917669,53.5960704,9.4775887,HH Harburg,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+305,HH Harburg to Bad Oldesloe (transit),10:00,53.4557227,9.9917669,53.8052678,10.3822381,HH Harburg,Bad Oldesloe,TRANSIT|WALK,transit
+306,HH Harburg to Bad Oldesloe (flex),10:00,53.4557227,9.9917669,53.8052678,10.3822381,HH Harburg,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+307,HH Harburg to Henstedt-Ulzburg (transit),10:00,53.4557227,9.9917669,53.7952480,9.9822267,HH Harburg,Henstedt-Ulzburg,TRANSIT|WALK,transit
+308,HH Harburg to Henstedt-Ulzburg (flex),10:00,53.4557227,9.9917669,53.7952480,9.9822267,HH Harburg,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+309,HH Harburg to Elmshorn (transit),10:00,53.4557227,9.9917669,53.7542251,9.6592636,HH Harburg,Elmshorn,TRANSIT|WALK,transit
+310,HH Harburg to Elmshorn (flex),10:00,53.4557227,9.9917669,53.7542251,9.6592636,HH Harburg,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+311,HH Harburg to Pinneberg (transit),10:00,53.4557227,9.9917669,53.6550342,9.7976864,HH Harburg,Pinneberg,TRANSIT|WALK,transit
+312,HH Harburg to Pinneberg (flex),10:00,53.4557227,9.9917669,53.6550342,9.7976864,HH Harburg,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+313,HH Harburg to Buchholz (transit),10:00,53.4557227,9.9917669,53.3243628,9.8749387,HH Harburg,Buchholz,TRANSIT|WALK,transit
+314,HH Harburg to Buchholz (flex),10:00,53.4557227,9.9917669,53.3243628,9.8749387,HH Harburg,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+315,HH Harburg to HH Hbf (transit),10:00,53.4557227,9.9917669,53.5531993,10.0064364,HH Harburg,HH Hbf,TRANSIT|WALK,transit
+316,HH Harburg to HH Hbf (flex),10:00,53.4557227,9.9917669,53.5531993,10.0064364,HH Harburg,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+317,HH Harburg to HH Flughafen (transit),10:00,53.4557227,9.9917669,53.6326466,10.0066778,HH Harburg,HH Flughafen,TRANSIT|WALK,transit
+318,HH Harburg to HH Flughafen (flex),10:00,53.4557227,9.9917669,53.6326466,10.0066778,HH Harburg,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+319,HH Harburg to HH Landungsbrücken (S) (transit),10:00,53.4557227,9.9917669,53.5462334,9.9711435,HH Harburg,HH Landungsbrücken (S),TRANSIT|WALK,transit
+320,HH Harburg to HH Landungsbrücken (S) (flex),10:00,53.4557227,9.9917669,53.5462334,9.9711435,HH Harburg,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+321,HH Harburg to HH Schlump (transit),10:00,53.4557227,9.9917669,53.5675879,9.9700757,HH Harburg,HH Schlump,TRANSIT|WALK,transit
+322,HH Harburg to HH Schlump (flex),10:00,53.4557227,9.9917669,53.5675879,9.9700757,HH Harburg,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+323,HH Harburg to HH Kirschenallee (transit),10:00,53.4557227,9.9917669,53.6246134,10.0726482,HH Harburg,HH Kirschenallee,TRANSIT|WALK,transit
+324,HH Harburg to HH Kirschenallee (flex),10:00,53.4557227,9.9917669,53.6246134,10.0726482,HH Harburg,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+325,HH Harburg to HH Wasserturm (transit),10:00,53.4557227,9.9917669,53.6196717,10.0500744,HH Harburg,HH Wasserturm,TRANSIT|WALK,transit
+326,HH Harburg to HH Wasserturm (flex),10:00,53.4557227,9.9917669,53.6196717,10.0500744,HH Harburg,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+327,HH Harburg to HH Finkenwerder (transit),10:00,53.4557227,9.9917669,53.5364482,9.8789390,HH Harburg,HH Finkenwerder,TRANSIT|WALK,transit
+328,HH Harburg to HH Finkenwerder (flex),10:00,53.4557227,9.9917669,53.5364482,9.8789390,HH Harburg,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+329,HH Harburg to HH Mümmelmannsberg (transit),10:00,53.4557227,9.9917669,53.5281075,10.1500277,HH Harburg,HH Mümmelmannsberg,TRANSIT|WALK,transit
+330,HH Harburg to HH Mümmelmannsberg (flex),10:00,53.4557227,9.9917669,53.5281075,10.1500277,HH Harburg,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+331,HH Schlump to Lüneburg (transit),10:00,53.5675879,9.9700757,53.2497728,10.4197721,HH Schlump,Lüneburg,TRANSIT|WALK,transit
+332,HH Schlump to Lüneburg (flex),10:00,53.5675879,9.9700757,53.2497728,10.4197721,HH Schlump,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+333,HH Schlump to Stade (transit),10:00,53.5675879,9.9700757,53.5960704,9.4775887,HH Schlump,Stade,TRANSIT|WALK,transit
+334,HH Schlump to Stade (flex),10:00,53.5675879,9.9700757,53.5960704,9.4775887,HH Schlump,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+335,HH Schlump to Bad Oldesloe (transit),10:00,53.5675879,9.9700757,53.8052678,10.3822381,HH Schlump,Bad Oldesloe,TRANSIT|WALK,transit
+336,HH Schlump to Bad Oldesloe (flex),10:00,53.5675879,9.9700757,53.8052678,10.3822381,HH Schlump,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+337,HH Schlump to Henstedt-Ulzburg (transit),10:00,53.5675879,9.9700757,53.7952480,9.9822267,HH Schlump,Henstedt-Ulzburg,TRANSIT|WALK,transit
+338,HH Schlump to Henstedt-Ulzburg (flex),10:00,53.5675879,9.9700757,53.7952480,9.9822267,HH Schlump,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+339,HH Schlump to Elmshorn (transit),10:00,53.5675879,9.9700757,53.7542251,9.6592636,HH Schlump,Elmshorn,TRANSIT|WALK,transit
+340,HH Schlump to Elmshorn (flex),10:00,53.5675879,9.9700757,53.7542251,9.6592636,HH Schlump,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+341,HH Schlump to Pinneberg (transit),10:00,53.5675879,9.9700757,53.6550342,9.7976864,HH Schlump,Pinneberg,TRANSIT|WALK,transit
+342,HH Schlump to Pinneberg (flex),10:00,53.5675879,9.9700757,53.6550342,9.7976864,HH Schlump,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+343,HH Schlump to Buchholz (transit),10:00,53.5675879,9.9700757,53.3243628,9.8749387,HH Schlump,Buchholz,TRANSIT|WALK,transit
+344,HH Schlump to Buchholz (flex),10:00,53.5675879,9.9700757,53.3243628,9.8749387,HH Schlump,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+345,HH Schlump to HH Hbf (transit),10:00,53.5675879,9.9700757,53.5531993,10.0064364,HH Schlump,HH Hbf,TRANSIT|WALK,transit
+346,HH Schlump to HH Hbf (flex),10:00,53.5675879,9.9700757,53.5531993,10.0064364,HH Schlump,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+347,HH Schlump to HH Flughafen (transit),10:00,53.5675879,9.9700757,53.6326466,10.0066778,HH Schlump,HH Flughafen,TRANSIT|WALK,transit
+348,HH Schlump to HH Flughafen (flex),10:00,53.5675879,9.9700757,53.6326466,10.0066778,HH Schlump,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+349,HH Schlump to HH Landungsbrücken (S) (transit),10:00,53.5675879,9.9700757,53.5462334,9.9711435,HH Schlump,HH Landungsbrücken (S),TRANSIT|WALK,transit
+350,HH Schlump to HH Landungsbrücken (S) (flex),10:00,53.5675879,9.9700757,53.5462334,9.9711435,HH Schlump,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+351,HH Schlump to HH Harburg (transit),10:00,53.5675879,9.9700757,53.4557227,9.9917669,HH Schlump,HH Harburg,TRANSIT|WALK,transit
+352,HH Schlump to HH Harburg (flex),10:00,53.5675879,9.9700757,53.4557227,9.9917669,HH Schlump,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+353,HH Schlump to HH Kirschenallee (transit),10:00,53.5675879,9.9700757,53.6246134,10.0726482,HH Schlump,HH Kirschenallee,TRANSIT|WALK,transit
+354,HH Schlump to HH Kirschenallee (flex),10:00,53.5675879,9.9700757,53.6246134,10.0726482,HH Schlump,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+355,HH Schlump to HH Wasserturm (transit),10:00,53.5675879,9.9700757,53.6196717,10.0500744,HH Schlump,HH Wasserturm,TRANSIT|WALK,transit
+356,HH Schlump to HH Wasserturm (flex),10:00,53.5675879,9.9700757,53.6196717,10.0500744,HH Schlump,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+357,HH Schlump to HH Finkenwerder (transit),10:00,53.5675879,9.9700757,53.5364482,9.8789390,HH Schlump,HH Finkenwerder,TRANSIT|WALK,transit
+358,HH Schlump to HH Finkenwerder (flex),10:00,53.5675879,9.9700757,53.5364482,9.8789390,HH Schlump,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+359,HH Schlump to HH Mümmelmannsberg (transit),10:00,53.5675879,9.9700757,53.5281075,10.1500277,HH Schlump,HH Mümmelmannsberg,TRANSIT|WALK,transit
+360,HH Schlump to HH Mümmelmannsberg (flex),10:00,53.5675879,9.9700757,53.5281075,10.1500277,HH Schlump,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+361,HH Kirschenallee to Lüneburg (transit),10:00,53.6246134,10.0726482,53.2497728,10.4197721,HH Kirschenallee,Lüneburg,TRANSIT|WALK,transit
+362,HH Kirschenallee to Lüneburg (flex),10:00,53.6246134,10.0726482,53.2497728,10.4197721,HH Kirschenallee,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+363,HH Kirschenallee to Stade (transit),10:00,53.6246134,10.0726482,53.5960704,9.4775887,HH Kirschenallee,Stade,TRANSIT|WALK,transit
+364,HH Kirschenallee to Stade (flex),10:00,53.6246134,10.0726482,53.5960704,9.4775887,HH Kirschenallee,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+365,HH Kirschenallee to Bad Oldesloe (transit),10:00,53.6246134,10.0726482,53.8052678,10.3822381,HH Kirschenallee,Bad Oldesloe,TRANSIT|WALK,transit
+366,HH Kirschenallee to Bad Oldesloe (flex),10:00,53.6246134,10.0726482,53.8052678,10.3822381,HH Kirschenallee,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+367,HH Kirschenallee to Henstedt-Ulzburg (transit),10:00,53.6246134,10.0726482,53.7952480,9.9822267,HH Kirschenallee,Henstedt-Ulzburg,TRANSIT|WALK,transit
+368,HH Kirschenallee to Henstedt-Ulzburg (flex),10:00,53.6246134,10.0726482,53.7952480,9.9822267,HH Kirschenallee,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+369,HH Kirschenallee to Elmshorn (transit),10:00,53.6246134,10.0726482,53.7542251,9.6592636,HH Kirschenallee,Elmshorn,TRANSIT|WALK,transit
+370,HH Kirschenallee to Elmshorn (flex),10:00,53.6246134,10.0726482,53.7542251,9.6592636,HH Kirschenallee,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+371,HH Kirschenallee to Pinneberg (transit),10:00,53.6246134,10.0726482,53.6550342,9.7976864,HH Kirschenallee,Pinneberg,TRANSIT|WALK,transit
+372,HH Kirschenallee to Pinneberg (flex),10:00,53.6246134,10.0726482,53.6550342,9.7976864,HH Kirschenallee,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+373,HH Kirschenallee to Buchholz (transit),10:00,53.6246134,10.0726482,53.3243628,9.8749387,HH Kirschenallee,Buchholz,TRANSIT|WALK,transit
+374,HH Kirschenallee to Buchholz (flex),10:00,53.6246134,10.0726482,53.3243628,9.8749387,HH Kirschenallee,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+375,HH Kirschenallee to HH Hbf (transit),10:00,53.6246134,10.0726482,53.5531993,10.0064364,HH Kirschenallee,HH Hbf,TRANSIT|WALK,transit
+376,HH Kirschenallee to HH Hbf (flex),10:00,53.6246134,10.0726482,53.5531993,10.0064364,HH Kirschenallee,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+377,HH Kirschenallee to HH Flughafen (transit),10:00,53.6246134,10.0726482,53.6326466,10.0066778,HH Kirschenallee,HH Flughafen,TRANSIT|WALK,transit
+378,HH Kirschenallee to HH Flughafen (flex),10:00,53.6246134,10.0726482,53.6326466,10.0066778,HH Kirschenallee,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+379,HH Kirschenallee to HH Landungsbrücken (S) (transit),10:00,53.6246134,10.0726482,53.5462334,9.9711435,HH Kirschenallee,HH Landungsbrücken (S),TRANSIT|WALK,transit
+380,HH Kirschenallee to HH Landungsbrücken (S) (flex),10:00,53.6246134,10.0726482,53.5462334,9.9711435,HH Kirschenallee,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+381,HH Kirschenallee to HH Harburg (transit),10:00,53.6246134,10.0726482,53.4557227,9.9917669,HH Kirschenallee,HH Harburg,TRANSIT|WALK,transit
+382,HH Kirschenallee to HH Harburg (flex),10:00,53.6246134,10.0726482,53.4557227,9.9917669,HH Kirschenallee,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+383,HH Kirschenallee to HH Schlump (transit),10:00,53.6246134,10.0726482,53.5675879,9.9700757,HH Kirschenallee,HH Schlump,TRANSIT|WALK,transit
+384,HH Kirschenallee to HH Schlump (flex),10:00,53.6246134,10.0726482,53.5675879,9.9700757,HH Kirschenallee,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+385,HH Kirschenallee to HH Wasserturm (transit),10:00,53.6246134,10.0726482,53.6196717,10.0500744,HH Kirschenallee,HH Wasserturm,TRANSIT|WALK,transit
+386,HH Kirschenallee to HH Wasserturm (flex),10:00,53.6246134,10.0726482,53.6196717,10.0500744,HH Kirschenallee,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+387,HH Kirschenallee to HH Finkenwerder (transit),10:00,53.6246134,10.0726482,53.5364482,9.8789390,HH Kirschenallee,HH Finkenwerder,TRANSIT|WALK,transit
+388,HH Kirschenallee to HH Finkenwerder (flex),10:00,53.6246134,10.0726482,53.5364482,9.8789390,HH Kirschenallee,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+389,HH Kirschenallee to HH Mümmelmannsberg (transit),10:00,53.6246134,10.0726482,53.5281075,10.1500277,HH Kirschenallee,HH Mümmelmannsberg,TRANSIT|WALK,transit
+390,HH Kirschenallee to HH Mümmelmannsberg (flex),10:00,53.6246134,10.0726482,53.5281075,10.1500277,HH Kirschenallee,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+391,HH Wasserturm to Lüneburg (transit),10:00,53.6196717,10.0500744,53.2497728,10.4197721,HH Wasserturm,Lüneburg,TRANSIT|WALK,transit
+392,HH Wasserturm to Lüneburg (flex),10:00,53.6196717,10.0500744,53.2497728,10.4197721,HH Wasserturm,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+393,HH Wasserturm to Stade (transit),10:00,53.6196717,10.0500744,53.5960704,9.4775887,HH Wasserturm,Stade,TRANSIT|WALK,transit
+394,HH Wasserturm to Stade (flex),10:00,53.6196717,10.0500744,53.5960704,9.4775887,HH Wasserturm,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+395,HH Wasserturm to Bad Oldesloe (transit),10:00,53.6196717,10.0500744,53.8052678,10.3822381,HH Wasserturm,Bad Oldesloe,TRANSIT|WALK,transit
+396,HH Wasserturm to Bad Oldesloe (flex),10:00,53.6196717,10.0500744,53.8052678,10.3822381,HH Wasserturm,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+397,HH Wasserturm to Henstedt-Ulzburg (transit),10:00,53.6196717,10.0500744,53.7952480,9.9822267,HH Wasserturm,Henstedt-Ulzburg,TRANSIT|WALK,transit
+398,HH Wasserturm to Henstedt-Ulzburg (flex),10:00,53.6196717,10.0500744,53.7952480,9.9822267,HH Wasserturm,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+399,HH Wasserturm to Elmshorn (transit),10:00,53.6196717,10.0500744,53.7542251,9.6592636,HH Wasserturm,Elmshorn,TRANSIT|WALK,transit
+400,HH Wasserturm to Elmshorn (flex),10:00,53.6196717,10.0500744,53.7542251,9.6592636,HH Wasserturm,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+401,HH Wasserturm to Pinneberg (transit),10:00,53.6196717,10.0500744,53.6550342,9.7976864,HH Wasserturm,Pinneberg,TRANSIT|WALK,transit
+402,HH Wasserturm to Pinneberg (flex),10:00,53.6196717,10.0500744,53.6550342,9.7976864,HH Wasserturm,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+403,HH Wasserturm to Buchholz (transit),10:00,53.6196717,10.0500744,53.3243628,9.8749387,HH Wasserturm,Buchholz,TRANSIT|WALK,transit
+404,HH Wasserturm to Buchholz (flex),10:00,53.6196717,10.0500744,53.3243628,9.8749387,HH Wasserturm,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+405,HH Wasserturm to HH Hbf (transit),10:00,53.6196717,10.0500744,53.5531993,10.0064364,HH Wasserturm,HH Hbf,TRANSIT|WALK,transit
+406,HH Wasserturm to HH Hbf (flex),10:00,53.6196717,10.0500744,53.5531993,10.0064364,HH Wasserturm,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+407,HH Wasserturm to HH Flughafen (transit),10:00,53.6196717,10.0500744,53.6326466,10.0066778,HH Wasserturm,HH Flughafen,TRANSIT|WALK,transit
+408,HH Wasserturm to HH Flughafen (flex),10:00,53.6196717,10.0500744,53.6326466,10.0066778,HH Wasserturm,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+409,HH Wasserturm to HH Landungsbrücken (S) (transit),10:00,53.6196717,10.0500744,53.5462334,9.9711435,HH Wasserturm,HH Landungsbrücken (S),TRANSIT|WALK,transit
+410,HH Wasserturm to HH Landungsbrücken (S) (flex),10:00,53.6196717,10.0500744,53.5462334,9.9711435,HH Wasserturm,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+411,HH Wasserturm to HH Harburg (transit),10:00,53.6196717,10.0500744,53.4557227,9.9917669,HH Wasserturm,HH Harburg,TRANSIT|WALK,transit
+412,HH Wasserturm to HH Harburg (flex),10:00,53.6196717,10.0500744,53.4557227,9.9917669,HH Wasserturm,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+413,HH Wasserturm to HH Schlump (transit),10:00,53.6196717,10.0500744,53.5675879,9.9700757,HH Wasserturm,HH Schlump,TRANSIT|WALK,transit
+414,HH Wasserturm to HH Schlump (flex),10:00,53.6196717,10.0500744,53.5675879,9.9700757,HH Wasserturm,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+415,HH Wasserturm to HH Kirschenallee (transit),10:00,53.6196717,10.0500744,53.6246134,10.0726482,HH Wasserturm,HH Kirschenallee,TRANSIT|WALK,transit
+416,HH Wasserturm to HH Kirschenallee (flex),10:00,53.6196717,10.0500744,53.6246134,10.0726482,HH Wasserturm,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+417,HH Wasserturm to HH Finkenwerder (transit),10:00,53.6196717,10.0500744,53.5364482,9.8789390,HH Wasserturm,HH Finkenwerder,TRANSIT|WALK,transit
+418,HH Wasserturm to HH Finkenwerder (flex),10:00,53.6196717,10.0500744,53.5364482,9.8789390,HH Wasserturm,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+419,HH Wasserturm to HH Mümmelmannsberg (transit),10:00,53.6196717,10.0500744,53.5281075,10.1500277,HH Wasserturm,HH Mümmelmannsberg,TRANSIT|WALK,transit
+420,HH Wasserturm to HH Mümmelmannsberg (flex),10:00,53.6196717,10.0500744,53.5281075,10.1500277,HH Wasserturm,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+421,HH Finkenwerder to Lüneburg (transit),10:00,53.5364482,9.8789390,53.2497728,10.4197721,HH Finkenwerder,Lüneburg,TRANSIT|WALK,transit
+422,HH Finkenwerder to Lüneburg (flex),10:00,53.5364482,9.8789390,53.2497728,10.4197721,HH Finkenwerder,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+423,HH Finkenwerder to Stade (transit),10:00,53.5364482,9.8789390,53.5960704,9.4775887,HH Finkenwerder,Stade,TRANSIT|WALK,transit
+424,HH Finkenwerder to Stade (flex),10:00,53.5364482,9.8789390,53.5960704,9.4775887,HH Finkenwerder,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+425,HH Finkenwerder to Bad Oldesloe (transit),10:00,53.5364482,9.8789390,53.8052678,10.3822381,HH Finkenwerder,Bad Oldesloe,TRANSIT|WALK,transit
+426,HH Finkenwerder to Bad Oldesloe (flex),10:00,53.5364482,9.8789390,53.8052678,10.3822381,HH Finkenwerder,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+427,HH Finkenwerder to Henstedt-Ulzburg (transit),10:00,53.5364482,9.8789390,53.7952480,9.9822267,HH Finkenwerder,Henstedt-Ulzburg,TRANSIT|WALK,transit
+428,HH Finkenwerder to Henstedt-Ulzburg (flex),10:00,53.5364482,9.8789390,53.7952480,9.9822267,HH Finkenwerder,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+429,HH Finkenwerder to Elmshorn (transit),10:00,53.5364482,9.8789390,53.7542251,9.6592636,HH Finkenwerder,Elmshorn,TRANSIT|WALK,transit
+430,HH Finkenwerder to Elmshorn (flex),10:00,53.5364482,9.8789390,53.7542251,9.6592636,HH Finkenwerder,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+431,HH Finkenwerder to Pinneberg (transit),10:00,53.5364482,9.8789390,53.6550342,9.7976864,HH Finkenwerder,Pinneberg,TRANSIT|WALK,transit
+432,HH Finkenwerder to Pinneberg (flex),10:00,53.5364482,9.8789390,53.6550342,9.7976864,HH Finkenwerder,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+433,HH Finkenwerder to Buchholz (transit),10:00,53.5364482,9.8789390,53.3243628,9.8749387,HH Finkenwerder,Buchholz,TRANSIT|WALK,transit
+434,HH Finkenwerder to Buchholz (flex),10:00,53.5364482,9.8789390,53.3243628,9.8749387,HH Finkenwerder,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+435,HH Finkenwerder to HH Hbf (transit),10:00,53.5364482,9.8789390,53.5531993,10.0064364,HH Finkenwerder,HH Hbf,TRANSIT|WALK,transit
+436,HH Finkenwerder to HH Hbf (flex),10:00,53.5364482,9.8789390,53.5531993,10.0064364,HH Finkenwerder,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+437,HH Finkenwerder to HH Flughafen (transit),10:00,53.5364482,9.8789390,53.6326466,10.0066778,HH Finkenwerder,HH Flughafen,TRANSIT|WALK,transit
+438,HH Finkenwerder to HH Flughafen (flex),10:00,53.5364482,9.8789390,53.6326466,10.0066778,HH Finkenwerder,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+439,HH Finkenwerder to HH Landungsbrücken (S) (transit),10:00,53.5364482,9.8789390,53.5462334,9.9711435,HH Finkenwerder,HH Landungsbrücken (S),TRANSIT|WALK,transit
+440,HH Finkenwerder to HH Landungsbrücken (S) (flex),10:00,53.5364482,9.8789390,53.5462334,9.9711435,HH Finkenwerder,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+441,HH Finkenwerder to HH Harburg (transit),10:00,53.5364482,9.8789390,53.4557227,9.9917669,HH Finkenwerder,HH Harburg,TRANSIT|WALK,transit
+442,HH Finkenwerder to HH Harburg (flex),10:00,53.5364482,9.8789390,53.4557227,9.9917669,HH Finkenwerder,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+443,HH Finkenwerder to HH Schlump (transit),10:00,53.5364482,9.8789390,53.5675879,9.9700757,HH Finkenwerder,HH Schlump,TRANSIT|WALK,transit
+444,HH Finkenwerder to HH Schlump (flex),10:00,53.5364482,9.8789390,53.5675879,9.9700757,HH Finkenwerder,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+445,HH Finkenwerder to HH Kirschenallee (transit),10:00,53.5364482,9.8789390,53.6246134,10.0726482,HH Finkenwerder,HH Kirschenallee,TRANSIT|WALK,transit
+446,HH Finkenwerder to HH Kirschenallee (flex),10:00,53.5364482,9.8789390,53.6246134,10.0726482,HH Finkenwerder,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+447,HH Finkenwerder to HH Wasserturm (transit),10:00,53.5364482,9.8789390,53.6196717,10.0500744,HH Finkenwerder,HH Wasserturm,TRANSIT|WALK,transit
+448,HH Finkenwerder to HH Wasserturm (flex),10:00,53.5364482,9.8789390,53.6196717,10.0500744,HH Finkenwerder,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+449,HH Finkenwerder to HH Mümmelmannsberg (transit),10:00,53.5364482,9.8789390,53.5281075,10.1500277,HH Finkenwerder,HH Mümmelmannsberg,TRANSIT|WALK,transit
+450,HH Finkenwerder to HH Mümmelmannsberg (flex),10:00,53.5364482,9.8789390,53.5281075,10.1500277,HH Finkenwerder,HH Mümmelmannsberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+451,HH Mümmelmannsberg to Lüneburg (transit),10:00,53.5281075,10.1500277,53.2497728,10.4197721,HH Mümmelmannsberg,Lüneburg,TRANSIT|WALK,transit
+452,HH Mümmelmannsberg to Lüneburg (flex),10:00,53.5281075,10.1500277,53.2497728,10.4197721,HH Mümmelmannsberg,Lüneburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+453,HH Mümmelmannsberg to Stade (transit),10:00,53.5281075,10.1500277,53.5960704,9.4775887,HH Mümmelmannsberg,Stade,TRANSIT|WALK,transit
+454,HH Mümmelmannsberg to Stade (flex),10:00,53.5281075,10.1500277,53.5960704,9.4775887,HH Mümmelmannsberg,Stade,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+455,HH Mümmelmannsberg to Bad Oldesloe (transit),10:00,53.5281075,10.1500277,53.8052678,10.3822381,HH Mümmelmannsberg,Bad Oldesloe,TRANSIT|WALK,transit
+456,HH Mümmelmannsberg to Bad Oldesloe (flex),10:00,53.5281075,10.1500277,53.8052678,10.3822381,HH Mümmelmannsberg,Bad Oldesloe,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+457,HH Mümmelmannsberg to Henstedt-Ulzburg (transit),10:00,53.5281075,10.1500277,53.7952480,9.9822267,HH Mümmelmannsberg,Henstedt-Ulzburg,TRANSIT|WALK,transit
+458,HH Mümmelmannsberg to Henstedt-Ulzburg (flex),10:00,53.5281075,10.1500277,53.7952480,9.9822267,HH Mümmelmannsberg,Henstedt-Ulzburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+459,HH Mümmelmannsberg to Elmshorn (transit),10:00,53.5281075,10.1500277,53.7542251,9.6592636,HH Mümmelmannsberg,Elmshorn,TRANSIT|WALK,transit
+460,HH Mümmelmannsberg to Elmshorn (flex),10:00,53.5281075,10.1500277,53.7542251,9.6592636,HH Mümmelmannsberg,Elmshorn,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+461,HH Mümmelmannsberg to Pinneberg (transit),10:00,53.5281075,10.1500277,53.6550342,9.7976864,HH Mümmelmannsberg,Pinneberg,TRANSIT|WALK,transit
+462,HH Mümmelmannsberg to Pinneberg (flex),10:00,53.5281075,10.1500277,53.6550342,9.7976864,HH Mümmelmannsberg,Pinneberg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+463,HH Mümmelmannsberg to Buchholz (transit),10:00,53.5281075,10.1500277,53.3243628,9.8749387,HH Mümmelmannsberg,Buchholz,TRANSIT|WALK,transit
+464,HH Mümmelmannsberg to Buchholz (flex),10:00,53.5281075,10.1500277,53.3243628,9.8749387,HH Mümmelmannsberg,Buchholz,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+465,HH Mümmelmannsberg to HH Hbf (transit),10:00,53.5281075,10.1500277,53.5531993,10.0064364,HH Mümmelmannsberg,HH Hbf,TRANSIT|WALK,transit
+466,HH Mümmelmannsberg to HH Hbf (flex),10:00,53.5281075,10.1500277,53.5531993,10.0064364,HH Mümmelmannsberg,HH Hbf,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+467,HH Mümmelmannsberg to HH Flughafen (transit),10:00,53.5281075,10.1500277,53.6326466,10.0066778,HH Mümmelmannsberg,HH Flughafen,TRANSIT|WALK,transit
+468,HH Mümmelmannsberg to HH Flughafen (flex),10:00,53.5281075,10.1500277,53.6326466,10.0066778,HH Mümmelmannsberg,HH Flughafen,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+469,HH Mümmelmannsberg to HH Landungsbrücken (S) (transit),10:00,53.5281075,10.1500277,53.5462334,9.9711435,HH Mümmelmannsberg,HH Landungsbrücken (S),TRANSIT|WALK,transit
+470,HH Mümmelmannsberg to HH Landungsbrücken (S) (flex),10:00,53.5281075,10.1500277,53.5462334,9.9711435,HH Mümmelmannsberg,HH Landungsbrücken (S),FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+471,HH Mümmelmannsberg to HH Harburg (transit),10:00,53.5281075,10.1500277,53.4557227,9.9917669,HH Mümmelmannsberg,HH Harburg,TRANSIT|WALK,transit
+472,HH Mümmelmannsberg to HH Harburg (flex),10:00,53.5281075,10.1500277,53.4557227,9.9917669,HH Mümmelmannsberg,HH Harburg,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+473,HH Mümmelmannsberg to HH Schlump (transit),10:00,53.5281075,10.1500277,53.5675879,9.9700757,HH Mümmelmannsberg,HH Schlump,TRANSIT|WALK,transit
+474,HH Mümmelmannsberg to HH Schlump (flex),10:00,53.5281075,10.1500277,53.5675879,9.9700757,HH Mümmelmannsberg,HH Schlump,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+475,HH Mümmelmannsberg to HH Kirschenallee (transit),10:00,53.5281075,10.1500277,53.6246134,10.0726482,HH Mümmelmannsberg,HH Kirschenallee,TRANSIT|WALK,transit
+476,HH Mümmelmannsberg to HH Kirschenallee (flex),10:00,53.5281075,10.1500277,53.6246134,10.0726482,HH Mümmelmannsberg,HH Kirschenallee,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+477,HH Mümmelmannsberg to HH Wasserturm (transit),10:00,53.5281075,10.1500277,53.6196717,10.0500744,HH Mümmelmannsberg,HH Wasserturm,TRANSIT|WALK,transit
+478,HH Mümmelmannsberg to HH Wasserturm (flex),10:00,53.5281075,10.1500277,53.6196717,10.0500744,HH Mümmelmannsberg,HH Wasserturm,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
+479,HH Mümmelmannsberg to HH Finkenwerder (transit),10:00,53.5281075,10.1500277,53.5364482,9.8789390,HH Mümmelmannsberg,HH Finkenwerder,TRANSIT|WALK,transit
+480,HH Mümmelmannsberg to HH Finkenwerder (flex),10:00,53.5281075,10.1500277,53.5364482,9.8789390,HH Mümmelmannsberg,HH Finkenwerder,FLEX_ACCESS|FLEX_EGRESS|TRANSIT,flex
