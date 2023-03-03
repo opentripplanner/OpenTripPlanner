@@ -82,6 +82,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Ignore UnrestrictedPublicTransportAreas that do not contain regular stops [#4919](https://github.com/opentripplanner/OpenTripPlanner/pull/4919)
 - GBFS geofencing zones - part 2: backwards search [#4805](https://github.com/opentripplanner/OpenTripPlanner/pull/4805)
 - Return 404 when a requested vector tile layer cannot be found [#4924](https://github.com/opentripplanner/OpenTripPlanner/pull/4924)
+- Use UnscheduledTrip for flex trips with one scheduled and one unscheduled stop. [#4905](https://github.com/opentripplanner/OpenTripPlanner/pull/4905)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
