@@ -13,6 +13,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
@@ -54,61 +55,58 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
 
     FlexTripEdge flexEdge = getFlexEdge(flexToVertex, egress.stop);
 
-    State[] state = flexEdge.traverse(accessEgress.state);
+    final State[] afterFlexState = flexEdge.traverse(accessEgress.state);
 
-    for (Edge e : egressEdges) {
-      var states = e.traverse(state[0]);
-      if (State.isEmpty(states)) {
-        state = null;
-      } else {
-        state = states;
-      }
-    }
+    var finalStateOpt = Transfer.miniAstar(afterFlexState[0], egressEdges);
 
-    int[] flexTimes = getFlexTimes(flexEdge, state[0]);
+    return finalStateOpt
+      .map(finalState -> {
+        int[] flexTimes = getFlexTimes(flexEdge, finalState);
 
-    int preFlexTime = flexTimes[0];
-    int flexTime = flexTimes[1];
-    int postFlexTime = flexTimes[2];
+        int preFlexTime = flexTimes[0];
+        int flexTime = flexTimes[1];
+        int postFlexTime = flexTimes[2];
 
-    int timeShift;
+        int timeShift;
 
-    if (arriveBy) {
-      int lastStopArrivalTime = departureTime - postFlexTime - secondsFromStartOfTime;
-      int latestArrivalTime = trip.latestArrivalTime(
-        lastStopArrivalTime,
-        fromStopIndex,
-        toStopIndex,
-        flexTime
-      );
+        if (arriveBy) {
+          int lastStopArrivalTime = departureTime - postFlexTime - secondsFromStartOfTime;
+          int latestArrivalTime = trip.latestArrivalTime(
+            lastStopArrivalTime,
+            fromStopIndex,
+            toStopIndex,
+            flexTime
+          );
 
-      if (latestArrivalTime == MISSING_VALUE) {
-        return null;
-      }
+          if (latestArrivalTime == MISSING_VALUE) {
+            return null;
+          }
 
-      // Shift from departing at departureTime to arriving at departureTime
-      timeShift = secondsFromStartOfTime + latestArrivalTime - flexTime - preFlexTime;
-    } else {
-      int firstStopDepartureTime = departureTime + preFlexTime - secondsFromStartOfTime;
-      int earliestDepartureTime = trip.earliestDepartureTime(
-        firstStopDepartureTime,
-        fromStopIndex,
-        toStopIndex,
-        flexTime
-      );
+          // Shift from departing at departureTime to arriving at departureTime
+          timeShift = secondsFromStartOfTime + latestArrivalTime - flexTime - preFlexTime;
+        } else {
+          int firstStopDepartureTime = departureTime + preFlexTime - secondsFromStartOfTime;
+          int earliestDepartureTime = trip.earliestDepartureTime(
+            firstStopDepartureTime,
+            fromStopIndex,
+            toStopIndex,
+            flexTime
+          );
 
-      if (earliestDepartureTime == MISSING_VALUE) {
-        return null;
-      }
+          if (earliestDepartureTime == MISSING_VALUE) {
+            return null;
+          }
 
-      timeShift = secondsFromStartOfTime + earliestDepartureTime - preFlexTime;
-    }
+          timeShift = secondsFromStartOfTime + earliestDepartureTime - preFlexTime;
+        }
 
-    ZonedDateTime startTime = startOfTime.plusSeconds(timeShift);
+        ZonedDateTime startTime = startOfTime.plusSeconds(timeShift);
 
-    return graphPathToItineraryMapper
-      .generateItinerary(new GraphPath<>(state[0]))
-      .withTimeShiftToStartAt(startTime);
+        return graphPathToItineraryMapper
+          .generateItinerary(new GraphPath<>(finalState))
+          .withTimeShiftToStartAt(startTime);
+      })
+      .orElse(null);
   }
 
   protected List<Edge> getTransferEdges(PathTransfer transfer) {

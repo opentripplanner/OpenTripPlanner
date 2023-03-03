@@ -24,8 +24,6 @@ import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
-import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
-import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -340,6 +338,14 @@ public class PruneIslands implements GraphBuilderModule {
           continue;
         }
         State[] states = e.traverse(s0);
+        if (states.length > 1) {
+          throw new IllegalStateException(
+            "Expected single state returned from edge %s but received %s".formatted(
+                e,
+                states.length
+              )
+          );
+        }
         if (State.isEmpty(states)) {
           continue;
         }

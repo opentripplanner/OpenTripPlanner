@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
@@ -75,16 +76,9 @@ public class Transfer {
     StateEditor se = new StateEditor(edges.get(0).getFromVertex(), request);
     se.setTimeSeconds(0);
 
-    State s = se.makeState();
-    for (Edge e : edges) {
-      var states = e.traverse(s);
-      if (State.isEmpty(states)) {
-        return Optional.empty();
-      }
-      s = states[0];
-    }
+    var state = miniAstar(se.makeState(), edges);
 
-    return Optional.of(
+    return state.map(s ->
       new DefaultRaptorTransfer(
         this.toStop,
         (int) s.getElapsedTimeSeconds(),
@@ -92,5 +86,26 @@ public class Transfer {
         this
       )
     );
+  }
+
+  public static Optional<State> miniAstar(final State s, Collection<Edge> edges) {
+    var state = s;
+    for (Edge e : edges) {
+      var afterTraversal = e.traverse(state);
+      if (afterTraversal.length > 1) {
+        throw new IllegalStateException(
+          "Expected only a single state returned from edge %s but received %s".formatted(
+              e,
+              afterTraversal.length
+            )
+        );
+      }
+      if (State.isEmpty(afterTraversal)) {
+        return Optional.empty();
+      } else {
+        state = afterTraversal[0];
+      }
+    }
+    return Optional.ofNullable(state);
   }
 }

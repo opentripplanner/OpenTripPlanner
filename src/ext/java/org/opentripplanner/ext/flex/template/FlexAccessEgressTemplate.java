@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
@@ -13,6 +14,7 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PathTransfer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
@@ -156,6 +158,7 @@ public abstract class FlexAccessEgressTemplate {
    */
   protected abstract FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
 
+  @Nullable
   protected FlexAccessEgress getFlexAccessEgress(
     List<Edge> transferEdges,
     Vertex flexVertex,
@@ -166,33 +169,30 @@ public abstract class FlexAccessEgressTemplate {
     // this code is a little repetitive but needed as a performance improvement. previously
     // the flex path was checked before this method was called. this meant that every path
     // was traversed twice leading to a noticeable slowdown.
-    var state = flexEdge.traverse(accessEgress.state);
-    if (State.isEmpty(state)) {
+    final var afterFlexState = flexEdge.traverse(accessEgress.state);
+    if (State.isEmpty(afterFlexState)) {
       return null;
     }
 
-    for (Edge e : transferEdges) {
-      var states = e.traverse(state[0]);
-      if (State.isEmpty(states)) {
-        return null;
-      } else {
-        state = states;
-      }
-    }
+    final var finalStateOpt = Transfer.miniAstar(afterFlexState[0], transferEdges);
 
-    int[] times = getFlexTimes(flexEdge, state[0]);
+    return finalStateOpt
+      .map(finalState -> {
+        int[] times = getFlexTimes(flexEdge, finalState);
 
-    return new FlexAccessEgress(
-      stop,
-      times[0],
-      times[1],
-      times[2],
-      fromStopIndex,
-      toStopIndex,
-      secondsFromStartOfTime,
-      trip,
-      state[0],
-      transferEdges.isEmpty()
-    );
+        return new FlexAccessEgress(
+          stop,
+          times[0],
+          times[1],
+          times[2],
+          fromStopIndex,
+          toStopIndex,
+          secondsFromStartOfTime,
+          trip,
+          finalState,
+          transferEdges.isEmpty()
+        );
+      })
+      .orElse(null);
   }
 }
