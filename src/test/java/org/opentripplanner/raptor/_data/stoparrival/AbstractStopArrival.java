@@ -3,7 +3,7 @@ package org.opentripplanner.raptor._data.stoparrival;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 
-public abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
+public abstract class AbstractStopArrival extends ArrivalView<TestTripSchedule> {
 
   private final int round;
   private final int stop;
@@ -16,8 +16,10 @@ public abstract class AbstractStopArrival implements ArrivalView<TestTripSchedul
     int stop,
     int arrivalTime,
     int extraCost,
-    ArrivalView<TestTripSchedule> previous
+    ArrivalView<TestTripSchedule> previous,
+    boolean arrivalReachedOnBoard
   ) {
+    super(arrivalReachedOnBoard);
     this.round = round;
     this.stop = stop;
     this.arrivalTime = arrivalTime;

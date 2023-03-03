@@ -18,7 +18,7 @@ public class Walk extends AbstractStopArrival {
     int extraCost,
     ArrivalView<TestTripSchedule> previous
   ) {
-    super(round, stop, arrivalTime, extraCost, previous);
+    super(round, stop, arrivalTime, extraCost, previous, false);
     // In a reverse search we the arrival is before the departure
     int durationInSeconds = Math.abs(arrivalTime - departureTime);
     this.transfer = TestTransfer.transfer(stop, durationInSeconds, extraCost);
@@ -30,7 +30,7 @@ public class Walk extends AbstractStopArrival {
     RaptorTransfer transfer,
     ArrivalView<TestTripSchedule> previous
   ) {
-    super(round, transfer.stop(), arrivalTime, transfer.generalizedCost(), previous);
+    super(round, transfer.stop(), arrivalTime, transfer.generalizedCost(), previous, false);
     this.transfer = transfer;
   }
 
@@ -42,10 +42,5 @@ public class Walk extends AbstractStopArrival {
   @Override
   public TransferPathView transferPath() {
     return () -> transfer;
-  }
-
-  @Override
-  public boolean arrivedOnBoard() {
-    return false;
   }
 }

@@ -14,7 +14,7 @@ final class Transfer<T extends RaptorTripSchedule>
   private final StopsCursor<T> cursor;
 
   Transfer(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
-    super(round, stop);
+    super(round, stop, false);
     this.arrival = arrival;
     this.cursor = cursor;
   }
@@ -47,10 +47,5 @@ final class Transfer<T extends RaptorTripSchedule>
   @Override
   public int durationInSeconds() {
     return arrival.transferPath().durationInSeconds();
-  }
-
-  @Override
-  public boolean arrivedOnBoard() {
-    return false;
   }
 }

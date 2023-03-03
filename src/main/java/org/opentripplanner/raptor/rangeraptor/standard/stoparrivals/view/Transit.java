@@ -13,7 +13,7 @@ final class Transit<T extends RaptorTripSchedule>
   private final StopsCursor<T> cursor;
 
   Transit(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
-    super(round, stop);
+    super(round, stop, true);
     this.arrival = arrival;
     this.cursor = cursor;
   }
@@ -50,10 +50,5 @@ final class Transit<T extends RaptorTripSchedule>
 
   public int boardTime() {
     return arrival.boardTime();
-  }
-
-  @Override
-  public boolean arrivedOnBoard() {
-    return true;
   }
 }

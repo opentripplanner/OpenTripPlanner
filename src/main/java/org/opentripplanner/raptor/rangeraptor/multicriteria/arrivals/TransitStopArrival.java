@@ -25,7 +25,8 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
       previousState.arrivedByTransit() ? 2 : 1,
       stopIndex,
       arrivalTime,
-      totalCost
+      totalCost,
+      true
     );
     this.trip = trip;
   }
@@ -53,10 +54,5 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
   @Override
   public TransitPathView<T> transitPath() {
     return this;
-  }
-
-  @Override
-  public boolean arrivedOnBoard() {
-    return true;
   }
 }

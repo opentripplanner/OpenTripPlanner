@@ -17,7 +17,7 @@ public class Access extends AbstractStopArrival {
   }
 
   public Access(int stop, int arrivalTime, RaptorAccessEgress path) {
-    super(0, stop, arrivalTime, path.generalizedCost(), null);
+    super(0, stop, arrivalTime, path.generalizedCost(), null, path.stopReachedOnBoard());
     this.access = path;
   }
 
@@ -29,10 +29,5 @@ public class Access extends AbstractStopArrival {
   @Override
   public AccessPathView accessPath() {
     return () -> access;
-  }
-
-  @Override
-  public boolean arrivedOnBoard() {
-    return access.stopReachedOnBoard();
   }
 }

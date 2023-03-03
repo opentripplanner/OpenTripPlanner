@@ -16,7 +16,7 @@ public class Bus extends AbstractStopArrival implements TransitPathView<TestTrip
     TestTripSchedule trip,
     ArrivalView<TestTripSchedule> previous
   ) {
-    super(round, stop, arrivalTime, cost, previous);
+    super(round, stop, arrivalTime, cost, previous, true);
     this.trip = trip;
   }
 
@@ -38,10 +38,5 @@ public class Bus extends AbstractStopArrival implements TransitPathView<TestTrip
   @Override
   public TestTripSchedule trip() {
     return trip;
-  }
-
-  @Override
-  public boolean arrivedOnBoard() {
-    return true;
   }
 }

@@ -25,7 +25,7 @@ import org.opentripplanner.raptor.api.view.EgressPathView;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
+public class DestinationArrival<T extends RaptorTripSchedule> extends ArrivalView<T> {
 
   private final ArrivalView<T> previous;
   private final RaptorAccessEgress egress;
@@ -39,6 +39,7 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
     int arrivalTime,
     int additionalCost
   ) {
+    super(false);
     this.previous = previous;
     this.egress = egress;
     this.arrivalTime = arrivalTime;
@@ -79,11 +80,6 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   @Override
   public EgressPathView egressPath() {
     return () -> egress;
-  }
-
-  @Override
-  public boolean arrivedOnBoard() {
-    return false;
   }
 
   @Override

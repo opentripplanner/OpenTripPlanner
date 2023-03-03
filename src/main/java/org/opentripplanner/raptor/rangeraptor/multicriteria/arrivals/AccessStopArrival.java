@@ -20,7 +20,8 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
       departureTime,
       access.durationInSeconds(),
       access.generalizedCost(),
-      access.numberOfRides()
+      access.numberOfRides(),
+      access.stopReachedOnBoard()
     );
     this.access = access;
   }
@@ -50,10 +51,5 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
     int newDepartureTime = newArrivalTime - access.durationInSeconds();
 
     return new AccessStopArrival<>(newDepartureTime, access);
-  }
-
-  @Override
-  public boolean arrivedOnBoard() {
-    return access.stopReachedOnBoard();
   }
 }

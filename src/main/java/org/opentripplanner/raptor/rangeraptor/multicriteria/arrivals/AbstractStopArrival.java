@@ -9,7 +9,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
+public abstract class AbstractStopArrival<T extends RaptorTripSchedule> extends ArrivalView<T> {
 
   private final AbstractStopArrival<T> previous;
   /**
@@ -43,8 +43,10 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     int paretoRoundIncrement,
     int stop,
     int arrivalTime,
-    int generalizedCost
+    int generalizedCost,
+    boolean arrivedOnBoard
   ) {
+    super(arrivedOnBoard);
     this.previous = previous;
     this.paretoRound = previous.paretoRound + paretoRoundIncrement;
     this.stop = stop;
@@ -61,8 +63,10 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     int departureTime,
     int travelDuration,
     int initialCost,
-    int paretoRound
+    int paretoRound,
+    boolean arrivedOnBoard
   ) {
+    super(arrivedOnBoard);
     this.previous = null;
     this.paretoRound = paretoRound;
     this.stop = stop;

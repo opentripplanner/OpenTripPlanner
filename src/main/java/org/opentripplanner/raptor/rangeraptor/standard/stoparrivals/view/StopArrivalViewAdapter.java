@@ -8,12 +8,13 @@ import org.opentripplanner.raptor.api.view.ArrivalView;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-abstract class StopArrivalViewAdapter<T extends RaptorTripSchedule> implements ArrivalView<T> {
+abstract class StopArrivalViewAdapter<T extends RaptorTripSchedule> extends ArrivalView<T> {
 
   private final int round;
   private final int stop;
 
-  StopArrivalViewAdapter(int round, int stop) {
+  StopArrivalViewAdapter(int round, int stop, boolean arrivedOnBoard) {
+    super(arrivedOnBoard);
     this.round = round;
     this.stop = stop;
   }

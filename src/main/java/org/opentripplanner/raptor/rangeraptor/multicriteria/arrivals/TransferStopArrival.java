@@ -23,7 +23,8 @@ public final class TransferStopArrival<T extends RaptorTripSchedule>
       1,
       transferPath.stop(),
       arrivalTime,
-      previousState.cost() + transferPath.generalizedCost()
+      previousState.cost() + transferPath.generalizedCost(),
+      false
     );
     this.transfer = transferPath;
   }
@@ -41,10 +42,5 @@ public final class TransferStopArrival<T extends RaptorTripSchedule>
   @Override
   public TransferPathView transferPath() {
     return () -> transfer;
-  }
-
-  @Override
-  public boolean arrivedOnBoard() {
-    return false;
   }
 }

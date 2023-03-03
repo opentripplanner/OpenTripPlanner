@@ -35,24 +35,31 @@ import org.opentripplanner.raptor.spi.CostCalculator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface ArrivalView<T extends RaptorTripSchedule> {
+public abstract class ArrivalView<T extends RaptorTripSchedule> {
+
+  private final boolean arrivedOnBoard;
+
+  protected ArrivalView(boolean arrivedOnBoard) {
+    this.arrivedOnBoard = arrivedOnBoard;
+  }
+
   /**
    * Stop index where the arrival takes place.
    *
    * @throws UnsupportedOperationException if arrived at destination.
    */
-  int stop();
+  public abstract int stop();
 
   /**
    * The Range Raptor ROUND this stop is reached. Note! the destination is reached in the same round
    * as the associated egress stop arrival.
    */
-  int round();
+  public abstract int round();
 
   /**
    * Return number of transfers used to reach the stop.
    */
-  default int numberOfTransfers() {
+  public int numberOfTransfers() {
     return round() - 1;
   }
 
@@ -63,19 +70,19 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
    * This method is used to add special functionality for the first transit leg and the next leg.
    * For example adding transfer cost to all boardings except the fist one.
    */
-  default boolean isFirstRound() {
+  public boolean isFirstRound() {
     return round() == 0;
   }
 
   /**
    * The arrival time for when the stop is reached including alight-slack.
    */
-  int arrivalTime();
+  public abstract int arrivalTime();
 
   /**
    * The accumulated cost. 0 (zero) is returned if no cost exist.
    */
-  default int cost() {
+  public int cost() {
     return CostCalculator.ZERO_COST;
   }
 
@@ -83,7 +90,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
    * The previous stop arrival state or {@code null} if first arrival (access stop arrival).
    */
   @Nullable
-  ArrivalView<T> previous();
+  public abstract ArrivalView<T> previous();
 
   /**
    * If it exists, return the most recent transit arrival visited. For a transit-stop-arrival this
@@ -94,7 +101,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
    * The method should be as light as possible, since it is used during routing.
    */
   @Nullable
-  default TransitArrival<T> mostRecentTransitArrival() {
+  public TransitArrival<T> mostRecentTransitArrival() {
     return null;
   }
 
@@ -103,51 +110,53 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   /**
    * First stop arrival, arrived by a given access path.
    */
-  default boolean arrivedByAccess() {
+  public boolean arrivedByAccess() {
     return false;
   }
 
-  default AccessPathView accessPath() {
+  public AccessPathView accessPath() {
     throw new UnsupportedOperationException();
   }
 
   /* Transit */
 
   /** @return true if transit arrival, otherwise false. */
-  default boolean arrivedByTransit() {
+  public boolean arrivedByTransit() {
     return false;
   }
 
-  default TransitPathView<T> transitPath() {
+  public TransitPathView<T> transitPath() {
     throw new UnsupportedOperationException();
   }
 
   /* Transfer */
 
   /** @return true if transfer arrival, otherwise false. */
-  default boolean arrivedByTransfer() {
+  public boolean arrivedByTransfer() {
     return false;
   }
 
-  default TransferPathView transferPath() {
+  public TransferPathView transferPath() {
     throw new UnsupportedOperationException();
   }
 
   /* Egress */
 
   /** @return true if destination arrival, otherwise false. */
-  default boolean arrivedAtDestination() {
+  public boolean arrivedAtDestination() {
     return false;
   }
 
-  default EgressPathView egressPath() {
+  public EgressPathView egressPath() {
     throw new UnsupportedOperationException();
   }
 
-  boolean arrivedOnBoard();
+  public final boolean arrivedOnBoard() {
+    return arrivedOnBoard;
+  }
 
   /** Use this to easy create a to String implementation. */
-  default String asString() {
+  public String asString() {
     String arrival =
       "[" +
       TimeUtils.timeToStrCompact(arrivalTime()) +

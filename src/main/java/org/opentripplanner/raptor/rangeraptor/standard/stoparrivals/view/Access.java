@@ -13,7 +13,7 @@ final class Access<T extends RaptorTripSchedule>
   private final RaptorAccessEgress access;
 
   Access(int round, int arrivalTime, RaptorAccessEgress access) {
-    super(round, access.stop());
+    super(round, access.stop(), access.stopReachedOnBoard());
     this.arrivalTime = arrivalTime;
     this.access = access;
   }
@@ -41,10 +41,5 @@ final class Access<T extends RaptorTripSchedule>
   @Override
   public RaptorAccessEgress access() {
     return access;
-  }
-
-  @Override
-  public boolean arrivedOnBoard() {
-    return access.stopReachedOnBoard();
   }
 }
