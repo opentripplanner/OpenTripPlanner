@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.model.plan.FareProductInstance;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -111,10 +112,10 @@ class RealtimeResolverTest {
     }
 
     @Override
-    public void addFareProducts(List<Itinerary.FareProductInstance> products) {}
+    public void addFareProducts(List<FareProductInstance> products) {}
 
     @Override
-    public List<Itinerary.FareProductInstance> fareProducts() {
+    public List<FareProductInstance> fareProducts() {
       return List.of();
     }
   }

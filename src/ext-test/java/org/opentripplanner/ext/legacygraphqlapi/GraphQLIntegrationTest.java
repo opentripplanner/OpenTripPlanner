@@ -115,19 +115,16 @@ class GraphQLIntegrationTest {
       .bus(122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
       .build();
+    var busLeg = i1.getTransitLeg(1);
     var railLeg = i1.getTransitLeg(2);
 
     var fares = new ItineraryFares();
-    var dayPass = new FareProduct(
-      id("fare-1"),
-      "day pass",
-      Money.euros(10),
-      null,
-      new RiderCategory("senior-citizens", "Senior citizens", null),
-      new FareContainer("oyster", "TfL Oyster Card")
-    );
+    var dayPass = fareProduct("day-pass");
     fares.addItineraryProducts(List.of(dayPass));
-    fares.addFareProduct(railLeg, dayPass);
+
+    var singleTicket = fareProduct("single-ticket");
+    fares.addFareProduct(railLeg, singleTicket);
+    fares.addFareProduct(busLeg, singleTicket);
     i1.setFare(fares);
 
     var alert = TransitAlert
@@ -157,6 +154,18 @@ class GraphQLIntegrationTest {
         GraphFinder.getInstance(graph, transitService::findRegularStop),
         new RouteRequest()
       );
+  }
+
+  @Nonnull
+  private static FareProduct fareProduct(String name) {
+    return new FareProduct(
+      id(name),
+      name,
+      Money.euros(1000),
+      null,
+      new RiderCategory("senior-citizens", "Senior citizens", null),
+      new FareContainer("oyster", "TfL Oyster Card")
+    );
   }
 
   @FilePatternSource(pattern = "src/ext-test/resources/legacygraphqlapi/queries/*.graphql")

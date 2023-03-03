@@ -59,7 +59,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   private double distanceMeters;
   private final double directDistanceMeters;
   private final Float accessibilityScore;
-  private List<Itinerary.FareProductInstance> fareProducts;
+  private List<FareProductInstance> fareProducts;
 
   public ScheduledTransitLeg(
     TripTimes tripTimes,
@@ -358,12 +358,12 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public void addFareProducts(List<Itinerary.FareProductInstance> products) {
+  public void addFareProducts(List<FareProductInstance> products) {
     this.fareProducts = List.copyOf(products);
   }
 
   @Override
-  public List<Itinerary.FareProductInstance> fareProducts() {
+  public List<FareProductInstance> fareProducts() {
     return fareProducts;
   }
 

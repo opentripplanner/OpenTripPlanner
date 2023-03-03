@@ -9,7 +9,6 @@ import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertCauseType;
@@ -23,6 +22,7 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
+import org.opentripplanner.model.plan.FareProductInstance;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
@@ -30,7 +30,6 @@ import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.core.FareComponent;
-import org.opentripplanner.routing.core.IndexedLegProducts;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -304,17 +303,13 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> id();
 
+    public DataFetcher<String> instanceId();
+
     public DataFetcher<String> name();
 
     public DataFetcher<Object> price();
 
     public DataFetcher<Object> riderCategory();
-  }
-
-  public interface LegacyGraphQLFareProducts {
-    public DataFetcher<Iterable<FareProduct>> itinerary();
-
-    public DataFetcher<Iterable<IndexedLegProducts>> legs();
   }
 
   /** A feed provides routing data (stops, routes, timetables, etc.) from one or more public transport agencies. */
@@ -342,8 +337,6 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Double> elevationLost();
 
     public DataFetcher<Long> endTime();
-
-    public DataFetcher<Itinerary> fareProducts();
 
     public DataFetcher<Iterable<Map<String, Object>>> fares();
 
@@ -380,6 +373,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Double> duration();
 
     public DataFetcher<Long> endTime();
+
+    public DataFetcher<Iterable<FareProductInstance>> fareProducts();
 
     public DataFetcher<StopArrival> from();
 
@@ -424,12 +419,6 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Trip> trip();
 
     public DataFetcher<Boolean> walkingBike();
-  }
-
-  public interface LegacyGraphQLLegProducts {
-    public DataFetcher<Iterable<Integer>> legIndices();
-
-    public DataFetcher<Iterable<FareProduct>> products();
   }
 
   /** A span of time. */

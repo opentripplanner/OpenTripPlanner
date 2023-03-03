@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +12,6 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -55,29 +53,9 @@ public class ItineraryFares {
     return ImmutableMultimap.copyOf(legProducts);
   }
 
-  public List<IndexedLegProducts> indexedLegProducts(Itinerary itinerary) {
-    return legProducts
-      .keySet()
-      .stream()
-      .map(leg -> {
-        var index = itinerary.getLegIndex(leg);
-        // eventually we want to implement products that span multiple legs (but not the entire itinerary)
-        var products = List.copyOf(legProducts.get(leg));
-        return new IndexedLegProducts(products, leg, index);
-      })
-      .toList();
-  }
-
   public void addFare(FareType fareType, Money money) {
     itineraryProducts.add(
-      new FareProduct(
-        faresV1Id(fareType),
-        fareType.name(),
-        money,
-        null,
-        null,
-        null
-      )
+      new FareProduct(faresV1Id(fareType), fareType.name(), money, null, null, null)
     );
   }
 

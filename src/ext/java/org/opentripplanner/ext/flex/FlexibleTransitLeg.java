@@ -14,7 +14,7 @@ import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.FareProductInstance;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
@@ -43,7 +43,7 @@ public class FlexibleTransitLeg implements TransitLeg {
   private final Set<TransitAlert> transitAlerts = new HashSet<>();
 
   private final int generalizedCost;
-  private List<Itinerary.FareProductInstance> fareProducts;
+  private List<FareProductInstance> fareProducts;
 
   public FlexibleTransitLeg(
     FlexTripEdge flexTripEdge,
@@ -206,12 +206,12 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
-  public void addFareProducts(List<Itinerary.FareProductInstance> products) {
+  public void addFareProducts(List<FareProductInstance> products) {
     this.fareProducts = List.copyOf(products);
   }
 
   @Override
-  public List<Itinerary.FareProductInstance> fareProducts() {
+  public List<FareProductInstance> fareProducts() {
     return fareProducts;
   }
 

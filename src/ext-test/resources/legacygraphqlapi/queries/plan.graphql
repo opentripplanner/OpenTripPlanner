@@ -51,40 +51,22 @@
                         }
                     }
                 }
-            }
-            fareProducts {
-                itinerary {
+                fareProducts {
+                    instanceId
+                    id
                     name
                     price {
-                        cents
                         currency
+                        cents
                     }
                     riderCategory {
-                        name
                         id
+                        name
                     }
                     container {
-                        name
                         id
-                    }
-                }
-                legs {
-                    products {
                         name
-                        price {
-                            currency
-                            cents
-                        }
-                        riderCategory {
-                            id
-                            name
-                        }
-                        container {
-                            id
-                            name
-                        }
                     }
-                    legIndices
                 }
             }
         }

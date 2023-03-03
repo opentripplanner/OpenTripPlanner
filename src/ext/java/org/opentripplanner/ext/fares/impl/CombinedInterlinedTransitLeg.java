@@ -8,7 +8,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.collection.ListUtils;
-import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.FareProductInstance;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -110,10 +110,10 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   }
 
   @Override
-  public void addFareProducts(List<Itinerary.FareProductInstance> products) {}
+  public void addFareProducts(List<FareProductInstance> products) {}
 
   @Override
-  public List<Itinerary.FareProductInstance> fareProducts() {
+  public List<FareProductInstance> fareProducts() {
     return List.of();
   }
 }

@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.core;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.PlanTestConstants.A;
 import static org.opentripplanner.model.plan.PlanTestConstants.B;
 import static org.opentripplanner.model.plan.PlanTestConstants.C;
@@ -13,7 +12,6 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_50;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
-import java.util.List;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.model.FareProduct;
@@ -42,20 +40,6 @@ class ItineraryFaresTest {
     fares.addFareProduct(busLeg, busTicket);
     fares.addFareProduct(railLeg, railTicketA);
     fares.addFareProduct(railLeg, railTicketB);
-
-    var indexed = fares.indexedLegProducts(i1);
-
-    assertEquals(2, indexed.size());
-
-    var first = indexed.get(0);
-    assertEquals(busLeg, first.leg());
-    assertEquals(1, first.legIndex());
-    assertEquals(List.of(busTicket), first.products());
-
-    var second = indexed.get(1);
-    assertEquals(railLeg, second.leg());
-    assertEquals(2, second.legIndex());
-    assertEquals(List.of(railTicketA, railTicketB), second.products());
   }
 
   @Nonnull

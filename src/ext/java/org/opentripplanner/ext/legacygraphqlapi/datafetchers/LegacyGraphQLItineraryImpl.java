@@ -41,11 +41,6 @@ public class LegacyGraphQLItineraryImpl
   }
 
   @Override
-  public DataFetcher<Itinerary> fareProducts() {
-    return this::getSource;
-  }
-
-  @Override
   public DataFetcher<Iterable<Map<String, Object>>> fares() {
     return environment -> {
       ItineraryFares fare = getSource(environment).getFares();

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.lang.DoubleUtils;
@@ -549,15 +548,29 @@ public class Itinerary {
   public void setFare(ItineraryFares fare) {
     this.fare = fare;
 
-    var itineraryInstances = fare.getItineraryProducts().stream().map(fp -> new FareProductInstance(fp.id().toString()+"_"+hashCode(), fp));
+    var itineraryInstances = fare
+      .getItineraryProducts()
+      .stream()
+      .map(fp ->
+        new FareProductInstance(
+          fp.id().toString() + '_' + this.getLegs().get(0).getStartTime().toEpochSecond(),
+          fp
+        )
+      )
+      .toList();
 
     this.legs.forEach(l -> {
-      var legInstances = fare.getLegProducts().get(l).stream().map(fp -> new FareProductInstance(fp.id().toString()+l.hashCode(), fp));
-      l.addFareProducts(ListUtils.combine(itineraryInstances, legInstances)) ;
-    });
+        var legInstances = fare
+          .getLegProducts()
+          .get(l)
+          .stream()
+          .map(fp ->
+            new FareProductInstance(fp.id().toString() + '_' + l.getStartTime().toEpochSecond(), fp)
+          )
+          .toList();
+        l.addFareProducts(ListUtils.combine(itineraryInstances, legInstances));
+      });
   }
-
-  public record FareProductInstance(String instanceId, FareProduct product){};
 
   public List<ScheduledTransitLeg> getScheduledTransitLegs() {
     return getLegs()

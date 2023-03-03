@@ -1353,27 +1353,6 @@ type FareProduct {
     container: FareContainer
 }
 
-type LegProducts {
-    "The fare products that apply to a limited set of legs but not the entire itinerary."
-    products: [FareProduct]!
-    """
-    The indices of the legs that the fare products apply to. If there are multiple indices listed,
-    then the fare product covers several legs (but not the entire itinerary).
-    """
-    legIndices: [Int]!
-}
-
-type FareProducts {
-    """
-    Fare products that apply to the entire itinerary.
-    If there are products that only cover part of the itinerary they can be found in `legs`.
-    """
-    itinerary: [FareProduct]
-
-    "Fare products that apply only to individual legs, not the entire itinerary."
-    legs: [LegProducts]
-}
-
 type Itinerary {
     """
     Time when the user leaves from the origin. Format: Unix timestamp in milliseconds.
@@ -1413,12 +1392,6 @@ type Itinerary {
     will be deprecated in the near future.
     """
     fares: [fare]
-
-
-    """
-    Contains prices and information about available fare for this itinerary and its legs.
-    """
-    fareProducts: FareProducts
 
     """
     How much elevation is gained, in total, over the course of the itinerary, in meters.
@@ -1591,6 +1564,8 @@ type Leg {
         destinationModesWithParentStation: [TransitMode!]
 
         ): [Leg!]
+
+    fareProducts: [FareProduct]
 }
 
 """A span of time."""
