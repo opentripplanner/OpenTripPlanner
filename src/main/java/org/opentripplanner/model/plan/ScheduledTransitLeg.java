@@ -57,8 +57,9 @@ public class ScheduledTransitLeg implements TransitLeg {
   protected final LocalDate serviceDate;
   protected final ZoneId zoneId;
   private double distanceMeters;
-  private double directDistanceMeters;
+  private final double directDistanceMeters;
   private final Float accessibilityScore;
+  private List<Itinerary.FareProductInstance> fareProducts;
 
   public ScheduledTransitLeg(
     TripTimes tripTimes,
@@ -354,6 +355,16 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   public void addAlert(TransitAlert alert) {
     transitAlerts.add(alert);
+  }
+
+  @Override
+  public void addFareProducts(List<Itinerary.FareProductInstance> products) {
+    this.fareProducts = List.copyOf(products);
+  }
+
+  @Override
+  public List<Itinerary.FareProductInstance> fareProducts() {
+    return fareProducts;
   }
 
   @Override

@@ -187,11 +187,11 @@ public class DefaultFareService implements FareService {
       float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
 
-      var routes = new ArrayList<FeedScopedId>();
+      var componentLegs = new ArrayList<Leg>();
       for (int i = start; i <= via; ++i) {
-        routes.add(legs.get(i).getRoute().getId());
+        componentLegs.add(legs.get(i));
       }
-      var component = new FareComponent(fareId, null, getMoney(currency, cost), routes);
+      var component = new FareComponent(fareId, null, getMoney(currency, cost), componentLegs);
       details.add(component);
       ++count;
       start = via + 1;

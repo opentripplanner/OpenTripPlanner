@@ -1310,18 +1310,43 @@ type FareContainer {
 
 "A fare product (ticket) to cover thi entire or a subset of an itinerary."
 type FareProduct {
-    "Identifier for the product."
-    id: String!
     """
-    Human readable name of the product, for example example "Day pass".
+    Identifier local to the itinerary that allows to cross-reference fare products that span
+    more than one leg.
+
+    If you want to uniquely identify the fare product itself (not its instance) use `id`.
+
+    ### Example: Day pass
+
+    When a day pass is valid for all three legs in the itinerary it will appear
+    for each leg but with the same `instanceId`.
+
+    *It is the responsibility of the API consumers to display the day pass as a product for the
+    entire itinerary rather than three day passes!*
+
+    ### Example: Several single tickets
+
+    If you have two legs and need to buy two single tickets they will appear in each leg with the
+    same `id` but different `instanceId`.
+    """
+    instanceId: String!
+
+    "Identifier for the fare product."
+    id: String!
+
+    """
+    Human readable name of the product, for example example "Day pass" or "Single ticket".
     """
     name: String!
+
     "The price of the product"
     price: Money!
+
     "The category of riders this product applies to, for example students or pensioners."
     riderCategory: RiderCategory
+
     """
-    The 'container' that this product applies to, for example "Oyster Card" or "DB Navigator App".
+    The 'container' that this product applies to, for example "Oyster Card" or "Berlin Ticket App".
 
     This communicates to riders that a specific way of buying or keeping this product is required.
     """

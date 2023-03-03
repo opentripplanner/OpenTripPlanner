@@ -4,17 +4,19 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.basic.Money;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * <p>
@@ -23,23 +25,19 @@ import org.opentripplanner.transit.model.basic.Money;
  */
 public class ItineraryFares {
 
-  /**
-   * A mapping from {@link FareType} to a list of {@link FareComponent}.
-   */
-  private final HashMap<FareType, List<FareComponent>> details = new HashMap<>();
-  private final Set<FareProduct> itineraryProducts = new HashSet<>();
+  private static final String FARES_V1_FEED_ID = "faresv1";
+
+  // LinkedHashSet for insertion order
+  private final Set<FareProduct> itineraryProducts = new LinkedHashSet<>();
 
   // LinkedHashMultimap keeps the insertion order
   private final Multimap<Leg, FareProduct> legProducts = LinkedHashMultimap.create();
 
-  /**
-   * A mapping from {@link FareType} to {@link Money}.
-   */
-  private HashMap<FareType, Money> fare = new HashMap<>();
+  private final Multimap<FareType, FareComponent> components = LinkedHashMultimap.create();
 
   public ItineraryFares(ItineraryFares aFare) {
     if (aFare != null) {
-      fare.putAll(aFare.fare);
+      itineraryProducts.addAll(aFare.itineraryProducts);
     }
   }
 
@@ -71,11 +69,34 @@ public class ItineraryFares {
   }
 
   public void addFare(FareType fareType, Money money) {
-    fare.put(fareType, money);
+    itineraryProducts.add(
+      new FareProduct(
+        faresV1Id(fareType),
+        fareType.name(),
+        money,
+        null,
+        null,
+        null
+      )
+    );
   }
 
-  public void addFareDetails(FareType fareType, List<FareComponent> newDetails) {
-    details.put(fareType, newDetails);
+  @Nonnull
+  private static FeedScopedId faresV1Id(FareType fareType) {
+    return new FeedScopedId(FARES_V1_FEED_ID, fareType.name());
+  }
+
+  public void addFareDetails(FareType fareType, List<FareComponent> components) {
+    this.components.replaceValues(fareType, components);
+
+    for (var c : components) {
+      for (var leg : c.legs()) {
+        legProducts.put(
+          leg,
+          new FareProduct(c.fareId(), fareType.name(), c.price(), null, null, null)
+        );
+      }
+    }
   }
 
   public void addItineraryProducts(Collection<FareProduct> products) {
@@ -83,20 +104,25 @@ public class ItineraryFares {
   }
 
   public Money getFare(FareType type) {
-    return fare.get(type);
+    return itineraryProducts
+      .stream()
+      .filter(f -> faresV1Id(type).equals(f.id()))
+      .findAny()
+      .map(FareProduct::amount)
+      .orElse(null);
   }
 
-  public List<FareComponent> getDetails(FareType type) {
-    return details.getOrDefault(type, List.of());
+  public List<FareComponent> getComponents(FareType type) {
+    return List.copyOf(components.get(type));
   }
 
-  public Set<FareType> getTypes() {
-    return fare.keySet();
+  public Set<FareType> getComponentTypes() {
+    return components.keySet();
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(fare, details, itineraryProducts, legProducts);
+    return Objects.hash(itineraryProducts, legProducts);
   }
 
   @Override
@@ -105,7 +131,6 @@ public class ItineraryFares {
     if (o == null || getClass() != o.getClass()) return false;
     ItineraryFares fare1 = (ItineraryFares) o;
     return (
-      Objects.equals(details, fare1.details) &&
       Objects.equals(itineraryProducts, fare1.itineraryProducts) &&
       Objects.equals(legProducts, fare1.legProducts)
     );
@@ -113,7 +138,11 @@ public class ItineraryFares {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(this.getClass()).addObj("details", details).toString();
+    return ToStringBuilder
+      .of(this.getClass())
+      .addObj("itineraryProducts", itineraryProducts)
+      .addObj("legProducts", legProducts)
+      .toString();
   }
 
   public void addLegProducts(Collection<LegProducts> legProducts) {

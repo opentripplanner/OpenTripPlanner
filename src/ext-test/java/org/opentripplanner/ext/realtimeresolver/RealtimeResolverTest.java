@@ -1,9 +1,11 @@
 package org.opentripplanner.ext.realtimeresolver;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.plan.Itinerary;
@@ -106,6 +108,14 @@ class RealtimeResolverTest {
     @Override
     public LegReference getLegReference() {
       return new MockLegReference(realtimeLeg);
+    }
+
+    @Override
+    public void addFareProducts(List<Itinerary.FareProductInstance> products) {}
+
+    @Override
+    public List<Itinerary.FareProductInstance> fareProducts() {
+      return List.of();
     }
   }
 

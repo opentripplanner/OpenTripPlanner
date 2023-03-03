@@ -173,6 +173,16 @@ public class StreetLeg implements Leg {
       .build();
   }
 
+  @Override
+  public void addFareProducts(List<Itinerary.FareProductInstance> products) {
+
+  }
+
+  @Override
+  public List<Itinerary.FareProductInstance> fareProducts() {
+    return List.of();
+  }
+
   public StreetLeg withAccessibilityScore(float accessibilityScore) {
     return StreetLegBuilder.of(this).withAccessibilityScore(accessibilityScore).build();
   }

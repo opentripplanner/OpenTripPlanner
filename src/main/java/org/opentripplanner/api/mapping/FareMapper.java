@@ -99,10 +99,10 @@ public class FareMapper {
 
   private Map<String, List<ApiFareComponent>> toApiFareComponents(ItineraryFares fare) {
     return fare
-      .getTypes()
+      .getComponentTypes()
       .stream()
       .map(key -> {
-        var money = fare.getDetails(key).stream().map(this::toApiFareComponent).toList();
+        var money = fare.getComponents(key).stream().map(this::toApiFareComponent).toList();
         return new SimpleEntry<>(key, money);
       })
       .collect(Collectors.toMap(e -> e.getKey().name(), Entry::getValue));
@@ -110,7 +110,7 @@ public class FareMapper {
 
   private Map<String, ApiMoney> toApiMoneys(ItineraryFares fare) {
     return fare
-      .getTypes()
+      .getComponentTypes()
       .stream()
       .map(key -> {
         var money = toApiMoney(fare.getFare(key));
