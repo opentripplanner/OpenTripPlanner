@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * input files should be used and validate the available input files against the command line
  * parameters set.
  * <p/>
- * After this class is validated the {@link #has(FileType)} method can be used to determine if a the
+ * After this class is validated the {@link #has(FileType)} method can be used to determine if the
  * build process should include a file in the build.
  * <p/>
  * By separating this from the builder, this class can be constructed early, causing a validation of
@@ -241,7 +241,7 @@ public class GraphBuilderDataSources {
   private void validateCliMatchesInputData(CommandLineParameters cli) {
     if (cli.build) {
       if (!hasOneOf(OSM, GTFS, NETEX)) {
-        throw new OtpAppException("Unable to build graph, no transit data available.");
+        throw new OtpAppException("Unable to build graph, no transit nor OSM data available.");
       }
     } else if (cli.buildStreet) {
       if (!has(OSM)) {
@@ -260,6 +260,9 @@ public class GraphBuilderDataSources {
           "Unable to load street graph, no street graph file found: %s",
           store.getStreetGraph().path()
         );
+      }
+      if (!hasOneOf(GTFS, NETEX)) {
+        throw new OtpAppException("Unable to build transit graph, no transit data available.");
       }
     }
   }
