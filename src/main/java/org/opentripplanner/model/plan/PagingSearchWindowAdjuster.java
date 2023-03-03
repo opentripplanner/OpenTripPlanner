@@ -24,12 +24,12 @@ public final class PagingSearchWindowAdjuster {
   private final int[] pagingSearchWindowAdjustments;
 
   public PagingSearchWindowAdjuster(
-    int minSearchWindowMinutes,
-    int maxSearchWindowMinutes,
+    Duration minSearchWindow,
+    Duration maxSearchWindow,
     List<Duration> pagingSearchWindowAdjustments
   ) {
-    this.minSearchWindow = Duration.ofMinutes(minSearchWindowMinutes);
-    this.maxSearchWindow = Duration.ofMinutes(maxSearchWindowMinutes);
+    this.minSearchWindow = minSearchWindow;
+    this.maxSearchWindow = maxSearchWindow;
     this.pagingSearchWindowAdjustments =
       pagingSearchWindowAdjustments.stream().mapToInt(d -> (int) d.toMinutes()).toArray();
   }
