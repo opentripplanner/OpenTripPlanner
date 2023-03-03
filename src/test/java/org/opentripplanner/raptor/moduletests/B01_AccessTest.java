@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToStringDetailed;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
@@ -87,8 +86,9 @@ public class B01_AccessTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("testCases")
   void testRaptor(RaptorModuleTestCase testCase) {
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToStringDetailed(response));
+    assertEquals(
+      testCase.expected(),
+      testCase.runDetailedResult(raptorService, data, requestBuilder)
+    );
   }
 }

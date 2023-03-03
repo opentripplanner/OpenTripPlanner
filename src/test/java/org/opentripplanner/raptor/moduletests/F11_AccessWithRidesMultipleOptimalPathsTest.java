@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
@@ -100,6 +99,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
 
     return RaptorModuleTestCase
       .of()
+      .withRequest(r -> r.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D3m)))
       .addMinDuration("19m", TX_1, T00_02, T00_30)
       .add(standard().manyIterations(), withoutCost(flexTransferTransit, flexAndTransit))
       .add(TC_STANDARD_ONE, withoutCost(flexTransferTransit))
@@ -111,12 +111,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
   @ParameterizedTest
   @MethodSource("testCase3mWalkAccess")
   void test3mWalkAccess(RaptorModuleTestCase testCase) {
-    requestBuilder.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D3m));
-    var request = testCase.withConfig(requestBuilder);
-
-    var response = raptorService.route(request, data);
-
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   /**
@@ -137,6 +132,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
 
     return RaptorModuleTestCase
       .of()
+      .withRequest(r -> r.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D1m)))
       .addMinDuration("17m", TX_1, T00_02, T00_30)
       .add(standard().manyIterations(), withoutCost(flexAndTransit))
       .add(TC_STANDARD_ONE, withoutCost(transitAndTransit))
@@ -148,11 +144,6 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
   @ParameterizedTest
   @MethodSource("testCase1mWalkAccess")
   void test1mWalkAccess(RaptorModuleTestCase testCase) {
-    requestBuilder.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D1m));
-    var request = testCase.withConfig(requestBuilder);
-
-    var response = raptorService.route(request, data);
-
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 }

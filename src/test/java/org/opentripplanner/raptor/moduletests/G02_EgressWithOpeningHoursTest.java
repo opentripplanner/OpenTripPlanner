@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.TimeUtils.hm2time;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
@@ -84,6 +83,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
+      .withRequest(r -> r.searchParams().addEgressPaths(walk(STOP_B, D2m)))
       .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.first(3)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
@@ -99,11 +99,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("openNoTimeRestrictionTestCase")
   void openNoTimeRestrictionTest(RaptorModuleTestCase testCase) {
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_B, D2m));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> openOneHourTestCase() {
@@ -116,6 +112,9 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
+      .withRequest(r ->
+        r.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00))
+      )
       .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.first(3)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
@@ -128,11 +127,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("openOneHourTestCase")
   void openOneHourTest(RaptorModuleTestCase testCase) {
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> openInWholeSearchIntervalTestNextDayTestCase() {
@@ -141,6 +136,12 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
+      .withRequest(r ->
+        r
+          .searchParams()
+          .earliestDepartureTime(T24_10)
+          .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00))
+      )
       .addMinDuration("12m", TX_0, T24_10, T25_00)
       .add(standard(), withoutCost(expected))
       .add(multiCriteria(), expected)
@@ -150,14 +151,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("openInWholeSearchIntervalTestNextDayTestCase")
   void openInWholeSearchIntervalTestNextDayTest(RaptorModuleTestCase testCase) {
-    requestBuilder
-      .searchParams()
-      .earliestDepartureTime(T24_10)
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> openInFirstHalfIntervalTestCase() {
@@ -168,6 +162,9 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
+      .withRequest(r ->
+        r.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_25))
+      )
       .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.all()))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
@@ -180,11 +177,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("openInFirstHalfIntervalTestCase")
   void openInFirstHalfIntervalTest(RaptorModuleTestCase testCase) {
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_25));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> openInFirstHalfIntervalTestNextDayTestCase() {
@@ -193,6 +186,14 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
+      .withRequest(r ->
+        r
+          .searchParams()
+          .earliestDepartureTime(T24_10)
+          .latestArrivalTime(T25_00)
+          .searchWindow(Duration.ofMinutes(30))
+          .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_40))
+      )
       .addMinDuration("12m", TX_0, T24_10, T25_00)
       .add(standard(), withoutCost(expected))
       .add(multiCriteria(), expected)
@@ -202,16 +203,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("openInFirstHalfIntervalTestNextDayTestCase")
   void openInFirstHalfIntervalTestNextDayTest(RaptorModuleTestCase testCase) {
-    requestBuilder
-      .searchParams()
-      .earliestDepartureTime(T24_10)
-      .latestArrivalTime(T25_00)
-      .searchWindow(Duration.ofMinutes(30))
-      .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_40));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> partiallyOpenIntervalTestCase() {
@@ -224,6 +216,9 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
+      .withRequest(r ->
+        r.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_35))
+      )
       .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.first(3)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
@@ -240,16 +235,13 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("partiallyOpenIntervalTestCase")
   void partiallyOpenIntervalTest(RaptorModuleTestCase testCase) {
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_35));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> closedTestCase() {
     return RaptorModuleTestCase
       .of()
+      .withRequest(r -> r.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHoursClosed()))
       .add(minDuration())
       .add(standard())
       .add(multiCriteria())
@@ -263,10 +255,6 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("closedTestCase")
   void closedTest(RaptorModuleTestCase testCase) {
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHoursClosed());
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 }

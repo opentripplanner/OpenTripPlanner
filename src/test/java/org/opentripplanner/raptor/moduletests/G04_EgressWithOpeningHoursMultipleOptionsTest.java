@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToStringDetailed;
 import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
@@ -85,8 +84,9 @@ public class G04_EgressWithOpeningHoursMultipleOptionsTest implements RaptorTest
   @ParameterizedTest
   @MethodSource("openInWholeSearchIntervalTestCases")
   void openInWholeSearchIntervalTest(RaptorModuleTestCase testCase) {
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToStringDetailed(response));
+    assertEquals(
+      testCase.expected(),
+      testCase.runDetailedResult(raptorService, data, requestBuilder)
+    );
   }
 }

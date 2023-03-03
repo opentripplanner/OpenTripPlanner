@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
@@ -94,8 +93,6 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("testCases")
   void testRaptor(RaptorModuleTestCase testCase) {
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 }

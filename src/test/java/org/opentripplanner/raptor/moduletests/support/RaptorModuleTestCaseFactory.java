@@ -6,27 +6,37 @@ import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCon
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.spi.UnknownPath;
 
 /**
- * Builder for {@link RaptorModuleTestConfig}.
+ * Factory for {@link RaptorModuleTestConfig}, create a list of test-cases.
  */
-public class RaptorModuleTestCaseBuilder {
+public class RaptorModuleTestCaseFactory {
 
-  private final List<RaptorModuleTestCase> cases = new ArrayList<>();
+  private Consumer<RaptorRequestBuilder<TestTripSchedule>> requestAdditions = null;
+  private final List<RaptorModuleTestCase.Builder> cases = new ArrayList<>();
 
-  public RaptorModuleTestCaseBuilder add(RaptorModuleTestConfig config, String... expected) {
-    return add(config, Arrays.asList(expected));
-  }
-
-  public RaptorModuleTestCaseBuilder add(RaptorModuleTestConfig config, Iterable<String> expected) {
-    cases.add(new RaptorModuleTestCase(config, String.join("\n", expected)));
+  public RaptorModuleTestCaseFactory withRequest(
+    Consumer<RaptorRequestBuilder<TestTripSchedule>> requestAdditions
+  ) {
+    this.requestAdditions = requestAdditions;
     return this;
   }
 
-  public RaptorModuleTestCaseBuilder add(
+  public RaptorModuleTestCaseFactory add(RaptorModuleTestConfig config, String... expected) {
+    return add(config, Arrays.asList(expected));
+  }
+
+  public RaptorModuleTestCaseFactory add(RaptorModuleTestConfig config, Iterable<String> expected) {
+    cases.add(new RaptorModuleTestCase.Builder(config, String.join("\n", expected)));
+    return this;
+  }
+
+  public RaptorModuleTestCaseFactory add(
     RaptorModuleTestConfigSetBuilder configs,
     String... expected
   ) {
@@ -35,7 +45,7 @@ public class RaptorModuleTestCaseBuilder {
     return this;
   }
 
-  public RaptorModuleTestCaseBuilder addMinDuration(
+  public RaptorModuleTestCaseFactory addMinDuration(
     String duration,
     int nTransfers,
     int earliestDepartureTime,
@@ -64,6 +74,11 @@ public class RaptorModuleTestCaseBuilder {
   }
 
   public List<RaptorModuleTestCase> build() {
-    return cases;
+    if (requestAdditions != null) {
+      for (var it : cases) {
+        it.withRequestAdditions(requestAdditions);
+      }
+    }
+    return cases.stream().map(RaptorModuleTestCase.Builder::build).toList();
   }
 }

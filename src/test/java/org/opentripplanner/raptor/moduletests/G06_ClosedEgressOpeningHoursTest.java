@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
@@ -57,6 +56,7 @@ public class G06_ClosedEgressOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
+      .withRequest(r -> r.searchParams().addAccessPaths(walk(STOP_B, D2m)))
       .addMinDuration("10m", TX_0, T00_00, T00_30)
       .add(standard(), PathUtils.withoutCost(expected))
       .add(multiCriteria(), expected)
@@ -66,11 +66,6 @@ public class G06_ClosedEgressOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("testCases")
   void verifyNo(RaptorModuleTestCase testCase) {
-    requestBuilder.searchParams().addAccessPaths(walk(STOP_B, D2m));
-    var request = testCase.withConfig(requestBuilder);
-
-    var response = raptorService.route(request, data);
-
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 }

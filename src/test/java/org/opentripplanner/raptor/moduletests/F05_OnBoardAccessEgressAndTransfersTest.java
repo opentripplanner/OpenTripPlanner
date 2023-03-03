@@ -4,10 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
-import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -42,7 +39,7 @@ public class F05_OnBoardAccessEgressAndTransfersTest implements RaptorTestConsta
   @BeforeEach
   public void setup() {
     data
-      .withRoute(route(pattern("R1", STOP_B, STOP_C)).withTimetable(schedule().times("0:10 0:20")))
+      .withTransit("R1", "0:10 0:20", STOP_B, STOP_C)
       .withTransfer(STOP_A, transfer(STOP_B, D10s))
       .withTransfer(STOP_C, transfer(STOP_D, D10s));
 
@@ -60,15 +57,12 @@ public class F05_OnBoardAccessEgressAndTransfersTest implements RaptorTestConsta
 
   static List<RaptorModuleTestCase> testCases() {
     var path =
-      "Flex 5m 1x ~ A ~ Walk 10s ~ B ~ BUS R1 0:10 0:20 ~ C ~ Walk 10s ~ D ~ Flex 5m 1x [0:03:50 0:26:10 22m20s 2tx $1620]";
-    var stdPathRev =
-      "Flex 5m 1x ~ A ~ Walk 10s ~ B ~ BUS R1 0:10 0:20 ~ C ~ Walk 10s ~ D ~ Flex 5m 1x [0:03:50 0:26:10 22m20s 2tx]";
+      "Flex 5m 1x ~ A ~ Walk 10s ~ B ~ BUS R1 0:10 0:20 ~ C ~ Walk 10s ~ D ~ Flex 5m 1x [0:03:50 0:26:10 22m20s 2tx $2560]";
 
     return RaptorModuleTestCase
       .of()
       .addMinDuration("22m20s", 2, T00_00, T00_30)
-      .add(standard().forwardOnly(), PathUtils.withoutCost(path))
-      .add(standard().reverseOnly(), stdPathRev)
+      .add(standard(), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)
       .build();
   }
