@@ -18,6 +18,10 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      # Fix CI timeouts which is caused by Maven keeping connections open for a very long time
+      # https://github.com/actions/runner-images/issues/1499#issuecomment-718396233
+      MAVEN_OPTS: -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
       - uses: actions/checkout@v3.3.0
