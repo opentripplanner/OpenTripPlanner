@@ -213,7 +213,6 @@ public class AffectsMapper {
           if (stop == null) {
             stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
           }
-          // Creating unique, deterministic id for the alert
           EntitySelector.StopAndTrip entitySelector = new EntitySelector.StopAndTrip(
             stop,
             tripId,
