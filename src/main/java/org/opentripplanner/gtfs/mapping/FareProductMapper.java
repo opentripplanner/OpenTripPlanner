@@ -58,7 +58,7 @@ public class FareProductMapper {
       return null;
     } else {
       return new RiderCategory(
-        riderCategory.getId().getId(),
+        AgencyAndIdMapper.mapAgencyAndId(riderCategory.getId()),
         riderCategory.getName(),
         riderCategory.getEligibilityUrl()
       );
@@ -84,7 +84,7 @@ public class FareProductMapper {
     if (c == null) {
       return null;
     } else {
-      return new FareContainer(c.getId().getId(), c.getName());
+      return new FareContainer(AgencyAndIdMapper.mapAgencyAndId(c.getId()), c.getName());
     }
   }
 }

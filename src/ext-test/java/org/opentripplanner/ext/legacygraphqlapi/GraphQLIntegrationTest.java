@@ -163,8 +163,8 @@ class GraphQLIntegrationTest {
       name,
       Money.euros(1000),
       null,
-      new RiderCategory("senior-citizens", "Senior citizens", null),
-      new FareContainer("oyster", "TfL Oyster Card")
+      new RiderCategory(id("senior-citizens"), "Senior citizens", null),
+      new FareContainer(id("oyster"), "TfL Oyster Card")
     );
   }
 

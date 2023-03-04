@@ -1,3 +1,5 @@
 package org.opentripplanner.ext.fares.model;
 
-public record FareContainer(String id, String name) {}
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+
+public record FareContainer(FeedScopedId id, String name) {}

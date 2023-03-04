@@ -59,16 +59,16 @@
                     "cents" : 1000
                   },
                   "riderCategory" : {
-                    "id" : "senior-citizens",
+                    "id" : "F:senior-citizens",
                     "name" : "Senior citizens"
                   },
                   "container" : {
-                    "id" : "oyster",
+                    "id" : "F:oyster",
                     "name" : "TfL Oyster Card"
                   }
                 },
                 {
-                  "instanceId" : "F:single-ticket1580641260",
+                  "instanceId" : "F:single-ticket_1580641260",
                   "id" : "F:single-ticket",
                   "name" : "single-ticket",
                   "price" : {
@@ -76,11 +76,11 @@
                     "cents" : 1000
                   },
                   "riderCategory" : {
-                    "id" : "senior-citizens",
+                    "id" : "F:senior-citizens",
                     "name" : "Senior citizens"
                   },
                   "container" : {
-                    "id" : "oyster",
+                    "id" : "F:oyster",
                     "name" : "TfL Oyster Card"
                   }
                 }
@@ -136,16 +136,16 @@
                     "cents" : 1000
                   },
                   "riderCategory" : {
-                    "id" : "senior-citizens",
+                    "id" : "F:senior-citizens",
                     "name" : "Senior citizens"
                   },
                   "container" : {
-                    "id" : "oyster",
+                    "id" : "F:oyster",
                     "name" : "TfL Oyster Card"
                   }
                 },
                 {
-                  "instanceId" : "F:single-ticket1580643000",
+                  "instanceId" : "F:single-ticket_1580643000",
                   "id" : "F:single-ticket",
                   "name" : "single-ticket",
                   "price" : {
@@ -153,11 +153,11 @@
                     "cents" : 1000
                   },
                   "riderCategory" : {
-                    "id" : "senior-citizens",
+                    "id" : "F:senior-citizens",
                     "name" : "Senior citizens"
                   },
                   "container" : {
-                    "id" : "oyster",
+                    "id" : "F:oyster",
                     "name" : "TfL Oyster Card"
                   }
                 }

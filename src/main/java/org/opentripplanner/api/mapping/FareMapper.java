@@ -69,14 +69,14 @@ public class FareMapper {
   private static ApiFareQualifier toApiFareQualifier(@Nullable FareContainer nullable) {
     return Optional
       .ofNullable(nullable)
-      .map(c -> new ApiFareQualifier(c.id(), c.name()))
+      .map(c -> new ApiFareQualifier(c.id().getId(), c.name()))
       .orElse(null);
   }
 
   private static ApiFareQualifier toApiFareQualifier(@Nullable RiderCategory nullable) {
     return Optional
       .ofNullable(nullable)
-      .map(c -> new ApiFareQualifier(c.id(), c.name()))
+      .map(c -> new ApiFareQualifier(c.id().getId(), c.name()))
       .orElse(null);
   }
 
