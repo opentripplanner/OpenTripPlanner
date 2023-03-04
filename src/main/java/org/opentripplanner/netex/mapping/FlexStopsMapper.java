@@ -1,12 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
-import javax.annotation.Nullable;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -14,7 +13,6 @@ import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
-import org.opentripplanner.transit.model.site.GroupStopBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.rutebanken.netex.model.FlexibleArea;
@@ -59,58 +57,63 @@ class FlexStopsMapper {
    * dependent on a key/value in the NeTEx file, until proper NeTEx support is added.
    */
   StopLocation map(FlexibleStopPlace flexibleStopPlace) {
-    Object area = flexibleStopPlace
-      .getAreas()
-      .getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea()
-      .get(0);
-    if (!(area instanceof FlexibleArea)) {
-      issueStore.add(
-        Issue.issue(
-          "UnsupportedFlexibleStopPlaceAreaType",
-          "FlexibleStopPlace %s contains an unsupported area.",
-          flexibleStopPlace.getId()
-        )
-      );
-      LOG.warn(
-        "FlexibleStopPlace {} not mapped. Hail and ride areas are not currently supported.",
-        flexibleStopPlace.getId()
-      );
+    List<StopLocation> stops = new ArrayList<>();
+
+    var areas = flexibleStopPlace.getAreas().getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea();
+    for (var area : areas) {
+      if (!(area instanceof FlexibleArea flexibleArea)) {
+        issueStore.add(
+          Issue.issue(
+            "UnsupportedFlexibleStopPlaceAreaType",
+            "FlexibleStopPlace %s contains an unsupported area %s.",
+            flexibleStopPlace.getId(),
+            area
+          )
+        );
+        LOG.warn(
+          "FlexibleStopPlace {} contains an unsupported area {}. Hail and ride areas are not currently supported.",
+          flexibleStopPlace.getId(),
+          area
+        );
+        continue;
+      }
+
+      if (UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE.equals(getFlexibleAreaType(flexibleArea))) {
+        stops.addAll(findStopsInFlexArea(flexibleArea));
+      } else {
+        AreaStop areaStop = mapFlexArea(flexibleArea, flexibleStopPlace.getName().getValue());
+        if (areaStop != null) {
+          stops.add(areaStop);
+        }
+      }
+    }
+
+    if (stops.isEmpty()) {
       return null;
-    }
-
-    Optional<KeyValueStructure> flexibleAreaType = Optional.empty();
-    if (flexibleStopPlace.getKeyList() != null) {
-      flexibleAreaType =
-        flexibleStopPlace
-          .getKeyList()
-          .getKeyValue()
-          .stream()
-          .filter(k -> k.getKey().equals(FLEXIBLE_STOP_AREA_TYPE_KEY))
-          .findFirst();
-    }
-
-    if (
-      flexibleAreaType.isPresent() &&
-      flexibleAreaType.get().getValue().equals(UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE)
-    ) {
-      return mapStopsInFlexArea(flexibleStopPlace, (FlexibleArea) area);
     } else {
-      return mapFlexArea(flexibleStopPlace, (FlexibleArea) area);
+      // We create a new GroupStop, even if the stop place consists of a single area, in order to
+      // get the ids for the area and stop place correct
+      var builder = GroupStop
+        .of(idFactory.createId(flexibleStopPlace.getId()))
+        .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()));
+      stops.forEach(builder::addLocation);
+      return builder.build();
     }
   }
 
   /**
    * Allows pickup / drop off along any eligible street inside the area
    */
-  AreaStop mapFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
-    var name = new NonLocalizedString(flexibleStopPlace.getName().getValue());
+  AreaStop mapFlexArea(FlexibleArea area, String backupName) {
     Geometry geometry = mapGeometry(area);
     if (geometry == null) {
       return null;
     }
+
+    var areaName = area.getName();
     return AreaStop
-      .of(idFactory.createId(flexibleStopPlace.getId()))
-      .withName(name)
+      .of(idFactory.createId(area.getId()))
+      .withName(new NonLocalizedString(areaName != null ? areaName.getValue() : backupName))
       .withGeometry(geometry)
       .build();
   }
@@ -118,26 +121,18 @@ class FlexStopsMapper {
   /**
    * Allows pickup / drop off at any regular Stop inside the area
    */
-  @Nullable
-  GroupStop mapStopsInFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
-    GroupStopBuilder result = GroupStop
-      .of(idFactory.createId(flexibleStopPlace.getId()))
-      .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()));
-
+  List<RegularStop> findStopsInFlexArea(FlexibleArea area) {
     Geometry geometry = mapGeometry(area);
     if (geometry == null) {
-      return null;
+      return List.of();
     }
-    for (RegularStop stop : stopsSpatialIndex.query(geometry.getEnvelopeInternal())) {
-      Point p = GeometryUtils
-        .getGeometryFactory()
-        .createPoint(stop.getCoordinate().asJtsCoordinate());
-      if (geometry.contains(p)) {
-        result.addLocation(stop);
-      }
-    }
+    List<RegularStop> stops = stopsSpatialIndex
+      .query(geometry.getEnvelopeInternal())
+      .stream()
+      .filter(stop -> geometry.contains(stop.getGeometry()))
+      .collect(Collectors.toList());
 
-    if (result.stopLocations().isEmpty()) {
+    if (stops.isEmpty()) {
       issueStore.add(
         Issue.issue(
           "MissingStopsInUnrestrictedPublicTransportAreas",
@@ -149,10 +144,10 @@ class FlexStopsMapper {
         "FlexibleArea {} with type UnrestrictedPublicTransportAreas does not contain any regular stop.",
         area.getId()
       );
-      return null;
+      return List.of();
     }
 
-    return result.build();
+    return stops;
   }
 
   private Geometry mapGeometry(FlexibleArea area) {
@@ -169,5 +164,18 @@ class FlexStopsMapper {
       LOG.warn("FlexibleArea {}  has an invalid geometry", area.getId(), e);
       return null;
     }
+  }
+
+  private static String getFlexibleAreaType(FlexibleArea flexibleArea) {
+    String flexibleAreaType = null;
+    if (flexibleArea.getKeyList() != null) {
+      for (KeyValueStructure k : flexibleArea.getKeyList().getKeyValue()) {
+        if (k.getKey().equals(FLEXIBLE_STOP_AREA_TYPE_KEY)) {
+          flexibleAreaType = k.getValue();
+          break;
+        }
+      }
+    }
+    return flexibleAreaType;
   }
 }

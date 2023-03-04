@@ -3,6 +3,7 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
 import java.util.Arrays;
@@ -13,11 +14,14 @@ import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
@@ -30,7 +34,7 @@ class FlexStopsMapperTest {
   static final String FLEXIBLE_STOP_PLACE_ID = "RUT:FlexibleStopPlace:1";
   static final String FLEXIBLE_STOP_PLACE_NAME = "Sauda-HentMeg";
   static final String FLEXIBLE_AREA_ID = "RUT:FlexibleArea:1";
-  static final Collection<Double> AREA_POS_LIST = Arrays.asList(
+  static final List<Double> AREA_POS_LIST = Arrays.asList(
     59.62575084033623,
     6.3023991052849,
     59.62883380609349,
@@ -100,9 +104,21 @@ class FlexStopsMapperTest {
 
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
 
-    AreaStop areaStop = (AreaStop) flexStopsMapper.map(flexibleStopPlace);
+    StopLocation areaStop = flexStopsMapper.map(flexibleStopPlace);
 
     assertNotNull(areaStop);
+    assertNotNull(areaStop.getGeometry());
+    assertEquals(1, areaStop.getGeometry().getNumGeometries());
+    var areaStopPolygon = areaStop.getGeometry().getGeometryN(0);
+
+    Coordinate[] coordinates = new Coordinate[AREA_POS_LIST.size() / 2];
+    for (int i = 0; i < AREA_POS_LIST.size(); i += 2) {
+      coordinates[i / 2] = new Coordinate(AREA_POS_LIST.get(i + 1), AREA_POS_LIST.get(i));
+    }
+    var geometryFactory = GeometryUtils.getGeometryFactory();
+    var ring = geometryFactory.createLinearRing(coordinates);
+    var polygon = geometryFactory.createPolygon(ring);
+    assertTrue(polygon.equalsTopo(areaStopPolygon));
   }
 
   @Test
