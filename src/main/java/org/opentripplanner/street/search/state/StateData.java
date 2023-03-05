@@ -52,10 +52,10 @@ public class StateData implements Cloneable {
 
   /** Private constructor, use static methods to get a set of initial states. */
   protected StateData(StreetMode requestMode) {
-    if (requestMode.includesDriving()) {
-      currentMode = TraverseMode.CAR;
-    } else if (requestMode.includesWalking()) {
+    if (requestMode.includesWalking()) {
       currentMode = TraverseMode.WALK;
+    } else if (requestMode.includesDriving()) {
+      currentMode = TraverseMode.CAR;
     } else if (requestMode.includesBiking()) {
       currentMode = TraverseMode.BICYCLE;
     } else {
