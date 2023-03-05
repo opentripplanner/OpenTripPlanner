@@ -131,15 +131,20 @@ class StationMapper {
         stopPlace.getId() + " " + stopPlace.getName()
       );
       List<WgsCoordinate> coordinates = new ArrayList<>();
-      for (Object it : stopPlace.getQuays().getQuayRefOrQuay()) {
-        if (it instanceof Quay quay && quay.getCentroid() != null) {
-          coordinates.add(WgsCoordinateMapper.mapToDomain(quay.getCentroid()));
+      /* try to get a coordinate from quays in this stopPlace */
+      if (stopPlace.getQuays() != null) {
+        for (Object it : stopPlace.getQuays().getQuayRefOrQuay()) {
+          if (it instanceof Quay quay && quay.getCentroid() != null) {
+            coordinates.add(WgsCoordinateMapper.mapToDomain(quay.getCentroid()));
+          }
         }
       }
+      /* FIXME there are "sub"stopPlace with Quays that have no coordinates, but a ParentStopPlaceReference to a parentStop with a coordinate.... */
       if (coordinates.isEmpty()) {
-        throw new IllegalArgumentException(
-          "Station w/quays without coordinates. Station id: " + stopPlace.getId()
-        );
+        // throw new IllegalArgumentException(
+        //   "Station without any related coordinates. Station id: " + stopPlace.getId()
+        // );
+        return new WgsCoordinate(0f, 0f);
       }
       return WgsCoordinate.mean(coordinates);
     }
