@@ -42,6 +42,7 @@ class StateTest {
 
   static Stream<Arguments> testCases = Stream.of(
     of(SCOOTER_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
+    //FIXME: it's strange that the arriveBy rental searches all start on a bicycle
     of(SCOOTER_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
     of(BIKE_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
     of(BIKE_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
