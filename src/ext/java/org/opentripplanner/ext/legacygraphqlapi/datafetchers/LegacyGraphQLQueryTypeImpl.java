@@ -118,62 +118,7 @@ public class LegacyGraphQLQueryTypeImpl
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(
         environment.getArguments()
       );
-      List<LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType> severities = args.getLegacyGraphQLSeverityLevel() ==
-        null
-        ? null
-        : (
-          (List<LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType>) args.getLegacyGraphQLSeverityLevel()
-        ).stream()
-          .toList();
-      List<LegacyGraphQLTypes.LegacyGraphQLAlertEffectType> effects = args.getLegacyGraphQLEffect() ==
-        null
-        ? null
-        : (
-          (List<LegacyGraphQLTypes.LegacyGraphQLAlertEffectType>) args.getLegacyGraphQLEffect()
-        ).stream()
-          .toList();
-      List<LegacyGraphQLTypes.LegacyGraphQLAlertCauseType> causes = args.getLegacyGraphQLCause() ==
-        null
-        ? null
-        : (
-          (List<LegacyGraphQLTypes.LegacyGraphQLAlertCauseType>) args.getLegacyGraphQLCause()
-        ).stream()
-          .toList();
-      return alerts
-        .stream()
-        .filter(alert ->
-          args.getLegacyGraphQLFeeds() == null ||
-          ((List<String>) args.getLegacyGraphQLFeeds()).contains(alert.getId().getFeedId())
-        )
-        .filter(alert ->
-          severities == null || severities.contains(getLegacyGraphQLSeverity(alert.severity()))
-        )
-        .filter(alert -> effects == null || effects.contains(getLegacyGraphQLEffect(alert.effect()))
-        )
-        .filter(alert -> causes == null || causes.contains(getLegacyGraphQLCause(alert.cause())))
-        .filter(alert ->
-          args.getLegacyGraphQLRoute() == null ||
-          alert
-            .entities()
-            .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
-            .map(EntitySelector.Route.class::cast)
-            .anyMatch(route ->
-              ((List<String>) args.getLegacyGraphQLRoute()).contains(route.routeId().toString())
-            )
-        )
-        .filter(alert ->
-          args.getLegacyGraphQLStop() == null ||
-          alert
-            .entities()
-            .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
-            .map(EntitySelector.Stop.class::cast)
-            .anyMatch(stop ->
-              ((List<String>) args.getLegacyGraphQLStop()).contains(stop.stopId().toString())
-            )
-        )
-        .collect(Collectors.toList());
+      return filterAlerts(alerts, args);
     };
   }
 
@@ -1316,5 +1261,49 @@ public class LegacyGraphQLQueryTypeImpl
     private <T> void argument(String name, Consumer<T> consumer) {
       call(environment, name, consumer);
     }
+  }
+
+  protected static List<TransitAlert> filterAlerts(
+    Collection<TransitAlert> alerts,
+    LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs args
+  ) {
+    var severities = LegacyGraphQLUtils.mapIterableToList(args.getLegacyGraphQLSeverityLevel());
+    var effects = LegacyGraphQLUtils.mapIterableToList(args.getLegacyGraphQLEffect());
+    var causes = LegacyGraphQLUtils.mapIterableToList(args.getLegacyGraphQLCause());
+    return alerts
+      .stream()
+      .filter(alert ->
+        args.getLegacyGraphQLFeeds() == null ||
+        ((List<String>) args.getLegacyGraphQLFeeds()).contains(alert.getId().getFeedId())
+      )
+      .filter(alert ->
+        severities.isEmpty() || severities.contains(getLegacyGraphQLSeverity(alert.severity()))
+      )
+      .filter(alert -> effects.isEmpty() || effects.contains(getLegacyGraphQLEffect(alert.effect()))
+      )
+      .filter(alert -> causes.isEmpty() || causes.contains(getLegacyGraphQLCause(alert.cause())))
+      .filter(alert ->
+        args.getLegacyGraphQLRoute() == null ||
+        alert
+          .entities()
+          .stream()
+          .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
+          .map(EntitySelector.Route.class::cast)
+          .anyMatch(route ->
+            ((List<String>) args.getLegacyGraphQLRoute()).contains(route.routeId().toString())
+          )
+      )
+      .filter(alert ->
+        args.getLegacyGraphQLStop() == null ||
+        alert
+          .entities()
+          .stream()
+          .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
+          .map(EntitySelector.Stop.class::cast)
+          .anyMatch(stop ->
+            ((List<String>) args.getLegacyGraphQLStop()).contains(stop.stopId().toString())
+          )
+      )
+      .collect(Collectors.toList());
   }
 }
