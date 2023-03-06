@@ -20,7 +20,7 @@ to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opent
 navigate to
 the [directory of releases](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.2.0/),
 and download
-the [file whose name ends with `shaded.jar`](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.2.0/otp-2.2.0-shaded.jar)
+the [file with `shaded.jar` suffix](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.2.0/otp-2.2.0-shaded.jar)
 .
 
 You may also want to get your own copy of the OTP source code
