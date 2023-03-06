@@ -104,20 +104,24 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     }
     if (startOfRunningPeriod.isAfter(endOfRunningPeriod)) {
       if (hasFrequencies()) {
-        var tripId = frequencies.get(0).tripTimes.getTrip().getId();
+        var startTripId = frequencies.get(0).tripTimes.getTrip().getId();
+        var endTripId = frequencies.get(frequencies.size() - 1).tripTimes.getTrip().getId();
         LOG.warn(
-          "Could not construct as start of the running period {} is after the end {} in frequency trip {}",
+          "Could not construct as start of the running period {} in frequency trip {} is after the end {} in frequency trip {}",
           startOfRunningPeriod,
+          startTripId,
           endOfRunningPeriod,
-          tripId
+          endTripId
         );
       } else {
-        var tripId = tripTimes.get(0).getTrip().getId();
+        var startTripId = tripTimes.get(0).getTrip().getId();
+        var endTripId = tripTimes.get(tripTimes.size() - 1).getTrip().getId();
         LOG.warn(
-          "Could not construct as start of the running period {} is after the end {} in trip {}",
+          "Could not construct as start of the running period {} in trip {} is after the end {} in trip {}",
           startOfRunningPeriod,
+          startTripId,
           endOfRunningPeriod,
-          tripId
+          endTripId
         );
       }
       throw new IllegalArgumentException(
