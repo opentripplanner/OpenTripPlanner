@@ -98,6 +98,11 @@ jobs:
         run: |
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
+          
+          # mkdocs/mike generates a new sitemap.xml.gz for every commit even if the docs have not changed
+          # this configures the date of the change to be the date when the docs haven been changed last
+          # https://github.com/jimporter/mike/issues/103#issuecomment-1453878471
+          export SOURCE_DATE_EPOCH=git log -1 --format=%ct docs
 
           # mike, the versioning plugin for mkdocs, expects there to be a local branch to push to so
           # we are cloning one here and commit to it
