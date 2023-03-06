@@ -1,6 +1,8 @@
 package org.opentripplanner.graph_builder.linking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
@@ -21,10 +24,12 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -38,10 +43,9 @@ import org.slf4j.LoggerFactory;
 public class LinkStopToPlatformTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(LinkStopToPlatformTest.class);
-
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-  private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate stop) {
+  private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     Graph graph = new Graph(deduplicator);
@@ -58,16 +62,21 @@ public class LinkStopToPlatformTest {
     }
     closedGeom[platform.length] = closedGeom[0];
 
-    AreaEdgeList areaEdgeList = new AreaEdgeList(
-      GeometryUtils.getGeometryFactory().createPolygon(closedGeom),
-      Set.of()
-    );
+    Polygon polygon = GeometryUtils.getGeometryFactory().createPolygon(closedGeom);
+    AreaEdgeList areaEdgeList = new AreaEdgeList(polygon, Set.of());
 
     // visibility vertices are platform entrance points and convex corners
     // which should be directly linked with stops
     for (int i : visible) {
       areaEdgeList.visibilityVertices.add(vertices.get(i));
     }
+
+    // AreaEdgeList must include a valid NamedArea which defines area atttributes
+    NamedArea namedArea = new NamedArea();
+    namedArea.setName(new LocalizedString("test platform"));
+    namedArea.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    namedArea.setOriginalEdges(polygon);
+    areaEdgeList.addArea(namedArea);
 
     ArrayList<AreaEdge> edges = new ArrayList<>();
 
@@ -84,22 +93,25 @@ public class LinkStopToPlatformTest {
       );
     }
 
-    RegularStop transitStop = TransitModelForTest
-      .stop("TestStop")
-      .withCoordinate(stop.y, stop.x)
-      .build();
+    RegularStop transitStops[] = new RegularStop[stops.length];
+    for (int i = 0; i < stops.length; i++) {
+      Coordinate stop = stops[i];
+      transitStops[i] =
+        TransitModelForTest.stop("TestStop " + i).withCoordinate(stop.y, stop.x).build();
+    }
 
     transitModel.index();
     graph.index(transitModel.getStopModel());
 
-    new TransitStopVertexBuilder().withGraph(graph).withStop(transitStop).build();
+    for (RegularStop s : transitStops) {
+      new TransitStopVertexBuilder().withGraph(graph).withStop(s).build();
+    }
 
-    LOG.info("Test graph size {}", graph.getEdges().size());
     return graph;
   }
 
   /**
-   * Link stop outside platform area to platform. Adds direct connection to closest edges.
+   * Link stop outside platform area to platform.
    */
   @Test
   public void testLinkStopOutsideArea() {
@@ -114,14 +126,20 @@ public class LinkStopToPlatformTest {
     int visibilityPoints[] = { 0, 1, 2, 3 };
 
     // place one stop outside the platform, halway under the bottom edge
-    Coordinate stop = new Coordinate(10.001, 59.9999);
+    Coordinate stops[] = { new Coordinate(10.001, 59.9999) };
 
-    Graph graph = prepareTest(platform, visibilityPoints, stop);
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
     linkStops(graph);
 
-    // Two bottom edges gets split into half and both split points
-    // connected to the stop bidirectonally. 6 new eges get added.
-    assertEquals(14, graph.getEdges().size());
+    for (Edge e : graph.getEdges()) {
+      LOG.debug("Edge {}", e);
+    }
+
+    // Two bottom edges gets split into half (+2 edges)
+    // both split points are linked to the stop bidirectonally (+4 edges).
+    // both split points also link to 2 visibility points at opposite side (+8 edges)
+    // 14 new edges in total
+    assertEquals(22, graph.getEdges().size());
   }
 
   /**
@@ -140,16 +158,81 @@ public class LinkStopToPlatformTest {
     int visibilityPoints[] = { 0, 1, 2, 3 };
 
     // place one stop inside the platform, near bottom left corner
-    Coordinate stop = new Coordinate(10.001, 60.001);
+    Coordinate stops[] = { new Coordinate(10.001, 60.001) };
 
-    Graph graph = prepareTest(platform, visibilityPoints, stop);
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
     linkStops(graph);
 
-    for (Edge e : graph.getEdges()) {
-      LOG.info("Edge {}", e);
+    // stop links to a new street vertex with 2 edges
+    // new vertex connects to all 4 visibility points with 4*2 new edges
+    assertEquals(18, graph.getEdges().size());
+  }
+
+  /**
+   * Link stop which is very close to a platform vertex.
+   * Linking snaps directly to the vertex.
+   */
+  @Test
+  public void testLinkStopNearPlatformVertex() {
+    Coordinate platform[] = {
+      new Coordinate(10, 60.002),
+      new Coordinate(10.004, 60.002),
+      new Coordinate(10.004, 60),
+      new Coordinate(10, 60),
+    };
+    // add entrance to every corner of the platform
+    int visibilityPoints[] = { 0, 1, 2, 3 };
+
+    // place one stop inside the platform, very near of the bottom left corner
+    Coordinate stops[] = { new Coordinate(10.00000001, 60.00000001) };
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+    linkStops(graph);
+
+    // stop links to a existing vertex with 2 edges
+    // selected vertex connects to oppiste corner  with 2 new edges
+    assertEquals(12, graph.getEdges().size());
+  }
+
+  /**
+   * Link two stops inside platform area to platform.
+   * Stops will get linked directly.
+   */
+  @Test
+  public void testLinkTwoStopsInsideArea() {
+    Coordinate platform[] = {
+      new Coordinate(10, 60.002),
+      new Coordinate(10.004, 60.002),
+      new Coordinate(10.004, 60),
+      new Coordinate(10, 60),
+    };
+    // entrance to every corner of the platform
+    int visibilityPoints[] = { 0, 1, 2, 3 };
+
+    // place two stops inside the platform
+    Coordinate stops[] = { new Coordinate(10.001, 60.001), new Coordinate(10.003, 60.001) };
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+    linkStops(graph);
+
+    // stops are linked with 2 new street vertices with 2 edges each (+4)
+    // new vertices connects to original 4 visibility points with 2*4*2 new edges (+16)
+    // stops are also linked directly (+2)
+    assertEquals(30, graph.getEdges().size());
+
+    // verify direct linking
+    List<TransitStopVertex> transitStops = graph.getVerticesOfType(TransitStopVertex.class);
+    Vertex v1 = null;
+    Vertex v2 = null;
+    for (Edge e : transitStops.get(0).getOutgoing()) {
+      v1 = e.getToVertex();
     }
-    // stop connects to all 4 visibility points and 4*2 new edges will be added
-    assertEquals(16, graph.getEdges().size());
+    for (Edge e : transitStops.get(1).getOutgoing()) {
+      v2 = e.getToVertex();
+    }
+    assertNotNull(v1);
+    assertNotNull(v2);
+    assertTrue(v1.isConnected(v2));
   }
 
   private void linkStops(Graph graph) {
