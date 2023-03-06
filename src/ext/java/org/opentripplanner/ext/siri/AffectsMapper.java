@@ -142,14 +142,12 @@ public class AffectsMapper {
 
       final FramedVehicleJourneyRefStructure framedVehicleJourneyRef = affectedVehicleJourney.getFramedVehicleJourneyRef();
       if (framedVehicleJourneyRef != null) {
-
         selectors.addAll(
           mapTripSelectors(
             affectedStops,
-            List.of(
-              entityResolver.resolveId(framedVehicleJourneyRef.getDatedVehicleJourneyRef())
-            ),
-            entityResolver.resolveServiceDate(framedVehicleJourneyRef))
+            List.of(entityResolver.resolveId(framedVehicleJourneyRef.getDatedVehicleJourneyRef())),
+            entityResolver.resolveServiceDate(framedVehicleJourneyRef)
+          )
         );
       }
 
