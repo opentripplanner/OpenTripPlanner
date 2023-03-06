@@ -390,17 +390,12 @@ public class VertexLinker {
       boolean split = true;
       // if vertex is inside an area, no need to snap to nearest edge and split it
       if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
-        // do not relink again to same area when many edges are equally close
-        if (linkedAreas.contains(aEdge.getArea())) {
-          return null;
-        }
-
-        if (
-          aEdge
-            .getArea()
-            .getGeometry()
-            .contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))
-        ) {
+        AreaEdgeList ael = aEdge.getArea();
+        if (ael.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))) {
+          // do not relink again to the area when many edges are equally close
+          if (!linkedAreas.add(ael)) {
+            return null;
+          }
           if (vertex instanceof IntersectionVertex iv) {
             start = iv;
           } else {
@@ -586,7 +581,6 @@ public class VertexLinker {
       createSegments(newVertex, v, edgeList, areas, scope, tempEdges);
       added++;
     }
-
     // TODO: Temporary fix for unconnected area edges. This should go away when moving walkable
     // area calculation to be done after stop linking
     if (added == 0) {
@@ -608,12 +602,9 @@ public class VertexLinker {
     DisposableEdgeCollection tempEdges
   ) {
     // Check that vertices are not yet linked
-    for (Edge e : from.getOutgoing()) {
-      if (e.getToVertex() == to) {
-        return;
-      }
+    if (from.isConnected(to)) {
+      return;
     }
-
     LineString line = GEOMETRY_FACTORY.createLineString(
       new Coordinate[] { from.getCoordinate(), to.getCoordinate() }
     );
