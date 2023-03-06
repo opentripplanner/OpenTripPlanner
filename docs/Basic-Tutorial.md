@@ -18,7 +18,7 @@ JAR containing all other libraries needed for OTP to work, and is available from
 repository. You will be able to go
 to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/),
 navigate to
-the [directory for the 2.1 release](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.2.0/),
+the [directory of releases](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.2.0/),
 and download
 the [file whose name ends with `shaded.jar`](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.2.0/otp-2.2.0-shaded.jar)
 .
