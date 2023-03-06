@@ -141,6 +141,6 @@ public class LegacyGraphQLUtils {
    * Converts iterable to List or returns an empty List of iterable is null.
    */
   public static <T> List<T> mapIterableToList(Iterable<T> iterable) {
-    return iterable == null ? List.of() : (List<T>) iterable;
+    return iterable == null ? List.of() : java.util.stream.StreamSupport.stream(iterable.spliterator(), false).toList();
   }
 }
