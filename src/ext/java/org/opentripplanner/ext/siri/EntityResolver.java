@@ -12,6 +12,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.org.siri.siri20.DataFrameRefStructure;
 import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
@@ -88,17 +89,22 @@ public class EntityResolver {
   public TripOnServiceDate resolveTripOnServiceDate(
     FramedVehicleJourneyRefStructure framedVehicleJourney
   ) {
-    LocalDate serviceDate = resolveServiceDate(framedVehicleJourney);
+    return resolveTripOnServiceDate(
+      framedVehicleJourney.getDatedVehicleJourneyRef(),
+      resolveServiceDate(framedVehicleJourney)
+    );
+  }
 
+  public TripOnServiceDate resolveTripOnServiceDate(
+    String serviceJourneyId,
+    LocalDate serviceDate
+  ) {
     if (serviceDate == null) {
       return null;
     }
 
     return transitService.getTripOnServiceDateForTripAndDay(
-      new TripIdAndServiceDate(
-        resolveId(framedVehicleJourney.getDatedVehicleJourneyRef()),
-        serviceDate
-      )
+      new TripIdAndServiceDate(resolveId(serviceJourneyId), serviceDate)
     );
   }
 
