@@ -96,7 +96,8 @@ for cropping and filtering OSM data.
 A typical command to start OTP looks like `java -Xmx2G -jar otp.shaded.jar <options>`. The
 `-Xmx` parameter sets the limit on how much memory OTP is allowed to consume. GTFS and OSM data sets
 are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory when
-working with the Portland TriMet data set, and several gigabytes for larger inputs. If you have
+working with the Portland TriMet data set, and several gigabytes for larger inputs.
+[Here is more information about the system requirements](System-Requirements.md). If you have
 sufficient memory in your computer, set this to a couple of gigabytes (e.g. `-Xmx2G`). Java uses
 a [garbage collection](https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)) approach
 to memory management, which requires some "breathing room" to efficiently operate. Without
