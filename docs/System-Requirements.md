@@ -8,7 +8,7 @@ OTP is relatively memory-hungry as it includes all the required data in memory. 
 
 ### Processor
 
-Single thread perfomance is an important factor for OTP's perfomance. Additionally, OTP benefits from larger CPU cache as reading from memory can be a bottleneck.
+Single thread performance is an important factor for OTP's performance. Additionally, OTP benefits from larger CPU cache as reading from memory can be a bottleneck.
 
 OTP's performance scales with the number of available CPU cores. OTP processes each request in a separate thread and depending on the configuration, a single request can use multiple threads. Realtime updates also run in a separate thread. Therefore, to have a good performance, it makes sense to have multiple cores available. How OTP uses parallel processing also depends on the available cores (<= 2 cores vs >2 cores) in some cases. Therefore, load testing should be done against a machine that doesn't differ too much from production machines.
 
