@@ -2,6 +2,7 @@ package org.opentripplanner.street.search.state;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.search.TraverseMode;
@@ -46,6 +47,7 @@ public class StateData implements Cloneable {
   protected boolean enteredNoThroughTrafficArea;
 
   protected boolean insideNoRentalDropOffArea = false;
+  public Set<String> noRentalDropOffZonesAtStartOfReverseSearch = Set.of();
 
   /** Private constructor, use static methods to get a set of initial states. */
   private StateData(StreetMode requestMode) {
@@ -138,6 +140,7 @@ public class StateData implements Cloneable {
           }
           var floatingRentalStateData = proto.clone();
           floatingRentalStateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
+          floatingRentalStateData.rentalVehicleFormFactor = toFormFactor(requestMode);
           floatingRentalStateData.currentMode = TraverseMode.BICYCLE;
           res.add(floatingRentalStateData);
         }
@@ -167,6 +170,25 @@ public class StateData implements Cloneable {
     }
 
     return res;
+  }
+
+  private static RentalFormFactor toFormFactor(StreetMode streetMode) {
+    return switch (streetMode) {
+      case BIKE_RENTAL -> RentalFormFactor.BICYCLE;
+      case SCOOTER_RENTAL -> RentalFormFactor.SCOOTER;
+      case CAR_RENTAL -> RentalFormFactor.CAR;
+      // there is no default here so you get a compiler error when you add a new value to the enum
+      case NOT_SET,
+        WALK,
+        BIKE,
+        BIKE_TO_PARK,
+        CAR,
+        CAR_TO_PARK,
+        CAR_PICKUP,
+        FLEXIBLE -> throw new IllegalStateException(
+        "Cannot convert street mode %s to a form factor".formatted(streetMode)
+      );
+    };
   }
 
   public StateData clone() {

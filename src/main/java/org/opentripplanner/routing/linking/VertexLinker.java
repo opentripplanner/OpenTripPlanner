@@ -442,6 +442,7 @@ public class VertexLinker {
 
     // create the geometries
     Coordinate splitPoint = ll.getCoordinate(geometry);
+
     SplitterVertex v = splitVertex(originalEdge, scope, direction, splitPoint.x, splitPoint.y);
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
@@ -497,6 +498,8 @@ public class VertexLinker {
       v = new SplitterVertex(graph, uniqueSplitLabel, x, y, originalEdge.getName());
     }
     v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
+    v.addRentalRestriction(originalEdge.getToVertex().rentalRestrictions());
+
     return v;
   }
 

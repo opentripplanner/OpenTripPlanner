@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 0
           
@@ -75,14 +75,14 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.3.0
         # this is necessary so that the correct credentials are put into the git configuration
         # when we push to dev-2.x and push the HTML to the git repo
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
 
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.3.0
         # for a simple PR where we don't push, we don't need any credentials
         if: github.event_name == 'pull_request'
 

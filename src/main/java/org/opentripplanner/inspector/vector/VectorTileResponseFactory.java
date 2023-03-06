@@ -5,6 +5,7 @@ import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -28,6 +29,22 @@ public class VectorTileResponseFactory {
     Envelope envelope = WebMercatorTile.tile2Envelope(x, y, z);
 
     int cacheMaxSeconds = Integer.MAX_VALUE;
+
+    var availableLayerNames = availableLayers
+      .stream()
+      .map(LayerParameters::name)
+      .collect(Collectors.toSet());
+    if (!availableLayerNames.containsAll(requestedLayers)) {
+      return Response
+        .status(Response.Status.NOT_FOUND)
+        .entity(
+          "Could not find vector tile layer(s). Requested layers: %s. Available layers: %s.".formatted(
+              requestedLayers,
+              availableLayerNames
+            )
+        )
+        .build();
+    }
 
     for (LayerParameters<LayerType> layerParameters : availableLayers) {
       if (

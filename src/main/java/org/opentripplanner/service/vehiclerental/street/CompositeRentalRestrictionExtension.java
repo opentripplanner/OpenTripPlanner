@@ -92,6 +92,19 @@ public final class CompositeRentalRestrictionExtension implements RentalRestrict
   }
 
   @Override
+  public boolean hasRestrictions() {
+    return extensions.length > 0;
+  }
+
+  @Override
+  public Set<String> noDropOffNetworks() {
+    return Arrays
+      .stream(extensions)
+      .flatMap(e -> e.noDropOffNetworks().stream())
+      .collect(Collectors.toSet());
+  }
+
+  @Override
   public List<String> networks() {
     return Arrays.stream(extensions).flatMap(e -> e.networks().stream()).toList();
   }

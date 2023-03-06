@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.flex;
+package org.opentripplanner.ext.flex.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,8 +20,8 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresFilter;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
+import org.opentripplanner.ext.flex.FlexRouter;
+import org.opentripplanner.ext.flex.FlexTest;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
