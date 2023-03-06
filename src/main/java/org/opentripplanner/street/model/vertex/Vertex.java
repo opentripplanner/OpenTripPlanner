@@ -200,6 +200,23 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return result;
   }
 
+  /**
+   * Returns true if vertex is connected to another one by an edge
+   */
+  public boolean isConnected(Vertex v) {
+    for (Edge e : this.getOutgoing()) {
+      if (e.getToVertex() == v) {
+        return true;
+      }
+    }
+    for (Edge e : v.getOutgoing()) {
+      if (e.getToVertex() == this) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public boolean rentalTraversalBanned(State currentState) {
     return rentalRestrictions.traversalBanned(currentState);
   }
