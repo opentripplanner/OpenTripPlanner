@@ -7,8 +7,8 @@ import java.util.Map;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper.DigitransitRentalVehiclePropertyMapper;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 
 public class VehicleRentalVehiclesLayerBuilder
   extends VehicleRentalLayerBuilder<VehicleRentalVehicle> {

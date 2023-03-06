@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vehicle_rental;
+package org.opentripplanner.service.vehiclerental.model;
 
 import javax.annotation.Nullable;
 

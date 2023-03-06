@@ -25,6 +25,7 @@ public final class TemporaryStreetLocation extends StreetLocation implements Tem
       if (endVertex) {
         throw new UnsupportedOperationException("Can't add outgoing edge to end vertex");
       } else {
+        addRentalRestriction(edge.getToVertex().rentalRestrictions());
         super.addOutgoing(edge);
       }
     } else {
@@ -36,6 +37,7 @@ public final class TemporaryStreetLocation extends StreetLocation implements Tem
   public void addIncoming(Edge edge) {
     if (edge instanceof TemporaryEdge) {
       if (endVertex) {
+        addRentalRestriction(edge.getFromVertex().rentalRestrictions());
         super.addIncoming(edge);
       } else {
         throw new UnsupportedOperationException("Can't add incoming edge to start vertex");
