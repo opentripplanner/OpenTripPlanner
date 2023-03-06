@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFilterPlaceType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
@@ -141,6 +142,8 @@ public class LegacyGraphQLUtils {
    * Converts iterable to List or returns an empty List of iterable is null.
    */
   public static <T> List<T> mapIterableToList(Iterable<T> iterable) {
-    return iterable == null ? List.of() : java.util.stream.StreamSupport.stream(iterable.spliterator(), false).toList();
+    return iterable == null
+      ? List.of()
+      : StreamSupport.stream(iterable.spliterator(), false).toList();
   }
 }
