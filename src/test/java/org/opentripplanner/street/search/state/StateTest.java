@@ -4,11 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
-import static org.opentripplanner.routing.api.request.StreetMode.CAR;
+import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
+import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
 import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
+import static org.opentripplanner.street.search.TraverseMode.CAR;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.street.search.state.VehicleRentalState.BEFORE_RENTING;
 import static org.opentripplanner.street.search.state.VehicleRentalState.HAVE_RENTED;
@@ -30,11 +33,11 @@ class StateTest {
 
   Vertex v1 = intersectionVertex(1, 1);
 
-  static Set<VehicleRentalState> NULL_MODES;
+  static Set<VehicleRentalState> NULL_RENTAL_STATES;
 
   static {
-    NULL_MODES = new HashSet<>();
-    NULL_MODES.add(null);
+    NULL_RENTAL_STATES = new HashSet<>();
+    NULL_RENTAL_STATES.add(null);
   }
 
   static Stream<Arguments> testCases = Stream.of(
@@ -44,8 +47,12 @@ class StateTest {
     of(BIKE_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
     of(CAR_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
     of(CAR_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
-    of(CAR, false, NULL_MODES, Set.of(TraverseMode.CAR)),
-    of(BIKE, false, NULL_MODES, Set.of(BICYCLE))
+    of(StreetMode.CAR, false, NULL_RENTAL_STATES, Set.of(TraverseMode.CAR)),
+    of(BIKE, false, NULL_RENTAL_STATES, Set.of(BICYCLE)),
+    of(StreetMode.WALK, false, NULL_RENTAL_STATES, Set.of(TraverseMode.WALK)),
+    of(BIKE_TO_PARK, false, NULL_RENTAL_STATES, Set.of(BICYCLE)),
+    of(CAR_TO_PARK, false, NULL_RENTAL_STATES, Set.of(CAR)),
+    of(FLEXIBLE, false, NULL_RENTAL_STATES, Set.of(WALK))
   );
 
   @ParameterizedTest(
