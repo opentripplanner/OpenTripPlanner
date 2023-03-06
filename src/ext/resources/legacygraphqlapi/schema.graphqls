@@ -1309,7 +1309,7 @@ type FareContainer {
 }
 
 "A fare product (ticket) to cover the entire or a subset of an itinerary."
-type FareProduct {
+type FareProductInstance {
     """
     Identifier local to the itinerary that allows to cross-reference fare products that span
     more than one leg.
@@ -1572,7 +1572,7 @@ type Leg {
     Please read the documentation of `instanceId` very carefully to learn how a single fare product
     that applies to multiple legs can appear several times.
     """
-    fareProducts: [FareProduct]
+    fareProducts: [FareProductInstance]
 }
 
 """A span of time."""
