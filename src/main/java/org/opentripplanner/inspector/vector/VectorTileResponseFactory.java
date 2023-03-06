@@ -5,10 +5,10 @@ import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.resource.WebMercatorTile;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
  * Common functionality for creating a vector tile response.
@@ -23,13 +23,28 @@ public class VectorTileResponseFactory {
     List<String> requestedLayers,
     List<LayerParameters<LayerType>> availableLayers,
     LayerBuilderFactory<LayerType> layerBuilderFactory,
-    Graph graph,
-    TransitService transitService
+    OtpServerRequestContext context
   ) {
     VectorTile.Tile.Builder mvtBuilder = VectorTile.Tile.newBuilder();
     Envelope envelope = WebMercatorTile.tile2Envelope(x, y, z);
 
     int cacheMaxSeconds = Integer.MAX_VALUE;
+
+    var availableLayerNames = availableLayers
+      .stream()
+      .map(LayerParameters::name)
+      .collect(Collectors.toSet());
+    if (!availableLayerNames.containsAll(requestedLayers)) {
+      return Response
+        .status(Response.Status.NOT_FOUND)
+        .entity(
+          "Could not find vector tile layer(s). Requested layers: %s. Available layers: %s.".formatted(
+              requestedLayers,
+              availableLayerNames
+            )
+        )
+        .build();
+    }
 
     for (LayerParameters<LayerType> layerParameters : availableLayers) {
       if (
@@ -39,7 +54,7 @@ public class VectorTileResponseFactory {
       ) {
         cacheMaxSeconds = Math.min(cacheMaxSeconds, layerParameters.cacheMaxSeconds());
         VectorTile.Tile.Layer layer = layerBuilderFactory
-          .crateLayerBuilder(layerParameters, locale, graph, transitService)
+          .createLayerBuilder(layerParameters, locale, context)
           .build(envelope);
         mvtBuilder.addLayers(layer);
       }
@@ -58,11 +73,10 @@ public class VectorTileResponseFactory {
 
   @FunctionalInterface
   public interface LayerBuilderFactory<LayerType extends Enum<LayerType>> {
-    LayerBuilder<?> crateLayerBuilder(
+    LayerBuilder<?> createLayerBuilder(
       LayerParameters<LayerType> layerParameters,
       Locale locale,
-      Graph graph,
-      TransitService transitService
+      OtpServerRequestContext context
     );
   }
 }

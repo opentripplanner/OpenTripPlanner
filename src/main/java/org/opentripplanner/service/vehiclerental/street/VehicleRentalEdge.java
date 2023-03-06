@@ -1,0 +1,204 @@
+package org.opentripplanner.service.vehiclerental.street;
+
+import java.util.Collections;
+import java.util.Set;
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.street.model.RentalFormFactor;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
+
+/**
+ * Renting or dropping off a rented vehicle edge.
+ *
+ * @author laurent
+ */
+public class VehicleRentalEdge extends Edge {
+
+  public RentalFormFactor formFactor;
+
+  public VehicleRentalEdge(VehicleRentalPlaceVertex vertex, RentalFormFactor formFactor) {
+    super(vertex, vertex);
+    this.formFactor = formFactor;
+  }
+
+  public State traverse(State s0) {
+    if (!s0.getRequest().mode().includesRenting()) {
+      return null;
+    }
+
+    var allowedRentalFormFactors = allowedModes(s0.getRequest().mode());
+    if (!allowedRentalFormFactors.isEmpty() && !allowedRentalFormFactors.contains(formFactor)) {
+      return null;
+    }
+
+    StateEditor s1 = s0.edit(this);
+
+    VehicleRentalPlaceVertex stationVertex = (VehicleRentalPlaceVertex) tov;
+    VehicleRentalPlace station = stationVertex.getStation();
+    String network = station.getNetwork();
+    var preferences = s0.getPreferences();
+    boolean realtimeAvailability = preferences.rental().useAvailabilityInformation();
+
+    if (station.networkIsNotAllowed(s0.getRequest().rental())) {
+      return null;
+    }
+
+    boolean pickedUp;
+    if (s0.getRequest().arriveBy()) {
+      switch (s0.getVehicleRentalState()) {
+        case BEFORE_RENTING -> {
+          return null;
+        }
+        case HAVE_RENTED -> {
+          if (
+            (realtimeAvailability && !station.allowDropoffNow()) ||
+            !station.getAvailableDropoffFormFactors(realtimeAvailability).contains(formFactor)
+          ) {
+            return null;
+          }
+          s1.dropOffRentedVehicleAtStation(formFactor, network, true);
+          pickedUp = false;
+        }
+        case RENTING_FLOATING -> {
+          if (!station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)) {
+            return null;
+          }
+          if (station.isFloatingVehicle()) {
+            s1.beginFloatingVehicleRenting(formFactor, network, true);
+            pickedUp = true;
+          } else {
+            return null;
+          }
+        }
+        case RENTING_FROM_STATION -> {
+          if (
+            (realtimeAvailability && !station.allowPickupNow()) ||
+            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
+          ) {
+            return null;
+          }
+          // For arriveBy searches mayKeepRentedVehicleAtDestination is only set in State#getInitialStates(),
+          // and so here it is checked if this bicycle could have been kept at the destination
+          if (
+            s0.mayKeepRentedVehicleAtDestination() &&
+            !station.isArrivingInRentalVehicleAtDestinationAllowed()
+          ) {
+            return null;
+          }
+          if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {
+            return null;
+          }
+          s1.beginVehicleRentingAtStation(formFactor, network, false, true);
+          pickedUp = true;
+        }
+        default -> throw new IllegalStateException();
+      }
+    } else {
+      switch (s0.getVehicleRentalState()) {
+        case BEFORE_RENTING -> {
+          if (
+            (realtimeAvailability && !station.allowPickupNow()) ||
+            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
+          ) {
+            return null;
+          }
+          if (station.isFloatingVehicle()) {
+            s1.beginFloatingVehicleRenting(formFactor, network, false);
+          } else {
+            boolean mayKeep =
+              s0.getRequest().rental().allowArrivingInRentedVehicleAtDestination() &&
+              station.isArrivingInRentalVehicleAtDestinationAllowed();
+            s1.beginVehicleRentingAtStation(formFactor, network, mayKeep, false);
+          }
+          pickedUp = true;
+        }
+        case HAVE_RENTED -> {
+          return null;
+        }
+        case RENTING_FLOATING, RENTING_FROM_STATION -> {
+          if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {
+            return null;
+          }
+          var formFactors = station.getAvailableDropoffFormFactors(realtimeAvailability);
+          if (
+            (realtimeAvailability && !station.allowDropoffNow()) ||
+            !formFactors.contains(formFactor)
+          ) {
+            return null;
+          }
+          if (
+            !allowedRentalFormFactors.isEmpty() &&
+            Collections.disjoint(allowedRentalFormFactors, formFactors)
+          ) {
+            return null;
+          }
+          s1.dropOffRentedVehicleAtStation(formFactor, network, false);
+          pickedUp = false;
+        }
+        default -> throw new IllegalStateException();
+      }
+    }
+
+    s1.incrementWeight(
+      pickedUp ? preferences.rental().pickupCost() : preferences.rental().dropoffCost()
+    );
+    s1.incrementTimeInSeconds(
+      pickedUp ? preferences.rental().pickupTime() : preferences.rental().dropoffTime()
+    );
+    s1.setBackMode(null);
+    return s1.makeState();
+  }
+
+  @Override
+  public I18NString getName() {
+    return getToVertex().getName();
+  }
+
+  @Override
+  public boolean hasBogusName() {
+    return false;
+  }
+
+  @Override
+  public LineString getGeometry() {
+    return null;
+  }
+
+  @Override
+  public double getDistanceMeters() {
+    return 0;
+  }
+
+  /**
+   * @param stationNetwork The station network where we want to drop the bike off.
+   * @param rentedNetwork  The networks of the station we rented the bike from.
+   * @return true if the bike can be dropped off here, false if not.
+   */
+  private boolean hasCompatibleNetworks(String stationNetwork, String rentedNetwork) {
+    /*
+     * Special case for "null" networks ("catch-all" network defined).
+     */
+    if (rentedNetwork == null) {
+      return true;
+    }
+
+    return rentedNetwork.equals(stationNetwork);
+  }
+
+  private static Set<RentalFormFactor> allowedModes(StreetMode streetMode) {
+    return switch (streetMode) {
+      case BIKE_RENTAL -> Set.of(RentalFormFactor.BICYCLE, RentalFormFactor.CARGO_BICYCLE);
+      case SCOOTER_RENTAL -> Set.of(
+        RentalFormFactor.SCOOTER,
+        RentalFormFactor.SCOOTER_SEATED,
+        RentalFormFactor.SCOOTER_STANDING
+      );
+      case CAR_RENTAL -> Set.of(RentalFormFactor.CAR);
+      default -> Set.of();
+    };
+  }
+}

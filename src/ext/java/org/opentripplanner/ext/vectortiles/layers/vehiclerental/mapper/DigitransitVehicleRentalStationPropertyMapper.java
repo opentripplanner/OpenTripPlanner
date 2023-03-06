@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import org.opentripplanner.api.mapping.I18NStringMapper;
 import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 
 public class DigitransitVehicleRentalStationPropertyMapper
   extends PropertyMapper<VehicleRentalStation> {

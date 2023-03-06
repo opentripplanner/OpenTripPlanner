@@ -9,8 +9,8 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper.DigitransitRealtimeVehicleRentalStationPropertyMapper;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper.DigitransitVehicleRentalStationPropertyMapper;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 
 public class VehicleRentalStationsLayerBuilder
   extends VehicleRentalLayerBuilder<VehicleRentalStation> {
