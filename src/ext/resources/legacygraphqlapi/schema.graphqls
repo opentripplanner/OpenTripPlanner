@@ -1308,7 +1308,7 @@ type FareContainer {
     name: String
 }
 
-"A fare product (ticket) to cover thi entire or a subset of an itinerary."
+"A fare product (ticket) to cover the entire or a subset of an itinerary."
 type FareProduct {
     """
     Identifier local to the itinerary that allows to cross-reference fare products that span
@@ -1565,6 +1565,13 @@ type Leg {
 
         ): [Leg!]
 
+    """
+    Fare products are purchasable tickets which may have an optional fare container or rider
+    category that limits who can buy them or how.
+
+    Please read the documentation of `instanceId` very carefully to learn how a single fare product
+    that applies to multiple legs can appear several times.
+    """
     fareProducts: [FareProduct]
 }
 
