@@ -190,7 +190,7 @@ public class LinkStopToPlatformTest {
     linkStops(graph);
 
     // stop links to a existing vertex with 2 edges
-    // selected vertex connects to oppiste corner  with 2 new edges
+    // selected vertex connects to opposite corner with 2 new edges
     assertEquals(12, graph.getEdges().size());
   }
 
