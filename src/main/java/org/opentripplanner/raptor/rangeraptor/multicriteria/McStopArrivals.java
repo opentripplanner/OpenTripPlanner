@@ -128,7 +128,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   private StopArrivalParetoSet<T> findOrCreateSet(final int stop) {
     if (arrivals[stop] == null) {
       arrivals[stop] =
-        StopArrivalParetoSet.createStopArrivalSetWithListener(
+        StopArrivalParetoSet.createStopArrivalSetWithOnBoardCriteria(
           debugHandlerFactory.paretoSetStopArrivalListener(stop)
         );
     }

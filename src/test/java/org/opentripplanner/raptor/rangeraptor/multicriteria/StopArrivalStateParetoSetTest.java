@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor.rangeraptor.multicriteria.StopArrivalParetoSet.createEgressStopArrivalSet;
-import static org.opentripplanner.raptor.rangeraptor.multicriteria.StopArrivalParetoSet.createStopArrivalSetWithListener;
+import static org.opentripplanner.raptor.rangeraptor.multicriteria.StopArrivalParetoSet.createStopArrivalSet;
 
 import java.util.Arrays;
 import java.util.List;
@@ -64,13 +64,11 @@ public class StopArrivalStateParetoSetTest {
     BASE_COST
   );
 
-  private final StopArrivalParetoSet<RaptorTripSchedule> subject = createStopArrivalSetWithListener(
-    null
-  );
+  private final StopArrivalParetoSet<RaptorTripSchedule> subject = createStopArrivalSet(null);
 
   private static Stream<Arguments> testCases() {
     return Stream.of(
-      Arguments.of("Stop Arrival - regular", createStopArrivalSetWithListener(null)),
+      Arguments.of("Stop Arrival - regular", createStopArrivalSet(null)),
       Arguments.of("Stop Arrival - w/egress", createEgressStopArrivalSet(List.of(), null, null))
     );
   }
@@ -155,7 +153,7 @@ public class StopArrivalStateParetoSetTest {
    */
   @Test
   public void testTransitAndTransferDoesNotAffectDominance() {
-    var subject = createStopArrivalSetWithListener(null);
+    var subject = createStopArrivalSet(null);
     subject.add(newAccessStopState(STOP_1, 20, ANY));
     subject.add(newTransitStopState(ROUND_1, STOP_2, 10, ANY));
     subject.add(newTransferStopState(ROUND_1, STOP_4, 8, ANY));

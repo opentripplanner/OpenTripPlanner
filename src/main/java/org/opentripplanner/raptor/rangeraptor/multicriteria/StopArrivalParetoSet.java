@@ -23,7 +23,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
   /**
    * Use the factory methods in this class to create a new instance.
    */
-  StopArrivalParetoSet(
+  private StopArrivalParetoSet(
     ParetoComparator<AbstractStopArrival<T>> comparator,
     ParetoSetEventListener<ArrivalView<T>> listener
   ) {
@@ -39,11 +39,33 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
    *   <li>arrival-time</li>
    *   <li>round</li>
    *   <li>generalized-cost</li>
-   *   <li>But not on-board-arrival</li>
+   *   <li><b>But not on-board-arrival</b></li>
    * </ul>
-   * @see AbstractStopArrival#compareArrivalTimeRoundAndCost()
    */
-  static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createStopArrivalSetWithListener(
+  static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createStopArrivalSet(
+    @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
+  ) {
+    return new StopArrivalParetoSet<>(
+      AbstractStopArrival.compareArrivalTimeRoundAndCost(),
+      paretoSetEventListener
+    );
+  }
+
+  /**
+   * Create a stop arrivals pareto set and attach an optional {@code paretoSetEventListener}
+   * (debug handler).
+   * <p>
+   * The comparator used compare:
+   * <ul>
+   *   <li>arrival-time</li>
+   *   <li>round</li>
+   *   <li>generalized-cost</li>
+   *   <li>on-board-arrival</li>
+   * </ul>
+   */
+  static <
+    T extends RaptorTripSchedule
+  > StopArrivalParetoSet<T> createStopArrivalSetWithOnBoardCriteria(
     @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
   ) {
     return new StopArrivalParetoSet<>(
