@@ -112,18 +112,22 @@ public class StopsCursor<T extends RaptorTripSchedule> {
   public ArrivalView<T> stop(int round, int stop, boolean stopReachedOnBoard) {
     var arrival = arrivals.get(round, stop);
 
-    // We chack for on-street arrivals first, since on-street is only available if it is better
+    // We check for on-street arrivals first, since on-street is only available if it is better
     // than on-board arrivals
     if (!stopReachedOnBoard) {
       if (arrival.arrivedByAccessOnStreet()) {
-        return newAccessView(round, arrival.time(), arrival.accessPathOnStreet());
+        return newAccessViewByExactArrivalTime(round, arrival.time(), arrival.accessPathOnStreet());
       } else if (arrival.arrivedByTransfer()) {
         return new Transfer<>(round, stop, arrival, this);
       }
     }
     // On on-board arrivals can always be used, we do not care what the *stopReachedOnBoard* is.
     if (arrival.arrivedByAccessOnBoard()) {
-      return newAccessView(round, arrival.onBoardArrivalTime(), arrival.accessPathOnBoard());
+      return newAccessViewByExactArrivalTime(
+        round,
+        arrival.onBoardArrivalTime(),
+        arrival.accessPathOnBoard()
+      );
     } else if (arrival.arrivedByTransit()) {
       return new Transit<>(round, stop, arrival, this);
     }
@@ -172,14 +176,14 @@ public class StopsCursor<T extends RaptorTripSchedule> {
       boardSlack + accessPath.durationInSeconds()
     );
 
-    return newAccessView(round, preferredDepartureTime, accessPath);
+    return newAccessViewByPreferredDepartureTime(round, preferredDepartureTime, accessPath);
   }
 
   /**
    * An access stop arrival, time-shifted according to the {@code preferredDepartureTime} and the
    * possible restrictions in the access.
    */
-  private ArrivalView<T> newAccessView(
+  private ArrivalView<T> newAccessViewByPreferredDepartureTime(
     int round,
     int preferredDepartureTime,
     RaptorAccessEgress accessPath
@@ -192,6 +196,17 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     }
 
     int arrivalTime = transitCalculator.plusDuration(departureTime, accessPath.durationInSeconds());
-    return new Access<>(round, arrivalTime, accessPath);
+    return newAccessViewByExactArrivalTime(round, arrivalTime, accessPath);
+  }
+
+  /**
+   * An access stop arrival, NOT time-shifted! The arrival-time is used "as is".
+   */
+  private ArrivalView<T> newAccessViewByExactArrivalTime(
+    int round,
+    int exactArrivalTimeTime,
+    RaptorAccessEgress accessPath
+  ) {
+    return new Access<>(round, exactArrivalTimeTime, accessPath);
   }
 }
