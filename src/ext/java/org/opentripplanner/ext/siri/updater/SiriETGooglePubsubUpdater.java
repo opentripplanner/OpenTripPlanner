@@ -380,7 +380,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
             numberOfUpdates,
             FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
             java.time.Duration
-              .between(siri.getServiceDelivery().getResponseTimestamp(), Instant.now())
+              .between(siri.getServiceDelivery().getResponseTimestamp().toInstant(), Instant.now())
               .toMillis(),
             getTimeSinceStartupString()
           );
