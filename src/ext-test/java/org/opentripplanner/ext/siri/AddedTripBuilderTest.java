@@ -130,21 +130,21 @@ public class AddedTripBuilderTest {
 
     // Assert trip
     Trip trip = addedTrip.successValue().tripTimes().getTrip();
-    assertEquals(TRIP_ID, trip.getId(), "Trip is should be mapped");
-    assertEquals(OPERATOR, trip.getOperator(), "operator is should be mapped");
-    assertEquals(TRANSIT_MODE, trip.getMode(), "transitMode is should be mapped");
-    assertEquals(SubMode.of(SUB_MODE), trip.getNetexSubMode(), "submode is should be mapped");
+    assertEquals(TRIP_ID, trip.getId(), "Trip should be mapped");
+    assertEquals(OPERATOR, trip.getOperator(), "operator should be mapped");
+    assertEquals(TRANSIT_MODE, trip.getMode(), "transitMode should be mapped");
+    assertEquals(SubMode.of(SUB_MODE), trip.getNetexSubMode(), "submode should be mapped");
     assertNotNull(trip.getHeadsign(), "Headsign should be mapped");
     assertEquals(HEADSIGN, trip.getHeadsign().toString(), "Headsign should be mapped");
     assertEquals(SERVICE_DATE, addedTrip.successValue().serviceDate());
 
     // Assert route
     Route route = trip.getRoute();
-    assertEquals(LINE_REF, route.getId().getId(), "route is should be mapped");
+    assertEquals(LINE_REF, route.getId().getId(), "route should be mapped");
     assertEquals(AGENCY, route.getAgency(), "Agency should be taken from replaced route");
     assertEquals(SHORT_NAME, route.getShortName());
-    assertEquals(TRANSIT_MODE, route.getMode(), "transitMode is should be mapped");
-    assertEquals(SubMode.of(SUB_MODE), route.getNetexSubmode(), "submode is should be mapped");
+    assertEquals(TRANSIT_MODE, route.getMode(), "transitMode should be mapped");
+    assertEquals(SubMode.of(SUB_MODE), route.getNetexSubmode(), "submode should be mapped");
     assertNotEquals(REPLACED_ROUTE, route, "Should not re-use replaced route");
 
     // Assert transit model index
@@ -168,7 +168,7 @@ public class AddedTripBuilderTest {
         .getServiceCodesRunningForDate()
         .get(SERVICE_DATE)
         .contains(TRANSIT_MODEL.getServiceCodes().get(trip.getServiceId())),
-      "serviceId is should be running on service date"
+      "serviceId should be running on service date"
     );
 
     // Assert stop pattern
@@ -273,7 +273,7 @@ public class AddedTripBuilderTest {
 
     // Assert trip
     Trip secondTrip = secondAddedTrip.successValue().tripTimes().getTrip();
-    assertEquals(tripId2, secondTrip.getId(), "Trip is should be mapped");
+    assertEquals(tripId2, secondTrip.getId(), "Trip should be mapped");
     assertNotEquals(firstTrip, secondTrip);
 
     // Assert route
@@ -323,7 +323,7 @@ public class AddedTripBuilderTest {
 
     // Assert trip
     Trip trip = addedTrip.successValue().tripTimes().getTrip();
-    assertEquals(TRIP_ID, trip.getId(), "Trip is should be mapped");
+    assertEquals(TRIP_ID, trip.getId(), "Trip should be mapped");
     assertSame(REPLACED_ROUTE, trip.getRoute());
   }
 
@@ -353,18 +353,18 @@ public class AddedTripBuilderTest {
 
     // Assert trip
     Trip trip = addedTrip.successValue().tripTimes().getTrip();
-    assertEquals(TRIP_ID, trip.getId(), "Trip is should be mapped");
+    assertEquals(TRIP_ID, trip.getId(), "Trip should be mapped");
 
     // Assert route
     Route route = trip.getRoute();
-    assertEquals(LINE_REF, route.getId().getId(), "route is should be mapped");
+    assertEquals(LINE_REF, route.getId().getId(), "route should be mapped");
     assertEquals(AGENCY, route.getAgency(), "Agency should be taken from replaced route");
     assertEquals(SHORT_NAME, route.getShortName());
-    assertEquals(TRANSIT_MODE, route.getMode(), "transitMode is should be mapped");
+    assertEquals(TRANSIT_MODE, route.getMode(), "transitMode should be mapped");
     assertEquals(
       SubMode.UNKNOWN,
       route.getNetexSubmode(),
-      "submode is should be unknown, when ro replacing route is found"
+      "submode should be unknown, when ro replacing route is found"
     );
     assertNotEquals(REPLACED_ROUTE, route, "Should not re-use replaced route");
   }
