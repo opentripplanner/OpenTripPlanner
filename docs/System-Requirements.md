@@ -4,7 +4,7 @@
 
 ### Memory
 
-OTP is relatively memory-hungry as it includes all the required data in memory. How much memory is required to build the graph for OTP, or to run the OTP server, depends on the used data sets (is OSM, elevation and/or transit data included?), on the size of the covered geographical area and the density of the transit and street network. The required memory can vary from less than one GB to more than 100 GB. For example, including all available data for Finland takes a bit over 10 GB but for Germany it requires 80 GB.
+OTP is relatively memory-hungry as it includes all the required data in memory. How much memory is required to build the graph for OTP, or to run the OTP server, depends on the used data sets (is OSM, elevation and/or transit data included?), on the size of the covered geographical area and the density of the transit and street network. The required memory can vary from less than one GB to more than 100 GB. For example, including all available data for Finland takes a bit over 10 GB but for Germany it requires 95 GB.
 
 ### Processor
 
