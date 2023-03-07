@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.RaptorConstants;
@@ -25,14 +26,14 @@ public class RaptorSearchWindowCalculatorTest {
 
     /** 10 minutes = 600s */
     @Override
-    public int minWinTimeMinutes() {
-      return 10;
+    public Duration minWindow() {
+      return Duration.ofMinutes(10);
     }
 
     /** Set the max search-window length to 30 minutes (1_800 seconds) */
     @Override
-    public int maxWinTimeMinutes() {
-      return 30;
+    public Duration maxWindow() {
+      return Duration.ofMinutes(30);
     }
 
     /** Round search-window to nearest 1 minute (60 seconds) */
