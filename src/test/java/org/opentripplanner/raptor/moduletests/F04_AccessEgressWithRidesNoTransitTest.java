@@ -145,7 +145,7 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
   /* Flex+Walk ~ C ~ Flex  (No transfer) */
 
   static List<RaptorModuleTestCase> flexAndWalkToFlexTestCases() {
-    var path = "Flex+Walk 7m 1x ~ C ~ Flex 2m 1x [0:10 0:20 10m 1tx $0000]";
+    var path = "Flex+Walk 7m 1x ~ C ~ Flex 2m 1x [0:10 0:20 10m 1tx $1140]";
     var stdPathRev = "Flex+Walk 7m 1x ~ C ~ Flex 2m 1x [0:20 0:30 10m 1tx]";
     return RaptorModuleTestCase
       .of()
@@ -158,8 +158,7 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       .addMinDuration("10m", TX_1, T00_10, T00_30)
       .add(standard().forwardOnly(), PathUtils.withoutCost(path))
       .add(standard().reverseOnly(), stdPathRev)
-      // TODO - connect access and egress in mc-search
-      //.add(multiCriteria(), path)
+      .add(multiCriteria(), path)
       .build();
   }
 
@@ -185,8 +184,7 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       .addMinDuration("10m", TX_1, T00_10, T00_30)
       .add(standard().forwardOnly(), PathUtils.withoutCost(path))
       .add(standard().reverseOnly(), stdPathRev)
-      // TODO - connect access and egress in mc-search
-      //.add(multiCriteria(), path)
+      .add(multiCriteria(), path)
       .build();
   }
 

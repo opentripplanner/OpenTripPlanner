@@ -37,14 +37,28 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
   @Override
   public void notifyElementAccepted(ArrivalView<T> newElement) {
     if (newElement.arrivedByTransit()) {
-      for (RaptorAccessEgress egress : egressPaths) {
-        destinationArrivals.add(newElement, egress);
-      }
+      addOnBoardStopArrivalToDestination(newElement);
     } else if (newElement.arrivedByTransfer()) {
-      for (RaptorAccessEgress egress : egressPaths) {
-        if (egress.stopReachedOnBoard()) {
-          destinationArrivals.add(newElement, egress);
-        }
+      addOnStreetArrivalToDestination(newElement);
+    } else if (newElement.arrivedByAccess()) {
+      if (newElement.arrivedOnBoard()) {
+        addOnBoardStopArrivalToDestination(newElement);
+      } else {
+        addOnStreetArrivalToDestination(newElement);
+      }
+    }
+  }
+
+  private void addOnBoardStopArrivalToDestination(ArrivalView<T> newElement) {
+    for (RaptorAccessEgress egress : egressPaths) {
+      destinationArrivals.add(newElement, egress);
+    }
+  }
+
+  private void addOnStreetArrivalToDestination(ArrivalView<T> newElement) {
+    for (RaptorAccessEgress egress : egressPaths) {
+      if (egress.stopReachedOnBoard()) {
+        destinationArrivals.add(newElement, egress);
       }
     }
   }
