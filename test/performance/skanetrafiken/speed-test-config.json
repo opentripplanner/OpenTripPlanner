@@ -5,7 +5,7 @@
 
   "tuningParameters": {
     "dynamicSearchWindow": {
-      "maxWinTimeMinutes": 1440
+      "maxWindow": "24h"
     },
     "stopTransferCost": {
       "DISCOURAGED": 3000,

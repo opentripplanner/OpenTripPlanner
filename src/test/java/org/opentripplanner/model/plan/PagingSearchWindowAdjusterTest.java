@@ -31,8 +31,8 @@ class PagingSearchWindowAdjusterTest {
   private final Instant time = Instant.parse("2022-01-15T12:00:00Z");
 
   private final PagingSearchWindowAdjuster subject = new PagingSearchWindowAdjuster(
-    (int) D10m.toMinutes(),
-    (int) D1d.toMinutes(),
+    D10m,
+    D1d,
     LIST_OF_DURATIONS
   );
 

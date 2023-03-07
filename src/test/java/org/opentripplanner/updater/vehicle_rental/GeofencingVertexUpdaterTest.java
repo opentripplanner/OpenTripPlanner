@@ -13,11 +13,11 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.street.BusinessAreaBorder;
+import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
+import org.opentripplanner.service.vehiclerental.street.NoRestriction;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.GeofencingZoneExtension;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.NoRestriction;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 
 class GeofencingVertexUpdaterTest {
@@ -113,9 +113,7 @@ class GeofencingVertexUpdaterTest {
 
     assertEquals(3, updated.size());
 
-    var ext = (RentalRestrictionExtension.BusinessAreaBorder) businessBorder
-      .getFromVertex()
-      .rentalRestrictions();
-    assertInstanceOf(RentalRestrictionExtension.BusinessAreaBorder.class, ext);
+    var ext = (BusinessAreaBorder) businessBorder.getFromVertex().rentalRestrictions();
+    assertInstanceOf(BusinessAreaBorder.class, ext);
   }
 }

@@ -305,17 +305,17 @@ public class ScheduledDeviatedTrip
       this.stop = st.getStop();
 
       // Store the time the user is guaranteed to arrive at latest
-      this.arrivalTime =
-        st.getFlexWindowEnd() != MISSING_VALUE ? st.getFlexWindowEnd() : st.getArrivalTime();
+      this.arrivalTime = st.getLatestPossibleArrivalTime();
       // Store the time the user needs to be ready for pickup
-      this.departureTime =
-        st.getFlexWindowStart() != MISSING_VALUE ? st.getFlexWindowStart() : st.getDepartureTime();
+      this.departureTime = st.getEarliestPossibleDepartureTime();
 
       // TODO: Store the window for a stop, and allow the user to have an "unguaranteed"
       // pickup/dropoff between the start and end of the window
 
-      this.pickupType = st.getPickupType();
-      this.dropOffType = st.getDropOffType();
+      // Do not allow for pickup/dropoff if times are not available. We do not support interpolation
+      // for flex trips currently
+      this.pickupType = departureTime == MISSING_VALUE ? PickDrop.NONE : st.getPickupType();
+      this.dropOffType = arrivalTime == MISSING_VALUE ? PickDrop.NONE : st.getDropOffType();
     }
   }
 }

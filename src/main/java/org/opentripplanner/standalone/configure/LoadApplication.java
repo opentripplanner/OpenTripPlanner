@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.configure;
 
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
@@ -47,7 +48,12 @@ public class LoadApplication {
 
   /** Construct application from serialized graph */
   public ConstructApplication appConstruction(SerializedGraphObject obj) {
-    return createAppConstruction(obj.graph, obj.transitModel, obj.worldEnvelopeRepository);
+    return createAppConstruction(
+      obj.graph,
+      obj.transitModel,
+      obj.worldEnvelopeRepository,
+      obj.issueSummary
+    );
   }
 
   /** Construct application with an empty model. */
@@ -55,7 +61,8 @@ public class LoadApplication {
     return createAppConstruction(
       factory.emptyGraph(),
       factory.emptyTransitModel(),
-      factory.emptyWorldEnvelopeRepository()
+      factory.emptyWorldEnvelopeRepository(),
+      DataImportIssueSummary.empty()
     );
   }
 
@@ -73,7 +80,8 @@ public class LoadApplication {
   private ConstructApplication createAppConstruction(
     Graph graph,
     TransitModel transitModel,
-    WorldEnvelopeRepository worldEnvelopeRepository
+    WorldEnvelopeRepository worldEnvelopeRepository,
+    DataImportIssueSummary issueSummary
   ) {
     return new ConstructApplication(
       cli,
@@ -81,7 +89,8 @@ public class LoadApplication {
       transitModel,
       worldEnvelopeRepository,
       config(),
-      graphBuilderDataSources()
+      graphBuilderDataSources(),
+      issueSummary
     );
   }
 }
