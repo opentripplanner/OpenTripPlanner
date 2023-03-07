@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
+import java.time.Duration;
 import org.opentripplanner.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.raptor.api.request.SearchParams;
 
@@ -22,9 +23,9 @@ public class RaptorSearchWindowCalculator {
   private final double minWaitTimeCoefficient;
 
   /** Min search window in seconds */
-  private final int minSearchWinSeconds;
+  private final Duration minSearchWindow;
 
-  private final int maxSearchWinSeconds;
+  private final Duration maxSearchWindow;
   private final int stepSeconds;
 
   private int heuristicMinTransitTime = NOT_SET;
@@ -37,8 +38,8 @@ public class RaptorSearchWindowCalculator {
   public RaptorSearchWindowCalculator(DynamicSearchWindowCoefficients c) {
     this.minTransitTimeCoefficient = c.minTransitTimeCoefficient();
     this.minWaitTimeCoefficient = c.minWaitTimeCoefficient();
-    this.minSearchWinSeconds = c.minWinTimeMinutes() * 60;
-    this.maxSearchWinSeconds = c.maxWinTimeMinutes() * 60;
+    this.minSearchWindow = c.minWindow();
+    this.maxSearchWindow = c.maxWindow();
     this.stepSeconds = c.stepMinutes() * 60;
   }
 
@@ -115,12 +116,12 @@ public class RaptorSearchWindowCalculator {
     // min-travel-time.
     if (params.isEarliestDepartureTimeSet() && params.isLatestArrivalTimeSet()) {
       int travelWindow = params.latestArrivalTime() - params.earliestDepartureTime();
-      // There is no upper limit the the search window when both EDT and LAT is set.
+      // There is no upper limit the search window when both EDT and LAT is set.
       return roundStep(travelWindow - heuristicMinTransitTime);
     } else {
       // Set the search window using the min-travel-time.
       int v = roundStep(
-        minSearchWinSeconds +
+        minSearchWindow.toSeconds() +
         minTransitTimeCoefficient *
         heuristicMinTransitTime +
         minWaitTimeCoefficient *
@@ -128,7 +129,7 @@ public class RaptorSearchWindowCalculator {
       );
 
       // Set an upper bound to the search window
-      return Math.min(maxSearchWinSeconds, v);
+      return (int) Math.min(maxSearchWindow.toSeconds(), v);
     }
   }
 }

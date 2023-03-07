@@ -22,14 +22,25 @@ public class TravelTimeRequest {
   public final Duration maxCutoff;
 
   public final Duration maxAccessDuration;
+  public final Duration maxEgressDuration;
 
-  public TravelTimeRequest(List<Duration> cutoffList, Duration defaultAccessDuration) {
+  public TravelTimeRequest(
+    List<Duration> cutoffList,
+    Duration defaultAccessDuration,
+    Duration defaultEgressDuration
+  ) {
     this.cutoffs = cutoffList;
     this.maxCutoff = cutoffs.stream().max(Duration::compareTo).orElseThrow();
     if (maxCutoff.compareTo(defaultAccessDuration) < 0) {
       maxAccessDuration = maxCutoff;
     } else {
       maxAccessDuration = defaultAccessDuration;
+    }
+
+    if (maxCutoff.compareTo(defaultEgressDuration) < 0) {
+      maxEgressDuration = maxCutoff;
+    } else {
+      maxEgressDuration = defaultEgressDuration;
     }
   }
 

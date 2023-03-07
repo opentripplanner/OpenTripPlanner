@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -92,7 +91,7 @@ class FlexStopsMapperTest {
   );
 
   @Test
-  void mapAreaStop() {
+  void testMapAreaStop() {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
@@ -107,7 +106,7 @@ class FlexStopsMapperTest {
   }
 
   @Test
-  void mapInvalidAreaStop() {
+  void testMapInvalidAreaStop() {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
@@ -122,7 +121,7 @@ class FlexStopsMapperTest {
   }
 
   @Test
-  void mapGroupStop() {
+  void testMapGroupStop() {
     RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
     RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
@@ -144,10 +143,29 @@ class FlexStopsMapperTest {
 
     GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
 
+    assertNotNull(groupStop);
+
     // Only one of the stops should be inside the polygon
     assertEquals(1, groupStop.getLocations().size());
+  }
 
-    assertNotNull(groupStop);
+  @Test
+  void testMapFlexibleStopPlaceMissingStops() {
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
+    flexibleStopPlace.setKeyList(
+      new KeyListStructure()
+        .withKeyValue(
+          new KeyValueStructure()
+            .withKey("FlexibleStopAreaType")
+            .withValue("UnrestrictedPublicTransportAreas")
+        )
+    );
+
+    FlexStopsMapper subject = new FlexStopsMapper(ID_FACTORY, List.of(), DataImportIssueStore.NOOP);
+
+    GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
+
+    assertNull(groupStop);
   }
 
   private FlexibleStopPlace getFlexibleStopPlace(Collection<Double> areaPosList) {
