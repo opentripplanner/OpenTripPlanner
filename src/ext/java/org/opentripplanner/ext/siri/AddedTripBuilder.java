@@ -275,14 +275,6 @@ class AddedTripBuilder {
 
     tripBuilder.withOperator(operator);
 
-    // TODO - SIRI: Populate these?
-    tripBuilder.withShapeId(null); // Replacement-trip has different shape
-    //        trip.setTripPrivateCode(null);
-    //        trip.setTripPublicCode(null);
-    tripBuilder.withGtfsBlockId(null);
-    tripBuilder.withShortName(null);
-    //        trip.setKeyValues(null);
-
     return tripBuilder.build();
   }
 
