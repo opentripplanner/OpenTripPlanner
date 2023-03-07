@@ -6,6 +6,8 @@ import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -66,7 +68,16 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
 
     return RaptorModuleTestCase
       .of()
-      .addMinDuration("9m", 1, T00_00, T00_30)
+      // Zero transfers is wrong, it is caused by the egress stop(C) being reached by transfer
+      // with 0tx(before boarding). This happens since the path is computed after, not during,
+      // the Raptor search. The result is still valid to use as heuristics, so it does not
+      // cause the mc-raptor w/destination pruning to miss results. There are two ways to fix
+      // this. We can keep the best-number-of-transfers for both transit and over-all for all
+      // stops (at least egress stops) or we can compute paths during the search. The last
+      // solution is probably the one witch give the best performance, but the first will make
+      // mc-raptor perform better (tighter heuristics).
+      .add(TC_MIN_DURATION, "[0:00 0:09 9m 0tx]")
+      .add(TC_MIN_DURATION_REV, "[0:21 0:30 9m 1tx]")
       .add(standard(), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)
       .build();
