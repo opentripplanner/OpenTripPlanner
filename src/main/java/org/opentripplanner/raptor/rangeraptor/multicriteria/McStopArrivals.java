@@ -1,12 +1,16 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
+import gnu.trove.map.TIntObjectMap;
 import java.util.BitSet;
 import java.util.Collections;
+import java.util.List;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
+import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.util.BitSetIterator;
@@ -32,6 +36,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   public McStopArrivals(
     int nStops,
     EgressPaths egressPaths,
+    AccessPaths accessPaths,
     DestinationArrivalPaths<T> paths,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
@@ -41,6 +46,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     this.debugHandlerFactory = debugHandlerFactory;
     this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
+    initAccessArrivals(accessPaths.arrivedOnBoardByNumOfRides());
     glueTogetherEgressStopWithDestinationArrivals(egressPaths, paths);
   }
 
@@ -128,11 +134,23 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   private StopArrivalParetoSet<T> findOrCreateSet(final int stop) {
     if (arrivals[stop] == null) {
       arrivals[stop] =
-        StopArrivalParetoSet.createStopArrivalSetWithOnBoardCriteria(
+        StopArrivalParetoSet.createStopArrivalSet(
           debugHandlerFactory.paretoSetStopArrivalListener(stop)
         );
     }
     return arrivals[stop];
+  }
+
+  private void initAccessArrivals(TIntObjectMap<List<RaptorAccessEgress>> accessOnBoardByRides) {
+    for (int round : accessOnBoardByRides.keys()) {
+      for (var access : accessOnBoardByRides.get(round)) {
+        int stop = access.stop();
+        arrivals[stop] =
+          StopArrivalParetoSet.createStopArrivalSetWithOnBoardCriteria(
+            debugHandlerFactory.paretoSetStopArrivalListener(stop)
+          );
+      }
+    }
   }
 
   /**
