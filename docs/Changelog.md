@@ -86,6 +86,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove deprecation annotation from viaTrip query field [#4923](https://github.com/opentripplanner/OpenTripPlanner/pull/4923)
 - Validate missing transit data before building transit graph [#4930](https://github.com/opentripplanner/OpenTripPlanner/pull/4930)
 - Use durations for Raptor search window configuration [#4926](https://github.com/opentripplanner/OpenTripPlanner/pull/4926)
+- Add graph build issue statistics to metrics endpoint [#4869](https://github.com/opentripplanner/OpenTripPlanner/pull/4869)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
