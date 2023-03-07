@@ -287,7 +287,7 @@ public class ItineraryListFilterChainBuilder {
 
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
-      filters.add(new SameFirstOrLastTripFilter());
+      filters.add(new DeletionFlaggingFilter(new SameFirstOrLastTripFilter()));
     }
 
     if (minBikeParkingDistance > 0) {
