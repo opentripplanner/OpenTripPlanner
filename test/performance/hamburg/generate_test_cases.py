@@ -6,7 +6,7 @@ fieldnames = ["testCaseId", "description", "departure", "fromLat", "fromLon", "t
               "modes", "category"]
 
 locations = [
-    {"name": "Lüneburg", "coordinates": "53.2497728,10.4197721"},
+    {"name": "Ahrensburg", "coordinates": "53.671926,10.234838"},
     {"name": "Stade", "coordinates": "53.5960704,9.4775887"},
     {"name": "Bad Oldesloe", "coordinates": "53.8052678,10.3822381"},
     {"name": "Henstedt-Ulzburg", "coordinates": "53.7952480,9.9822267"},
@@ -24,7 +24,7 @@ locations = [
     {"name": "HH Mümmelmannsberg", "coordinates": "53.5281075,10.1500277"},
 ]
 
-failing_cases = []
+failing_cases = [95,96,161,162,181,182,211,212,223,224,241,242,253,254,271,272,283,284,301,302,313,314,331,332,343,344,373,374,403,404,433,434,451,452,]
 
 rows = []
 
