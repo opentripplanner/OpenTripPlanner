@@ -35,7 +35,12 @@
     {
       "matchPackageNames": [
         "org.onebusaway:onebusaway-gtfs",
-        "com.google.cloud:libraries-bom"
+        "com.google.cloud:libraries-bom",
+        "@graphql-codegen/add",
+        "@graphql-codegen/cli",
+        "@graphql-codegen/java",
+        "@graphql-codegen/java-resolvers",
+        "graphql"
       ],
       "extends": [
         "schedule:monthly"
