@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.path;
 
-import java.util.function.IntUnaryOperator;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -486,33 +485,31 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     var accessPath = asAccessLeg().streetPath;
     var nextTransitLeg = nextTransitLeg();
 
-    int newToTime;
-
-    // if there is no next transit leg then it's a Flex ~ Transfer/Walk ~ Flex path and we
-    // move the access as early as possible
+    // if there is no next transit leg then move the access as early as possible relative to
+    // the iteration-departure-time
     if (nextTransitLeg == null) {
-      newToTime = iterationDepartureTime + accessPath.durationInSeconds();
-      newToTime =
-        timeShiftAccessPathWithOpeningHours(
-          newToTime,
-          accessPath,
-          accessPath::earliestDepartureTime
-        );
-
-      if (next.isTransfer()) {
-        newToTime += next.asTransferLeg().transfer.durationInSeconds();
-      }
+      int fromTime = accessPath.earliestDepartureTime(iterationDepartureTime);
+      assertTimeExist(
+        fromTime,
+        accessPath,
+        "Access can not be time-shifted after iteration-departure-time."
+      );
+      setTime(fromTime, fromTime + accessPath.durationInSeconds());
     }
     // For transit, we time-shift the access as late as possible to fit with the transit.
     else {
-      newToTime = nextTransitLeg.transitStopArrivalTimeBefore(slackProvider, hasRides());
+      int toTime = nextTransitLeg.transitStopArrivalTimeBefore(slackProvider, hasRides());
       if (next.isTransfer()) {
-        newToTime -= next.asTransferLeg().transfer.durationInSeconds();
+        toTime -= next.asTransferLeg().transfer.durationInSeconds();
       }
-      newToTime =
-        timeShiftAccessPathWithOpeningHours(newToTime, accessPath, accessPath::latestArrivalTime);
+      toTime = accessPath.latestArrivalTime(toTime);
+      assertTimeExist(
+        toTime,
+        accessPath,
+        "Access can not be time-shifted before first transit leg."
+      );
+      setTime(toTime - accessPath.durationInSeconds(), toTime);
     }
-    setTime(newToTime - accessPath.durationInSeconds(), newToTime);
   }
 
   private void timeShiftTransferTime(RaptorSlackProvider slackProvider) {
@@ -538,9 +535,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       slackProvider.transferSlack()
     );
 
-    if (egressDepartureTime == RaptorConstants.TIME_NOT_SET) {
-      throw egressDepartureNotAvailable(stopArrivalTime, egressPath);
-    }
+    assertTimeExist(
+      egressDepartureTime,
+      egressPath,
+      "Transit does not arrive in time to board flex access."
+    );
 
     setTime(egressDepartureTime, egressDepartureTime + egressPath.durationInSeconds());
   }
@@ -619,17 +618,18 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     );
   }
 
-  private static int timeShiftAccessPathWithOpeningHours(
-    int time,
-    RaptorAccessEgress accessPath,
-    IntUnaryOperator timeShiftOp
-  ) {
-    int newTime = timeShiftOp.applyAsInt(time);
-
-    if (newTime == RaptorConstants.TIME_NOT_SET) {
-      throw new IllegalStateException("Can not time-shift accessPath: " + accessPath);
+  private static int assertTimeExist(int time, RaptorAccessEgress path, String details) {
+    if (time == RaptorConstants.TIME_NOT_SET) {
+      throw new IllegalStateException(
+        String.format(
+          "Unable to reconstruct path. %s. Arrival-time stop: %s, path: %s",
+          details,
+          TimeUtils.timeToStrCompact(time),
+          path
+        )
+      );
     }
-    return newTime;
+    return time;
   }
 
   /* PRIVATE INTERFACES */

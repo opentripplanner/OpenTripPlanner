@@ -179,7 +179,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       )
       .add(TC_STANDARD, withoutCost(expected.first(3)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
-      .add(TC_STANDARD_REV, withoutCost(expected.last(3)))
+      .add(TC_STANDARD_REV, withoutCost(expected.range(1, 3)))
       .add(TC_STANDARD_REV_ONE, withoutCost(expected.last()))
       .add(multiCriteria(), expected.first(3))
       .build();
@@ -211,7 +211,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       )
       .add(TC_STANDARD, withoutCost(expected.get(0, 1, 2, 4)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
-      .add(TC_STANDARD_REV, withoutCost(expected.fromTo(3, 6)))
+      .add(TC_STANDARD_REV, withoutCost(expected.range(3, 6)))
       .add(TC_STANDARD_REV_ONE, withoutCost(expected.last()))
       .add(multiCriteria(), expected.get(0, 1, 2, 4))
       .build();

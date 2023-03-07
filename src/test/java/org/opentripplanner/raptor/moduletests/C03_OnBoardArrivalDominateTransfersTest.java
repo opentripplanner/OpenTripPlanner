@@ -44,7 +44,8 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
     data
       .withRoute(route(pattern("R1", STOP_A, STOP_B)).withTimetable(schedule().times("0:05 0:08")))
       .withRoute(route(pattern("R2", STOP_B, STOP_C)).withTimetable(schedule().times("0:12 0:15")))
-      .withTransfer(STOP_B, transfer(STOP_C, D5m));
+      // We add a transfer here witch arrive at C before R2, but it should not be used.
+      .withTransfer(STOP_B, transfer(STOP_C, D1m));
 
     requestBuilder
       .searchParams()
@@ -56,6 +57,8 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       .searchParams()
       .addAccessPaths(walk(STOP_A, D1m))
       .addEgressPaths(walk(STOP_C, D1m));
+
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   static List<RaptorModuleTestCase> testCases() {
@@ -69,10 +72,11 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
     return RaptorModuleTestCase
       .of()
       // Zero transfers is wrong, it is caused by the egress stop(C) being reached by transfer
-      // with 0tx(before boarding). This happens since the path is computed after, not during,
-      // the Raptor search. The result is still valid to use as heuristics, so it does not
-      // cause the mc-raptor w/destination pruning to miss results. There are two ways to fix
-      // this. We can keep the best-number-of-transfers for both transit and over-all for all
+      // with 0tx(before boarding), so 0 transfers is stored in BestNumberOfTransfers for stop C.
+      // Then since the path is computed after, not during, the Raptor search this fails combine
+      // the egress with the correct path. The result is still valid to use as heuristics, so it
+      // does not cause the mc-raptor w/destination pruning to miss results. There are two ways to
+      // fix this. We can keep the best-number-of-transfers for both transit and over-all for all
       // stops (at least egress stops) or we can compute paths during the search. The last
       // solution is probably the one witch give the best performance, but the first will make
       // mc-raptor perform better (tighter heuristics).

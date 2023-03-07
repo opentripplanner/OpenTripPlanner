@@ -62,9 +62,9 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
     requestBuilder
       .searchParams()
       // Start walking 1m before: 30s walk + 30s board-slack
-      .addAccessPaths(flexAndWalk(STOP_B, D2m, ONE_RIDE, 40_000))
+      .addAccessPaths(flexAndWalk(STOP_B, D2m))
       // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
-      .addEgressPaths(flex(STOP_C, D2m, ONE_RIDE, 56_000))
+      .addEgressPaths(flex(STOP_C, D2m))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       // Only one iteration is needed - the access should be time-shifted
@@ -76,7 +76,7 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
   static List<RaptorModuleTestCase> testCases() {
     var path =
       "Flex+Walk 2m 1x ~ B ~ BUS R1 0:04 0:06 ~ C ~ Flex 2m 1x " +
-      "[0:00:30 0:09:10 8m40s 2tx $1840]";
+      "[0:00:30 0:09:10 8m40s 2tx $1360]";
     return RaptorModuleTestCase
       .of()
       // TODO - Alight slack is missing
