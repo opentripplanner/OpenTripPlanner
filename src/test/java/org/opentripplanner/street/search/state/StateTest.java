@@ -5,6 +5,7 @@ import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_PICKUP;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
@@ -48,12 +49,14 @@ class StateTest {
     of(BIKE_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
     of(CAR_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
     of(CAR_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
-    of(StreetMode.CAR, false, NULL_RENTAL_STATES, Set.of(TraverseMode.CAR)),
+    of(StreetMode.CAR, false, NULL_RENTAL_STATES, Set.of(CAR)),
     of(BIKE, false, NULL_RENTAL_STATES, Set.of(BICYCLE)),
     of(StreetMode.WALK, false, NULL_RENTAL_STATES, Set.of(TraverseMode.WALK)),
     of(BIKE_TO_PARK, false, NULL_RENTAL_STATES, Set.of(BICYCLE)),
     of(CAR_TO_PARK, false, NULL_RENTAL_STATES, Set.of(CAR)),
-    of(FLEXIBLE, false, NULL_RENTAL_STATES, Set.of(WALK))
+    of(FLEXIBLE, false, NULL_RENTAL_STATES, Set.of(WALK)),
+    of(CAR_PICKUP, false, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
+    of(CAR_PICKUP, true, NULL_RENTAL_STATES, Set.of(CAR, WALK))
   );
 
   @ParameterizedTest(
