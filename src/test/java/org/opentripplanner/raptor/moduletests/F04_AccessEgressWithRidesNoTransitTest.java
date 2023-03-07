@@ -11,7 +11,6 @@ import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCon
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
@@ -159,15 +158,13 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       .addMinDuration("10m", TX_1, T00_10, T00_30)
       .add(standard().forwardOnly(), PathUtils.withoutCost(path))
       .add(standard().reverseOnly(), stdPathRev)
-      .add(multiCriteria(), path)
+      // TODO - connect access and egress in mc-search
+      //.add(multiCriteria(), path)
       .build();
   }
 
   @ParameterizedTest
   @MethodSource("flexAndWalkToFlexTestCases")
-  @Disabled(
-    "This does not work because access and egress are not directly connected in the current implementation."
-  )
   void flexAndWalkToFlexTest(RaptorModuleTestCase testCase) {
     assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
@@ -188,15 +185,13 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       .addMinDuration("10m", TX_1, T00_10, T00_30)
       .add(standard().forwardOnly(), PathUtils.withoutCost(path))
       .add(standard().reverseOnly(), stdPathRev)
-      .add(multiCriteria(), path)
+      // TODO - connect access and egress in mc-search
+      //.add(multiCriteria(), path)
       .build();
   }
 
   @ParameterizedTest
   @MethodSource("flexToFlexAndWalkTestCases")
-  @Disabled(
-    "This does not work because access and egress are not directly connected in the current implementation."
-  )
   void flexToFlexAndWalkTest(RaptorModuleTestCase testCase) {
     assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
