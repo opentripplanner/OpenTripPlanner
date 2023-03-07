@@ -112,13 +112,10 @@ public class AffectsMapper {
         for (VehicleJourneyRef vehicleJourneyRef : vehicleJourneyReves) {
           List<FeedScopedId> tripIds = new ArrayList<>();
 
-          TripOnServiceDate tripOnServiceDate = entityResolver.resolveTripOnServiceDate(
-            vehicleJourneyRef.getValue(),
-            serviceDate
-          );
+          Trip trip = entityResolver.resolveTrip(vehicleJourneyRef.getValue());
 
-          if (tripOnServiceDate != null) {
-            tripIds.add(tripOnServiceDate.getTrip().getId());
+          if (trip != null) {
+            tripIds.add(trip.getId());
           } else if (siriFuzzyTripMatcher != null) {
             // "Temporary", custom legacy solution - supports alerts tagged on "privateCode" in NeTEx
             tripIds.addAll(

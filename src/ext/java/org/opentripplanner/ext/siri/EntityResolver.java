@@ -147,10 +147,13 @@ public class EntityResolver {
    */
   public Trip resolveTrip(FramedVehicleJourneyRefStructure journey) {
     if (journey != null) {
-      String serviceJourneyId = journey.getDatedVehicleJourneyRef();
-      return transitService.getTripForId(resolveId(serviceJourneyId));
+      return resolveTrip(journey.getDatedVehicleJourneyRef());
     }
     return null;
+  }
+
+  public Trip resolveTrip(String serviceJourneyId) {
+    return transitService.getTripForId(resolveId(serviceJourneyId));
   }
 
   /**
