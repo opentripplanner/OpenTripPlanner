@@ -44,16 +44,15 @@ public class GbfsFeedLoader {
       throw new UpdaterConstructionException("Invalid url " + url);
     }
 
-    if (!url.endsWith("gbfs.json")) {
-      LOG.warn(
-        "GBFS autoconfiguration url {} does not end with gbfs.json. Make sure it follows the specification, if you get any errors using it.",
-        url
-      );
-    }
-
     // Fetch autoconfiguration file
     GBFS data = fetchFeed(uri, httpHeaders, GBFS.class);
     if (data == null) {
+      if (!url.endsWith("gbfs.json")) {
+        LOG.warn(
+          "GBFS autoconfiguration url {} does not end with gbfs.json. Make sure it follows the specification, if you get any errors using it.",
+          url
+        );
+      }
       throw new UpdaterConstructionException(
         "Could not fetch the feed auto-configuration file from " + uri
       );
