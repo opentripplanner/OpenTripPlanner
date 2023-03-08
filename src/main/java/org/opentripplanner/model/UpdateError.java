@@ -48,6 +48,7 @@ public record UpdateError(
     INVALID_STOP_SEQUENCE,
     NOT_IMPLEMENTED_UNSCHEDULED,
     NOT_IMPLEMENTED_DUPLICATED,
+    NOT_MONITORED,
   }
 
   public static <T> Result<T, UpdateError> result(FeedScopedId tripId, UpdateErrorType errorType) {

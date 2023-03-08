@@ -39,7 +39,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * set the headsigns array to null to save space. Field is private to force use of the getter
    * method which does the necessary fallbacks.
    */
-  private final I18NString[] headsigns;
+  private I18NString[] headsigns;
   /**
    * Contains a list of via names for each stop. This field provides info about intermediate stops
    * between current stop and final trip destination. This is 2D array since there can be more than
@@ -182,6 +182,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     this.realTimeState = object.realTimeState;
     this.timepoints = object.timepoints;
     this.wheelchairAccessibility = object.wheelchairAccessibility;
+    this.occupancyStatus = object.occupancyStatus;
   }
 
   /**
@@ -305,7 +306,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     return stopRealTimeStates[stop] == StopRealTimeState.NO_DATA;
   }
 
-  // TODO OTP2 - Unused, but will be used by Transmodel API
   public boolean isPredictionInaccurate(int stop) {
     if (stopRealTimeStates == null) {
       return false;
@@ -592,6 +592,21 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     }
   }
 
+  public void setHeadsign(int index, I18NString headsign) {
+    if (headsigns == null) {
+      if (headsign.equals(trip.getHeadsign())) {
+        return;
+      }
+
+      this.headsigns = new I18NString[scheduledArrivalTimes.length];
+      this.headsigns[index] = headsign;
+      return;
+    }
+
+    prepareForRealTimeUpdates();
+    headsigns[index] = headsign;
+  }
+
   /**
    * Create 2D String array for via names for each stop in sequence.
    *
@@ -635,6 +650,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       this.departureTimes = Arrays.copyOf(scheduledDepartureTimes, scheduledDepartureTimes.length);
       this.stopRealTimeStates = new StopRealTimeState[arrivalTimes.length];
       this.occupancyStatus = new OccupancyStatus[arrivalTimes.length];
+      if (headsigns != null) {
+        headsigns = Arrays.copyOf(headsigns, headsigns.length);
+      }
+
       for (int i = 0; i < arrivalTimes.length; i++) {
         arrivalTimes[i] += timeShift;
         departureTimes[i] += timeShift;

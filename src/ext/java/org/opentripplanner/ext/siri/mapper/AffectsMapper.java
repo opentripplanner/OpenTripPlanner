@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.siri;
+package org.opentripplanner.ext.siri.mapper;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -50,7 +51,7 @@ public class AffectsMapper {
     this.transitService = transitService;
   }
 
-  List<EntitySelector> mapAffects(AffectsScopeStructure affectsStructure) {
+  public List<EntitySelector> mapAffects(AffectsScopeStructure affectsStructure) {
     if (affectsStructure == null) {
       return List.of();
     }
