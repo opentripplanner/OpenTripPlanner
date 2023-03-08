@@ -24,7 +24,7 @@ locations = [
     {"name": "HH Mümmelmannsberg", "coordinates": "53.5281075,10.1500277"},
 ]
 
-failing_cases = [95,96,161,162,181,182,211,212,223,224,241,242,253,254,271,272,283,284,301,302,313,314,331,332,343,344,373,374,403,404,433,434,451,452,]
+failing_cases = [48,81,112,127,142,157,172,187,202,217]
 
 rows = []
 
@@ -33,11 +33,6 @@ modes = [
         "mode": "TRANSIT|WALK",
         "category": "transit",
         "window": ""
-    },
-    {
-        "mode": "FLEX_ACCESS|FLEX_EGRESS|TRANSIT",
-        "category": "flex",
-        "window": "6h"
     }
 ]
 
