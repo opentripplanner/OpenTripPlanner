@@ -92,7 +92,7 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
   /**
    * Create/provide the cost criteria calculator.
    */
-  CostCalculator<T> multiCriteriaCostCalculator();
+  RaptorCostCalculator<T> multiCriteriaCostCalculator();
 
   /**
    * The board-, alight- and transfer-slack provider.

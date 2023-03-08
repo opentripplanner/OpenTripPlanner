@@ -16,8 +16,8 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransitStop
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
-import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**
  * Tracks the state of a RAPTOR search, specifically the best arrival times at each transit stop at
@@ -36,7 +36,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   private final DestinationArrivalPaths<T> paths;
   private final HeuristicsProvider<T> heuristics;
   private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
-  private final CostCalculator<T> costCalculator;
+  private final RaptorCostCalculator<T> costCalculator;
   private final RaptorTransitCalculator<T> transitCalculator;
 
   /**
@@ -47,7 +47,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     McStopArrivals<T> arrivals,
     DestinationArrivalPaths<T> paths,
     HeuristicsProvider<T> heuristics,
-    CostCalculator<T> costCalculator,
+    RaptorCostCalculator<T> costCalculator,
     RaptorTransitCalculator<T> transitCalculator,
     WorkerLifeCycle lifeCycle
   ) {

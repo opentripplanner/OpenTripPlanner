@@ -12,7 +12,7 @@ import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.ForwardPathMapper;
 import org.opentripplanner.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.raptor.rangeraptor.path.ReversePathMapper;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
@@ -78,7 +78,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
     RaptorProfile profile,
     SearchDirection searchDirection,
     RaptorSlackProvider slackProvider,
-    CostCalculator<S> costCalculator,
+    RaptorCostCalculator<S> costCalculator,
     RaptorStopNameResolver stopNameResolver,
     RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
     WorkerLifeCycle lifeCycle

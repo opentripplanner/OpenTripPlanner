@@ -31,7 +31,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.ReverseRaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.raptor.rangeraptor.transit.SlackProviderAdapter;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
@@ -62,7 +62,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
   /** Lazy initialized */
-  private CostCalculator<T> costCalculator = null;
+  private RaptorCostCalculator<T> costCalculator = null;
 
   public SearchContext(
     RaptorRequest<T> request,
@@ -142,7 +142,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   @Nullable
-  public CostCalculator<T> costCalculator() {
+  public RaptorCostCalculator<T> costCalculator() {
     if (costCalculator == null) {
       this.costCalculator = transit.multiCriteriaCostCalculator();
     }

@@ -17,7 +17,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.DebugHandler;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private final RaptorTransitCalculator<T> transitCalculator;
 
   @Nullable
-  private final CostCalculator<T> costCalculator;
+  private final RaptorCostCalculator<T> costCalculator;
 
   private final SlackProvider slackProvider;
   private final PathMapper<T> pathMapper;
@@ -58,7 +58,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   public DestinationArrivalPaths(
     ParetoComparator<RaptorPath<T>> paretoComparator,
     RaptorTransitCalculator<T> transitCalculator,
-    @Nullable CostCalculator<T> costCalculator,
+    @Nullable RaptorCostCalculator<T> costCalculator,
     SlackProvider slackProvider,
     PathMapper<T> pathMapper,
     DebugHandlerFactory<T> debugHandlerFactory,

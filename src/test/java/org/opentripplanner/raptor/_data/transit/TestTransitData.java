@@ -21,10 +21,10 @@ import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
-import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
@@ -100,7 +100,7 @@ public class TestTransitData
   }
 
   @Override
-  public CostCalculator<TestTripSchedule> multiCriteriaCostCalculator() {
+  public RaptorCostCalculator<TestTripSchedule> multiCriteriaCostCalculator() {
     return CostCalculatorFactory.createCostCalculator(
       costParamsBuilder.build(),
       stopBoardAlightCost()

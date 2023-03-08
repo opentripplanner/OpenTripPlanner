@@ -12,9 +12,9 @@ import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
-import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
@@ -61,7 +61,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   private final ZonedDateTime transitSearchTimeZero;
 
-  private final CostCalculator<TripSchedule> generalizedCostCalculator;
+  private final RaptorCostCalculator<TripSchedule> generalizedCostCalculator;
 
   private final RaptorSlackProvider slackProvider;
 
@@ -161,7 +161,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   }
 
   @Override
-  public CostCalculator<TripSchedule> multiCriteriaCostCalculator() {
+  public RaptorCostCalculator<TripSchedule> multiCriteriaCostCalculator() {
     return generalizedCostCalculator;
   }
 

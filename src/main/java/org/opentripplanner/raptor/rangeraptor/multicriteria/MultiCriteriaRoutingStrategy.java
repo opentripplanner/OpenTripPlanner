@@ -11,9 +11,9 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
-import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
@@ -30,14 +30,14 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   private final TimeBasedBoardingSupport<T> boardingSupport;
   private final ParetoSet<PatternRide<T>> patternRides;
   private final TransitCalculator<T> calculator;
-  private final CostCalculator<T> costCalculator;
+  private final RaptorCostCalculator<T> costCalculator;
   private final SlackProvider slackProvider;
 
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
     TimeBasedBoardingSupport<T> boardingSupport,
     TransitCalculator<T> calculator,
-    CostCalculator<T> costCalculator,
+    RaptorCostCalculator<T> costCalculator,
     SlackProvider slackProvider,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {

@@ -8,7 +8,7 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**
  * The purpose of the stop-arrival-view is to provide a common interface for stop-arrivals for
@@ -79,7 +79,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
    * The accumulated cost. 0 (zero) is returned if no cost exist.
    */
   default int cost() {
-    return CostCalculator.ZERO_COST;
+    return RaptorCostCalculator.ZERO_COST;
   }
 
   /**

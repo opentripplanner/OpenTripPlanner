@@ -67,7 +67,7 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
 
   @Override
   public int generalizedCost() {
-    return CostCalculator.ZERO_COST;
+    return RaptorCostCalculator.ZERO_COST;
   }
 
   @Override
