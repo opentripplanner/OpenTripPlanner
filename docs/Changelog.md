@@ -89,6 +89,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add graph build issue statistics to metrics endpoint [#4869](https://github.com/opentripplanner/OpenTripPlanner/pull/4869)
 - Refactor SIRI-ET updaters [#4865](https://github.com/opentripplanner/OpenTripPlanner/pull/4865)
 - Add documentation about system requirements and suggestions [#4937](https://github.com/opentripplanner/OpenTripPlanner/pull/4937)
+- Make SameFirstOrLastTripFilter implement ItineraryDeletionFlagger [#4943](https://github.com/opentripplanner/OpenTripPlanner/pull/4943)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
