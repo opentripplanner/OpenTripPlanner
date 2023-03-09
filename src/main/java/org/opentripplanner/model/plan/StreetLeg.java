@@ -35,7 +35,7 @@ public class StreetLeg implements Leg {
   private final Boolean walkingBike;
   private final Boolean rentedVehicle;
   private final String vehicleRentalNetwork;
-
+  private final String carHailingNetwork;
   private final Float accessibilityScore;
 
   public StreetLeg(StreetLegBuilder builder) {
@@ -54,6 +54,7 @@ public class StreetLeg implements Leg {
     this.walkingBike = builder.getWalkingBike();
     this.rentedVehicle = builder.getRentedVehicle();
     this.vehicleRentalNetwork = builder.getVehicleRentalNetwork();
+    this.carHailingNetwork = builder.getCarHailingNetwork();
     this.accessibilityScore = builder.getAccessibilityScore();
   }
 
@@ -152,6 +153,11 @@ public class StreetLeg implements Leg {
   @Override
   public String getVehicleRentalNetwork() {
     return vehicleRentalNetwork;
+  }
+
+  @Override
+  public String getCarHailingNetwork() {
+    return carHailingNetwork;
   }
 
   @Override

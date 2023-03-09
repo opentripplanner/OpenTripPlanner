@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -118,8 +117,8 @@ public class QualifiedModeSet implements Serializable {
           } else if (requestMode.qualifiers.contains(Qualifier.PICKUP)) {
             mBuilder.withAccessMode(StreetMode.WALK);
             mBuilder.withTransferMode(StreetMode.WALK);
-            mBuilder.withEgressMode(StreetMode.CAR_PICKUP);
-            mBuilder.withDirectMode(StreetMode.CAR_PICKUP);
+            mBuilder.withEgressMode(StreetMode.CAR_HAIL);
+            mBuilder.withDirectMode(StreetMode.CAR_HAIL);
           } else if (requestMode.qualifiers.contains(Qualifier.DROPOFF)) {
             mBuilder.withAccessMode(StreetMode.CAR_PICKUP);
             mBuilder.withTransferMode(StreetMode.WALK);

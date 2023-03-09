@@ -2,6 +2,7 @@ package org.opentripplanner.ext.vehicletostopheuristics;
 
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_HAIL;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_PICKUP;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
@@ -46,6 +47,7 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Ed
     BIKE_RENTAL,
     CAR_TO_PARK,
     CAR_PICKUP,
+    CAR_HAIL,
     CAR_RENTAL,
     SCOOTER_RENTAL
   );

@@ -53,6 +53,8 @@ public enum StreetMode {
    */
   CAR_RENTAL(true, true, true, true, false, true, true, false, false),
 
+  CAR_HAIL(true, false, true, true, false, true, false, false, true),
+
   /**
    * Encompasses all types of on-demand and flexible transportation.
    */

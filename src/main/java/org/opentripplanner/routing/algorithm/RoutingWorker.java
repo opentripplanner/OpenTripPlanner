@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import org.opentripplanner.ext.carhailing.CarHailingRouter;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
@@ -104,6 +105,7 @@ public class RoutingWorker {
           .allOf(
             CompletableFuture.runAsync(() -> routeDirectStreet(itineraries, routingErrors)),
             CompletableFuture.runAsync(() -> routeDirectFlex(itineraries, routingErrors)),
+            CompletableFuture.runAsync(() -> routeDirectCarHailing(itineraries, routingErrors)),
             CompletableFuture.runAsync(() -> routeTransit(itineraries, routingErrors))
           )
           .join();
@@ -116,6 +118,7 @@ public class RoutingWorker {
 
       // Direct flex routing
       routeDirectFlex(itineraries, routingErrors);
+      routeDirectCarHailing(itineraries, routingErrors);
 
       // Transit routing
       routeTransit(itineraries, routingErrors);
@@ -258,6 +261,18 @@ public class RoutingWorker {
       routingErrors.addAll(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedDirectFlexRouter();
+    }
+  }
+
+  private void routeDirectCarHailing(
+    List<Itinerary> itineraries,
+    Collection<RoutingError> routingErrors
+  ) {
+    try {
+      var router = new CarHailingRouter(request);
+      itineraries.addAll(router.routeDirect(serverContext));
+    } catch (RoutingValidationException e) {
+      routingErrors.addAll(e.getRoutingErrors());
     }
   }
 
