@@ -130,7 +130,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return incoming.length;
   }
 
-  public boolean checkEdges() {
+  public boolean hasEdges() {
     if (outgoing == null || incoming == null) {
       return false;
     }
