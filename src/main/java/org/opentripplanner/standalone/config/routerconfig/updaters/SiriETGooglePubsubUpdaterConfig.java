@@ -14,7 +14,9 @@ public class SiriETGooglePubsubUpdaterConfig {
       configRef,
       c.of("feedId").since(NA).summary("TODO").asString(null),
       c.of("type").since(NA).summary("TODO").asString(),
-      c.of("projectName").since(NA).summary("TODO").asString(),
+      c.of("projectName").since(NA).summary("TODO").asString(null), // TODO: Remove (deprecated)
+      c.of("subscriptionProjectName").since(NA).summary("TODO").asString(null), // TODO: Set as required
+      c.of("topicProjectName").since(NA).summary("TODO").asString(null), // TODO: Set as required
       c.of("topicName").since(NA).summary("TODO").asString(),
       c.of("dataInitializationUrl").since(NA).summary("TODO").asString(null),
       c.of("reconnectPeriod").since(NA).summary("TODO").asDuration(RECONNECT_PERIOD),
