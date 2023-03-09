@@ -69,6 +69,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
           .getVehicleTypes()
           .stream()
           .map(vehicleTypeMapper::mapRentalVehicleType)
+          .distinct()
           .collect(Collectors.toMap(v -> v.id.getId(), Function.identity()));
     }
 
