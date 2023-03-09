@@ -146,8 +146,8 @@ graph. The header info is available to configuration substitution:
 - `${graph.file.header}` Will expand to: `OpenTripPlannerGraph;0000007;`
 - `${otp.serialization.version.id}` Will expand to: `7`
 
-The intended usage is to be able to have a graph build pipeline which "knows" which graph that
-matches OTP planner instances. For example, you may build new graphs for every OTP serialization
+The intended usage is to be able to have a graph build pipeline that "knows" the matching graph and
+OTP planner instance. For example, you may build new graphs for every OTP serialization
 version id in use by the planning OTP instances you have deployed and plan to deploy. This way you
 can roll forward and backward new OTP instances without worrying about building new graphs.
 
