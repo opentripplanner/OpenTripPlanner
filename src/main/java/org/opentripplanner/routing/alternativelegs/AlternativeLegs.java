@@ -117,9 +117,7 @@ public class AlternativeLegs {
       .filter(tripPattern -> tripPattern.getStops().stream().anyMatch(destinations::contains))
       .filter(tripPatternPredicate)
       .distinct()
-      .flatMap(tripPattern ->
-        withBoardingAlightingPositions(origins, destinations, tripPattern, onlyFirstDestinationStop)
-      )
+      .flatMap(tripPattern -> withBoardingAlightingPositions(origins, destinations, tripPattern))
       .flatMap(t ->
         generateLegs(transitService, t, leg.getStartTime(), leg.getServiceDate(), searchBackward)
       )
@@ -252,8 +250,7 @@ public class AlternativeLegs {
   private static Stream<TripPatternBetweenStops> withBoardingAlightingPositions(
     Collection<StopLocation> origins,
     Collection<StopLocation> destinations,
-    TripPattern tripPattern,
-    boolean onlyFirstDestinationStop
+    TripPattern tripPattern
   ) {
     List<StopLocation> stops = tripPattern.getStops();
 
@@ -262,7 +259,6 @@ public class AlternativeLegs {
       .iterate(stops.size() - 1, i -> i - 1)
       .limit(stops.size())
       .filter(i -> destinations.contains(stops.get(i)) && tripPattern.canAlight(i))
-      .limit(onlyFirstDestinationStop ? 1 : destinations.size())
       .toArray();
 
     // Find out all boarding positions
@@ -276,9 +272,22 @@ public class AlternativeLegs {
           .stream(alightingPositions)
           // Filter out the impossible combinations
           .filter(alightingPosition -> boardingPosition < alightingPosition)
+          .min()
+          .stream()
           .mapToObj(alightingPosition ->
             new BoardingAlightingPositions(boardingPosition, alightingPosition)
           )
+      )
+      // Group by alighting position
+      .collect(Collectors.groupingBy(pair -> pair.alightingPosition))
+      .values()
+      .stream()
+      // Find the shortest leg in each group
+      .flatMap(legGroup ->
+        legGroup
+          .stream()
+          .min(Comparator.comparing(ba -> ba.alightingPosition - ba.boardingPosition))
+          .stream()
       )
       .map(pair -> new TripPatternBetweenStops(tripPattern, pair));
   }
