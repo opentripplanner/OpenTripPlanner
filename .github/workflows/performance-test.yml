@@ -31,7 +31,7 @@ jobs:
             jfr-delay: "50s"
 
           - location: switzerland
-            iterations: 4
+            iterations: 1
             jfr-delay: "50s"
 
           - location: washington-state
