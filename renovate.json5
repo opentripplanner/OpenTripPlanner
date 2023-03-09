@@ -20,7 +20,12 @@
         // need code changes, don't want to upgrade
         "io.github.origin-energy:java-snapshot-testing-junit5",
         "commons-cli:commons-cli",
-        "org.processing:core"
+        "org.processing:core",
+        // Skanetrafiken doesn't want automatic updates for these Azure libraries
+        "com.microsoft.azure:azure-servicebus",
+        "com.azure.resourcemanager:azure-resourcemanager-servicebus",
+        "com.azure:azure-core",
+        "com.azure:azure-messaging-servicebus"
       ],
       "enabled": false
     },
@@ -67,17 +72,6 @@
       "automerge": true,
       "automergeSchedule": "after 11pm and before 5am every weekday",
       "schedule": "after 11pm and before 5am every weekday"
-    },
-    {
-      "description": "Azure Cloud SDKs for Skanetrafiken",
-      "matchPackageNames": [
-        "com.microsoft.azure:azure-servicebus",
-        "com.azure.resourcemanager:azure-resourcemanager-servicebus",
-        "com.azure:azure-core",
-        "com.azure:azure-messaging-servicebus"
-      ],
-      reviewers: ["Bartosz-Kruba", "jtorin"],
-      labels: ["skip changelog", "Skanetrafiken"]
     }
   ],
   "timezone": "Europe/Berlin"
