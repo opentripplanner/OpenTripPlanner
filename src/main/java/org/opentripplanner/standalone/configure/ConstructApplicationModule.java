@@ -9,6 +9,7 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -27,6 +28,7 @@ public class ConstructApplicationModule {
     TransitService transitService,
     WorldEnvelopeService worldEnvelopeService,
     VehiclePositionService vehiclePositionService,
+    VehicleRentalService vehicleRentalService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor
   ) {
     return DefaultServerRequestContext.create(
@@ -40,6 +42,7 @@ public class ConstructApplicationModule {
       routerConfig.vectorTileLayers(),
       worldEnvelopeService,
       vehiclePositionService,
+      vehicleRentalService,
       routerConfig.flexConfig(),
       traverseVisitor,
       routerConfig.requestLogFile()

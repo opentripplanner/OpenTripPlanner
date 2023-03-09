@@ -197,9 +197,7 @@ public class RoutingWorker {
     RouteRequest request
   ) {
     var searchDateTime = ZonedDateTime.ofInstant(request.dateTime(), zoneId);
-    var maxWindow = Duration.ofMinutes(
-      raptorTuningParameters.dynamicSearchWindowCoefficients().maxWinTimeMinutes()
-    );
+    var maxWindow = raptorTuningParameters.dynamicSearchWindowCoefficients().maxWindow();
 
     return new AdditionalSearchDays(
       request.arriveBy(),
@@ -326,8 +324,8 @@ public class RoutingWorker {
   ) {
     var c = raptorTuningParameters.dynamicSearchWindowCoefficients();
     return new PagingSearchWindowAdjuster(
-      c.minWinTimeMinutes(),
-      c.maxWinTimeMinutes(),
+      c.minWindow(),
+      c.maxWindow(),
       transitTuningParameters.pagingSearchWindowAdjustments()
     );
   }

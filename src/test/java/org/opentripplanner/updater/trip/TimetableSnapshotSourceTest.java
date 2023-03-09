@@ -34,6 +34,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
@@ -668,6 +669,12 @@ public class TimetableSnapshotSourceTest {
         assertTrue(newTripPattern.canBoard(0));
         assertFalse(newTripPattern.canBoard(1));
         assertTrue(newTripPattern.canBoard(2));
+
+        assertEquals(new NonLocalizedString("foo"), newTripPattern.getTripHeadsign());
+        assertEquals(
+          newTripPattern.getOriginalTripPattern().getTripHeadsign(),
+          newTripPattern.getTripHeadsign()
+        );
 
         final int newTimetableForTodayModifiedTripIndex = newTimetableForToday.getTripIndex(
           scheduledTripId

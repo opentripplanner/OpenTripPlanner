@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.apache.commons.io.IOUtils;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,8 +124,8 @@ public class ConfigFileLoader {
    * with no fields defined.
    */
   private JsonNode loadJsonFile(File file) {
-    try {
-      String configString = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+    try (var is = new FileInputStream(file)) {
+      String configString = new String(is.readAllBytes(), StandardCharsets.UTF_8);
       JsonNode node = stringToJsonNode(configString, file.toString());
       LOG.info("Load JSON configuration file '{}'", file.getPath());
       LOG.info("Summarizing '{}': {}", file.getName(), toRedactedString(node));

@@ -35,12 +35,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.collections4.CollectionUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
@@ -57,6 +55,7 @@ import org.opentripplanner.ext.transmodelapi.model.framework.OperatorType;
 import org.opentripplanner.ext.transmodelapi.model.framework.PointsOnLinkType;
 import org.opentripplanner.ext.transmodelapi.model.framework.RentalVehicleTypeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ServerInfoType;
+import org.opentripplanner.ext.transmodelapi.model.framework.StreetModeDurationInputType;
 import org.opentripplanner.ext.transmodelapi.model.framework.SystemNoticeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ValidityPeriodType;
 import org.opentripplanner.ext.transmodelapi.model.network.DestinationDisplayType;
@@ -105,7 +104,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -347,7 +346,14 @@ public class TransmodelGraphQLSchema {
       gqlUtil
     );
 
-    GraphQLFieldDefinition tripQuery = TripQuery.create(routing, tripType, gqlUtil);
+    GraphQLInputObjectType durationPerStreetModeInput = StreetModeDurationInputType.create(gqlUtil);
+
+    GraphQLFieldDefinition tripQuery = TripQuery.create(
+      routing,
+      tripType,
+      durationPerStreetModeInput,
+      gqlUtil
+    );
 
     GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
     GraphQLInputObjectType viaLocationInputType = ViaLocationInputType.create(gqlUtil);
@@ -1283,35 +1289,33 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
-            List<FeedScopedId> lineIds = mapIDsToDomain(environment.getArgument("lines"));
-            List<String> privateCodes = environment.getArgument("privateCodes");
-            List<LocalDate> activeDates = environment.getArgument("activeDates");
-
-            var activeServiceDates = Optional.ofNullable(activeDates).orElse(List.of());
+            List<FeedScopedId> lineIds = mapIDsToDomain(
+              environment.getArgumentOrDefault("lines", List.of())
+            );
+            List<String> privateCodes = environment.getArgumentOrDefault("privateCodes", List.of());
+            List<LocalDate> activeServiceDates = environment.getArgumentOrDefault(
+              "activeDates",
+              List.of()
+            );
 
             // TODO OTP2 - Use FeedScoped ID
-            List<String> authorities = environment.getArgument("authorities");
-            return GqlUtil
-              .getTransitService(environment)
+            List<String> authorities = environment.getArgumentOrDefault("authorities", List.of());
+            TransitService transitService = GqlUtil.getTransitService(environment);
+            return transitService
               .getAllTrips()
               .stream()
+              .filter(t -> lineIds.isEmpty() || lineIds.contains(t.getRoute().getId()))
               .filter(t ->
-                lineIds == null || lineIds.isEmpty() || lineIds.contains(t.getRoute().getId())
+                privateCodes.isEmpty() || privateCodes.contains(t.getNetexInternalPlanningCode())
               )
               .filter(t ->
-                CollectionUtils.isEmpty(privateCodes) ||
-                privateCodes.contains(t.getNetexInternalPlanningCode())
-              )
-              .filter(t ->
-                authorities == null ||
                 authorities.isEmpty() ||
                 authorities.contains(t.getRoute().getAgency().getId().getId())
               )
               .filter(t ->
                 (
                   activeServiceDates.isEmpty() ||
-                  GqlUtil
-                    .getTransitService(environment)
+                  transitService
                     .getCalendarService()
                     .getServiceDatesForServiceId(t.getServiceId())
                     .stream()

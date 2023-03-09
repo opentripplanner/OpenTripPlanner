@@ -1,8 +1,8 @@
 package org.opentripplanner.inspector.vector.geofencing;
 
-import static org.opentripplanner.street.model.vertex.RentalRestrictionExtension.RestrictionType.BUSINESS_AREA_BORDER;
-import static org.opentripplanner.street.model.vertex.RentalRestrictionExtension.RestrictionType.NO_DROP_OFF;
-import static org.opentripplanner.street.model.vertex.RentalRestrictionExtension.RestrictionType.NO_TRAVERSAL;
+import static org.opentripplanner.street.model.RentalRestrictionExtension.RestrictionType.BUSINESS_AREA_BORDER;
+import static org.opentripplanner.street.model.RentalRestrictionExtension.RestrictionType.NO_DROP_OFF;
+import static org.opentripplanner.street.model.RentalRestrictionExtension.RestrictionType.NO_TRAVERSAL;
 
 import java.util.Collection;
 import java.util.List;

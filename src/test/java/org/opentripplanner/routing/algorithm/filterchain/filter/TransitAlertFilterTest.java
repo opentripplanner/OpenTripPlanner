@@ -4,16 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.BUS_ROUTE;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
-import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 
 class TransitAlertFilterTest implements PlanTestConstants {
 
@@ -21,10 +21,18 @@ class TransitAlertFilterTest implements PlanTestConstants {
 
   @Test
   void testFilter() {
-    TransitAlertFilter filter = new TransitAlertFilter(
-      Mockito.spy(TestTransitAlertService.class),
-      ignore -> null
+    var transitAlertService = new TransitAlertServiceImpl(new TransitModel());
+    transitAlertService.setAlerts(
+      List.of(
+        TransitAlert
+          .of(ID)
+          .addEntity(new EntitySelector.Route(BUS_ROUTE.getId()))
+          .addTimePeriod(new TimePeriod(0, TimePeriod.OPEN_ENDED))
+          .build()
+      )
     );
+
+    TransitAlertFilter filter = new TransitAlertFilter(transitAlertService, ignore -> null);
 
     // Expect filter to no fail on an empty list
     assertEquals(List.of(), filter.filter(List.of()));
@@ -42,22 +50,5 @@ class TransitAlertFilterTest implements PlanTestConstants {
     assertEquals(1, first.getLegs().get(0).getTransitAlerts().size());
     assertEquals(ID, first.getLegs().get(0).getTransitAlerts().iterator().next().getId());
     assertEquals(0, list.get(1).getLegs().get(0).getTransitAlerts().size());
-  }
-
-  abstract static class TestTransitAlertService implements TransitAlertService {
-
-    public static final TransitAlert BUS_ALERT = TransitAlert
-      .of(ID)
-      .addTimePeriod(new TimePeriod(0, TimePeriod.OPEN_ENDED))
-      .build();
-
-    @Override
-    public Collection<TransitAlert> getRouteAlerts(FeedScopedId route) {
-      if (route.equals(BUS_ROUTE.getId())) {
-        return List.of(BUS_ALERT);
-      }
-
-      return List.of();
-    }
   }
 }

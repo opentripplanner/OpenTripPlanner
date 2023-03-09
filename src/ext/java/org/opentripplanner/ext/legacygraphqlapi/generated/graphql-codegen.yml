@@ -8,6 +8,7 @@ generates:
       - java
     config:
       className: LegacyGraphQLTypes
+      listType: List
   LegacyGraphQLDataFetchers.java:
     plugins:
       - add:
@@ -33,11 +34,11 @@ config:
     AlertEffectType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertEffectType#LegacyGraphQLAlertEffectType
     AlertSeverityLevelType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType#LegacyGraphQLAlertSeverityLevelType
     BikePark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
-    BikeRentalStation: org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace#VehicleRentalPlace
-    BikeRentalStationUris: org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris#VehicleRentalStationUris
-    VehicleRentalStation: org.opentripplanner.routing.vehicle_rental.VehicleRentalStation#VehicleRentalStation
-    RentalVehicle: org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle#VehicleRentalVehicle
-    VehicleRentalUris: org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris#VehicleRentalStationUris
+    BikeRentalStation: org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace#VehicleRentalPlace
+    BikeRentalStationUris: org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris#VehicleRentalStationUris
+    VehicleRentalStation: org.opentripplanner.service.vehiclerental.model.VehicleRentalStation#VehicleRentalStation
+    RentalVehicle: org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle#VehicleRentalVehicle
+    VehicleRentalUris: org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris#VehicleRentalStationUris
     BikesAllowed: String
     BookingInfo: org.opentripplanner.model.BookingInfo
     BookingTime: org.opentripplanner.model.BookingTime
@@ -94,5 +95,5 @@ config:
     WheelchairBoarding: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding
     FormFactor: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor
     PropulsionType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType
-    RentalVehicleType: org.opentripplanner.routing.vehicle_rental.RentalVehicleType#RentalVehicleType
+    RentalVehicleType: org.opentripplanner.service.vehiclerental.model.RentalVehicleType#RentalVehicleType
     OpeningHours: org.opentripplanner.model.calendar.openinghours.OHCalendar#OHCalendar

@@ -265,6 +265,7 @@ public class WalkableAreaBuilder {
             // area or a convex point, i.e. the angle is over 180 degrees.
             if (outerRing.isNodeConvex(i)) {
               visibilityNodes.add(node);
+              edgeList.visibilityVertices.add(handler.getVertexForOsmNode(node, areaEntity));
             }
             if (isStartingNode(node, osmWayIds)) {
               visibilityNodes.add(node);
@@ -283,6 +284,7 @@ public class WalkableAreaBuilder {
               // For holes, the internal angle is calculated, so we must swap the sign
               if (!innerRing.isNodeConvex(j)) {
                 visibilityNodes.add(node);
+                edgeList.visibilityVertices.add(handler.getVertexForOsmNode(node, areaEntity));
               }
               if (isStartingNode(node, osmWayIds)) {
                 visibilityNodes.add(node);

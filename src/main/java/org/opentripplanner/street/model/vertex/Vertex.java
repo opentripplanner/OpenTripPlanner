@@ -14,6 +14,7 @@ import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.state.State;
@@ -68,6 +69,9 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     if (this.getCoordinate() != null) {
       sb.append(" lat,lng=").append(this.getCoordinate().y);
       sb.append(",").append(this.getCoordinate().x);
+    }
+    if (!rentalRestrictions.toList().isEmpty()) {
+      sb.append(", traversalExtension=").append(rentalRestrictions);
     }
     sb.append("}");
     return sb.toString();

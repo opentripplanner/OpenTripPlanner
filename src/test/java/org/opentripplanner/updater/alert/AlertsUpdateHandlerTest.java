@@ -3,8 +3,6 @@ package org.opentripplanner.updater.alert;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.Alert;
 import com.google.transit.realtime.GtfsRealtime.Alert.Cause;
@@ -14,25 +12,25 @@ import com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.service.TransitModel;
 
 public class AlertsUpdateHandlerTest {
 
   private AlertsUpdateHandler handler;
 
-  private final FakeTransitAlertService service = Mockito.spy(FakeTransitAlertService.class);
+  private final TransitAlertService service = new TransitAlertServiceImpl(new TransitModel());
 
   @BeforeEach
   public void setUp() {
@@ -536,27 +534,5 @@ public class AlertsUpdateHandlerTest {
     Collection<TransitAlert> alerts = service.getAllAlerts();
     assertEquals(1, alerts.size());
     return alerts.iterator().next();
-  }
-
-  abstract static class FakeTransitAlertService implements TransitAlertService {
-
-    private Multimap<EntitySelector, TransitAlert> alerts = HashMultimap.create();
-
-    @Override
-    public void setAlerts(Collection<TransitAlert> alerts) {
-      Multimap<EntitySelector, TransitAlert> newAlerts = HashMultimap.create();
-      for (TransitAlert alert : alerts) {
-        for (EntitySelector entity : alert.entities()) {
-          newAlerts.put(entity, alert);
-        }
-      }
-
-      this.alerts = newAlerts;
-    }
-
-    @Override
-    public Collection<TransitAlert> getAllAlerts() {
-      return new HashSet<>(alerts.values());
-    }
   }
 }

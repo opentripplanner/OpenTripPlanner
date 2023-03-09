@@ -5,7 +5,6 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.LocalDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
@@ -245,8 +244,8 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
         boolean limitToExactOriginStop =
           originModesWithParentStation == null ||
           !(
-            StreamSupport
-              .stream(originModesWithParentStation.spliterator(), false)
+            originModesWithParentStation
+              .stream()
               .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString)
               .toList()
               .contains(originalLeg.getMode().name())
@@ -255,8 +254,8 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
         boolean limitToExactDestinationStop =
           destinationModesWithParentStation == null ||
           !(
-            StreamSupport
-              .stream(destinationModesWithParentStation.spliterator(), false)
+            destinationModesWithParentStation
+              .stream()
               .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString)
               .toList()
               .contains(originalLeg.getMode().name())

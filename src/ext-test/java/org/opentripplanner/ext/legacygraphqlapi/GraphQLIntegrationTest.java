@@ -47,8 +47,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -134,7 +134,7 @@ class GraphQLIntegrationTest {
         transitService,
         new DefaultFareService(),
         graph.getVehicleParkingService(),
-        new VehicleRentalService(),
+        new DefaultVehicleRentalService(),
         new DefaultVehiclePositionService(),
         GraphFinder.getInstance(graph, transitService::findRegularStop),
         new RouteRequest()
