@@ -96,7 +96,7 @@ documentation below we will refer to the following types:
 
 ## System environment and project information substitution
 
-OTP support injecting system environment variables and project information parameters into the
+OTP supports injecting system environment variables and project information parameters into the
 configuration. A pattern like `${VAR_NAME}` in a configuration file is substituted with an
 environment variable with name `VAR_NAME`. The substitution is done BEFORE the JSON is parsed, so
 both json keys and values is subject to substitution. This is useful if you want OTPs version number
