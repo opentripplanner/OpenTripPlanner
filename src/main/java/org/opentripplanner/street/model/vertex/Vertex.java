@@ -130,6 +130,13 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return incoming.length;
   }
 
+  public boolean checkEdges() {
+    if (outgoing == null || incoming == null) {
+      return false;
+    }
+    return true;
+  }
+
   /** Get the longitude of the vertex */
   public final double getX() {
     return getLon();
@@ -197,13 +204,13 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
    * Returns true if vertex is connected to another one by an edge
    */
   public boolean isConnected(Vertex v) {
-    for (Edge e : this.getOutgoing()) {
+    for (Edge e : outgoing) {
       if (e.getToVertex() == v) {
         return true;
       }
     }
-    for (Edge e : v.getOutgoing()) {
-      if (e.getToVertex() == this) {
+    for (Edge e : incoming) {
+      if (e.getFromVertex() == v) {
         return true;
       }
     }
