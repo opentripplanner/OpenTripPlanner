@@ -140,7 +140,7 @@ in your build-pipeline, at deployment time or use system environment variable su
 ## OTP Serialization version id and _Graph.obj_ file header
 
 OTP has a _OTP Serialization Version Id_ maintained in the pom.xml_ file. OTP stores the id in the
-serialized _Graph.obj_ file header, allowing OTP the check for compatibility issues when loading the
+serialized _Graph.obj_ file header, allowing OTP to check for compatibility issues when loading the
 graph. The header info is available to configuration substitution:
 
 - `${graph.file.header}` Will expand to: `OpenTripPlannerGraph;0000007;`
