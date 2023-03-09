@@ -34,18 +34,25 @@ public class CarHailingRouter {
     var req = routeRequest.clone();
     req.setDateTime(earliestArrivalTime);
 
-    return DirectStreetRouter.route(serverContext, req).stream().map(CarHailingRouter::addCarHailInformation).toList();
+    return DirectStreetRouter
+      .route(serverContext, req)
+      .stream()
+      .map(CarHailingRouter::addCarHailInformation)
+      .toList();
   }
 
   public static Itinerary addCarHailInformation(Itinerary input) {
-    input.getLegs().stream().map(CarHailingRouter::foo)
+    return null;
   }
 
   private static Leg foo(Leg leg) {
-    if(leg instanceof StreetLeg sl){
-      return StreetLegBuilder.of(sl).withCarHailingNetwork("uber").withMode(TraverseMode.CAR).build();
-    }
-    else {
+    if (leg instanceof StreetLeg sl) {
+      return StreetLegBuilder
+        .of(sl)
+        .withCarHailingNetwork("uber")
+        .withMode(TraverseMode.CAR)
+        .build();
+    } else {
       return leg;
     }
   }
