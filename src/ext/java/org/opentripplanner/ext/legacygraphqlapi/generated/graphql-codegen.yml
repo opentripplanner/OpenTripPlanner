@@ -8,6 +8,7 @@ generates:
       - java
     config:
       className: LegacyGraphQLTypes
+      listType: List
   LegacyGraphQLDataFetchers.java:
     plugins:
       - add:

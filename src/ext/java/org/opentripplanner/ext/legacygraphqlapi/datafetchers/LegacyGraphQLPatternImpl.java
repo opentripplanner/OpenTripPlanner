@@ -39,7 +39,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
     return environment -> {
       TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
       var args = new LegacyGraphQLTypes.LegacyGraphQLPatternAlertsArgs(environment.getArguments());
-      Iterable<LegacyGraphQLTypes.LegacyGraphQLPatternAlertType> types = args.getLegacyGraphQLTypes();
+      List<LegacyGraphQLTypes.LegacyGraphQLPatternAlertType> types = args.getLegacyGraphQLTypes();
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
