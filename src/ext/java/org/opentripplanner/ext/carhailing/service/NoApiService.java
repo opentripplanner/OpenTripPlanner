@@ -1,8 +1,9 @@
 package org.opentripplanner.ext.carhailing.service;
 
-import java.net.HttpURLConnection;
+import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Money;
 
@@ -36,9 +37,9 @@ public class NoApiService extends CarHailingService {
   }
 
   @Override
-  protected HttpURLConnection buildOAuthConnection() {
+  protected Optional<HttpRequest> oauthTokenHttpRequest() {
     // There is no authentication for this class.
-    return null;
+    return Optional.empty();
   }
 
   /**

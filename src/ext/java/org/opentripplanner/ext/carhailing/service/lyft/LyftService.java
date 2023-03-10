@@ -1,5 +1,8 @@
 package org.opentripplanner.ext.carhailing.service.lyft;
 
+import static java.util.Map.entry;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,11 +11,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Currency;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.opentripplanner.ext.carhailing.service.ArrivalTime;
 import org.opentripplanner.ext.carhailing.service.CarHailingCompany;
 import org.opentripplanner.ext.carhailing.service.CarHailingService;
@@ -58,28 +64,6 @@ public class LyftService extends CarHailingService {
   }
 
   @Override
-  protected HttpURLConnection buildOAuthConnection() throws IOException {
-    // prepare request to get token
-    UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "oauth/token");
-    URL url = new URL(uriBuilder.toString());
-    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-    String userpass = clientId + ":" + clientSecret;
-    String basicAuth =
-      "Basic " + jakarta.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
-    connection.setRequestProperty("Authorization", basicAuth);
-    connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-
-    // set request body
-    LyftAuthenticationRequestBody authRequest = new LyftAuthenticationRequestBody(
-      "client_credentials",
-      "public"
-    );
-    connection.setDoOutput(true);
-    mapper.writeValue(connection.getOutputStream(), authRequest);
-    return connection;
-  }
-
-  @Override
   public List<ArrivalTime> queryArrivalTimes(WgsCoordinate request) throws IOException {
     // prepare request
     UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "v1/eta");
@@ -101,7 +85,7 @@ public class LyftService extends CarHailingService {
       );
 
       // serialize into Arrival Time objects
-      List<ArrivalTime> arrivalTimes = new ArrayList<ArrivalTime>();
+      List<ArrivalTime> arrivalTimes = new ArrayList<>();
 
       LOG.info("Received " + response.eta_estimates.size() + " lyft arrival time estimates");
 
@@ -211,6 +195,28 @@ public class LyftService extends CarHailingService {
         throw new IOException(error.error_description());
       }
       throw new IOException("received an error from the Lyft API");
+    }
+  }
+
+  @Override
+  protected Optional<HttpRequest> oauthTokenHttpRequest() {
+    var uri = UriBuilder.fromUri(baseUrl + "oauth/token").build();
+    String userpass = clientId + ":" + clientSecret;
+    String basicAuth =
+      "Basic " + jakarta.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+
+    var body = Map.ofEntries(entry("grant_type", "client_credentials"), entry("scope", "public"));
+    try {
+      var bodyAsString = mapper.writeValueAsString(body);
+      var req = HttpRequest
+        .newBuilder(uri)
+        .header("Authorization", basicAuth)
+        .header("Content-Type", "application/json;charset=UTF-8")
+        .POST(HttpRequest.BodyPublishers.ofString(bodyAsString))
+        .build();
+      return Optional.of(req);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
     }
   }
 }

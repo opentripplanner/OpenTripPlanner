@@ -1,12 +1,19 @@
 package org.opentripplanner.ext.carhailing.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import org.opentripplanner.ext.carhailing.service.oauth.CachedOAuthToken;
+import org.opentripplanner.ext.carhailing.service.oauth.OAuthToken;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +36,7 @@ public abstract class CarHailingService {
 
   protected String wheelChairAccessibleRideType;
 
-  private OAuthToken token = OAuthToken.empty();
+  private CachedOAuthToken token = CachedOAuthToken.empty();
 
   // Abstract method to return the TransportationNetworkCompany enum type
   public abstract CarHailingCompany carHailingCompany();
@@ -60,21 +67,27 @@ public abstract class CarHailingService {
    * Obtains and caches an OAuth API access token.
    * @return A token holder with the token value (including null token values if the call was unsuccessful).
    */
-  public OAuthToken getToken() throws IOException {
+  public CachedOAuthToken getToken() throws IOException {
     if (token.isExpired()) {
       // prepare request to get token
-      HttpURLConnection connection = buildOAuthConnection();
+      oauthTokenHttpRequest()
+        .ifPresent(request -> {
+          try {
+            String companyType = carHailingCompany().name();
+            LOG.info("Requesting new {} access token", companyType);
+            var response = HttpClient
+              .newHttpClient()
+              .send(request, HttpResponse.BodyHandlers.ofInputStream());
+            var mapper = new ObjectMapper();
+            var token = mapper.readValue(response.body(), OAuthToken.class);
 
-      // send request and parse response (if a connection object was provided)
-      if (connection != null) {
-        String companyType = carHailingCompany().name();
-        LOG.info("Requesting new {} access token", companyType);
+            this.token = new CachedOAuthToken(token);
 
-        token = new OAuthToken(connection);
-
-        connection.disconnect();
-        LOG.info("Received new {} access token", companyType);
-      }
+            LOG.info("Received new {} access token", companyType);
+          } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+        });
     }
 
     return token;
@@ -85,5 +98,5 @@ public abstract class CarHailingService {
    * @return An {@link HttpURLConnection} object for obtaining the token.
    * @throws IOException Thrown if setting up the connection fails.
    */
-  protected abstract HttpURLConnection buildOAuthConnection() throws IOException;
+  protected abstract Optional<HttpRequest> oauthTokenHttpRequest() throws IOException;
 }
