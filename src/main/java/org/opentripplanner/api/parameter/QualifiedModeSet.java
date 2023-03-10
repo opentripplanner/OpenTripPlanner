@@ -1,6 +1,5 @@
 package org.opentripplanner.api.parameter;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  */
 public class QualifiedModeSet implements Serializable {
 
-  @Serial
   public Set<QualifiedMode> qModes = new HashSet<>();
 
   public QualifiedModeSet(String[] modes) {
@@ -83,10 +81,8 @@ public class QualifiedModeSet implements Serializable {
 
     if (requestMode != null) {
       switch (requestMode.mode) {
-        case WALK:
-          mBuilder.withAllStreetModes(StreetMode.WALK);
-          break;
-        case BICYCLE:
+        case WALK -> mBuilder.withAllStreetModes(StreetMode.WALK);
+        case BICYCLE -> {
           if (requestMode.qualifiers.contains(Qualifier.RENT)) {
             mBuilder.withAllStreetModes(StreetMode.BIKE_RENTAL);
           } else if (requestMode.qualifiers.contains(Qualifier.PARK)) {
@@ -97,16 +93,16 @@ public class QualifiedModeSet implements Serializable {
           } else {
             mBuilder.withAllStreetModes(StreetMode.BIKE);
           }
-          break;
-        case SCOOTER:
+        }
+        case SCOOTER -> {
           if (requestMode.qualifiers.contains(Qualifier.RENT)) {
             mBuilder.withAllStreetModes(StreetMode.SCOOTER_RENTAL);
           } else {
             // Only supported as rental mode
             throw new IllegalArgumentException();
           }
-          break;
-        case CAR:
+        }
+        case CAR -> {
           if (requestMode.qualifiers.contains(Qualifier.RENT)) {
             mBuilder.withAllStreetModes(StreetMode.CAR_RENTAL);
           } else if (requestMode.qualifiers.contains(Qualifier.PARK)) {
@@ -117,20 +113,25 @@ public class QualifiedModeSet implements Serializable {
           } else if (requestMode.qualifiers.contains(Qualifier.PICKUP)) {
             mBuilder.withAccessMode(StreetMode.WALK);
             mBuilder.withTransferMode(StreetMode.WALK);
-            mBuilder.withEgressMode(StreetMode.CAR_HAIL);
-            mBuilder.withDirectMode(StreetMode.CAR_HAIL);
+            mBuilder.withEgressMode(StreetMode.CAR_PICKUP);
+            mBuilder.withDirectMode(StreetMode.CAR_PICKUP);
           } else if (requestMode.qualifiers.contains(Qualifier.DROPOFF)) {
             mBuilder.withAccessMode(StreetMode.CAR_PICKUP);
             mBuilder.withTransferMode(StreetMode.WALK);
             mBuilder.withEgressMode(StreetMode.WALK);
             mBuilder.withDirectMode(StreetMode.CAR_PICKUP);
+          } else if (requestMode.qualifiers.contains(Qualifier.HAIL)) {
+            mBuilder.withAccessMode(StreetMode.CAR_HAIL);
+            mBuilder.withTransferMode(StreetMode.WALK);
+            mBuilder.withEgressMode(StreetMode.CAR_HAIL);
+            mBuilder.withDirectMode(StreetMode.CAR_HAIL);
           } else {
             mBuilder.withAccessMode(StreetMode.WALK);
             mBuilder.withTransferMode(StreetMode.WALK);
             mBuilder.withEgressMode(StreetMode.WALK);
             mBuilder.withDirectMode(StreetMode.CAR);
           }
-          break;
+        }
       }
     }
 

@@ -3,6 +3,7 @@ package org.opentripplanner.ext.carhailing;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -15,43 +16,43 @@ import org.opentripplanner.street.search.TraverseMode;
 
 public class CarHailingRouter {
 
-  private final RouteRequest routeRequest;
-
-  public CarHailingRouter(RouteRequest request) {
-    this.routeRequest = request;
-  }
-
-  private Instant earliestArrivalTime() {
-    return routeRequest.dateTime().plus(Duration.ofMinutes(15));
-  }
-
-  public List<Itinerary> routeDirect(OtpServerRequestContext serverContext) {
+  public static List<Itinerary> routeDirect(
+    OtpServerRequestContext serverContext,
+    RouteRequest routeRequest
+  ) {
     if (routeRequest.journey().modes().directMode != StreetMode.CAR_HAIL) {
       return List.of();
     }
-    var earliestArrivalTime = earliestArrivalTime();
+    var times = earliestArrivalTimes(routeRequest);
 
-    var req = routeRequest.clone();
-    req.setDateTime(earliestArrivalTime);
+    return times
+      .entrySet()
+      .parallelStream()
+      .flatMap(entry -> {
+        var req = routeRequest.clone();
+        req.setDateTime(entry.getValue());
 
-    return DirectStreetRouter
-      .route(serverContext, req)
-      .stream()
-      .map(CarHailingRouter::addCarHailInformation)
+        return DirectStreetRouter
+          .route(serverContext, req)
+          .stream()
+          .map(i -> CarHailingRouter.addCarHailInformation(i, entry.getKey()));
+      })
       .toList();
   }
 
-  public static Itinerary addCarHailInformation(Itinerary input) {
-    return null;
+  public static Itinerary addCarHailInformation(Itinerary input, String network) {
+    var legs = input.getLegs().stream().map(l -> CarHailingRouter.addNetwork(l, network)).toList();
+    input.setLegs(legs);
+    return input;
   }
 
-  private static Leg foo(Leg leg) {
-    if (leg instanceof StreetLeg sl) {
-      return StreetLegBuilder
-        .of(sl)
-        .withCarHailingNetwork("uber")
-        .withMode(TraverseMode.CAR)
-        .build();
+  private static Map<String, Instant> earliestArrivalTimes(RouteRequest routeRequest) {
+    return Map.of("uber", routeRequest.dateTime().plus(Duration.ofMinutes(15)));
+  }
+
+  private static Leg addNetwork(Leg leg, String network) {
+    if (leg instanceof StreetLeg sl && sl.getMode() == TraverseMode.CAR) {
+      return StreetLegBuilder.of(sl).withCarHailingNetwork(network).build();
     } else {
       return leg;
     }

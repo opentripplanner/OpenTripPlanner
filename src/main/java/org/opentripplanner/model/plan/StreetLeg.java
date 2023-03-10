@@ -205,6 +205,7 @@ public class StreetLeg implements Leg {
       .addBool("walkingBike", walkingBike)
       .addBool("rentedVehicle", rentedVehicle)
       .addStr("bikeRentalNetwork", vehicleRentalNetwork)
+      .addStr("carHailingNetwork", carHailingNetwork)
       .toString();
   }
 }

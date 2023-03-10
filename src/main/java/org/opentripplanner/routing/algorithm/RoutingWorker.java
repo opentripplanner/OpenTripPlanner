@@ -105,7 +105,6 @@ public class RoutingWorker {
           .allOf(
             CompletableFuture.runAsync(() -> routeDirectStreet(itineraries, routingErrors)),
             CompletableFuture.runAsync(() -> routeDirectFlex(itineraries, routingErrors)),
-            CompletableFuture.runAsync(() -> routeDirectCarHailing(itineraries, routingErrors)),
             CompletableFuture.runAsync(() -> routeTransit(itineraries, routingErrors))
           )
           .join();
@@ -118,7 +117,6 @@ public class RoutingWorker {
 
       // Direct flex routing
       routeDirectFlex(itineraries, routingErrors);
-      routeDirectCarHailing(itineraries, routingErrors);
 
       // Transit routing
       routeTransit(itineraries, routingErrors);
@@ -238,7 +236,11 @@ public class RoutingWorker {
   ) {
     debugTimingAggregator.startedDirectStreetRouter();
     try {
-      itineraries.addAll(DirectStreetRouter.route(serverContext, request));
+      if (request.journey().modes().directMode == StreetMode.CAR_HAIL) {
+        itineraries.addAll(CarHailingRouter.routeDirect(serverContext, request));
+      } else {
+        itineraries.addAll(DirectStreetRouter.route(serverContext, request));
+      }
     } catch (RoutingValidationException e) {
       routingErrors.addAll(e.getRoutingErrors());
     } finally {
@@ -261,18 +263,6 @@ public class RoutingWorker {
       routingErrors.addAll(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedDirectFlexRouter();
-    }
-  }
-
-  private void routeDirectCarHailing(
-    List<Itinerary> itineraries,
-    Collection<RoutingError> routingErrors
-  ) {
-    try {
-      var router = new CarHailingRouter(request);
-      itineraries.addAll(router.routeDirect(serverContext));
-    } catch (RoutingValidationException e) {
-      routingErrors.addAll(e.getRoutingErrors());
     }
   }
 
