@@ -28,5 +28,5 @@ public enum Qualifier {
   /**
    * Hailing a car from a taxi-like service like Uber or Lyft
    */
-  HAIL
+  HAIL,
 }

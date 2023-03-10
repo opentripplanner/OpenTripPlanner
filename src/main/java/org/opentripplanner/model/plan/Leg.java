@@ -427,6 +427,7 @@ public interface Leg {
   default String getCarHailingNetwork() {
     return null;
   }
+
   /**
    * If a generalized cost is used in the routing algorithm, this should be the "delta" cost
    * computed by the algorithm for the section this leg account for. This is relevant for anyone who

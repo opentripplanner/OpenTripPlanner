@@ -203,6 +203,7 @@ public class StreetLegBuilder {
   public String getCarHailingNetwork() {
     return carHailingNetwork;
   }
+
   public StreetLegBuilder withCarHailingNetwork(String network) {
     this.carHailingNetwork = network;
     return this;
