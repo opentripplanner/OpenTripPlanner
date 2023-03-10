@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.carhailing.service.uber;
 
+import static java.util.Map.entry;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.UriBuilder;
@@ -11,12 +13,14 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
+import java.util.Map;
 import org.opentripplanner.ext.carhailing.service.ArrivalTime;
 import org.opentripplanner.ext.carhailing.service.CarHailingCompany;
 import org.opentripplanner.ext.carhailing.service.CarHailingService;
 import org.opentripplanner.ext.carhailing.service.RideEstimate;
 import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,22 +72,23 @@ public class UberService extends CarHailingService {
   }
 
   @Override
-  public List<ArrivalTime> queryArrivalTimes(WgsCoordinate position) throws IOException {
-    // prepare request
-    UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "estimates/time");
-    uriBuilder.queryParam("start_latitude", position.latitude());
-    uriBuilder.queryParam("start_longitude", position.longitude());
-    String requestUrl = uriBuilder.toString();
-    URL uberUrl = new URL(requestUrl);
-    HttpURLConnection connection = (HttpURLConnection) uberUrl.openConnection();
-    connection.setRequestProperty("Authorization", "Bearer " + getToken().value);
-    connection.setRequestProperty("Accept-Language", "en_US");
-    connection.setRequestProperty("Content-Type", "application/json");
+  public List<ArrivalTime> queryArrivalTimes(WgsCoordinate coord) throws IOException {
+    var uri = UriBuilder
+      .fromUri(baseUrl + "estimates/time")
+      .queryParam("start_latitude", coord.latitude())
+      .queryParam("start_longitude", coord.longitude())
+      .build();
 
-    LOG.info("Made arrival time request to Uber API at following URL: {}", requestUrl);
+    var headers = Map.ofEntries(
+      entry("Authorization", "Bearer " + getToken().value),
+      entry("Accept-Language", "en_US"),
+      entry("Content-Type", "application/json")
+    );
+
+    LOG.info("Made arrival time request to Uber API at following URL: {}", uri);
 
     // Make request, parse response
-    InputStream responseStream = connection.getInputStream();
+    InputStream responseStream = HttpUtils.openInputStream(uri, headers);
     UberArrivalEstimateResponse response = mapper.readValue(
       responseStream,
       UberArrivalEstimateResponse.class
@@ -105,7 +110,7 @@ public class UberService extends CarHailingService {
       .toList();
 
     if (arrivalTimes.isEmpty()) {
-      LOG.warn("No Uber service available at {}", position);
+      LOG.warn("No Uber service available at {}", coord);
     }
 
     return arrivalTimes;

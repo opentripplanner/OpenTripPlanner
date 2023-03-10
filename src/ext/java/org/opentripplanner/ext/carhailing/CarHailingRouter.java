@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class CarHailingRouter {
 
-  private static Logger LOG = LoggerFactory.getLogger(CarHailingRouter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CarHailingRouter.class);
 
   public static List<Itinerary> routeDirect(
     OtpServerRequestContext serverContext,

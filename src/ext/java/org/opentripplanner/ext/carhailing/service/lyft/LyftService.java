@@ -65,7 +65,7 @@ public class LyftService extends CarHailingService {
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
     String userpass = clientId + ":" + clientSecret;
     String basicAuth =
-      "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+      "Basic " + jakarta.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
     connection.setRequestProperty("Authorization", basicAuth);
     connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
 
