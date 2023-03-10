@@ -1,7 +1,10 @@
 package org.opentripplanner.ext.siri;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -12,7 +15,6 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.DataFrameRefStructure;
 import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
@@ -137,6 +139,23 @@ public class EntityResolver {
           LOG.warn("Invalid dataFrame format: {}", dataFrame.getValue());
         }
       }
+    }
+    return null;
+  }
+
+  /**
+   * Resolve serviceDate.
+   * For legacy reasons this is provided in originAimedDepartureTime - in lack of alternatives. Even
+   * though the field's name indicates that the timestamp represents the departure from the first
+   * stop, only the Date-part is actually used, and is defined to represent the actual serviceDate.
+   */
+  public LocalDate resolveServiceDate(ZonedDateTime originAimedDepartureTime) {
+    Optional<ZonedDateTime> localDateOptional = Optional
+      .ofNullable(originAimedDepartureTime)
+      .map(ServiceDateUtils::asStartOfService);
+
+    if (localDateOptional.isPresent()) {
+      return localDateOptional.get().toLocalDate();
     }
     return null;
   }

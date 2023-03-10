@@ -2,12 +2,10 @@ package org.opentripplanner.ext.siri;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -94,16 +92,6 @@ public class AffectsMapper {
         }
       }
 
-      LocalDate serviceDate = null;
-
-      if (affectedVehicleJourney.getOriginAimedDepartureTime() != null) {
-        ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
-          affectedVehicleJourney.getOriginAimedDepartureTime()
-        );
-
-        serviceDate = startOfService.toLocalDate();
-      }
-
       List<VehicleJourneyRef> vehicleJourneyReves = affectedVehicleJourney.getVehicleJourneyReves();
 
       if (isNotEmpty(vehicleJourneyReves)) {
@@ -115,13 +103,16 @@ public class AffectsMapper {
           Trip trip = entityResolver.resolveTrip(vehicleJourneyRef.getValue());
 
           if (trip != null) {
+            // Match found - add tripId to selector
             tripIds.add(trip.getId());
           } else if (siriFuzzyTripMatcher != null) {
-            // "Temporary", custom legacy solution - supports alerts tagged on "privateCode" in NeTEx
+            // "Temporary", custom legacy solution - supports alerts tagged on NeTEx-"privateCode" + serviceDate
             tripIds.addAll(
               siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDate(
                 vehicleJourneyRef.getValue(),
-                serviceDate
+                entityResolver.resolveServiceDate(
+                  affectedVehicleJourney.getOriginAimedDepartureTime()
+                )
               )
             );
           }
@@ -134,7 +125,13 @@ public class AffectsMapper {
           affectedTripIds.addAll(tripIds);
         }
 
-        selectors.addAll(mapTripSelectors(affectedStops, affectedTripIds, serviceDate));
+        selectors.addAll(
+          mapTripSelectors(
+            affectedStops,
+            affectedTripIds,
+            entityResolver.resolveServiceDate(affectedVehicleJourney.getOriginAimedDepartureTime())
+          )
+        );
       }
 
       final FramedVehicleJourneyRefStructure framedVehicleJourneyRef = affectedVehicleJourney.getFramedVehicleJourneyRef();
@@ -150,12 +147,32 @@ public class AffectsMapper {
 
       final List<DatedVehicleJourneyRef> datedVehicleJourneyReves = affectedVehicleJourney.getDatedVehicleJourneyReves();
       if (isNotEmpty(datedVehicleJourneyReves)) {
-        List<FeedScopedId> tripIds = new ArrayList<>();
         for (DatedVehicleJourneyRef datedVehicleJourneyRef : datedVehicleJourneyReves) {
-          tripIds.add(entityResolver.resolveId(datedVehicleJourneyRef.getValue()));
-        }
-        if (!tripIds.isEmpty()) {
-          selectors.addAll(mapTripSelectors(affectedStops, tripIds, serviceDate));
+          // Lookup provided reference as if it is a DSJ
+          TripOnServiceDate tripOnServiceDate = entityResolver.resolveTripOnServiceDate(
+            datedVehicleJourneyRef.getValue()
+          );
+          if (tripOnServiceDate != null) {
+            // Match found - add TripOnServiceDate-selector
+            selectors.addAll(
+              mapTripSelectors(
+                affectedStops,
+                List.of(tripOnServiceDate.getTrip().getId()),
+                tripOnServiceDate.getServiceDate()
+              )
+            );
+          } else {
+            // Not found - add generic Trip-selector - with legacy ServiceDate if provided
+            selectors.addAll(
+              mapTripSelectors(
+                affectedStops,
+                List.of(entityResolver.resolveId(datedVehicleJourneyRef.getValue())),
+                entityResolver.resolveServiceDate(
+                  affectedVehicleJourney.getOriginAimedDepartureTime()
+                )
+              )
+            );
+          }
         }
       }
     }
