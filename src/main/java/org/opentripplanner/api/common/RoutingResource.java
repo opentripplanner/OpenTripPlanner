@@ -21,11 +21,12 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -736,8 +737,17 @@ public abstract class RoutingResource {
       }
       {
         var parking = journey.parking();
-        setIfNotNull(bannedVehicleParkingTags, parking::setBannedTags);
-        setIfNotNull(requiredVehicleParkingTags, parking::setRequiredTags);
+        setIfNotNull(
+          useVehicleParkingAvailabilityInformation,
+          parking::setUseAvailabilityInformation
+        );
+
+        parking.setFilter(
+          new VehicleParkingFilterRequest(
+            new TagsFilter(bannedVehicleParkingTags),
+            new TagsFilter(requiredVehicleParkingTags)
+          )
+        );
       }
 
       setIfNotNull(arriveBy, request::setArriveBy);

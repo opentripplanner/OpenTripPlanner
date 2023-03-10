@@ -880,7 +880,7 @@ type QueryType {
     via: [ViaLocationInput!]!,
     "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit yet."
     wheelchairAccessible: Boolean = false
-  ): ViaTrip! @deprecated @timingData
+  ): ViaTrip! @timingData
 }
 
 type RentalVehicle implements PlaceInterface {

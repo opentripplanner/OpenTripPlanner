@@ -6,7 +6,7 @@ import java.util.Locale;
 import org.opentripplanner.api.mapping.I18NStringMapper;
 import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 
 public class DigitransitVehicleRentalPropertyMapper extends PropertyMapper<VehicleRentalPlace> {
 

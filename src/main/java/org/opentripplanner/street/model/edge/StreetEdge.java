@@ -23,18 +23,19 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
+import org.opentripplanner.street.search.state.VehicleRentalState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -388,12 +389,42 @@ public class StreetEdge
   public State traverse(State s0) {
     final StateEditor editor;
 
+    final boolean arriveByRental =
+      s0.getRequest().mode().includesRenting() && s0.getRequest().arriveBy();
+
+    if (
+      arriveByRental &&
+      (tov.rentalTraversalBanned(s0) || hasStartedSearchInNoDropOffZoneAndIsExitingIt(s0))
+    ) {
+      return null;
+    }
     // if the traversal is banned for the current state because of a GBFS geofencing zone
     // we drop the vehicle and continue walking
-    if (s0.getRequest().mode().includesRenting() && tov.rentalTraversalBanned(s0)) {
+    else if (s0.getRequest().mode().includesRenting() && tov.rentalTraversalBanned(s0)) {
       editor = doTraverse(s0, TraverseMode.WALK, false);
       if (editor != null) {
-        editor.dropFloatingVehicle();
+        editor.dropFloatingVehicle(
+          s0.vehicleRentalFormFactor(),
+          s0.getVehicleRentalNetwork(),
+          s0.getRequest().arriveBy()
+        );
+      }
+      // when we start the reverse search of a rental request there are three cases when we need
+      // to stop walking and pick up a vehicle:
+      //  - crossing the border of a business zone
+      //  - leaving a no-drop-off zone
+      //  - leaving a no-traversal zone
+      // remember that this is a reverse search so calling dropFloatingVehicle actually transitions
+      // from walking to using the vehicle.
+    } else if (arriveByRental && leavesZoneWithRentalRestrictionsWhenHavingRented(s0)) {
+      editor = doTraverse(s0, TraverseMode.WALK, false);
+      if (editor != null) {
+        editor.dropFloatingVehicle(
+          s0.vehicleRentalFormFactor(),
+          s0.getVehicleRentalNetwork(),
+          s0.getRequest().arriveBy()
+        );
+        editor.resetStartedInNoDropOffZone();
       }
     }
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
@@ -415,15 +446,31 @@ public class StreetEdge
 
     // we are transitioning into a no-drop-off zone therefore we add a second state for dropping
     // off the vehicle and walking
-    if (!fromv.rentalDropOffBanned(s0) && tov.rentalDropOffBanned(s0)) {
+    if (state != null && !fromv.rentalDropOffBanned(s0) && tov.rentalDropOffBanned(s0)) {
       StateEditor afterTraversal = doTraverse(s0, TraverseMode.WALK, false);
       if (afterTraversal != null) {
-        afterTraversal.dropFloatingVehicle();
+        afterTraversal.dropFloatingVehicle(
+          state.vehicleRentalFormFactor(),
+          state.getVehicleRentalNetwork(),
+          state.getRequest().arriveBy()
+        );
         afterTraversal.leaveNoRentalDropOffArea();
         var forkState = afterTraversal.makeState();
         forkState.addToExistingResultChain(state);
         return forkState;
       }
+    }
+
+    // when we leave a geofencing zone in reverse search we want to speculatively pick up a rental
+    // vehicle, however, we _also_ want to keep on walking in case the renting state doesn't lead
+    // anywhere due to these cases:
+    //  - no rental vehicle available
+    //  - not being able to continue renting due to traversal restrictions or geofencing zones
+    if (state != null && arriveByRental && leavesZoneWithRentalRestrictionsWhenHavingRented(s0)) {
+      StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
+      var forkState = walking.makeState();
+      forkState.addToExistingResultChain(state);
+      return forkState;
     }
 
     if (canPickupAndDrive(s0) && canTraverse(TraverseMode.CAR)) {
@@ -453,6 +500,33 @@ public class StreetEdge
     }
 
     return state;
+  }
+
+  /**
+   * This is the state that starts a backwards search inside a restricted zone
+   * (no drop off, no traversal or outside business area) and is walking towards finding a rental
+   * vehicle. Once we are leaving a geofencing zone or are entering a business area we want to
+   * speculatively pick up a vehicle a ride towards an edge where there is one parked.
+   */
+  private boolean leavesZoneWithRentalRestrictionsWhenHavingRented(State s0) {
+    return (
+      s0.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED &&
+      !fromv.rentalRestrictions().hasRestrictions() &&
+      tov.rentalRestrictions().hasRestrictions()
+    );
+  }
+
+  /**
+   * If the reverse search has started in a no-drop off rental zone and you are exiting
+   * it .
+   */
+  private boolean hasStartedSearchInNoDropOffZoneAndIsExitingIt(State s0) {
+    return (
+      s0.isRentingVehicle() &&
+      !fromv.rentalDropOffBanned(s0) &&
+      tov.rentalDropOffBanned(s0) &&
+      !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty()
+    );
   }
 
   /**

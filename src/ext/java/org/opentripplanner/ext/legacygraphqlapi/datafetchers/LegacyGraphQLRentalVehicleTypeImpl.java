@@ -5,7 +5,7 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers.LegacyGraphQLRentalVehicleType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 
 public class LegacyGraphQLRentalVehicleTypeImpl implements LegacyGraphQLRentalVehicleType {
 

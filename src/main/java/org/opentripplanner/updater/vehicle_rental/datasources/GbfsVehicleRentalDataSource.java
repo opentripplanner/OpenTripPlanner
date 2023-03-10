@@ -15,10 +15,10 @@ import org.entur.gbfs.v2_3.system_information.GBFSSystemInformation;
 import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
 /**

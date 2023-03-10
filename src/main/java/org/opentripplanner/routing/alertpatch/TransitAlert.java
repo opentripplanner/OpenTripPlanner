@@ -77,6 +77,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     return adviceText;
   }
 
+  @Nullable
   public I18NString url() {
     return url;
   }

@@ -22,6 +22,7 @@ The following are known deployments of OTP in a government- or agency-sponsored 
   service [Matkahuolto](https://en.wikipedia.org/wiki/Matkahuolto)
   has [developed a trip planner in partnership with Kyyti](https://www.kyyti.com/matkahuoltos-new-app-brings-real-travel-chains-within-the-reach-of-citizens-in-addition-to-coach-travel-hsl-tickets-are-also-available/)
   .
+* **Lower Saxony, Germany** The [VBN](https://www.vbn.de/en/) transportation authority offers an [OTP instance](https://www.vbn.de/en/service/developer-information/opendata-and-openservice) as alternative to the [Hafas](https://www.hacon.de/en/portfolio/information-ticketing/#section_8294) passenger information system.
 * **Leipzig, Germany** As of summer 2020 [Leipzig Move](https://leipzig-move.de/) has been using
   OpenTripPlanner.
 * **Portland, Oregon** TriMet is the agency that originally started the OpenTripPlanner project.

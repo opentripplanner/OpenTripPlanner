@@ -9,18 +9,22 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
+import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
+import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -54,18 +58,39 @@ public class RouteRequestTransitDataProviderFilterTest {
 
   private static final WheelchairPreferences DEFAULT_ACCESSIBILITY = WheelchairPreferences.DEFAULT;
 
+  private static final AccessibilityPreferences RELAXED_ACCESSIBILITY_PREFERENCE = AccessibilityPreferences.ofCost(
+    0,
+    10
+  );
+  private static final WheelchairPreferences RELAXED_ACCESSIBILITY = new WheelchairPreferences(
+    RELAXED_ACCESSIBILITY_PREFERENCE,
+    RELAXED_ACCESSIBILITY_PREFERENCE,
+    RELAXED_ACCESSIBILITY_PREFERENCE,
+    DEFAULT_ACCESSIBILITY.inaccessibleStreetReluctance(),
+    DEFAULT_ACCESSIBILITY.maxSlope(),
+    DEFAULT_ACCESSIBILITY.slopeExceededReluctance(),
+    DEFAULT_ACCESSIBILITY.stairsReluctance()
+  );
+
+  static Stream<Arguments> wheelchairCases = Stream.of(
+    Arguments.of(Accessibility.POSSIBLE, DEFAULT_ACCESSIBILITY),
+    Arguments.of(Accessibility.POSSIBLE, RELAXED_ACCESSIBILITY),
+    Arguments.of(Accessibility.NOT_POSSIBLE, DEFAULT_ACCESSIBILITY),
+    Arguments.of(Accessibility.NOT_POSSIBLE, RELAXED_ACCESSIBILITY),
+    Arguments.of(Accessibility.NO_INFORMATION, DEFAULT_ACCESSIBILITY),
+    Arguments.of(Accessibility.NO_INFORMATION, RELAXED_ACCESSIBILITY)
+  );
+
   /**
    * Test filter for wheelchair access.
    *
-   * @param wheelchair If true stops are wheelchair accessible else not
+   * @param wheelchair Accessibility for stops
    */
   @ParameterizedTest
-  @ValueSource(strings = { "true", "false" })
-  public void testWheelchairAccess(boolean wheelchair) {
-    var wheelchairBoarding = wheelchair ? Accessibility.POSSIBLE : Accessibility.NOT_POSSIBLE;
-
-    var firstStop = TransitModelForTest.stopForTest("TEST:START", wheelchairBoarding, 0.0, 0.0);
-    var lastStop = TransitModelForTest.stopForTest("TEST:END", wheelchairBoarding, 0.0, 0.0);
+  @VariableSource("wheelchairCases")
+  public void testWheelchairAccess(Accessibility wheelchair, WheelchairPreferences accessibility) {
+    var firstStop = TransitModelForTest.stopForTest("TEST:START", wheelchair, 0.0, 0.0);
+    var lastStop = TransitModelForTest.stopForTest("TEST:END", wheelchair, 0.0, 0.0);
 
     var stopTimeStart = new StopTime();
     var stopTimeEnd = new StopTime();
@@ -84,7 +109,7 @@ public class RouteRequestTransitDataProviderFilterTest {
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       true,
-      DEFAULT_ACCESSIBILITY,
+      accessibility,
       false,
       false,
       Set.of(),
@@ -95,10 +120,81 @@ public class RouteRequestTransitDataProviderFilterTest {
 
     boardingPossible.set(0, 2);
 
-    var wheelchairPossible = filter.filterAvailableStops(tripPattern, boardingPossible);
+    var wheelchairPossible = filter.filterAvailableStops(
+      tripPattern,
+      boardingPossible,
+      BoardAlight.BOARD
+    );
 
-    assertEquals(wheelchair, wheelchairPossible.get(0), "Wrong boarding value on first stop");
-    assertEquals(wheelchair, wheelchairPossible.get(1), "Wrong boarding value on second stop");
+    var relaxedAccessibility = !accessibility.stop().onlyConsiderAccessible();
+    var wheelchairPossibleForStop = wheelchair == Accessibility.POSSIBLE;
+
+    assertEquals(
+      relaxedAccessibility || wheelchairPossibleForStop,
+      wheelchairPossible.get(0),
+      "Wrong boarding value on first stop"
+    );
+    assertEquals(
+      relaxedAccessibility || wheelchairPossibleForStop,
+      wheelchairPossible.get(1),
+      "Wrong boarding value on second stop"
+    );
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = { true, false })
+  void testRealtimeCancelledStops(boolean includeRealtimeCancellations) {
+    var stopTime1 = getStopTime("TEST:1", PickDrop.SCHEDULED);
+    var stopTime2 = getStopTime("TEST:2", PickDrop.CANCELLED);
+    var stopTime3 = getStopTime("TEST:3", PickDrop.NONE);
+    var stopTime4 = getStopTime("TEST:4", PickDrop.SCHEDULED);
+    var stopPattern = new StopPattern(List.of(stopTime1, stopTime2, stopTime3, stopTime4));
+    var tripPattern = TripPattern
+      .of(TransitModelForTest.id("P1"))
+      .withRoute(TransitModelForTest.route("1").build())
+      .withStopPattern(stopPattern)
+      .build()
+      .getRoutingTripPattern();
+
+    var filter = new RouteRequestTransitDataProviderFilter(
+      false,
+      false,
+      DEFAULT_ACCESSIBILITY,
+      false,
+      includeRealtimeCancellations,
+      Set.of(),
+      List.of(AllowAllTransitFilter.of())
+    );
+
+    var boardingPossible = tripPattern.getBoardingPossible();
+    var boardingPossibleCopy = boardingPossible.clone();
+    var filteredBoardingPossible = filter.filterAvailableStops(
+      tripPattern,
+      boardingPossible,
+      BoardAlight.BOARD
+    );
+
+    assertTrue(filteredBoardingPossible.get(0));
+    assertEquals(includeRealtimeCancellations, filteredBoardingPossible.get(1));
+    assertFalse(filteredBoardingPossible.get(2));
+    assertTrue(filteredBoardingPossible.get(3));
+
+    assertEquals(boardingPossibleCopy, boardingPossible, "Method should not modify bitset");
+
+    var alightingPossible = tripPattern.getAlightingPossible();
+    var alightingPossibleCopy = boardingPossible.clone();
+    var filteredAlightingPossible = filter.filterAvailableStops(
+      tripPattern,
+      tripPattern.getAlightingPossible(),
+      BoardAlight.ALIGHT
+    );
+
+    assertTrue(filteredAlightingPossible.get(0));
+    assertEquals(includeRealtimeCancellations, filteredAlightingPossible.get(1));
+    assertFalse(filteredAlightingPossible.get(2));
+    assertTrue(filteredAlightingPossible.get(3));
+
+    assertEquals(alightingPossibleCopy, alightingPossible, "Method should not modify bitset");
   }
 
   @Test
@@ -606,7 +702,11 @@ public class RouteRequestTransitDataProviderFilterTest {
       .build()
       .getRoutingTripPattern();
 
-    TripTimes tripTimes = Mockito.mock(TripTimes.class);
+    TripTimes tripTimes = new TripTimes(
+      TransitModelForTest.trip("1").withRoute(route).build(),
+      List.of(new StopTime()),
+      new Deduplicator()
+    );
 
     return new TripPatternForDate(tripPattern, List.of(tripTimes), List.of(), LocalDate.now());
   }
@@ -650,5 +750,13 @@ public class RouteRequestTransitDataProviderFilterTest {
     stopTime.setStopSequence(0);
 
     return new TripTimes(trip, List.of(stopTime), new Deduplicator());
+  }
+
+  private static StopTime getStopTime(String idAndName, PickDrop scheduled) {
+    var stopTime1 = new StopTime();
+    stopTime1.setStop(TransitModelForTest.stopForTest(idAndName, 0.0, 0.0));
+    stopTime1.setDropOffType(scheduled);
+    stopTime1.setPickupType(scheduled);
+    return stopTime1;
   }
 }

@@ -12,8 +12,8 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 
 abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends LayerBuilder<T> {
 

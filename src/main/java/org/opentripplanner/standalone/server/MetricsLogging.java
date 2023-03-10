@@ -17,7 +17,9 @@ import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import jakarta.inject.Inject;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.service.TransitModel;
@@ -29,7 +31,11 @@ import org.opentripplanner.transit.service.TransitModel;
 public class MetricsLogging {
 
   @Inject
-  public MetricsLogging(TransitModel transitModel, RaptorConfig<TripSchedule> raptorConfig) {
+  public MetricsLogging(
+    TransitModel transitModel,
+    RaptorConfig<TripSchedule> raptorConfig,
+    DataImportIssueSummary issueSummary
+  ) {
     new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
     new FileDescriptorMetrics().bindTo(Metrics.globalRegistry);
     new JvmCompilationMetrics().bindTo(Metrics.globalRegistry);
@@ -81,5 +87,14 @@ public class MetricsLogging {
       )
         .bindTo(Metrics.globalRegistry);
     }
+
+    final Map<String, Long> issueCount = issueSummary.asMap();
+
+    var totalIssues = issueCount.values().stream().mapToLong(i -> i).sum();
+    Metrics.globalRegistry.gauge("graph_build_issues_total", totalIssues);
+
+    issueCount.forEach((issueType, number) ->
+      Metrics.globalRegistry.gauge("graph_build_issues", List.of(Tag.of("type", issueType)), number)
+    );
   }
 }

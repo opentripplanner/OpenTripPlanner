@@ -11,8 +11,8 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.VertexType;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 

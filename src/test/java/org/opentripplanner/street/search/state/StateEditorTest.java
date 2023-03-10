@@ -12,13 +12,16 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 public class StateEditorTest {
 
+  static Vertex vertex = StreetModelForTest.intersectionVertex(1, 1);
+
   @Test
   public final void testIncrementTimeInSeconds() {
-    StateEditor stateEditor = new StateEditor(null, StreetSearchRequest.of().build());
+    StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementTimeInSeconds(999999999);
@@ -28,7 +31,7 @@ public class StateEditorTest {
 
   @Test
   public final void testWeightIncrement() {
-    StateEditor stateEditor = new StateEditor(null, StreetSearchRequest.of().build());
+    StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(10);
@@ -38,7 +41,7 @@ public class StateEditorTest {
 
   @Test
   public final void testNanWeightIncrement() {
-    StateEditor stateEditor = new StateEditor(null, StreetSearchRequest.of().build());
+    StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(Double.NaN);
@@ -48,7 +51,7 @@ public class StateEditorTest {
 
   @Test
   public final void testInfinityWeightIncrement() {
-    StateEditor stateEditor = new StateEditor(null, StreetSearchRequest.of().build());
+    StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(Double.NEGATIVE_INFINITY);
@@ -64,7 +67,7 @@ public class StateEditorTest {
     StreetEdge edge1 = StreetModelForTest.streetEdge(v1, v2);
 
     @Test
-    void enterZone() {
+    void forwardEnterZone() {
       var editor = new StateEditor(
         v1,
         StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build()

@@ -34,6 +34,8 @@ The feature must be enabled in otp-config.json as follows:
   This parameter can be given multiple times to include multiple isochrones in a single request.
   The default value is one hour.
 - `modes` A list of travel modes.
+- `arriveBy` Set to `false` when searching from the location and `true` when searching to the 
+  location
 
 ### Isochrone API
 

@@ -7,7 +7,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.model.plan.ElevationProfile;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
@@ -18,7 +17,6 @@ import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.ExitVertex;
-import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -87,24 +85,6 @@ public class StatesToWalkStepsMapper {
   public List<WalkStep> generateWalkSteps() {
     for (int i = 0; i < states.size() - 1; i++) {
       processState(states.get(i), states.get(i + 1));
-    }
-
-    if (steps.isEmpty()) {
-      return steps;
-    }
-
-    // add vehicle rental information if applicable
-    if (GraphPathToItineraryMapper.isRentalPickUp(states.get(states.size() - 1))) {
-      VehicleRentalPlaceVertex vertex = (VehicleRentalPlaceVertex) (
-        states.get(states.size() - 1)
-      ).getVertex();
-      steps.get(steps.size() - 1).setVehicleRentalOffStation(new VehicleRentalStationInfo(vertex));
-    }
-    if (
-      GraphPathToItineraryMapper.isRentalStationDropOff(states.get(0)) &&
-      states.get(0).getVertex() instanceof VehicleRentalPlaceVertex rentalVertex
-    ) {
-      steps.get(0).setVehicleRentalOffStation(new VehicleRentalStationInfo(rentalVertex));
     }
 
     return steps;

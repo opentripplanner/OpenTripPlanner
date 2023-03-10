@@ -6,9 +6,11 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
@@ -99,11 +101,12 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
+    final StreetSearchRequest request = s0.getRequest();
     if (
       !vehicleParking.hasSpacesAvailable(
         mode,
-        s0.getRequest().wheelchair(),
-        s0.getPreferences().parking().useAvailabilityInformation()
+        request.wheelchair(),
+        request.parking().useAvailabilityInformation()
       )
     ) {
       return null;
@@ -113,6 +116,9 @@ public class VehicleParkingEdge extends Edge {
     s0e.incrementWeight(parkingCost);
     s0e.incrementTimeInSeconds(parkingTime);
     s0e.setVehicleParked(false, mode);
+
+    addUnpreferredTagCost(request.parking(), s0e);
+
     return s0e.makeState();
   }
 
@@ -143,7 +149,7 @@ public class VehicleParkingEdge extends Edge {
       !vehicleParking.hasSpacesAvailable(
         s0.getNonTransitMode(),
         s0.getRequest().wheelchair(),
-        s0.getPreferences().parking().useAvailabilityInformation()
+        s0.getRequest().parking().useAvailabilityInformation()
       )
     ) {
       return null;
@@ -153,6 +159,15 @@ public class VehicleParkingEdge extends Edge {
     s0e.incrementWeight(parkingCost);
     s0e.incrementTimeInSeconds(parkingTime);
     s0e.setVehicleParked(true, TraverseMode.WALK);
+
+    addUnpreferredTagCost(s0.getRequest().parking(), s0e);
+
     return s0e.makeState();
+  }
+
+  private void addUnpreferredTagCost(VehicleParkingRequest req, StateEditor s0e) {
+    if (!req.preferred().matches(vehicleParking)) {
+      s0e.incrementWeight(req.unpreferredCost());
+    }
   }
 }
