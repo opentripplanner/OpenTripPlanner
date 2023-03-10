@@ -1,6 +1,9 @@
 package org.opentripplanner.model;
 
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -51,13 +54,19 @@ public class GenericLocation {
   }
 
   /**
+   *
    * Returns this as a Coordinate object.
    */
+  @Nullable
   public Coordinate getCoordinate() {
     if (this.lat == null || this.lng == null) {
       return null;
     }
     return new Coordinate(this.lng, this.lat);
+  }
+
+  public Optional<WgsCoordinate> toWgsCoordinate() {
+    return Optional.ofNullable(getCoordinate()).map(WgsCoordinate::new);
   }
 
   public boolean isSpecified() {

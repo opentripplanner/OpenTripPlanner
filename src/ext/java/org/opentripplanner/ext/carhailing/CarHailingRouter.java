@@ -1,9 +1,10 @@
 package org.opentripplanner.ext.carhailing;
 
-import java.time.Duration;
-import java.time.Instant;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import org.opentripplanner.ext.carhailing.service.ArrivalTime;
+import org.opentripplanner.ext.carhailing.service.uber.UberConfig;
+import org.opentripplanner.ext.carhailing.service.uber.UberService;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -13,8 +14,12 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.search.TraverseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CarHailingRouter {
+
+  private static Logger LOG = LoggerFactory.getLogger(CarHailingRouter.class);
 
   public static List<Itinerary> routeDirect(
     OtpServerRequestContext serverContext,
@@ -26,16 +31,15 @@ public class CarHailingRouter {
     var times = earliestArrivalTimes(routeRequest);
 
     return times
-      .entrySet()
       .parallelStream()
-      .flatMap(entry -> {
+      .flatMap(arrival -> {
         var req = routeRequest.clone();
-        req.setDateTime(entry.getValue());
+        req.setDateTime(req.dateTime().plus(arrival.estimatedDuration()));
 
         return DirectStreetRouter
           .route(serverContext, req)
           .stream()
-          .map(i -> CarHailingRouter.addCarHailInformation(i, entry.getKey()));
+          .map(i -> CarHailingRouter.addCarHailInformation(i, arrival.company().name()));
       })
       .toList();
   }
@@ -46,8 +50,20 @@ public class CarHailingRouter {
     return input;
   }
 
-  private static Map<String, Instant> earliestArrivalTimes(RouteRequest routeRequest) {
-    return Map.of("uber", routeRequest.dateTime().plus(Duration.ofMinutes(15)));
+  private static List<ArrivalTime> earliestArrivalTimes(RouteRequest routeRequest) {
+    var service = new UberService(new UberConfig("client1", "client2", "foo"));
+    return routeRequest
+      .from()
+      .toWgsCoordinate()
+      .map(c -> {
+        try {
+          return service.queryArrivalTimes(c);
+        } catch (IOException e) {
+          LOG.error("Error when getting arrival times", e);
+          return List.<ArrivalTime>of();
+        }
+      })
+      .orElse(List.of());
   }
 
   private static Leg addNetwork(Leg leg, String network) {

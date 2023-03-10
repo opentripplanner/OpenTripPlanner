@@ -7,6 +7,6 @@ public record ArrivalTime(
   CarHailingCompany company,
   String productId,
   String displayName,
-  Duration estimatedSeconds,
+  Duration estimatedDuration,
   boolean wheelchairAccessible
 ) {}
