@@ -12,18 +12,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.opentripplanner.ext.carhailing.service.ArrivalTime;
 import org.opentripplanner.ext.carhailing.service.CarHailingCompany;
 import org.opentripplanner.ext.carhailing.service.CarHailingService;
 import org.opentripplanner.ext.carhailing.service.RideEstimate;
 import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
+import org.opentripplanner.ext.carhailing.service.oauth.UrlEncodedOauthService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.transit.model.basic.Money;
@@ -40,6 +39,7 @@ public class UberService extends CarHailingService {
   private final String baseUrl;
   private final String authenticationUrl;
   private final UberConfig config;
+  private final UrlEncodedOauthService oauthService;
 
   static {
     mapper = new ObjectMapper();
@@ -50,29 +50,14 @@ public class UberService extends CarHailingService {
     this.baseUrl = DEFAULT_BASE_URL;
     this.authenticationUrl = DEFAULT_AUTHENTICATION_URL;
     this.config = config;
+
+    var uri = UriBuilder.fromUri(authenticationUrl + "oauth/v2/token").build();
+    this.oauthService = new UrlEncodedOauthService(config.clientSecret(), config.clientId(), uri);
   }
 
   @Override
   public CarHailingCompany carHailingCompany() {
     return CarHailingCompany.UBER;
-  }
-
-  @Override
-  protected Optional<HttpRequest> oauthTokenHttpRequest() {
-    var uri = UriBuilder.fromUri(authenticationUrl + "oauth/v2/token").build();
-    // set request body
-    UberAuthenticationRequestBody authRequest = new UberAuthenticationRequestBody(
-      config.clientId(),
-      config.clientSecret()
-    );
-
-    var req = HttpRequest
-      .newBuilder(uri)
-      .POST(HttpRequest.BodyPublishers.ofString(authRequest.toRequestParamString()))
-      .header("Content-Type", "application/x-www-form-urlencoded")
-      .build();
-
-    return Optional.of(req);
   }
 
   @Override
@@ -84,7 +69,7 @@ public class UberService extends CarHailingService {
       .build();
 
     var headers = Map.ofEntries(
-      entry(AUTHORIZATION, "Bearer " + getToken().value),
+      entry(AUTHORIZATION, "Bearer " + oauthService.getToken()),
       entry(ACCEPT_LANGUAGE, "en_US"),
       entry(CONTENT_TYPE, "application/json")
     );
@@ -131,7 +116,7 @@ public class UberService extends CarHailingService {
     String requestUrl = uriBuilder.toString();
     URL uberUrl = new URL(requestUrl);
     HttpURLConnection connection = (HttpURLConnection) uberUrl.openConnection();
-    connection.setRequestProperty("Authorization", "Bearer " + getToken().value);
+    connection.setRequestProperty("Authorization", "Bearer " + oauthService.getToken());
     connection.setRequestProperty("Accept-Language", "en_US");
     connection.setRequestProperty("Content-Type", "application/json");
 

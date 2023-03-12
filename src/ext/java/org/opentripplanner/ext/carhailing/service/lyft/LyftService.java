@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.carhailing.service.lyft;
 
-import static java.util.Map.entry;
+import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,19 +11,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Currency;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.opentripplanner.ext.carhailing.service.ArrivalTime;
 import org.opentripplanner.ext.carhailing.service.CarHailingCompany;
 import org.opentripplanner.ext.carhailing.service.CarHailingService;
 import org.opentripplanner.ext.carhailing.service.RideEstimate;
 import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
+import org.opentripplanner.ext.carhailing.service.oauth.JsonPostAuthService;
+import org.opentripplanner.ext.carhailing.service.oauth.OAuthService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
@@ -36,8 +35,7 @@ public class LyftService extends CarHailingService {
   private static final ObjectMapper mapper;
 
   private final String baseUrl; // for testing purposes
-  private final String clientId;
-  private final String clientSecret;
+  private final OAuthService oauthService;
 
   static {
     mapper = new ObjectMapper();
@@ -45,17 +43,24 @@ public class LyftService extends CarHailingService {
   }
 
   public LyftService(JsonNode config) {
-    this.baseUrl = LYFT_API_URL;
-    this.clientId = config.path("clientId").asText();
-    this.clientSecret = config.path("clientSecret").asText();
-    this.wheelChairAccessibleRideType = config.path("wheelChairAccessibleRideType").asText();
+    this(
+      LYFT_API_URL,
+      config.path("clientId").asText(),
+      config.path("clientSecret").asText(),
+      config.path("wheelChairAccessibleRideType").asText()
+    );
   }
 
   // intended for use during testing
-  public LyftService(String baseUrl, String clientId, String clientSecret) {
+  public LyftService(
+    String baseUrl,
+    String clientId,
+    String clientSecret,
+    String wheelchairAccessibleRideType
+  ) {
     this.baseUrl = baseUrl;
-    this.clientId = clientId;
-    this.clientSecret = clientSecret;
+    this.oauthService = new JsonPostAuthService(clientId, clientSecret, LYFT_API_URL);
+    this.wheelChairAccessibleRideType = wheelchairAccessibleRideType;
   }
 
   @Override
@@ -72,7 +77,7 @@ public class LyftService extends CarHailingService {
     String requestUrl = uriBuilder.toString();
     URL url = new URL(requestUrl);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-    connection.setRequestProperty("Authorization", "Bearer " + getToken().value);
+    connection.setRequestProperty("Authorization", "Bearer " + oauthService.getToken());
     connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
 
     LOG.info("Made request to lyft API at following URL: " + requestUrl);
@@ -134,8 +139,8 @@ public class LyftService extends CarHailingService {
     String requestUrl = uriBuilder.toString();
     URL url = new URL(requestUrl);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-    connection.setRequestProperty("Authorization", "Bearer " + getToken().value);
-    connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+    connection.setRequestProperty(AUTHORIZATION, "Bearer " + oauthService.getToken());
+    connection.setRequestProperty(CONTENT_TYPE, "application/json;charset=UTF-8");
 
     LOG.info("Made request to lyft API at following URL: " + requestUrl);
 
@@ -195,28 +200,6 @@ public class LyftService extends CarHailingService {
         throw new IOException(error.error_description());
       }
       throw new IOException("received an error from the Lyft API");
-    }
-  }
-
-  @Override
-  protected Optional<HttpRequest> oauthTokenHttpRequest() {
-    var uri = UriBuilder.fromUri(baseUrl + "oauth/token").build();
-    String userpass = clientId + ":" + clientSecret;
-    String basicAuth =
-      "Basic " + jakarta.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
-
-    var body = Map.ofEntries(entry("grant_type", "client_credentials"), entry("scope", "public"));
-    try {
-      var bodyAsString = mapper.writeValueAsString(body);
-      var req = HttpRequest
-        .newBuilder(uri)
-        .header("Authorization", basicAuth)
-        .header("Content-Type", "application/json;charset=UTF-8")
-        .POST(HttpRequest.BodyPublishers.ofString(bodyAsString))
-        .build();
-      return Optional.of(req);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
     }
   }
 }
