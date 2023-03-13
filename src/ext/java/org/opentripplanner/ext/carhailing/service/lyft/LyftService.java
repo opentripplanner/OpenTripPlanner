@@ -4,7 +4,6 @@ import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -17,6 +16,7 @@ import java.util.Collections;
 import java.util.Currency;
 import java.util.List;
 import org.opentripplanner.ext.carhailing.service.CarHailingService;
+import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters.LyftServiceParameters;
 import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
 import org.opentripplanner.ext.carhailing.service.model.ArrivalTime;
 import org.opentripplanner.ext.carhailing.service.model.CarHailingCompany;
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 public class LyftService extends CarHailingService {
 
   private static final Logger LOG = LoggerFactory.getLogger(LyftService.class);
-  private static final String LYFT_API_URL = "https://api.lyft.com/";
+  private static final String DEFAULT_LYFT_API_URL = "https://api.lyft.com/";
   private static final ObjectMapper mapper;
 
   private final String baseUrl; // for testing purposes
@@ -42,25 +42,16 @@ public class LyftService extends CarHailingService {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
-  public LyftService(JsonNode config) {
-    this(
-      LYFT_API_URL,
-      config.path("clientId").asText(),
-      config.path("clientSecret").asText(),
-      config.path("wheelChairAccessibleRideType").asText()
-    );
+  public LyftService(LyftServiceParameters params) {
+    this(DEFAULT_LYFT_API_URL, params);
   }
 
   // intended for use during testing
-  public LyftService(
-    String baseUrl,
-    String clientId,
-    String clientSecret,
-    String wheelchairAccessibleRideType
-  ) {
+  public LyftService(String baseUrl, LyftServiceParameters params) {
     this.baseUrl = baseUrl;
-    this.oauthService = new JsonPostAuthService(clientId, clientSecret, LYFT_API_URL);
-    this.wheelChairAccessibleRideType = wheelchairAccessibleRideType;
+    this.oauthService =
+      new JsonPostAuthService(params.clientSecret(), params.clientSecret(), baseUrl);
+    this.wheelChairAccessibleRideType = params.wheelchairAccessibleRideType();
   }
 
   @Override

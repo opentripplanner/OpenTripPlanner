@@ -18,6 +18,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.carhailing.service.CarHailingService;
+import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters;
 import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
 import org.opentripplanner.ext.carhailing.service.model.ArrivalTime;
 import org.opentripplanner.ext.carhailing.service.model.CarHailingCompany;
@@ -38,7 +39,7 @@ public class UberService extends CarHailingService {
 
   private final String baseUrl;
   private final String authenticationUrl;
-  private final UberServiceParameters config;
+  private final CarHailingServiceParameters.UberServiceParameters config;
   private final UrlEncodedOauthService oauthService;
 
   static {
@@ -46,7 +47,7 @@ public class UberService extends CarHailingService {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
-  public UberService(UberServiceParameters config) {
+  public UberService(CarHailingServiceParameters.UberServiceParameters config) {
     this.baseUrl = DEFAULT_BASE_URL;
     this.authenticationUrl = DEFAULT_AUTHENTICATION_URL;
     this.config = config;

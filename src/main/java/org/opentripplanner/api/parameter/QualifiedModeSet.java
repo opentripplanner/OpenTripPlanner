@@ -121,10 +121,10 @@ public class QualifiedModeSet implements Serializable {
             mBuilder.withEgressMode(StreetMode.WALK);
             mBuilder.withDirectMode(StreetMode.CAR_PICKUP);
           } else if (requestMode.qualifiers.contains(Qualifier.HAIL)) {
-            mBuilder.withAccessMode(StreetMode.CAR_HAIL);
+            mBuilder.withAccessMode(StreetMode.CAR_HAILING);
             mBuilder.withTransferMode(StreetMode.WALK);
-            mBuilder.withEgressMode(StreetMode.CAR_HAIL);
-            mBuilder.withDirectMode(StreetMode.CAR_HAIL);
+            mBuilder.withEgressMode(StreetMode.CAR_HAILING);
+            mBuilder.withDirectMode(StreetMode.CAR_HAILING);
           } else {
             mBuilder.withAccessMode(StreetMode.WALK);
             mBuilder.withTransferMode(StreetMode.WALK);

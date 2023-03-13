@@ -5,7 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.JsonSupport.j
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.carhailing.service.uber.UberServiceParameters;
+import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters;
 import org.opentripplanner.standalone.config.RouterConfig;
 
 public class ServicesConfigTest {
@@ -15,7 +15,9 @@ public class ServicesConfigTest {
     var node = jsonNodeFromResource("standalone/config/router-config.json");
     var c = new RouterConfig(node, this.getClass().getSimpleName(), false);
     assertEquals(
-      List.of(new UberServiceParameters("secret-id", "very-secret", "car")),
+      List.of(
+        new CarHailingServiceParameters.UberServiceParameters("secret-id", "very-secret", "car")
+      ),
       c.servicesParameters().carHailingServiceParameters()
     );
   }

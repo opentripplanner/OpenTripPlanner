@@ -15,9 +15,9 @@ public class JsonPostAuthService extends OAuthService {
   private final String clientId;
   private final String baseUrl;
 
-  public JsonPostAuthService(String clientSecret, String clientId, String baseUrl) {
-    this.clientSecret = clientSecret;
+  public JsonPostAuthService(String clientId, String clientSecret, String baseUrl) {
     this.clientId = clientId;
+    this.clientSecret = clientSecret;
     this.baseUrl = baseUrl;
   }
 

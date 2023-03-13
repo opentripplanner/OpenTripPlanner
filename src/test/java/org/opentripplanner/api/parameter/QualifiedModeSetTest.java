@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
-import static org.opentripplanner.routing.api.request.StreetMode.CAR_HAIL;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_HAILING;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 import static org.opentripplanner.transit.model.basic.TransitMode.AIRPLANE;
@@ -221,9 +221,9 @@ public class QualifiedModeSetTest {
     var modeSet = new QualifiedModeSet("CAR_HAIL");
     assertTrue(modeSet.getTransitModes().isEmpty());
 
-    assertEquals(CAR_HAIL, modeSet.getRequestModes().directMode);
-    assertEquals(CAR_HAIL, modeSet.getRequestModes().accessMode);
-    assertEquals(CAR_HAIL, modeSet.getRequestModes().egressMode);
+    assertEquals(CAR_HAILING, modeSet.getRequestModes().directMode);
+    assertEquals(CAR_HAILING, modeSet.getRequestModes().accessMode);
+    assertEquals(CAR_HAILING, modeSet.getRequestModes().egressMode);
   }
 
   @Test
@@ -231,8 +231,8 @@ public class QualifiedModeSetTest {
     var modeSet = new QualifiedModeSet("CAR_HAIL,BUS,RAIL");
     assertEquals(Set.of(COACH, BUS, RAIL), Set.copyOf(modeSet.getTransitModes()));
 
-    assertEquals(CAR_HAIL, modeSet.getRequestModes().directMode);
-    assertEquals(CAR_HAIL, modeSet.getRequestModes().accessMode);
-    assertEquals(CAR_HAIL, modeSet.getRequestModes().egressMode);
+    assertEquals(CAR_HAILING, modeSet.getRequestModes().directMode);
+    assertEquals(CAR_HAILING, modeSet.getRequestModes().accessMode);
+    assertEquals(CAR_HAILING, modeSet.getRequestModes().egressMode);
   }
 }

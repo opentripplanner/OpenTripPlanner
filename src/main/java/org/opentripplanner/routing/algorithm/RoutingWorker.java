@@ -236,7 +236,7 @@ public class RoutingWorker {
   ) {
     debugTimingAggregator.startedDirectStreetRouter();
     try {
-      if (request.journey().modes().directMode == StreetMode.CAR_HAIL) {
+      if (request.journey().modes().directMode == StreetMode.CAR_HAILING) {
         itineraries.addAll(CarHailingRouter.routeDirect(serverContext, request));
       } else {
         itineraries.addAll(DirectStreetRouter.route(serverContext, request));

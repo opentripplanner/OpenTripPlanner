@@ -25,7 +25,7 @@ public class CarHailingRouter {
     OtpServerRequestContext serverContext,
     RouteRequest routeRequest
   ) {
-    if (routeRequest.journey().modes().directMode != StreetMode.CAR_HAIL) {
+    if (routeRequest.journey().modes().directMode != StreetMode.CAR_HAILING) {
       return List.of();
     }
     var times = earliestArrivalTimes(routeRequest, serverContext.carHailingServices());

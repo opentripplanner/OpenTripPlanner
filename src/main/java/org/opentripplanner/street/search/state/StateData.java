@@ -59,7 +59,7 @@ public class StateData implements Cloneable {
         // when cycling all the way or to a stop, you start on your own bike
         case BIKE, BIKE_TO_PARK -> TraverseMode.BICYCLE;
         // when driving (not car rental) you start in your own car
-        case CAR, CAR_TO_PARK, CAR_PICKUP, CAR_HAIL -> TraverseMode.CAR;
+        case CAR, CAR_TO_PARK, CAR_PICKUP, CAR_HAILING -> TraverseMode.CAR;
       };
   }
 
@@ -200,7 +200,7 @@ public class StateData implements Cloneable {
         CAR,
         CAR_TO_PARK,
         CAR_PICKUP,
-        CAR_HAIL,
+        CAR_HAILING,
         FLEXIBLE -> throw new IllegalStateException(
         "Cannot convert street mode %s to a form factor".formatted(streetMode)
       );
