@@ -162,7 +162,7 @@ public class StopArrivalStateParetoSetTest {
 
   /**
    * For arrivals arriving on-a-ride (transit and flex) we need to keep the arrival. These
-   * arrivals can continue with an egress that start with as walking leg.
+   * arrivals can continue with an egress that start with a walking leg.
    *
    * @see #testTransitAndTransferDoesNotAffectDominance
    */

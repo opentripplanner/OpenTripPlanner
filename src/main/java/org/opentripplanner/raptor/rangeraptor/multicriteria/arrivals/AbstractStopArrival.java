@@ -77,7 +77,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
    * {@code arrivedOnBoard}. Normally arriving on-board should give the arrival an advantage
    * - you can continue on foot, walking to the next stop. But, we only do this if it happens
    * in the same Raptor iteration and round - if it does it is taken care of by the order
-   * witch the algorithm work - not by this comparator.
+   * which the algorithm work - not by this comparator.
    */
   public static <
     T extends RaptorTripSchedule

@@ -27,7 +27,7 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
  * Raptor should return a path if it exists for the most basic case with one route with one trip, an
  * access and an egress path.
  */
-public class A01_SingeRouteTest implements RaptorTestConstants {
+public class A01_SingleRouteTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();

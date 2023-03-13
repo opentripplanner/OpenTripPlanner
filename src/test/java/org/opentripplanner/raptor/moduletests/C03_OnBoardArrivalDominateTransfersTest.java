@@ -28,7 +28,7 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
  * FEATURE UNDER TEST
  * <p>
  * Raptor should be able to route access and transit arriving on-board and egress departing
- * on-board connecting to transit by transfers. Access and egress witch arrive/depart at/from
+ * on-board connecting to transit by transfers. Access and egress which arrive/depart at/from
  * the same stops by walking should not be possible.
  */
 public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConstants {
@@ -44,7 +44,7 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
     data
       .withRoute(route(pattern("R1", STOP_A, STOP_B)).withTimetable(schedule().times("0:05 0:08")))
       .withRoute(route(pattern("R2", STOP_B, STOP_C)).withTimetable(schedule().times("0:12 0:15")))
-      // We add a transfer here witch arrive at C before R2, but it should not be used.
+      // We add a transfer here which arrive at C before R2, but it should not be used.
       .withTransfer(STOP_B, transfer(STOP_C, D1m));
 
     requestBuilder
@@ -78,7 +78,7 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       // does not cause the mc-raptor w/destination pruning to miss results. There are two ways to
       // fix this. We can keep the best-number-of-transfers for both transit and over-all for all
       // stops (at least egress stops) or we can compute paths during the search. The last
-      // solution is probably the one witch give the best performance, but the first will make
+      // solution is probably the one which give the best performance, but the first will make
       // mc-raptor perform better (tighter heuristics).
       .add(TC_MIN_DURATION, "[0:00 0:09 9m 0tx]")
       .add(TC_MIN_DURATION_REV, "[0:21 0:30 9m 1tx]")
