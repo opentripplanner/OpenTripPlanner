@@ -38,7 +38,7 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
    * @param arrivalTime          the arrival time for this stop index
    * @param generalizedCost                 the total accumulated cost at this stop arrival
    */
-  McStopArrival(
+  protected McStopArrival(
     McStopArrival<T> previous,
     int paretoRoundIncrement,
     int stop,
@@ -56,7 +56,13 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
   /**
    * Initial state - first stop visited during the RAPTOR algorithm.
    */
-  McStopArrival(int stop, int departureTime, int travelDuration, int initialCost, int paretoRound) {
+  protected McStopArrival(
+    int stop,
+    int departureTime,
+    int travelDuration,
+    int initialCost,
+    int paretoRound
+  ) {
     this.previous = null;
     this.paretoRound = paretoRound;
     this.stop = stop;
@@ -150,7 +156,7 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
   /**
    * @return previous state or throw a NPE if no previousArrival exist.
    */
-  final int previousStop() {
+  protected final int previousStop() {
     return previous.stop;
   }
 }

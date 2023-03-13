@@ -15,10 +15,10 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.AccessStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.TransferStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.TransitStopArrival;
 
 public class StopArrivalStateParetoSetTest {
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
+package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
 
 import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 
@@ -7,6 +7,7 @@ import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.AccessPathView;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 
 /**
  * Represent a access stop arrival.

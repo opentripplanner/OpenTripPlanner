@@ -156,11 +156,17 @@ public class RaptorArchitectureTest {
       .subPackage("arrivals")
       .dependsOn(RR_SHARED_PACKAGES)
       .verify();
+    var mcArrivalsC1 = mcArrivals
+      .subPackage("c1")
+      .dependsOn(mcArrivals, RR_SHARED_PACKAGES)
+      .verify();
     var mcHeuristics = RR_MULTI_CRITERIA
       .subPackage("heuristic")
       .dependsOn(RR_SHARED_PACKAGES, mcArrivals)
       .verify();
-    RR_MULTI_CRITERIA.dependsOn(RR_SHARED_PACKAGES, mcArrivals, mcHeuristics).verify();
+    RR_MULTI_CRITERIA
+      .dependsOn(RR_SHARED_PACKAGES, mcArrivals, mcArrivalsC1, mcHeuristics)
+      .verify();
 
     RR_MC_CONFIGURE
       .dependsOn(RR_SHARED_PACKAGES, RR_CONTEXT, RR_PATH_CONFIGURE, mcHeuristics, RR_MULTI_CRITERIA)
