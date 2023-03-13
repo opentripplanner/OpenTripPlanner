@@ -72,7 +72,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
           pathBuilder.transit(transit.trip(), times);
           break;
         case TRANSFER:
-          pathBuilder.transfer(arrival.transferPath().transfer(), arrival.previous().stop());
+          pathBuilder.transfer(arrival.transfer(), arrival.previous().stop());
           break;
         case EGRESS:
           throw new IllegalStateException("Unexpected arrival: " + arrival);

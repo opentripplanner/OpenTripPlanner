@@ -166,7 +166,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   private static int legDuration(ArrivalView<?> a) {
     return switch (a.arrivedBy()) {
       case ACCESS -> a.accessPath().access().durationInSeconds();
-      case TRANSFER -> a.transferPath().durationInSeconds();
+      case TRANSFER -> a.transfer().durationInSeconds();
       case EGRESS -> a.egressPath().egress().durationInSeconds();
       case TRANSIT -> throw new IllegalStateException("Unsupported type: " + a.getClass());
     };
