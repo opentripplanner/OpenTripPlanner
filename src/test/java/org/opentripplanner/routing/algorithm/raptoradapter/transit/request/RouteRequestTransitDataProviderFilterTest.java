@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -703,7 +702,11 @@ public class RouteRequestTransitDataProviderFilterTest {
       .build()
       .getRoutingTripPattern();
 
-    TripTimes tripTimes = Mockito.mock(TripTimes.class);
+    TripTimes tripTimes = new TripTimes(
+      TransitModelForTest.trip("1").withRoute(route).build(),
+      List.of(new StopTime()),
+      new Deduplicator()
+    );
 
     return new TripPatternForDate(tripPattern, List.of(tripTimes), List.of(), LocalDate.now());
   }

@@ -18,9 +18,9 @@ JAR containing all other libraries needed for OTP to work, and is available from
 repository. You will be able to go
 to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/),
 navigate to
-the [directory for the 2.1 release](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.2.0/),
+the [directory of releases](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.2.0/),
 and download
-the [file whose name ends with `shaded.jar`](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.2.0/otp-2.2.0-shaded.jar)
+the [file with `shaded.jar` suffix](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.2.0/otp-2.2.0-shaded.jar)
 .
 
 You may also want to get your own copy of the OTP source code
@@ -96,7 +96,8 @@ for cropping and filtering OSM data.
 A typical command to start OTP looks like `java -Xmx2G -jar otp.shaded.jar <options>`. The
 `-Xmx` parameter sets the limit on how much memory OTP is allowed to consume. GTFS and OSM data sets
 are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory when
-working with the Portland TriMet data set, and several gigabytes for larger inputs. If you have
+working with the Portland TriMet data set, and several gigabytes for larger inputs.
+[Here is more information about the system requirements](System-Requirements.md). If you have
 sufficient memory in your computer, set this to a couple of gigabytes (e.g. `-Xmx2G`). Java uses
 a [garbage collection](https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)) approach
 to memory management, which requires some "breathing room" to efficiently operate. Without

@@ -128,14 +128,16 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     // set subscriber
     String subscriptionId = System.getenv("HOSTNAME");
     if (subscriptionId == null || subscriptionId.isEmpty()) {
-      subscriptionId = "otp-" + UUID.randomUUID().toString();
+      subscriptionId = "otp-" + UUID.randomUUID();
     }
 
-    String projectName = config.projectName();
+    String subscriptionProjectName = config.subscriptionProjectName();
+    String topicProjectName = config.topicProjectName();
+
     String topicName = config.topicName();
 
-    this.subscriptionName = ProjectSubscriptionName.of(projectName, subscriptionId);
-    this.topic = ProjectTopicName.of(projectName, topicName);
+    this.subscriptionName = ProjectSubscriptionName.of(subscriptionProjectName, subscriptionId);
+    this.topic = ProjectTopicName.of(topicProjectName, topicName);
     this.pushConfig = PushConfig.getDefaultInstance();
     TransitService transitService = new DefaultTransitService(transitModel);
     this.entityResolver = new EntityResolver(transitService, feedId);
@@ -380,7 +382,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
             numberOfUpdates,
             FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
             java.time.Duration
-              .between(siri.getServiceDelivery().getResponseTimestamp(), Instant.now())
+              .between(siri.getServiceDelivery().getResponseTimestamp().toInstant(), Instant.now())
               .toMillis(),
             getTimeSinceStartupString()
           );

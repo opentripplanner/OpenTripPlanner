@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.traveltime;
 
-import static javax.imageio.ImageWriteParam.MODE_EXPLICIT;
-
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -11,7 +9,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
-import java.awt.image.DataBuffer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
@@ -21,39 +18,18 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import javax.media.jai.RasterFactory;
-import org.geojson.MultiPolygon;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridCoverageFactory;
-import org.geotools.coverage.grid.GridEnvelope2D;
-import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.grid.io.AbstractGridFormat;
+import java.util.Set;
 import org.geotools.data.geojson.GeoJSONWriter;
-import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.gce.geotiff.GeoTiffFormat;
-import org.geotools.gce.geotiff.GeoTiffWriteParams;
-import org.geotools.gce.geotiff.GeoTiffWriter;
-import org.geotools.geometry.Envelope2D;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.operation.transform.AffineTransform2D;
-import org.locationtech.jts.geom.Coordinate;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
+import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
-import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.api.response.StopArrivals;
@@ -65,9 +41,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RouteRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
@@ -76,13 +56,12 @@ import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateData;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
 @Path("/traveltime")
 public class TravelTimeResource {
-
-  private static final SimpleFeatureType contourSchema = makeContourSchema();
 
   private final RouteRequest routingRequest;
   private final RaptorRoutingRequestTransitData requestTransitDataProvider;
@@ -99,34 +78,44 @@ public class TravelTimeResource {
     @QueryParam("location") String location,
     @QueryParam("time") String time,
     @QueryParam("cutoff") @DefaultValue("60m") List<String> cutoffs,
-    @QueryParam("modes") String modes
+    @QueryParam("modes") String modes,
+    @QueryParam("arriveBy") @DefaultValue("false") boolean arriveBy
   ) {
     this.graph = serverContext.graph();
     this.transitService = serverContext.transitService();
     routingRequest = serverContext.defaultRouteRequest();
-    routingRequest.setFrom(LocationStringParser.fromOldStyleString(location));
+    routingRequest.setArriveBy(arriveBy);
+
     if (modes != null) {
-      routingRequest.journey().setModes(new QualifiedModeSet(modes).getRequestModes());
+      var modeSet = new QualifiedModeSet(modes);
+      routingRequest.journey().setModes(modeSet.getRequestModes());
+      var transitModes = modeSet.getTransitModes().stream().map(MainAndSubMode::new).toList();
+      var select = SelectRequest.of().withTransportModes(transitModes).build();
+      var request = TransitFilterRequest.of().addSelect(select).build();
+      routingRequest.journey().transit().setFilters(List.of(request));
     }
 
+    var durationForMode = routingRequest.preferences().street().maxAccessEgressDuration();
     traveltimeRequest =
       new TravelTimeRequest(
         cutoffs.stream().map(DurationUtils::duration).toList(),
-        routingRequest
-          .preferences()
-          .street()
-          .maxAccessEgressDuration()
-          .valueOf(routingRequest.journey().access().mode())
+        durationForMode.valueOf(getAccessRequest(routingRequest).mode()),
+        durationForMode.valueOf(getEgressRequest(routingRequest).mode())
       );
 
-    if (time != null) {
-      startTime = Instant.parse(time);
-    } else {
-      startTime = Instant.now();
-    }
+    var parsedLocation = LocationStringParser.fromOldStyleString(location);
+    var requestTime = time != null ? Instant.parse(time) : Instant.now();
+    routingRequest.setDateTime(requestTime);
 
-    routingRequest.setDateTime(startTime);
-    endTime = startTime.plus(traveltimeRequest.maxCutoff);
+    if (routingRequest.arriveBy()) {
+      startTime = requestTime.minus(traveltimeRequest.maxCutoff);
+      endTime = requestTime;
+      routingRequest.setTo(parsedLocation);
+    } else {
+      startTime = requestTime;
+      endTime = startTime.plus(traveltimeRequest.maxCutoff);
+      routingRequest.setFrom(parsedLocation);
+    }
 
     ZoneId zoneId = transitService.getTimeZone();
     LocalDate startDate = LocalDate.ofInstant(startTime, zoneId);
@@ -153,8 +142,7 @@ public class TravelTimeResource {
     ZSampleGrid<WTWD> sampleGrid = getSampleGrid();
 
     var isochrones = IsochroneRenderer.renderIsochrones(sampleGrid, traveltimeRequest);
-
-    var features = makeContourFeatures(isochrones);
+    var features = IsochroneRenderer.makeContourFeatures(isochrones);
 
     StreamingOutput out = outputStream -> {
       try (final GeoJSONWriter geoJSONWriter = new GeoJSONWriter(outputStream)) {
@@ -170,107 +158,58 @@ public class TravelTimeResource {
   @Produces("image/tiff")
   public Response getSurface() {
     ZSampleGrid<WTWD> sampleGrid = getSampleGrid();
-
-    int minX = sampleGrid.getXMin();
-    int minY = sampleGrid.getYMin();
-    int maxY = sampleGrid.getYMax();
-
-    int width = sampleGrid.getXMax() - minX + 1;
-    int height = maxY - minY + 1;
-
-    Coordinate center = sampleGrid.getCenter();
-
-    double resX = sampleGrid.getCellSize().x;
-    double resY = sampleGrid.getCellSize().y;
-
-    var raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_INT, width, height, 1, null);
-    var dataBuffer = raster.getDataBuffer();
-
-    // Initialize with NO DATA value
-    for (int i = 0; i < dataBuffer.getSize(); i++) {
-      dataBuffer.setElem(i, Integer.MIN_VALUE);
-    }
-
-    for (var s : sampleGrid) {
-      final WTWD z = s.getZ();
-      raster.setSample(s.getX() - minX, maxY - s.getY(), 0, z.wTime / z.w);
-    }
-
-    Envelope2D geom = new GridGeometry2D(
-      new GridEnvelope2D(0, 0, width, height),
-      new AffineTransform2D(resX, 0, 0, resY, center.x + resX * minX, center.y + resY * minY),
-      DefaultGeographicCRS.WGS84
-    )
-      .getEnvelope2D();
-
-    GridCoverage2D gridCoverage = new GridCoverageFactory().create("traveltime", raster, geom);
-
-    GeoTiffWriteParams wp = new GeoTiffWriteParams();
-    wp.setCompressionMode(MODE_EXPLICIT);
-    wp.setCompressionType("LZW");
-    ParameterValueGroup params = new GeoTiffFormat().getWriteParameters();
-    params.parameter(AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName().toString()).setValue(wp);
-    StreamingOutput streamingOutput = outputStream -> {
-      GeoTiffWriter writer = new GeoTiffWriter(outputStream);
-      writer.write(gridCoverage, params.values().toArray(new GeneralParameterValue[1]));
-      writer.dispose();
-      outputStream.close();
-    };
+    StreamingOutput streamingOutput = RasterRenderer.createGeoTiffRaster(sampleGrid);
     return Response.ok().entity(streamingOutput).build();
   }
 
   private ZSampleGrid<WTWD> getSampleGrid() {
-    final RouteRequest accessRequest = routingRequest.clone();
-
-    accessRequest.withPreferences(preferences ->
-      preferences.withStreet(it ->
-        it.withMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration, Map.of())
-      )
-    );
-
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
-        accessRequest,
-        accessRequest.journey().access().mode(),
+        routingRequest,
+        getAccessRequest(routingRequest).mode(),
         StreetMode.NOT_SET
       )
     ) {
-      final Collection<DefaultAccessEgress> accessList = getAccess(
-        accessRequest,
-        temporaryVertices
-      );
-
+      var accessList = getAccess(temporaryVertices);
       var arrivals = route(accessList).getArrivals();
-
-      var spt = StreetSearchBuilder
-        .of()
-        .setSkipEdgeStrategy(new DurationSkipEdgeStrategy(traveltimeRequest.maxCutoff))
-        .setRequest(routingRequest)
-        .setStreetRequest(accessRequest.journey().access())
-        .setVerticesContainer(temporaryVertices)
-        .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-        .setInitialStates(getInitialStates(arrivals, temporaryVertices))
-        .getShortestPathTree();
-
+      var spt = getShortestPathTree(temporaryVertices, arrivals);
       return SampleGridRenderer.getSampleGrid(spt, traveltimeRequest);
     }
   }
 
-  private Collection<DefaultAccessEgress> getAccess(
-    RouteRequest accessRequest,
-    TemporaryVerticesContainer temporaryVertices
-  ) {
+  private Collection<DefaultAccessEgress> getAccess(TemporaryVerticesContainer temporaryVertices) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-      accessRequest,
+      routingRequest,
       temporaryVertices,
       transitService,
-      routingRequest.journey().access(),
+      getAccessRequest(routingRequest),
       null,
-      false,
+      routingRequest.arriveBy(),
       traveltimeRequest.maxAccessDuration
     );
-    return new AccessEgressMapper().mapNearbyStops(accessStops, false);
+    return new AccessEgressMapper().mapNearbyStops(accessStops, routingRequest.arriveBy());
+  }
+
+  private ShortestPathTree<State, Edge, Vertex> getShortestPathTree(
+    TemporaryVerticesContainer temporaryVertices,
+    StopArrivals arrivals
+  ) {
+    return StreetSearchBuilder
+      .of()
+      .setSkipEdgeStrategy(
+        new PostTransitSkipEdgeStrategy(
+          traveltimeRequest.maxEgressDuration,
+          routingRequest.dateTime(),
+          routingRequest.arriveBy()
+        )
+      )
+      .setRequest(routingRequest)
+      .setStreetRequest(getEgressRequest(routingRequest))
+      .setVerticesContainer(temporaryVertices)
+      .setDominanceFunction(new DominanceFunctions.EarliestArrival())
+      .setInitialStates(getInitialStates(arrivals, temporaryVertices))
+      .getShortestPathTree();
   }
 
   private List<State> getInitialStates(
@@ -279,76 +218,87 @@ public class TravelTimeResource {
   ) {
     List<State> initialStates = new ArrayList<>();
 
-    StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper
+    StreetSearchRequest directStreetSearchRequest = StreetSearchRequestMapper
       .map(routingRequest)
-      .withMode(routingRequest.journey().egress().mode())
-      .withArriveBy(false)
+      .withMode(routingRequest.journey().direct().mode())
+      .withArriveBy(routingRequest.arriveBy())
       .build();
 
-    StateData stateData = StateData.getInitialStateData(streetSearchRequest);
+    List<StateData> directStateDatas = StateData.getInitialStateDatas(directStreetSearchRequest);
 
-    for (var vertex : temporaryVertices.getFromVertices()) {
-      // TODO StateData should be of direct mode here
-      initialStates.add(new State(vertex, startTime, stateData, streetSearchRequest));
+    Set<Vertex> vertices = routingRequest.arriveBy()
+      ? temporaryVertices.getToVertices()
+      : temporaryVertices.getFromVertices();
+    for (var vertex : vertices) {
+      for (var stateData : directStateDatas) {
+        initialStates.add(new State(vertex, startTime, stateData, directStreetSearchRequest));
+      }
     }
 
-    // TODO - Add a method to return all Stops, not StopLocations
+    StreetSearchRequest egressStreetSearchRequest = StreetSearchRequestMapper
+      .map(routingRequest)
+      .withMode(getEgressRequest(routingRequest).mode())
+      .withArriveBy(routingRequest.arriveBy())
+      .build();
+
     for (RegularStop stop : transitService.listRegularStops()) {
       int index = stop.getIndex();
-      if (arrivals.reachedByTransit(index)) {
-        final int arrivalTime = arrivals.bestTransitArrivalTime(index);
-        Vertex v = graph.getStopVertexForStopId(stop.getId());
-        if (v != null) {
-          Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
-          State s = new State(v, time, stateData.clone(), streetSearchRequest);
-          s.weight = startTime.until(time, ChronoUnit.SECONDS);
-          initialStates.add(s);
-        }
+      if (!arrivals.reachedByTransit(index)) {
+        continue;
+      }
+      final int arrivalTime = arrivals.bestTransitArrivalTime(index);
+      Vertex v = graph.getStopVertexForStopId(stop.getId());
+      if (v == null) {
+        continue;
+      }
+      Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
+      List<StateData> egressStateDatas = StateData.getInitialStateDatas(
+        egressStreetSearchRequest,
+        mode -> new TravelTimeStateData(mode, time.getEpochSecond())
+      );
+      for (var stopStateData : egressStateDatas) {
+        State s = new State(v, time, stopStateData, directStreetSearchRequest);
+        s.weight =
+          routingRequest.arriveBy()
+            ? time.until(endTime, ChronoUnit.SECONDS)
+            : startTime.until(time, ChronoUnit.SECONDS);
+        initialStates.add(s);
       }
     }
     return initialStates;
   }
 
   private RaptorResponse<TripSchedule> route(Collection<? extends RaptorAccessEgress> accessList) {
-    final RaptorRequest<TripSchedule> request = new RaptorRequestBuilder<TripSchedule>()
+    RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
+
+    builder
       .profile(RaptorProfile.BEST_TIME)
       .searchParams()
       .earliestDepartureTime(ServiceDateUtils.secondsSinceStartOfTime(startOfTime, startTime))
       .latestArrivalTime(ServiceDateUtils.secondsSinceStartOfTime(startOfTime, endTime))
-      .addAccessPaths(accessList)
       .searchOneIterationOnly()
       .timetable(false)
-      .allowEmptyEgressPaths(true)
-      .constrainedTransfers(false) // TODO: Not compatible with best times
-      .build();
+      .allowEmptyAccessEgressPaths(true)
+      .constrainedTransfers(false); // TODO: Not compatible with best times
 
-    return raptorService.route(request, requestTransitDataProvider);
-  }
-
-  static SimpleFeatureType makeContourSchema() {
-    /* Create the output feature schema. */
-    SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-    typeBuilder.setName("contours");
-    typeBuilder.setCRS(DefaultGeographicCRS.WGS84);
-    typeBuilder.setDefaultGeometry("the_geom");
-    // Do not use "geom" or "geometry" below, it seems to broke shapefile generation
-    typeBuilder.add("the_geom", MultiPolygon.class);
-    typeBuilder.add("time", Long.class);
-    return typeBuilder.buildFeatureType();
-  }
-
-  /**
-   * Create a geotools feature collection from a list of isochrones in the OTPA internal format.
-   * Once in a FeatureCollection, they can for example be exported as GeoJSON.
-   */
-  private static SimpleFeatureCollection makeContourFeatures(List<IsochroneData> isochrones) {
-    DefaultFeatureCollection featureCollection = new DefaultFeatureCollection(null, contourSchema);
-    SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(contourSchema);
-    for (IsochroneData isochrone : isochrones) {
-      fbuilder.add(isochrone.geometry());
-      fbuilder.add(isochrone.cutoffSec());
-      featureCollection.add(fbuilder.buildFeature(null));
+    if (routingRequest.arriveBy()) {
+      builder.searchDirection(SearchDirection.REVERSE).searchParams().addEgressPaths(accessList);
+    } else {
+      builder.searchDirection(SearchDirection.FORWARD).searchParams().addAccessPaths(accessList);
     }
-    return featureCollection;
+
+    return raptorService.route(builder.build(), requestTransitDataProvider);
+  }
+
+  private StreetRequest getAccessRequest(RouteRequest accessRequest) {
+    return routingRequest.arriveBy()
+      ? accessRequest.journey().egress()
+      : accessRequest.journey().access();
+  }
+
+  private StreetRequest getEgressRequest(RouteRequest accessRequest) {
+    return routingRequest.arriveBy()
+      ? accessRequest.journey().access()
+      : accessRequest.journey().egress();
   }
 }

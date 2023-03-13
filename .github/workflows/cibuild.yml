@@ -17,6 +17,7 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
       - uses: actions/checkout@v3.3.0
@@ -32,7 +33,13 @@ jobs:
           cache: maven
 
       - name: Prepare coverage agent, build and test
-        run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report -P prettierCheck
+        # these are split into two steps because otherwise maven keeps long-running HTTP connections
+        # to Maven Central open which then hang during the package phase because the Azure (Github Actions)
+        # NAT drops them
+        # https://github.com/actions/runner-images/issues/1499
+        run: |
+          mvn --batch-mode jacoco:prepare-agent test jacoco:report -P prettierCheck
+          mvn --batch-mode package -Dmaven.test.skip -P prettierSkip
 
       - name: Send coverage data to codecov.io
         if: github.repository_owner == 'opentripplanner'
@@ -44,9 +51,10 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierCheck -P deployGitHub
+        run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip -P deployGitHub
 
   build-windows:
+    timeout-minutes: 20
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
@@ -98,6 +106,11 @@ jobs:
         run: |
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
+          
+          # mkdocs/mike generates a new sitemap.xml.gz for every commit even if the docs have not changed
+          # this configures the date of the change to be the date when the docs haven been changed last
+          # https://github.com/jimporter/mike/issues/103#issuecomment-1453878471
+          export SOURCE_DATE_EPOCH=`git log -1 --format=%ct docs`
 
           # mike, the versioning plugin for mkdocs, expects there to be a local branch to push to so
           # we are cloning one here and commit to it
@@ -162,9 +175,8 @@ jobs:
           cache: maven
       - name: Build container image with Jib, push to Dockerhub
         run: |
-          # we give the container three tags
+          # we give the container two tags
           #   - "latest"
-          #   - the git SHA1
           #   - a string like "2.3_2022-12-12T21-38"
           
           version_with_snapshot=`mvn -q help:evaluate -Dexpression=project.version -q -DforceStdout`
@@ -172,4 +184,4 @@ jobs:
           image_date=`date +%Y-%m-%dT%H-%M`
           image_version="${version}_${image_date}"
           
-          mvn --batch-mode -P prettierSkip compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,${{ github.sha }},$image_version
+          mvn --batch-mode -P prettierSkip compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,$image_version
