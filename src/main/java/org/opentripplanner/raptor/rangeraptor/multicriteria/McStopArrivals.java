@@ -167,10 +167,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
       });
   }
 
-  private int transitStopArrivalsMinInt(
-    int stopIndex,
-    Function<McStopArrival<T>, Integer> mapper
-  ) {
+  private int transitStopArrivalsMinInt(int stopIndex, Function<McStopArrival<T>, Integer> mapper) {
     var transitArrivals = arrivals[stopIndex].stream().filter(a -> a.arrivedBy(TRANSIT));
     return minInt(transitArrivals, mapper);
   }

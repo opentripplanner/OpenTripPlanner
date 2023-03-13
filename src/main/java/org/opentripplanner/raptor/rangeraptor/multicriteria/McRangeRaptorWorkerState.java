@@ -14,6 +14,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.AccessSt
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.TransferStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.TransitStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;

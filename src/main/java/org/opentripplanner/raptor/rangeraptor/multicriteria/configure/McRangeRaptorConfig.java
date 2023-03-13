@@ -11,6 +11,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerS
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
 
@@ -48,10 +49,11 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     return new MultiCriteriaRoutingStrategy<>(
       state,
       context.createTimeBasedBoardingSupport(),
-      context.calculator(),
+      PatternRideC1.factory(),
       context.costCalculator(),
       context.slackProvider(),
-      context.debugFactory()
+      PatternRideC1.paretoComparatorRelativeCost(),
+      context.debugFactory().paretoSetPatternRideListener()
     );
   }
 

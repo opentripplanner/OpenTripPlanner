@@ -1,21 +1,23 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
-import static org.opentripplanner.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
-import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
+import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
+import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 
 /**
  * The purpose of this class is to implement the multi-criteria specific functionality of the
@@ -23,34 +25,33 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
+public final class MultiCriteriaRoutingStrategy<
+  T extends RaptorTripSchedule, R extends PatternRide<T>
+>
   implements RoutingStrategy<T> {
 
   private final McRangeRaptorWorkerState<T> state;
   private final TimeBasedBoardingSupport<T> boardingSupport;
-  private final ParetoSet<PatternRide<T>> patternRides;
-  private final TransitCalculator<T> calculator;
+  private final PatternRideFactory<T, R> patternRideFactory;
+  private final ParetoSet<R> patternRides;
   private final RaptorCostCalculator<T> costCalculator;
   private final SlackProvider slackProvider;
 
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
     TimeBasedBoardingSupport<T> boardingSupport,
-    TransitCalculator<T> calculator,
+    PatternRideFactory<T, R> patternRideFactory,
     RaptorCostCalculator<T> costCalculator,
     SlackProvider slackProvider,
-    DebugHandlerFactory<T> debugHandlerFactory
+    ParetoComparator<R> patternRideComparator,
+    ParetoSetEventListener<PatternRideView<?, ?>> paretoSetPatternRideListener
   ) {
     this.state = state;
     this.boardingSupport = boardingSupport;
-    this.calculator = calculator;
+    this.patternRideFactory = patternRideFactory;
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;
-    this.patternRides =
-      new ParetoSet<>(
-        paretoComparatorRelativeCost(),
-        debugHandlerFactory.paretoSetPatternRideListener()
-      );
+    this.patternRides = new ParetoSet<>(patternRideComparator, paretoSetPatternRideListener);
   }
 
   @Override
@@ -66,7 +67,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
   @Override
   public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {
-    for (PatternRide<T> ride : patternRides) {
+    for (R ride : patternRides) {
       state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
     }
   }
@@ -115,7 +116,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     final int relativeBoardCost = boardCost + calculateOnTripRelativeCost(boardTime, trip);
 
     patternRides.add(
-      new PatternRide<>(
+      patternRideFactory.createPatternRide(
         prevArrival,
         stopIndex,
         boarding.stopPositionInPattern(),

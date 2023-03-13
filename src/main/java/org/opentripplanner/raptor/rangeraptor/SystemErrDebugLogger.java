@@ -87,12 +87,12 @@ public class SystemErrDebugLogger implements DebugLogger {
    * This should be passed into the {@link DebugRequestBuilder#patternRideDebugListener(Consumer)}
    * using a lambda to enable debugging pattern ride events.
    */
-  public void patternRideLister(DebugEvent<PatternRideView<?>> e) {
+  public void patternRideLister(DebugEvent<PatternRideView<?, ?>> e) {
     printIterationHeader(e.iterationStartTime());
     printRoundHeader(e.element().prevArrival().round() + 1);
     print(e.element(), e.action().toString());
 
-    PatternRideView<?> byElement = e.rejectedDroppedByElement();
+    var byElement = e.rejectedDroppedByElement();
     if (e.action() == DebugEvent.Action.DROP && byElement != null) {
       print(byElement, "->by");
     }
@@ -203,7 +203,7 @@ public class SystemErrDebugLogger implements DebugLogger {
     );
   }
 
-  private void print(PatternRideView<?> p, String action) {
+  private void print(PatternRideView<?, ?> p, String action) {
     println(
       arrivalTable.rowAsText(
         action,

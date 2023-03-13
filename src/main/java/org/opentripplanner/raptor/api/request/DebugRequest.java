@@ -47,7 +47,7 @@ public record DebugRequest(
    */
   int debugPathFromStopIndex,
   Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener,
-  Consumer<DebugEvent<PatternRideView<?>>> patternRideDebugListener,
+  Consumer<DebugEvent<PatternRideView<?, ?>>> patternRideDebugListener,
   Consumer<DebugEvent<RaptorPath<?>>> pathFilteringListener,
   DebugLogger logger
 ) {
