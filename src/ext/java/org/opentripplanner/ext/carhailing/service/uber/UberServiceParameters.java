@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.carhailing.service.uber;
 
-public record UberConfig(
+public record UberServiceParameters(
   String clientId,
   String clientSecret,
   String wheelchairAccessibleRideType

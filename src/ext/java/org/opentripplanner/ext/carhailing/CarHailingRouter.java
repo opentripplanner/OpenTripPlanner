@@ -3,8 +3,8 @@ package org.opentripplanner.ext.carhailing;
 import java.io.IOException;
 import java.util.List;
 import org.opentripplanner.ext.carhailing.service.ArrivalTime;
-import org.opentripplanner.ext.carhailing.service.uber.UberConfig;
 import org.opentripplanner.ext.carhailing.service.uber.UberService;
+import org.opentripplanner.ext.carhailing.service.uber.UberServiceParameters;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -51,7 +51,7 @@ public class CarHailingRouter {
   }
 
   private static List<ArrivalTime> earliestArrivalTimes(RouteRequest routeRequest) {
-    var service = new UberService(new UberConfig("client1", "client2", "foo"));
+    var service = new UberService(new UberServiceParameters("client1", "client2", "foo"));
     return routeRequest
       .from()
       .toWgsCoordinate()

@@ -38,7 +38,7 @@ public class UberService extends CarHailingService {
 
   private final String baseUrl;
   private final String authenticationUrl;
-  private final UberConfig config;
+  private final UberServiceParameters config;
   private final UrlEncodedOauthService oauthService;
 
   static {
@@ -46,7 +46,7 @@ public class UberService extends CarHailingService {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
-  public UberService(UberConfig config) {
+  public UberService(UberServiceParameters config) {
     this.baseUrl = DEFAULT_BASE_URL;
     this.authenticationUrl = DEFAULT_AUTHENTICATION_URL;
     this.config = config;

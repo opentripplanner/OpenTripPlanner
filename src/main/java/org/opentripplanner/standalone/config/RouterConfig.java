@@ -4,14 +4,17 @@ import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONF
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.time.Duration;
+import org.opentripplanner.ServicesParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerconfig.ServicesConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
@@ -47,6 +50,7 @@ public class RouterConfig implements Serializable {
   private final RouteRequest routingRequestDefaults;
   private final TransitRoutingConfig transitConfig;
   private final UpdatersParameters updatersParameters;
+  private final ServicesParameters servicesParameters;
   private final VectorTileConfig vectorTileLayers;
   private final FlexConfig flexConfig;
 
@@ -110,6 +114,7 @@ number of transit vehicles used in that itinerary.
     this.routingRequestDefaults =
       RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
     this.updatersParameters = new UpdatersConfig(root);
+    this.servicesParameters = new ServicesConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig = new FlexConfig(root, "flex");
 
@@ -164,6 +169,10 @@ number of transit vehicles used in that itinerary.
     return updatersParameters;
   }
 
+  public ServicesParameters servicesParameters() {
+    return servicesParameters;
+  }
+
   public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
     return vectorTileLayers;
   }
@@ -201,7 +210,7 @@ number of transit vehicles used in that itinerary.
   static Duration parseStreetRoutingTimeout(NodeAdapter adapter) {
     return adapter
       .of("streetRoutingTimeout")
-      .since(NA)
+      .since(V2_2)
       .summary(
         "The maximum time a street routing request is allowed to take before returning a timeout."
       )
