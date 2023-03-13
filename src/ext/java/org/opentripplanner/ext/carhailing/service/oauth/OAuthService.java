@@ -26,10 +26,19 @@ public abstract class OAuthService {
         LOG.info("Requesting new {} access token", request.uri());
         var response = HttpClient
           .newHttpClient()
-          .send(request, HttpResponse.BodyHandlers.ofInputStream());
+          .send(request, HttpResponse.BodyHandlers.ofString());
         var mapper = new ObjectMapper();
-        var token = mapper.readValue(response.body(), OAuthToken.class);
 
+        if (response.statusCode() != 200) {
+          LOG.error(
+            "Error fetching OAuth token from {}. Response: {}",
+            request.uri(),
+            response.body()
+          );
+          throw new IOException("Could not fetch OAuth token from %s".formatted(request.uri()));
+        }
+
+        var token = mapper.readValue(response.body(), OAuthToken.class);
         this.cachedToken = new CachedOAuthToken(token);
 
         LOG.info("Received new access token from URL {}", request.uri());

@@ -63,6 +63,7 @@ public class CarHailingRouter {
             try {
               return service.getArrivalTimes(c).stream();
             } catch (ExecutionException e) {
+              LOG.error("Error while fetching car hailing arrival times", e);
               return Stream.empty();
             }
           })
