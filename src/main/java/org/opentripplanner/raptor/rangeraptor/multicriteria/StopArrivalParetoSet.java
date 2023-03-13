@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
@@ -18,13 +18,13 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetWithMarker;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 class StopArrivalParetoSet<T extends RaptorTripSchedule>
-  extends ParetoSetWithMarker<AbstractStopArrival<T>> {
+  extends ParetoSetWithMarker<McStopArrival<T>> {
 
   /**
    * Use the factory methods in this class to create a new instance.
    */
   private StopArrivalParetoSet(
-    ParetoComparator<AbstractStopArrival<T>> comparator,
+    ParetoComparator<McStopArrival<T>> comparator,
     ParetoSetEventListener<ArrivalView<T>> listener
   ) {
     super(comparator, listener);
@@ -46,7 +46,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
     @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
   ) {
     return new StopArrivalParetoSet<>(
-      AbstractStopArrival.compareArrivalTimeRoundAndCost(),
+      McStopArrival.compareArrivalTimeRoundAndCost(),
       paretoSetEventListener
     );
   }
@@ -69,7 +69,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
     @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
   ) {
     return new StopArrivalParetoSet<>(
-      AbstractStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(),
+      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(),
       paretoSetEventListener
     );
   }
@@ -93,7 +93,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
     }
 
     return new StopArrivalParetoSet<>(
-      AbstractStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(),
+      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(),
       listener
     );
   }

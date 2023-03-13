@@ -9,8 +9,8 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
@@ -35,7 +35,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   private final McStopArrivals<T> arrivals;
   private final DestinationArrivalPaths<T> paths;
   private final HeuristicsProvider<T> heuristics;
-  private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
+  private final List<McStopArrival<T>> arrivalsCache = new ArrayList<>();
   private final RaptorCostCalculator<T> costCalculator;
   private final RaptorTransitCalculator<T> transitCalculator;
 
@@ -100,9 +100,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
    */
   @Override
   public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
-    Iterable<? extends AbstractStopArrival<T>> fromArrivals = arrivals.listArrivalsAfterMarker(
-      fromStop
-    );
+    Iterable<? extends McStopArrival<T>> fromArrivals = arrivals.listArrivalsAfterMarker(fromStop);
 
     while (transfers.hasNext()) {
       transferToStop(fromArrivals, transfers.next());
@@ -115,7 +113,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     return new McRaptorWorkerResult<T>(arrivals, paths);
   }
 
-  Iterable<? extends AbstractStopArrival<T>> listStopArrivalsPreviousRound(int stop) {
+  Iterable<? extends McStopArrival<T>> listStopArrivalsPreviousRound(int stop) {
     return arrivals.listArrivalsAfterMarker(stop);
   }
 
@@ -174,12 +172,12 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   private void transferToStop(
-    Iterable<? extends AbstractStopArrival<T>> fromArrivals,
+    Iterable<? extends McStopArrival<T>> fromArrivals,
     RaptorTransfer transfer
   ) {
     final int transferTimeInSeconds = transfer.durationInSeconds();
 
-    for (AbstractStopArrival<T> it : fromArrivals) {
+    for (McStopArrival<T> it : fromArrivals) {
       int arrivalTime = it.arrivalTime() + transferTimeInSeconds;
 
       if (!exceedsTimeLimit(arrivalTime)) {
@@ -189,13 +187,13 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   private void commitCachedArrivals() {
-    for (AbstractStopArrival<T> arrival : arrivalsCache) {
+    for (McStopArrival<T> arrival : arrivalsCache) {
       addStopArrival(arrival);
     }
     arrivalsCache.clear();
   }
 
-  private void addStopArrival(AbstractStopArrival<T> arrival) {
+  private void addStopArrival(McStopArrival<T> arrival) {
     if (heuristics.rejectDestinationArrivalBasedOnHeuristic(arrival)) {
       return;
     }

@@ -8,7 +8,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
@@ -80,7 +80,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
   @Override
   public void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack) {
-    for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
+    for (McStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
       boardWithRegularTransfer(prevArrival, stopIndex, stopPos, boardSlack);
     }
   }
@@ -92,13 +92,13 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     int boardSlack,
     RaptorConstrainedBoardingSearch<T> txSearch
   ) {
-    for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
+    for (McStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
       boardWithConstrainedTransfer(prevArrival, stopIndex, stopPos, boardSlack, txSearch);
     }
   }
 
   private void board(
-    AbstractStopArrival<T> prevArrival,
+    McStopArrival<T> prevArrival,
     final int stopIndex,
     final RaptorBoardOrAlightEvent<T> boarding
   ) {
@@ -128,7 +128,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   private void boardWithRegularTransfer(
-    AbstractStopArrival<T> prevArrival,
+    McStopArrival<T> prevArrival,
     int stopIndex,
     int stopPos,
     int boardSlack
@@ -144,7 +144,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   private void boardWithConstrainedTransfer(
-    AbstractStopArrival<T> prevArrival,
+    McStopArrival<T> prevArrival,
     int stopIndex,
     int stopPos,
     int boardSlack,
@@ -172,7 +172,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
    * Note! This depends on the {@code prevArrival} being set.
    */
   private int calculateCostAtBoardTime(
-    AbstractStopArrival<T> prevArrival,
+    McStopArrival<T> prevArrival,
     final RaptorBoardOrAlightEvent<T> boardEvent
   ) {
     return (

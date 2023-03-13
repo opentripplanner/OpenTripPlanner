@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
@@ -58,7 +58,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   public int bestArrivalTime(int stopIndex) {
-    return minInt(arrivals[stopIndex].stream(), AbstractStopArrival::arrivalTime);
+    return minInt(arrivals[stopIndex].stream(), McStopArrival::arrivalTime);
   }
 
   public boolean reachedByTransit(int stopIndex) {
@@ -69,11 +69,11 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   public int bestTransitArrivalTime(int stopIndex) {
-    return transitStopArrivalsMinInt(stopIndex, AbstractStopArrival::arrivalTime);
+    return transitStopArrivalsMinInt(stopIndex, McStopArrival::arrivalTime);
   }
 
   public int smallestNumberOfTransfers(int stopIndex) {
-    return transitStopArrivalsMinInt(stopIndex, AbstractStopArrival::numberOfTransfers);
+    return transitStopArrivalsMinInt(stopIndex, McStopArrival::numberOfTransfers);
   }
 
   boolean updateExist() {
@@ -84,7 +84,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     return new BitSetIterator(touchedStops);
   }
 
-  void addStopArrival(AbstractStopArrival<T> arrival) {
+  void addStopArrival(McStopArrival<T> arrival) {
     boolean added = findOrCreateSet(arrival.stop()).add(arrival);
     if (added) {
       touchedStops.set(arrival.stop());
@@ -104,7 +104,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   /** List all transits arrived this round. */
-  Iterable<AbstractStopArrival<T>> listArrivalsAfterMarker(final int stop) {
+  Iterable<McStopArrival<T>> listArrivalsAfterMarker(final int stop) {
     StopArrivalParetoSet<T> it = arrivals[stop];
     if (it == null) {
       // Avoid creating new objects in a tight loop
@@ -169,15 +169,15 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   private int transitStopArrivalsMinInt(
     int stopIndex,
-    Function<AbstractStopArrival<T>, Integer> mapper
+    Function<McStopArrival<T>, Integer> mapper
   ) {
     var transitArrivals = arrivals[stopIndex].stream().filter(a -> a.arrivedBy(TRANSIT));
     return minInt(transitArrivals, mapper);
   }
 
   private int minInt(
-    Stream<AbstractStopArrival<T>> transitArrivals,
-    Function<AbstractStopArrival<T>, Integer> mapper
+    Stream<McStopArrival<T>> transitArrivals,
+    Function<McStopArrival<T>, Integer> mapper
   ) {
     return transitArrivals.mapToInt(mapper::apply).min().orElseThrow();
   }

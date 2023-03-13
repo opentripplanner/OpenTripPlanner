@@ -80,9 +80,7 @@ public class AccessStopArrivalTest {
   @Test
   public void timeShiftDefaultBehaviour() {
     final int dTime = 60;
-    AbstractStopArrival<RaptorTripSchedule> result = subject.timeShiftNewArrivalTime(
-      ALIGHT_TIME + dTime
-    );
+    McStopArrival<RaptorTripSchedule> result = subject.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
 
     assertEquals(result.arrivalTime(), ALIGHT_TIME + dTime);
     assertEquals(subject.cost(), result.cost());
@@ -103,7 +101,7 @@ public class AccessStopArrivalTest {
   @Test
   public void timeShiftPartiallyAllowed() {
     final int dTime = 60;
-    AbstractStopArrival<RaptorTripSchedule> original, result;
+    McStopArrival<RaptorTripSchedule> original, result;
 
     // Allow time-shift, but only by dTime (a free edge has zero duration)
     RaptorAccessEgress access = TestAccessEgress

@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.PatternRideView;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
@@ -53,7 +53,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public record PatternRide<T extends RaptorTripSchedule>(
-  AbstractStopArrival<T> prevArrival,
+  McStopArrival<T> prevArrival,
   int boardStopIndex,
   int boardPos,
   int boardTime,
@@ -66,7 +66,7 @@ public record PatternRide<T extends RaptorTripSchedule>(
   // Pareto vector: [relativeCost, tripSortIndex]
 
   public PatternRide(
-    AbstractStopArrival<T> prevArrival,
+    McStopArrival<T> prevArrival,
     int boardStopIndex,
     int boardPos,
     int boardTime,

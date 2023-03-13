@@ -9,9 +9,9 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
+public abstract class McStopArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
 
-  private final AbstractStopArrival<T> previous;
+  private final McStopArrival<T> previous;
   /**
    * We want transits to dominate transfers so we increment the round not only between RangeRaptor
    * rounds, but for transits and transfers also. The access path is paretoRound 0, the first
@@ -38,8 +38,8 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
    * @param arrivalTime          the arrival time for this stop index
    * @param generalizedCost                 the total accumulated cost at this stop arrival
    */
-  AbstractStopArrival(
-    AbstractStopArrival<T> previous,
+  McStopArrival(
+    McStopArrival<T> previous,
     int paretoRoundIncrement,
     int stop,
     int arrivalTime,
@@ -56,13 +56,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
   /**
    * Initial state - first stop visited during the RAPTOR algorithm.
    */
-  AbstractStopArrival(
-    int stop,
-    int departureTime,
-    int travelDuration,
-    int initialCost,
-    int paretoRound
-  ) {
+  McStopArrival(int stop, int departureTime, int travelDuration, int initialCost, int paretoRound) {
     this.previous = null;
     this.paretoRound = paretoRound;
     this.stop = stop;
@@ -81,7 +75,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
    */
   public static <
     T extends RaptorTripSchedule
-  > ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundAndCost() {
+  > ParetoComparator<McStopArrival<T>> compareArrivalTimeRoundAndCost() {
     // This is important with respect to performance. Using the short-circuit logical OR(||) is
     // faster than bitwise inclusive OR(|) (even between boolean expressions)
     return (l, r) ->
@@ -96,7 +90,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
    */
   public static <
     T extends RaptorTripSchedule
-  > ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundCostAndOnBoardArrival() {
+  > ParetoComparator<McStopArrival<T>> compareArrivalTimeRoundCostAndOnBoardArrival() {
     // This is important with respect to performance. Using the short-circuit logical OR(||) is
     // faster than bitwise inclusive OR(|) (even between boolean expressions)
     return (l, r) ->
@@ -126,7 +120,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
   }
 
   @Override
-  public final AbstractStopArrival<T> previous() {
+  public final McStopArrival<T> previous() {
     return previous;
   }
 
@@ -134,7 +128,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     return travelDuration;
   }
 
-  public AbstractStopArrival<T> timeShiftNewArrivalTime(int newArrivalTime) {
+  public McStopArrival<T> timeShiftNewArrivalTime(int newArrivalTime) {
     throw new UnsupportedOperationException("No accessEgress for transfer stop arrival");
   }
 

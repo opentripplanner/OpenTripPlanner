@@ -15,8 +15,8 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 
@@ -44,20 +44,20 @@ public class StopArrivalStateParetoSetTest {
 
   // Make sure all "base" arrivals have the same cost
   private static final int BASE_COST = 1;
-  private static final AbstractStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = newAccessStopState(
+  private static final McStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = newAccessStopState(
     999,
     5,
     BASE_COST
   );
 
-  private static final AbstractStopArrival<RaptorTripSchedule> TRANSIT_L1 = newTransitStopState(
+  private static final McStopArrival<RaptorTripSchedule> TRANSIT_L1 = newTransitStopState(
     ROUND_1,
     998,
     10,
     BASE_COST
   );
 
-  private static final AbstractStopArrival<RaptorTripSchedule> TRANSIT_L2 = newTransitStopState(
+  private static final McStopArrival<RaptorTripSchedule> TRANSIT_L2 = newTransitStopState(
     ROUND_2,
     997,
     20,
@@ -210,7 +210,7 @@ public class StopArrivalStateParetoSetTest {
     );
   }
 
-  private static AbstractStopArrival<RaptorTripSchedule> prev(int round) {
+  private static McStopArrival<RaptorTripSchedule> prev(int round) {
     switch (round) {
       case 1:
         return ACCESS_ARRIVAL;
@@ -227,7 +227,7 @@ public class StopArrivalStateParetoSetTest {
     StopArrivalParetoSet<RaptorTripSchedule> subject,
     int... expStopIndexes
   ) {
-    int[] result = subject.stream().mapToInt(AbstractStopArrival::stop).sorted().toArray();
+    int[] result = subject.stream().mapToInt(McStopArrival::stop).sorted().toArray();
     assertEquals(Arrays.toString(expStopIndexes), Arrays.toString(result), "Stop indexes");
   }
 }
