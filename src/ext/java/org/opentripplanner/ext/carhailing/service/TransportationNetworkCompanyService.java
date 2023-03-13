@@ -59,7 +59,7 @@ public class TransportationNetworkCompanyService implements Serializable {
           transportationNetworkCompany.carHailingCompany(),
           place.coordinate
         );
-        return transportationNetworkCompany.getArrivalTimes(place.coordinate);
+        return transportationNetworkCompany.arrivalTimes(place.coordinate);
       });
     }
 

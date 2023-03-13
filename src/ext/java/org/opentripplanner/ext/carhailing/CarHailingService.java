@@ -15,15 +15,15 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 public abstract class CarHailingService {
 
   // This value should be no longer than 30 minutes (according to Uber API docs) TODO check Lyft time limit
-  private static final Duration CACHE_TIME = Duration.ofMinutes(2);
+  private static final Duration CACHE_DURATION = Duration.ofMinutes(2);
 
   private final Cache<WgsCoordinate, List<ArrivalTime>> arrivalTimeCache = CacheBuilder
     .newBuilder()
-    .expireAfterWrite(CACHE_TIME)
+    .expireAfterWrite(CACHE_DURATION)
     .build();
   private final Cache<RideEstimateRequest, List<RideEstimate>> rideEstimateCache = CacheBuilder
     .newBuilder()
-    .expireAfterWrite(CACHE_TIME)
+    .expireAfterWrite(CACHE_DURATION)
     .build();
 
   protected String wheelChairAccessibleRideType;
@@ -32,13 +32,15 @@ public abstract class CarHailingService {
   public abstract CarHailingCompany carHailingCompany();
 
   // get the next arrivals for a specific location
-  public List<ArrivalTime> getArrivalTimes(WgsCoordinate coordinate) throws ExecutionException {
-    return arrivalTimeCache.get(coordinate, () -> queryArrivalTimes(coordinate));
+  public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) throws ExecutionException {
+    return arrivalTimeCache.get(coordinate.rounded(), () -> queryArrivalTimes(coordinate));
   }
 
   protected abstract List<ArrivalTime> queryArrivalTimes(WgsCoordinate position) throws IOException;
 
-  // get the estimated trip time for a specific rideType
+  /**
+   * Get the estimated trip time for a specific rideType
+   */
   public List<RideEstimate> getRideEstimates(WgsCoordinate start, WgsCoordinate end)
     throws ExecutionException {
     // Truncate lat/lon values in order to reduce the number of API requests made.

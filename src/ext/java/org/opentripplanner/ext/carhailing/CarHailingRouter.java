@@ -61,7 +61,7 @@ public class CarHailingRouter {
           .parallelStream()
           .flatMap(service -> {
             try {
-              return service.getArrivalTimes(c).stream();
+              return service.arrivalTimes(c).stream();
             } catch (ExecutionException e) {
               LOG.error("Error while fetching car hailing arrival times", e);
               return Stream.empty();
