@@ -35,9 +35,14 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |-------------------------------------------------------------------------------------------|:---------------------:|---------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                   | *Optional* |               |  2.1  |
 | [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
-| [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |   na  |
+| [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |  2.2  |
 | [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |  2.1  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
+| [services](#services)                                                                     |       `object[]`      | Configuration for interfaces to external services.                                                | *Optional* |               |  2.3  |
+|       type = "UBER_CAR_HAILING"                                                           |         `enum`        | The type of the service.                                                                          | *Required* |               |  2.3  |
+|       clientId                                                                            |        `string`       | OAuth client id to access the API.                                                                | *Required* |               |  2.3  |
+|       clientSecret                                                                        |        `string`       | OAuth client secret to access the API.                                                            | *Required* |               |  2.3  |
+|       wheelchairAccessibleRideType                                                        |        `string`       | HTTP headers to add.                                                                              | *Required* |               |  2.3  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
 | [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                   | *Optional* |               |   na  |
 |    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)            |       `integer`       | Step for departure times between each RangeRaptor iterations.                                     | *Optional* | `60`          |   na  |
@@ -126,7 +131,7 @@ number of transit vehicles used in that itinerary.
 
 <h3 id="streetRoutingTimeout">streetRoutingTimeout</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"`   
+**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"`   
 **Path:** / 
 
 The maximum time a street routing request is allowed to take before returning a timeout.
@@ -142,6 +147,13 @@ search-window.
 
 The search aborts after this duration and any paths found are returned to the client.
 
+
+<h3 id="services">services</h3>
+
+**Since version:** `2.3` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Configuration for interfaces to external services.
 
 <h3 id="transit">transit</h3>
 
@@ -647,6 +659,14 @@ Http headers.
         "toDateTime" : "P1D",
         "timeout" : 300000
       }
+    }
+  ],
+  "services" : [
+    {
+      "type" : "uber-car-hailing",
+      "clientId" : "secret-id",
+      "clientSecret" : "very-secret",
+      "wheelchairAccessibleRideType" : "car"
     }
   ]
 }

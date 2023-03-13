@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import org.opentripplanner.ext.carhailing.service.model.ArrivalTime;
+import org.opentripplanner.ext.carhailing.service.model.CarHailingCompany;
+import org.opentripplanner.ext.carhailing.service.model.RideEstimate;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 
 public abstract class CarHailingService {

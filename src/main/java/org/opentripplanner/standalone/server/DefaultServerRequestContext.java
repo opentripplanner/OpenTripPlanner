@@ -2,9 +2,11 @@ package org.opentripplanner.standalone.server;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
+import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.ext.carhailing.service.CarHailingService;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
@@ -29,6 +31,7 @@ import org.slf4j.Logger;
 @HttpRequestScoped
 public class DefaultServerRequestContext implements OtpServerRequestContext {
 
+  private final List<CarHailingService> carHailingServices;
   private RouteRequest routeRequest = null;
   private final Graph graph;
   private final TransitService transitService;
@@ -63,6 +66,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     WorldEnvelopeService worldEnvelopeService,
     VehiclePositionService vehiclePositionService,
     VehicleRentalService vehicleRentalService,
+    List<CarHailingService> carHailingServices,
     TraverseVisitor traverseVisitor,
     FlexConfig flexConfig
   ) {
@@ -81,6 +85,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.routeRequestDefaults = routeRequestDefaults;
     this.worldEnvelopeService = worldEnvelopeService;
     this.vehiclePositionService = vehiclePositionService;
+    this.carHailingServices = carHailingServices;
   }
 
   /**
@@ -99,6 +104,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehiclePositionService vehiclePositionService,
     VehicleRentalService vehicleRentalService,
     FlexConfig flexConfig,
+    List<CarHailingService> carHailingServices,
     @Nullable TraverseVisitor traverseVisitor,
     @Nullable String requestLogFile
   ) {
@@ -116,6 +122,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       worldEnvelopeService,
       vehiclePositionService,
       vehicleRentalService,
+      carHailingServices,
       traverseVisitor,
       flexConfig
     );
@@ -181,6 +188,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public RaptorTuningParameters raptorTuningParameters() {
     return transitRoutingConfig;
+  }
+
+  @Override
+  public List<CarHailingService> carHailingServices() {
+    return carHailingServices;
   }
 
   @Override

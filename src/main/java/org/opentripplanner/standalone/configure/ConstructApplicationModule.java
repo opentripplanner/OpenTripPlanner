@@ -3,8 +3,10 @@ package org.opentripplanner.standalone.configure;
 import dagger.Module;
 import dagger.Provides;
 import io.micrometer.core.instrument.Metrics;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.ext.carhailing.service.CarHailingService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
@@ -29,6 +31,7 @@ public class ConstructApplicationModule {
     WorldEnvelopeService worldEnvelopeService,
     VehiclePositionService vehiclePositionService,
     VehicleRentalService vehicleRentalService,
+    List<CarHailingService> carHailingServices,
     @Nullable TraverseVisitor<?, ?> traverseVisitor
   ) {
     return DefaultServerRequestContext.create(
@@ -44,6 +47,7 @@ public class ConstructApplicationModule {
       vehiclePositionService,
       vehicleRentalService,
       routerConfig.flexConfig(),
+      carHailingServices,
       traverseVisitor,
       routerConfig.requestLogFile()
     );

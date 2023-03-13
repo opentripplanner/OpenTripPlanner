@@ -1,14 +1,13 @@
 package org.opentripplanner.standalone.config.routerconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
-import static org.opentripplanner.standalone.config.routerconfig.ServicesConfig.Type.UBER_CAR_HAILING;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.ServicesParameters;
-import org.opentripplanner.ext.carhailing.service.uber.UberServiceParameters;
+import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.services.UberConfig;
 
@@ -35,8 +34,13 @@ public class ServicesConfig implements ServicesParameters {
   }
 
   @Override
-  public List<UberServiceParameters> uberServiceParameters() {
-    return getParameters(UBER_CAR_HAILING);
+  public List<CarHailingServiceParameters> carHailingServiceParameters() {
+    return configList
+      .values()
+      .stream()
+      .filter(CarHailingServiceParameters.class::isInstance)
+      .map(CarHailingServiceParameters.class::cast)
+      .toList();
   }
 
   private <T> List<T> getParameters(Type key) {

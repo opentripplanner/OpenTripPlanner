@@ -1,10 +1,10 @@
 package org.opentripplanner.ext.carhailing;
 
-import java.io.IOException;
 import java.util.List;
-import org.opentripplanner.ext.carhailing.service.ArrivalTime;
-import org.opentripplanner.ext.carhailing.service.uber.UberService;
-import org.opentripplanner.ext.carhailing.service.uber.UberServiceParameters;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
+import org.opentripplanner.ext.carhailing.service.CarHailingService;
+import org.opentripplanner.ext.carhailing.service.model.ArrivalTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -28,7 +28,7 @@ public class CarHailingRouter {
     if (routeRequest.journey().modes().directMode != StreetMode.CAR_HAIL) {
       return List.of();
     }
-    var times = earliestArrivalTimes(routeRequest);
+    var times = earliestArrivalTimes(routeRequest, serverContext.carHailingServices());
 
     return times
       .parallelStream()
@@ -50,20 +50,26 @@ public class CarHailingRouter {
     return input;
   }
 
-  private static List<ArrivalTime> earliestArrivalTimes(RouteRequest routeRequest) {
-    var service = new UberService(new UberServiceParameters("client1", "client2", "foo"));
+  private static List<ArrivalTime> earliestArrivalTimes(
+    RouteRequest routeRequest,
+    List<CarHailingService> services
+  ) {
     return routeRequest
       .from()
       .toWgsCoordinate()
-      .map(c -> {
-        try {
-          return service.queryArrivalTimes(c);
-        } catch (IOException e) {
-          LOG.error("Error when getting arrival times", e);
-          return List.<ArrivalTime>of();
-        }
-      })
-      .orElse(List.of());
+      .map(c ->
+        services
+          .parallelStream()
+          .flatMap(service -> {
+            try {
+              return service.getArrivalTimes(c).stream();
+            } catch (ExecutionException e) {
+              return Stream.empty();
+            }
+          })
+      )
+      .orElse(Stream.empty())
+      .toList();
   }
 
   private static Leg addNetwork(Leg leg, String network) {

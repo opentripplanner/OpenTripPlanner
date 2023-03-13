@@ -2,8 +2,10 @@ package org.opentripplanner.standalone.api;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
+import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.ext.carhailing.service.CarHailingService;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -89,6 +91,8 @@ public interface OtpServerRequestContext {
   TransitTuningParameters transitTuningParameters();
 
   RaptorTuningParameters raptorTuningParameters();
+
+  List<CarHailingService> carHailingServices();
 
   Duration streetRoutingTimeout();
 

@@ -16,7 +16,7 @@ public class ServicesConfigTest {
     var c = new RouterConfig(node, this.getClass().getSimpleName(), false);
     assertEquals(
       List.of(new UberServiceParameters("secret-id", "very-secret", "car")),
-      c.servicesParameters().uberServiceParameters()
+      c.servicesParameters().carHailingServiceParameters()
     );
   }
 }

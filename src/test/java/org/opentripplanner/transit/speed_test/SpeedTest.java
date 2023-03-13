@@ -114,6 +114,7 @@ public class SpeedTest {
         TestServerContext.createVehiclePositionService(),
         TestServerContext.createVehicleRentalService(),
         config.flexConfig,
+        List.of(),
         null,
         null
       );

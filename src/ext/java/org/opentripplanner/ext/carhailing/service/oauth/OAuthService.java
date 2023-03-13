@@ -21,21 +21,21 @@ public abstract class OAuthService {
   public String getToken() {
     if (cachedToken.isExpired()) {
       // prepare request to get token
-          try {
-            var request =oauthTokenRequest();
-            LOG.info("Requesting new {} access token", request.uri());
-            var response = HttpClient
-              .newHttpClient()
-              .send(request, HttpResponse.BodyHandlers.ofInputStream());
-            var mapper = new ObjectMapper();
-            var token = mapper.readValue(response.body(), OAuthToken.class);
+      try {
+        var request = oauthTokenRequest();
+        LOG.info("Requesting new {} access token", request.uri());
+        var response = HttpClient
+          .newHttpClient()
+          .send(request, HttpResponse.BodyHandlers.ofInputStream());
+        var mapper = new ObjectMapper();
+        var token = mapper.readValue(response.body(), OAuthToken.class);
 
-            this.cachedToken = new CachedOAuthToken(token);
+        this.cachedToken = new CachedOAuthToken(token);
 
-            LOG.info("Received new access token from URL {}", request.uri());
-          } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-          }
+        LOG.info("Received new access token from URL {}", request.uri());
+      } catch (IOException | InterruptedException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     return cachedToken.value;
