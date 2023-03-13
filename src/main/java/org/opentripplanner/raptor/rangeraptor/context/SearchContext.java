@@ -13,6 +13,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.request.DebugRequest;
+import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
@@ -108,6 +109,10 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
   public SearchDirection searchDirection() {
     return request.searchDirection();
+  }
+
+  public MultiCriteriaRequest<T> multiCriteria() {
+    return request.multiCriteria();
   }
 
   public RaptorTransitDataProvider<T> transit() {

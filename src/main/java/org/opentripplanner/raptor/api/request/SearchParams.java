@@ -5,8 +5,6 @@ import static org.opentripplanner.raptor.api.request.RaptorRequest.assertPropert
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -24,10 +22,6 @@ public class SearchParams {
   private final boolean preferLateArrival;
   private final int numberOfAdditionalTransfers;
   private final int maxNumberOfTransfers;
-
-  @Nullable
-  private final Double relaxCostAtDestination;
-
   private final boolean timetable;
   private final boolean constrainedTransfers;
   private final Collection<RaptorAccessEgress> accessPaths;
@@ -44,7 +38,6 @@ public class SearchParams {
     preferLateArrival = false;
     numberOfAdditionalTransfers = 5;
     maxNumberOfTransfers = RaptorConstants.NOT_SET;
-    relaxCostAtDestination = null;
     timetable = false;
     constrainedTransfers = false;
     accessPaths = List.of();
@@ -59,7 +52,6 @@ public class SearchParams {
     this.preferLateArrival = builder.preferLateArrival();
     this.numberOfAdditionalTransfers = builder.numberOfAdditionalTransfers();
     this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
-    this.relaxCostAtDestination = builder.relaxCostAtDestination();
     this.timetable = builder.timetable();
     this.constrainedTransfers = builder.constrainedTransfers();
     this.accessPaths = List.copyOf(builder.accessPaths());
@@ -161,24 +153,6 @@ public class SearchParams {
   }
 
   /**
-   * Whether to accept non-optimal trips if they are close enough - if and only if they represent an
-   * optimal path for their given iteration. In other words this slack only relaxes the pareto
-   * comparison at the destination.
-   * <p>
-   * Let {@code c} be the existing minimum pareto optimal cost to beat. Then a trip with cost
-   * {@code c'} is accepted if the following is true:
-   * <pre>
-   * c' < Math.round(c * relaxCostAtDestination)
-   * </pre>
-   * If the value is less than 1.0 a normal '<' comparison is performed.
-   * <p>
-   * The default is not set.
-   */
-  public Optional<Double> relaxCostAtDestination() {
-    return Optional.ofNullable(relaxCostAtDestination);
-  }
-
-  /**
    * The timetable flag allow a Journey to be included in the result if it departs from the origin
    * AFTER another Journey, even if the first departure have lower cost, number of transfers, and
    * shorter travel time. For two Journeys that depart at the same time only the best one will be
@@ -250,7 +224,6 @@ public class SearchParams {
       searchWindowInSeconds,
       preferLateArrival,
       numberOfAdditionalTransfers,
-      relaxCostAtDestination,
       accessPaths,
       egressPaths
     );
@@ -271,7 +244,6 @@ public class SearchParams {
       searchWindowInSeconds == that.searchWindowInSeconds &&
       preferLateArrival == that.preferLateArrival &&
       numberOfAdditionalTransfers == that.numberOfAdditionalTransfers &&
-      Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination) &&
       accessPaths.equals(that.accessPaths) &&
       egressPaths.equals(that.egressPaths)
     );
@@ -286,7 +258,6 @@ public class SearchParams {
       .addDurationSec("searchWindow", searchWindowInSeconds)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
-      .addNum("relaxCostAtDestination", relaxCostAtDestination)
       .addCollection("accessPaths", accessPaths, 5)
       .addCollection("egressPaths", egressPaths, 5)
       .toString();

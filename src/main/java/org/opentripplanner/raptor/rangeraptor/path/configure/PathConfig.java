@@ -51,7 +51,13 @@ public class PathConfig<T extends RaptorTripSchedule> {
 
   private DestinationArrivalPaths<T> createDestArrivalPaths(boolean includeCost) {
     return new DestinationArrivalPaths<>(
-      paretoComparator(ctx.searchParams(), includeCost, ctx.searchDirection()),
+      paretoComparator(
+        includeCost,
+        ctx.searchParams().timetable(),
+        ctx.searchParams().preferLateArrival(),
+        ctx.searchDirection(),
+        ctx.multiCriteria().relaxCostAtDestination().orElse(null)
+      ),
       ctx.calculator(),
       includeCost ? ctx.costCalculator() : null,
       ctx.slackProvider(),

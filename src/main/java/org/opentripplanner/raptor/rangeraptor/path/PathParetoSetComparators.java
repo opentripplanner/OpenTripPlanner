@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.path;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
@@ -29,32 +29,30 @@ public class PathParetoSetComparators {
    * TODO This method should have unit tests.
    */
   public static <T extends RaptorTripSchedule> ParetoComparator<RaptorPath<T>> paretoComparator(
-    SearchParams searchParams,
     boolean includeCost,
-    SearchDirection searchDirection
+    boolean includeTimetable,
+    boolean preferLateArrival,
+    SearchDirection searchDirection,
+    @Nullable Double relaxCostAtDestination
   ) {
-    boolean includeRelaxedCost = includeCost && searchParams.relaxCostAtDestination().isPresent();
-    boolean includeTimetable = searchParams.timetable();
-    boolean preferLatestDeparture =
-      searchParams.preferLateArrival() != searchDirection.isInReverse();
+    boolean includeRelaxedCost = includeCost && relaxCostAtDestination != null;
+    boolean preferLatestDeparture = preferLateArrival != searchDirection.isInReverse();
 
     if (includeRelaxedCost) {
-      double relaxedCost = searchParams.relaxCostAtDestination().get();
-
       if (includeTimetable) {
-        return comparatorWithTimetableAndRelaxedCost(relaxedCost);
+        return comparatorWithTimetableAndRelaxedCost(relaxCostAtDestination);
       }
       if (searchDirection.isInReverse()) {
-        if (searchParams.preferLateArrival()) {
-          return comparatorWithRelaxedCost(relaxedCost);
+        if (preferLateArrival) {
+          return comparatorWithRelaxedCost(relaxCostAtDestination);
         } else {
-          return comparatorWithRelaxedCostAndLatestDeparture(relaxedCost);
+          return comparatorWithRelaxedCostAndLatestDeparture(relaxCostAtDestination);
         }
       } else {
-        if (searchParams.preferLateArrival()) {
-          return comparatorWithRelaxedCostAndLatestDeparture(relaxedCost);
+        if (preferLateArrival) {
+          return comparatorWithRelaxedCostAndLatestDeparture(relaxCostAtDestination);
         } else {
-          return comparatorWithRelaxedCost(relaxedCost);
+          return comparatorWithRelaxedCost(relaxCostAtDestination);
         }
       }
     }
