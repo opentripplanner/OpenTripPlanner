@@ -21,7 +21,7 @@ public abstract class AbstractStopArrival implements ArrivalView<TestTripSchedul
     this.round = round;
     this.stop = stop;
     this.arrivalTime = arrivalTime;
-    this.cost = (previous == null ? 0 : previous.cost()) + extraCost;
+    this.cost = (previous == null ? 0 : previous.c1()) + extraCost;
     this.previous = previous;
   }
 
@@ -41,7 +41,7 @@ public abstract class AbstractStopArrival implements ArrivalView<TestTripSchedul
   }
 
   @Override
-  public int cost() {
+  public int c1() {
     return cost;
   }
 

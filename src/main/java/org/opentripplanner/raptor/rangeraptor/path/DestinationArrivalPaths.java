@@ -204,7 +204,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     DestinationArrival<T> destArrival,
     RaptorPath<T> path
   ) {
-    if (path.generalizedCost() != destArrival.cost()) {
+    if (path.generalizedCost() != destArrival.c1()) {
       // TODO - Bug: Cost mismatch stop-arrivals and paths #3623
       LOG_MISS_MATCH.warn(
         "Cost mismatch - Mapper: {}, stop-arrivals: {}, path: {}",
@@ -224,7 +224,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     var arrivalCosts = new ArrayList<String>();
     ArrivalView<?> it = destArrival;
     while (it != null) {
-      arrivalCosts.add(OtpNumberFormat.formatCostCenti(it.cost()));
+      arrivalCosts.add(OtpNumberFormat.formatCostCenti(it.c1()));
       it = it.previous();
     }
     // Remove decimals if zero

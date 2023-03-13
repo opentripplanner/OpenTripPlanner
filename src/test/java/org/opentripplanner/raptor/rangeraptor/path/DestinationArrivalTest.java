@@ -45,7 +45,7 @@ public class DestinationArrivalTest {
     ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
     TRANSIT_STOP,
     TRANSIT_ALIGHT_TIME,
-    ACCESS_ARRIVAL.cost() + TRANSIT_COST,
+    ACCESS_ARRIVAL.c1() + TRANSIT_COST,
     A_TRIP
   );
 
@@ -63,7 +63,7 @@ public class DestinationArrivalTest {
 
   @Test
   public void cost() {
-    assertEquals(EXPECTED_TOTAL_COST, subject.cost());
+    assertEquals(EXPECTED_TOTAL_COST, subject.c1());
   }
 
   @Test

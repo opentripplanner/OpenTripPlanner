@@ -176,7 +176,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     final RaptorBoardOrAlightEvent<T> boardEvent
   ) {
     return (
-      prevArrival.cost() +
+      prevArrival.c1() +
       costCalculator.boardingCost(
         prevArrival.isFirstRound(),
         prevArrival.arrivalTime(),

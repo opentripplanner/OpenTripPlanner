@@ -205,7 +205,7 @@ public class StopArrivalStateParetoSetTest {
     var prev = prev(round);
     return new TransferStopArrival<>(
       prev,
-      TestTransfer.transfer(stop, ANY, cost - prev.cost()),
+      TestTransfer.transfer(stop, ANY, cost - prev.c1()),
       arrivalTime
     );
   }

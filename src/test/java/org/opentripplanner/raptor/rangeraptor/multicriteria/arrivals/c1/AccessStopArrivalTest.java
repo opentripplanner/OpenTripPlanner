@@ -45,7 +45,7 @@ public class AccessStopArrivalTest {
 
   @Test
   public void cost() {
-    assertEquals(COST, subject.cost());
+    assertEquals(COST, subject.c1());
   }
 
   @Test
@@ -84,7 +84,7 @@ public class AccessStopArrivalTest {
     McStopArrival<RaptorTripSchedule> result = subject.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
 
     assertEquals(result.arrivalTime(), ALIGHT_TIME + dTime);
-    assertEquals(subject.cost(), result.cost());
+    assertEquals(subject.c1(), result.c1());
     assertEquals(subject.travelDuration(), result.travelDuration());
     assertEquals(subject.round(), result.round());
     assertEquals(subject.stop(), result.stop());

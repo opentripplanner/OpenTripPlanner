@@ -51,7 +51,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
       arrival.stop(),
       arrival.arrivalTime(),
       arrival.travelDuration(),
-      arrival.cost()
+      arrival.c1()
     );
 
     if (rejected) {

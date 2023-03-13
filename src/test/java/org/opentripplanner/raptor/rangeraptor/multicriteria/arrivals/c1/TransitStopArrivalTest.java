@@ -43,7 +43,7 @@ public class TransitStopArrivalTest {
     ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
     TRANSIT_TO_STOP,
     TRANSIT_ALIGHT_TIME,
-    ACCESS_ARRIVAL.cost() + TRANSIT_COST,
+    ACCESS_ARRIVAL.c1() + TRANSIT_COST,
     TRANSIT_TRIP
   );
 
@@ -75,7 +75,7 @@ public class TransitStopArrivalTest {
 
   @Test
   public void cost() {
-    assertEquals(ACCESS_COST + TRANSIT_COST, subject.cost());
+    assertEquals(ACCESS_COST + TRANSIT_COST, subject.c1());
   }
 
   @Test

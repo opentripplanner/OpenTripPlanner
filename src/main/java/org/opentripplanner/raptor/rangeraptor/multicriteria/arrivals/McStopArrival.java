@@ -27,7 +27,7 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
   private final int stop;
   private final int arrivalTime;
   private final int travelDuration;
-  private final int generalizedCost;
+  private final int c1;
 
   /**
    * Transit or transfer.
@@ -36,21 +36,21 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
    * @param paretoRoundIncrement the increment to add to the paretoRound
    * @param stop                 stop index for this arrival
    * @param arrivalTime          the arrival time for this stop index
-   * @param generalizedCost                 the total accumulated cost at this stop arrival
+   * @param c1                   the accumulated criteria-one(cost) at this stop arrival
    */
   protected McStopArrival(
     McStopArrival<T> previous,
     int paretoRoundIncrement,
     int stop,
     int arrivalTime,
-    int generalizedCost
+    int c1
   ) {
     this.previous = previous;
     this.paretoRound = previous.paretoRound + paretoRoundIncrement;
     this.stop = stop;
     this.arrivalTime = arrivalTime;
     this.travelDuration = previous.travelDuration() + (arrivalTime - previous.arrivalTime());
-    this.generalizedCost = generalizedCost;
+    this.c1 = c1;
   }
 
   /**
@@ -60,7 +60,7 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
     int stop,
     int departureTime,
     int travelDuration,
-    int initialCost,
+    int initialC1,
     int paretoRound
   ) {
     this.previous = null;
@@ -68,7 +68,7 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
     this.stop = stop;
     this.arrivalTime = departureTime + travelDuration;
     this.travelDuration = travelDuration;
-    this.generalizedCost = initialCost;
+    this.c1 = initialC1;
   }
 
   /**
@@ -84,10 +84,7 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
   > ParetoComparator<McStopArrival<T>> compareArrivalTimeRoundAndCost() {
     // This is important with respect to performance. Using the short-circuit logical OR(||) is
     // faster than bitwise inclusive OR(|) (even between boolean expressions)
-    return (l, r) ->
-      l.arrivalTime < r.arrivalTime ||
-      l.paretoRound < r.paretoRound ||
-      l.generalizedCost < r.generalizedCost;
+    return (l, r) -> l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound || l.c1 < r.c1;
   }
 
   /**
@@ -102,7 +99,7 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
     return (l, r) ->
       l.arrivalTime < r.arrivalTime ||
       l.paretoRound < r.paretoRound ||
-      l.generalizedCost < r.generalizedCost ||
+      l.c1 < r.c1 ||
       (l.arrivedOnBoard() && !r.arrivedOnBoard());
   }
 
@@ -121,8 +118,8 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
     return arrivalTime;
   }
 
-  public int cost() {
-    return generalizedCost;
+  public int c1() {
+    return c1;
   }
 
   @Override

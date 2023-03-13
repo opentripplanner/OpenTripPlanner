@@ -76,9 +76,10 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   int arrivalTime();
 
   /**
-   * The accumulated cost. 0 (zero) is returned if no cost exist.
+   * The accumulated multi-criteria one (usually used to store the generalized-cost, but is not
+   * limited to this). {@link RaptorCostCalculator#ZERO_COST} is returned if no cost exist.
    */
-  default int cost() {
+  default int c1() {
     return RaptorCostCalculator.ZERO_COST;
   }
 
@@ -151,7 +152,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
       "[" +
       TimeUtils.timeToStrCompact(arrivalTime()) +
       " " +
-      OtpNumberFormat.formatCostCenti(cost()) +
+      OtpNumberFormat.formatCostCenti(c1()) +
       "]";
     return switch (arrivedBy()) {
       case ACCESS -> String.format(
