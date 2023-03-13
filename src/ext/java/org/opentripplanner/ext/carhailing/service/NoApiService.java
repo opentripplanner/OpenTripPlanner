@@ -2,9 +2,10 @@ package org.opentripplanner.ext.carhailing.service;
 
 import java.time.Duration;
 import java.util.List;
-import org.opentripplanner.ext.carhailing.service.model.ArrivalTime;
-import org.opentripplanner.ext.carhailing.service.model.CarHailingCompany;
-import org.opentripplanner.ext.carhailing.service.model.RideEstimate;
+import org.opentripplanner.ext.carhailing.CarHailingService;
+import org.opentripplanner.ext.carhailing.model.ArrivalTime;
+import org.opentripplanner.ext.carhailing.model.CarHailingCompany;
+import org.opentripplanner.ext.carhailing.model.RideEstimate;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Money;
 

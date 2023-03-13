@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.carhailing.service.model;
+package org.opentripplanner.ext.carhailing.model;
 
 import java.time.Duration;
 

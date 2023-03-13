@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import org.opentripplanner.ext.carhailing.service.CarHailingService;
+import org.opentripplanner.ext.carhailing.CarHailingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,7 @@ public abstract class OAuthService {
    * Obtains and caches an OAuth API access token.
    * @return A token holder with the token value (including null token values if the call was unsuccessful).
    */
-  public String getToken() {
+  public String getToken() throws IOException {
     if (cachedToken.isExpired()) {
       // prepare request to get token
       try {
@@ -33,8 +33,8 @@ public abstract class OAuthService {
         this.cachedToken = new CachedOAuthToken(token);
 
         LOG.info("Received new access token from URL {}", request.uri());
-      } catch (IOException | InterruptedException e) {
-        throw new RuntimeException(e);
+      } catch (InterruptedException e) {
+        throw new IOException(e);
       }
     }
 

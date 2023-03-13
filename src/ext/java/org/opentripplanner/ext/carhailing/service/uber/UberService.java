@@ -17,13 +17,14 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.ext.carhailing.service.CarHailingService;
+import org.opentripplanner.ext.carhailing.CarHailingService;
+import org.opentripplanner.ext.carhailing.model.ArrivalTime;
+import org.opentripplanner.ext.carhailing.model.CarHailingCompany;
+import org.opentripplanner.ext.carhailing.model.RideEstimate;
 import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters;
 import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
-import org.opentripplanner.ext.carhailing.service.model.ArrivalTime;
-import org.opentripplanner.ext.carhailing.service.model.CarHailingCompany;
-import org.opentripplanner.ext.carhailing.service.model.RideEstimate;
-import org.opentripplanner.ext.carhailing.service.oauth.UrlEncodedOauthService;
+import org.opentripplanner.ext.carhailing.service.oauth.OAuthService;
+import org.opentripplanner.ext.carhailing.service.oauth.UrlEncodedOAuthService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.transit.model.basic.Money;
@@ -38,9 +39,7 @@ public class UberService extends CarHailingService {
   private static final ObjectMapper mapper;
 
   private final String baseUrl;
-  private final String authenticationUrl;
-  private final CarHailingServiceParameters.UberServiceParameters config;
-  private final UrlEncodedOauthService oauthService;
+  private final OAuthService oauthService;
 
   static {
     mapper = new ObjectMapper();
@@ -49,11 +48,10 @@ public class UberService extends CarHailingService {
 
   public UberService(CarHailingServiceParameters.UberServiceParameters config) {
     this.baseUrl = DEFAULT_BASE_URL;
-    this.authenticationUrl = DEFAULT_AUTHENTICATION_URL;
-    this.config = config;
 
-    var uri = UriBuilder.fromUri(authenticationUrl + "oauth/v2/token").build();
-    this.oauthService = new UrlEncodedOauthService(config.clientSecret(), config.clientId(), uri);
+    var authUrl = UriBuilder.fromUri(DEFAULT_AUTHENTICATION_URL + "oauth/v2/token").build();
+    this.oauthService =
+      new UrlEncodedOAuthService(config.clientSecret(), config.clientId(), authUrl);
   }
 
   @Override
@@ -70,14 +68,13 @@ public class UberService extends CarHailingService {
       .build();
 
     var headers = Map.ofEntries(
-      entry(AUTHORIZATION, "Bearer " + oauthService.getToken()),
+      entry(AUTHORIZATION, "Bearer %s".formatted(oauthService.getToken())),
       entry(ACCEPT_LANGUAGE, "en_US"),
       entry(CONTENT_TYPE, "application/json")
     );
 
     LOG.info("Made arrival time request to Uber API at following URL: {}", uri);
 
-    // Make request, parse response
     InputStream responseStream = HttpUtils.openInputStream(uri, headers);
     UberArrivalEstimateResponse response = mapper.readValue(
       responseStream,

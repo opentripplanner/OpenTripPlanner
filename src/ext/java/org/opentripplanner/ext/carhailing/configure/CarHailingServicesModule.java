@@ -2,8 +2,9 @@ package org.opentripplanner.ext.carhailing.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import jakarta.inject.Singleton;
 import java.util.List;
-import org.opentripplanner.ext.carhailing.service.CarHailingService;
+import org.opentripplanner.ext.carhailing.CarHailingService;
 import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters;
 import org.opentripplanner.ext.carhailing.service.uber.UberService;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -12,6 +13,7 @@ import org.opentripplanner.standalone.config.RouterConfig;
 public class CarHailingServicesModule {
 
   @Provides
+  @Singleton
   List<CarHailingService> services(RouterConfig config) {
     return config
       .servicesParameters()
