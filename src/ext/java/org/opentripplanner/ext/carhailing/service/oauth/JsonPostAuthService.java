@@ -8,6 +8,9 @@ import jakarta.ws.rs.core.UriBuilder;
 import java.net.http.HttpRequest;
 import java.util.Map;
 
+/**
+ * An implementation of the OAuth service which POSTs the login information as a JSON.
+ */
 public class JsonPostAuthService extends OAuthService {
 
   private static final ObjectMapper mapper = new ObjectMapper();

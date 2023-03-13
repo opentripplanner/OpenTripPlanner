@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.opentripplanner.ext.carhailing.CarHailingService;
 import org.opentripplanner.ext.carhailing.model.ArrivalTime;
-import org.opentripplanner.ext.carhailing.model.CarHailingCompany;
+import org.opentripplanner.ext.carhailing.model.CarHailingProvider;
 import org.opentripplanner.ext.carhailing.model.RideEstimate;
 import org.opentripplanner.model.plan.Place;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public class TransportationNetworkCompanyService implements Serializable {
 
   private static Logger LOG = LoggerFactory.getLogger(TransportationNetworkCompanyService.class);
 
-  private Map<CarHailingCompany, CarHailingService> sources = new HashMap<>();
+  private Map<CarHailingProvider, CarHailingService> sources = new HashMap<>();
 
   public void addSource(CarHailingService source) {
     sources.put(source.carHailingCompany(), source);
@@ -131,7 +131,7 @@ public class TransportationNetworkCompanyService implements Serializable {
   }
 
   private CarHailingService getTransportationNetworkCompanyDataSource(String company) {
-    CarHailingCompany co = CarHailingCompany.valueOf(company);
+    CarHailingProvider co = CarHailingProvider.valueOf(company);
     if (co == null) {
       throw new UnsupportedOperationException(
         "Transportation Network Company value " + company + " is not a valid type"

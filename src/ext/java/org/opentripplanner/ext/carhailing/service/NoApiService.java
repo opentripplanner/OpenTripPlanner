@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import org.opentripplanner.ext.carhailing.CarHailingService;
 import org.opentripplanner.ext.carhailing.model.ArrivalTime;
-import org.opentripplanner.ext.carhailing.model.CarHailingCompany;
+import org.opentripplanner.ext.carhailing.model.CarHailingProvider;
 import org.opentripplanner.ext.carhailing.model.RideEstimate;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Money;
@@ -34,8 +34,8 @@ public class NoApiService extends CarHailingService {
   }
 
   @Override
-  public CarHailingCompany carHailingCompany() {
-    return CarHailingCompany.NOAPI;
+  public CarHailingProvider carHailingCompany() {
+    return CarHailingProvider.NOAPI;
   }
 
   /**
@@ -47,7 +47,7 @@ public class NoApiService extends CarHailingService {
   protected List<ArrivalTime> queryArrivalTimes(WgsCoordinate position) {
     return List.of(
       new ArrivalTime(
-        CarHailingCompany.NOAPI,
+        CarHailingProvider.NOAPI,
         "no-api-tnc-service",
         "no-api-tnc-service",
         DEFAULT_ARRIVAL_DURATION,
@@ -64,7 +64,7 @@ public class NoApiService extends CarHailingService {
   protected List<RideEstimate> queryRideEstimates(RideEstimateRequest request) {
     return List.of(
       new RideEstimate(
-        CarHailingCompany.NOAPI,
+        CarHailingProvider.NOAPI,
         Duration.ZERO,
         Money.usDollars(0),
         Money.usDollars(0),

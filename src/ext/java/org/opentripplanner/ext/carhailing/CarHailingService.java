@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opentripplanner.ext.carhailing.model.ArrivalTime;
-import org.opentripplanner.ext.carhailing.model.CarHailingCompany;
+import org.opentripplanner.ext.carhailing.model.CarHailingProvider;
 import org.opentripplanner.ext.carhailing.model.RideEstimate;
 import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -26,10 +26,10 @@ public abstract class CarHailingService {
     .expireAfterWrite(CACHE_DURATION)
     .build();
 
-  protected String wheelChairAccessibleRideType;
+  protected String wheelchairAccessibleRideType;
 
   // Abstract method to return the TransportationNetworkCompany enum type
-  public abstract CarHailingCompany carHailingCompany();
+  public abstract CarHailingProvider carHailingCompany();
 
   // get the next arrivals for a specific location
   public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) throws ExecutionException {
@@ -52,6 +52,6 @@ public abstract class CarHailingService {
     throws IOException;
 
   protected boolean productIsWheelChairAccessible(String productId) {
-    return productId.equals(wheelChairAccessibleRideType);
+    return productId.equals(wheelchairAccessibleRideType);
   }
 }

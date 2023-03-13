@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.carhailing.CarHailingService;
 import org.opentripplanner.ext.carhailing.model.ArrivalTime;
-import org.opentripplanner.ext.carhailing.model.CarHailingCompany;
+import org.opentripplanner.ext.carhailing.model.CarHailingProvider;
 import org.opentripplanner.ext.carhailing.model.RideEstimate;
 import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters;
 import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
@@ -55,8 +55,8 @@ public class UberService extends CarHailingService {
   }
 
   @Override
-  public CarHailingCompany carHailingCompany() {
-    return CarHailingCompany.UBER;
+  public CarHailingProvider carHailingCompany() {
+    return CarHailingProvider.UBER;
   }
 
   @Override
@@ -87,7 +87,7 @@ public class UberService extends CarHailingService {
       .stream()
       .map(time ->
         new ArrivalTime(
-          CarHailingCompany.UBER,
+          CarHailingProvider.UBER,
           time.product_id(),
           time.localized_display_name(),
           Duration.ofSeconds(time.estimate()),
@@ -140,7 +140,7 @@ public class UberService extends CarHailingService {
 
       estimates.add(
         new RideEstimate(
-          CarHailingCompany.UBER,
+          CarHailingProvider.UBER,
           Duration.ofSeconds(price.duration),
           new Money(currency, price.high_estimate),
           new Money(currency, price.low_estimate),

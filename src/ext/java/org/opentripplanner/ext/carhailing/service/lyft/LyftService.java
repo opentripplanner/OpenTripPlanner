@@ -17,7 +17,7 @@ import java.util.Currency;
 import java.util.List;
 import org.opentripplanner.ext.carhailing.CarHailingService;
 import org.opentripplanner.ext.carhailing.model.ArrivalTime;
-import org.opentripplanner.ext.carhailing.model.CarHailingCompany;
+import org.opentripplanner.ext.carhailing.model.CarHailingProvider;
 import org.opentripplanner.ext.carhailing.model.RideEstimate;
 import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters.LyftServiceParameters;
 import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
@@ -51,12 +51,12 @@ public class LyftService extends CarHailingService {
     this.baseUrl = baseUrl;
     this.oauthService =
       new JsonPostAuthService(params.clientSecret(), params.clientSecret(), baseUrl);
-    this.wheelChairAccessibleRideType = params.wheelchairAccessibleRideType();
+    this.wheelchairAccessibleRideType = params.wheelchairAccessibleRideType();
   }
 
   @Override
-  public CarHailingCompany carHailingCompany() {
-    return CarHailingCompany.LYFT;
+  public CarHailingProvider carHailingCompany() {
+    return CarHailingProvider.LYFT;
   }
 
   @Override
@@ -88,7 +88,7 @@ public class LyftService extends CarHailingService {
       for (final LyftArrivalEstimate time : response.eta_estimates) {
         arrivalTimes.add(
           new ArrivalTime(
-            CarHailingCompany.LYFT,
+            CarHailingProvider.LYFT,
             time.ride_type,
             time.display_name,
             Duration.ofSeconds(time.eta_seconds),
@@ -155,7 +155,7 @@ public class LyftService extends CarHailingService {
         var currency = Currency.getInstance(estimate.currency);
         estimates.add(
           new RideEstimate(
-            CarHailingCompany.LYFT,
+            CarHailingProvider.LYFT,
             Duration.ofSeconds(estimate.estimated_duration_seconds),
             // Lyft's estimated cost is in the "minor" unit, so the following
             // may not work in countries that don't have 100 minor units per major unit

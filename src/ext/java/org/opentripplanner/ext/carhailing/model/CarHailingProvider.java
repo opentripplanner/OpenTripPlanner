@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.carhailing.model;
 
-public enum CarHailingCompany {
+public enum CarHailingProvider {
   LYFT,
   NOAPI,
   UBER,

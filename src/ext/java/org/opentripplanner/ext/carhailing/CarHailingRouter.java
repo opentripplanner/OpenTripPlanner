@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.carhailing.model.ArrivalTime;
+import org.opentripplanner.ext.carhailing.model.CarHailingLeg;
+import org.opentripplanner.ext.carhailing.model.CarHailingProvider;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.model.plan.StreetLegBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -38,13 +39,13 @@ public class CarHailingRouter {
         return DirectStreetRouter
           .route(serverContext, req)
           .stream()
-          .map(i -> CarHailingRouter.addCarHailInformation(i, arrival.company().name()));
+          .map(i -> CarHailingRouter.addCarHailInformation(i, arrival.provider()));
       })
       .toList();
   }
 
-  public static Itinerary addCarHailInformation(Itinerary input, String network) {
-    var legs = input.getLegs().stream().map(l -> CarHailingRouter.addNetwork(l, network)).toList();
+  public static Itinerary addCarHailInformation(Itinerary input, CarHailingProvider provider) {
+    var legs = input.getLegs().stream().map(l -> CarHailingRouter.addNetwork(l, provider)).toList();
     input.setLegs(legs);
     return input;
   }
@@ -72,9 +73,9 @@ public class CarHailingRouter {
       .toList();
   }
 
-  private static Leg addNetwork(Leg leg, String network) {
+  private static Leg addNetwork(Leg leg, CarHailingProvider network) {
     if (leg instanceof StreetLeg sl && sl.getMode() == TraverseMode.CAR) {
-      return StreetLegBuilder.of(sl).withCarHailingNetwork(network).build();
+      return new CarHailingLeg(sl, network, null);
     } else {
       return leg;
     }

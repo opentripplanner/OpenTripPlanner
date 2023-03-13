@@ -8,7 +8,7 @@ import org.opentripplanner.transit.model.basic.Money;
  * company
  */
 public record RideEstimate(
-  CarHailingCompany company,
+  CarHailingProvider company,
   Duration duration,
   Money maxCost,
   Money minCost,
