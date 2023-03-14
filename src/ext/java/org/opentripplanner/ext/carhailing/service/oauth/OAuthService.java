@@ -6,11 +6,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import org.opentripplanner.ext.carhailing.CarHailingService;
+import org.opentripplanner.framework.json.ObjectMappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class OAuthService {
 
+  private static ObjectMapper MAPPER = ObjectMappers.ignoringExtraFields();
   private static final Logger LOG = LoggerFactory.getLogger(CarHailingService.class);
   private CachedOAuthToken cachedToken = CachedOAuthToken.empty();
 
@@ -27,7 +29,6 @@ public abstract class OAuthService {
         var response = HttpClient
           .newHttpClient()
           .send(request, HttpResponse.BodyHandlers.ofString());
-        var mapper = new ObjectMapper();
 
         if (response.statusCode() != 200) {
           LOG.error(
@@ -38,7 +39,7 @@ public abstract class OAuthService {
           throw new IOException("Could not fetch OAuth token from %s".formatted(request.uri()));
         }
 
-        var token = mapper.readValue(response.body(), OAuthToken.class);
+        var token = MAPPER.readValue(response.body(), SerializedOAuthToken.class);
         this.cachedToken = new CachedOAuthToken(token);
 
         LOG.info("Received new access token from URL {}", request.uri());

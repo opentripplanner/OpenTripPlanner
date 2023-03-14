@@ -2,7 +2,13 @@ package org.opentripplanner.ext.carhailing.service.uber;
 
 import java.util.List;
 
-public class UberArrivalEstimateResponse {
+public record UberArrivalEstimateResponse(List<UberArrivalEstimate> times)  {
+  public record UberArrivalEstimate(
+    String display_name,
+    int estimate,
+    String localized_display_name,
+    String product_id
+  ) {}
 
-  public List<UberArrivalEstimate> times;
 }
+

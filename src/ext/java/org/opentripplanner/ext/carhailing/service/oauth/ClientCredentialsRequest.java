@@ -1,21 +1,19 @@
-package org.opentripplanner.ext.carhailing.service.uber;
+package org.opentripplanner.ext.carhailing.service.oauth;
 
 /**
  * Data structure for requesting an Uber access token.
  */
-public class UberAuthenticationRequestBody {
+public class ClientCredentialsRequest {
 
   public final String clientId;
   public final String clientSecret;
-  public final String grantType;
+  public final String grantType = "client_credentials";
   public final String scope;
 
-  public UberAuthenticationRequestBody(String clientId, String clientSecret) {
+  public ClientCredentialsRequest(String clientId, String clientSecret, String scope) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    // Defaults needed for price/time estimates.
-    this.grantType = "client_credentials";
-    this.scope = "ride_request.estimate";
+    this.scope = scope;
   }
 
   /**

@@ -5,7 +5,6 @@ import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static java.util.Map.entry;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -27,6 +26,7 @@ import org.opentripplanner.ext.carhailing.service.oauth.OAuthService;
 import org.opentripplanner.ext.carhailing.service.oauth.UrlEncodedOAuthService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,22 +36,22 @@ public class UberService extends CarHailingService {
   private static final Logger LOG = LoggerFactory.getLogger(UberService.class);
   private static final String DEFAULT_BASE_URL = "https://api.uber.com/v1.2/";
   private static final String DEFAULT_AUTHENTICATION_URL = "https://login.uber.com/";
-  private static final ObjectMapper mapper;
+  private static final ObjectMapper MAPPER = ObjectMappers.ignoringExtraFields();
 
   private final String baseUrl;
   private final OAuthService oauthService;
-
-  static {
-    mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-  }
 
   public UberService(CarHailingServiceParameters.UberServiceParameters config) {
     this.baseUrl = DEFAULT_BASE_URL;
 
     var authUrl = UriBuilder.fromUri(DEFAULT_AUTHENTICATION_URL + "oauth/v2/token").build();
     this.oauthService =
-      new UrlEncodedOAuthService(config.clientSecret(), config.clientId(), authUrl);
+      new UrlEncodedOAuthService(
+        config.clientSecret(),
+        config.clientId(),
+        "ride_request.estimate",
+        authUrl
+      );
   }
 
   @Override
@@ -76,14 +76,12 @@ public class UberService extends CarHailingService {
     LOG.info("Made arrival time request to Uber API at following URL: {}", uri);
 
     InputStream responseStream = HttpUtils.openInputStream(uri, headers);
-    UberArrivalEstimateResponse response = mapper.readValue(
-      responseStream,
-      UberArrivalEstimateResponse.class
-    );
+    var response = MAPPER.readValue(responseStream, UberArrivalEstimateResponse.class);
 
-    LOG.debug("Received {} Uber arrival time estimates", response.times.size());
+    LOG.debug("Received {} Uber arrival time estimates", response.times().size());
 
-    var arrivalTimes = response.times
+    var arrivalTimes = response
+      .times()
       .stream()
       .map(time ->
         new ArrivalTime(
@@ -122,7 +120,7 @@ public class UberService extends CarHailingService {
 
     // Make request, parse response
     InputStream responseStream = connection.getInputStream();
-    UberTripTimeEstimateResponse response = mapper.readValue(
+    UberTripTimeEstimateResponse response = MAPPER.readValue(
       responseStream,
       UberTripTimeEstimateResponse.class
     );

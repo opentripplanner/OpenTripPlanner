@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.carhailing.service.oauth;
 
+import java.time.Duration;
 import java.time.Instant;
 
 /**
@@ -18,11 +19,12 @@ public class CachedOAuthToken {
     return new CachedOAuthToken();
   }
 
-  public CachedOAuthToken(OAuthToken token) {
-    value = token.value();
+  public CachedOAuthToken(SerializedOAuthToken token) {
+    value = token.access_token();
     // Expire the token one minute before the actual expiry, e.g. to cover
     // long API calls or calls over slow networks near the expiration time.
-    tokenExpirationTime = Instant.now().plus(token.expiry().minusMinutes(1));
+    tokenExpirationTime =
+      Instant.now().plus(Duration.ofSeconds(token.expires_in()).minusMinutes(1));
   }
 
   /**
