@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
+import org.opentripplanner.ext.carhailing.CarHailingService;
+import org.opentripplanner.ext.carhailing.service.CarHailingFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
@@ -69,6 +71,8 @@ public class ItineraryListFilterChainBuilder {
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
+
+  private List<CarHailingService> carHailingServices;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -275,6 +279,11 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withCarHailingServices(List<CarHailingService> services) {
+    this.carHailingServices = services;
+    return this;
+  }
+
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
@@ -365,6 +374,10 @@ public class ItineraryListFilterChainBuilder {
           )
         );
       }
+    }
+
+    if (!carHailingServices.isEmpty()) {
+      filters.add(new CarHailingFilter(carHailingServices));
     }
 
     // Remove itineraries if max limit is set

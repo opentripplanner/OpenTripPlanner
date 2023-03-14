@@ -142,7 +142,8 @@ public class RoutingWorker {
       serverContext.graph().getFareService(),
       minBikeParkingDistance(request),
       serverContext.transitService().getTransitAlertService(),
-      serverContext.transitService()::getMultiModalStationForStation
+      serverContext.transitService()::getMultiModalStationForStation,
+      serverContext.carHailingServices()
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
