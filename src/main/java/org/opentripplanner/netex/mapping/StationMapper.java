@@ -141,9 +141,11 @@ class StationMapper {
       }
       /* FIXME there are "sub"stopPlace with Quays that have no coordinates, but a ParentStopPlaceReference to a parentStop with a coordinate.... */
       if (coordinates.isEmpty()) {
-        // throw new IllegalArgumentException(
-        //   "Station without any related coordinates. Station id: " + stopPlace.getId()
-        // );
+        issueStore.add(
+          "StationWithoutCoordinates2",
+          "Station without any related coordinates. Station id: %s",
+          stopPlace.getId()
+        );
         return new WgsCoordinate(0f, 0f);
       }
       return WgsCoordinate.mean(coordinates);
