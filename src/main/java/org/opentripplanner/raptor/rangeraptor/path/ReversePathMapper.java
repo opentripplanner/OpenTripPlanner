@@ -62,17 +62,20 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
     pathBuilder.access(destinationArrival.egressPath().egress());
 
     while (true) {
-      if (arrival.arrivedByAccess()) {
-        pathBuilder.egress(arrival.accessPath().access());
-        return pathBuilder.build();
-      } else if (arrival.arrivedByTransit()) {
-        var times = tripSearch.find(arrival);
-        var transit = arrival.transitPath();
-        pathBuilder.transit(transit.trip(), times);
-      } else if (arrival.arrivedByTransfer()) {
-        pathBuilder.transfer(arrival.transferPath().transfer(), arrival.previous().stop());
-      } else {
-        throw new IllegalStateException("Unexpected arrival: " + arrival);
+      switch (arrival.arrivedBy()) {
+        case ACCESS:
+          pathBuilder.egress(arrival.accessPath().access());
+          return pathBuilder.build();
+        case TRANSIT:
+          var times = tripSearch.find(arrival);
+          var transit = arrival.transitPath();
+          pathBuilder.transit(transit.trip(), times);
+          break;
+        case TRANSFER:
+          pathBuilder.transfer(arrival.transferPath().transfer(), arrival.previous().stop());
+          break;
+        case EGRESS:
+          throw new IllegalStateException("Unexpected arrival: " + arrival);
       }
       arrival = arrival.previous();
     }

@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 public class TransferStopArrivalTest {
@@ -63,9 +64,8 @@ public class TransferStopArrivalTest {
 
   @Test
   public void arrivedByTransfer() {
-    assertTrue(subject.arrivedByTransfer());
+    assertTrue(subject.arrivedBy(PathLegType.TRANSFER));
     assertFalse(subject.arrivedByTransit());
-    assertFalse(subject.arrivedByAccess());
   }
 
   @Test

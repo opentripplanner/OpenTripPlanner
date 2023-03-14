@@ -4,9 +4,9 @@ import gnu.trove.map.TIntObjectMap;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -64,13 +64,13 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   public boolean reachedByTransit(int stopIndex) {
     return (
       arrivals[stopIndex] != null &&
-      arrivals[stopIndex].stream().anyMatch(ArrivalView::arrivedByTransit)
+      arrivals[stopIndex].stream().anyMatch(McStopArrivals::arrivedByTransit)
     );
   }
 
   public int bestTransitArrivalTime(int stopIndex) {
     return arrivals[stopIndex].stream()
-      .filter(ArrivalView::arrivedByTransit)
+      .filter(McStopArrivals::arrivedByTransit)
       .mapToInt(AbstractStopArrival::arrivalTime)
       .min()
       .orElseThrow();
@@ -78,7 +78,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   public int smallestNumberOfTransfers(int stopIndex) {
     return arrivals[stopIndex].stream()
-      .filter(ArrivalView::arrivedByTransit)
+      .filter(McStopArrivals::arrivedByTransit)
       .mapToInt(AbstractStopArrival::numberOfTransfers)
       .min()
       .orElseThrow();
@@ -173,5 +173,9 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
           );
         return true;
       });
+  }
+
+  private static boolean arrivedByTransit(AbstractStopArrival<?> arrival) {
+    return arrival.arrivedBy(PathLegType.TRANSIT);
   }
 }

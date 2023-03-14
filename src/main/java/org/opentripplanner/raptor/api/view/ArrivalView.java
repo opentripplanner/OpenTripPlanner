@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.api.view;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.spi.CostCalculator;
@@ -103,8 +104,10 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   /**
    * First stop arrival, arrived by a given access path.
    */
-  default boolean arrivedByAccess() {
-    return false;
+  PathLegType arrivedBy();
+
+  default boolean arrivedBy(PathLegType expected) {
+    return arrivedBy().is(expected);
   }
 
   default AccessPathView accessPath() {
@@ -113,9 +116,8 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
 
   /* Transit */
 
-  /** @return true if transit arrival, otherwise false. */
   default boolean arrivedByTransit() {
-    return false;
+    return this.arrivedBy(PathLegType.TRANSIT);
   }
 
   default TransitPathView<T> transitPath() {
@@ -123,11 +125,6 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   }
 
   /* Transfer */
-
-  /** @return true if transfer arrival, otherwise false. */
-  default boolean arrivedByTransfer() {
-    return false;
-  }
 
   default TransferPathView transferPath() {
     throw new UnsupportedOperationException();
@@ -154,41 +151,34 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
       " " +
       OtpNumberFormat.formatCostCenti(cost()) +
       "]";
-    if (arrivedByAccess()) {
-      return String.format(
+    return switch (arrivedBy()) {
+      case ACCESS -> String.format(
         "Access { stop: %d, arrival: %s, path: %s }",
         stop(),
         arrival,
         accessPath().access()
       );
-    }
-    if (arrivedByTransit()) {
-      return String.format(
+      case TRANSIT -> String.format(
         "Transit { round: %d, stop: %d, arrival: %s, pattern: %s }",
         round(),
         stop(),
         arrival,
         transitPath().trip().pattern().debugInfo()
       );
-    }
-    if (arrivedByTransfer()) {
-      return String.format(
+      case TRANSFER -> String.format(
         "Walk { round: %d, stop: %d, arrival: %s, path: %s }",
         round(),
         stop(),
         arrival,
         transferPath().transfer()
       );
-    }
-    if (arrivedAtDestination()) {
-      return String.format(
+      case EGRESS -> String.format(
         "Egress { round: %d, from-stop: %d, arrival: %s, path: %s }",
         round(),
-        previous().stop(),
+        egressPath().egress().stop(),
         arrival,
         egressPath().egress()
       );
-    }
-    throw new IllegalStateException("Unknown type of stop-arrival: " + getClass());
+    };
   }
 }

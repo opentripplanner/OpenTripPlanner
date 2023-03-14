@@ -54,17 +54,17 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     pathBuilder.egress(destinationArrival.egressPath().egress());
     ArrivalView<T> arrival = destinationArrival.previous();
 
-    while (true) {
-      if (arrival.arrivedByTransit()) {
-        var times = tripSearch.find(arrival);
-        pathBuilder.transit(arrival.transitPath().trip(), times);
-      } else if (arrival.arrivedByTransfer()) {
-        pathBuilder.transfer(arrival.transferPath().transfer(), arrival.stop());
-      } else if (arrival.arrivedByAccess()) {
-        pathBuilder.access(arrival.accessPath().access());
-        break;
-      } else {
-        throw new RuntimeException("Unknown arrival type: " + arrival.getClass().getSimpleName());
+    while (arrival != null) {
+      switch (arrival.arrivedBy()) {
+        case TRANSIT -> {
+          var times = tripSearch.find(arrival);
+          pathBuilder.transit(arrival.transitPath().trip(), times);
+        }
+        case TRANSFER -> pathBuilder.transfer(arrival.transferPath().transfer(), arrival.stop());
+        case ACCESS -> pathBuilder.access(arrival.accessPath().access());
+        case EGRESS -> throw new RuntimeException(
+          "Unknown arrival type: " + arrival.getClass().getSimpleName()
+        );
       }
       arrival = arrival.previous();
     }

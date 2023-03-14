@@ -2,15 +2,16 @@ package org.opentripplanner.raptor._data.stoparrival;
 
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.TransferPathView;
 
-public class Walk extends AbstractStopArrival {
+public class Transfer extends AbstractStopArrival {
 
   private final RaptorTransfer transfer;
 
-  public Walk(
+  public Transfer(
     int round,
     int stop,
     int departureTime,
@@ -24,7 +25,7 @@ public class Walk extends AbstractStopArrival {
     this.transfer = TestTransfer.transfer(stop, durationInSeconds, extraCost);
   }
 
-  public Walk(
+  public Transfer(
     int round,
     int arrivalTime,
     RaptorTransfer transfer,
@@ -35,8 +36,8 @@ public class Walk extends AbstractStopArrival {
   }
 
   @Override
-  public boolean arrivedByTransfer() {
-    return true;
+  public PathLegType arrivedBy() {
+    return PathLegType.TRANSFER;
   }
 
   @Override

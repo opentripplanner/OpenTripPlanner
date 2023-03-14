@@ -13,7 +13,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class CalculateTransferToDestination<T extends RaptorTripSchedule>
+class CalculateTransferToDestination<T extends RaptorTripSchedule>
   implements ParetoSetEventListener<ArrivalView<T>> {
 
   private final List<RaptorAccessEgress> egressPaths;
@@ -36,16 +36,17 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
    */
   @Override
   public void notifyElementAccepted(ArrivalView<T> newElement) {
-    if (newElement.arrivedByTransit()) {
-      addOnBoardStopArrivalToDestination(newElement);
-    } else if (newElement.arrivedByTransfer()) {
-      addOnStreetArrivalToDestination(newElement);
-    } else if (newElement.arrivedByAccess()) {
-      if (newElement.arrivedOnBoard()) {
-        addOnBoardStopArrivalToDestination(newElement);
-      } else {
-        addOnStreetArrivalToDestination(newElement);
+    switch (newElement.arrivedBy()) {
+      case TRANSIT -> addOnBoardStopArrivalToDestination(newElement);
+      case TRANSFER -> addOnStreetArrivalToDestination(newElement);
+      case ACCESS -> {
+        if (newElement.arrivedOnBoard()) {
+          addOnBoardStopArrivalToDestination(newElement);
+        } else {
+          addOnStreetArrivalToDestination(newElement);
+        }
       }
+      case EGRESS -> throw new IllegalArgumentException();
     }
   }
 
