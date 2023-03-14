@@ -48,7 +48,6 @@ jobs:
         with:
           java-version: 17
           distribution: temurin
-          cache: maven
         timeout-minutes: 5
 
       - name: Set up Maven
@@ -57,6 +56,8 @@ jobs:
           maven-version: 3.8.2
 
       - name: Build jar
+        env:
+          MAVEN_OPTS: "-Dmaven.repo.local=/home/lenni/.m2/repository/"
         run: mvn -DskipTests --batch-mode package -P prettierSkip
 
       - name: Build graph
@@ -68,7 +69,7 @@ jobs:
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
           SPEEDTEST_LOCATION: ${{ matrix.location }}
-          MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr"
+          MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr -Dmaven.repo.local=/home/lenni/.m2/repository/"
         run: |
           mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
 
