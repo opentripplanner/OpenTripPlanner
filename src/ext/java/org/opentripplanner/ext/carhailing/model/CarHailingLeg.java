@@ -5,12 +5,20 @@ import org.opentripplanner.model.plan.StreetLegBuilder;
 
 public class CarHailingLeg extends StreetLeg {
 
-  private final CarHailingRide ride;
-  private final CarHailingProvider company;
+  private final RideEstimate ride;
+  private final CarHailingProvider provider;
 
-  public CarHailingLeg(StreetLeg streetLeg, CarHailingProvider company, CarHailingRide ride) {
+  public CarHailingLeg(StreetLeg streetLeg, CarHailingProvider provider, RideEstimate ride) {
     super(StreetLegBuilder.of(streetLeg));
-    this.company = company;
+    this.provider = provider;
     this.ride = ride;
+  }
+
+  public RideEstimate ride() {
+    return ride;
+  }
+
+  public CarHailingProvider provider() {
+    return provider;
   }
 }

@@ -19,8 +19,8 @@ import org.opentripplanner.ext.carhailing.CarHailingService;
 import org.opentripplanner.ext.carhailing.model.ArrivalTime;
 import org.opentripplanner.ext.carhailing.model.CarHailingProvider;
 import org.opentripplanner.ext.carhailing.model.RideEstimate;
+import org.opentripplanner.ext.carhailing.model.RideEstimateRequest;
 import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters.LyftServiceParameters;
-import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
 import org.opentripplanner.ext.carhailing.service.oauth.JsonPostAuthService;
 import org.opentripplanner.ext.carhailing.service.oauth.OAuthService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -92,7 +92,7 @@ public class LyftService extends CarHailingService {
             time.ride_type,
             time.display_name,
             Duration.ofSeconds(time.eta_seconds),
-            productIsWheelChairAccessible(time.ride_type)
+            productIsWheelchairAccessible(time.ride_type)
           )
         );
       }
@@ -163,7 +163,7 @@ public class LyftService extends CarHailingService {
             new Money(currency, estimate.estimated_cost_cents_max),
             new Money(currency, estimate.estimated_cost_cents_min),
             estimate.ride_type,
-            productIsWheelChairAccessible(estimate.ride_type)
+            productIsWheelchairAccessible(estimate.ride_type)
           )
         );
       }

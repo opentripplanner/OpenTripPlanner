@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.carhailing.service;
+package org.opentripplanner.ext.carhailing.model;
 
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 

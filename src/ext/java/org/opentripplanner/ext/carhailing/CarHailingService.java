@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutionException;
 import org.opentripplanner.ext.carhailing.model.ArrivalTime;
 import org.opentripplanner.ext.carhailing.model.CarHailingProvider;
 import org.opentripplanner.ext.carhailing.model.RideEstimate;
-import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
+import org.opentripplanner.ext.carhailing.model.RideEstimateRequest;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 
 public abstract class CarHailingService {
@@ -44,14 +44,14 @@ public abstract class CarHailingService {
   public List<RideEstimate> getRideEstimates(WgsCoordinate start, WgsCoordinate end)
     throws ExecutionException {
     // Truncate lat/lon values in order to reduce the number of API requests made.
-    RideEstimateRequest request = new RideEstimateRequest(start, end);
+    var request = new RideEstimateRequest(start.rounded(), end.rounded());
     return rideEstimateCache.get(request, () -> queryRideEstimates(request));
   }
 
   protected abstract List<RideEstimate> queryRideEstimates(RideEstimateRequest request)
     throws IOException;
 
-  protected boolean productIsWheelChairAccessible(String productId) {
+  protected boolean productIsWheelchairAccessible(String productId) {
     return productId.equals(wheelchairAccessibleRideType);
   }
 }

@@ -65,6 +65,9 @@ public class GenericLocation {
     return new Coordinate(this.lng, this.lat);
   }
 
+  /**
+   * Extract the coordinate from this place if it contains them.
+   */
   public Optional<WgsCoordinate> toWgsCoordinate() {
     return Optional.ofNullable(getCoordinate()).map(WgsCoordinate::new);
   }

@@ -73,9 +73,9 @@ public class CarHailingRouter {
       .toList();
   }
 
-  private static Leg addNetwork(Leg leg, CarHailingProvider network) {
+  private static Leg addNetwork(Leg leg, CarHailingProvider provider) {
     if (leg instanceof StreetLeg sl && sl.getMode() == TraverseMode.CAR) {
-      return new CarHailingLeg(sl, network, null);
+      return new CarHailingLeg(sl, provider, null);
     } else {
       return leg;
     }

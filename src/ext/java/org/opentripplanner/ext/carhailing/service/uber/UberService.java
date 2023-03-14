@@ -9,19 +9,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import org.opentripplanner.ext.carhailing.CarHailingService;
 import org.opentripplanner.ext.carhailing.model.ArrivalTime;
 import org.opentripplanner.ext.carhailing.model.CarHailingProvider;
 import org.opentripplanner.ext.carhailing.model.RideEstimate;
+import org.opentripplanner.ext.carhailing.model.RideEstimateRequest;
 import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters;
-import org.opentripplanner.ext.carhailing.service.RideEstimateRequest;
 import org.opentripplanner.ext.carhailing.service.oauth.OAuthService;
 import org.opentripplanner.ext.carhailing.service.oauth.UrlEncodedOAuthService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -67,15 +65,9 @@ public class UberService extends CarHailingService {
       .queryParam("start_longitude", coord.longitude())
       .build();
 
-    var headers = Map.ofEntries(
-      entry(AUTHORIZATION, "Bearer %s".formatted(oauthService.getToken())),
-      entry(ACCEPT_LANGUAGE, "en_US"),
-      entry(CONTENT_TYPE, "application/json")
-    );
-
     LOG.info("Made arrival time request to Uber API at following URL: {}", uri);
 
-    InputStream responseStream = HttpUtils.openInputStream(uri, headers);
+    InputStream responseStream = HttpUtils.openInputStream(uri, headers());
     var response = MAPPER.readValue(responseStream, UberArrivalEstimateResponse.class);
 
     LOG.debug("Received {} Uber arrival time estimates", response.times().size());
@@ -89,7 +81,7 @@ public class UberService extends CarHailingService {
           time.product_id(),
           time.localized_display_name(),
           Duration.ofSeconds(time.estimate()),
-          productIsWheelChairAccessible(time.product_id())
+          productIsWheelchairAccessible(time.product_id())
         )
       )
       .toList();
@@ -103,50 +95,40 @@ public class UberService extends CarHailingService {
 
   @Override
   public List<RideEstimate> queryRideEstimates(RideEstimateRequest request) throws IOException {
-    // prepare request
-    UriBuilder uriBuilder = UriBuilder.fromUri(baseUrl + "estimates/price");
-    uriBuilder.queryParam("start_latitude", request.startPosition().latitude());
-    uriBuilder.queryParam("start_longitude", request.startPosition().longitude());
-    uriBuilder.queryParam("end_latitude", request.endPosition().latitude());
-    uriBuilder.queryParam("end_longitude", request.endPosition().longitude());
-    String requestUrl = uriBuilder.toString();
-    URL uberUrl = new URL(requestUrl);
-    HttpURLConnection connection = (HttpURLConnection) uberUrl.openConnection();
-    connection.setRequestProperty("Authorization", "Bearer " + oauthService.getToken());
-    connection.setRequestProperty("Accept-Language", "en_US");
-    connection.setRequestProperty("Content-Type", "application/json");
+    var uri = UriBuilder
+      .fromUri(baseUrl + "estimates/price")
+      .queryParam("start_latitude", request.startPosition().latitude())
+      .queryParam("start_longitude", request.startPosition().longitude())
+      .queryParam("end_latitude", request.endPosition().latitude())
+      .queryParam("end_longitude", request.endPosition().longitude())
+      .build();
 
-    LOG.info("Made price estimate request to Uber API at following URL: {}", requestUrl);
+    LOG.info("Made price estimate request to Uber API at following URL: {}", uri);
 
-    // Make request, parse response
-    InputStream responseStream = connection.getInputStream();
-    UberTripTimeEstimateResponse response = MAPPER.readValue(
-      responseStream,
-      UberTripTimeEstimateResponse.class
-    );
+    InputStream responseStream = HttpUtils.openInputStream(uri, headers());
+    var response = MAPPER.readValue(responseStream, UberTripTimeEstimateResponse.class);
 
-    if (response.prices == null) {
+    if (response.prices() == null) {
       throw new IOException("Unexpected response format");
     }
 
-    LOG.debug("Received {} Uber price estimates", response.prices.size());
+    LOG.debug("Received {} Uber price estimates", response.prices().size());
 
-    List<RideEstimate> estimates = new ArrayList<>();
-
-    for (final UberTripTimeEstimate price : response.prices) {
-      var currency = Currency.getInstance(price.currency_code);
-
-      estimates.add(
-        new RideEstimate(
+    var estimates = response
+      .prices()
+      .stream()
+      .map(price -> {
+        var currency = Currency.getInstance(price.currency_code);
+        return new RideEstimate(
           CarHailingProvider.UBER,
           Duration.ofSeconds(price.duration),
           new Money(currency, price.high_estimate),
           new Money(currency, price.low_estimate),
           price.product_id,
-          productIsWheelChairAccessible(price.product_id)
-        )
-      );
-    }
+          productIsWheelchairAccessible(price.product_id)
+        );
+      })
+      .toList();
 
     if (estimates.isEmpty()) {
       LOG.warn(
@@ -157,5 +139,14 @@ public class UberService extends CarHailingService {
     }
 
     return estimates;
+  }
+
+  @Nonnull
+  private Map<String, String> headers() throws IOException {
+    return Map.ofEntries(
+      entry(AUTHORIZATION, "Bearer %s".formatted(oauthService.getToken())),
+      entry(ACCEPT_LANGUAGE, "en_US"),
+      entry(CONTENT_TYPE, "application/json")
+    );
   }
 }
