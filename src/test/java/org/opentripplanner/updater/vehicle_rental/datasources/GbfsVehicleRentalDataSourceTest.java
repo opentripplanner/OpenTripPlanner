@@ -1,13 +1,18 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
@@ -65,6 +70,40 @@ class GbfsVehicleRentalDataSourceTest {
           vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed()
         )
     );
+  }
+
+  @Test
+  void getEmptyListOfVehicleTypes() {
+    GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper("systemID");
+    Map<String, RentalVehicleType> vehicleTypes = GbfsVehicleRentalDataSource.mapVehicleTypes(
+      vehicleTypeMapper,
+      Collections.emptyList()
+    );
+    assertTrue(vehicleTypes.isEmpty());
+  }
+
+  @Test
+  void duplicatedVehicleTypesDoNotThrowException() {
+    GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper("systemID");
+
+    List<GBFSVehicleType> vehicleTypes = getDuplicatedGbfsVehicleTypes();
+
+    assertDoesNotThrow(() -> {
+      GbfsVehicleRentalDataSource.mapVehicleTypes(vehicleTypeMapper, vehicleTypes);
+    });
+  }
+
+  @Test
+  void getOneVehicleTypeOfDuplicatedVehicleTypes() {
+    GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper("systemID");
+
+    List<GBFSVehicleType> duplicatedVehicleTypes = getDuplicatedGbfsVehicleTypes();
+
+    Map<String, RentalVehicleType> vehicleTypes = GbfsVehicleRentalDataSource.mapVehicleTypes(
+      vehicleTypeMapper,
+      duplicatedVehicleTypes
+    );
+    assertEquals(1, vehicleTypes.size());
   }
 
   @Test
@@ -158,5 +197,19 @@ class GbfsVehicleRentalDataSourceTest {
           vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed()
         )
     );
+  }
+
+  private static List<GBFSVehicleType> getDuplicatedGbfsVehicleTypes() {
+    GBFSVehicleType gbfsVehicleType1 = new GBFSVehicleType();
+    gbfsVehicleType1.setVehicleTypeId("sameId");
+    gbfsVehicleType1.setFormFactor(GBFSVehicleType.FormFactor.BICYCLE);
+    gbfsVehicleType1.setPropulsionType(GBFSVehicleType.PropulsionType.HUMAN);
+
+    GBFSVehicleType gbfsVehicleType2 = new GBFSVehicleType();
+    gbfsVehicleType2.setVehicleTypeId("sameId");
+    gbfsVehicleType2.setFormFactor(GBFSVehicleType.FormFactor.BICYCLE);
+    gbfsVehicleType2.setPropulsionType(GBFSVehicleType.PropulsionType.HUMAN);
+
+    return List.of(gbfsVehicleType1, gbfsVehicleType2);
   }
 }
