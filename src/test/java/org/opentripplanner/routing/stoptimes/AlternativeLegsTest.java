@@ -97,4 +97,35 @@ class AlternativeLegsTest extends GtfsTest {
 
     assertEquals(expectd, legs);
   }
+
+  @Test
+  void testCircularRoutes() {
+    var transitService = new DefaultTransitService(transitModel);
+
+    var originalLeg = new ScheduledTransitLegReference(
+      new FeedScopedId(this.feedId.getId(), "19.1"),
+      LocalDate.parse("2022-04-02"),
+      0,
+      1
+    )
+      .getLeg(transitService);
+
+    final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
+      originalLeg,
+      2,
+      transitService,
+      false,
+      AlternativeLegsFilter.NO_FILTER
+    );
+    var legs = Itinerary.toStr(
+      alternativeLegs.stream().map(Leg.class::cast).map(List::of).map(Itinerary::new).toList()
+    );
+
+    var expected = String.join(
+      ", ",
+      List.of("X ~ BUS 19 10:30 10:40 ~ Y [$-1]", "X ~ BUS 19 10:00 10:10 ~ Y [$-1]")
+    );
+
+    assertEquals(expected, legs);
+  }
 }
