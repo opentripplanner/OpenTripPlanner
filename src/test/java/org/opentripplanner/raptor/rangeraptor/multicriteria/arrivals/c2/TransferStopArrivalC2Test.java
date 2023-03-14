@@ -1,18 +1,17 @@
-package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
+package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSFER;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
-class TransferStopArrivalTest {
+class TransferStopArrivalC2Test {
 
   private static final int BOARD_SLACK = 80;
 
@@ -44,12 +43,12 @@ class TransferStopArrivalTest {
 
   private static final int EXPECTED_COST = ACCESS_COST + TRANSIT_COST + TRANSFER_COST;
 
-  private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
+  private static final AccessStopArrivalC2<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrivalC2<>(
     ACCESS_DEPARTURE_TIME,
     ACCESS_WALK
   );
 
-  private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
+  private static final TransitStopArrivalC2<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrivalC2<>(
     ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
     TRANSIT_TO_STOP,
     TRANSIT_ALIGHT_TIME,
@@ -57,7 +56,7 @@ class TransferStopArrivalTest {
     TRANSIT_TRIP
   );
 
-  private final TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
+  private final TransferStopArrivalC2<RaptorTripSchedule> subject = new TransferStopArrivalC2<>(
     TRANSIT_ARRIVAL,
     TRANSFER_WALK,
     TRANSFER_ALIGHT_TIME
@@ -65,8 +64,9 @@ class TransferStopArrivalTest {
 
   @Test
   public void arrivedByTransfer() {
-    assertTrue(subject.arrivedBy(TRANSFER));
+    assertTrue(subject.arrivedByTransfer());
     assertFalse(subject.arrivedByTransit());
+    assertFalse(subject.arrivedByAccess());
   }
 
   @Test
@@ -86,7 +86,8 @@ class TransferStopArrivalTest {
 
   @Test
   public void c2() {
-    assertThrows(UnsupportedOperationException.class, subject::c2);
+    // We will add a more meaning-full implementation later
+    assertEquals(RaptorCostCalculator.ZERO_COST, subject.c2());
   }
 
   @Test

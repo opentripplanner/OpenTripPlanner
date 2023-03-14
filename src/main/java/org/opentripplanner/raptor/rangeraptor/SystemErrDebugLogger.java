@@ -211,7 +211,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         p.prevArrival().round() + 1,
         p.boardStopIndex(),
         timeToStrLong(p.boardTime()),
-        numFormat.format(p.relativeCost()),
+        numFormat.format(p.relativeC1()),
         p.trip().pattern().debugInfo(),
         p.toString()
       )

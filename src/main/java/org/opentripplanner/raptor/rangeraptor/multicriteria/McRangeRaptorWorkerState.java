@@ -10,9 +10,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.AccessStopArrival;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.TransferStopArrival;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.TransitStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -36,8 +34,9 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   private final McStopArrivals<T> arrivals;
   private final DestinationArrivalPaths<T> paths;
   private final HeuristicsProvider<T> heuristics;
+  private final McStopArrivalFactory<T> stopArrivalFactory;
   private final List<McStopArrival<T>> arrivalsCache = new ArrayList<>();
-  private final RaptorCostCalculator<T> costCalculator;
+  private final RaptorCostCalculator<T> calculatorGeneralizedCost;
   private final RaptorTransitCalculator<T> transitCalculator;
 
   /**
@@ -48,14 +47,16 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     McStopArrivals<T> arrivals,
     DestinationArrivalPaths<T> paths,
     HeuristicsProvider<T> heuristics,
-    RaptorCostCalculator<T> costCalculator,
+    McStopArrivalFactory<T> stopArrivalFactory,
+    RaptorCostCalculator<T> calculatorGeneralizedCost,
     RaptorTransitCalculator<T> transitCalculator,
     WorkerLifeCycle lifeCycle
   ) {
     this.arrivals = arrivals;
     this.paths = paths;
     this.heuristics = heuristics;
-    this.costCalculator = costCalculator;
+    this.stopArrivalFactory = stopArrivalFactory;
+    this.calculatorGeneralizedCost = calculatorGeneralizedCost;
     this.transitCalculator = transitCalculator;
 
     // Attach to the RR life cycle
@@ -93,7 +94,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   public void setAccessToStop(RaptorAccessEgress accessPath, int departureTime) {
-    addStopArrival(new AccessStopArrival<>(departureTime, accessPath));
+    addStopArrival(stopArrivalFactory.createAccessStopArrival(departureTime, accessPath));
   }
 
   /**
@@ -133,8 +134,8 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
       return;
     }
 
-    final int costTransit = costCalculator.transitArrivalCost(
-      ride.boardCost(),
+    final int c1 = calculatorGeneralizedCost.transitArrivalCost(
+      ride.boardC1(),
       alightSlack,
       alightTime - ride.boardTime(),
       ride.trip(),
@@ -142,11 +143,11 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     );
 
     arrivalsCache.add(
-      new TransitStopArrival<>(
+      stopArrivalFactory.createTransitStopArrival(
         ride.prevArrival(),
         alightStop,
         stopArrivalTime,
-        costTransit,
+        c1,
         ride.trip()
       )
     );
@@ -182,7 +183,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
       int arrivalTime = it.arrivalTime() + transferTimeInSeconds;
 
       if (!exceedsTimeLimit(arrivalTime)) {
-        arrivalsCache.add(new TransferStopArrival<>(it, transfer, arrivalTime));
+        arrivalsCache.add(stopArrivalFactory.createTransferStopArrival(it, transfer, arrivalTime));
       }
     }
   }

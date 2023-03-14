@@ -77,12 +77,20 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   int arrivalTime();
 
   /**
-   * The accumulated multi-criteria one (usually used to store the generalized-cost, but is not
+   * The accumulated criteria ONE(usually used to store the generalized-cost, but is not
    * limited to this). {@link RaptorCostCalculator#ZERO_COST} is returned if no cost exist.
    */
-  default int c1() {
-    return RaptorCostCalculator.ZERO_COST;
-  }
+  int c1();
+
+  /**
+   * The accumulated criteria TWO. Can be used for any int criteria used during routing. A
+   * state with c1 and c2 is created dynamically if c2 is in use, if not this method will
+   * throw an exception.
+   * <p>
+   * {@link RaptorCostCalculator#ZERO_COST} is returned if no criteria exist, but the model
+   * support it.
+   */
+  int c2();
 
   /**
    * The previous stop arrival state or {@code null} if first arrival (access stop arrival).

@@ -34,14 +34,14 @@ public final class MultiCriteriaRoutingStrategy<
   private final TimeBasedBoardingSupport<T> boardingSupport;
   private final PatternRideFactory<T, R> patternRideFactory;
   private final ParetoSet<R> patternRides;
-  private final RaptorCostCalculator<T> costCalculator;
+  private final RaptorCostCalculator<T> generalizedCostCalculator;
   private final SlackProvider slackProvider;
 
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
     TimeBasedBoardingSupport<T> boardingSupport,
     PatternRideFactory<T, R> patternRideFactory,
-    RaptorCostCalculator<T> costCalculator,
+    RaptorCostCalculator<T> generalizedCostCalculator,
     SlackProvider slackProvider,
     ParetoComparator<R> patternRideComparator,
     ParetoSetEventListener<PatternRideView<?, ?>> paretoSetPatternRideListener
@@ -49,7 +49,7 @@ public final class MultiCriteriaRoutingStrategy<
     this.state = state;
     this.boardingSupport = boardingSupport;
     this.patternRideFactory = patternRideFactory;
-    this.costCalculator = costCalculator;
+    this.generalizedCostCalculator = generalizedCostCalculator;
     this.slackProvider = slackProvider;
     this.patternRides = new ParetoSet<>(patternRideComparator, paretoSetPatternRideListener);
   }
@@ -98,6 +98,7 @@ public final class MultiCriteriaRoutingStrategy<
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void board(
     McStopArrival<T> prevArrival,
     final int stopIndex,
@@ -111,21 +112,20 @@ public final class MultiCriteriaRoutingStrategy<
       prevArrival = prevArrival.timeShiftNewArrivalTime(latestArrivalTime);
     }
 
-    final int boardCost = calculateCostAtBoardTime(prevArrival, boarding);
+    final int boardC1 = calculateCostAtBoardTime(prevArrival, boarding);
 
-    final int relativeBoardCost = boardCost + calculateOnTripRelativeCost(boardTime, trip);
+    final int relativeBoardC1 = boardC1 + calculateOnTripRelativeCost(boardTime, trip);
 
-    patternRides.add(
-      patternRideFactory.createPatternRide(
-        prevArrival,
-        stopIndex,
-        boarding.stopPositionInPattern(),
-        boardTime,
-        boardCost,
-        relativeBoardCost,
-        trip
-      )
+    R ride = patternRideFactory.createPatternRide(
+      prevArrival,
+      stopIndex,
+      boarding.stopPositionInPattern(),
+      boardTime,
+      boardC1,
+      relativeBoardC1,
+      trip
     );
+    patternRides.add(ride);
   }
 
   private void boardWithRegularTransfer(
@@ -178,7 +178,7 @@ public final class MultiCriteriaRoutingStrategy<
   ) {
     return (
       prevArrival.c1() +
-      costCalculator.boardingCost(
+      generalizedCostCalculator.boardingCost(
         prevArrival.isFirstRound(),
         prevArrival.arrivalTime(),
         boardEvent.boardStopIndex(),
@@ -197,6 +197,6 @@ public final class MultiCriteriaRoutingStrategy<
    * origin in the same iteration, having used the same number-of-rounds to board the same trip.
    */
   private int calculateOnTripRelativeCost(int boardTime, T tripSchedule) {
-    return costCalculator.onTripRelativeRidingCost(boardTime, tripSchedule);
+    return generalizedCostCalculator.onTripRelativeRidingCost(boardTime, tripSchedule);
   }
 }

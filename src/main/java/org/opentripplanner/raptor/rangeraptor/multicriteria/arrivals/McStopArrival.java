@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
@@ -79,28 +80,41 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
    * in the same Raptor iteration and round - if it does it is taken care of by the order
    * which the algorithm work - not by this comparator.
    */
-  public static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<McStopArrival<T>> compareArrivalTimeRoundAndCost() {
-    // This is important with respect to performance. Using the short-circuit logical OR(||) is
-    // faster than bitwise inclusive OR(|) (even between boolean expressions)
-    return (l, r) -> l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound || l.c1 < r.c1;
+  public static <T extends McStopArrival<?>> ParetoComparator<T> compareArrivalTimeRoundAndCost() {
+    return McStopArrival::compareBase;
   }
 
   /**
-   * This include {@code arrivedOnBoard} in the comparison compared with
+   * This includes {@code arrivedOnBoard} in the comparison compared with
    * {@link #compareArrivalTimeRoundAndCost()}.
    */
   public static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<McStopArrival<T>> compareArrivalTimeRoundCostAndOnBoardArrival() {
-    // This is important with respect to performance. Using the short-circuit logical OR(||) is
-    // faster than bitwise inclusive OR(|) (even between boolean expressions)
+    T extends McStopArrival<?>
+  > ParetoComparator<T> compareArrivalTimeRoundCostAndOnBoardArrival() {
+    return (l, r) -> compareBase(l, r) || compareArrivedOnBoard(l, r);
+  }
+
+  /**
+   * Same as {@link #compareArrivalTimeRoundAndCost}, but relax arrival-time and c1.
+   */
+  public static <T extends McStopArrival<?>> ParetoComparator<T> compareArrivalTimeRoundAndCost(
+    final RelaxFunction relaxArrivalTime,
+    final RelaxFunction relaxC1
+  ) {
+    return (l, r) -> relaxedCompareBase(relaxArrivalTime, relaxC1, l, r);
+  }
+
+  /**
+   * Same as {@link #compareArrivalTimeRoundCostAndOnBoardArrival()}, but relax arrival-time and c1.
+   */
+  public static <
+    T extends McStopArrival<?>
+  > ParetoComparator<T> compareArrivalTimeRoundCostAndOnBoardArrival(
+    final RelaxFunction relaxArrivalTime,
+    final RelaxFunction relaxC1
+  ) {
     return (l, r) ->
-      l.arrivalTime < r.arrivalTime ||
-      l.paretoRound < r.paretoRound ||
-      l.c1 < r.c1 ||
-      (l.arrivedOnBoard() && !r.arrivedOnBoard());
+      relaxedCompareBase(relaxArrivalTime, relaxC1, l, r) || compareArrivedOnBoard(l, r);
   }
 
   @Override
@@ -113,12 +127,16 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
     return (paretoRound + 1) / 2;
   }
 
+  protected final int paretoRound() {
+    return paretoRound;
+  }
+
   @Override
   public final int arrivalTime() {
     return arrivalTime;
   }
 
-  public int c1() {
+  public final int c1() {
     return c1;
   }
 
@@ -127,7 +145,7 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
     return previous;
   }
 
-  public int travelDuration() {
+  public final int travelDuration() {
     return travelDuration;
   }
 
@@ -155,5 +173,40 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
    */
   protected final int previousStop() {
     return previous.stop;
+  }
+
+  /**
+   * Compare arrivalTime, paretoRound and c1.
+   */
+  protected static boolean compareBase(McStopArrival<?> l, McStopArrival<?> r) {
+    // This is important with respect to performance. Using the short-circuit logical OR(||) is
+    // faster than bitwise inclusive OR(|) (even between boolean expressions)
+    return (
+      l.arrivalTime() < r.arrivalTime() || l.paretoRound() < r.paretoRound() || l.c1() < r.c1()
+    );
+  }
+
+  /**
+   * Compare arrivalTime, paretoRound and c1, relaxing arrivalTime and c1.
+   */
+  protected static boolean relaxedCompareBase(
+    final RelaxFunction relaxArrivalTime,
+    final RelaxFunction relaxC1,
+    McStopArrival<?> l,
+    McStopArrival<?> r
+  ) {
+    return (
+      l.arrivalTime() < relaxArrivalTime.relax(r.arrivalTime()) ||
+      l.paretoRound() < r.paretoRound() ||
+      l.c1() < relaxC1.relax(r.c1())
+    );
+  }
+
+  /**
+   * Compare arrivedOnBoard. On-board arrival dominate arrive by transfer(foot) since
+   * you can continue on foot; hence has more options.
+   */
+  protected static boolean compareArrivedOnBoard(McStopArrival<?> l, McStopArrival<?> r) {
+    return l.arrivedOnBoard() && !r.arrivedOnBoard();
   }
 }

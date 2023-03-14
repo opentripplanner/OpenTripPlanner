@@ -1,42 +1,35 @@
-package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
-
-import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
+package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 
 import org.opentripplanner.raptor.api.RaptorConstants;
-import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.AccessPathView;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**
  * Represent a access stop arrival.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-final class AccessStopArrival<T extends RaptorTripSchedule> extends McStopArrival<T> {
+final class AccessStopArrivalC2<T extends RaptorTripSchedule> extends AbstractStopArrivalC2<T> {
 
   private final RaptorAccessEgress access;
 
-  AccessStopArrival(int departureTime, RaptorAccessEgress access) {
+  AccessStopArrivalC2(int departureTime, RaptorAccessEgress access) {
     super(
       access.stop(),
       departureTime,
       access.durationInSeconds(),
+      access.numberOfRides(),
       access.generalizedCost(),
-      access.numberOfRides()
+      RaptorCostCalculator.ZERO_COST
     );
     this.access = access;
   }
 
   @Override
-  public int c2() {
-    throw new UnsupportedOperationException("C2 is not available for the C1 implementation");
-  }
-
-  @Override
-  public PathLegType arrivedBy() {
-    return ACCESS;
+  public boolean arrivedByAccess() {
+    return true;
   }
 
   @Override
@@ -45,7 +38,7 @@ final class AccessStopArrival<T extends RaptorTripSchedule> extends McStopArriva
   }
 
   @Override
-  public McStopArrival<T> timeShiftNewArrivalTime(int newRequestedArrivalTime) {
+  public AbstractStopArrivalC2<T> timeShiftNewArrivalTime(int newRequestedArrivalTime) {
     int newArrivalTime = access.latestArrivalTime(newRequestedArrivalTime);
 
     if (newArrivalTime == RaptorConstants.TIME_NOT_SET) {
@@ -58,7 +51,7 @@ final class AccessStopArrival<T extends RaptorTripSchedule> extends McStopArriva
     }
     int newDepartureTime = newArrivalTime - access.durationInSeconds();
 
-    return new AccessStopArrival<>(newDepartureTime, access);
+    return new AccessStopArrivalC2<>(newDepartureTime, access);
   }
 
   @Override

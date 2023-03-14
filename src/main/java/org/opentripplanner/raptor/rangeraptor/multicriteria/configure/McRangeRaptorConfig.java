@@ -10,6 +10,8 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.StopArrivalFactoryC1;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -62,10 +64,18 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
       createStopArrivals(),
       createDestinationArrivalPaths(),
       createHeuristicsProvider(heuristics),
+      createStopArrivalFactory(),
       context.costCalculator(),
       context.calculator(),
       context.lifeCycle()
     );
+  }
+
+  private McStopArrivalFactory<T> createStopArrivalFactory() {
+    // So fare there are no use-cases where the second criteria is used, so
+    // we just return the C1 factory here. We do this to be able to benchmark
+    // the performance. We will change this soon.
+    return new StopArrivalFactoryC1<>();
   }
 
   private McStopArrivals<T> createStopArrivals() {

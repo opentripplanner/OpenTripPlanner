@@ -7,6 +7,7 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 final class Transfer<T extends RaptorTripSchedule> extends StopArrivalViewAdapter<T> {
 
@@ -17,6 +18,16 @@ final class Transfer<T extends RaptorTripSchedule> extends StopArrivalViewAdapte
     super(round, stop);
     this.arrival = arrival;
     this.cursor = cursor;
+  }
+
+  @Override
+  public int c1() {
+    return RaptorCostCalculator.ZERO_COST;
+  }
+
+  @Override
+  public int c2() {
+    throw new UnsupportedOperationException("C2 is not available for the C1 implementation");
   }
 
   @Override

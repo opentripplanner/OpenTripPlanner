@@ -46,6 +46,11 @@ public abstract class AbstractStopArrival implements ArrivalView<TestTripSchedul
   }
 
   @Override
+  public int c2() {
+    throw new UnsupportedOperationException("C2 is not available for the C1 implementation");
+  }
+
+  @Override
   public ArrivalView<TestTripSchedule> previous() {
     return previous;
   }
