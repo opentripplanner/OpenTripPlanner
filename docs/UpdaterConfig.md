@@ -23,7 +23,7 @@ feed does not account for unexpected service changes or traffic disruptions that
 day. Thus, this kind of data is also referred to as 'static' data or 'theoretical' arrival and
 departure times.
 
-The [GTFS-RT spec](https://developers.google.com/transit/gtfs-realtime/) complements GTFS with three
+[GTFS-Realtime](https://gtfs.org/realtime/) complements GTFS with three
 additional kinds of feeds. In contrast to the base GTFS schedule feed, they provide *real-time*
 updates (*'dynamic'* data) and are updated from minute to minute.
 
