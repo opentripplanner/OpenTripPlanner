@@ -104,7 +104,7 @@ public class OtpTransitServiceImplTest {
   public void testGetAllStops() {
     Collection<RegularStop> stops = subject.stopModel().listRegularStops();
 
-    assertEquals(22, stops.size());
+    assertEquals(25, stops.size());
     assertEquals("RegularStop{F:A A}", first(stops).toString());
   }
 
@@ -115,7 +115,7 @@ public class OtpTransitServiceImplTest {
       stopTimes.addAll(subject.getStopTimesForTrip(trip));
     }
 
-    assertEquals(80, stopTimes.size());
+    assertEquals(85, stopTimes.size());
     assertEquals(
       "StopTime(seq=1 stop=F:A trip=agency:1.1 times=00:00:00-00:00:00)",
       first(stopTimes).toString()
@@ -126,7 +126,7 @@ public class OtpTransitServiceImplTest {
   public void testGetAllTrips() {
     Collection<Trip> trips = subject.getAllTrips();
 
-    assertEquals(33, trips.size());
+    assertEquals(34, trips.size());
     assertEquals("Trip{agency:1.1 1}", first(trips).toString());
   }
 
