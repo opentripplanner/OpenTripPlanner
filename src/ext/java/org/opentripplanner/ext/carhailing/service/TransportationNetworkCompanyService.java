@@ -111,10 +111,7 @@ public class TransportationNetworkCompanyService implements Serializable {
           fromPlace.coordinate,
           toPlace.coordinate
         );
-        return transportationNetworkCompany.getRideEstimates(
-          fromPlace.coordinate,
-          toPlace.coordinate
-        );
+        return transportationNetworkCompany.rideEstimates(fromPlace.coordinate, toPlace.coordinate);
       });
     }
 

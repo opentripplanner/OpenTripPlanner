@@ -39,7 +39,8 @@ public class RouteRequestToFilterChainMapper {
     double minBikeParkingDistance,
     TransitAlertService transitAlertService,
     Function<Station, MultiModalStation> getMultiModalStation,
-    List<CarHailingService> carHailingServices) {
+    List<CarHailingService> carHailingServices
+  ) {
     var builder = new ItineraryListFilterChainBuilder(sortOrder);
 
     // Group by similar legs filter

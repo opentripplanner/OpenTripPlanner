@@ -30,7 +30,7 @@ public class CarHailingFilter implements ItineraryListFilter {
           try {
             var service = findService(carHailingLeg.provider());
             var estimate = service
-              .getRideEstimates(leg.getFrom().coordinate, leg.getTo().coordinate)
+              .rideEstimates(leg.getFrom().coordinate, leg.getTo().coordinate)
               .get(0);
             return new CarHailingLeg(carHailingLeg, carHailingLeg.provider(), estimate);
           } catch (ExecutionException e) {

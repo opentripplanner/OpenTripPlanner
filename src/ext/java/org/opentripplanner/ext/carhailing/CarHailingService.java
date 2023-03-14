@@ -41,7 +41,7 @@ public abstract class CarHailingService {
   /**
    * Get the estimated trip time for a specific rideType
    */
-  public List<RideEstimate> getRideEstimates(WgsCoordinate start, WgsCoordinate end)
+  public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end)
     throws ExecutionException {
     // Truncate lat/lon values in order to reduce the number of API requests made.
     var request = new RideEstimateRequest(start.rounded(), end.rounded());

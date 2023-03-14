@@ -25,7 +25,6 @@ public class StreetLegBuilder {
   private Boolean walkingBike;
   private Boolean rentedVehicle;
   private String vehicleRentalNetwork;
-  private String carHailingNetwork;
   private Float accessibilityScore;
   private Set<StreetNote> streetNotes = new HashSet<>();
 
@@ -47,7 +46,6 @@ public class StreetLegBuilder {
       .withWalkingBike(leg.getWalkingBike())
       .withRentedVehicle(leg.getRentedVehicle())
       .withVehicleRentalNetwork(leg.getVehicleRentalNetwork())
-      .withCarHailingNetwork(leg.getCarHailingNetwork())
       .withAccessibilityScore(leg.accessibilityScore())
       .withStreetNotes(leg.getStreetNotes());
   }
@@ -197,15 +195,6 @@ public class StreetLegBuilder {
 
   public StreetLegBuilder withStreetNotes(Set<StreetNote> notes) {
     streetNotes = Set.copyOf(notes);
-    return this;
-  }
-
-  public String getCarHailingNetwork() {
-    return carHailingNetwork;
-  }
-
-  public StreetLegBuilder withCarHailingNetwork(String network) {
-    this.carHailingNetwork = network;
     return this;
   }
 }
