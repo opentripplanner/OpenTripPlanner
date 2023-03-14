@@ -15,9 +15,9 @@ import org.rutebanken.netex.model.DayTypesInFrame_RelStructure;
 import org.rutebanken.netex.model.DayTypes_RelStructure;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingDaysInFrame_RelStructure;
-import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.OperatingPeriodsInFrame_RelStructure;
+import org.rutebanken.netex.model.OperatingPeriods_RelStructure;
 import org.rutebanken.netex.model.ServiceCalendar;
 import org.rutebanken.netex.model.ServiceCalendarFrame_VersionFrameStructure;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
   private static final Logger LOG = LoggerFactory.getLogger(ServiceCalendarFrameParser.class);
 
   private final Collection<DayType> dayTypes = new ArrayList<>();
-  private final Collection<OperatingPeriod> operatingPeriods = new ArrayList<>();
+  private final Collection<OperatingPeriod_VersionStructure> operatingPeriods = new ArrayList<>();
   private final Collection<OperatingDay> operatingDays = new ArrayList<>();
   private final Multimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId = ArrayListMultimap.create();
 
@@ -60,7 +60,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     if (serviceCalendar == null) return;
 
     parseDayTypes(serviceCalendar.getDayTypes());
-    // TODO OTP2 - What about OperatingPeriods here?
+    parseOperatingPeriods(serviceCalendar.getOperatingPeriods());
     parseDayTypeAssignments(serviceCalendar.getDayTypeAssignments());
   }
 
@@ -73,6 +73,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
   }
 
   private void parseDayTypes(DayTypes_RelStructure dayTypes) {
+    if (dayTypes == null) return;
     for (JAXBElement<?> dt : dayTypes.getDayTypeRefOrDayType_()) {
       parseDayType(dt);
     }
@@ -84,13 +85,31 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     }
   }
 
-  private void parseOperatingPeriods(OperatingPeriodsInFrame_RelStructure element) {
-    if (element == null) {
+  private void parseOperatingPeriods(OperatingPeriodsInFrame_RelStructure operatingPeriods) {
+    if (operatingPeriods == null) {
       return;
     }
 
-    for (OperatingPeriod_VersionStructure p : element.getOperatingPeriodOrUicOperatingPeriod()) {
-      operatingPeriods.add((OperatingPeriod) p);
+    for (OperatingPeriod_VersionStructure p : operatingPeriods.getOperatingPeriodOrUicOperatingPeriod()) {
+      parseOperatingPeriod(p);
+    }
+  }
+
+  private void parseOperatingPeriods(OperatingPeriods_RelStructure operatingPeriods) {
+    if (operatingPeriods == null) {
+      return;
+    }
+
+    for (Object p : operatingPeriods.getOperatingPeriodRefOrOperatingPeriodOrUicOperatingPeriod()) {
+      parseOperatingPeriod(p);
+    }
+  }
+
+  private void parseOperatingPeriod(Object operatingPeriod) {
+    if (operatingPeriod instanceof OperatingPeriod_VersionStructure op) {
+      operatingPeriods.add(op);
+    } else {
+      NetexParser.warnOnMissingMapping(LOG, operatingPeriod);
     }
   }
 
