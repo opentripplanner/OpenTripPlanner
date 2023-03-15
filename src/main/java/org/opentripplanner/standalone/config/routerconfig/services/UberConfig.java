@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config.routerconfig.services;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
-import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters;
+import org.opentripplanner.ext.ridehailing.service.CarHailingServiceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class UberConfig {

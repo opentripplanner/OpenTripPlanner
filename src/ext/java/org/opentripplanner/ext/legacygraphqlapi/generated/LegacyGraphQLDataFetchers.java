@@ -18,6 +18,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.Leg
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLTransitMode;
+import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -379,6 +380,8 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Boolean> rentedBike();
 
+    public DataFetcher<RideEstimate> rideHailing();
+
     public DataFetcher<Route> route();
 
     public DataFetcher<String> serviceDate();
@@ -408,6 +411,13 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> date();
 
     public DataFetcher<Iterable<Object>> timeSpans();
+  }
+
+  /** An amount of money. */
+  public interface LegacyGraphQLMoney {
+    public DataFetcher<Integer> cents();
+
+    public DataFetcher<String> currency();
   }
 
   /** An object with an ID */
@@ -649,6 +659,14 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor> formFactor();
 
     public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType> propulsionType();
+  }
+
+  public interface LegacyGraphQLRideEstimate {
+    public DataFetcher<Object> maxPrice();
+
+    public DataFetcher<Object> minPrice();
+
+    public DataFetcher<String> provider();
   }
 
   /**

@@ -5,7 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.JsonSupport.j
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.carhailing.service.CarHailingServiceParameters;
+import org.opentripplanner.ext.ridehailing.service.CarHailingServiceParameters;
 import org.opentripplanner.standalone.config.RouterConfig;
 
 public class ServicesConfigTest {

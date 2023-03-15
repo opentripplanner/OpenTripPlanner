@@ -1340,6 +1340,23 @@ type Itinerary {
     systemNotices: [SystemNotice]!
 }
 
+"An amount of money."
+type Money {
+    "ISO-4217 currency code"
+    currency: String!
+    """
+    Money amount in cents. **Note:** this value is dependent on the currency used,
+    as one cent is not necessarily ¹/₁₀₀ of the basic monetary unit.
+    """
+    cents: Int!
+}
+
+type RideEstimate {
+    provider: String!
+    minPrice: Money!
+    maxPrice: Money!
+}
+
 type Leg {
     """
     The date and time when this leg begins. Format: Unix timestamp in milliseconds.
@@ -1485,6 +1502,8 @@ type Leg {
         for the next legs. For modes not listed, only the exact destination stop of the leg is considered.
         """
         destinationModesWithParentStation: [TransitMode!]): [Leg!]
+
+    rideEstimate: RideEstimate
 }
 
 """A span of time."""

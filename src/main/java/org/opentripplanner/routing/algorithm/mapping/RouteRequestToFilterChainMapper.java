@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import org.opentripplanner.ext.carhailing.CarHailingService;
+import org.opentripplanner.ext.ridehailing.CarHailingService;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;

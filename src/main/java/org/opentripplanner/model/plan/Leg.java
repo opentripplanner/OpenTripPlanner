@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.ext.carhailing.model.RideEstimate;
+import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
@@ -426,7 +426,7 @@ public interface Leg {
   }
 
   @Nullable
-  default RideEstimate carHailingEstimate() {
+  default RideEstimate rideEstimate() {
     return null;
   }
 
