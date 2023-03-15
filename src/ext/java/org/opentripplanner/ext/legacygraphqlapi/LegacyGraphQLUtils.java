@@ -29,12 +29,19 @@ public class LegacyGraphQLUtils {
       return Locale.forLanguageTag(localeString);
     }
 
+    // This can come from the accept-language header
+    var envLocale = environment.getLocale();
+
     Map<String, ?> localContext = environment.getLocalContext();
-    if (localContext != null && localContext.get("locale") != null) {
+    if (
+      (envLocale == null || envLocale.getLanguage().equals("*")) &&
+      localContext != null &&
+      localContext.get("locale") != null
+    ) {
       return (Locale) localContext.get("locale");
     }
 
-    return environment.getLocale();
+    return envLocale;
   }
 
   public static String getTranslation(I18NString input, DataFetchingEnvironment environment) {
