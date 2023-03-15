@@ -42,18 +42,10 @@ public class PathParetoSetComparators {
       if (includeTimetable) {
         return comparatorWithTimetableAndRelaxedCost(relaxCostAtDestination);
       }
-      if (searchDirection.isInReverse()) {
-        if (preferLateArrival) {
-          return comparatorWithRelaxedCost(relaxCostAtDestination);
-        } else {
-          return comparatorWithRelaxedCostAndLatestDeparture(relaxCostAtDestination);
-        }
+      if (preferLateArrival) {
+        return comparatorWithRelaxedCostAndLatestDeparture(relaxCostAtDestination);
       } else {
-        if (preferLateArrival) {
-          return comparatorWithRelaxedCostAndLatestDeparture(relaxCostAtDestination);
-        } else {
-          return comparatorWithRelaxedCost(relaxCostAtDestination);
-        }
+        return comparatorWithRelaxedCost(relaxCostAtDestination);
       }
     }
 
