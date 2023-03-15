@@ -72,14 +72,14 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   public int bestTransitArrivalTime(int stopIndex) {
-    return stopArrivalsByTransit(stopIndex)
+    return transitStopArrivals(stopIndex)
       .mapToInt(AbstractStopArrival::arrivalTime)
       .min()
       .orElseThrow();
   }
 
   public int smallestNumberOfTransfers(int stopIndex) {
-    return stopArrivalsByTransit(stopIndex)
+    return transitStopArrivals(stopIndex)
       .mapToInt(AbstractStopArrival::numberOfTransfers)
       .min()
       .orElseThrow();
@@ -177,7 +177,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   @Nonnull
-  private Stream<AbstractStopArrival<T>> stopArrivalsByTransit(int stopIndex) {
+  private Stream<AbstractStopArrival<T>> transitStopArrivals(int stopIndex) {
     return arrivals[stopIndex].stream().filter(a -> a.arrivedBy(TRANSIT));
   }
 }
