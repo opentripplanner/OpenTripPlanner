@@ -145,22 +145,16 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       config.fuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
 
     try {
-      if (
-        System.getenv("GOOGLE_APPLICATION_CREDENTIALS") != null &&
-        !System.getenv("GOOGLE_APPLICATION_CREDENTIALS").isEmpty()
-      ) {
-        // Google libraries expects path to credentials json-file is stored in environment variable "GOOGLE_APPLICATION_CREDENTIALS"
-        // Ref.: https://cloud.google.com/docs/authentication/getting-started
+      // Google libraries expects credentials json-file either as
+      //   Path is stored in environment variable "GOOGLE_APPLICATION_CREDENTIALS"
+      //   (https://cloud.google.com/docs/authentication/getting-started)
+      // or
+      //   Credentials are provided through "workload identity"
+      //   (https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity)
 
-        subscriptionAdminClient = SubscriptionAdminClient.create();
+      subscriptionAdminClient = SubscriptionAdminClient.create();
 
-        addShutdownHook();
-      } else {
-        throw new RuntimeException(
-          "Google Pubsub updater is configured, but environment variable 'GOOGLE_APPLICATION_CREDENTIALS' is not defined. " +
-          "See https://cloud.google.com/docs/authentication/getting-started"
-        );
-      }
+      addShutdownHook();
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
