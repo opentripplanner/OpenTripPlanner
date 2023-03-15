@@ -1353,8 +1353,8 @@ type Money {
 
 type RideEstimate {
     provider: String!
-    minPrice: Money!
-    maxPrice: Money!
+    minCost: Money!
+    maxCost: Money!
 }
 
 type Leg {
@@ -1503,6 +1503,7 @@ type Leg {
         """
         destinationModesWithParentStation: [TransitMode!]): [Leg!]
 
+    "Estimate of "
     rideEstimate: RideEstimate
 }
 
@@ -2085,7 +2086,10 @@ enum Qualifier {
     EGRESS,
 
     """The mode is used for the direct street search."""
-    DIRECT
+    DIRECT,
+
+    """Hailing a ride, for example via an app like Uber."""
+    HAIL
 }
 
 type QueryType {

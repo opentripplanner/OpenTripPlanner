@@ -271,7 +271,7 @@
       }
     }
   ],
-  "services": [
+  "rideHailingServices": [
     {
       "type": "uber-car-hailing",
       "clientId": "secret-id",

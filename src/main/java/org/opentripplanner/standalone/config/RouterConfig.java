@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
@@ -105,7 +104,7 @@ number of transit vehicles used in that itinerary.
       new TransmodelAPIConfig(
         root
           .of("transmodelApi")
-          .since(NA)
+          .since(V2_1)
           .summary("Configuration for the Transmodel GraphQL API.")
           .asObject()
       );

@@ -37,12 +37,12 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
 | [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |  2.2  |
 | [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |  2.1  |
-| [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
-| [services](#services)                                                                     |       `object[]`      | Configuration for interfaces to external services.                                                | *Optional* |               |  2.3  |
+| [rideHailingServices](#rideHailingServices)                                               |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                         | *Optional* |               |  2.3  |
 |       type = "UBER_CAR_HAILING"                                                           |         `enum`        | The type of the service.                                                                          | *Required* |               |  2.3  |
 |       clientId                                                                            |        `string`       | OAuth client id to access the API.                                                                | *Required* |               |  2.3  |
 |       clientSecret                                                                        |        `string`       | OAuth client secret to access the API.                                                            | *Required* |               |  2.3  |
 |       wheelchairAccessibleRideType                                                        |        `string`       | HTTP headers to add.                                                                              | *Required* |               |  2.3  |
+| [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
 | [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                   | *Optional* |               |   na  |
 |    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)            |       `integer`       | Step for departure times between each RangeRaptor iterations.                                     | *Optional* | `60`          |   na  |
@@ -58,7 +58,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |       [stepMinutes](#transit_dynamicSearchWindow_stepMinutes)                             |       `integer`       | Used to set the steps the search-window is rounded to.                                            | *Optional* | `10`          |  2.1  |
 |    [pagingSearchWindowAdjustments](#transit_pagingSearchWindowAdjustments)                |      `duration[]`     | The provided array of durations is used to increase the search-window for the next/previous page. | *Optional* |               |   na  |
 |    [stopTransferCost](#transit_stopTransferCost)                                          | `enum map of integer` | Use this to set a stop transfer cost for the given transfer priority                              | *Optional* |               |   na  |
-| transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                     | *Optional* |               |   na  |
+| transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                     | *Optional* |               |  2.1  |
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                           | *Optional* | `false`       |   na  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                       | *Optional* |               |   na  |
 | [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                        | *Optional* |               |  1.5  |
@@ -148,12 +148,12 @@ search-window.
 The search aborts after this duration and any paths found are returned to the client.
 
 
-<h3 id="services">services</h3>
+<h3 id="rideHailingServices">rideHailingServices</h3>
 
 **Since version:** `2.3` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
-Configuration for interfaces to external services.
+Configuration for interfaces to external ride hailing services like Uber.
 
 <h3 id="transit">transit</h3>
 
@@ -661,7 +661,7 @@ Http headers.
       }
     }
   ],
-  "services" : [
+  "rideHailingServices" : [
     {
       "type" : "uber-car-hailing",
       "clientId" : "secret-id",

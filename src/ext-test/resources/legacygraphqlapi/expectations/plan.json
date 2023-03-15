@@ -4,10 +4,11 @@
       "itineraries" : [
         {
           "startTime" : 1580641200000,
-          "endTime" : 1580644200000,
-          "generalizedCost" : 3072,
+          "endTime" : 1580644800000,
+          "generalizedCost" : 4072,
           "legs" : [
             {
+              "mode" : "WALK",
               "from" : {
                 "name" : "A",
                 "lat" : 5.0,
@@ -24,11 +25,12 @@
               },
               "startTime" : 1580641200000,
               "endTime" : 1580641220000,
-              "mode" : "WALK",
               "generalizedCost" : 40,
-              "alerts" : [ ]
+              "alerts" : [ ],
+              "rideEstimate" : null
             },
             {
+              "mode" : "BUS",
               "from" : {
                 "name" : "B",
                 "lat" : 6.0,
@@ -45,11 +47,12 @@
               },
               "startTime" : 1580641260000,
               "endTime" : 1580642100000,
-              "mode" : "BUS",
               "generalizedCost" : 992,
-              "alerts" : [ ]
+              "alerts" : [ ],
+              "rideEstimate" : null
             },
             {
+              "mode" : "RAIL",
               "from" : {
                 "name" : "C",
                 "lat" : 7.0,
@@ -66,7 +69,6 @@
               },
               "startTime" : 1580643000000,
               "endTime" : 1580644200000,
-              "mode" : "RAIL",
               "generalizedCost" : 2040,
               "alerts" : [
                 {
@@ -88,7 +90,40 @@
                     }
                   ]
                 }
-              ]
+              ],
+              "rideEstimate" : null
+            },
+            {
+              "mode" : "CAR",
+              "from" : {
+                "name" : "D",
+                "lat" : 8.0,
+                "lon" : 9.5,
+                "departureTime" : 1580644200000,
+                "arrivalTime" : 1580644200000
+              },
+              "to" : {
+                "name" : "E",
+                "lat" : 9.0,
+                "lon" : 10.0,
+                "departureTime" : 1580644800000,
+                "arrivalTime" : 1580644800000
+              },
+              "startTime" : 1580644200000,
+              "endTime" : 1580644800000,
+              "generalizedCost" : 1000,
+              "alerts" : [ ],
+              "rideEstimate" : {
+                "provider" : "UBER",
+                "minCost" : {
+                  "currency" : "EUR",
+                  "cents" : 1000
+                },
+                "maxCost" : {
+                  "currency" : "EUR",
+                  "cents" : 2000
+                }
+              }
             }
           ]
         }

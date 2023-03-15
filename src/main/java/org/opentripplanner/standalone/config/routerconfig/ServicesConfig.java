@@ -17,9 +17,9 @@ public class ServicesConfig implements ServicesParameters {
 
   public ServicesConfig(NodeAdapter rootAdapter) {
     rootAdapter
-      .of("services")
+      .of("rideHailingServices")
       .since(V2_3)
-      .summary("Configuration for interfaces to external services.")
+      .summary("Configuration for interfaces to external ride hailing services like Uber.")
       .asObjects(it -> {
         Type type = it
           .of("type")
