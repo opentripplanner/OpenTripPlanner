@@ -5,6 +5,7 @@ import static org.opentripplanner.framework.text.Table.Align.Left;
 import static org.opentripplanner.framework.text.Table.Align.Right;
 import static org.opentripplanner.framework.time.TimeUtils.timeToStrCompact;
 import static org.opentripplanner.framework.time.TimeUtils.timeToStrLong;
+import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
 import java.text.NumberFormat;
@@ -19,7 +20,6 @@ import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.debug.DebugTopic;
-import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
@@ -223,7 +223,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {
-    if (a.arrivedBy().not(PathLegType.ACCESS)) {
+    if (a.arrivedBy().not(ACCESS)) {
       // Recursively call this method to insert arrival in front of this arrival
       path(a.previous(), buf);
     }

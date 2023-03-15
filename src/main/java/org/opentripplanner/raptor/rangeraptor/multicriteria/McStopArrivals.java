@@ -1,10 +1,11 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+
 import gnu.trove.map.TIntObjectMap;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
-import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -176,6 +177,6 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   private static boolean arrivedByTransit(AbstractStopArrival<?> arrival) {
-    return arrival.arrivedBy(PathLegType.TRANSIT);
+    return arrival.arrivedBy(TRANSIT);
   }
 }

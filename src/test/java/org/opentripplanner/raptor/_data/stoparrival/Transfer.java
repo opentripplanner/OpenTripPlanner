@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor._data.stoparrival;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSFER;
+
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.PathLegType;
@@ -37,7 +39,7 @@ public class Transfer extends AbstractStopArrival {
 
   @Override
   public PathLegType arrivedBy() {
-    return PathLegType.TRANSFER;
+    return TRANSFER;
   }
 
   @Override

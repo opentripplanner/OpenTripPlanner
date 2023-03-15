@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
@@ -28,7 +28,7 @@ public class AccessStopArrivalTest {
 
   @Test
   public void arrivedByAccessLeg() {
-    assertTrue(subject.arrivedBy(PathLegType.ACCESS));
+    assertTrue(subject.arrivedBy(ACCESS));
     assertFalse(subject.arrivedByTransit());
   }
 

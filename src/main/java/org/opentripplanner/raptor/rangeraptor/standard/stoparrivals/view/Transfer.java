@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSFER;
+
 import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -32,7 +34,7 @@ final class Transfer<T extends RaptorTripSchedule>
 
   @Override
   public PathLegType arrivedBy() {
-    return PathLegType.TRANSFER;
+    return TRANSFER;
   }
 
   @Override
