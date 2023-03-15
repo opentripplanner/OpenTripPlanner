@@ -6,6 +6,7 @@ import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 public class RideHailingFilter implements ItineraryListFilter {
@@ -18,31 +19,39 @@ public class RideHailingFilter implements ItineraryListFilter {
 
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
-    return itineraries.stream().map(this::addCarHailingInformation).toList();
+    return itineraries.parallelStream().map(this::addCarHailingInformation).toList();
   }
 
   private Itinerary addCarHailingInformation(Itinerary i) {
-    var legs = i
-      .getLegs()
-      .stream()
-      .map(leg -> {
-        if (leg instanceof RideHailingLeg carHailingLeg) {
+    if (!i.isFlaggedForDeletion()) {
+      var legs = i
+        .getLegs()
+        .parallelStream()
+        .map(leg -> {
           try {
-            var service = findService(carHailingLeg.provider());
-            var estimate = service
-              .rideEstimates(leg.getFrom().coordinate, leg.getTo().coordinate)
-              .get(0);
-            return new RideHailingLeg(carHailingLeg, carHailingLeg.provider(), estimate);
+            if (leg instanceof RideHailingLeg carHailingLeg) {
+              var service = findService(carHailingLeg.provider());
+              var estimate = service
+                .rideEstimates(leg.getFrom().coordinate, leg.getTo().coordinate)
+                .get(0);
+              return new RideHailingLeg(carHailingLeg, carHailingLeg.provider(), estimate);
+            } else if (leg instanceof StreetLeg sl && sl.getMode().isDriving()) {
+              var service = findService(RideHailingProvider.UBER);
+              var estimate = service
+                .rideEstimates(leg.getFrom().coordinate, leg.getTo().coordinate)
+                .get(0);
+              return new RideHailingLeg(sl, RideHailingProvider.UBER, estimate);
+            } else {
+              return leg;
+            }
           } catch (ExecutionException e) {
             throw new RuntimeException(e);
           }
-        } else {
-          return leg;
-        }
-      })
-      .toList();
+        })
+        .toList();
 
-    i.setLegs(legs);
+      i.setLegs(legs);
+    }
     return i;
   }
 

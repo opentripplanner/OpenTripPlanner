@@ -375,10 +375,6 @@ public class ItineraryListFilterChainBuilder {
       }
     }
 
-    if (!rideHailingServices.isEmpty()) {
-      filters.add(new RideHailingFilter(rideHailingServices));
-    }
-
     // Remove itineraries if max limit is set
     if (maxNumberOfItineraries > 0) {
       filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
@@ -396,6 +392,10 @@ public class ItineraryListFilterChainBuilder {
 
     // Do the final itineraries sort
     filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
+
+    if (!rideHailingServices.isEmpty()) {
+      filters.add(new RideHailingFilter(rideHailingServices));
+    }
 
     return new ItineraryListFilterChain(filters, debug);
   }
