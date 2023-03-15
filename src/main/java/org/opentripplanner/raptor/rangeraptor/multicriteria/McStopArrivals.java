@@ -6,8 +6,8 @@ import gnu.trove.map.TIntObjectMap;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -58,10 +58,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   public int bestArrivalTime(int stopIndex) {
-    return arrivals[stopIndex].stream()
-      .mapToInt(AbstractStopArrival::arrivalTime)
-      .min()
-      .orElseThrow();
+    return minInt(arrivals[stopIndex].stream(), AbstractStopArrival::arrivalTime);
   }
 
   public boolean reachedByTransit(int stopIndex) {
@@ -72,17 +69,11 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   public int bestTransitArrivalTime(int stopIndex) {
-    return transitStopArrivals(stopIndex)
-      .mapToInt(AbstractStopArrival::arrivalTime)
-      .min()
-      .orElseThrow();
+    return transitStopArrivalsMinInt(stopIndex, AbstractStopArrival::arrivalTime);
   }
 
   public int smallestNumberOfTransfers(int stopIndex) {
-    return transitStopArrivals(stopIndex)
-      .mapToInt(AbstractStopArrival::numberOfTransfers)
-      .min()
-      .orElseThrow();
+    return transitStopArrivalsMinInt(stopIndex, AbstractStopArrival::numberOfTransfers);
   }
 
   boolean updateExist() {
@@ -176,8 +167,18 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
       });
   }
 
-  @Nonnull
-  private Stream<AbstractStopArrival<T>> transitStopArrivals(int stopIndex) {
-    return arrivals[stopIndex].stream().filter(a -> a.arrivedBy(TRANSIT));
+  private int transitStopArrivalsMinInt(
+    int stopIndex,
+    Function<AbstractStopArrival<T>, Integer> mapper
+  ) {
+    var transitArrivals = arrivals[stopIndex].stream().filter(a -> a.arrivedBy(TRANSIT));
+    return minInt(transitArrivals, mapper);
+  }
+
+  private int minInt(
+    Stream<AbstractStopArrival<T>> transitArrivals,
+    Function<AbstractStopArrival<T>, Integer> mapper
+  ) {
+    return transitArrivals.mapToInt(mapper::apply).min().orElseThrow();
   }
 }
