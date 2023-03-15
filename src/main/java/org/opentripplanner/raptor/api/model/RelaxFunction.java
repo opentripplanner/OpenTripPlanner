@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.api.model;
 
-
 import java.util.Objects;
 
 /**
@@ -12,11 +11,12 @@ import java.util.Objects;
  * performance reasons since we then can use shift-right 4 bit to divide by 16.
  */
 public final class RelaxFunction {
+
   private final int ratioOf16s;
   private final int slack;
 
   public RelaxFunction(double ratio, int slack) {
-    this.ratioOf16s = (int)Math.round(ratio * 16.0);
+    this.ratioOf16s = (int) Math.round(ratio * 16.0);
     this.slack = slack;
   }
 

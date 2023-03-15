@@ -121,7 +121,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         aLeg != null ? timeToStrLong(aLeg.fromTime()) : null,
         eLeg != null ? timeToStrLong(eLeg.toTime()) : null,
         DurationUtils.durationToStr(p.durationInSeconds()),
-        OtpNumberFormat.formatCostCenti(p.generalizedCost()),
+        OtpNumberFormat.formatCostCenti(p.c1()),
         details(e.action().toString(), e.reason(), e.element().toString())
       )
     );

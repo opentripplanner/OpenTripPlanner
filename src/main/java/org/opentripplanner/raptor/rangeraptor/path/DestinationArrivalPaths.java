@@ -204,11 +204,11 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     DestinationArrival<T> destArrival,
     RaptorPath<T> path
   ) {
-    if (path.generalizedCost() != destArrival.c1()) {
+    if (path.c1() != destArrival.c1()) {
       // TODO - Bug: Cost mismatch stop-arrivals and paths #3623
       LOG_MISS_MATCH.warn(
         "Cost mismatch - Mapper: {}, stop-arrivals: {}, path: {}",
-        OtpNumberFormat.formatCostCenti(path.generalizedCost()),
+        OtpNumberFormat.formatCostCenti(path.c1()),
         raptorCostsAsString(destArrival),
         path.toStringDetailed(stopNameResolver)
       );

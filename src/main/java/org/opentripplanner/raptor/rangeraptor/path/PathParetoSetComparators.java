@@ -105,7 +105,7 @@ public class PathParetoSetComparators {
       l.endTime() < r.endTime() ||
       l.numberOfTransfers() < r.numberOfTransfers() ||
       l.durationInSeconds() < r.durationInSeconds() ||
-      l.generalizedCost() < r.generalizedCost();
+      l.c1() < r.c1();
   }
 
   public static <
@@ -118,7 +118,7 @@ public class PathParetoSetComparators {
       l.endTime() < r.endTime() ||
       l.numberOfTransfers() < r.numberOfTransfers() ||
       l.durationInSeconds() < r.durationInSeconds() ||
-      l.generalizedCost() < Math.round(r.generalizedCost() * relaxCostAtDestinationArrival);
+      l.c1() < Math.round(r.c1() * relaxCostAtDestinationArrival);
   }
 
   public static <
@@ -128,7 +128,7 @@ public class PathParetoSetComparators {
       l.endTime() < r.endTime() ||
       l.numberOfTransfers() < r.numberOfTransfers() ||
       l.durationInSeconds() < r.durationInSeconds() ||
-      l.generalizedCost() < r.generalizedCost();
+      l.c1() < r.c1();
   }
 
   public static <
@@ -138,7 +138,7 @@ public class PathParetoSetComparators {
       l.startTime() > r.startTime() ||
       l.numberOfTransfers() < r.numberOfTransfers() ||
       l.durationInSeconds() < r.durationInSeconds() ||
-      l.generalizedCost() < r.generalizedCost();
+      l.c1() < r.c1();
   }
 
   public static <
@@ -150,7 +150,7 @@ public class PathParetoSetComparators {
       l.endTime() < r.endTime() ||
       l.numberOfTransfers() < r.numberOfTransfers() ||
       l.durationInSeconds() < r.durationInSeconds() ||
-      l.generalizedCost() < Math.round(r.generalizedCost() * relaxCostAtDestinationArrival);
+      l.c1() < Math.round(r.c1() * relaxCostAtDestinationArrival);
   }
 
   public static <
@@ -162,6 +162,6 @@ public class PathParetoSetComparators {
       l.startTime() > r.startTime() ||
       l.numberOfTransfers() < r.numberOfTransfers() ||
       l.durationInSeconds() < r.durationInSeconds() ||
-      l.generalizedCost() < Math.round(r.generalizedCost() * relaxCostAtDestinationArrival);
+      l.c1() < Math.round(r.c1() * relaxCostAtDestinationArrival);
   }
 }

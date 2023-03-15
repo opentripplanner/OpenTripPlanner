@@ -47,13 +47,13 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
   int numberOfTransfersExAccessEgress();
 
   /**
-   * The total Raptor cost computed for this path. This is for debugging and filtering purposes.
+   * The Raptor criteria-one(c1/generalized-cost) computed for this path.
    * <p>
    * {@code -1} is returned if no cost exist.
    * <p>
    * The unit is centi-seconds
    */
-  int generalizedCost();
+  int c1();
 
   /**
    * The first leg/path of this journey - which is linked to the next and so on. The leg can contain
@@ -122,7 +122,7 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
     if (c != 0) {
       return c;
     }
-    c = generalizedCost() - other.generalizedCost();
+    c = c1() - other.c1();
     if (c != 0) {
       return c;
     }

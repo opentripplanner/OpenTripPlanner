@@ -8,6 +8,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 
 class McStopArrivalTest {
+
   private static final int STOP = 9;
   private static final boolean ARRIVED_ON_BOARD = true;
   private static final boolean ARRIVED_ON_FOOT = false;
@@ -20,36 +21,43 @@ class McStopArrivalTest {
 
   private static final RelaxFunction NORMAL = new RelaxFunction(1.0, 0);
 
-
   @Test
   void compareArrivalTimeRoundAndCostTest() {
     // Same values for arrival-time, pareto-round and c1. Ignore c2 and arrivedOnBoard
     assertFalse(
-      McStopArrival.compareArrivalTimeRoundAndCost().leftDominanceExist(
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT)
-      )
+      McStopArrival
+        .compareArrivalTimeRoundAndCost()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT)
+        )
     );
     // Arrival-time is better
     assertTrue(
-      McStopArrival.compareArrivalTimeRoundAndCost().leftDominanceExist(
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
-      )
+      McStopArrival
+        .compareArrivalTimeRoundAndCost()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
+        )
     );
     // Pareto-round is better
     assertTrue(
-      McStopArrival.compareArrivalTimeRoundAndCost().leftDominanceExist(
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_777, ARRIVED_ON_FOOT),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_100, COST_100, ARRIVED_ON_BOARD)
-      )
+      McStopArrival
+        .compareArrivalTimeRoundAndCost()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_777, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_100, COST_100, ARRIVED_ON_BOARD)
+        )
     );
     // C1 is better
     assertTrue(
-      McStopArrival.compareArrivalTimeRoundAndCost().leftDominanceExist(
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_BOARD)
-      )
+      McStopArrival
+        .compareArrivalTimeRoundAndCost()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_BOARD)
+        )
     );
   }
 
@@ -57,38 +65,48 @@ class McStopArrivalTest {
   void compareArrivalTimeRoundCostAndOnBoardArrival() {
     // Same values for arrival-time, pareto-round and c1. Ignore c2 and arrivedOnBoard
     assertFalse(
-      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_BOARD)
-      )
+      McStopArrival
+        .compareArrivalTimeRoundCostAndOnBoardArrival()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_BOARD)
+        )
     );
     // Arrival-time is better
     assertTrue(
-      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
-      )
+      McStopArrival
+        .compareArrivalTimeRoundCostAndOnBoardArrival()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
+        )
     );
     // Pareto-round is better
     assertTrue(
-      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_777, COST_777, ARRIVED_ON_FOOT),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_100, COST_100, ARRIVED_ON_BOARD)
-      )
+      McStopArrival
+        .compareArrivalTimeRoundCostAndOnBoardArrival()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_777, COST_777, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_100, COST_100, ARRIVED_ON_BOARD)
+        )
     );
     // C1 is better
     assertTrue(
-      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_100, COST_777, ARRIVED_ON_FOOT),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_BOARD)
-      )
+      McStopArrival
+        .compareArrivalTimeRoundCostAndOnBoardArrival()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_100, COST_777, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_BOARD)
+        )
     );
     // Arrived on-board is better
     assertTrue(
-      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival().leftDominanceExist(
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_BOARD),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_FOOT)
-      )
+      McStopArrival
+        .compareArrivalTimeRoundCostAndOnBoardArrival()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_BOARD),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_FOOT)
+        )
     );
   }
 
@@ -96,36 +114,50 @@ class McStopArrivalTest {
   void compareRelaxedArrivalTimeTest() {
     int bestArrivalTime = 600;
     int okArrivalTime = 899;
-    int rejectArrivalTime = okArrivalTime+1;
+    int rejectArrivalTime = okArrivalTime + 1;
     RelaxFunction relaxArrivalTime = new RelaxFunction(1.5, 0);
-    var referenceArrival = new A(bestArrivalTime, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD);
+    var referenceArrival = new A(
+      bestArrivalTime,
+      PARETO_ROUND_ONE,
+      COST_100,
+      COST_100,
+      ARRIVED_ON_BOARD
+    );
 
     // Test base
     assertFalse(
-      McStopArrival.compareArrivalTimeRoundAndCost(relaxArrivalTime, NORMAL).leftDominanceExist(
-        new A(rejectArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-        referenceArrival
-      )
+      McStopArrival
+        .compareArrivalTimeRoundAndCost(relaxArrivalTime, NORMAL)
+        .leftDominanceExist(
+          new A(rejectArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
+          referenceArrival
+        )
     );
     assertTrue(
-      McStopArrival.compareArrivalTimeRoundAndCost(relaxArrivalTime, NORMAL).leftDominanceExist(
-        new A(okArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-        referenceArrival
-      )
+      McStopArrival
+        .compareArrivalTimeRoundAndCost(relaxArrivalTime, NORMAL)
+        .leftDominanceExist(
+          new A(okArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
+          referenceArrival
+        )
     );
 
     // Test OnBoardArrival
     assertFalse(
-      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(relaxArrivalTime, NORMAL).leftDominanceExist(
-        new A(rejectArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-        referenceArrival
-      )
+      McStopArrival
+        .compareArrivalTimeRoundCostAndOnBoardArrival(relaxArrivalTime, NORMAL)
+        .leftDominanceExist(
+          new A(rejectArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
+          referenceArrival
+        )
     );
     assertTrue(
-      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(relaxArrivalTime, NORMAL).leftDominanceExist(
-        new A(okArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-        referenceArrival
-      )
+      McStopArrival
+        .compareArrivalTimeRoundCostAndOnBoardArrival(relaxArrivalTime, NORMAL)
+        .leftDominanceExist(
+          new A(okArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
+          referenceArrival
+        )
     );
   }
 
@@ -135,40 +167,53 @@ class McStopArrivalTest {
     int okC1 = 799;
     int rejectC1 = okC1 + 1;
     RelaxFunction relaxC1 = new RelaxFunction(1.0, 200);
-    var referenceArrival = new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, bestC1, COST_100, ARRIVED_ON_BOARD);
+    var referenceArrival = new A(
+      ARRIVAL_TIME_EARLY,
+      PARETO_ROUND_ONE,
+      bestC1,
+      COST_100,
+      ARRIVED_ON_BOARD
+    );
 
     // Test base
     assertFalse(
-      McStopArrival.compareArrivalTimeRoundAndCost(NORMAL, relaxC1).leftDominanceExist(
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, rejectC1, COST_777, ARRIVED_ON_FOOT),
-        referenceArrival
-      )
+      McStopArrival
+        .compareArrivalTimeRoundAndCost(NORMAL, relaxC1)
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, rejectC1, COST_777, ARRIVED_ON_FOOT),
+          referenceArrival
+        )
     );
     assertTrue(
-      McStopArrival.compareArrivalTimeRoundAndCost(NORMAL, relaxC1).leftDominanceExist(
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, okC1, COST_777, ARRIVED_ON_FOOT),
-        referenceArrival
-      )
+      McStopArrival
+        .compareArrivalTimeRoundAndCost(NORMAL, relaxC1)
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, okC1, COST_777, ARRIVED_ON_FOOT),
+          referenceArrival
+        )
     );
 
     // Test OnBoardArrival
     assertFalse(
-      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(NORMAL, relaxC1).leftDominanceExist(
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, rejectC1, COST_777, ARRIVED_ON_FOOT),
-        referenceArrival
-      )
+      McStopArrival
+        .compareArrivalTimeRoundCostAndOnBoardArrival(NORMAL, relaxC1)
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, rejectC1, COST_777, ARRIVED_ON_FOOT),
+          referenceArrival
+        )
     );
     assertTrue(
-      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(NORMAL, relaxC1).leftDominanceExist(
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, okC1, COST_777, ARRIVED_ON_FOOT),
-        referenceArrival
-      )
+      McStopArrival
+        .compareArrivalTimeRoundCostAndOnBoardArrival(NORMAL, relaxC1)
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, okC1, COST_777, ARRIVED_ON_FOOT),
+          referenceArrival
+        )
     );
-
   }
 
-
   private static class A extends McStopArrival<TestTripSchedule> {
+
     int c2;
     boolean arrivedOnBoard;
 
