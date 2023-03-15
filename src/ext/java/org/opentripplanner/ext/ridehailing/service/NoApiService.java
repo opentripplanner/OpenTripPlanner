@@ -2,7 +2,7 @@ package org.opentripplanner.ext.ridehailing.service;
 
 import java.time.Duration;
 import java.util.List;
-import org.opentripplanner.ext.ridehailing.CarHailingService;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideEstimateRequest;
@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.basic.Money;
  * estimates or ride estimates. The config for this updater can include a default value for the estimated arrival time
  * which will always be provided when estimates for the arrival time are desired.
  */
-public class NoApiService extends CarHailingService {
+public class NoApiService extends RideHailingService {
 
   /**
    * The default arrival time in seconds to respond with for all valid arrival time estimate requests. Defaults to 0.

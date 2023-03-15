@@ -5,8 +5,8 @@ import dagger.Component;
 import jakarta.inject.Singleton;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.ridehailing.CarHailingService;
-import org.opentripplanner.ext.ridehailing.configure.CarHailingServicesModule;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -45,7 +45,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     VehicleRentalServiceModule.class,
     VehicleRentalRepositoryModule.class,
     ConstructApplicationModule.class,
-    CarHailingServicesModule.class,
+    RideHailingServicesModule.class,
   }
 )
 public interface ConstructApplicationFactory {
@@ -59,7 +59,7 @@ public interface ConstructApplicationFactory {
   VehiclePositionService vehiclePositionService();
   VehicleRentalRepository vehicleRentalRepository();
   VehicleRentalService vehicleRentalService();
-  List<CarHailingService> carHailingServices();
+  List<RideHailingService> carHailingServices();
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable

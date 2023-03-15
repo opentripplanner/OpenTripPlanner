@@ -1,17 +1,17 @@
 package org.opentripplanner.ext.ridehailing.service;
 
-public sealed interface CarHailingServiceParameters {
+public sealed interface RideHailingServiceParameters {
   record UberServiceParameters(
     String clientId,
     String clientSecret,
     String wheelchairAccessibleRideType
   )
-    implements CarHailingServiceParameters {}
+    implements RideHailingServiceParameters {}
 
   record LyftServiceParameters(
     String clientId,
     String clientSecret,
     String wheelchairAccessibleRideType
   )
-    implements CarHailingServiceParameters {}
+    implements RideHailingServiceParameters {}
 }

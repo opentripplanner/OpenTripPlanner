@@ -14,12 +14,12 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.opentripplanner.ext.ridehailing.CarHailingService;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideEstimateRequest;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
-import org.opentripplanner.ext.ridehailing.service.CarHailingServiceParameters;
+import org.opentripplanner.ext.ridehailing.service.RideHailingServiceParameters;
 import org.opentripplanner.ext.ridehailing.service.oauth.OAuthService;
 import org.opentripplanner.ext.ridehailing.service.oauth.UrlEncodedOAuthService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -29,7 +29,7 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UberService extends CarHailingService {
+public class UberService extends RideHailingService {
 
   private static final Logger LOG = LoggerFactory.getLogger(UberService.class);
   private static final String DEFAULT_BASE_URL = "https://api.uber.com/v1.2/";
@@ -39,7 +39,7 @@ public class UberService extends CarHailingService {
   private final String baseUrl;
   private final OAuthService oauthService;
 
-  public UberService(CarHailingServiceParameters.UberServiceParameters config) {
+  public UberService(RideHailingServiceParameters.UberServiceParameters config) {
     this.baseUrl = DEFAULT_BASE_URL;
 
     var authUrl = UriBuilder.fromUri(DEFAULT_AUTHENTICATION_URL + "oauth/v2/token").build();

@@ -12,7 +12,7 @@ import org.opentripplanner.ext.ridehailing.model.RideEstimateRequest;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 
-public abstract class CarHailingService {
+public abstract class RideHailingService {
 
   // This value should be no longer than 30 minutes (according to Uber API docs) TODO check Lyft time limit
   private static final Duration CACHE_DURATION = Duration.ofMinutes(2);

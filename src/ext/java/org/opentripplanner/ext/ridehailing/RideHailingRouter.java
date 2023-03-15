@@ -17,9 +17,9 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CarHailingRouter {
+public class RideHailingRouter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CarHailingRouter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RideHailingRouter.class);
 
   public static List<Itinerary> routeDirect(
     OtpServerRequestContext serverContext,
@@ -39,20 +39,24 @@ public class CarHailingRouter {
         return DirectStreetRouter
           .route(serverContext, req)
           .stream()
-          .map(i -> CarHailingRouter.addCarHailInformation(i, arrival.provider()));
+          .map(i -> RideHailingRouter.addCarHailInformation(i, arrival.provider()));
       })
       .toList();
   }
 
   public static Itinerary addCarHailInformation(Itinerary input, RideHailingProvider provider) {
-    var legs = input.getLegs().stream().map(l -> CarHailingRouter.addNetwork(l, provider)).toList();
+    var legs = input
+      .getLegs()
+      .stream()
+      .map(l -> RideHailingRouter.addNetwork(l, provider))
+      .toList();
     input.setLegs(legs);
     return input;
   }
 
   private static List<ArrivalTime> earliestArrivalTimes(
     RouteRequest routeRequest,
-    List<CarHailingService> services
+    List<RideHailingService> services
   ) {
     return routeRequest
       .from()

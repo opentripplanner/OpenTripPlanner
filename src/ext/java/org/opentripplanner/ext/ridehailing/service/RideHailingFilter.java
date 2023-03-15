@@ -2,18 +2,18 @@ package org.opentripplanner.ext.ridehailing.service;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import org.opentripplanner.ext.ridehailing.CarHailingService;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
-public class CarHailingFilter implements ItineraryListFilter {
+public class RideHailingFilter implements ItineraryListFilter {
 
-  private final List<CarHailingService> carHailingServices;
+  private final List<RideHailingService> rideHailingServices;
 
-  public CarHailingFilter(List<CarHailingService> carHailingServices) {
-    this.carHailingServices = carHailingServices;
+  public RideHailingFilter(List<RideHailingService> rideHailingServices) {
+    this.rideHailingServices = rideHailingServices;
   }
 
   @Override
@@ -46,8 +46,8 @@ public class CarHailingFilter implements ItineraryListFilter {
     return i;
   }
 
-  private CarHailingService findService(RideHailingProvider provider) {
-    return carHailingServices
+  private RideHailingService findService(RideHailingProvider provider) {
+    return rideHailingServices
       .stream()
       .filter(s -> s.carHailingCompany().equals(provider))
       .findAny()

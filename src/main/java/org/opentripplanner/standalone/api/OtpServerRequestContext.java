@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
-import org.opentripplanner.ext.ridehailing.CarHailingService;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.inspector.raster.TileRendererManager;
@@ -92,7 +92,7 @@ public interface OtpServerRequestContext {
 
   RaptorTuningParameters raptorTuningParameters();
 
-  List<CarHailingService> carHailingServices();
+  List<RideHailingService> carHailingServices();
 
   Duration streetRoutingTimeout();
 

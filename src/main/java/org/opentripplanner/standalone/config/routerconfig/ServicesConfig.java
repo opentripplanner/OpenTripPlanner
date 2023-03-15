@@ -7,7 +7,7 @@ import com.google.common.collect.Multimap;
 import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.ServicesParameters;
-import org.opentripplanner.ext.ridehailing.service.CarHailingServiceParameters;
+import org.opentripplanner.ext.ridehailing.service.RideHailingServiceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.services.UberConfig;
 
@@ -34,12 +34,12 @@ public class ServicesConfig implements ServicesParameters {
   }
 
   @Override
-  public List<CarHailingServiceParameters> carHailingServiceParameters() {
+  public List<RideHailingServiceParameters> carHailingServiceParameters() {
     return configList
       .values()
       .stream()
-      .filter(CarHailingServiceParameters.class::isInstance)
-      .map(CarHailingServiceParameters.class::cast)
+      .filter(RideHailingServiceParameters.class::isInstance)
+      .map(RideHailingServiceParameters.class::cast)
       .toList();
   }
 

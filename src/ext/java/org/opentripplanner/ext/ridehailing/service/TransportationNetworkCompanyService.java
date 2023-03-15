@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import org.opentripplanner.ext.ridehailing.CarHailingService;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
@@ -22,9 +22,9 @@ public class TransportationNetworkCompanyService implements Serializable {
 
   private static Logger LOG = LoggerFactory.getLogger(TransportationNetworkCompanyService.class);
 
-  private Map<RideHailingProvider, CarHailingService> sources = new HashMap<>();
+  private Map<RideHailingProvider, RideHailingService> sources = new HashMap<>();
 
-  public void addSource(CarHailingService source) {
+  public void addSource(RideHailingService source) {
     sources.put(source.carHailingCompany(), source);
   }
 
@@ -41,7 +41,7 @@ public class TransportationNetworkCompanyService implements Serializable {
     throws ExecutionException, InterruptedException {
     List<ArrivalTime> arrivalTimes = new ArrayList<>();
 
-    List<CarHailingService> companiesToRequestFrom = parseCompanies(companies);
+    List<RideHailingService> companiesToRequestFrom = parseCompanies(companies);
     if (companiesToRequestFrom.size() == 0) {
       return arrivalTimes;
     }
@@ -52,7 +52,7 @@ public class TransportationNetworkCompanyService implements Serializable {
     ExecutorService pool = Executors.newFixedThreadPool(companiesToRequestFrom.size());
     List<Callable<List<ArrivalTime>>> tasks = new ArrayList<>();
 
-    for (CarHailingService transportationNetworkCompany : companiesToRequestFrom) {
+    for (RideHailingService transportationNetworkCompany : companiesToRequestFrom) {
       tasks.add(() -> {
         LOG.debug(
           "Finding TNC arrival times for {} ({})",
@@ -75,8 +75,8 @@ public class TransportationNetworkCompanyService implements Serializable {
     return arrivalTimes;
   }
 
-  private List<CarHailingService> parseCompanies(String companies) {
-    List<CarHailingService> companyDataSources = new ArrayList<>();
+  private List<RideHailingService> parseCompanies(String companies) {
+    List<RideHailingService> companyDataSources = new ArrayList<>();
 
     // parse list of tnc companies
     for (String company : companies.split(",")) {
@@ -94,7 +94,7 @@ public class TransportationNetworkCompanyService implements Serializable {
     throws ExecutionException, InterruptedException {
     List<RideEstimate> rideEstimates = new ArrayList<>();
 
-    List<CarHailingService> companiesToRequestFrom = parseCompanies(companies);
+    List<RideHailingService> companiesToRequestFrom = parseCompanies(companies);
     if (companiesToRequestFrom.size() == 0) {
       return rideEstimates;
     }
@@ -103,7 +103,7 @@ public class TransportationNetworkCompanyService implements Serializable {
     ExecutorService pool = Executors.newFixedThreadPool(companiesToRequestFrom.size());
     List<Callable<List<RideEstimate>>> tasks = new ArrayList<>();
 
-    for (CarHailingService transportationNetworkCompany : companiesToRequestFrom) {
+    for (RideHailingService transportationNetworkCompany : companiesToRequestFrom) {
       tasks.add(() -> {
         LOG.debug(
           "Finding TNC ride/price estimates for {} for trip ({}) -> ({})",
@@ -127,7 +127,7 @@ public class TransportationNetworkCompanyService implements Serializable {
     return rideEstimates;
   }
 
-  private CarHailingService getTransportationNetworkCompanyDataSource(String company) {
+  private RideHailingService getTransportationNetworkCompanyDataSource(String company) {
     RideHailingProvider co = RideHailingProvider.valueOf(company);
     if (co == null) {
       throw new UnsupportedOperationException(

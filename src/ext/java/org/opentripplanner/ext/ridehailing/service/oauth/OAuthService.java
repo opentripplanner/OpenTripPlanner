@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import org.opentripplanner.ext.ridehailing.CarHailingService;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public abstract class OAuthService {
 
   private static ObjectMapper MAPPER = ObjectMappers.ignoringExtraFields();
-  private static final Logger LOG = LoggerFactory.getLogger(CarHailingService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RideHailingService.class);
   private CachedOAuthToken cachedToken = CachedOAuthToken.empty();
 
   /**

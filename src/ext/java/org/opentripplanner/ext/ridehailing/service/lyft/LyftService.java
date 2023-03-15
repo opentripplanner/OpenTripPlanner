@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Currency;
 import java.util.List;
-import org.opentripplanner.ext.ridehailing.CarHailingService;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideEstimateRequest;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
-import org.opentripplanner.ext.ridehailing.service.CarHailingServiceParameters.LyftServiceParameters;
+import org.opentripplanner.ext.ridehailing.service.RideHailingServiceParameters.LyftServiceParameters;
 import org.opentripplanner.ext.ridehailing.service.oauth.JsonPostAuthService;
 import org.opentripplanner.ext.ridehailing.service.oauth.OAuthService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -28,7 +28,7 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LyftService extends CarHailingService {
+public class LyftService extends RideHailingService {
 
   private static final Logger LOG = LoggerFactory.getLogger(LyftService.class);
   private static final String DEFAULT_LYFT_API_URL = "https://api.lyft.com/";
