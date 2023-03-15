@@ -66,7 +66,7 @@
         <micrometer.version>1.10.5</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
-        <logback.version>1.4.5</logback.version>
+        <logback.version>1.4.6</logback.version>
         <lucene.version>9.5.0</lucene.version>
         <graphql.version>20.0</graphql.version>
         <slf4j.version>2.0.6</slf4j.version>
