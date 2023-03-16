@@ -130,13 +130,6 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return incoming.length;
   }
 
-  public boolean hasEdges() {
-    if (outgoing == null || incoming == null) {
-      return false;
-    }
-    return true;
-  }
-
   /** Get the longitude of the vertex */
   public final double getX() {
     return getLon();
