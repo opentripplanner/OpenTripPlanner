@@ -1,6 +1,9 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import static org.opentripplanner.routing.api.request.preference.AccessibilityPreferences.ofCost;
+
 import java.util.Objects;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
@@ -37,10 +40,9 @@ public record WheelchairPreferences(
    * assumed to be so for that reason they only have a small default penalty for unknown
    * accessibility
    */
-  private static final AccessibilityPreferences DEFAULT_ELEVATOR_FEATURE = AccessibilityPreferences.ofCost(
-    20,
-    3600
-  );
+  private static final AccessibilityPreferences DEFAULT_ELEVATOR_FEATURE = ofCost(20, 3600);
+
+  public static final AccessibilityPreferences DEFAULT_COSTS = ofCost(600, 3600);
 
   public static final WheelchairPreferences DEFAULT = new WheelchairPreferences(
     AccessibilityPreferences.ofOnlyAccessible(),
@@ -68,5 +70,23 @@ public record WheelchairPreferences(
     this.maxSlope = Units.ratio(maxSlope);
     this.slopeExceededReluctance = Units.reluctance(slopeExceededReluctance);
     this.stairsReluctance = Units.reluctance(stairsReluctance);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(WheelchairPreferences.class)
+      .addObjOp("trip", trip, DEFAULT.trip, i -> i.toString(DEFAULT_COSTS))
+      .addObjOp("stop", stop, DEFAULT.stop, i -> i.toString(DEFAULT_COSTS))
+      .addObjOp("elevator", elevator, DEFAULT.elevator, i -> i.toString(DEFAULT.elevator))
+      .addNum(
+        "inaccessibleStreetReluctance",
+        inaccessibleStreetReluctance,
+        DEFAULT.inaccessibleStreetReluctance
+      )
+      .addNum("maxSlope", maxSlope, DEFAULT.maxSlope)
+      .addNum("slopeExceededReluctance", slopeExceededReluctance, DEFAULT.slopeExceededReluctance)
+      .addNum("stairsReluctance", stairsReluctance, DEFAULT.stairsReluctance)
+      .toString();
   }
 }
