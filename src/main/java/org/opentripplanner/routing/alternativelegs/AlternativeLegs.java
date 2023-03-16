@@ -53,7 +53,6 @@ public class AlternativeLegs {
       searchBackward,
       filter,
       false,
-      false,
       false
     );
   }
@@ -84,8 +83,7 @@ public class AlternativeLegs {
     boolean searchBackward,
     AlternativeLegsFilter filter,
     boolean exactOriginStop,
-    boolean exactDestinationStop,
-    boolean onlyFirstDestinationStop
+    boolean exactDestinationStop
   ) {
     StopLocation fromStop = leg.getFrom().stop;
     StopLocation toStop = leg.getTo().stop;
@@ -266,7 +264,6 @@ public class AlternativeLegs {
       .range(0, stops.size())
       .filter(i -> origins.contains(stops.get(i)) && tripPattern.canBoard(i))
       .boxed()
-      // Create a cartesian product of the pairs
       .flatMap(boardingPosition ->
         Arrays
           .stream(alightingPositions)
