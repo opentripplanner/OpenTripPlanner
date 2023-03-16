@@ -202,7 +202,7 @@ public class StopAndStationMapperTest {
   }
 
   @ParameterizedTest
-  @CsvSource(value = {"true", "false"})
+  @CsvSource(value = { "true", "false" })
   public void testMapIsolatedStopPlace(boolean isolated) {
     Collection<StopPlace> stopPlaces = new ArrayList<>();
     StopPlace stopPlace;
@@ -254,10 +254,7 @@ public class StopAndStationMapperTest {
     // Create on quay with access, one without, and one with NULL
     var quay1 = createQuay("ST:Quay:1", "Quay1", "1", 55.706063, 13.186708, "a");
 
-    stopPlace.setQuays(
-      new Quays_RelStructure()
-        .withQuayRefOrQuay(quay1)
-    );
+    stopPlace.setQuays(new Quays_RelStructure().withQuayRefOrQuay(quay1));
 
     StopModelBuilder stopModelBuilder = StopModel.of();
 
@@ -270,11 +267,18 @@ public class StopAndStationMapperTest {
     stopModelBuilder.regularStopsById().addAll(stopAndStationMapper2.resultStops);
 
     assertEquals(1, stopModelBuilder.regularStopsById().size());
-    assertEquals(0, stopModelBuilder.regularStopsById().get(MappingSupport.ID_FACTORY.createId("ST:Quay:1")).getIndex());
-
+    assertEquals(
+      0,
+      stopModelBuilder
+        .regularStopsById()
+        .get(MappingSupport.ID_FACTORY.createId("ST:Quay:1"))
+        .getIndex()
+    );
   }
 
-  private static StopAndStationMapper createStopAndStationMapper(StopModelBuilder stopModelBuilder) {
+  private static StopAndStationMapper createStopAndStationMapper(
+    StopModelBuilder stopModelBuilder
+  ) {
     return new StopAndStationMapper(
       MappingSupport.ID_FACTORY,
       new HierarchicalVersionMapById<>(),
@@ -354,11 +358,11 @@ public class StopAndStationMapperTest {
       wheelchairAccessibility,
       () ->
         "wheelchairAccessibility should be " +
-          expected +
-          " found " +
-          wheelchairAccessibility +
-          " for quayId = " +
-          quayId
+        expected +
+        " found " +
+        wheelchairAccessibility +
+        " for quayId = " +
+        quayId
     );
   }
 
