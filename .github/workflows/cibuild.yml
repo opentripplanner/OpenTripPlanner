@@ -188,7 +188,7 @@ jobs:
 
       # March '23: we temporarily publish to both Dockerhub and Github Container Registry as the
       # Dockerhub free team registry is going away
-      - name: Build container image with Jib, push to Dockerhub
+      - name: Build container image with Jib, push to Github Container Registry 
         env:
           CONTAINER_REPO: ghcr.io/opentripplanner/opentripplanner
           CONTAINER_REGISTRY_USER: ${{ github.repository_owner }}
