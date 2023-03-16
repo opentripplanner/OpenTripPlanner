@@ -19,6 +19,7 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.service.StopModel;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
@@ -77,6 +78,7 @@ public class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       new HierarchicalVersionMapById<>(),
       null,
+      StopModel.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
       false
@@ -157,6 +159,7 @@ public class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       quaysById,
       null,
+      StopModel.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
       false
@@ -226,6 +229,7 @@ public class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       new HierarchicalVersionMapById<>(),
       null,
+      StopModel.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
       isolated
