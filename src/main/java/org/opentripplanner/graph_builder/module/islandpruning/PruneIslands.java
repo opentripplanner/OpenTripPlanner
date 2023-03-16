@@ -496,13 +496,6 @@ public class PruneIslands implements GraphBuilderModule {
       return false;
     }
 
-    for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {
-      Vertex v = vIter.next();
-      if (v.getDegreeOut() + v.getDegreeIn() == 0) {
-        graph.remove(v);
-      }
-    }
-
     if (stats.isEmpty()) {
       return false;
     }
