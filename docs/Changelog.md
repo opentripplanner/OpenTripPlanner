@@ -85,6 +85,14 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Use UnscheduledTrip for flex trips with one scheduled and one unscheduled stop. [#4905](https://github.com/opentripplanner/OpenTripPlanner/pull/4905)
 - Remove deprecation annotation from viaTrip query field [#4923](https://github.com/opentripplanner/OpenTripPlanner/pull/4923)
 - Validate missing transit data before building transit graph [#4930](https://github.com/opentripplanner/OpenTripPlanner/pull/4930)
+- Use durations for Raptor search window configuration [#4926](https://github.com/opentripplanner/OpenTripPlanner/pull/4926)
+- Add graph build issue statistics to metrics endpoint [#4869](https://github.com/opentripplanner/OpenTripPlanner/pull/4869)
+- Refactor SIRI-ET updaters [#4865](https://github.com/opentripplanner/OpenTripPlanner/pull/4865)
+- Add documentation about system requirements and suggestions [#4937](https://github.com/opentripplanner/OpenTripPlanner/pull/4937)
+- Make SameFirstOrLastTripFilter implement ItineraryDeletionFlagger [#4943](https://github.com/opentripplanner/OpenTripPlanner/pull/4943)
+- Adding support for SIRI SX-messages tagged on DatedServiceJourney [#4888](https://github.com/opentripplanner/OpenTripPlanner/pull/4888)
+- Fix initial A* state of car rental [#4934](https://github.com/opentripplanner/OpenTripPlanner/pull/4934)
+- Remove check for (now optional) ENV-variable for GCP Authentication [#4966](https://github.com/opentripplanner/OpenTripPlanner/pull/4966)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

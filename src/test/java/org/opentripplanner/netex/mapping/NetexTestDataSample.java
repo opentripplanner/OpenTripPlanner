@@ -26,6 +26,7 @@ import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplayRefStructure;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
+import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.MultilingualString;
@@ -59,7 +60,7 @@ class NetexTestDataSample {
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final JourneyPattern journeyPattern;
-  private final HierarchicalMapById<JourneyPattern> journeyPatternById = new HierarchicalMapById<>();
+  private final HierarchicalMapById<JourneyPattern_VersionStructure> journeyPatternById = new HierarchicalMapById<>();
   private final HierarchicalMapById<DestinationDisplay> destinationDisplayById = new HierarchicalMapById<>();
   private final EntityById<RegularStop> stopsById = new EntityById<>();
   private final HierarchicalMap<String, String> quayIdByStopPointRef = new HierarchicalMap<>();
@@ -218,7 +219,7 @@ class NetexTestDataSample {
     return routesById;
   }
 
-  HierarchicalMapById<JourneyPattern> getJourneyPatternById() {
+  HierarchicalMapById<JourneyPattern_VersionStructure> getJourneyPatternById() {
     return journeyPatternById;
   }
 

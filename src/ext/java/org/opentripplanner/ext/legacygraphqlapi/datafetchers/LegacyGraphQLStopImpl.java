@@ -46,7 +46,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment -> {
       TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
       var args = new LegacyGraphQLTypes.LegacyGraphQLStopAlertsArgs(environment.getArguments());
-      List<LegacyGraphQLTypes.LegacyGraphQLStopAlertType> types = (List) args.getLegacyGraphQLTypes();
+      List<LegacyGraphQLTypes.LegacyGraphQLStopAlertType> types = args.getLegacyGraphQLTypes();
       FeedScopedId id = getValue(environment, StopLocation::getId, AbstractTransitEntity::getId);
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();

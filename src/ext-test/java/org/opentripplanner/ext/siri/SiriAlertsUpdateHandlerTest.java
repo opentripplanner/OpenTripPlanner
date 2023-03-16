@@ -36,6 +36,7 @@ import uk.org.siri.siri20.AffectedStopPointStructure;
 import uk.org.siri.siri20.AffectedVehicleJourneyStructure;
 import uk.org.siri.siri20.AffectsScopeStructure;
 import uk.org.siri.siri20.DataFrameRefStructure;
+import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.DefaultedTextStructure;
 import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
 import uk.org.siri.siri20.HalfOpenTimestampOutputRangeStructure;
@@ -527,6 +528,43 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(situationNumber, transitAlert.getId().getId());
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndTrip.class));
     assertTrue(matchesEntity(transitAlert, stopId1, tripId, serviceDate));
+  }
+
+  @Test
+  public void testSiriSxUpdateForTripByDatedVehicleJourney() {
+    init();
+    final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
+
+    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+
+    final String situationNumber = "TST:SituationNumber:1234";
+    final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
+    final ZonedDateTime endTime = ZonedDateTime.parse("2014-01-01T23:59:59+01:00");
+
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      startTime,
+      endTime,
+      createAffectsDatedVehicleJourney(tripId.getId(), null)
+    );
+
+    alertsUpdateHandler.update(createServiceDelivery(ptSituation));
+
+    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+
+    LocalDate serviceDate = LocalDate.of(2014, 1, 1);
+    final Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(
+      tripId,
+      serviceDate
+    );
+
+    assertNotNull(tripPatches);
+    assertEquals(1, tripPatches.size());
+    final TransitAlert transitAlert = tripPatches.iterator().next();
+
+    assertEquals(situationNumber, transitAlert.getId().getId());
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Trip.class));
+    assertTrue(matchesEntity(transitAlert, tripId));
   }
 
   @Test
@@ -1044,6 +1082,31 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     vehicleJourney.setValue(vehicleJourneyRef);
     affectedVehicleJourney.getVehicleJourneyReves().add(vehicleJourney);
     affectedVehicleJourney.setOriginAimedDepartureTime(originAimedDepartureTime);
+
+    if (stopIds != null) {
+      AffectedRouteStructure affectedRoute = new AffectedRouteStructure();
+      AffectedRouteStructure.StopPoints stopPoints = createAffectedStopPoints(stopIds);
+      affectedRoute.setStopPoints(stopPoints);
+      affectedVehicleJourney.getRoutes().add(affectedRoute);
+    }
+
+    vehicleJourneys.getAffectedVehicleJourneies().add(affectedVehicleJourney);
+    affects.setVehicleJourneys(vehicleJourneys);
+
+    return affects;
+  }
+
+  private AffectsScopeStructure createAffectsDatedVehicleJourney(
+    String datedVehicleJourneyRef,
+    String... stopIds
+  ) {
+    AffectsScopeStructure affects = new AffectsScopeStructure();
+    AffectsScopeStructure.VehicleJourneys vehicleJourneys = new AffectsScopeStructure.VehicleJourneys();
+    AffectedVehicleJourneyStructure affectedVehicleJourney = new AffectedVehicleJourneyStructure();
+
+    DatedVehicleJourneyRef datedVehicleJourney = new DatedVehicleJourneyRef();
+    datedVehicleJourney.setValue(datedVehicleJourneyRef);
+    affectedVehicleJourney.getDatedVehicleJourneyReves().add(datedVehicleJourney);
 
     if (stopIds != null) {
       AffectedRouteStructure affectedRoute = new AffectedRouteStructure();

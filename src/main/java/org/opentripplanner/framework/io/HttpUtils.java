@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.http.Header;
@@ -18,9 +19,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpUtils {
 
+  private static final Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
   private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
   public static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
   public static final String HEADER_X_FORWARDED_HOST = "X-Forwarded-Host";
@@ -76,12 +80,13 @@ public class HttpUtils {
       );
     }
     if (response.getStatusLine().getStatusCode() != 200) {
-      throw new RuntimeException(
-        "Resource " +
-        sanitizeUri(uri) +
-        " unavailable. HTTP error code " +
+      LOG.warn(
+        "Headers of Resource {} unavailable. HTTP error code {}",
+        sanitizeUri(uri),
         response.getStatusLine().getStatusCode()
       );
+
+      return Collections.emptyList();
     }
     return Arrays.stream(response.getAllHeaders()).toList();
   }
