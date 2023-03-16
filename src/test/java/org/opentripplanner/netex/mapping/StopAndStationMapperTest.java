@@ -17,9 +17,9 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.StopModelBuilder;
 import org.rutebanken.netex.model.AccessibilityAssessment;
@@ -242,6 +242,7 @@ public class StopAndStationMapperTest {
 
   @Test
   public void testDuplicateStopIndices() {
+    StopLocation.initIndexCounter(0);
     var stopPlace = createStopPlace(
       "ST:StopPlace:1",
       "Lunce C",
