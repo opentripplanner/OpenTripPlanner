@@ -372,7 +372,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       RideHailingProvider.UBER,
       new RideEstimate(
         RideHailingProvider.UBER,
-        Duration.ofMinutes(duration),
+        Duration.ofSeconds(duration),
         Money.euros(1000),
         Money.euros(2000),
         "VW",

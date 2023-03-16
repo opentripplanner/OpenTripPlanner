@@ -1351,10 +1351,17 @@ type Money {
     cents: Int!
 }
 
+""""
+An ISO-8601-formatted time duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
+"""
+scalar Duration
+
 type RideEstimate {
     provider: String!
     minCost: Money!
     maxCost: Money!
+    "The estimated time it takes for the vehicle to arrive."
+    arrival: Duration!
 }
 
 type Leg {
@@ -1503,7 +1510,7 @@ type Leg {
         """
         destinationModesWithParentStation: [TransitMode!]): [Leg!]
 
-    "Estimate of "
+    "Estimate of a hailed ride like Uber."
     rideEstimate: RideEstimate
 }
 

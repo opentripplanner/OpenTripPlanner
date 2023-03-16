@@ -122,7 +122,8 @@
                 "maxCost" : {
                   "currency" : "EUR",
                   "cents" : 2000
-                }
+                },
+                "arrival" : "PT10M"
               }
             }
           ]

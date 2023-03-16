@@ -102,6 +102,7 @@ class LegacyGraphQLIndex {
       IntrospectionTypeWiring typeWiring = new IntrospectionTypeWiring(typeRegistry);
       RuntimeWiring runtimeWiring = RuntimeWiring
         .newRuntimeWiring()
+        .scalar(LegacyGraphQLScalars.durationScalar)
         .scalar(LegacyGraphQLScalars.polylineScalar)
         .scalar(LegacyGraphQLScalars.geoJsonScalar)
         .scalar(LegacyGraphQLScalars.graphQLIDScalar)
