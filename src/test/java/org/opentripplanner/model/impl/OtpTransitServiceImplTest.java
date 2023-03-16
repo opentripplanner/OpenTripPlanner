@@ -115,7 +115,7 @@ public class OtpTransitServiceImplTest {
       stopTimes.addAll(subject.getStopTimesForTrip(trip));
     }
 
-    assertEquals(85, stopTimes.size());
+    assertEquals(88, stopTimes.size());
     assertEquals(
       "StopTime(seq=1 stop=F:A trip=agency:1.1 times=00:00:00-00:00:00)",
       first(stopTimes).toString()
