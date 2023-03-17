@@ -62,12 +62,13 @@
       ]
     },
     {
-      "description": "automatically merge test dependencies",
+      "description": "automatically merge test and logging dependencies",
       "matchPackageNames": [
         "org.mockito:mockito-core",
         "org.junit.jupiter:",
         "com.tngtech.archunit:archunit",
-        "org.apache.maven.plugins:maven-surefire-plugin"
+        "org.apache.maven.plugins:maven-surefire-plugin",
+        "org.slf4j:"
       ],
       "automerge": true,
       "schedule": "after 11pm and before 5am every weekday"
