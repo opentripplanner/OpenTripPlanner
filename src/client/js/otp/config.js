@@ -351,6 +351,5 @@ otp.config.modes = {
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "FLEX_DIRECT"              : _tr('Direct flex search'),
     "CARPOOL,WALK"             : _tr("Carpool"),
-    "CAR_HAIL,WALK"            : _tr("Car hailing only"),
     "CAR_HAIL,TRANSIT,WALK"    : _tr("Car hailing and transit")
 };
