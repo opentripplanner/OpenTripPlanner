@@ -7,5 +7,4 @@ public sealed interface RideHailingServiceParameters {
     String wheelchairAccessibleRideType
   )
     implements RideHailingServiceParameters {}
-
 }

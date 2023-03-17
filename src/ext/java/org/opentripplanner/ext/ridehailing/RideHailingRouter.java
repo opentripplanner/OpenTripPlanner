@@ -34,7 +34,7 @@ public class RideHailingRouter {
       .parallelStream()
       .flatMap(arrival -> {
         var req = routeRequest.clone();
-        req.setDateTime(req.dateTime().plus(arrival.estimatedDuration()));
+        req.setDateTime(req.dateTime().plus(arrival.duration()));
 
         return DirectStreetRouter
           .route(serverContext, req)

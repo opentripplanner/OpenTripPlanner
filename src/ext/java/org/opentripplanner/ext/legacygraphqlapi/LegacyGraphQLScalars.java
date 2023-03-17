@@ -26,27 +26,24 @@ public class LegacyGraphQLScalars {
     .coercing(
       new Coercing<Duration, String>() {
         @Override
-        public String serialize(
-          @Nonnull Object dataFetcherResult
-        ) throws CoercingSerializeException {
-          if(dataFetcherResult instanceof Duration duration) {
+        public String serialize(@Nonnull Object dataFetcherResult)
+          throws CoercingSerializeException {
+          if (dataFetcherResult instanceof Duration duration) {
             return duration.toString();
           } else {
-            throw new IllegalArgumentException("Cannot format %s as a ISO-8601 duration".formatted(dataFetcherResult));
+            throw new IllegalArgumentException(
+              "Cannot format %s as a ISO-8601 duration".formatted(dataFetcherResult)
+            );
           }
         }
 
         @Override
-        public  Duration parseValue(
-          Object input
-        ) throws CoercingParseValueException {
+        public Duration parseValue(Object input) throws CoercingParseValueException {
           return null;
         }
 
         @Override
-        public  Duration parseLiteral(
-           Object input
-        ) throws CoercingParseLiteralException {
+        public Duration parseLiteral(Object input) throws CoercingParseLiteralException {
           return null;
         }
       }
