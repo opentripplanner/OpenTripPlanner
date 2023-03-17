@@ -7,7 +7,7 @@ import com.google.common.collect.Multimap;
 import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.ServicesParameters;
-import org.opentripplanner.ext.ridehailing.service.RideHailingServiceParameters;
+import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.services.UberConfig;
 

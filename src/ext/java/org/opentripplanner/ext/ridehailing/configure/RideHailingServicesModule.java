@@ -5,7 +5,7 @@ import dagger.Provides;
 import jakarta.inject.Singleton;
 import java.util.List;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
-import org.opentripplanner.ext.ridehailing.service.RideHailingServiceParameters;
+import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.ridehailing.service.uber.UberService;
 import org.opentripplanner.standalone.config.RouterConfig;
 

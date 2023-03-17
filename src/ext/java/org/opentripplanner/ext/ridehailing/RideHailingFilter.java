@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.ridehailing.service;
+package org.opentripplanner.ext.ridehailing;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;

@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.ridehailing.service;
+package org.opentripplanner.ext.ridehailing;
 
 public sealed interface RideHailingServiceParameters {
   record UberServiceParameters(
