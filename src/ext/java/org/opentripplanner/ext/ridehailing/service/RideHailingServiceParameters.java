@@ -8,10 +8,4 @@ public sealed interface RideHailingServiceParameters {
   )
     implements RideHailingServiceParameters {}
 
-  record LyftServiceParameters(
-    String clientId,
-    String clientSecret,
-    String wheelchairAccessibleRideType
-  )
-    implements RideHailingServiceParameters {}
 }
