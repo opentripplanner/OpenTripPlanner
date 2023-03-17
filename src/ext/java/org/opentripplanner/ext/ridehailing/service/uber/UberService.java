@@ -14,7 +14,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.ridehailing.CachingRideHailingService;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideEstimateRequest;
@@ -29,7 +29,7 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UberService extends RideHailingService {
+public class UberService extends CachingRideHailingService {
 
   private static final Logger LOG = LoggerFactory.getLogger(UberService.class);
   private static final String DEFAULT_BASE_URL = "https://api.uber.com/v1.2/";
