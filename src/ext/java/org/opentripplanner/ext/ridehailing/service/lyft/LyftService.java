@@ -83,16 +83,16 @@ public class LyftService extends RideHailingService {
       // serialize into Arrival Time objects
       List<ArrivalTime> arrivalTimes = new ArrayList<>();
 
-      LOG.info("Received " + response.eta_estimates.size() + " lyft arrival time estimates");
+      LOG.info("Received " + response.eta_estimates().size() + " lyft arrival time estimates");
 
-      for (final LyftArrivalEstimate time : response.eta_estimates) {
+      for (final LyftArrivalEstimateResponse.LyftArrivalEstimate time : response.eta_estimates()) {
         arrivalTimes.add(
           new ArrivalTime(
             RideHailingProvider.LYFT,
-            time.ride_type,
-            time.display_name,
-            Duration.ofSeconds(time.eta_seconds),
-            productIsWheelchairAccessible(time.ride_type)
+            time.ride_type(),
+            time.display_name(),
+            Duration.ofSeconds(time.eta_seconds()),
+            productIsWheelchairAccessible(time.ride_type())
           )
         );
       }
@@ -143,27 +143,27 @@ public class LyftService extends RideHailingService {
         LyftRideEstimateResponse.class
       );
 
-      if (response.cost_estimates == null) {
+      if (response.cost_estimates() == null) {
         throw new IOException("Unrecognized response format");
       }
 
-      LOG.info("Received " + response.cost_estimates.size() + " lyft price/time estimates");
+      LOG.info("Received " + response.cost_estimates().size() + " lyft price/time estimates");
 
       List<RideEstimate> estimates = new ArrayList<>();
 
-      for (final LyftRideEstimate estimate : response.cost_estimates) {
-        var currency = Currency.getInstance(estimate.currency);
+      for (final LyftRideEstimateResponse.LyftRideEstimate estimate : response.cost_estimates()) {
+        var currency = Currency.getInstance(estimate.currency());
         estimates.add(
           new RideEstimate(
             RideHailingProvider.LYFT,
-            Duration.ofSeconds(estimate.estimated_duration_seconds),
+            Duration.ofSeconds(estimate.estimated_duration_seconds()),
             // Lyft's estimated cost is in the "minor" unit, so the following
             // may not work in countries that don't have 100 minor units per major unit
             // see https://en.wikipedia.org/wiki/ISO_4217#Treatment_of_minor_currency_units_(the_"exponent")
-            new Money(currency, estimate.estimated_cost_cents_max),
-            new Money(currency, estimate.estimated_cost_cents_min),
-            estimate.ride_type,
-            productIsWheelchairAccessible(estimate.ride_type)
+            new Money(currency, estimate.estimated_cost_cents_max()),
+            new Money(currency, estimate.estimated_cost_cents_min()),
+            estimate.ride_type(),
+            productIsWheelchairAccessible(estimate.ride_type())
           )
         );
       }
