@@ -53,4 +53,6 @@ public abstract class CachingOAuthService implements OAuthService {
   }
 
   protected abstract HttpRequest oauthTokenRequest();
+
+  public static record SerializedOAuthToken(String access_token, long expires_in) {}
 }

@@ -2,6 +2,7 @@ package org.opentripplanner.ext.ridehailing.service.oauth;
 
 import java.time.Duration;
 import java.time.Instant;
+import org.opentripplanner.ext.ridehailing.service.oauth.CachingOAuthService.SerializedOAuthToken;
 
 /**
  * Holds an OAuth access token and its expiration time for querying ride-hail APIs.

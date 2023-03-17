@@ -67,15 +67,21 @@ public class UberService extends CachingRideHailingService {
 
   @Override
   public List<ArrivalTime> queryArrivalTimes(WgsCoordinate coord) throws IOException {
-    var uri = UriBuilder
-      .fromUri(timeEstimateUri)
-      .queryParam("start_latitude", coord.latitude())
-      .queryParam("start_longitude", coord.longitude())
-      .build();
+    var uri = UriBuilder.fromUri(timeEstimateUri).build();
+
+    var finalUri = uri;
+    if (uri.getScheme().equalsIgnoreCase("https")) {
+      finalUri =
+        UriBuilder
+          .fromUri(uri)
+          .queryParam("start_latitude", coord.latitude())
+          .queryParam("start_longitude", coord.longitude())
+          .build();
+    }
 
     LOG.info("Made arrival time request to Uber API at following URL: {}", uri);
 
-    InputStream responseStream = HttpUtils.openInputStream(uri, headers());
+    InputStream responseStream = HttpUtils.openInputStream(finalUri, headers());
     var response = MAPPER.readValue(responseStream, UberArrivalEstimateResponse.class);
 
     LOG.debug("Received {} Uber arrival time estimates", response.times().size());
@@ -103,17 +109,23 @@ public class UberService extends CachingRideHailingService {
 
   @Override
   public List<RideEstimate> queryRideEstimates(RideEstimateRequest request) throws IOException {
-    var uri = UriBuilder
-      .fromUri(priceEstimateUri)
-      .queryParam("start_latitude", request.startPosition().latitude())
-      .queryParam("start_longitude", request.startPosition().longitude())
-      .queryParam("end_latitude", request.endPosition().latitude())
-      .queryParam("end_longitude", request.endPosition().longitude())
-      .build();
+    var uri = UriBuilder.fromUri(priceEstimateUri).build();
+
+    var finalUri = uri;
+    if (uri.getScheme().equalsIgnoreCase("https")) {
+      finalUri =
+        UriBuilder
+          .fromUri(uri)
+          .queryParam("start_latitude", request.startPosition().latitude())
+          .queryParam("start_longitude", request.startPosition().longitude())
+          .queryParam("end_latitude", request.endPosition().latitude())
+          .queryParam("end_longitude", request.endPosition().longitude())
+          .build();
+    }
 
     LOG.info("Made price estimate request to Uber API at following URL: {}", uri);
 
-    InputStream responseStream = HttpUtils.openInputStream(uri, headers());
+    InputStream responseStream = HttpUtils.openInputStream(finalUri, headers());
     var response = MAPPER.readValue(responseStream, UberTripTimeEstimateResponse.class);
 
     if (response.prices() == null) {
@@ -122,7 +134,7 @@ public class UberService extends CachingRideHailingService {
 
     LOG.debug("Received {} Uber price estimates", response.prices().size());
 
-    var estimates = response
+    return response
       .prices()
       .stream()
       .map(price -> {
@@ -137,16 +149,6 @@ public class UberService extends CachingRideHailingService {
         );
       })
       .toList();
-
-    if (estimates.isEmpty()) {
-      LOG.warn(
-        "No Uber service available for trip from {} to {}",
-        request.startPosition(),
-        request.endPosition()
-      );
-    }
-
-    return estimates;
   }
 
   @Nonnull
