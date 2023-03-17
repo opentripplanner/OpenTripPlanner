@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import org.opentripplanner.ext.ridehailing.RideHailingRouter;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -246,11 +245,7 @@ public class RoutingWorker {
   ) {
     debugTimingAggregator.startedDirectStreetRouter();
     try {
-      if (request.journey().modes().directMode == StreetMode.CAR_HAILING) {
-        itineraries.addAll(RideHailingRouter.routeDirect(serverContext, request));
-      } else {
-        itineraries.addAll(DirectStreetRouter.route(serverContext, request));
-      }
+      itineraries.addAll(DirectStreetRouter.route(serverContext, request));
     } catch (RoutingValidationException e) {
       routingErrors.addAll(e.getRoutingErrors());
     } finally {
