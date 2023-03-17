@@ -70,7 +70,7 @@ public class SmooveBikeRentalDataSource
       log.warn("Error parsing bike rental station {}", station.id, e);
       return null;
     }
-    if (!node.path("operative").asText().equals("true")) {
+    if (!node.path("style").asText().equals("Station on")) {
       station.isRenting = false;
       station.isReturning = false;
       station.vehiclesAvailable = 0;
