@@ -40,14 +40,14 @@ public record WheelchairPreferences(
    * assumed to be so for that reason they only have a small default penalty for unknown
    * accessibility
    */
-  private static final AccessibilityPreferences DEFAULT_ELEVATOR_FEATURE = ofCost(20, 3600);
+  private static final AccessibilityPreferences DEFAULT_ELEVATOR_PREFERENCES = ofCost(20, 3600);
 
   public static final AccessibilityPreferences DEFAULT_COSTS = ofCost(600, 3600);
 
   public static final WheelchairPreferences DEFAULT = new WheelchairPreferences(
     AccessibilityPreferences.ofOnlyAccessible(),
     AccessibilityPreferences.ofOnlyAccessible(),
-    DEFAULT_ELEVATOR_FEATURE,
+    DEFAULT_ELEVATOR_PREFERENCES,
     DEFAULT_INACCESSIBLE_STREET_RELUCTANCE,
     DEFAULT_MAX_SLOPE,
     DEFAULT_SLOPE_EXCEEDED_RELUCTANCE,
