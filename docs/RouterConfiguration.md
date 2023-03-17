@@ -466,7 +466,16 @@ Http headers.
         "onlyConsiderAccessible" : false,
         "unknownCost" : 600,
         "inaccessibleCost" : 3600
-      }
+      },
+      "elevator" : {
+        "onlyConsiderAccessible" : false,
+        "unknownCost" : 20,
+        "inaccessibleCost" : 3600
+      },
+      "inaccessibleStreetReluctance" : 25,
+      "maxSlope" : 0.083,
+      "slopeExceededReluctance" : 1,
+      "stairsReluctance" : 100
     }
   },
   "flex" : {
