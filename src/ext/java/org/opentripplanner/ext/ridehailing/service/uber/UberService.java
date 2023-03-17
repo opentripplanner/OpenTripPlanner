@@ -33,23 +33,31 @@ public class UberService extends CachingRideHailingService {
 
   private static final Logger LOG = LoggerFactory.getLogger(UberService.class);
   private static final String DEFAULT_BASE_URL = "https://api.uber.com/v1.2/";
-  private static final String DEFAULT_AUTHENTICATION_URL = "https://login.uber.com/";
+  private static final String DEFAULT_TIME_ESTIMATE_URI = DEFAULT_BASE_URL + "estimates/time";
+  private static final String DEFAULT_PRICE_ESTIMATE_URI = DEFAULT_BASE_URL + "estimates/price";
   private static final ObjectMapper MAPPER = ObjectMappers.ignoringExtraFields();
 
-  private final String baseUrl;
   private final OAuthService oauthService;
+  private final String timeEstimateUri;
+  private final String priceEstimateUri;
 
   public UberService(RideHailingServiceParameters.UberServiceParameters config) {
-    this.baseUrl = DEFAULT_BASE_URL;
-
-    var authUrl = UriBuilder.fromUri(DEFAULT_AUTHENTICATION_URL + "oauth/v2/token").build();
-    this.oauthService =
+    this(
       new UrlEncodedOAuthService(
         config.clientSecret(),
         config.clientId(),
         "ride_request.estimate",
-        authUrl
-      );
+        UriBuilder.fromUri("https://login.uber.com/oauth/v2/token").build()
+      ),
+      DEFAULT_PRICE_ESTIMATE_URI,
+      DEFAULT_TIME_ESTIMATE_URI
+    );
+  }
+
+  UberService(OAuthService oauthService, String priceEstimateUri, String timeEstimateUri) {
+    this.oauthService = oauthService;
+    this.priceEstimateUri = priceEstimateUri;
+    this.timeEstimateUri = timeEstimateUri;
   }
 
   @Override
@@ -60,7 +68,7 @@ public class UberService extends CachingRideHailingService {
   @Override
   public List<ArrivalTime> queryArrivalTimes(WgsCoordinate coord) throws IOException {
     var uri = UriBuilder
-      .fromUri(baseUrl + "estimates/time")
+      .fromUri(timeEstimateUri)
       .queryParam("start_latitude", coord.latitude())
       .queryParam("start_longitude", coord.longitude())
       .build();
@@ -96,7 +104,7 @@ public class UberService extends CachingRideHailingService {
   @Override
   public List<RideEstimate> queryRideEstimates(RideEstimateRequest request) throws IOException {
     var uri = UriBuilder
-      .fromUri(baseUrl + "estimates/price")
+      .fromUri(priceEstimateUri)
       .queryParam("start_latitude", request.startPosition().latitude())
       .queryParam("start_longitude", request.startPosition().longitude())
       .queryParam("end_latitude", request.endPosition().latitude())

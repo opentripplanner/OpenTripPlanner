@@ -9,7 +9,7 @@ import java.net.http.HttpRequest;
  * Implementation of an OAuth service that sends its parameters as a form url-endcoded
  * POST request.
  */
-public class UrlEncodedOAuthService extends OAuthService {
+public class UrlEncodedOAuthService extends CachingOAuthService {
 
   private final ClientCredentialsRequest authRequest;
   private final URI uri;

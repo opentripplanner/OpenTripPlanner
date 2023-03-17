@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.standalone.config.RouterConfig;
 
-public class ServicesConfigTest {
+public class RideHailingServicesConfigTest {
 
   @Test
   void parseServicesParameters() {

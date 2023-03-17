@@ -13,7 +13,7 @@ import org.opentripplanner.ServicesParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.standalone.config.routerconfig.ServicesConfig;
+import org.opentripplanner.standalone.config.routerconfig.RideHailingServicesConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
@@ -113,7 +113,7 @@ number of transit vehicles used in that itinerary.
     this.routingRequestDefaults =
       RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
     this.updatersParameters = new UpdatersConfig(root);
-    this.servicesParameters = new ServicesConfig(root);
+    this.servicesParameters = new RideHailingServicesConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig = new FlexConfig(root, "flex");
 

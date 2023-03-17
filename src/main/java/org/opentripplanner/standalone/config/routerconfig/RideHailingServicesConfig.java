@@ -11,11 +11,11 @@ import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.services.UberConfig;
 
-public class ServicesConfig implements ServicesParameters {
+public class RideHailingServicesConfig implements ServicesParameters {
 
   private final Multimap<Type, Object> configList = ArrayListMultimap.create();
 
-  public ServicesConfig(NodeAdapter rootAdapter) {
+  public RideHailingServicesConfig(NodeAdapter rootAdapter) {
     rootAdapter
       .of("rideHailingServices")
       .since(V2_3)
@@ -48,7 +48,6 @@ public class ServicesConfig implements ServicesParameters {
   }
 
   public enum Type {
-    LYFT_CAR_HAILING(UberConfig::create),
     UBER_CAR_HAILING(UberConfig::create);
 
     private final Function<NodeAdapter, ?> factory;
