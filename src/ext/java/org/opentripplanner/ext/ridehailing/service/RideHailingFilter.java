@@ -5,12 +5,14 @@ import java.util.concurrent.ExecutionException;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
+import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 public class RideHailingFilter implements ItineraryListFilter {
 
+  public static final String NO_RIDE_HAILING_AVAILABLE = "no-ride-hailing-available";
   private final List<RideHailingService> rideHailingServices;
 
   public RideHailingFilter(List<RideHailingService> rideHailingServices) {
@@ -29,18 +31,18 @@ public class RideHailingFilter implements ItineraryListFilter {
         .parallelStream()
         .map(leg -> {
           try {
-            if (leg instanceof RideHailingLeg carHailingLeg) {
-              var service = findService(carHailingLeg.provider());
-              var estimate = service
-                .rideEstimates(leg.getFrom().coordinate, leg.getTo().coordinate)
-                .get(0);
-              return new RideHailingLeg(carHailingLeg, carHailingLeg.provider(), estimate);
-            } else if (leg instanceof StreetLeg sl && sl.getMode().isDriving()) {
+            if (leg instanceof StreetLeg sl && sl.getMode().isDriving()) {
               var service = findService(RideHailingProvider.UBER);
-              var estimate = service
-                .rideEstimates(leg.getFrom().coordinate, leg.getTo().coordinate)
-                .get(0);
-              return new RideHailingLeg(sl, RideHailingProvider.UBER, estimate);
+              var estimates = service.rideEstimates(
+                leg.getFrom().coordinate,
+                leg.getTo().coordinate
+              );
+              if (estimates.isEmpty()) {
+                flagForDeletion(i);
+                return leg;
+              } else {
+                return new RideHailingLeg(sl, RideHailingProvider.UBER, estimates.get(0));
+              }
             } else {
               return leg;
             }
@@ -53,6 +55,15 @@ public class RideHailingFilter implements ItineraryListFilter {
       i.setLegs(legs);
     }
     return i;
+  }
+
+  private static void flagForDeletion(Itinerary i) {
+    i.flagForDeletion(
+      new SystemNotice(
+        NO_RIDE_HAILING_AVAILABLE,
+        "This itinerary is marked as deleted by the " + NO_RIDE_HAILING_AVAILABLE + " filter."
+      )
+    );
   }
 
   private RideHailingService findService(RideHailingProvider provider) {
