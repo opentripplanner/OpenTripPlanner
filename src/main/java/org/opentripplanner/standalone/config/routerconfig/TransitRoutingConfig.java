@@ -246,13 +246,13 @@ The `round_N(...)` method rounds the input to the closest multiplication of N.
 
 The 3 coefficients above are:
 
- - `C` is parameter: `minWinTimeMinutes`
+ - `C` is parameter: `minWindow`
  - `T` is parameter: `minTransitTimeCoefficient`
  - `W` is parameter: `minWaitTimeCoefficient`
  - `N` is parameter: `stepMinutes`
 
 In addition there is an upper bound on the calculation of the search window:
-`maxWinTimeMinutes`.
+`maxWindow`.
 """
         )
         .asObject();
