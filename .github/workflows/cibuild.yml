@@ -159,10 +159,6 @@ jobs:
     needs:
       - build-windows
       - build-linux
-    env:
-      CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
-      CONTAINER_REGISTRY_USER: otpbot
-      CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v3.1.0
         with:
@@ -174,6 +170,29 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Build container image with Jib, push to Dockerhub
+        env:
+          CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
+          CONTAINER_REGISTRY_USER: otpbot
+          CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        run: |
+          # we give the container two tags
+          #   - "latest"
+          #   - a string like "2.3_2022-12-12T21-38"
+          
+          version_with_snapshot=`mvn -q help:evaluate -Dexpression=project.version -q -DforceStdout`
+          version=${version_with_snapshot/-SNAPSHOT/}
+          image_date=`date +%Y-%m-%dT%H-%M`
+          image_version="${version}_${image_date}"
+          
+          mvn --batch-mode -P prettierSkip compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,$image_version
+
+      # March '23: we temporarily publish to both Dockerhub and Github Container Registry as the
+      # Dockerhub free team registry is going away
+      - name: Build container image with Jib, push to Github Container Registry 
+        env:
+          CONTAINER_REPO: ghcr.io/opentripplanner/opentripplanner
+          CONTAINER_REGISTRY_USER: ${{ github.repository_owner }}
+          CONTAINER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # we give the container two tags
           #   - "latest"
