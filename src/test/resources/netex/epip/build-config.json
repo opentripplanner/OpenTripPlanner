@@ -6,7 +6,7 @@
   "platformEntriesLinking": true,
   "subwayAccessTime": 0,
   "netexDefaults": {
-    "groupFilePattern": "(.*)\\/.*\\.xml",
+    "groupFilePattern": "(.*)[\\/\\\\].*\\.xml",
     "feedId": "HH"
   },
   "osmDefaults": {
