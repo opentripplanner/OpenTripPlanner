@@ -1,22 +1,75 @@
 package org.opentripplanner.ext.ridehailing;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.opentripplanner.ext.ridehailing.model.RideHailingProvider.UBER;
 
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
+import org.opentripplanner.ext.ridehailing.model.RideEstimate;
+import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
+import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
+import org.opentripplanner.transit.model.basic.Money;
 
 class RideHailingFilterTest implements PlanTestConstants {
 
+  public static final RideEstimate RIDE_ESTIMATE = new RideEstimate(
+    UBER,
+    Duration.ofMinutes(15),
+    Money.usDollars(1500),
+    Money.usDollars(3000),
+    "foo",
+    false
+  );
+  RideHailingService mockService = new RideHailingService() {
+    @Override
+    public RideHailingProvider carHailingCompany() {
+      return UBER;
+    }
+
+    @Override
+    public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) {
+      return List.of(new ArrivalTime(UBER, "car", "car", Duration.ofMinutes(15), false));
+    }
+
+    @Override
+    public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end) {
+      return List.of(RIDE_ESTIMATE);
+    }
+  };
+
+  Itinerary i = TestItineraryBuilder
+    .newItinerary(A)
+    .drive(T11_30, PlanTestConstants.T11_50, B)
+    .build();
+
   @Test
   void noServices() {
-    var i = TestItineraryBuilder.newItinerary(A).drive(T11_30, PlanTestConstants.T11_50, B).build();
     var filter = new RideHailingFilter(List.of());
 
     var filtered = filter.filter(List.of(i));
 
-    assertSame(StreetLeg.class, filtered.get(0).getLegs().get(0).getClass());
+    assertEquals(List.of(), filtered);
+  }
+
+  @Test
+  void addCarhailingInformation() {
+    var filter = new RideHailingFilter(List.of(mockService));
+
+    var filtered = filter.filter(List.of(i));
+
+    var leg = filtered.get(0).getLegs().get(0);
+
+    assertInstanceOf(RideHailingLeg.class, leg);
+
+    var hailingLeg = (RideHailingLeg) leg;
+
+    assertEquals(RIDE_ESTIMATE, hailingLeg.rideEstimate());
   }
 }

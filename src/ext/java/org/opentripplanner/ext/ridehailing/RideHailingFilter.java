@@ -10,6 +10,10 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
+/**
+ * This filter decorates car dropoff/pickup legs with information from ride hailing services and
+ * adds information about price and arrival time of the vehicle.
+ */
 public class RideHailingFilter implements ItineraryListFilter {
 
   public static final String NO_RIDE_HAILING_AVAILABLE = "no-ride-hailing-available";
@@ -21,15 +25,29 @@ public class RideHailingFilter implements ItineraryListFilter {
 
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
-    return itineraries.parallelStream().map(this::addCarHailingInformation).toList();
+    return rideHailingServices
+      .parallelStream()
+      .flatMap(service ->
+        itineraries.parallelStream().map(i -> addCarHailingInformation(i, service))
+      )
+      .toList();
   }
 
-  private Itinerary addCarHailingInformation(Itinerary i) {
+  private static void flagForDeletion(Itinerary i) {
+    i.flagForDeletion(
+      new SystemNotice(
+        NO_RIDE_HAILING_AVAILABLE,
+        "This itinerary is marked as deleted by the " + NO_RIDE_HAILING_AVAILABLE + " filter."
+      )
+    );
+  }
+
+  private Itinerary addCarHailingInformation(Itinerary i, RideHailingService service) {
     if (!i.isFlaggedForDeletion()) {
       var legs = i
         .getLegs()
         .parallelStream()
-        .map(leg -> decorateLegWithRideEstimate(i, leg))
+        .map(leg -> decorateLegWithRideEstimate(i, leg, service))
         .toList();
 
       i.setLegs(legs);
@@ -37,10 +55,9 @@ public class RideHailingFilter implements ItineraryListFilter {
     return i;
   }
 
-  private Leg decorateLegWithRideEstimate(Itinerary i, Leg leg) {
+  private Leg decorateLegWithRideEstimate(Itinerary i, Leg leg, RideHailingService service) {
     try {
       if (leg instanceof StreetLeg sl && sl.getMode().isDriving()) {
-        var service = findService(RideHailingProvider.UBER);
         var estimates = service.rideEstimates(leg.getFrom().coordinate, leg.getTo().coordinate);
         if (estimates.isEmpty()) {
           flagForDeletion(i);
@@ -54,22 +71,5 @@ public class RideHailingFilter implements ItineraryListFilter {
     } catch (ExecutionException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private static void flagForDeletion(Itinerary i) {
-    i.flagForDeletion(
-      new SystemNotice(
-        NO_RIDE_HAILING_AVAILABLE,
-        "This itinerary is marked as deleted by the " + NO_RIDE_HAILING_AVAILABLE + " filter."
-      )
-    );
-  }
-
-  private RideHailingService findService(RideHailingProvider provider) {
-    return rideHailingServices
-      .stream()
-      .filter(s -> s.carHailingCompany().equals(provider))
-      .findAny()
-      .orElseThrow();
   }
 }

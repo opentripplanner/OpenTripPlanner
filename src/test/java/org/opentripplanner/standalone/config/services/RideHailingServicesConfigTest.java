@@ -18,7 +18,7 @@ public class RideHailingServicesConfigTest {
       List.of(
         new RideHailingServiceParameters.UberServiceParameters("secret-id", "very-secret", "car")
       ),
-      c.servicesParameters().carHailingServiceParameters()
+      c.rideHailingServiceParameters()
     );
   }
 }

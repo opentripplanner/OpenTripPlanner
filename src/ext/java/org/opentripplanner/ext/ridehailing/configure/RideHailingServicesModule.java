@@ -9,6 +9,10 @@ import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.ridehailing.service.uber.UberService;
 import org.opentripplanner.standalone.config.RouterConfig;
 
+/**
+ * This module converts the ride hailing configurations into ride hailing services to be used
+ * by the application context.
+ */
 @Module
 public class RideHailingServicesModule {
 
@@ -16,8 +20,7 @@ public class RideHailingServicesModule {
   @Singleton
   List<RideHailingService> services(RouterConfig config) {
     return config
-      .servicesParameters()
-      .carHailingServiceParameters()
+      .rideHailingServiceParameters()
       .stream()
       .map(p -> {
         // in Java 21 this can hopefully use a switch statement

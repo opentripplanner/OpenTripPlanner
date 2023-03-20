@@ -1,9 +1,13 @@
 package org.opentripplanner.ext.ridehailing.model;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.StreetLegBuilder;
 
+/**
+ * This is a special leg for ride hailing that adds information about the ride estimate like
+ * price, which type of vehicle and arrival time.
+ */
 public class RideHailingLeg extends StreetLeg {
 
   private final RideEstimate estimate;
@@ -23,7 +27,7 @@ public class RideHailingLeg extends StreetLeg {
     return provider;
   }
 
-  @Nullable
+  @Nonnull
   public RideEstimate rideEstimate() {
     return estimate;
   }
