@@ -29,6 +29,8 @@ public interface DataImportIssueStore {
    */
   void add(String type, String message, Object... arguments);
 
+  void setFilename(String filename);
+
   /** List all issues added */
   List<DataImportIssue> listIssues();
 }
