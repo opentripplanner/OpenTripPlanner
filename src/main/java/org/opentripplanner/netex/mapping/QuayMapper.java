@@ -39,7 +39,11 @@ class QuayMapper {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
     if (coordinate == null) {
-      issueStore.add("QuayWithoutCoordinates", "Quay %s does not contain any coordinates.", quay.getId());
+      issueStore.add(
+        "QuayWithoutCoordinates",
+        "Quay %s does not contain any coordinates.",
+        quay.getId()
+      );
       return null;
     }
 

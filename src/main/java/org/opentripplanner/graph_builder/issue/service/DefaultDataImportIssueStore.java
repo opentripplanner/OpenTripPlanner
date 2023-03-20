@@ -20,8 +20,7 @@ public class DefaultDataImportIssueStore implements DataImportIssueStore {
   private final List<DataImportIssue> issues = new ArrayList<>();
   private String fileName = null;
 
-  public DefaultDataImportIssueStore() {
-  }
+  public DefaultDataImportIssueStore() {}
 
   @Override
   public void add(DataImportIssue issue) {
@@ -41,7 +40,13 @@ public class DefaultDataImportIssueStore implements DataImportIssueStore {
   @Override
   public void add(String type, String message, Object... arguments) {
     if (fileName != null) {
-      add(Issue.issue(type, message + " - %s", Stream.concat(Stream.of(arguments), Stream.of(fileName)).toArray()));
+      add(
+        Issue.issue(
+          type,
+          message + " - %s",
+          Stream.concat(Stream.of(arguments), Stream.of(fileName)).toArray()
+        )
+      );
     } else {
       add(Issue.issue(type, message, arguments));
     }
