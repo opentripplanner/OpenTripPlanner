@@ -33,6 +33,8 @@ The feature must be enabled in otp-config.json as follows:
 - `cutoff` The maximum travel duration as a ISO-8601 duration. The `PT` can be dropped to simplify the value. 
   This parameter can be given multiple times to include multiple isochrones in a single request.
   The default value is one hour.
+- `searchWindow` How long wait at the beginning/end of the trip should be discarded. Same format as
+  `cutoff`
 - `modes` A list of travel modes.
 - `arriveBy` Set to `false` when searching from the location and `true` when searching to the 
   location

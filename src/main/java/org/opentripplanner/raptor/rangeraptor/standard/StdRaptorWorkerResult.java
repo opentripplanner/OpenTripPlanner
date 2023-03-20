@@ -37,6 +37,11 @@ public class StdRaptorWorkerResult<T extends RaptorTripSchedule> implements Rapt
   }
 
   @Override
+  public SingleCriteriaStopArrivals extractBestTransitDurations() {
+    return bestTimes.extractBestTransitDurations();
+  }
+
+  @Override
   public SingleCriteriaStopArrivals extractBestNumberOfTransfers() {
     return state.extractBestNumberOfTransfers();
   }

@@ -9,6 +9,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
@@ -72,12 +73,14 @@ public class TravelTimeResource {
   private final RaptorService<TripSchedule> raptorService;
   private final Graph graph;
   private final TransitService transitService;
+  private final Duration searchWindow;
 
   public TravelTimeResource(
     @Context OtpServerRequestContext serverContext,
     @QueryParam("location") String location,
     @QueryParam("time") String time,
     @QueryParam("cutoff") @DefaultValue("60m") List<String> cutoffs,
+    @QueryParam("searchWindow") @DefaultValue("0s") String searchWindow,
     @QueryParam("modes") String modes,
     @QueryParam("arriveBy") @DefaultValue("false") boolean arriveBy
   ) {
@@ -106,14 +109,15 @@ public class TravelTimeResource {
     var parsedLocation = LocationStringParser.fromOldStyleString(location);
     var requestTime = time != null ? Instant.parse(time) : Instant.now();
     routingRequest.setDateTime(requestTime);
+    this.searchWindow = DurationUtils.duration(searchWindow);
 
     if (routingRequest.arriveBy()) {
-      startTime = requestTime.minus(traveltimeRequest.maxCutoff);
+      startTime = requestTime.minus(traveltimeRequest.maxCutoff).minus(this.searchWindow);
       endTime = requestTime;
       routingRequest.setTo(parsedLocation);
     } else {
       startTime = requestTime;
-      endTime = startTime.plus(traveltimeRequest.maxCutoff);
+      endTime = startTime.plus(traveltimeRequest.maxCutoff).plus(this.searchWindow);
       routingRequest.setFrom(parsedLocation);
     }
 
@@ -246,22 +250,21 @@ public class TravelTimeResource {
       if (!arrivals.reachedByTransit(index)) {
         continue;
       }
-      final int arrivalTime = arrivals.bestTransitArrivalTime(index);
       Vertex v = graph.getStopVertexForStopId(stop.getId());
       if (v == null) {
         continue;
       }
-      Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
+      int duration = arrivals.bestTransitArrivalDuration(index);
+      var time = routingRequest.arriveBy()
+        ? endTime.minusSeconds(duration)
+        : startTime.plusSeconds(duration);
       List<StateData> egressStateDatas = StateData.getInitialStateDatas(
         egressStreetSearchRequest,
         mode -> new TravelTimeStateData(mode, time.getEpochSecond())
       );
       for (var stopStateData : egressStateDatas) {
         State s = new State(v, time, stopStateData, directStreetSearchRequest);
-        s.weight =
-          routingRequest.arriveBy()
-            ? time.until(endTime, ChronoUnit.SECONDS)
-            : startTime.until(time, ChronoUnit.SECONDS);
+        s.weight = duration;
         initialStates.add(s);
       }
     }
@@ -276,8 +279,8 @@ public class TravelTimeResource {
       .searchParams()
       .earliestDepartureTime(ServiceDateUtils.secondsSinceStartOfTime(startOfTime, startTime))
       .latestArrivalTime(ServiceDateUtils.secondsSinceStartOfTime(startOfTime, endTime))
-      .searchOneIterationOnly()
-      .timetable(false)
+      .searchWindow(searchWindow)
+      .timetable(!searchWindow.isZero())
       .allowEmptyAccessEgressPaths(true)
       .constrainedTransfers(false); // TODO: Not compatible with best times
 

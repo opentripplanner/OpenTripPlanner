@@ -20,6 +20,13 @@ public interface StopArrivals {
   int bestArrivalTime(int stopIndex);
 
   /**
+   * The minimum time between the raptor iteration stort time and the arrival at the given stop. If
+   * the stop is not reached, the behavior is undefined; It may return an arbitrary value or throw
+   * an exception.
+   */
+  int bestTransitArrivalDuration(int index);
+
+  /**
    * Returns {@code true} if the stop is reached.
    */
   boolean reachedByTransit(int stopIndex);

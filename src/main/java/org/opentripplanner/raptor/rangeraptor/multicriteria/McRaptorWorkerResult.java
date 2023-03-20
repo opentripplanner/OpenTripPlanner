@@ -53,6 +53,11 @@ public class McRaptorWorkerResult<T extends RaptorTripSchedule> implements Rapto
   }
 
   @Override
+  public SingleCriteriaStopArrivals extractBestTransitDurations() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public SingleCriteriaStopArrivals extractBestNumberOfTransfers() {
     return new SingleCriteriaStopArrivals() {
       @Override

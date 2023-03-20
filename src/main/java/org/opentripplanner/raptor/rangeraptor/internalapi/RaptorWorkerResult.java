@@ -24,6 +24,11 @@ public interface RaptorWorkerResult<T extends RaptorTripSchedule> {
   SingleCriteriaStopArrivals extractBestTransitArrivals();
 
   /**
+   * Get transit arrival duration for each stop reached in the search.
+   */
+  SingleCriteriaStopArrivals extractBestTransitDurations();
+
+  /**
    * Extract information about the best number of transfers for each stop arrival.
    */
   SingleCriteriaStopArrivals extractBestNumberOfTransfers();
