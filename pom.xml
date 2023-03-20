@@ -69,7 +69,7 @@
         <logback.version>1.4.6</logback.version>
         <lucene.version>9.5.0</lucene.version>
         <graphql.version>20.0</graphql.version>
-        <slf4j.version>2.0.6</slf4j.version>
+        <slf4j.version>2.0.7</slf4j.version>
         <netex-java-model.version>2.0.14</netex-java-model.version>
         <siri-java-model.version>1.21</siri-java-model.version>
         <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
