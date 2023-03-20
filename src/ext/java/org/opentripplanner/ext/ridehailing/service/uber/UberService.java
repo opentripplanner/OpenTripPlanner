@@ -29,6 +29,9 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implementation of a ride hailing service for Uber.
+ */
 public class UberService extends CachingRideHailingService {
 
   private static final Logger LOG = LoggerFactory.getLogger(UberService.class);
@@ -61,7 +64,7 @@ public class UberService extends CachingRideHailingService {
   }
 
   @Override
-  public RideHailingProvider carHailingCompany() {
+  public RideHailingProvider provider() {
     return RideHailingProvider.UBER;
   }
 

@@ -14,7 +14,7 @@ public interface RideHailingService {
   /**
    * The provider of the service.
    */
-  RideHailingProvider carHailingCompany();
+  RideHailingProvider provider();
 
   /**
    * Get the next arrivals for a specific location.

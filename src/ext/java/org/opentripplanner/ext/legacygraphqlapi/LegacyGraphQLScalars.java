@@ -31,7 +31,7 @@ public class LegacyGraphQLScalars {
           if (dataFetcherResult instanceof Duration duration) {
             return duration.toString();
           } else {
-            throw new IllegalArgumentException(
+            throw new CoercingSerializeException(
               "Cannot format %s as a ISO-8601 duration".formatted(dataFetcherResult)
             );
           }

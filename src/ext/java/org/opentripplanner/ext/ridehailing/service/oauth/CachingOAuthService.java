@@ -10,6 +10,9 @@ import org.opentripplanner.framework.json.ObjectMappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A base class for OAuth implementations that want to cache their access tokens.
+ */
 public abstract class CachingOAuthService implements OAuthService {
 
   private static final ObjectMapper MAPPER = ObjectMappers.ignoringExtraFields();

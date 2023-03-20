@@ -34,11 +34,4 @@ public class CachedOAuthToken {
   public boolean isExpired() {
     return tokenExpirationTime == null || Instant.now().isAfter(tokenExpirationTime);
   }
-
-  /**
-   * Used for testing purposes only.
-   */
-  public void makeTokenExpire() {
-    tokenExpirationTime = Instant.now().minusSeconds(1);
-  }
 }

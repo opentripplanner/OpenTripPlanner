@@ -9,12 +9,16 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This filter decorates car dropoff/pickup legs with information from ride hailing services and
  * adds information about price and arrival time of the vehicle.
  */
 public class RideHailingFilter implements ItineraryListFilter {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RideHailingFilter.class);
 
   public static final String NO_RIDE_HAILING_AVAILABLE = "no-ride-hailing-available";
   private final List<RideHailingService> rideHailingServices;
@@ -69,7 +73,9 @@ public class RideHailingFilter implements ItineraryListFilter {
         return leg;
       }
     } catch (ExecutionException e) {
-      throw new RuntimeException(e);
+      LOG.error("Could not get ride hailing estimate for {}", service.provider(), e);
+      flagForDeletion(i);
+      return leg;
     }
   }
 }

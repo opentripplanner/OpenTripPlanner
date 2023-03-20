@@ -11,6 +11,9 @@ import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideEstimateRequest;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 
+/**
+ * A base class for ride hailing services that want to cache their results.
+ */
 public abstract class CachingRideHailingService implements RideHailingService {
 
   // This value should be no longer than 30 minutes (according to Uber API docs) TODO check Lyft time limit

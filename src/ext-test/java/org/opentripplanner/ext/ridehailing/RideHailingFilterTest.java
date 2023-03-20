@@ -2,10 +2,13 @@ package org.opentripplanner.ext.ridehailing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.ridehailing.model.RideHailingProvider.UBER;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
@@ -29,7 +32,7 @@ class RideHailingFilterTest implements PlanTestConstants {
   );
   RideHailingService mockService = new RideHailingService() {
     @Override
-    public RideHailingProvider carHailingCompany() {
+    public RideHailingProvider provider() {
       return UBER;
     }
 
@@ -41,6 +44,23 @@ class RideHailingFilterTest implements PlanTestConstants {
     @Override
     public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end) {
       return List.of(RIDE_ESTIMATE);
+    }
+  };
+  RideHailingService failingService = new RideHailingService() {
+    @Override
+    public RideHailingProvider provider() {
+      return UBER;
+    }
+
+    @Override
+    public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) {
+      throw new RuntimeException();
+    }
+
+    @Override
+    public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end)
+      throws ExecutionException {
+      throw new ExecutionException(new IOException());
     }
   };
 
@@ -71,5 +91,14 @@ class RideHailingFilterTest implements PlanTestConstants {
     var hailingLeg = (RideHailingLeg) leg;
 
     assertEquals(RIDE_ESTIMATE, hailingLeg.rideEstimate());
+  }
+
+  @Test
+  void failingService() {
+    var filter = new RideHailingFilter(List.of(failingService));
+
+    var filtered = filter.filter(List.of(i));
+
+    assertTrue(filtered.get(0).isFlaggedForDeletion());
   }
 }
