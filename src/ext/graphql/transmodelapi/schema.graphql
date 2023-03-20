@@ -1401,6 +1401,7 @@ enum FilterPlaceType {
 enum InputField {
   dateTime
   from
+  intermediatePlace
   to
 }
 

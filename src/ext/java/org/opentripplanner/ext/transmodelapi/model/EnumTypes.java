@@ -479,6 +479,7 @@ public class EnumTypes {
     .value("dateTime", InputField.DATE_TIME)
     .value("from", InputField.FROM_PLACE)
     .value("to", InputField.TO_PLACE)
+    .value("intermediatePlace", InputField.INTERMEDIATE_PLACE)
     .build();
 
   public static GraphQLEnumType PURCHASE_WHEN = GraphQLEnumType
