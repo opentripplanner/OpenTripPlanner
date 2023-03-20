@@ -64,7 +64,7 @@ public class AlternativeLegs {
    * @param numberLegs           The number of alternative legs requested. If fewer legs are found,
    *                             only the found legs are returned.
    * @param transitService       The transit service used for the search
-   * @param includeDepartBefore       Boolean indicating whether the alternative legs should depart
+   * @param includeDepartBefore  Boolean indicating whether the alternative legs should depart
    *                             earlier or later than the original leg True if earlier, false if
    *                             later.
    * @param filter               AlternativeLegsFilter indicating which properties of the original
