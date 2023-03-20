@@ -94,6 +94,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix initial A* state of car rental [#4934](https://github.com/opentripplanner/OpenTripPlanner/pull/4934)
 - Remove check for (now optional) ENV-variable for GCP Authentication [#4966](https://github.com/opentripplanner/OpenTripPlanner/pull/4966)
 - Optimal walking routes when walking starts or ends in an area [#4936](https://github.com/opentripplanner/OpenTripPlanner/pull/4936)
+- Publish container to Github Container Registry [#4970](https://github.com/opentripplanner/OpenTripPlanner/pull/4970)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
