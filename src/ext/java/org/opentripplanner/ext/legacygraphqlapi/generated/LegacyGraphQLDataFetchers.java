@@ -43,6 +43,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -380,7 +381,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Boolean> rentedBike();
 
-    public DataFetcher<RideEstimate> rideHailing();
+    public DataFetcher<RideEstimate> rideEstimate();
 
     public DataFetcher<Route> route();
 
@@ -662,9 +663,11 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLRideEstimate {
-    public DataFetcher<Object> maxPrice();
+    public DataFetcher<Object> arrival();
 
-    public DataFetcher<Object> minPrice();
+    public DataFetcher<Money> maxCost();
+
+    public DataFetcher<Money> minCost();
 
     public DataFetcher<String> provider();
   }

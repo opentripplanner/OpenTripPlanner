@@ -180,7 +180,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
-  public DataFetcher<RideEstimate> rideHailing() {
+  public DataFetcher<RideEstimate> rideEstimate() {
     return environment -> {
       Leg leg = getSource(environment);
       if (leg instanceof RideHailingLeg rhl) {

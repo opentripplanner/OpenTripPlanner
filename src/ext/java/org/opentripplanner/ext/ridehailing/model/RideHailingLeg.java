@@ -24,7 +24,6 @@ public class RideHailingLeg extends StreetLeg {
   }
 
   @Nullable
-  @Override
   public RideEstimate rideEstimate() {
     return estimate;
   }

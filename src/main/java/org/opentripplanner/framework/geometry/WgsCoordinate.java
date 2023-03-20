@@ -160,6 +160,9 @@ public final class WgsCoordinate implements Serializable {
    * places which at the equator has ~11 meter precision.
    * <p>
    * See https://wiki.openstreetmap.org/wiki/Precision_of_coordinates
+   * <p>
+   * This is useful when you want to cache coordinate-based computations but don't need absolute
+   * precision.
    */
   public WgsCoordinate rounded() {
     var lat = DoubleUtils.roundTo4Decimals(latitude);

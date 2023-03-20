@@ -1,6 +1,6 @@
 # Ride hailing services
 
-This sandbox features allows you to use ride hailing services like Uber.
+This sandbox feature allows you to use ride hailing services like Uber.
 
 ## Contact Info
 
@@ -8,7 +8,7 @@ This sandbox features allows you to use ride hailing services like Uber.
 
 ## Configuration
 
-In order enable it add an entry to the `rideHailingServices` in `router-config.json`.
+In order enable it add an entry to the `rideHailingServices` section in `router-config.json`.
 
 The individual providers are listed below:
 
