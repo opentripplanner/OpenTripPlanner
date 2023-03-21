@@ -10,7 +10,7 @@ import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
-import org.opentripplanner.raptor.spi.RaptorTimeTable;
+import org.opentripplanner.raptor.spi.RaptorRoute;
 
 /**
  * The purpose of this class is to implement a routing strategy for finding the best arrival-time.
@@ -54,8 +54,8 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void prepareForTransitWith(RaptorTimeTable<T> timeTable) {
-    boardingSupport.prepareForTransitWith(timeTable);
+  public void prepareForTransitWith(RaptorRoute<T> route) {
+    boardingSupport.prepareForTransitWith(route.timetable());
     this.onTripIndex = UNBOUNDED_TRIP_INDEX;
     this.onTripBoardTime = NOT_SET;
     this.onTripBoardStop = NOT_SET;

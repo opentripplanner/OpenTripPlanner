@@ -14,7 +14,7 @@ import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
-import org.opentripplanner.raptor.spi.RaptorTimeTable;
+import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
@@ -60,8 +60,8 @@ public final class MultiCriteriaRoutingStrategy<
   }
 
   @Override
-  public void prepareForTransitWith(RaptorTimeTable<T> timeTable) {
-    boardingSupport.prepareForTransitWith(timeTable);
+  public void prepareForTransitWith(RaptorRoute<T> route) {
+    boardingSupport.prepareForTransitWith(route.timetable());
     this.patternRides.clear();
   }
 

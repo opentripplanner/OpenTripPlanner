@@ -4,6 +4,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 
 /**
@@ -25,7 +26,7 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   /**
    * Prepare the {@link RoutingStrategy} to route using the {@link RaptorTimeTable}.
    */
-  void prepareForTransitWith(RaptorTimeTable<T> timeTable);
+  void prepareForTransitWith(RaptorRoute<T> route);
 
   /**
    * Alight the current trip at the given stop.

@@ -200,7 +200,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
         int alightSlack = slackProvider.alightSlack(pattern.slackIndex());
         int boardSlack = slackProvider.boardSlack(pattern.slackIndex());
 
-        transitWorker.prepareForTransitWith(route.timetable());
+        transitWorker.prepareForTransitWith(route);
 
         IntIterator stop = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
 
