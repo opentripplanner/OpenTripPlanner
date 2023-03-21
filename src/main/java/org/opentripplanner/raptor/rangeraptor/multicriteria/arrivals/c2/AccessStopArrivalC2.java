@@ -1,6 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
+
 import org.opentripplanner.raptor.api.RaptorConstants;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.AccessPathView;
@@ -28,8 +31,8 @@ final class AccessStopArrivalC2<T extends RaptorTripSchedule> extends AbstractSt
   }
 
   @Override
-  public boolean arrivedByAccess() {
-    return true;
+  public PathLegType arrivedBy() {
+    return ACCESS;
   }
 
   @Override

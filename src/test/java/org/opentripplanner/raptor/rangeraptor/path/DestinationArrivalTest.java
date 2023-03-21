@@ -9,9 +9,11 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.StopArrivalFactoryC1;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
 
 public class DestinationArrivalTest {
 
+  private static final int ANY = 9_999;
   private static final int BOARD_SLACK = 60;
   private static final int ACCESS_STOP = 100;
   private static final int ACCESS_DEPARTURE_TIME = 8 * 60 * 60;
@@ -45,11 +47,10 @@ public class DestinationArrivalTest {
   );
 
   private static final ArrivalView<RaptorTripSchedule> TRANSIT_ARRIVAL = STOP_ARRIVAL_FACTORY.createTransitStopArrival(
-    ACCESS_ARRIVAL,
+    new PatternRideC1<>(ACCESS_ARRIVAL, ANY, ANY, ANY, ANY, ANY, ANY, A_TRIP),
     TRANSIT_STOP,
     TRANSIT_ALIGHT_TIME,
-    ACCESS_ARRIVAL.c1() + TRANSIT_COST,
-    A_TRIP
+    ACCESS_ARRIVAL.c1() + TRANSIT_COST
   );
 
   private final DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(

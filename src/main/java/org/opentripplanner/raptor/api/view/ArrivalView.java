@@ -1,7 +1,5 @@
 package org.opentripplanner.raptor.api.view;
 
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
-
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -128,16 +126,11 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
 
   /* Transit */
 
-  default boolean arrivedByTransit() {
-    return this.arrivedBy(TRANSIT);
-  }
-
   default TransitPathView<T> transitPath() {
     throw new UnsupportedOperationException();
   }
 
   /* Transfer */
-
 
   default RaptorTransfer transfer() {
     throw new UnsupportedOperationException();

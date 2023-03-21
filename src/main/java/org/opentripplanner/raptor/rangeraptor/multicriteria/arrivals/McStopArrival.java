@@ -3,7 +3,6 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
  * Abstract super class for multi-criteria stop arrival.
@@ -14,7 +13,7 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
 
   private final McStopArrival<T> previous;
   /**
-   * We want transits to dominate transfers so we increment the round not only between RangeRaptor
+   * We want transits to dominate transfers, so we increment the round not only between RangeRaptor
    * rounds, but for transits and transfers also. The access path is paretoRound 0, the first
    * transit path is 1. The following transfer path, if it exists, is paretoRound 2, and the next
    * transit is 3, and so on.
@@ -70,51 +69,6 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
     this.arrivalTime = departureTime + travelDuration;
     this.travelDuration = travelDuration;
     this.c1 = initialC1;
-  }
-
-  /**
-   * This comparator is used to compare regular stop arrivals. It uses {@code arrivalTime},
-   * {@code paretoRound} and {@code generalizedCost} to compare arrivals. It does NOT include
-   * {@code arrivedOnBoard}. Normally arriving on-board should give the arrival an advantage
-   * - you can continue on foot, walking to the next stop. But, we only do this if it happens
-   * in the same Raptor iteration and round - if it does it is taken care of by the order
-   * which the algorithm work - not by this comparator.
-   */
-  public static <T extends McStopArrival<?>> ParetoComparator<T> compareArrivalTimeRoundAndCost() {
-    return McStopArrival::compareBase;
-  }
-
-  /**
-   * This includes {@code arrivedOnBoard} in the comparison compared with
-   * {@link #compareArrivalTimeRoundAndCost()}.
-   */
-  public static <
-    T extends McStopArrival<?>
-  > ParetoComparator<T> compareArrivalTimeRoundCostAndOnBoardArrival() {
-    return (l, r) -> compareBase(l, r) || compareArrivedOnBoard(l, r);
-  }
-
-  /**
-   * Same as {@link #compareArrivalTimeRoundAndCost}, but relax arrival-time and c1.
-   */
-  public static <T extends McStopArrival<?>> ParetoComparator<T> compareArrivalTimeRoundAndCost(
-    final RelaxFunction relaxArrivalTime,
-    final RelaxFunction relaxC1
-  ) {
-    return (l, r) -> relaxedCompareBase(relaxArrivalTime, relaxC1, l, r);
-  }
-
-  /**
-   * Same as {@link #compareArrivalTimeRoundCostAndOnBoardArrival()}, but relax arrival-time and c1.
-   */
-  public static <
-    T extends McStopArrival<?>
-  > ParetoComparator<T> compareArrivalTimeRoundCostAndOnBoardArrival(
-    final RelaxFunction relaxArrivalTime,
-    final RelaxFunction relaxC1
-  ) {
-    return (l, r) ->
-      relaxedCompareBase(relaxArrivalTime, relaxC1, l, r) || compareArrivedOnBoard(l, r);
   }
 
   @Override
@@ -190,13 +144,12 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
    * Compare arrivalTime, paretoRound and c1, relaxing arrivalTime and c1.
    */
   protected static boolean relaxedCompareBase(
-    final RelaxFunction relaxArrivalTime,
     final RelaxFunction relaxC1,
     McStopArrival<?> l,
     McStopArrival<?> r
   ) {
     return (
-      l.arrivalTime() < relaxArrivalTime.relax(r.arrivalTime()) ||
+      l.arrivalTime() < r.arrivalTime() ||
       l.paretoRound() < r.paretoRound() ||
       l.c1() < relaxC1.relax(r.c1())
     );

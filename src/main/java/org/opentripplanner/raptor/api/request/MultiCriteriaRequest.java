@@ -4,7 +4,9 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RelaxFunction;
 
 /**
  * Parameters to configure the multi-criteria search.
@@ -13,14 +15,23 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
  */
 public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
 
+  private final RelaxFunction relaxC1;
+
+  @Nullable
+  private final RaptorTransitPriorityGroupCalculator transitPriorityCalculator;
+
   @Nullable
   private final Double relaxCostAtDestination;
 
   private MultiCriteriaRequest() {
+    this.relaxC1 = RelaxFunction.NORMAL;
+    this.transitPriorityCalculator = null;
     this.relaxCostAtDestination = null;
   }
 
   public MultiCriteriaRequest(Builder<T> builder) {
+    this.relaxC1 = Objects.requireNonNull(builder.relaxC1());
+    this.transitPriorityCalculator = builder.transitPriorityCalculator();
     this.relaxCostAtDestination = builder.relaxCostAtDestination();
   }
 
@@ -30,6 +41,34 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
 
   public Builder<T> copyOf() {
     return new Builder<>(this);
+  }
+
+  /**
+   * Whether to accept non-optimal trips if they are close enough with respect to
+   * c1(generalized-cost). In other words this relaxes the pareto comparison at
+   * each stop and at the destination.
+   * <p>
+   * Let {@code c} be the existing minimum pareto optimal cost to beat. Then a trip
+   * with cost {@code c'} is accepted if the following is true:
+   * <pre>
+   * c' < RelaxFunction.relax(c)
+   * </pre>
+   * The default is {@link RelaxFunction#NORMAL}.
+   */
+  public RelaxFunction relaxC1() {
+    return relaxC1;
+  }
+
+  @Deprecated
+  @Nullable
+  public RelaxFunction relaxC1AtDestination() {
+    return relaxC1.isNormal()
+      ? relaxCostAtDestination().map(GeneralizedCostRelaxFunction::of).orElse(RelaxFunction.NORMAL)
+      : relaxC1;
+  }
+
+  public Optional<RaptorTransitPriorityGroupCalculator> transitPriorityCalculator() {
+    return Optional.ofNullable(transitPriorityCalculator);
   }
 
   /**
@@ -47,7 +86,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
    * The default is not set.
    * <p>
    * @deprecated This parameter only relax the cost at the destination, not at each stop. This
-   * should be replaced with relaxing the cost at each stop instead.
+   * is replaced by {@link #relaxC1()}. This parameter is ignored if {@link #relaxC1()} exist.
    */
   @Deprecated
   public Optional<Double> relaxCostAtDestination() {
@@ -59,18 +98,24 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     MultiCriteriaRequest<?> that = (MultiCriteriaRequest<?>) o;
-    return Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination);
+    return (
+      Objects.equals(relaxC1, that.relaxC1) &&
+      Objects.equals(transitPriorityCalculator, that.transitPriorityCalculator) &&
+      Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination)
+    );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(relaxCostAtDestination);
+    return Objects.hash(relaxC1, transitPriorityCalculator, relaxCostAtDestination);
   }
 
   @Override
   public String toString() {
     return ToStringBuilder
       .of(MultiCriteriaRequest.class)
+      .addObj("relaxC1", relaxC1, RelaxFunction.NORMAL)
+      .addObj("transitPriorityCalculator", transitPriorityCalculator)
       .addNum("relaxCostAtDestination", relaxCostAtDestination)
       .toString();
   }
@@ -78,11 +123,33 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   public static class Builder<T extends RaptorTripSchedule> {
 
     private final MultiCriteriaRequest<T> original;
-
+    private RelaxFunction relaxC1;
+    private RaptorTransitPriorityGroupCalculator transitPriorityCalculator = null;
     private Double relaxCostAtDestination = null;
 
     public Builder(MultiCriteriaRequest<T> original) {
       this.original = original;
+      this.relaxC1 = original.relaxC1;
+    }
+
+    @Nullable
+    public RelaxFunction relaxC1() {
+      return relaxC1;
+    }
+
+    public Builder<T> withRelaxC1(RelaxFunction relaxC1) {
+      this.relaxC1 = relaxC1;
+      return this;
+    }
+
+    @Nullable
+    public RaptorTransitPriorityGroupCalculator transitPriorityCalculator() {
+      return transitPriorityCalculator;
+    }
+
+    public Builder<T> withTransitPriorityCalculator(RaptorTransitPriorityGroupCalculator value) {
+      transitPriorityCalculator = value;
+      return this;
     }
 
     @Nullable
@@ -106,6 +173,8 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     public String toString() {
       return ToStringBuilder
         .of(MultiCriteriaRequest.Builder.class)
+        .addObj("relaxC1", relaxC1)
+        .addObj("transitPriorityCalculator", transitPriorityCalculator)
         .addNum("relaxCostAtDestination", relaxCostAtDestination)
         .toString();
     }

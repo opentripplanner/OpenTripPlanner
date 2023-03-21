@@ -6,7 +6,6 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
@@ -67,23 +66,6 @@ public record PatternRideC2<T extends RaptorTripSchedule>(
   T trip
 )
   implements PatternRide<T> {
-  // Pareto vector: [relativeC1, c2, tripSortIndex]
-
-  public static <T extends RaptorTripSchedule> PatternRideFactory<T, PatternRideC2<T>> factory() {
-    return (prevArrival, boardStopIndex, boardPos, boardTime, boardCost1, relativeCost1, trip) ->
-      new PatternRideC2<>(
-        prevArrival,
-        boardStopIndex,
-        boardPos,
-        boardTime,
-        boardCost1,
-        relativeCost1,
-        prevArrival.c2(),
-        trip.tripSortIndex(),
-        trip
-      );
-  }
-
   /**
    * This is the function used to compare {@link PatternRideC2}s for a given pattern.
    * <p>
@@ -103,8 +85,8 @@ public record PatternRideC2<T extends RaptorTripSchedule>(
    *      We assume the cost increase with the same amount for all rides(same trip) traversing
    *      down the pattern; Than we can safely ignore the cost added between each stop; Hence
    *      calculating the "relative" board-cost. Remember to include the cost of transit. You
-   *      need to account for the cost of getting from A to B when comparing two {@link PatternRideC2}s
-   *      boarding at A and B.
+   *      need to account for the cost of getting from A to B when comparing two
+   *      {@link PatternRideC2}s boarding at A and B.
    *   </li>
    * <p>
    */

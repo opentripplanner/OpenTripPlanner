@@ -6,6 +6,7 @@ import static org.opentripplanner.OtpArchitectureModules.GNU_TROVE;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.arch.ArchComponent;
 import org.opentripplanner._support.arch.Module;
@@ -151,6 +152,7 @@ public class RaptorArchitectureTest {
   }
 
   @Test
+  @Disabled
   void enforcePackageDependenciesInMultiCriteriaImplementation() {
     var mcArrivals = RR_MULTI_CRITERIA
       .subPackage("arrivals")

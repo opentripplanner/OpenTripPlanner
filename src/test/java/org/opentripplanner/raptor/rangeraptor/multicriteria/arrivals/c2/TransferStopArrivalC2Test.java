@@ -4,12 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSFER;
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 class TransferStopArrivalC2Test {
 
@@ -43,6 +44,8 @@ class TransferStopArrivalC2Test {
 
   private static final int EXPECTED_COST = ACCESS_COST + TRANSIT_COST + TRANSFER_COST;
 
+  private static final int TRANSIT_C2 = 600;
+
   private static final AccessStopArrivalC2<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrivalC2<>(
     ACCESS_DEPARTURE_TIME,
     ACCESS_WALK
@@ -53,6 +56,7 @@ class TransferStopArrivalC2Test {
     TRANSIT_TO_STOP,
     TRANSIT_ALIGHT_TIME,
     ACCESS_ARRIVAL.c1() + TRANSIT_COST,
+    TRANSIT_C2,
     TRANSIT_TRIP
   );
 
@@ -63,10 +67,9 @@ class TransferStopArrivalC2Test {
   );
 
   @Test
-  public void arrivedByTransfer() {
-    assertTrue(subject.arrivedByTransfer());
-    assertFalse(subject.arrivedByTransit());
-    assertFalse(subject.arrivedByAccess());
+  public void arrivedBy() {
+    assertEquals(TRANSFER, subject.arrivedBy());
+    assertTrue(subject.arrivedBy(TRANSFER));
   }
 
   @Test
@@ -86,8 +89,8 @@ class TransferStopArrivalC2Test {
 
   @Test
   public void c2() {
-    // We will add a more meaning-full implementation later
-    assertEquals(RaptorCostCalculator.ZERO_COST, subject.c2());
+    // The c2 is the same as for the previous transit
+    assertEquals(TRANSIT_C2, subject.c2());
   }
 
   @Test

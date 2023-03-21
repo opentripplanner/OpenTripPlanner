@@ -102,7 +102,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
    */
   @Override
   public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
-    Iterable<? extends McStopArrival<T>> fromArrivals = arrivals.listArrivalsAfterMarker(fromStop);
+    var fromArrivals = arrivals.listArrivalsAfterMarker(fromStop);
 
     while (transfers.hasNext()) {
       transferToStop(fromArrivals, transfers.next());
@@ -134,23 +134,16 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
       return;
     }
 
-    final int c1 = calculatorGeneralizedCost.transitArrivalCost(
-      ride.boardC1(),
-      alightSlack,
-      alightTime - ride.boardTime(),
-      ride.trip(),
-      alightStop
+    final int c1 = calculateC1(ride, alightStop, alightTime, alightSlack);
+
+    var transitState = stopArrivalFactory.createTransitStopArrival(
+      ride,
+      alightStop,
+      stopArrivalTime,
+      c1
     );
 
-    arrivalsCache.add(
-      stopArrivalFactory.createTransitStopArrival(
-        ride.prevArrival(),
-        alightStop,
-        stopArrivalTime,
-        c1,
-        ride.trip()
-      )
-    );
+    arrivalsCache.add(transitState);
   }
 
   /* private methods */
@@ -200,6 +193,16 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
       return;
     }
     arrivals.addStopArrival(arrival);
+  }
+
+  private int calculateC1(PatternRide<T> ride, int alightStop, int alightTime, int alightSlack) {
+    return calculatorGeneralizedCost.transitArrivalCost(
+      ride.boardC1(),
+      alightSlack,
+      alightTime - ride.boardTime(),
+      ride.trip(),
+      alightStop
+    );
   }
 
   private boolean exceedsTimeLimit(int time) {

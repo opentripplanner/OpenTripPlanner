@@ -15,8 +15,11 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RelaxFunction;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.StopArrivalFactoryC1;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
 
 public class StopArrivalStateParetoSetTest {
 
@@ -63,13 +66,26 @@ public class StopArrivalStateParetoSetTest {
     20,
     BASE_COST
   );
-
-  private final StopArrivalParetoSet<RaptorTripSchedule> subject = createStopArrivalSet(null);
+  public static final ArrivalParetoSetComparatorFactory<McStopArrival<RaptorTripSchedule>> COMPARATOR_FACTORY = ArrivalParetoSetComparatorFactory.factory(
+    RelaxFunction.NORMAL,
+    null
+  );
 
   private static Stream<Arguments> testCases() {
     return Stream.of(
-      Arguments.of("Stop Arrival - regular", createStopArrivalSet(null)),
-      Arguments.of("Stop Arrival - w/egress", createEgressStopArrivalSet(List.of(), null, null))
+      Arguments.of(
+        "Stop Arrival - regular",
+        createStopArrivalSet(COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost(), null)
+      ),
+      Arguments.of(
+        "Stop Arrival - w/egress",
+        createEgressStopArrivalSet(
+          COMPARATOR_FACTORY.compareArrivalTimeRoundCostAndOnBoardArrival(),
+          List.of(),
+          null,
+          null
+        )
+      )
     );
   }
 
@@ -153,7 +169,7 @@ public class StopArrivalStateParetoSetTest {
    */
   @Test
   public void testTransitAndTransferDoesNotAffectDominance() {
-    var subject = createStopArrivalSet(null);
+    var subject = createStopArrivalSet(COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost(), null);
     subject.add(newAccessStopState(STOP_1, 20, ANY));
     subject.add(newTransitStopState(ROUND_1, STOP_2, 10, ANY));
     subject.add(newTransferStopState(ROUND_1, STOP_4, 8, ANY));
@@ -168,7 +184,12 @@ public class StopArrivalStateParetoSetTest {
    */
   @Test
   public void testTransitAndTransferDoesAffectDominanceForStopArrivalsWithEgress() {
-    var subject = createEgressStopArrivalSet(List.of(), null, null);
+    var subject = createEgressStopArrivalSet(
+      COMPARATOR_FACTORY.compareArrivalTimeRoundCostAndOnBoardArrival(),
+      List.of(),
+      null,
+      null
+    );
     subject.add(newAccessStopState(STOP_1, 20, ANY));
     subject.add(newTransitStopState(ROUND_1, STOP_2, 10, ANY));
     subject.add(newTransferStopState(ROUND_1, STOP_4, 8, ANY));
@@ -193,7 +214,8 @@ public class StopArrivalStateParetoSetTest {
     int cost
   ) {
     var prev = prev(round);
-    return STOP_ARRIVAL_FACTORY.createTransitStopArrival(prev, stop, arrivalTime, cost, ANY_TRIP);
+    var anyRide = new PatternRideC1<>(prev, ANY, ANY, ANY, ANY, ANY, ANY, ANY_TRIP);
+    return STOP_ARRIVAL_FACTORY.createTransitStopArrival(anyRide, stop, arrivalTime, cost);
   }
 
   private static McStopArrival<RaptorTripSchedule> newTransferStopState(

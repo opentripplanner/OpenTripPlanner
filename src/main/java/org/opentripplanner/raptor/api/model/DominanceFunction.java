@@ -7,6 +7,14 @@ package org.opentripplanner.raptor.api.model;
 @FunctionalInterface
 public interface DominanceFunction {
   /**
+   * Return a function witch never dominates anything. This is the same as
+   * ignoring a criteria in the pareto dominance function.
+   */
+  static DominanceFunction noop() {
+    return (l, r) -> false;
+  }
+
+  /**
    * Evaluates is left dominates right, if not return {@link false}.
    * <p>
    * Note! The function is not symmetric:

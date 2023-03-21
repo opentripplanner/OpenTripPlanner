@@ -1,5 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSFER;
+
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
@@ -30,8 +33,8 @@ final class TransferStopArrivalC2<T extends RaptorTripSchedule> extends Abstract
   }
 
   @Override
-  public boolean arrivedByTransfer() {
-    return true;
+  public PathLegType arrivedBy() {
+    return TRANSFER;
   }
 
   @Override

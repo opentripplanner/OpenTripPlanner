@@ -31,6 +31,17 @@ public final class IntUtils {
   }
 
   /**
+   * Copy int array and shift all values by the given {@code offset}.
+   */
+  public static int[] shiftArray(int offset, int[] array) {
+    int[] a = new int[array.length];
+    for (int i = 0; i < array.length; i++) {
+      a[i] = array[i] + offset;
+    }
+    return a;
+  }
+
+  /**
    * Concatenate list a and b and convert them to int arrays.
    */
   public static int[] concat(Collection<Integer> a, Collection<Integer> b) {

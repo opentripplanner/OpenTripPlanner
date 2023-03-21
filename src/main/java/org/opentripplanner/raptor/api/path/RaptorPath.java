@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RelaxFunction;
 
 /**
  * The result path of a Raptor search describing the one possible journey.
@@ -14,7 +15,7 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
   /**
    * The Range Raptor iteration departure time. This can be used in the path-pareto-function to make
    * sure all results found in previous iterations are kept, and not dominated by new results. This
-   * is used for the time-table view.
+   * is used for the timetable view.
    */
   int rangeRaptorIterationDepartureTime();
 
@@ -132,5 +133,51 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
 
   default boolean isUnknownPath() {
     return false;
+  }
+
+  /* Compare functions */
+
+  static <T extends RaptorTripSchedule> boolean compareArrivalTime(
+    RaptorPath<T> l,
+    RaptorPath<T> r
+  ) {
+    return l.endTime() < r.endTime();
+  }
+
+  static <T extends RaptorTripSchedule> boolean compareDepartureTime(
+    RaptorPath<T> l,
+    RaptorPath<T> r
+  ) {
+    return l.startTime() > r.startTime();
+  }
+
+  static <T extends RaptorTripSchedule> boolean compareIterationDepartureTime(
+    RaptorPath<T> l,
+    RaptorPath<T> r
+  ) {
+    return l.rangeRaptorIterationDepartureTime() > r.rangeRaptorIterationDepartureTime();
+  }
+
+  static <T extends RaptorTripSchedule> boolean compareDuration(RaptorPath<T> l, RaptorPath<T> r) {
+    return l.durationInSeconds() < r.durationInSeconds();
+  }
+
+  static <T extends RaptorTripSchedule> boolean compareNumberOfTransfers(
+    RaptorPath<T> l,
+    RaptorPath<T> r
+  ) {
+    return l.numberOfTransfers() < r.numberOfTransfers();
+  }
+
+  static <T extends RaptorTripSchedule> boolean compareC1(RaptorPath<T> l, RaptorPath<T> r) {
+    return l.c1() < r.c1();
+  }
+
+  static <T extends RaptorTripSchedule> boolean compareC1(
+    RelaxFunction relax,
+    RaptorPath<T> l,
+    RaptorPath<T> r
+  ) {
+    return l.c1() < relax.relax(r.c1());
   }
 }

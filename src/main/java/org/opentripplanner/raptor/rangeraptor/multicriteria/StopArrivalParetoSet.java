@@ -33,45 +33,12 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
   /**
    * Create a stop arrivals pareto set and attach an optional {@code paretoSetEventListener}
    * (debug handler).
-   * <p>
-   * The comparator used compare:
-   * <ul>
-   *   <li>arrival-time</li>
-   *   <li>round</li>
-   *   <li>generalized-cost</li>
-   *   <li><b>But not on-board-arrival</b></li>
-   * </ul>
    */
   static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createStopArrivalSet(
+    ParetoComparator<McStopArrival<T>> comparator,
     @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
   ) {
-    return new StopArrivalParetoSet<>(
-      McStopArrival.compareArrivalTimeRoundAndCost(),
-      paretoSetEventListener
-    );
-  }
-
-  /**
-   * Create a stop arrivals pareto set and attach an optional {@code paretoSetEventListener}
-   * (debug handler).
-   * <p>
-   * The comparator used compare:
-   * <ul>
-   *   <li>arrival-time</li>
-   *   <li>round</li>
-   *   <li>generalized-cost</li>
-   *   <li>on-board-arrival</li>
-   * </ul>
-   */
-  static <
-    T extends RaptorTripSchedule
-  > StopArrivalParetoSet<T> createStopArrivalSetWithOnBoardCriteria(
-    @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
-  ) {
-    return new StopArrivalParetoSet<>(
-      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(),
-      paretoSetEventListener
-    );
+    return new StopArrivalParetoSet<>(comparator, paretoSetEventListener);
   }
 
   /**
@@ -80,6 +47,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
    * accepted egress stop arrival.
    */
   static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(
+    ParetoComparator<McStopArrival<T>> comparator,
     List<RaptorAccessEgress> egressPaths,
     DestinationArrivalPaths<T> destinationArrivals,
     @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
@@ -92,9 +60,6 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
       listener = new ParetoSetEventListenerComposite<>(paretoSetEventListener, listener);
     }
 
-    return new StopArrivalParetoSet<>(
-      McStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(),
-      listener
-    );
+    return new StopArrivalParetoSet<>(comparator, listener);
   }
 }

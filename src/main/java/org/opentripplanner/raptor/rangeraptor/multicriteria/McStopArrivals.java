@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
@@ -29,6 +30,8 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   private final StopArrivalParetoSet<T>[] arrivals;
   private final BitSet touchedStops;
+
+  private final ArrivalParetoSetComparatorFactory<McStopArrival<T>> comparatorFactory;
   private final DebugHandlerFactory<T> debugHandlerFactory;
   private final DebugStopArrivalsStatistics debugStats;
 
@@ -41,8 +44,10 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     EgressPaths egressPaths,
     AccessPaths accessPaths,
     DestinationArrivalPaths<T> paths,
+    ArrivalParetoSetComparatorFactory<McStopArrival<T>> comparatorFactory,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
+    this.comparatorFactory = comparatorFactory;
     //noinspection unchecked
     this.arrivals = (StopArrivalParetoSet<T>[]) new StopArrivalParetoSet[nStops];
     this.touchedStops = new BitSet(nStops);
@@ -57,6 +62,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     return arrivals[stopIndex] != null && !arrivals[stopIndex].isEmpty();
   }
 
+  /** Slow! do not use during routing! */
   public int bestArrivalTime(int stopIndex) {
     return minInt(arrivals[stopIndex].stream(), McStopArrival::arrivalTime);
   }
@@ -68,10 +74,12 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     );
   }
 
+  /** Slow! do not use during routing! */
   public int bestTransitArrivalTime(int stopIndex) {
     return transitStopArrivalsMinInt(stopIndex, McStopArrival::arrivalTime);
   }
 
+  /** Slow! do not use during routing! */
   public int smallestNumberOfTransfers(int stopIndex) {
     return transitStopArrivalsMinInt(stopIndex, McStopArrival::numberOfTransfers);
   }
@@ -127,6 +135,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     if (arrivals[stop] == null) {
       arrivals[stop] =
         StopArrivalParetoSet.createStopArrivalSet(
+          comparatorFactory.compareArrivalTimeRoundAndCost(),
           debugHandlerFactory.paretoSetStopArrivalListener(stop)
         );
     }
@@ -138,7 +147,8 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
       for (var access : accessOnBoardByRides.get(round)) {
         int stop = access.stop();
         arrivals[stop] =
-          StopArrivalParetoSet.createStopArrivalSetWithOnBoardCriteria(
+          StopArrivalParetoSet.createStopArrivalSet(
+            comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival(),
             debugHandlerFactory.paretoSetStopArrivalListener(stop)
           );
       }
@@ -159,6 +169,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
         // The factory is creating the actual "glue"
         this.arrivals[stop] =
           StopArrivalParetoSet.createEgressStopArrivalSet(
+            comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival(),
             list,
             paths,
             debugHandlerFactory.paretoSetStopArrivalListener(stop)

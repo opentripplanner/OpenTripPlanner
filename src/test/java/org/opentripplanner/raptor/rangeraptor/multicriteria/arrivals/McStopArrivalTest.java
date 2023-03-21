@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 
 class McStopArrivalTest {
@@ -19,154 +21,64 @@ class McStopArrivalTest {
   private static final int ARRIVAL_TIME_EARLY = 12;
   private static final int ARRIVAL_TIME_LATE = 13;
 
-  private static final RelaxFunction NORMAL = new RelaxFunction(1.0, 0);
-
   @Test
-  void compareArrivalTimeRoundAndCostTest() {
+  void testCompareBase() {
     // Same values for arrival-time, pareto-round and c1. Ignore c2 and arrivedOnBoard
     assertFalse(
-      McStopArrival
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT)
-        )
+      McStopArrival.compareBase(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT)
+      )
     );
     // Arrival-time is better
     assertTrue(
-      McStopArrival
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
-        )
+      McStopArrival.compareBase(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
+      )
     );
     // Pareto-round is better
     assertTrue(
-      McStopArrival
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_100, COST_100, ARRIVED_ON_BOARD)
-        )
+      McStopArrival.compareBase(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_100, COST_100, ARRIVED_ON_BOARD)
+      )
     );
     // C1 is better
     assertTrue(
-      McStopArrival
-        .compareArrivalTimeRoundAndCost()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_BOARD)
-        )
+      McStopArrival.compareBase(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_BOARD)
+      )
     );
   }
 
   @Test
-  void compareArrivalTimeRoundCostAndOnBoardArrival() {
-    // Same values for arrival-time, pareto-round and c1. Ignore c2 and arrivedOnBoard
+  void testCompareArrivedOnBoard() {
+    // Same values for arrivedOnBoard. Ignore arrival-time, pareto-round, c1 and c2
     assertFalse(
-      McStopArrival
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_BOARD)
-        )
-    );
-    // Arrival-time is better
-    assertTrue(
-      McStopArrival
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
-        )
-    );
-    // Pareto-round is better
-    assertTrue(
-      McStopArrival
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_777, COST_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_100, COST_100, ARRIVED_ON_BOARD)
-        )
-    );
-    // C1 is better
-    assertTrue(
-      McStopArrival
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_100, COST_777, ARRIVED_ON_FOOT),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_BOARD)
-        )
+      McStopArrival.compareArrivedOnBoard(
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_BOARD)
+      )
     );
     // Arrived on-board is better
     assertTrue(
-      McStopArrival
-        .compareArrivalTimeRoundCostAndOnBoardArrival()
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_BOARD),
-          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_FOOT)
-        )
+      McStopArrival.compareArrivedOnBoard(
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_FOOT)
+      )
     );
   }
 
   @Test
-  void compareRelaxedArrivalTimeTest() {
-    int bestArrivalTime = 600;
-    int okArrivalTime = 899;
-    int rejectArrivalTime = okArrivalTime + 1;
-    RelaxFunction relaxArrivalTime = new RelaxFunction(1.5, 0);
-    var referenceArrival = new A(
-      bestArrivalTime,
-      PARETO_ROUND_ONE,
-      COST_100,
-      COST_100,
-      ARRIVED_ON_BOARD
-    );
-
-    // Test base
-    assertFalse(
-      McStopArrival
-        .compareArrivalTimeRoundAndCost(relaxArrivalTime, NORMAL)
-        .leftDominanceExist(
-          new A(rejectArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-          referenceArrival
-        )
-    );
-    assertTrue(
-      McStopArrival
-        .compareArrivalTimeRoundAndCost(relaxArrivalTime, NORMAL)
-        .leftDominanceExist(
-          new A(okArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-          referenceArrival
-        )
-    );
-
-    // Test OnBoardArrival
-    assertFalse(
-      McStopArrival
-        .compareArrivalTimeRoundCostAndOnBoardArrival(relaxArrivalTime, NORMAL)
-        .leftDominanceExist(
-          new A(rejectArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-          referenceArrival
-        )
-    );
-    assertTrue(
-      McStopArrival
-        .compareArrivalTimeRoundCostAndOnBoardArrival(relaxArrivalTime, NORMAL)
-        .leftDominanceExist(
-          new A(okArrivalTime, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-          referenceArrival
-        )
-    );
-  }
-
-  @Test
-  void compareRelaxedC1Test() {
+  void testRelaxedCompareBase() {
     int bestC1 = 600;
-    int okC1 = 799;
+    int okC1 = 899;
     int rejectC1 = okC1 + 1;
-    RelaxFunction relaxC1 = new RelaxFunction(1.0, 200);
+
+    RelaxFunction relaxC1 = GeneralizedCostRelaxFunction.of(1.25, 150);
+
     var referenceArrival = new A(
       ARRIVAL_TIME_EARLY,
       PARETO_ROUND_ONE,
@@ -175,40 +87,40 @@ class McStopArrivalTest {
       ARRIVED_ON_BOARD
     );
 
-    // Test base
+    // Test same values arrival-time, round and c1 should not dominate.
+    // Ignore better c2 and onBoardArrival
     assertFalse(
-      McStopArrival
-        .compareArrivalTimeRoundAndCost(NORMAL, relaxC1)
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, rejectC1, COST_777, ARRIVED_ON_FOOT),
-          referenceArrival
-        )
-    );
-    assertTrue(
-      McStopArrival
-        .compareArrivalTimeRoundAndCost(NORMAL, relaxC1)
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, okC1, COST_777, ARRIVED_ON_FOOT),
-          referenceArrival
-        )
+      McStopArrival.relaxedCompareBase(
+        relaxC1,
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, rejectC1, COST_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, bestC1, COST_777, ARRIVED_ON_FOOT)
+      )
     );
 
-    // Test OnBoardArrival
-    assertFalse(
-      McStopArrival
-        .compareArrivalTimeRoundCostAndOnBoardArrival(NORMAL, relaxC1)
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, rejectC1, COST_777, ARRIVED_ON_FOOT),
-          referenceArrival
-        )
-    );
+    // Arrival-time better, other the same
     assertTrue(
-      McStopArrival
-        .compareArrivalTimeRoundCostAndOnBoardArrival(NORMAL, relaxC1)
-        .leftDominanceExist(
-          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, okC1, COST_777, ARRIVED_ON_FOOT),
-          referenceArrival
-        )
+      McStopArrival.relaxedCompareBase(
+        relaxC1,
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, rejectC1, COST_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, bestC1, COST_100, ARRIVED_ON_BOARD)
+      )
+    );
+
+    // Round better, other the same
+    assertTrue(
+      McStopArrival.relaxedCompareBase(
+        relaxC1,
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, rejectC1, COST_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, bestC1, COST_100, ARRIVED_ON_BOARD)
+      )
+    );
+    // C1 is better, other the same
+    assertTrue(
+      McStopArrival.relaxedCompareBase(
+        relaxC1,
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, okC1, COST_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, bestC1, COST_100, ARRIVED_ON_BOARD)
+      )
     );
   }
 
@@ -226,6 +138,11 @@ class McStopArrivalTest {
     @Override
     public int c2() {
       return c2;
+    }
+
+    @Override
+    public PathLegType arrivedBy() {
+      throw new UnsupportedOperationException();
     }
 
     @Override

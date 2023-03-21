@@ -60,7 +60,7 @@ class TransitStopArrivalTest {
 
   @Test
   public void arrivedByTransit() {
-    assertTrue(subject.arrivedByTransit());
+    assertTrue(subject.arrivedBy(TRANSIT));
     assertTrue(subject.arrivedBy(TRANSIT));
   }
 

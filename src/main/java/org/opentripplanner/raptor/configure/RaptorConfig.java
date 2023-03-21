@@ -60,7 +60,10 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   ) {
     final SearchContext<T> context = context(transitData, request);
     return new McRangeRaptorConfig<>(context)
-      .createWorker(heuristics, (s, w) -> createWorker(context, s, w));
+      .createWorker(
+        heuristics,
+        (state, routingStrategy) -> createWorker(context, state, routingStrategy)
+      );
   }
 
   public RaptorWorker<T> createHeuristicSearch(

@@ -46,6 +46,12 @@ public interface RaptorTripPattern {
   int slackIndex();
 
   /**
+   * A pattern may belong to a transit-priority-group. Each group is given an advantage during
+   * the multi-criteria search, so the best alternative for each group is found.
+   */
+  int priorityGroupId();
+
+  /**
    * Pattern debug info, return transit mode and route name. This is  used for debugging purposes
    * only. The implementation should provide a short description with enough information for humans
    * to identify the the trip/route. This is is used in a context where information about agency and
