@@ -9,8 +9,10 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
@@ -18,7 +20,10 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitPriorityGroup32n;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.Relax;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class RaptorRequestMapper {
@@ -110,12 +115,14 @@ public class RaptorRequestMapper {
     }
 
     builder.withMultiCriteria(mcBuilder -> {
-      preferences
-        .transit()
-        .raptor()
-        .relaxGeneralizedCostAtDestination()
-        .ifPresent(mcBuilder::withRelaxCostAtDestination);
-      mcBuilder.withPassThroughPoints(mapPassThroughPoints());
+      var r = preferences.transit().raptor();
+      if (!r.relaxTransitPriorityGroup().isNormal()) {
+        mcBuilder.withTransitPriorityCalculator(TransitPriorityGroup32n.priorityCalculator());
+        mcBuilder.withRelaxC1(mapRelaxCost(r.relaxTransitPriorityGroup()));
+      } else {
+        mcBuilder.withPassThroughPoints(mapPassThroughPoints());
+        r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
+      }
     });
 
     for (Optimization optimization : preferences.transit().raptor().optimizations()) {
@@ -183,6 +190,16 @@ public class RaptorRequestMapper {
         return new PassThroughPoint(p.name(), stops);
       })
       .toList();
+  }
+
+  static RelaxFunction mapRelaxCost(Relax relax) {
+    if (relax == null) {
+      return null;
+    }
+    return GeneralizedCostRelaxFunction.of(
+      relax.ratio(),
+      RaptorCostConverter.toRaptorCost(relax.slack())
+    );
   }
 
   private int relativeTime(Instant time) {
