@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareProduct;
@@ -38,11 +39,7 @@ class FareTransferRuleMapperTest {
 
   @Test
   void transferRuleWithoutLegGroups() {
-    var fareProduct = new FareProduct();
-    fareProduct.setId(id);
-    fareProduct.setFareProductId(id);
-    fareProduct.setCurrency("EUR");
-    fareProduct.setAmount(1000);
+    var fareProduct = fareProduct();
 
     var rule = new FareTransferRule();
     rule.setFareProductId(id);
@@ -55,11 +52,7 @@ class FareTransferRuleMapperTest {
 
   @Test
   void transferRuleWithLegGroup() {
-    var fareProduct = new FareProduct();
-    fareProduct.setId(id);
-    fareProduct.setFareProductId(id);
-    fareProduct.setCurrency("EUR");
-    fareProduct.setAmount(1000);
+    var fareProduct = fareProduct();
 
     var rule = new FareTransferRule();
     rule.setFareProductId(id);
@@ -70,6 +63,17 @@ class FareTransferRuleMapperTest {
 
     assertEquals(groupId1.getId(), transferRule.fromLegGroup());
     assertEquals(groupId2.getId(), transferRule.toLegGroup());
+  }
+
+  @Nonnull
+  private FareProduct fareProduct() {
+    var fareProduct = new FareProduct();
+    fareProduct.setId(id);
+    fareProduct.setName("A fare product");
+    fareProduct.setFareProductId(id);
+    fareProduct.setCurrency("EUR");
+    fareProduct.setAmount(1000);
+    return fareProduct;
   }
 
   private org.opentripplanner.ext.fares.model.FareTransferRule map(

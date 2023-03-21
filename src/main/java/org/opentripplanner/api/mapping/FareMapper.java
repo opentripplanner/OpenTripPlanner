@@ -99,7 +99,7 @@ public class FareMapper {
 
   private Map<String, List<ApiFareComponent>> toApiFareComponents(ItineraryFares fare) {
     return fare
-      .getComponentTypes()
+      .getFaresV1Types()
       .stream()
       .map(key -> {
         var money = fare.getComponents(key).stream().map(this::toApiFareComponent).toList();
@@ -110,7 +110,7 @@ public class FareMapper {
 
   private Map<String, ApiMoney> toApiMoneys(ItineraryFares fare) {
     return fare
-      .getComponentTypes()
+      .getFaresV1Types()
       .stream()
       .map(key -> {
         var money = toApiMoney(fare.getFare(key));

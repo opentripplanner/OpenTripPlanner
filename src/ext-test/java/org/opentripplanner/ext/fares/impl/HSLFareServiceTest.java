@@ -15,6 +15,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -35,7 +36,12 @@ public class HSLFareServiceTest implements PlanTestConstants {
   ) {
     Assertions.assertArrayEquals(
       expectedFareIds.toArray(),
-      fareService.getCost(i).getComponents(FareType.regular).stream().map(f -> f.fareId()).toArray()
+      fareService
+        .getCost(i)
+        .getComponents(FareType.regular)
+        .stream()
+        .map(FareComponent::fareId)
+        .toArray()
     );
   }
 

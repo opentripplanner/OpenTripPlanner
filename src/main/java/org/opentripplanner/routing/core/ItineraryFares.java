@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.LegProducts;
@@ -31,6 +32,7 @@ public class ItineraryFares {
   // LinkedHashMultimap keeps the insertion order
   private final Multimap<Leg, FareProduct> legProducts = LinkedHashMultimap.create();
 
+  @Deprecated
   private final Multimap<FareType, FareComponent> components = LinkedHashMultimap.create();
 
   public ItineraryFares(ItineraryFares aFare) {
@@ -64,6 +66,7 @@ public class ItineraryFares {
     return new FeedScopedId(FARES_V1_FEED_ID, fareType.name());
   }
 
+  @Deprecated
   public void addFareDetails(FareType fareType, List<FareComponent> components) {
     this.components.replaceValues(fareType, components);
 
@@ -94,8 +97,13 @@ public class ItineraryFares {
     return List.copyOf(components.get(type));
   }
 
-  public Set<FareType> getComponentTypes() {
-    return components.keySet();
+  public Set<FareType> getFaresV1Types() {
+    return itineraryProducts
+      .stream()
+      .filter(fp -> fp.id().getFeedId().equals(FARES_V1_FEED_ID))
+      .map(fp -> fp.id().getId())
+      .map(FareType::valueOf)
+      .collect(Collectors.toSet());
   }
 
   @Override
