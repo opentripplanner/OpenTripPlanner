@@ -32,7 +32,7 @@ public class RideHailingFilter implements ItineraryListFilter {
     return rideHailingServices
       .parallelStream()
       .flatMap(service ->
-        itineraries.parallelStream().map(i -> addCarHailingInformation(i, service))
+        itineraries.parallelStream().map(i -> addRideHailingInformation(i, service))
       )
       .toList();
   }
@@ -46,7 +46,7 @@ public class RideHailingFilter implements ItineraryListFilter {
     );
   }
 
-  private Itinerary addCarHailingInformation(Itinerary i, RideHailingService service) {
+  private Itinerary addRideHailingInformation(Itinerary i, RideHailingService service) {
     if (!i.isFlaggedForDeletion()) {
       var legs = i
         .getLegs()

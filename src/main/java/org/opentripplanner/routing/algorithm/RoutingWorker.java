@@ -182,7 +182,7 @@ public class RoutingWorker {
 
   private List<RideHailingService> rideHailingServices() {
     if (request.journey().modes().contains(StreetMode.CAR_HAILING)) {
-      return serverContext.carHailingServices();
+      return serverContext.rideHailingServices();
     } else {
       return List.of();
     }

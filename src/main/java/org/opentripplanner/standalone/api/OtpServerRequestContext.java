@@ -92,7 +92,7 @@ public interface OtpServerRequestContext {
 
   RaptorTuningParameters raptorTuningParameters();
 
-  List<RideHailingService> carHailingServices();
+  List<RideHailingService> rideHailingServices();
 
   Duration streetRoutingTimeout();
 

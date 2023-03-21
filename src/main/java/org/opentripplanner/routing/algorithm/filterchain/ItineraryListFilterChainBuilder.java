@@ -278,7 +278,7 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withCarHailingServices(List<RideHailingService> services) {
+  public ItineraryListFilterChainBuilder withRideHailingServices(List<RideHailingService> services) {
     this.rideHailingServices = services;
     return this;
   }

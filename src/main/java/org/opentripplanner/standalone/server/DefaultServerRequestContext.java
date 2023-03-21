@@ -191,7 +191,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public List<RideHailingService> carHailingServices() {
+  public List<RideHailingService> rideHailingServices() {
     return rideHailingServices;
   }
 

@@ -79,7 +79,7 @@ class RideHailingFilterTest implements PlanTestConstants {
   }
 
   @Test
-  void addCarhailingInformation() {
+  void addRideHailingInformation() {
     var filter = new RideHailingFilter(List.of(mockService));
 
     var filtered = filter.filter(List.of(i));

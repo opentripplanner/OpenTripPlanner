@@ -86,7 +86,7 @@ public class RouteRequestToFilterChainMapper {
       .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
       .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
-      .withCarHailingServices(rideHailingServices)
+      .withRideHailingServices(rideHailingServices)
       .withDebugEnabled(params.debug());
 
     return builder.build();

@@ -3,9 +3,7 @@ package org.opentripplanner.standalone.configure;
 import dagger.BindsInstance;
 import dagger.Component;
 import jakarta.inject.Singleton;
-import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -59,7 +57,6 @@ public interface ConstructApplicationFactory {
   VehiclePositionService vehiclePositionService();
   VehicleRentalRepository vehicleRentalRepository();
   VehicleRentalService vehicleRentalService();
-  List<RideHailingService> carHailingServices();
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
