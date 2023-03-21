@@ -164,7 +164,7 @@ public final class WgsCoordinate implements Serializable {
    * This is useful when you want to cache coordinate-based computations but don't need absolute
    * precision. DO NOT USE THIS IN ROUTING(USE AT LEAST 7 DECIMALS)!
    */
-  public WgsCoordinate rounded() {
+  public WgsCoordinate roundToApproximate10m() {
     var lat = DoubleUtils.roundTo4Decimals(latitude);
     var lng = DoubleUtils.roundTo4Decimals(longitude);
     return new WgsCoordinate(lat, lng);

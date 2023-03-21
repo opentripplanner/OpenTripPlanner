@@ -33,7 +33,10 @@ public abstract class CachingRideHailingService implements RideHailingService {
   // get the next arrivals for a specific location
   @Override
   public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) throws ExecutionException {
-    return arrivalTimeCache.get(coordinate.rounded(), () -> queryArrivalTimes(coordinate));
+    return arrivalTimeCache.get(
+      coordinate.roundToApproximate10m(),
+      () -> queryArrivalTimes(coordinate)
+    );
   }
 
   protected abstract List<ArrivalTime> queryArrivalTimes(WgsCoordinate position) throws IOException;
@@ -45,7 +48,10 @@ public abstract class CachingRideHailingService implements RideHailingService {
   public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end)
     throws ExecutionException {
     // Truncate lat/lon values in order to reduce the number of API requests made.
-    var request = new RideEstimateRequest(start.rounded(), end.rounded());
+    var request = new RideEstimateRequest(
+      start.roundToApproximate10m(),
+      end.roundToApproximate10m()
+    );
     return rideEstimateCache.get(request, () -> queryRideEstimates(request));
   }
 
