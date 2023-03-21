@@ -21,6 +21,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -138,8 +139,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment ->
       getValue(
         environment,
-        stop -> LegacyGraphQLUtils.getTranslation(stop.getDescription(), environment),
-        station -> LegacyGraphQLUtils.getTranslation(station.getDescription(), environment)
+        stop -> GraphQLUtils.getTranslation(stop.getDescription(), environment),
+        station -> GraphQLUtils.getTranslation(station.getDescription(), environment)
       );
   }
 
@@ -148,8 +149,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment ->
       getValue(
         environment,
-        stop -> LegacyGraphQLUtils.getTranslation(stop.getUrl(), environment),
-        station -> LegacyGraphQLUtils.getTranslation(station.getUrl(), environment)
+        stop -> GraphQLUtils.getTranslation(stop.getUrl(), environment),
+        station -> GraphQLUtils.getTranslation(station.getUrl(), environment)
       );
   }
 
@@ -205,8 +206,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment ->
       getValue(
         environment,
-        stop -> LegacyGraphQLUtils.getTranslation(stop.getName(), environment),
-        station -> LegacyGraphQLUtils.getTranslation(station.getName(), environment)
+        stop -> GraphQLUtils.getTranslation(stop.getName(), environment),
+        station -> GraphQLUtils.getTranslation(station.getName(), environment)
       );
   }
 

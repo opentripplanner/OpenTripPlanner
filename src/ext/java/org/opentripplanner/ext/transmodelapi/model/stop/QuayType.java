@@ -19,11 +19,11 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -101,14 +101,12 @@ public class QuayType {
           .newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> {
-            I18NString description = (((StopLocation) environment.getSource()).getDescription());
-            if (description != null) {
-              Locale locale = TransmodelGraphQLUtils.getLocale(environment);
-              return description.toString(locale);
-            }
-            return null;
-          })
+          .dataFetcher(environment ->
+            GraphQLUtils.getTranslation(
+              ((StopLocation) environment.getSource()).getDescription(),
+              environment
+            )
+          )
           .build()
       )
       .field(
