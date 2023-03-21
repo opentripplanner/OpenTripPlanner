@@ -27,7 +27,7 @@
               "endTime" : 1580641220000,
               "generalizedCost" : 40,
               "alerts" : [ ],
-              "rideEstimate" : null
+              "rideHailingEstimate" : null
             },
             {
               "mode" : "BUS",
@@ -49,7 +49,7 @@
               "endTime" : 1580642100000,
               "generalizedCost" : 992,
               "alerts" : [ ],
-              "rideEstimate" : null
+              "rideHailingEstimate" : null
             },
             {
               "mode" : "RAIL",
@@ -91,7 +91,7 @@
                   ]
                 }
               ],
-              "rideEstimate" : null
+              "rideHailingEstimate" : null
             },
             {
               "mode" : "CAR",
@@ -113,7 +113,7 @@
               "endTime" : 1580644800000,
               "generalizedCost" : 1000,
               "alerts" : [ ],
-              "rideEstimate" : {
+              "rideHailingEstimate" : {
                 "provider" : "UBER",
                 "minCost" : {
                   "currency" : "EUR",

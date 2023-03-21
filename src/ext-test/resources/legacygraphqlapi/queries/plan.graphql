@@ -58,7 +58,7 @@
                         }
                     }
                 }
-                rideEstimate {
+                rideHailingEstimate {
                     provider
                     minCost {
                         currency

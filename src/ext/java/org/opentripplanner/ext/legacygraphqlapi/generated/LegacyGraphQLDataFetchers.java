@@ -381,7 +381,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Boolean> rentedBike();
 
-    public DataFetcher<RideEstimate> rideEstimate();
+    public DataFetcher<RideEstimate> rideHailingEstimate();
 
     public DataFetcher<Route> route();
 
@@ -662,7 +662,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType> propulsionType();
   }
 
-  public interface LegacyGraphQLRideEstimate {
+  public interface LegacyGraphQLRideHailingEstimate {
     public DataFetcher<Object> arrival();
 
     public DataFetcher<Money> maxCost();

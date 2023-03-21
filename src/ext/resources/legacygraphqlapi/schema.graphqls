@@ -1356,7 +1356,7 @@ An ISO-8601-formatted time duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
 """
 scalar Duration
 
-type RideEstimate {
+type RideHailingEstimate {
     provider: String!
     minCost: Money!
     maxCost: Money!
@@ -1513,7 +1513,7 @@ type Leg {
         ): [Leg!]
 
     "Estimate of a hailed ride like Uber."
-    rideEstimate: RideEstimate
+    rideHailingEstimate: RideHailingEstimate
 }
 
 """A span of time."""
