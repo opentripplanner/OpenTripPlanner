@@ -1508,7 +1508,9 @@ type Leg {
         Transportation modes for which all stops in the parent station are used as possible destination stops
         for the next legs. For modes not listed, only the exact destination stop of the leg is considered.
         """
-        destinationModesWithParentStation: [TransitMode!]): [Leg!]
+        destinationModesWithParentStation: [TransitMode!]
+
+        ): [Leg!]
 
     "Estimate of a hailed ride like Uber."
     rideEstimate: RideEstimate

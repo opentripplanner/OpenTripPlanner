@@ -32,3 +32,4 @@ route_id,service_id,trip_id,shape_id,block_id,wheelchair_accessible,trip_bikes_a
 18,alldays,18.1,,,,,N,foo
 18,alldays,18.1back,,,1,,S,foo
 18,alldays,18.bogus,,,,,,foo
+19,alldays,19.1,,,,,,
