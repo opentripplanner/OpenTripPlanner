@@ -290,8 +290,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
   }
 
-  /** A 'container' that a fare product applies to, for example 'Oyster Card' or 'DB Navigator App'. */
-  public interface LegacyGraphQLFareContainer {
+  /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */
+  public interface LegacyGraphQLFareMedium {
     public DataFetcher<String> id();
 
     public DataFetcher<String> name();
@@ -299,11 +299,11 @@ public class LegacyGraphQLDataFetchers {
 
   /** A fare product (ticket) to cover the entire or a subset of an itinerary. */
   public interface LegacyGraphQLFareProductInstance {
-    public DataFetcher<Object> container();
-
     public DataFetcher<String> id();
 
     public DataFetcher<String> instanceId();
+
+    public DataFetcher<Object> medium();
 
     public DataFetcher<String> name();
 

@@ -1299,9 +1299,9 @@ type RiderCategory {
 }
 
 """
-A 'container' that a fare product applies to, for example 'Oyster Card' or 'DB Navigator App'.
+A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'.
 """
-type FareContainer {
+type FareMedium {
     "ID of the container"
     id: String!
     "Human readable name of the container."
@@ -1350,7 +1350,7 @@ type FareProductInstance {
 
     This communicates to riders that a specific way of buying or keeping this product is required.
     """
-    container: FareContainer
+    medium: FareMedium
 }
 
 type Itinerary {

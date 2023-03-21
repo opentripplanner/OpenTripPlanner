@@ -62,7 +62,7 @@
                     "id" : "F:senior-citizens",
                     "name" : "Senior citizens"
                   },
-                  "container" : {
+                  "medium" : {
                     "id" : "F:oyster",
                     "name" : "TfL Oyster Card"
                   }
@@ -79,7 +79,7 @@
                     "id" : "F:senior-citizens",
                     "name" : "Senior citizens"
                   },
-                  "container" : {
+                  "medium" : {
                     "id" : "F:oyster",
                     "name" : "TfL Oyster Card"
                   }
@@ -139,7 +139,7 @@
                     "id" : "F:senior-citizens",
                     "name" : "Senior citizens"
                   },
-                  "container" : {
+                  "medium" : {
                     "id" : "F:oyster",
                     "name" : "TfL Oyster Card"
                   }
@@ -156,7 +156,7 @@
                     "id" : "F:senior-citizens",
                     "name" : "Senior citizens"
                   },
-                  "container" : {
+                  "medium" : {
                     "id" : "F:oyster",
                     "name" : "TfL Oyster Card"
                   }

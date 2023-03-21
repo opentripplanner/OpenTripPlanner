@@ -14,7 +14,7 @@ public class LegacyGraphQLFareProductInstanceImpl
   }
 
   @Override
-  public DataFetcher<Object> container() {
+  public DataFetcher<Object> medium() {
     return env -> getSource(env).product().container();
   }
 
