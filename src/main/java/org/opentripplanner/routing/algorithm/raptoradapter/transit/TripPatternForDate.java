@@ -92,41 +92,23 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
               .orElseThrow()
           )
           .toLocalDate();
+      assertValidRunningPeriod(
+        startOfRunningPeriod,
+        endOfRunningPeriod,
+        frequencies.get(0).tripTimes,
+        frequencies.get(frequencies.size() - 1).tripTimes
+      );
     } else {
       // These depend on the tripTimes array being sorted
+      var first = tripTimes.get(0);
       this.startOfRunningPeriod =
-        ServiceDateUtils.asDateTime(localDate, tripTimes.get(0).getDepartureTime(0)).toLocalDate();
+        ServiceDateUtils.asDateTime(localDate, first.getDepartureTime(0)).toLocalDate();
       var last = tripTimes.get(tripTimes.size() - 1);
       this.endOfRunningPeriod =
         ServiceDateUtils
           .asDateTime(localDate, last.getArrivalTime(last.getNumStops() - 1))
           .toLocalDate();
-    }
-    if (startOfRunningPeriod.isAfter(endOfRunningPeriod)) {
-      if (hasFrequencies()) {
-        var startTripId = frequencies.get(0).tripTimes.getTrip().getId();
-        var endTripId = frequencies.get(frequencies.size() - 1).tripTimes.getTrip().getId();
-        LOG.warn(
-          "Could not construct as start of the running period {} in frequency trip {} is after the end {} in frequency trip {}",
-          startOfRunningPeriod,
-          startTripId,
-          endOfRunningPeriod,
-          endTripId
-        );
-      } else {
-        var startTripId = tripTimes.get(0).getTrip().getId();
-        var endTripId = tripTimes.get(tripTimes.size() - 1).getTrip().getId();
-        LOG.warn(
-          "Could not construct as start of the running period {} in trip {} is after the end {} in trip {}",
-          startOfRunningPeriod,
-          startTripId,
-          endOfRunningPeriod,
-          endTripId
-        );
-      }
-      throw new IllegalArgumentException(
-        "Start of the running period is after end of the running period"
-      );
+      assertValidRunningPeriod(startOfRunningPeriod, endOfRunningPeriod, first, last);
     }
   }
 
@@ -239,5 +221,25 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     }
 
     return new TripPatternForDate(tripPattern, filteredTripTimes, filteredFrequencies, localDate);
+  }
+
+  private static void assertValidRunningPeriod(
+    LocalDate startOfRunningPeriod,
+    LocalDate endOfRunningPeriod,
+    TripTimes first,
+    TripTimes last
+  ) {
+    if (startOfRunningPeriod.isAfter(endOfRunningPeriod)) {
+      LOG.warn(
+        "Could not construct as start of the running period {} in trip {} is after the end {} in trip {}",
+        startOfRunningPeriod,
+        first.getTrip().getId(),
+        endOfRunningPeriod,
+        last.getTrip().getId()
+      );
+      throw new IllegalArgumentException(
+        "Start of the running period is after end of the running period"
+      );
+    }
   }
 }
