@@ -38,7 +38,16 @@ class ElevatorHopEdgeTest {
       .withWheelchair(true)
       .withPreferences(preferences ->
         preferences.withWheelchair(
-          new WheelchairPreferences(feature, feature, feature, 25, 0.5, 10, 25)
+          WheelchairPreferences
+            .of()
+            .withTrip(feature)
+            .withStop(feature)
+            .withElevator(feature)
+            .withInaccessibleStreetReluctance(25)
+            .withMaxSlope(0.5)
+            .withSlopeExceededReluctance(10)
+            .withStairsReluctance(25)
+            .build()
         )
       );
 
