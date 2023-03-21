@@ -297,8 +297,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> name();
   }
 
-  /** A fare product (ticket) to cover thi entire or a subset of an itinerary. */
-  public interface LegacyGraphQLFareProduct {
+  /** A fare product (ticket) to cover the entire or a subset of an itinerary. */
+  public interface LegacyGraphQLFareProductInstance {
     public DataFetcher<Object> container();
 
     public DataFetcher<String> id();

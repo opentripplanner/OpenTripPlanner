@@ -5,8 +5,8 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.plan.FareProductInstance;
 
-public class LegacyGraphQLFareProductImpl
-  implements LegacyGraphQLDataFetchers.LegacyGraphQLFareProduct {
+public class LegacyGraphQLFareProductInstanceImpl
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLFareProductInstance {
 
   @Override
   public DataFetcher<Object> price() {
