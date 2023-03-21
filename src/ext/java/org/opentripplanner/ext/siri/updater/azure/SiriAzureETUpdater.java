@@ -124,14 +124,14 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       }
 
       super.saveResultOnGraph.execute((graph, transitModel) -> {
-          snapshotSource.applyEstimatedTimetable(
-            transitModel,
-            fuzzyTripMatcher(),
-            entityResolver(),
-            feedId,
-            false,
-            updates
-          );
+        snapshotSource.applyEstimatedTimetable(
+          transitModel,
+          fuzzyTripMatcher(),
+          entityResolver(),
+          feedId,
+          false,
+          updates
+        );
       });
     } catch (JAXBException | XMLStreamException e) {
       LOG.error(e.getLocalizedMessage(), e);
