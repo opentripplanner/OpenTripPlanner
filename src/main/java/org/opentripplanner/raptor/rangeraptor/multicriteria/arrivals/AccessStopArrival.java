@@ -1,6 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
+
 import org.opentripplanner.raptor.api.RaptorConstants;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.AccessPathView;
@@ -26,8 +29,8 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
   }
 
   @Override
-  public boolean arrivedByAccess() {
-    return true;
+  public PathLegType arrivedBy() {
+    return ACCESS;
   }
 
   @Override
@@ -50,5 +53,10 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
     int newDepartureTime = newArrivalTime - access.durationInSeconds();
 
     return new AccessStopArrival<>(newDepartureTime, access);
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return access.stopReachedOnBoard();
   }
 }

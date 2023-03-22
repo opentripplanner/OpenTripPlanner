@@ -1,12 +1,9 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToStringDetailed;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
@@ -26,7 +23,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /*
  * FEATURE UNDER TEST
@@ -67,7 +63,6 @@ public class G03_AccessWithOpeningHoursMultipleOptionsTest implements RaptorTest
   }
 
   static List<RaptorModuleTestCase> openInWholeSearchIntervalTestCases() {
-    var expMinDuration = UnknownPathString.of("13m", 0);
     var expA =
       "Walk 1m Open(0:05 0:08) 0:08 0:09 $120 ~ B 1m " +
       "~ BUS R1 0:10 0:20 10m $1260 ~ C 0s " +
@@ -82,8 +77,7 @@ public class G03_AccessWithOpeningHoursMultipleOptionsTest implements RaptorTest
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_00))
-      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
+      .addMinDuration("13m", TX_0, T00_00, T00_30)
       .add(TC_STANDARD, PathUtils.withoutCost(expA, expB))
       .add(TC_STANDARD_ONE, PathUtils.withoutCost(expA))
       .add(TC_STANDARD_REV, PathUtils.withoutCost(expA, expB))
@@ -95,8 +89,9 @@ public class G03_AccessWithOpeningHoursMultipleOptionsTest implements RaptorTest
   @ParameterizedTest
   @MethodSource("openInWholeSearchIntervalTestCases")
   void openInWholeSearchIntervalTest(RaptorModuleTestCase testCase) {
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToStringDetailed(response));
+    assertEquals(
+      testCase.expected(),
+      testCase.runDetailedResult(raptorService, data, requestBuilder)
+    );
   }
 }

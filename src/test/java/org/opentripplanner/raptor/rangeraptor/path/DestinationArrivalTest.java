@@ -79,7 +79,7 @@ public class DestinationArrivalTest {
   @Test
   public void testToString() {
     assertEquals(
-      "Egress { round: 1, from-stop: 101, duration: 50s, arrival-time: 8:14:50 $1484 }",
+      "Egress { round: 1, from-stop: 101, arrival: [8:14:50 $1484], path: Walk 50s ~ 101 }",
       subject.toString()
     );
   }

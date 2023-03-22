@@ -1,5 +1,6 @@
 tcId,nTransfers,duration,cost,walkDistance,startTime,endTime,agencies,modes,routes,stops,details
 1,0,56m49s,0,1458,12:03:46,13:00:35,TriMet,BUS,8,prt:6789|prt:6548,Walk 7m34s ~ NE 15th & Halsey(6789) ~ BUS 8 12:11:20 12:49:19 ~ SW 11th & Gibbs(6548) ~ Walk 11m16s
-1,0,1h5m4s,0,3432,12:02:56,13:08:00,TriMet,BUS,19,prt:5063|prt:5239,Walk 12m46s ~ NE Sandy & 20th(5063) ~ BUS 19 12:15:42 12:35:42 ~ SW Sheridan & 4th(5239) ~ Walk 32m18s
 1,0,56m49s,0,1458,12:18:46,13:15:35,TriMet,BUS,8,prt:6789|prt:6548,Walk 7m34s ~ NE 15th & Halsey(6789) ~ BUS 8 12:26:20 13:04:19 ~ SW 11th & Gibbs(6548) ~ Walk 11m16s
+1,0,56m49s,0,1458,12:33:46,13:30:35,TriMet,BUS,8,prt:6789|prt:6548,Walk 7m34s ~ NE 15th & Halsey(6789) ~ BUS 8 12:41:20 13:19:19 ~ SW 11th & Gibbs(6548) ~ Walk 11m16s
 2,0,1h4m28s,0,1902,12:48:46,13:53:14,TriMet,BUS,8,prt:6789|prt:5028,Walk 7m34s ~ NE 15th & Halsey(6789) ~ BUS 8 12:56:20 13:36 ~ SW Sam Jackson Pk & OHSU(5028) ~ Walk 17m14s
+2,1,1h2m28s,0,1488,12:50:46,13:53:14,TriMet,BUS,73|8,prt:7106|prt:2592|prt:5028,Walk 2m20s ~ NE 21st & Clackamas(7106) ~ BUS 73 12:53:06 13:01 ~ Rose Quarter Transit Center(2592) ~ BUS 8 13:04 13:36 ~ SW Sam Jackson Pk & OHSU(5028) ~ Walk 17m14s
