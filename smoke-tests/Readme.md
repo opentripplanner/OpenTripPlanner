@@ -25,6 +25,13 @@ Each smoke test follows these steps:
 Since the input data is variable, there is some maintenance involved because expected results can 
 change over time. However, the upside is that catastrophic data errors are also caught early on.
 
+### Example results
+
+Here we see a screenshot of a typical smoke test run with the current locations (as of 2023) visible
+in the left panel.
+
+![Smoke tests screnshot](smoke-tests.png)
+
 ### Commands
 
 If you want to prepare an OTP instance for the smoke tests, run the following commands to build the
