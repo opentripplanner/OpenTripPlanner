@@ -115,11 +115,11 @@
               "alerts" : [ ],
               "rideHailingEstimate" : {
                 "provider" : "UBER",
-                "minCost" : {
+                "minPrice" : {
                   "currency" : "EUR",
                   "cents" : 1000
                 },
-                "maxCost" : {
+                "maxPrice" : {
                   "currency" : "EUR",
                   "cents" : 2000
                 },

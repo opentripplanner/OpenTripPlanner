@@ -25,6 +25,7 @@ config:
     Long: Long
     Polyline: String
     GeoJson: org.locationtech.jts.geom.Geometry
+    Duration: java.time.Duration
   mappers:
     AbsoluteDirection: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection#LegacyGraphQLAbsoluteDirection
     Agency: org.opentripplanner.transit.model.organization.Agency#Agency

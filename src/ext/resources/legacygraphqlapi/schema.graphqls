@@ -1352,14 +1352,18 @@ type Money {
 }
 
 """"
-An ISO-8601-formatted time duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
+An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
 """
 scalar Duration
 
+"An estimate for a ride on a hailed vehicle, like an Uber car."
 type RideHailingEstimate {
+    "The lower bound of the price estimate of this ride."
     provider: String!
-    minCost: Money!
-    maxCost: Money!
+    "The lower bound of the price estimate of this ride."
+    minPrice: Money!
+    "The upper bound of the price estimate of this ride."
+    maxPrice: Money!
     "The estimated time it takes for the vehicle to arrive."
     arrival: Duration!
 }
@@ -1543,7 +1547,6 @@ enum LocationType {
     STATION
     ENTRANCE
 }
-
 """Long type"""
 scalar Long
 

@@ -663,11 +663,11 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLRideHailingEstimate {
-    public DataFetcher<Object> arrival();
+    public DataFetcher<java.time.Duration> arrival();
 
-    public DataFetcher<Money> maxCost();
+    public DataFetcher<Money> maxPrice();
 
-    public DataFetcher<Money> minCost();
+    public DataFetcher<Money> minPrice();
 
     public DataFetcher<String> provider();
   }

@@ -60,11 +60,11 @@
                 }
                 rideHailingEstimate {
                     provider
-                    minCost {
+                    minPrice {
                         currency
                         cents
                     }
-                    maxCost {
+                    maxPrice {
                         currency
                         cents
                     }
