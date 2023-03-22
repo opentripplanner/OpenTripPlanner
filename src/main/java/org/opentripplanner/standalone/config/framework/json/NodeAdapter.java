@@ -53,7 +53,7 @@ public class NodeAdapter {
   private final Map<String, NodeInfo> parameters = new HashMap<>();
 
   /**
-   * All warning is collected during the file parsing and printed as one block at the
+   * All warnings are collected during the file parsing and printed as one block at the
    * end.
    */
   private final List<String> warnings = new ArrayList<>();
