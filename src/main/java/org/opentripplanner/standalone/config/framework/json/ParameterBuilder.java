@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -222,12 +221,13 @@ public class ParameterBuilder {
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass) {
     info.withOptional().withEnumSet(enumClass);
-    List<T> result = buildAndListSimpleArrayElements(
+    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(
       List.of(),
-      it -> parseOptionalEnum(it.asText(), enumClass).orElse(null)
-    )
-      .stream()
-      .filter(Objects::nonNull)
+      it -> parseOptionalEnum(it.asText(), enumClass)
+    );
+    List<T> result = optionalList.stream()
+      .filter(Optional::isPresent)
+      .map(Optional::get)
       .toList();
     return result.isEmpty() ? EnumSet.noneOf(enumClass) : EnumSet.copyOf(result);
   }
@@ -683,6 +683,6 @@ public class ParameterBuilder {
   }
 
   private void warning(String message) {
-    target.addWaring(message, paramName());
+    target.addWarning(message, paramName());
   }
 }

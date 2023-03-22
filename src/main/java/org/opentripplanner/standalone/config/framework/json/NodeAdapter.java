@@ -274,7 +274,7 @@ public class NodeAdapter {
    * Add a warning to the list of warnings logged after parsing a config file is
    * complete.
    */
-  public void addWaring(String message, String paramName) {
+  public void addWarning(String message, String paramName) {
     message += " Parameter: " + fullPath(paramName) + ".";
     message += " Source: " + source + ".";
     warnings.add(message);
