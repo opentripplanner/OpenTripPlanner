@@ -17,6 +17,7 @@ import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
 import org.opentripplanner.ext.transmodelapi.model.framework.PassThroughPointInputType;
 import org.opentripplanner.ext.transmodelapi.model.framework.PenaltyForStreetModeType;
+import org.opentripplanner.ext.transmodelapi.model.scalars.RelaxScalarFactory;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -276,6 +277,29 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
+          .name("relaxTransitPriorityGroup")
+          .description(
+            """
+            Relax generalized-cost when comparing trips with a different set of
+            transit-priority-groups. The groups are set server side for service-journey and
+            can not be configured in the API. This mainly help return competition neutral
+            services. Long distance authorities are put in different transit-priority-groups.
+            
+            This relax the comparison inside the routing engine for each stop-arrival. If two
+            paths have a different set of transit-priority-groups, then the generalized-cost
+            comparison is relaxed. The final set of paths are filtered through the normal 
+            itinerary-filters.
+            
+            - The `ratio` must be greater or equal to 1.0 and less then 1.2.
+            - The `slack` must be greater or equal to 0 and less then 3600.
+            """.stripIndent()
+          )
+          .type(RelaxScalarFactory.createRelaxFunctionScalar(1.2, 3600))
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
           .name("walkSpeed")
           .description("The maximum walk speed along streets, in meters per second.")
           .type(Scalars.GraphQLFloat)
@@ -491,6 +515,7 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("relaxTransitSearchGeneralizedCostAtDestination")
+          .deprecate("This is replaced by 'relaxTransitPriorityGroup'.")
           .description(
             """
               Whether non-optimal transit paths at the destination should be returned. Let c be the

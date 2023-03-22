@@ -24,12 +24,22 @@ public class TransitPriorityGroup32n {
       public DominanceFunction dominanceFunction() {
         return TransitPriorityGroup32n::dominate;
       }
+
+      @Override
+      public String toString() {
+        return "TransitPriorityGroup32nCalculator{}";
+      }
     };
   }
 
   /** To groups dominate each other if they are different. */
   public static boolean dominate(int left, int right) {
     return left != right;
+  }
+
+  @Override
+  public String toString() {
+    return "TransitPriorityGroup32n{}";
   }
 
   /**

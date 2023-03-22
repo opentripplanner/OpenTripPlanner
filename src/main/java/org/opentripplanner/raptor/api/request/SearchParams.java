@@ -281,13 +281,18 @@ public class SearchParams {
 
   @Override
   public String toString() {
+    var dft = defaults();
     return ToStringBuilder
       .of(SearchParams.class)
-      .addServiceTime("earliestDepartureTime", earliestDepartureTime, RaptorConstants.TIME_NOT_SET)
-      .addServiceTime("latestArrivalTime", latestArrivalTime, RaptorConstants.TIME_NOT_SET)
-      .addDurationSec("searchWindow", searchWindowInSeconds)
+      .addServiceTime("earliestDepartureTime", earliestDepartureTime, dft.earliestDepartureTime)
+      .addServiceTime("latestArrivalTime", latestArrivalTime, dft.latestArrivalTime)
+      .addDurationSec("searchWindow", searchWindowInSeconds, dft.searchWindowInSeconds)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
-      .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
+      .addNum(
+        "numberOfAdditionalTransfers",
+        numberOfAdditionalTransfers,
+        dft.numberOfAdditionalTransfers
+      )
       .addCollection("accessPaths", accessPaths, 5)
       .addCollection("egressPaths", egressPaths, 5)
       .toString();
