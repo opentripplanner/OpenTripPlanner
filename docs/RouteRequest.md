@@ -107,6 +107,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [extraStopBoardAlightCostsFactor](#rd_to_extraStopBoardAlightCostsFactor)                                 |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                                     | *Optional* | `0.0`            |  2.1  |
 |    [minSafeWaitTimeFactor](#rd_to_minSafeWaitTimeFactor)                                                     |        `double`        | Used to set a maximum wait-time cost, base on min-safe-transfer-time.                                                                          | *Optional* | `5.0`            |  2.1  |
 |    [optimizeTransferWaitTime](#rd_to_optimizeTransferWaitTime)                                               |        `boolean`       | This enables the transfer wait time optimization.                                                                                              | *Optional* | `true`           |  2.1  |
+| [transitPriorityGroups](#rd_transitPriorityGroups)                                                           |        `object`        | Transit priority groups configuration                                                                                                          | *Optional* |                  |  2.3  |
 | [transitReluctanceForMode](#rd_transitReluctanceForMode)                                                     |  `enum map of double`  | Transit reluctance for a given transport mode                                                                                                  | *Optional* |                  |  2.1  |
 | [unpreferred](#rd_unpreferred)                                                                               |        `object`        | Parameters listing authorities or lines that preferably should not be used in trip patters.                                                    | *Optional* |                  |  2.2  |
 |    [agencies](#rd_unpreferred_agencies)                                                                      |   `feed-scoped-id[]`   | The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`                                                    | *Optional* |                  |  2.2  |
@@ -788,6 +789,20 @@ This defines the maximum cost for the logarithmic function relative to the min-s
 This enables the transfer wait time optimization.
 
 If not enabled generalizedCost function is used to pick the optimal transfer point.
+
+<h3 id="rd_transitPriorityGroups">transitPriorityGroups</h3>
+
+**Since version:** `2.3` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults 
+
+Transit priority groups configuration
+
+Use this to group transit patterns into groups. Each group will be given priority
+over others groups in the trip search. Hence; To paths with a different different
+set of groups will BOTH be returned unless the cost is worse then the relaxation
+specified in the `` parameter .
+
+
 
 <h3 id="rd_transitReluctanceForMode">transitReluctanceForMode</h3>
 

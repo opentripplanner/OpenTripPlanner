@@ -71,7 +71,8 @@ public class TestRouteData {
       },
       new int[] { OFFSET },
       null,
-      null
+      null,
+      0
     );
     int id = 0;
     for (Trip trip : trips) {

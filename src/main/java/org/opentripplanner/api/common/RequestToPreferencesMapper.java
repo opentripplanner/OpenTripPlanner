@@ -88,18 +88,16 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.otherThanPreferredRoutesPenalty, tr::setOtherThanPreferredRoutesPenalty);
       setIfNotNull(req.ignoreRealtimeUpdates, tr::setIgnoreRealtimeUpdates);
 
-      tr.withRaptor(r -> {
-        if (req.relaxTransitPriorityGroup != null) {
-          r.withTransitGroupPriorityGeneralizedCostSlack(
-            RelaxMapper.mapRelax(req.relaxTransitPriorityGroup)
-          );
-        } else {
-          setIfNotNull(
-            req.relaxTransitSearchGeneralizedCostAtDestination,
-            r::withRelaxGeneralizedCostAtDestination
-          );
-        }
-      });
+      if (req.relaxTransitPriorityGroup != null) {
+        tr.withTransitGroupPriorityGeneralizedCostSlack(
+          RelaxMapper.mapRelax(req.relaxTransitPriorityGroup)
+        );
+      } else {
+        setIfNotNull(
+          req.relaxTransitSearchGeneralizedCostAtDestination,
+          v -> tr.withRaptor(r -> r.withRelaxGeneralizedCostAtDestination(v))
+        );
+      }
     });
 
     return new BoardAndAlightSlack(

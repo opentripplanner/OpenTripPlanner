@@ -28,7 +28,6 @@ class RaptorPreferencesTest {
     .atStartOfDay(ZoneIds.UTC)
     .toInstant();
 
-  private static final Relax TRANSIT_GROUP_PRIORITY_RELAX = new Relax(1.5, 300);
   private static final double RELAX_GENERALIZED_COST_AT_DESTINATION = 1.2;
 
   private final RaptorPreferences subject = RaptorPreferences
@@ -37,7 +36,6 @@ class RaptorPreferencesTest {
     .withProfile(PROFILE)
     .withOptimizations(OPTIMIZATIONS)
     .withTimeLimit(TIME_LIMIT)
-    .withTransitGroupPriorityGeneralizedCostSlack(TRANSIT_GROUP_PRIORITY_RELAX)
     .withRelaxGeneralizedCostAtDestination(RELAX_GENERALIZED_COST_AT_DESTINATION)
     .build();
 
@@ -134,7 +132,6 @@ class RaptorPreferencesTest {
       "profile: STANDARD, " +
       "searchDirection: REVERSE, " +
       "timeLimit: 2020-06-09T00:00:00Z, " +
-      "relaxTransitPriorityGroup: Relax[ratio=1.5, slack=300], " +
       "relaxGeneralizedCostAtDestination: 1.2" +
       "}",
       subject.toString()
