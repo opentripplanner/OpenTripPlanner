@@ -103,7 +103,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
    */
   private WriteToGraphCallback saveResultOnGraph;
 
-  private transient Instant startTime;
+  private final Instant startTime = Instant.now();
   private boolean primed;
 
   private final Consumer<UpdateResult> recordMetrics;
@@ -198,8 +198,6 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     );
 
     LOG.info("Created subscription {}", subscriptionName);
-
-    startTime = Instant.now();
 
     final EstimatedTimetableMessageReceiver receiver = new EstimatedTimetableMessageReceiver();
 
