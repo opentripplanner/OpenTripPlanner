@@ -14,36 +14,54 @@ jobs:
       matrix:
         include:
 
+          # Profiles
+          #
+          # The profile variable is used to filter out some locations when the speed test is run
+          # on a branch during development.
+          #
+          #  - locations with the 'core' profile are always run (even when on a branch)
+          #  - locations with the 'extended' profile are only run after merging to dev-2.x
+
           - location: germany # all of Germany (500k stops, 200k patterns) but no OSM
             iterations: 1
             jfr-delay: "50s"
+            profile: core
 
           - location: norway
             iterations: 4
             jfr-delay: "35s"
-
-          - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
-            iterations: 1
-            jfr-delay: "50s"
+            profile: core
 
           - location: skanetrafiken
             iterations: 1
             jfr-delay: "50s"
+            profile: core
+
+          # extended locations that are run only after merging to dev-2.x
+
+          - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
+            iterations: 1
+            jfr-delay: "50s"
+            profile: extended
 
           - location: switzerland
             iterations: 1
             jfr-delay: "50s"
+            profile: extended
 
           - location: washington-state
             iterations: 1
             jfr-delay: "20s"
+            profile: extended
 
     steps:
       - uses: actions/checkout@v3.1.0
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         with:
           fetch-depth: 0
 
       - name: Set up JDK 17
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/setup-java@v3
         with:
           java-version: 17
@@ -51,21 +69,25 @@ jobs:
         timeout-minutes: 5
 
       - name: Set up Maven
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: stCarolas/setup-maven@v.4.5
         with:
           maven-version: 3.8.2
 
       - name: Build jar
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         env:
           MAVEN_OPTS: "-Dmaven.repo.local=/home/lenni/.m2/repository/"
         run: mvn -DskipTests --batch-mode package -P prettierSkip
 
       - name: Build graph
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         run: |
           cp target/otp-*-SNAPSHOT-shaded.jar otp.jar
           java -Xmx32G -jar otp.jar --build --save test/performance/${{ matrix.location }}/
 
       - name: Run speed test
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
           SPEEDTEST_LOCATION: ${{ matrix.location }}
@@ -74,12 +96,14 @@ jobs:
           mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
 
       - name: Archive travel results file
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.location }}-travelSearch-results.csv
           path: test/performance/${{ matrix.location }}/travelSearch-results.csv
 
       - name: Archive Flight Recorder instrumentation file
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.location }}-flight-recorder
