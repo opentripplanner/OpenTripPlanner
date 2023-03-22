@@ -53,11 +53,11 @@ final class PageCursorSerializer {
     if (cursor == null || cursor.isBlank()) {
       return null;
     }
+    try {
+      var buf = Base64.getUrlDecoder().decode(cursor);
+      var input = new ByteArrayInputStream(buf);
 
-    var buf = Base64.getUrlDecoder().decode(cursor);
-    var input = new ByteArrayInputStream(buf);
-
-    try (var in = new ObjectInputStream(input)) {
+      var in = new ObjectInputStream(input);
       // The order must be the same in the encode and decode function
 
       // The version should be used to make serialization read/write forward and backward
@@ -70,8 +70,13 @@ final class PageCursorSerializer {
       var originalSortOrder = readEnum(in, SortOrder.class);
 
       return new PageCursor(type, originalSortOrder, edt, lat, searchWindow);
-    } catch (IOException e) {
-      LOG.error("Unable to decode page cursor: '" + cursor + "'", e);
+    } catch (Exception e) {
+      String details = e.getMessage();
+      if (details != null && !details.isBlank()) {
+        LOG.error("Unable to decode page cursor: '{}'. Details: {}", cursor, details);
+      } else {
+        LOG.error("Unable to decode page cursor: '{}'.", cursor);
+      }
       return null;
     }
   }
