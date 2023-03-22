@@ -1346,7 +1346,7 @@ type FareProductInstance {
     riderCategory: RiderCategory
 
     """
-    The 'container' that this product applies to, for example "Oyster Card" or "Berlin Ticket App".
+    The 'medium' that this product applies to, for example "Oyster Card" or "Berlin Ticket App".
 
     This communicates to riders that a specific way of buying or keeping this product is required.
     """

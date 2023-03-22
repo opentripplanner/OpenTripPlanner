@@ -551,12 +551,10 @@ public class Itinerary {
     var itineraryInstances = fare
       .getItineraryProducts()
       .stream()
-      .map(fp ->
-        new FareProductInstance(
-          fp.id().toString() + '_' + this.getLegs().get(0).getStartTime().toEpochSecond(),
-          fp
-        )
-      )
+      .map(fp -> {
+        var id = fp.uniqueCompositeUUID(firstLeg().getStartTime());
+        return new FareProductInstance(id, fp);
+      })
       .toList();
 
     this.legs.forEach(l -> {
@@ -564,9 +562,7 @@ public class Itinerary {
           .getLegProducts()
           .get(l)
           .stream()
-          .map(fp ->
-            new FareProductInstance(fp.id().toString() + '_' + l.getStartTime().toEpochSecond(), fp)
-          )
+          .map(fp -> new FareProductInstance(fp.uniqueCompositeUUID(l.getStartTime()), fp))
           .toList();
         l.addFareProducts(ListUtils.combine(itineraryInstances, legInstances));
       });

@@ -38,6 +38,15 @@ public class OrcaFareService extends DefaultFareService {
   public static final String WASHINGTON_STATE_FERRIES_AGENCY_ID = "WSF";
   public static final String KITSAP_TRANSIT_AGENCY_ID = "kt";
   public static final int ROUTE_TYPE_FERRY = 4;
+  public static final String FEED_ID = "orca";
+  private static final FareMedium ELECTRONIC_MEDIUM = new FareMedium(
+    new FeedScopedId(FEED_ID, "electronic"),
+    "electronic"
+  );
+  private static final FareMedium CASH_MEDIUM = new FareMedium(
+    new FeedScopedId(FEED_ID, "cash"),
+    "cash"
+  );
 
   protected enum RideType {
     COMM_TRANS_LOCAL_SWIFT,
@@ -503,26 +512,18 @@ public class OrcaFareService extends DefaultFareService {
     float totalFare,
     float transferDiscount
   ) {
-    var id = new FeedScopedId("orcaFares", "farePayment");
-    var riderCategory = new RiderCategory(
-      new FeedScopedId("orca", "orcaFares"),
-      getFareCategory(fareType),
-      null
-    );
-    var fareContainer = new FareMedium(
-      new FeedScopedId("orca", "orcaFares"),
-      usesOrca(fareType) ? "electronic" : "cash"
-    );
+    var id = new FeedScopedId(FEED_ID, "farePayment");
+    var riderCategory = getRiderCategory(fareType);
+
+    FareMedium medium;
+    if (usesOrca(fareType)) {
+      medium = ELECTRONIC_MEDIUM;
+    } else {
+      medium = CASH_MEDIUM;
+    }
     var duration = Duration.ZERO;
     var money = new Money(currency, (int) (totalFare * 100));
-    var fareProduct = new FareProduct(
-      id,
-      "rideCost",
-      money,
-      duration,
-      riderCategory,
-      fareContainer
-    );
+    var fareProduct = new FareProduct(id, "rideCost", money, duration, riderCategory, medium);
     itineraryFares.addFareProduct(leg, fareProduct);
     // If a transfer was used, then also add a transfer fare product.
     if (transferDiscount > 0) {
@@ -533,7 +534,7 @@ public class OrcaFareService extends DefaultFareService {
         transferDiscountMoney,
         duration,
         riderCategory,
-        fareContainer
+        medium
       );
       itineraryFares.addFareProduct(leg, transferFareProduct);
     }
@@ -587,12 +588,14 @@ public class OrcaFareService extends DefaultFareService {
     );
   }
 
-  private static String getFareCategory(FareType fareType) {
+  private static RiderCategory getRiderCategory(FareType fareType) {
     var splitFareType = fareType.toString().split("electronic");
+    String name;
     if (splitFareType.length > 1) {
-      return splitFareType[1].toLowerCase();
+      name = splitFareType[1].toLowerCase();
     } else {
-      return fareType.toString();
+      name = fareType.toString();
     }
+    return new RiderCategory(new FeedScopedId(FEED_ID, name), name, null);
   }
 }
