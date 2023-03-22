@@ -47,7 +47,7 @@ combined trip plans rather than presented in alternative trip plans
 mode, time, transfers, and other preferences while delivering balanced results
 - One OTP backend can power both a website and app for use by riders, along with a separate frontend 
 with a different configuration for use by a customer service team
-- Active development by dozens of agencies means new features every year ['(see the OTP common roadmap here)'] (https://docs.google.com/document/d/1mahjShc47UCSY9izBvDAw6eXN6Vy6JdRo42iq7YvwVQ/edit)
+- Active development by dozens of agencies means new features every year ['(see the OTP common roadmap here)'] (https://github.com/orgs/opentripplanner/projects/3)
 
 ### Regions, countries, and private entities
 
