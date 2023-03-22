@@ -902,7 +902,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-extended-scalars</artifactId>
-            <version>${graphql.version}</version>
+            <version>20.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
