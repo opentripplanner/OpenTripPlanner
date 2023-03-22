@@ -128,14 +128,16 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     // set subscriber
     String subscriptionId = System.getenv("HOSTNAME");
     if (subscriptionId == null || subscriptionId.isEmpty()) {
-      subscriptionId = "otp-" + UUID.randomUUID().toString();
+      subscriptionId = "otp-" + UUID.randomUUID();
     }
 
-    String projectName = config.projectName();
+    String subscriptionProjectName = config.subscriptionProjectName();
+    String topicProjectName = config.topicProjectName();
+
     String topicName = config.topicName();
 
-    this.subscriptionName = ProjectSubscriptionName.of(projectName, subscriptionId);
-    this.topic = ProjectTopicName.of(projectName, topicName);
+    this.subscriptionName = ProjectSubscriptionName.of(subscriptionProjectName, subscriptionId);
+    this.topic = ProjectTopicName.of(topicProjectName, topicName);
     this.pushConfig = PushConfig.getDefaultInstance();
     TransitService transitService = new DefaultTransitService(transitModel);
     this.entityResolver = new EntityResolver(transitService, feedId);
@@ -143,22 +145,16 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       config.fuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
 
     try {
-      if (
-        System.getenv("GOOGLE_APPLICATION_CREDENTIALS") != null &&
-        !System.getenv("GOOGLE_APPLICATION_CREDENTIALS").isEmpty()
-      ) {
-        // Google libraries expects path to credentials json-file is stored in environment variable "GOOGLE_APPLICATION_CREDENTIALS"
-        // Ref.: https://cloud.google.com/docs/authentication/getting-started
+      // Google libraries expects credentials json-file either as
+      //   Path is stored in environment variable "GOOGLE_APPLICATION_CREDENTIALS"
+      //   (https://cloud.google.com/docs/authentication/getting-started)
+      // or
+      //   Credentials are provided through "workload identity"
+      //   (https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity)
 
-        subscriptionAdminClient = SubscriptionAdminClient.create();
+      subscriptionAdminClient = SubscriptionAdminClient.create();
 
-        addShutdownHook();
-      } else {
-        throw new RuntimeException(
-          "Google Pubsub updater is configured, but environment variable 'GOOGLE_APPLICATION_CREDENTIALS' is not defined. " +
-          "See https://cloud.google.com/docs/authentication/getting-started"
-        );
-      }
+      addShutdownHook();
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
@@ -380,7 +376,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
             numberOfUpdates,
             FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
             java.time.Duration
-              .between(siri.getServiceDelivery().getResponseTimestamp(), Instant.now())
+              .between(siri.getServiceDelivery().getResponseTimestamp().toInstant(), Instant.now())
               .toMillis(),
             getTimeSinceStartupString()
           );

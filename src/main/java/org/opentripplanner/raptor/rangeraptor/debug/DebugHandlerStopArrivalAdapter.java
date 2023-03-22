@@ -28,12 +28,11 @@ final class DebugHandlerStopArrivalAdapter extends AbstractDebugHandlerAdapter<A
   private Iterable<Integer> listStopsForDebugging(ArrivalView<?> it) {
     LinkedList<Integer> stops = new LinkedList<>();
 
-    while (!it.arrivedByAccess()) {
+    // loop until access is done(previous is null)
+    while (it != null) {
       stops.addFirst(it.stop());
       it = it.previous();
     }
-    stops.addFirst(it.stop());
-
     return stops;
   }
 }

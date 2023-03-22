@@ -6,7 +6,6 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
-import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdater;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
@@ -171,9 +170,6 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
       updaters.add(new SiriSXUpdater(configItem, transitModel));
-    }
-    for (var configItem : updatersParameters.getSiriVMUpdaterParameters()) {
-      updaters.add(new SiriVMUpdater(provideSiriTimetableSnapshot(), configItem, transitModel));
     }
     for (var configItem : updatersParameters.getWebsocketGtfsRealtimeUpdaterParameters()) {
       updaters.add(

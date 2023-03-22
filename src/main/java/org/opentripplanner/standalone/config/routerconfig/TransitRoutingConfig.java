@@ -1,6 +1,8 @@
 package org.opentripplanner.standalone.config.routerconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import java.time.Duration;
 import java.util.List;
@@ -211,14 +213,14 @@ for more info."
 
     private final double minTransitTimeCoefficient;
     private final double minWaitTimeCoefficient;
-    private final int minWinTimeMinutes;
-    private final int maxWinTimeMinutes;
+    private final Duration minWindow;
+    private final Duration maxWindow;
     private final int stepMinutes;
 
     public DynamicSearchWindowConfig(String parameterName, NodeAdapter root) {
       var dsWin = root
         .of(parameterName)
-        .since(NA)
+        .since(V2_1)
         .summary("The dynamic search window coefficients used to calculate the EDT, LAT and SW.")
         .description(
           """
@@ -244,13 +246,13 @@ The `round_N(...)` method rounds the input to the closest multiplication of N.
 
 The 3 coefficients above are:
 
- - `C` is parameter: `minWinTimeMinutes`
+ - `C` is parameter: `minWindow`
  - `T` is parameter: `minTransitTimeCoefficient`
  - `W` is parameter: `minWaitTimeCoefficient`
  - `N` is parameter: `stepMinutes`
 
 In addition there is an upper bound on the calculation of the search window:
-`maxWinTimeMinutes`.
+`maxWindow`.
 """
         )
         .asObject();
@@ -259,7 +261,7 @@ In addition there is an upper bound on the calculation of the search window:
       this.minTransitTimeCoefficient =
         dsWin
           .of("minTransitTimeCoefficient")
-          .since(NA)
+          .since(V2_1)
           .summary("The coefficient to multiply with `minTransitTime`.")
           .description(
             "Use a value between `0.0` and `3.0`. Using `0.0` will eliminate the `minTransitTime` " +
@@ -269,41 +271,39 @@ In addition there is an upper bound on the calculation of the search window:
       this.minWaitTimeCoefficient =
         dsWin
           .of("minWaitTimeCoefficient")
-          .since(NA)
+          .since(V2_1)
           .summary("The coefficient to multiply with `minWaitTime`.")
           .description(
             "Use a value between `0.0` and `1.0`. Using `0.0` will eliminate the `minWaitTime` " +
             "from the dynamic raptor-search-window calculation."
           )
           .asDouble(dsWinDft.minWaitTimeCoefficient());
-      this.minWinTimeMinutes =
+      this.minWindow =
         dsWin
-          .of("minWinTimeMinutes")
-          .since(NA)
-          .summary("The constant minimum number of minutes for a raptor-search-window. ")
+          .of("minWindow")
+          .since(V2_2)
+          .summary("The constant minimum duration for a raptor-search-window. ")
           .description("Use a value between 20 and 180 minutes in a normal deployment.")
-          .asInt(dsWinDft.minWinTimeMinutes());
-      this.maxWinTimeMinutes =
+          .asDuration(dsWinDft.minWindow());
+      this.maxWindow =
         dsWin
-          .of("maxWinTimeMinutes")
-          .since(NA)
+          .of("maxWindow")
+          .since(V2_2)
           .summary("Upper limit for the search-window calculation.")
           .description(
             """
 Long search windows consumes a lot of resources and may take a long time. Use this parameter to 
 tune the desired maximum search time.
 
-This is the parameter that affect the response time most, the downside is that a search is only
+This is the parameter that affects the response time most, the downside is that a search is only
 guaranteed to be pareto-optimal within a search-window.
-
-The default is 3 hours. The unit is minutes.
 """
           )
-          .asInt(dsWinDft.maxWinTimeMinutes());
+          .asDuration(dsWinDft.maxWindow());
       this.stepMinutes =
         dsWin
           .of("stepMinutes")
-          .since(NA)
+          .since(V2_1)
           .summary("Used to set the steps the search-window is rounded to.")
           .description(
             """
@@ -330,13 +330,13 @@ coefficient.
     }
 
     @Override
-    public int minWinTimeMinutes() {
-      return minWinTimeMinutes;
+    public Duration minWindow() {
+      return minWindow;
     }
 
     @Override
-    public int maxWinTimeMinutes() {
-      return maxWinTimeMinutes;
+    public Duration maxWindow() {
+      return maxWindow;
     }
 
     @Override

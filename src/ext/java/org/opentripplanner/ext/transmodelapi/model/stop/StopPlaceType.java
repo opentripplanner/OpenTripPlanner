@@ -339,9 +339,7 @@ public class StopPlaceType {
             GraphQLArgument
               .newArgument()
               .name("includeCancelledTrips")
-              .description(
-                "Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED"
-              )
+              .description("Indicates that realtime-cancelled trips should also be included.")
               .type(Scalars.GraphQLBoolean)
               .defaultValue(false)
               .build()

@@ -19,7 +19,7 @@ public class ExpectedList {
   }
 
   public String[] first(int n) {
-    return fromTo(0, n);
+    return range(0, n);
   }
 
   public String get(int index) {
@@ -35,10 +35,10 @@ public class ExpectedList {
   }
 
   public String[] last(int n) {
-    return fromTo(items.length - n, items.length);
+    return range(items.length - n, items.length);
   }
 
-  public String[] fromTo(int startInclusive, int endExclusive) {
+  public String[] range(int startInclusive, int endExclusive) {
     return Arrays.stream(items, startInclusive, endExclusive).toList().toArray(new String[0]);
   }
 }

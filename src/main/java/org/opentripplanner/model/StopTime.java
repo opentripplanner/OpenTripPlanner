@@ -250,6 +250,16 @@ public final class StopTime implements Comparable<StopTime> {
     this.flexWindowEnd = flexWindowEnd;
   }
 
+  /** Get either the start of the flex window or the departure time, whichever is set */
+  public int getEarliestPossibleDepartureTime() {
+    return getAvailableTime(getFlexWindowStart(), getDepartureTime());
+  }
+
+  /** Get either the end of the flex window or the arrival time, whichever is set */
+  public int getLatestPossibleArrivalTime() {
+    return getAvailableTime(getFlexWindowEnd(), getArrivalTime());
+  }
+
   public PickDrop getFlexContinuousPickup() {
     return flexContinuousPickup;
   }
@@ -322,5 +332,15 @@ public final class StopTime implements Comparable<StopTime> {
       TimeUtils.timeToStrLong(getDepartureTime()) +
       ")"
     );
+  }
+
+  private static int getAvailableTime(int... times) {
+    for (var time : times) {
+      if (time != MISSING_VALUE) {
+        return time;
+      }
+    }
+
+    return MISSING_VALUE;
   }
 }

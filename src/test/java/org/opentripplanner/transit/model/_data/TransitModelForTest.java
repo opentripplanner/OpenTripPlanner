@@ -200,4 +200,14 @@ public class TransitModelForTest {
     }
     return builder.build();
   }
+
+  public static StopPattern stopPattern(RegularStop... stops) {
+    var builder = StopPattern.create(stops.length);
+    for (int i = 0; i < stops.length; i++) {
+      builder.stops[i] = stops[i];
+      builder.pickups[i] = PickDrop.SCHEDULED;
+      builder.dropoffs[i] = PickDrop.SCHEDULED;
+    }
+    return builder.build();
+  }
 }

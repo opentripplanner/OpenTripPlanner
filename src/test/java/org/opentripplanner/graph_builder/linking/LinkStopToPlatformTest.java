@@ -1,6 +1,8 @@
 package org.opentripplanner.graph_builder.linking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
@@ -20,10 +23,13 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -31,66 +37,205 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LinkStopToPlatformTest {
 
+  private static final Logger LOG = LoggerFactory.getLogger(LinkStopToPlatformTest.class);
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-  private Graph graph;
-
-  @BeforeEach
-  public void before() {
-    // Set up transit platform
-
+  private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    graph = new Graph(deduplicator);
+    Graph graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
-
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
+    Coordinate[] closedGeom = new Coordinate[platform.length + 1];
 
-    vertices.add(new IntersectionVertex(graph, "1", 10.22054, 59.13568, "Platform vertex 1"));
-    vertices.add(new IntersectionVertex(graph, "2", 10.22432, 59.13519, "Platform vertex 2"));
-    vertices.add(new IntersectionVertex(graph, "3", 10.22492, 59.13514, "Platform vertex 3"));
-    vertices.add(new IntersectionVertex(graph, "4", 10.22493, 59.13518, "Platform vertex 4"));
-    vertices.add(new IntersectionVertex(graph, "5", 10.22056, 59.13575, "Platform vertex 5"));
+    for (int i = 0; i < platform.length; i++) {
+      Coordinate c = platform[i];
+      vertices.add(
+        new IntersectionVertex(graph, String.valueOf(i), c.x, c.y, "Platform vertex " + i)
+      );
+      closedGeom[i] = c;
+    }
+    closedGeom[platform.length] = closedGeom[0];
 
-    AreaEdgeList areaEdgeList = new AreaEdgeList(
-      GeometryUtils.getGeometryFactory().createPolygon(),
-      Set.of()
-    );
+    Polygon polygon = GeometryUtils.getGeometryFactory().createPolygon(closedGeom);
+    AreaEdgeList areaEdgeList = new AreaEdgeList(polygon, Set.of());
+
+    // visibility vertices are platform entrance points and convex corners
+    // which should be directly linked with stops
+    for (int i : visible) {
+      areaEdgeList.visibilityVertices.add(vertices.get(i));
+    }
+
+    // AreaEdgeList must include a valid NamedArea which defines area atttributes
+    NamedArea namedArea = new NamedArea();
+    namedArea.setName(new LocalizedString("test platform"));
+    namedArea.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    namedArea.setOriginalEdges(polygon);
+    areaEdgeList.addArea(namedArea);
 
     ArrayList<AreaEdge> edges = new ArrayList<>();
 
-    edges.add(createAreaEdge(vertices.get(0), vertices.get(1), areaEdgeList, "edge 1"));
-    edges.add(createAreaEdge(vertices.get(1), vertices.get(2), areaEdgeList, "edge 2"));
-    edges.add(createAreaEdge(vertices.get(2), vertices.get(3), areaEdgeList, "edge 3"));
-    edges.add(createAreaEdge(vertices.get(3), vertices.get(4), areaEdgeList, "edge 4"));
-    edges.add(createAreaEdge(vertices.get(4), vertices.get(0), areaEdgeList, "edge 5"));
+    for (int i = 0; i < platform.length; i++) {
+      int next_i = (i + 1) % platform.length;
+      edges.add(createAreaEdge(vertices.get(i), vertices.get(next_i), areaEdgeList, "edge " + i));
+      edges.add(
+        createAreaEdge(
+          vertices.get(next_i),
+          vertices.get(i),
+          areaEdgeList,
+          "edge " + String.valueOf(i + platform.length)
+        )
+      );
+    }
 
-    edges.add(createAreaEdge(vertices.get(1), vertices.get(0), areaEdgeList, "edge 6"));
-    edges.add(createAreaEdge(vertices.get(2), vertices.get(1), areaEdgeList, "edge 7"));
-    edges.add(createAreaEdge(vertices.get(3), vertices.get(2), areaEdgeList, "edge 8"));
-    edges.add(createAreaEdge(vertices.get(4), vertices.get(3), areaEdgeList, "edge 9"));
-    edges.add(createAreaEdge(vertices.get(0), vertices.get(4), areaEdgeList, "edge 10"));
-
-    RegularStop stop = TransitModelForTest
-      .stop("TestStop")
-      .withCoordinate(59.13545, 10.22213)
-      .build();
+    RegularStop[] transitStops = new RegularStop[stops.length];
+    for (int i = 0; i < stops.length; i++) {
+      Coordinate stop = stops[i];
+      transitStops[i] =
+        TransitModelForTest.stop("TestStop " + i).withCoordinate(stop.y, stop.x).build();
+    }
 
     transitModel.index();
     graph.index(transitModel.getStopModel());
 
-    new TransitStopVertexBuilder().withGraph(graph).withStop(stop).build();
+    for (RegularStop s : transitStops) {
+      new TransitStopVertexBuilder().withGraph(graph).withStop(s).build();
+    }
+
+    return graph;
   }
 
   /**
-   * Tests that extra edges are added when linking stops to platform areas to prevent detours around
-   * the platform.
+   * Link stop outside platform area to platform.
    */
   @Test
-  public void testLinkStopWithoutExtraEdges() {
+  public void testLinkStopOutsideArea() {
+    // test platform is a simple rectangle. It creates a graph of 8 edges.
+    Coordinate[] platform = {
+      new Coordinate(10, 60.001),
+      new Coordinate(10.002, 60.001),
+      new Coordinate(10.002, 60),
+      new Coordinate(10, 60),
+    };
+    // add entrance to every corner of the platform (this array defines indices)
+    int[] visibilityPoints = { 0, 1, 2, 3 };
+
+    // place one stop outside the platform, halway under the bottom edge
+    Coordinate[] stops = { new Coordinate(10.001, 59.9999) };
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+    linkStops(graph);
+
+    for (Edge e : graph.getEdges()) {
+      LOG.debug("Edge {}", e);
+    }
+
+    // Two bottom edges gets split into half (+2 edges)
+    // both split points are linked to the stop bidirectonally (+4 edges).
+    // both split points also link to 2 visibility points at opposite side (+8 edges)
+    // 14 new edges in total
+    assertEquals(22, graph.getEdges().size());
+  }
+
+  /**
+   * Link stop inside platform area to platform. Connects stop with visibility points.
+   */
+  @Test
+  public void testLinkStopInsideArea() {
+    // test platform is a simple rectangle. It creates a graph of 8 edges.
+    Coordinate[] platform = {
+      new Coordinate(10, 60.002),
+      new Coordinate(10.004, 60.002),
+      new Coordinate(10.004, 60),
+      new Coordinate(10, 60),
+    };
+    // add entrance to every corner of the platform (this array defines indices)
+    int[] visibilityPoints = { 0, 1, 2, 3 };
+
+    // place one stop inside the platform, near bottom left corner
+    Coordinate[] stops = { new Coordinate(10.001, 60.001) };
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+    linkStops(graph);
+
+    // stop links to a new street vertex with 2 edges
+    // new vertex connects to all 4 visibility points with 4*2 new edges
+    assertEquals(18, graph.getEdges().size());
+  }
+
+  /**
+   * Link stop which is very close to a platform vertex.
+   * Linking snaps directly to the vertex.
+   */
+  @Test
+  public void testLinkStopNearPlatformVertex() {
+    Coordinate[] platform = {
+      new Coordinate(10, 60.002),
+      new Coordinate(10.004, 60.002),
+      new Coordinate(10.004, 60),
+      new Coordinate(10, 60),
+    };
+    // add entrance to every corner of the platform
+    int[] visibilityPoints = { 0, 1, 2, 3 };
+
+    // place one stop inside the platform, very near of the bottom left corner
+    Coordinate[] stops = { new Coordinate(10.00000001, 60.00000001) };
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+    linkStops(graph);
+
+    // stop links to a existing vertex with 2 edges
+    // selected vertex connects to opposite corner with 2 new edges
+    assertEquals(12, graph.getEdges().size());
+  }
+
+  /**
+   * Link two stops inside platform area to platform.
+   * Stops will get linked directly.
+   */
+  @Test
+  public void testLinkTwoStopsInsideArea() {
+    Coordinate[] platform = {
+      new Coordinate(10, 60.002),
+      new Coordinate(10.004, 60.002),
+      new Coordinate(10.004, 60),
+      new Coordinate(10, 60),
+    };
+    // entrance to every corner of the platform
+    int[] visibilityPoints = { 0, 1, 2, 3 };
+
+    // place two stops inside the platform
+    Coordinate[] stops = { new Coordinate(10.001, 60.001), new Coordinate(10.003, 60.001) };
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+    linkStops(graph);
+
+    // stops are linked with 2 new street vertices with 2 edges each (+4)
+    // new vertices connects to original 4 visibility points with 2*4*2 new edges (+16)
+    // stops are also linked directly (+2)
+    assertEquals(30, graph.getEdges().size());
+
+    // verify direct linking
+    List<TransitStopVertex> transitStops = graph.getVerticesOfType(TransitStopVertex.class);
+    Vertex v1 = null;
+    Vertex v2 = null;
+    for (Edge e : transitStops.get(0).getOutgoing()) {
+      v1 = e.getToVertex();
+    }
+    for (Edge e : transitStops.get(1).getOutgoing()) {
+      v2 = e.getToVertex();
+    }
+    assertNotNull(v1);
+    assertNotNull(v2);
+    assertTrue(v1.isConnected(v2));
+  }
+
+  private void linkStops(Graph graph) {
     VertexLinker linker = graph.getLinker();
 
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
@@ -105,19 +250,6 @@ public class LinkStopToPlatformTest {
           )
       );
     }
-
-    assertEquals(16, graph.getEdges().size());
-  }
-
-  @Test
-  @Disabled
-  public void testLinkStopWithExtraEdges() {
-    // TODO Reimplement this functionality #3152
-    //        SimpleStreetSplitter splitter = SimpleStreetSplitter.createForTest(graph);
-    //        splitter.setAddExtraEdgesToAreas(true);
-    //        splitter.link();
-    //
-    //        assertEquals(38, graph.getEdges().size());
   }
 
   private AreaEdge createAreaEdge(
@@ -130,13 +262,11 @@ public class LinkStopToPlatformTest {
       new Coordinate[] { v1.getCoordinate(), v2.getCoordinate() }
     );
     I18NString name = new LocalizedString(nameString);
-
     return new AreaEdge(
       v1,
       v2,
       line,
       name,
-      line.getLength(),
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
       false,
       area

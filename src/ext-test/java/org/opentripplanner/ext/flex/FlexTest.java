@@ -23,23 +23,23 @@ import org.opentripplanner.transit.service.TransitModel;
 
 public abstract class FlexTest {
 
-  static final String ASPEN_GTFS = "/flex/aspen-flex-on-demand.gtfs.zip";
-  static final String COBB_FLEX_GTFS = "/flex/cobblinc-scheduled-deviated-flex.gtfs.zip";
-  static final String COBB_BUS_30_GTFS = "/flex/cobblinc-bus-30-only.gtfs.zip";
-  static final String MARTA_BUS_856_GTFS = "/flex/marta-bus-856-only.gtfs.zip";
-  static final String LINCOLN_COUNTY_GBFS = "/flex/lincoln-county-flex.gtfs.zip";
-  static final String COBB_OSM = "/flex/cobb-county.filtered.osm.pbf";
+  protected static final String ASPEN_GTFS = "/flex/aspen-flex-on-demand.gtfs.zip";
+  protected static final String COBB_FLEX_GTFS = "/flex/cobblinc-scheduled-deviated-flex.gtfs.zip";
+  protected static final String COBB_BUS_30_GTFS = "/flex/cobblinc-bus-30-only.gtfs.zip";
+  protected static final String MARTA_BUS_856_GTFS = "/flex/marta-bus-856-only.gtfs.zip";
+  protected static final String LINCOLN_COUNTY_GBFS = "/flex/lincoln-county-flex.gtfs.zip";
+  protected static final String COBB_OSM = "/flex/cobb-county.filtered.osm.pbf";
 
-  static final DirectFlexPathCalculator calculator = new DirectFlexPathCalculator();
-  static final LocalDate serviceDate = LocalDate.of(2021, 4, 11);
-  static final int secondsSinceMidnight = LocalTime.of(10, 0).toSecondOfDay();
-  static final FlexServiceDate flexDate = new FlexServiceDate(
+  protected static final DirectFlexPathCalculator calculator = new DirectFlexPathCalculator();
+  protected static final LocalDate serviceDate = LocalDate.of(2021, 4, 11);
+  protected static final int secondsSinceMidnight = LocalTime.of(10, 0).toSecondOfDay();
+  protected static final FlexServiceDate flexDate = new FlexServiceDate(
     serviceDate,
     secondsSinceMidnight,
     new TIntHashSet()
   );
 
-  static TestOtpModel buildFlexGraph(String fileName) {
+  protected static TestOtpModel buildFlexGraph(String fileName) {
     File file = null;
     try {
       file = FakeGraph.getFileForResource(fileName);

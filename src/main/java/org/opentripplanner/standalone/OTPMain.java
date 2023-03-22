@@ -8,6 +8,7 @@ import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.GraphBuilder;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -147,7 +148,8 @@ public class OTPMain {
         app.transitModel(),
         app.worldEnvelopeRepository(),
         config.buildConfig(),
-        config.routerConfig()
+        config.routerConfig(),
+        DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary())
       )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator

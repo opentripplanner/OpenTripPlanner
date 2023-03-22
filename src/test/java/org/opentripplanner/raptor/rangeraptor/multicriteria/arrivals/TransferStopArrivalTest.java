@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSFER;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
@@ -63,9 +64,8 @@ public class TransferStopArrivalTest {
 
   @Test
   public void arrivedByTransfer() {
-    assertTrue(subject.arrivedByTransfer());
+    assertTrue(subject.arrivedBy(TRANSFER));
     assertFalse(subject.arrivedByTransit());
-    assertFalse(subject.arrivedByAccess());
   }
 
   @Test
@@ -103,6 +103,9 @@ public class TransferStopArrivalTest {
 
   @Test
   public void testToString() {
-    assertEquals("Walk { round: 1, stop: 102, arrival-time: 9:26 $2600 }", subject.toString());
+    assertEquals(
+      "Walk { round: 1, stop: 102, arrival: [9:26 $2600], path: On-Street 6m ~ 102 }",
+      subject.toString()
+    );
   }
 }

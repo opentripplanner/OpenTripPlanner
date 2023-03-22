@@ -3,6 +3,7 @@ package org.opentripplanner.netex.mapping;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -40,9 +41,22 @@ class GroupOfStationsMapper {
   }
 
   GroupOfStations map(GroupOfStopPlaces groupOfStopPlaces) {
+    I18NString name;
+
+    if (groupOfStopPlaces.getName() != null) {
+      name = NonLocalizedString.ofNullable(groupOfStopPlaces.getName().getValue());
+    } else {
+      issueStore.add(
+        "GroupOfStopPlacesWithoutName",
+        "GroupOfStopPlaces {} does not contain a name.",
+        groupOfStopPlaces.getId()
+      );
+      StopPlaceRefStructure ref = groupOfStopPlaces.getMembers().getStopPlaceRef().get(0);
+      name = stations.get(idFactory.createId(ref.getRef())).getName();
+    }
     GroupOfStationsBuilder groupOfStations = GroupOfStations
       .of(idFactory.createId(groupOfStopPlaces.getId()))
-      .withName(NonLocalizedString.ofNullable(groupOfStopPlaces.getName().getValue()));
+      .withName(name);
 
     // TODO Map PurposeOfGrouping from NeTEx
 
