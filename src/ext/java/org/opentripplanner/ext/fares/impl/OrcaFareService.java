@@ -8,7 +8,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.opentripplanner.ext.fares.model.FareContainer;
+import org.opentripplanner.ext.fares.model.FareMedium;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.RiderCategory;
@@ -509,7 +509,7 @@ public class OrcaFareService extends DefaultFareService {
       getFareCategory(fareType),
       null
     );
-    var fareContainer = new FareContainer(
+    var fareContainer = new FareMedium(
       new FeedScopedId("orca", "orcaFares"),
       usesOrca(fareType) ? "electronic" : "cash"
     );

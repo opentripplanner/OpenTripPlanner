@@ -1302,9 +1302,9 @@ type RiderCategory {
 A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'.
 """
 type FareMedium {
-    "ID of the container"
+    "ID of the medium"
     id: String!
-    "Human readable name of the container."
+    "Human readable name of the medium."
     name: String
 }
 

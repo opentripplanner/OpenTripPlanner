@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * @param amount Price
  * @param duration Maximum duration of the product, if null then unlimited duration
  * @param category Rider category, for example seniors or students
- * @param container Container like "cash", "HSL app" or
+ * @param medium Medium to "hold" the fare, like "cash", "HSL app" or
  */
 public record FareProduct(
   FeedScopedId id,
@@ -23,7 +23,7 @@ public record FareProduct(
   Money amount,
   Duration duration,
   RiderCategory category,
-  FareContainer container
+  FareMedium medium
 ) {
   public FareProduct {
     Objects.requireNonNull(id);

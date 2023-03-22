@@ -34,7 +34,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
-import org.opentripplanner.ext.fares.model.FareContainer;
+import org.opentripplanner.ext.fares.model.FareMedium;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -164,7 +164,7 @@ class GraphQLIntegrationTest {
       Money.euros(1000),
       null,
       new RiderCategory(id("senior-citizens"), "Senior citizens", null),
-      new FareContainer(id("oyster"), "TfL Oyster Card")
+      new FareMedium(id("oyster"), "TfL Oyster Card")
     );
   }
 

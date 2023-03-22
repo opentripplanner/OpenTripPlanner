@@ -75,7 +75,7 @@ public class OrcaFareServiceTest {
     var rideCost = legFareProducts
       .stream()
       .filter(fp ->
-        fp.container().name().equals("electronic") &&
+        fp.medium().name().equals("electronic") &&
         fp.category().name().equals("regular") &&
         fp.name().equals("rideCost")
       )
@@ -88,7 +88,7 @@ public class OrcaFareServiceTest {
     var transfer = legFareProducts
       .stream()
       .filter(fp ->
-        fp.container().name().equals("electronic") &&
+        fp.medium().name().equals("electronic") &&
         fp.category().name().equals("regular") &&
         fp.name().equals("transfer")
       )

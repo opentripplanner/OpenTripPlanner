@@ -17,7 +17,7 @@ import org.opentripplanner.api.model.ApiFareQualifier;
 import org.opentripplanner.api.model.ApiItineraryFares;
 import org.opentripplanner.api.model.ApiLegProducts;
 import org.opentripplanner.api.model.ApiMoney;
-import org.opentripplanner.ext.fares.model.FareContainer;
+import org.opentripplanner.ext.fares.model.FareMedium;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
@@ -66,7 +66,7 @@ public class FareMapper {
     }
   }
 
-  private static ApiFareQualifier toApiFareQualifier(@Nullable FareContainer nullable) {
+  private static ApiFareQualifier toApiFareQualifier(@Nullable FareMedium nullable) {
     return Optional
       .ofNullable(nullable)
       .map(c -> new ApiFareQualifier(c.id().getId(), c.name()))
@@ -89,7 +89,7 @@ public class FareMapper {
             p.id().toString(),
             p.name(),
             toApiMoney(p.amount()),
-            toApiFareQualifier(p.container()),
+            toApiFareQualifier(p.medium()),
             toApiFareQualifier(p.category())
           )
         )
