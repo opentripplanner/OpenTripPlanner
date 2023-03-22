@@ -27,7 +27,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
   private final int stop;
   private final int arrivalTime;
   private final int travelDuration;
-  private final int cost;
+  private final int generalizedCost;
 
   /**
    * Transit or transfer.
@@ -36,21 +36,21 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
    * @param paretoRoundIncrement the increment to add to the paretoRound
    * @param stop                 stop index for this arrival
    * @param arrivalTime          the arrival time for this stop index
-   * @param cost                 the total accumulated cost at this stop arrival
+   * @param generalizedCost                 the total accumulated cost at this stop arrival
    */
   AbstractStopArrival(
     AbstractStopArrival<T> previous,
     int paretoRoundIncrement,
     int stop,
     int arrivalTime,
-    int cost
+    int generalizedCost
   ) {
     this.previous = previous;
     this.paretoRound = previous.paretoRound + paretoRoundIncrement;
     this.stop = stop;
     this.arrivalTime = arrivalTime;
     this.travelDuration = previous.travelDuration() + (arrivalTime - previous.arrivalTime());
-    this.cost = cost;
+    this.generalizedCost = generalizedCost;
   }
 
   /**
@@ -68,22 +68,42 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     this.stop = stop;
     this.arrivalTime = departureTime + travelDuration;
     this.travelDuration = travelDuration;
-    this.cost = initialCost;
+    this.generalizedCost = initialCost;
   }
 
+  /**
+   * This comparator is used to compare regular stop arrivals. It uses {@code arrivalTime},
+   * {@code paretoRound} and {@code generalizedCost} to compare arrivals. It does NOT include
+   * {@code arrivedOnBoard}. Normally arriving on-board should give the arrival an advantage
+   * - you can continue on foot, walking to the next stop. But, we only do this if it happens
+   * in the same Raptor iteration and round - if it does it is taken care of by the order
+   * which the algorithm work - not by this comparator.
+   */
   public static <
     T extends RaptorTripSchedule
   > ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundAndCost() {
     // This is important with respect to performance. Using the short-circuit logical OR(||) is
     // faster than bitwise inclusive OR(|) (even between boolean expressions)
     return (l, r) ->
-      l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound || l.cost < r.cost;
+      l.arrivalTime < r.arrivalTime ||
+      l.paretoRound < r.paretoRound ||
+      l.generalizedCost < r.generalizedCost;
   }
 
+  /**
+   * This include {@code arrivedOnBoard} in the comparison compared with
+   * {@link #compareArrivalTimeRoundAndCost()}.
+   */
   public static <
     T extends RaptorTripSchedule
-  > ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeAndRound() {
-    return (l, r) -> l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound;
+  > ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundCostAndOnBoardArrival() {
+    // This is important with respect to performance. Using the short-circuit logical OR(||) is
+    // faster than bitwise inclusive OR(|) (even between boolean expressions)
+    return (l, r) ->
+      l.arrivalTime < r.arrivalTime ||
+      l.paretoRound < r.paretoRound ||
+      l.generalizedCost < r.generalizedCost ||
+      (l.arrivedOnBoard() && !r.arrivedOnBoard());
   }
 
   @Override
@@ -102,7 +122,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
   }
 
   public int cost() {
-    return cost;
+    return generalizedCost;
   }
 
   @Override

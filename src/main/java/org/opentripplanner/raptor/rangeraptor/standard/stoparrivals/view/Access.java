@@ -1,5 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
+
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.AccessPathView;
@@ -29,8 +32,8 @@ final class Access<T extends RaptorTripSchedule>
   }
 
   @Override
-  public boolean arrivedByAccess() {
-    return true;
+  public PathLegType arrivedBy() {
+    return ACCESS;
   }
 
   @Override
@@ -41,5 +44,10 @@ final class Access<T extends RaptorTripSchedule>
   @Override
   public RaptorAccessEgress access() {
     return access;
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return access.stopReachedOnBoard();
   }
 }

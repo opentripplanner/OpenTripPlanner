@@ -1,11 +1,8 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToStringDetailed;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
@@ -24,7 +21,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
@@ -66,7 +62,6 @@ public class B01_AccessTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var expMinDuration = UnknownPathString.of("14m1s", 0);
     var expStd =
       "Walk 7m 0:11 0:18 ~ D 0s ~ BUS R1 0:18 0:25 7m ~ F 0s ~ Walk 1s 0:25 0:25:01 [0:11 0:25:01 14m1s 0tx]";
     var expStdOne =
@@ -74,8 +69,7 @@ public class B01_AccessTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_00))
-      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
+      .addMinDuration("14m1s", TX_0, T00_00, T00_30)
       .add(standard().not(TC_STANDARD_ONE), expStd)
       // When we run one iteration the  first access boarding is used as long as it
       // arrives at the origin at the same time. In this case the "worst" path is kept.
@@ -92,8 +86,9 @@ public class B01_AccessTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("testCases")
   void testRaptor(RaptorModuleTestCase testCase) {
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToStringDetailed(response));
+    assertEquals(
+      testCase.expected(),
+      testCase.runDetailedResult(raptorService, data, requestBuilder)
+    );
   }
 }

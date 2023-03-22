@@ -97,6 +97,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Publish container to Github Container Registry [#4970](https://github.com/opentripplanner/OpenTripPlanner/pull/4970)
 - Remove unconnected walking areas from graph [#4981](https://github.com/opentripplanner/OpenTripPlanner/pull/4981)
 - Filter out duplicate-like legs in alternative legs [#4868](https://github.com/opentripplanner/OpenTripPlanner/pull/4868)
+- Fix timeshifting of Flex ~ Walk ~ Flex paths in Raptor [#4952](https://github.com/opentripplanner/OpenTripPlanner/pull/4952)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

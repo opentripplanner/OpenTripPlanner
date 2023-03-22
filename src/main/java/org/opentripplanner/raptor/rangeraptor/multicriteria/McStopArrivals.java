@@ -1,12 +1,19 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+
+import gnu.trove.map.TIntObjectMap;
 import java.util.BitSet;
 import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
+import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.util.BitSetIterator;
@@ -32,6 +39,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   public McStopArrivals(
     int nStops,
     EgressPaths egressPaths,
+    AccessPaths accessPaths,
     DestinationArrivalPaths<T> paths,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
@@ -41,6 +49,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     this.debugHandlerFactory = debugHandlerFactory;
     this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
+    initAccessArrivals(accessPaths.arrivedOnBoardByNumOfRides());
     glueTogetherEgressStopWithDestinationArrivals(egressPaths, paths);
   }
 
@@ -49,33 +58,22 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   public int bestArrivalTime(int stopIndex) {
-    return arrivals[stopIndex].stream()
-      .mapToInt(AbstractStopArrival::arrivalTime)
-      .min()
-      .orElseThrow();
+    return minInt(arrivals[stopIndex].stream(), AbstractStopArrival::arrivalTime);
   }
 
   public boolean reachedByTransit(int stopIndex) {
     return (
       arrivals[stopIndex] != null &&
-      arrivals[stopIndex].stream().anyMatch(ArrivalView::arrivedByTransit)
+      arrivals[stopIndex].stream().anyMatch(a -> a.arrivedBy(TRANSIT))
     );
   }
 
   public int bestTransitArrivalTime(int stopIndex) {
-    return arrivals[stopIndex].stream()
-      .filter(ArrivalView::arrivedByTransit)
-      .mapToInt(AbstractStopArrival::arrivalTime)
-      .min()
-      .orElseThrow();
+    return transitStopArrivalsMinInt(stopIndex, AbstractStopArrival::arrivalTime);
   }
 
   public int smallestNumberOfTransfers(int stopIndex) {
-    return arrivals[stopIndex].stream()
-      .filter(ArrivalView::arrivedByTransit)
-      .mapToInt(AbstractStopArrival::numberOfTransfers)
-      .min()
-      .orElseThrow();
+    return transitStopArrivalsMinInt(stopIndex, AbstractStopArrival::numberOfTransfers);
   }
 
   boolean updateExist() {
@@ -127,9 +125,24 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   private StopArrivalParetoSet<T> findOrCreateSet(final int stop) {
     if (arrivals[stop] == null) {
-      arrivals[stop] = StopArrivalParetoSet.createStopArrivalSet(stop, debugHandlerFactory);
+      arrivals[stop] =
+        StopArrivalParetoSet.createStopArrivalSet(
+          debugHandlerFactory.paretoSetStopArrivalListener(stop)
+        );
     }
     return arrivals[stop];
+  }
+
+  private void initAccessArrivals(TIntObjectMap<List<RaptorAccessEgress>> accessOnBoardByRides) {
+    for (int round : accessOnBoardByRides.keys()) {
+      for (var access : accessOnBoardByRides.get(round)) {
+        int stop = access.stop();
+        arrivals[stop] =
+          StopArrivalParetoSet.createStopArrivalSetWithOnBoardCriteria(
+            debugHandlerFactory.paretoSetStopArrivalListener(stop)
+          );
+      }
+    }
   }
 
   /**
@@ -145,8 +158,27 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
       .forEachEntry((stop, list) -> {
         // The factory is creating the actual "glue"
         this.arrivals[stop] =
-          StopArrivalParetoSet.createEgressStopArrivalSet(stop, list, paths, debugHandlerFactory);
+          StopArrivalParetoSet.createEgressStopArrivalSet(
+            list,
+            paths,
+            debugHandlerFactory.paretoSetStopArrivalListener(stop)
+          );
         return true;
       });
+  }
+
+  private int transitStopArrivalsMinInt(
+    int stopIndex,
+    Function<AbstractStopArrival<T>, Integer> mapper
+  ) {
+    var transitArrivals = arrivals[stopIndex].stream().filter(a -> a.arrivedBy(TRANSIT));
+    return minInt(transitArrivals, mapper);
+  }
+
+  private int minInt(
+    Stream<AbstractStopArrival<T>> transitArrivals,
+    Function<AbstractStopArrival<T>, Integer> mapper
+  ) {
+    return transitArrivals.mapToInt(mapper::apply).min().orElseThrow();
   }
 }
