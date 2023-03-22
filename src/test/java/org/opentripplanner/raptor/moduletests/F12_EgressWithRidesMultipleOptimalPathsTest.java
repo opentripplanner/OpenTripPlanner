@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
@@ -30,7 +29,6 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
-import org.opentripplanner.raptor.spi.UnknownPathString;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
@@ -55,7 +53,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
  * is better than the path with flex) and 7 minutes (the path with flex egress becomes the fastest
  * option). Note! There is 1 minute transfer slack.
  */
-public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConstants {
+public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestConstants {
 
   private static final String EXPECTED_PATH_FLEX_7M =
     "A ~ BUS R2 0:05 0:16 ~ B ~ Walk 2m ~ C ~ Flex 7m 1x [0:05 0:26 21m 1tx $2160]";
@@ -101,6 +99,10 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
   static List<RaptorModuleTestCase> withFlexAsBestOptionTestCases() {
     return RaptorModuleTestCase
       .of()
+      // with Flex egress as the best destination arrival-time
+      .withRequest(r ->
+        r.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D7m))
+      )
       .add(TC_MIN_DURATION, "[0:00 0:21 21m 1tx]", "[0:00 0:23 23m 0tx]")
       .add(TC_MIN_DURATION_REV, "[0:09 0:30 21m 0tx]")
       .add(TC_STANDARD, withoutCost(EXPECTED_PATH_FLEX_7M, EXPECTED_PATH_WALK_7M))
@@ -114,21 +116,17 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
   @ParameterizedTest
   @MethodSource("withFlexAsBestOptionTestCases")
   void withFlexAsBestOptionTest(RaptorModuleTestCase testCase) {
-    // with Flex egress as the best destination arrival-time
-    requestBuilder.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D7m));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   static List<RaptorModuleTestCase> withWalkingAsBestOptionTestCase() {
-    var expMinDuration = UnknownPathString.of("21m", 0);
-
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_00))
-      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
+      // with walk egress as the best destination arrival-time
+      .withRequest(r ->
+        r.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D5m))
+      )
+      .addMinDuration("21m", TX_0, T00_00, T00_30)
       .add(standard().forwardOnly(), withoutCost(EXPECTED_PATH_WALK_5M))
       // Walk egress is best on num-of-transfers, while Flex has the latest departure time
       .add(
@@ -143,11 +141,6 @@ public class F12_EgressWithRidesMultipleOptimalPaths implements RaptorTestConsta
   @ParameterizedTest
   @MethodSource("withWalkingAsBestOptionTestCase")
   void withWalkingAsBestOptionTest(RaptorModuleTestCase testCase) {
-    // with walk egress as the best destination arrival-time
-    requestBuilder.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D5m));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 }

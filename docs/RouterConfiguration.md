@@ -45,12 +45,12 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |    [scheduledTripBinarySearchThreshold](#transit_scheduledTripBinarySearchThreshold)      |       `integer`       | This threshold is used to determine when to perform a binary trip schedule search.                | *Optional* | `50`          |   na  |
 |    [searchThreadPoolSize](#transit_searchThreadPoolSize)                                  |       `integer`       | Split a travel search in smaller jobs and run them in parallel to improve performance.            | *Optional* | `0`           |   na  |
 |    [transferCacheMaxSize](#transit_transferCacheMaxSize)                                  |       `integer`       | The maximum number of distinct transfers parameters to cache pre-calculated transfers for.        | *Optional* | `25`          |   na  |
-|    [dynamicSearchWindow](#transit_dynamicSearchWindow)                                    |        `object`       | The dynamic search window coefficients used to calculate the EDT, LAT and SW.                     | *Optional* |               |   na  |
-|       [maxWinTimeMinutes](#transit_dynamicSearchWindow_maxWinTimeMinutes)                 |       `integer`       | Upper limit for the search-window calculation.                                                    | *Optional* | `180`         |   na  |
-|       [minTransitTimeCoefficient](#transit_dynamicSearchWindow_minTransitTimeCoefficient) |        `double`       | The coefficient to multiply with `minTransitTime`.                                                | *Optional* | `0.5`         |   na  |
-|       [minWaitTimeCoefficient](#transit_dynamicSearchWindow_minWaitTimeCoefficient)       |        `double`       | The coefficient to multiply with `minWaitTime`.                                                   | *Optional* | `0.5`         |   na  |
-|       [minWinTimeMinutes](#transit_dynamicSearchWindow_minWinTimeMinutes)                 |       `integer`       | The constant minimum number of minutes for a raptor-search-window.                                | *Optional* | `40`          |   na  |
-|       [stepMinutes](#transit_dynamicSearchWindow_stepMinutes)                             |       `integer`       | Used to set the steps the search-window is rounded to.                                            | *Optional* | `10`          |   na  |
+|    [dynamicSearchWindow](#transit_dynamicSearchWindow)                                    |        `object`       | The dynamic search window coefficients used to calculate the EDT, LAT and SW.                     | *Optional* |               |  2.1  |
+|       [maxWindow](#transit_dynamicSearchWindow_maxWindow)                                 |       `duration`      | Upper limit for the search-window calculation.                                                    | *Optional* | `"PT3H"`      |  2.2  |
+|       [minTransitTimeCoefficient](#transit_dynamicSearchWindow_minTransitTimeCoefficient) |        `double`       | The coefficient to multiply with `minTransitTime`.                                                | *Optional* | `0.5`         |  2.1  |
+|       [minWaitTimeCoefficient](#transit_dynamicSearchWindow_minWaitTimeCoefficient)       |        `double`       | The coefficient to multiply with `minWaitTime`.                                                   | *Optional* | `0.5`         |  2.1  |
+|       [minWindow](#transit_dynamicSearchWindow_minWindow)                                 |       `duration`      | The constant minimum duration for a raptor-search-window.                                         | *Optional* | `"PT40M"`     |  2.2  |
+|       [stepMinutes](#transit_dynamicSearchWindow_stepMinutes)                             |       `integer`       | Used to set the steps the search-window is rounded to.                                            | *Optional* | `10`          |  2.1  |
 |    [pagingSearchWindowAdjustments](#transit_pagingSearchWindowAdjustments)                |      `duration[]`     | The provided array of durations is used to increase the search-window for the next/previous page. | *Optional* |               |   na  |
 |    [stopTransferCost](#transit_stopTransferCost)                                          | `enum map of integer` | Use this to set a stop transfer cost for the given transfer priority                              | *Optional* |               |   na  |
 | transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                     | *Optional* |               |   na  |
@@ -216,7 +216,7 @@ The maximum number of distinct transfers parameters to cache pre-calculated tran
 
 <h3 id="transit_dynamicSearchWindow">dynamicSearchWindow</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.1` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
 **Path:** /transit 
 
 The dynamic search window coefficients used to calculate the EDT, LAT and SW.
@@ -243,18 +243,18 @@ The `round_N(...)` method rounds the input to the closest multiplication of N.
 
 The 3 coefficients above are:
 
- - `C` is parameter: `minWinTimeMinutes`
+ - `C` is parameter: `minWindow`
  - `T` is parameter: `minTransitTimeCoefficient`
  - `W` is parameter: `minWaitTimeCoefficient`
  - `N` is parameter: `stepMinutes`
 
 In addition there is an upper bound on the calculation of the search window:
-`maxWinTimeMinutes`.
+`maxWindow`.
 
 
-<h3 id="transit_dynamicSearchWindow_maxWinTimeMinutes">maxWinTimeMinutes</h3>
+<h3 id="transit_dynamicSearchWindow_maxWindow">maxWindow</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `180`   
+**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT3H"`   
 **Path:** /transit/dynamicSearchWindow 
 
 Upper limit for the search-window calculation.
@@ -262,15 +262,13 @@ Upper limit for the search-window calculation.
 Long search windows consumes a lot of resources and may take a long time. Use this parameter to
 tune the desired maximum search time.
 
-This is the parameter that affect the response time most, the downside is that a search is only
+This is the parameter that affects the response time most, the downside is that a search is only
 guaranteed to be pareto-optimal within a search-window.
-
-The default is 3 hours. The unit is minutes.
 
 
 <h3 id="transit_dynamicSearchWindow_minTransitTimeCoefficient">minTransitTimeCoefficient</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`   
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`   
 **Path:** /transit/dynamicSearchWindow 
 
 The coefficient to multiply with `minTransitTime`.
@@ -279,25 +277,25 @@ Use a value between `0.0` and `3.0`. Using `0.0` will eliminate the `minTransitT
 
 <h3 id="transit_dynamicSearchWindow_minWaitTimeCoefficient">minWaitTimeCoefficient</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`   
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`   
 **Path:** /transit/dynamicSearchWindow 
 
 The coefficient to multiply with `minWaitTime`.
 
 Use a value between `0.0` and `1.0`. Using `0.0` will eliminate the `minWaitTime` from the dynamic raptor-search-window calculation.
 
-<h3 id="transit_dynamicSearchWindow_minWinTimeMinutes">minWinTimeMinutes</h3>
+<h3 id="transit_dynamicSearchWindow_minWindow">minWindow</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`   
+**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT40M"`   
 **Path:** /transit/dynamicSearchWindow 
 
-The constant minimum number of minutes for a raptor-search-window. 
+The constant minimum duration for a raptor-search-window. 
 
 Use a value between 20 and 180 minutes in a normal deployment.
 
 <h3 id="transit_dynamicSearchWindow_stepMinutes">stepMinutes</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10`   
+**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10`   
 **Path:** /transit/dynamicSearchWindow 
 
 Used to set the steps the search-window is rounded to.
@@ -468,7 +466,16 @@ Http headers.
         "onlyConsiderAccessible" : false,
         "unknownCost" : 600,
         "inaccessibleCost" : 3600
-      }
+      },
+      "elevator" : {
+        "onlyConsiderAccessible" : false,
+        "unknownCost" : 20,
+        "inaccessibleCost" : 3600
+      },
+      "inaccessibleStreetReluctance" : 25,
+      "maxSlope" : 0.083,
+      "slopeExceededReluctance" : 1,
+      "stairsReluctance" : 100
     }
   },
   "flex" : {
@@ -482,8 +489,8 @@ Http headers.
     "dynamicSearchWindow" : {
       "minTransitTimeCoefficient" : 0.5,
       "minWaitTimeCoefficient" : 0.5,
-      "minWinTimeMinutes" : 60,
-      "maxWinTimeMinutes" : 300
+      "minWindow" : "1h",
+      "maxWindow" : "5h"
     },
     "stopTransferCost" : {
       "DISCOURAGED" : 1500,

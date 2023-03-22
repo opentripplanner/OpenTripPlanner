@@ -1,6 +1,9 @@
 package org.opentripplanner.raptor._data.stoparrival;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.TransitPathView;
 
@@ -21,8 +24,8 @@ public class Bus extends AbstractStopArrival implements TransitPathView<TestTrip
   }
 
   @Override
-  public boolean arrivedByTransit() {
-    return true;
+  public PathLegType arrivedBy() {
+    return TRANSIT;
   }
 
   @Override
@@ -38,5 +41,10 @@ public class Bus extends AbstractStopArrival implements TransitPathView<TestTrip
   @Override
   public TestTripSchedule trip() {
     return trip;
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return true;
   }
 }

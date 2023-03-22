@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.LinkInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
 import org.rutebanken.netex.model.ServiceLink;
@@ -57,7 +57,7 @@ class ServiceLinkMapper {
   }
 
   List<LineString> getGeometriesByJourneyPattern(
-    JourneyPattern journeyPattern,
+    JourneyPattern_VersionStructure journeyPattern,
     StopPattern stopPattern
   ) {
     LineString[] geometries = new LineString[stopPattern.getSize() - 1];

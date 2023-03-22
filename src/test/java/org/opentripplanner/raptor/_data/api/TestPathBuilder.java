@@ -116,7 +116,7 @@ public class TestPathBuilder implements RaptorTestConstants {
 
   public RaptorPath<TestTripSchedule> egress(TestAccessEgress transfer) {
     builder.egress(transfer);
-    return builder.build(startTime);
+    return builder.build();
   }
 
   /* private methods */
@@ -130,6 +130,7 @@ public class TestPathBuilder implements RaptorTestConstants {
     this.builder =
       PathBuilder.tailPathBuilder(
         slackProvider,
+        startTime,
         costCalculator,
         RaptorStopNameResolver.nullSafe(null),
         null

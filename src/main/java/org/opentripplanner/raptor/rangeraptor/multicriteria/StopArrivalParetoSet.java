@@ -1,12 +1,13 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
+import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListenerComposite;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetWithMarker;
@@ -22,18 +23,55 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
   /**
    * Use the factory methods in this class to create a new instance.
    */
-  StopArrivalParetoSet(ParetoSetEventListener<ArrivalView<T>> listener) {
-    super(AbstractStopArrival.compareArrivalTimeRoundAndCost(), listener);
+  private StopArrivalParetoSet(
+    ParetoComparator<AbstractStopArrival<T>> comparator,
+    ParetoSetEventListener<ArrivalView<T>> listener
+  ) {
+    super(comparator, listener);
   }
 
   /**
-   * Create a stop arrivals pareto set and attach a debugger is handler exist.
+   * Create a stop arrivals pareto set and attach an optional {@code paretoSetEventListener}
+   * (debug handler).
+   * <p>
+   * The comparator used compare:
+   * <ul>
+   *   <li>arrival-time</li>
+   *   <li>round</li>
+   *   <li>generalized-cost</li>
+   *   <li><b>But not on-board-arrival</b></li>
+   * </ul>
    */
   static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createStopArrivalSet(
-    int stop,
-    DebugHandlerFactory<T> debugHandlerFactory
+    @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
   ) {
-    return new StopArrivalParetoSet<>(debugHandlerFactory.paretoSetStopArrivalListener(stop));
+    return new StopArrivalParetoSet<>(
+      AbstractStopArrival.compareArrivalTimeRoundAndCost(),
+      paretoSetEventListener
+    );
+  }
+
+  /**
+   * Create a stop arrivals pareto set and attach an optional {@code paretoSetEventListener}
+   * (debug handler).
+   * <p>
+   * The comparator used compare:
+   * <ul>
+   *   <li>arrival-time</li>
+   *   <li>round</li>
+   *   <li>generalized-cost</li>
+   *   <li>on-board-arrival</li>
+   * </ul>
+   */
+  static <
+    T extends RaptorTripSchedule
+  > StopArrivalParetoSet<T> createStopArrivalSetWithOnBoardCriteria(
+    @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
+  ) {
+    return new StopArrivalParetoSet<>(
+      AbstractStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(),
+      paretoSetEventListener
+    );
   }
 
   /**
@@ -42,21 +80,21 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
    * accepted egress stop arrival.
    */
   static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(
-    int stop,
     List<RaptorAccessEgress> egressPaths,
     DestinationArrivalPaths<T> destinationArrivals,
-    DebugHandlerFactory<T> debugHandlerFactory
+    @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
   ) {
     ParetoSetEventListener<ArrivalView<T>> listener;
-    ParetoSetEventListener<ArrivalView<T>> debugListener;
 
     listener = new CalculateTransferToDestination<>(egressPaths, destinationArrivals);
-    debugListener = debugHandlerFactory.paretoSetStopArrivalListener(stop);
 
-    if (debugListener != null) {
-      listener = new ParetoSetEventListenerComposite<>(debugListener, listener);
+    if (paretoSetEventListener != null) {
+      listener = new ParetoSetEventListenerComposite<>(paretoSetEventListener, listener);
     }
 
-    return new StopArrivalParetoSet<>(listener);
+    return new StopArrivalParetoSet<>(
+      AbstractStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(),
+      listener
+    );
   }
 }

@@ -28,7 +28,6 @@ public class ViaTripQuery {
       .description(
         "Via trip search. Find trip patterns traveling via one or more intermediate (via) locations."
       )
-      .deprecate("This API is under development, expect the contract to change")
       .type(new GraphQLNonNull(viaTripType))
       .withDirective(gqlUtil.timingData)
       .argument(

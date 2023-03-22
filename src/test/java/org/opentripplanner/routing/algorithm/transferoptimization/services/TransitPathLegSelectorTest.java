@@ -50,6 +50,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
   private final OptimizedPathTail<TestTripSchedule> pathTail = new OptimizedPathTail<>(
     SLACK_PROVIDER,
     COST_CALCULATOR,
+    0,
     null,
     null,
     0.0,

@@ -93,7 +93,7 @@ public class EstimatedCallType {
           .name("actualArrivalTime")
           .type(gqlUtil.dateTimeScalar)
           .description(
-            "Actual time of arrival at quay. Updated from real time information if available. NOT IMPLEMENTED"
+            "Actual time of arrival at quay. Updated from real time information if available."
           )
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
@@ -144,7 +144,7 @@ public class EstimatedCallType {
           .name("actualDepartureTime")
           .type(gqlUtil.dateTimeScalar)
           .description(
-            "Actual time of departure from quay. Updated with real time information if available. NOT IMPLEMENTED"
+            "Actual time of departure from quay. Updated with real time information if available."
           )
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();

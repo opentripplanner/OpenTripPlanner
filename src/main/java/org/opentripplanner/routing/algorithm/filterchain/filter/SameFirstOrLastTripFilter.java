@@ -2,9 +2,8 @@ package org.opentripplanner.routing.algorithm.filterchain.filter;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.ItineraryDeletionFlagger;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameFirstOrLastTrip;
 
 /**
@@ -14,10 +13,16 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameFir
  * Uses {@link org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameFirstOrLastTrip}.
  * for matching itineraries.
  */
-public class SameFirstOrLastTripFilter implements ItineraryListFilter {
+public class SameFirstOrLastTripFilter implements ItineraryDeletionFlagger {
 
   @Override
-  public List<Itinerary> filter(List<Itinerary> itineraries) {
+  public String name() {
+    return "SameFirstOrLastTripFilter";
+  }
+
+  @Override
+  public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
+    List<Itinerary> filtered = new ArrayList<>();
     List<GroupBySameFirstOrLastTrip> groups = new ArrayList<>();
 
     OUTER_LOOP:for (Itinerary it : itineraries) {
@@ -25,9 +30,7 @@ public class SameFirstOrLastTripFilter implements ItineraryListFilter {
 
       for (GroupBySameFirstOrLastTrip group : groups) {
         if (group.match(currentGroup)) {
-          it.flagForDeletion(
-            new SystemNotice("SameFirstOrLastTripFilter", "Deleted by SameFirstOrLastTripFilter")
-          );
+          filtered.add(it);
           continue OUTER_LOOP;
         }
       }
@@ -35,6 +38,6 @@ public class SameFirstOrLastTripFilter implements ItineraryListFilter {
       groups.add(currentGroup);
     }
 
-    return itineraries;
+    return filtered;
   }
 }
