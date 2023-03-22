@@ -38,6 +38,8 @@ jobs:
             jfr-delay: "50s"
             profile: core
 
+          # extended locations that are run only after merging to dev-2.x
+
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
             iterations: 1
             jfr-delay: "50s"
@@ -55,12 +57,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3.1.0
-        if: ${{ matrix.profile }} == 'core' || github.ref == 'refs/heads/dev-2.x'
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         with:
           fetch-depth: 0
 
       - name: Set up JDK 17
-        if: ${{ matrix.profile }} == 'core' || github.ref == 'refs/heads/dev-2.x'
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/setup-java@v3
         with:
           java-version: 17
@@ -68,25 +70,25 @@ jobs:
         timeout-minutes: 5
 
       - name: Set up Maven
-        if: ${{ matrix.profile }} == 'core' || github.ref == 'refs/heads/dev-2.x'
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: stCarolas/setup-maven@v.4.5
         with:
           maven-version: 3.8.2
 
       - name: Build jar
-        if: ${{ matrix.profile }} == 'core' || github.ref == 'refs/heads/dev-2.x'
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         env:
           MAVEN_OPTS: "-Dmaven.repo.local=/home/lenni/.m2/repository/"
         run: mvn -DskipTests --batch-mode package -P prettierSkip
 
       - name: Build graph
-        if: ${{ matrix.profile }} == 'core' || github.ref == 'refs/heads/dev-2.x'
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         run: |
           cp target/otp-*-SNAPSHOT-shaded.jar otp.jar
           java -Xmx32G -jar otp.jar --build --save test/performance/${{ matrix.location }}/
 
       - name: Run speed test
-        if: ${{ matrix.profile }} == 'core' || github.ref == 'refs/heads/dev-2.x'
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
           SPEEDTEST_LOCATION: ${{ matrix.location }}
@@ -95,14 +97,14 @@ jobs:
           mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
 
       - name: Archive travel results file
-        if: ${{ matrix.profile }} == 'core' || github.ref == 'refs/heads/dev-2.x'
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.location }}-travelSearch-results.csv
           path: test/performance/${{ matrix.location }}/travelSearch-results.csv
 
       - name: Archive Flight Recorder instrumentation file
-        if: ${{ matrix.profile }} == 'core' || github.ref == 'refs/heads/dev-2.x'
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.location }}-flight-recorder
