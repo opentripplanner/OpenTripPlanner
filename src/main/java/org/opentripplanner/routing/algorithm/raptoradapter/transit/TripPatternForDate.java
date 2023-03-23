@@ -92,12 +92,6 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
               .orElseThrow()
           )
           .toLocalDate();
-      assertValidRunningPeriod(
-        startOfRunningPeriod,
-        endOfRunningPeriod,
-        frequencies.get(0).tripTimes,
-        frequencies.get(frequencies.size() - 1).tripTimes
-      );
     } else {
       // These depend on the tripTimes array being sorted
       var first = tripTimes.get(0);
