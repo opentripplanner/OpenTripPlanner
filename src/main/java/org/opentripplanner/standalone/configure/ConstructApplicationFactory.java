@@ -4,9 +4,18 @@ import dagger.BindsInstance;
 import dagger.Component;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclepositions.configure.VehiclePositionsRepositoryModule;
+import org.opentripplanner.service.vehiclepositions.configure.VehiclePositionsServiceModule;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.configure.VehicleRentalRepositoryModule;
+import org.opentripplanner.service.vehiclerental.configure.VehicleRentalServiceModule;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.service.worldenvelope.configure.WorldEnvelopeServiceModule;
@@ -28,6 +37,10 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     ConfigModule.class,
     TransitModule.class,
     WorldEnvelopeServiceModule.class,
+    VehiclePositionsServiceModule.class,
+    VehiclePositionsRepositoryModule.class,
+    VehicleRentalServiceModule.class,
+    VehicleRentalRepositoryModule.class,
     ConstructApplicationModule.class,
   }
 )
@@ -38,6 +51,11 @@ public interface ConstructApplicationFactory {
   TransitModel transitModel();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
+  VehiclePositionRepository vehiclePositionRepository();
+  VehiclePositionService vehiclePositionService();
+  VehicleRentalRepository vehicleRentalRepository();
+  VehicleRentalService vehicleRentalService();
+  DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
   GraphVisualizer graphVisualizer();
@@ -63,6 +81,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
+
+    @BindsInstance
+    Builder dataImportIssueSummary(DataImportIssueSummary issueSummary);
 
     ConstructApplicationFactory build();
   }

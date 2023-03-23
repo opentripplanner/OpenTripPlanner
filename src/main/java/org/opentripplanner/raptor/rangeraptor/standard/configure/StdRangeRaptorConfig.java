@@ -1,15 +1,17 @@
 package org.opentripplanner.raptor.rangeraptor.standard.configure;
 
-import java.util.Objects;
+import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
+import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
+
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
-import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicSearch;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
-import org.opentripplanner.raptor.rangeraptor.internalapi.Worker;
-import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
 import org.opentripplanner.raptor.rangeraptor.standard.ArrivalTimeRoutingStrategy;
@@ -30,7 +32,6 @@ import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArriv
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArrivalsState;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.path.EgressArrivalToPathAdapter;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
-import org.opentripplanner.raptor.spi.CostCalculator;
 
 /**
  * The responsibility of this class is to wire different standard range raptor worker configurations
@@ -45,7 +46,6 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   private final PathConfig<T> pathConfig;
 
   private BestTimes bestTimes = null;
-  private StdStopArrivals<T> arrivals = null;
   private ArrivedAtDestinationCheck destinationCheck = null;
   private BestNumberOfTransfers bestNumberOfTransfers = null;
 
@@ -54,25 +54,8 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     this.pathConfig = new PathConfig<>(context);
   }
 
-  /**
-   * Create a heuristic search using the provided callback to create the worker. The callback is
-   * necessary because the heuristics MUST be created before the worker, if not the heuristic can
-   * not be added to the worker lifecycle and fails.
-   */
-  public HeuristicSearch<T> createHeuristicSearch(
-    BiFunction<WorkerState<T>, RoutingStrategy<T>, Worker<T>> createWorker,
-    CostCalculator<T> costCalculator
-  ) {
-    StdRangeRaptorWorkerState<T> state = createState();
-    Heuristics heuristics = createHeuristicsAdapter(costCalculator);
-    return new HeuristicSearch<>(
-      createWorker.apply(state, createWorkerStrategy(state)),
-      heuristics
-    );
-  }
-
-  public Worker<T> createSearch(
-    BiFunction<WorkerState<T>, RoutingStrategy<T>, Worker<T>> createWorker
+  public RaptorWorker<T> createSearch(
+    BiFunction<RaptorWorkerState<T>, RoutingStrategy<T>, RaptorWorker<T>> createWorker
   ) {
     StdRangeRaptorWorkerState<T> state = createState();
     return createWorker.apply(state, createWorkerStrategy(state));
@@ -84,10 +67,9 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     new VerifyRequestIsValid(ctx).verify();
     switch (ctx.profile()) {
       case STANDARD:
-      case MIN_TRAVEL_DURATION:
         return workerState(stdStopArrivalsState());
       case BEST_TIME:
-      case MIN_TRAVEL_DURATION_BEST_TIME:
+      case MIN_TRAVEL_DURATION:
         return workerState(bestTimeStopArrivalsState());
     }
     throw new IllegalArgumentException(ctx.profile().toString());
@@ -103,25 +85,25 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
           ctx.calculator()
         );
       case MIN_TRAVEL_DURATION:
-      case MIN_TRAVEL_DURATION_BEST_TIME:
         return new MinTravelDurationRoutingStrategy<>(
           state,
           ctx.createTimeBasedBoardingSupport(),
-          ctx.calculator()
+          ctx.calculator(),
+          ctx.lifeCycle()
         );
     }
     throw new IllegalArgumentException(ctx.profile().toString());
   }
 
-  private Heuristics createHeuristicsAdapter(CostCalculator<T> costCalculator) {
-    Objects.requireNonNull(bestNumberOfTransfers);
+  public Heuristics createHeuristics(RaptorWorkerResult<T> results) {
     return new HeuristicsAdapter(
-      bestTimes(),
-      this.bestNumberOfTransfers,
+      ctx.nStops(),
       ctx.egressPaths(),
       ctx.calculator(),
-      costCalculator,
-      ctx.lifeCycle()
+      ctx.costCalculator(),
+      results.extractBestOverallArrivals(),
+      results.extractBestTransitArrivals(),
+      results.extractBestNumberOfTransfers()
     );
   }
 
@@ -134,17 +116,11 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     );
   }
 
-  private BestTimesOnlyStopArrivalsState<T> bestTimeStopArrivalsState() {
+  private StopArrivalsState<T> bestTimeStopArrivalsState() {
     return new BestTimesOnlyStopArrivalsState<>(
       bestTimes(),
       simpleBestNumberOfTransfers(),
-      new UnknownPathFactory<>(
-        bestTimes(),
-        simpleBestNumberOfTransfers(),
-        ctx.calculator(),
-        ctx.lifeCycle(),
-        ctx.egressPaths()
-      )
+      unknownPathFactory()
     );
   }
 
@@ -215,13 +191,14 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private DestinationArrivalPaths<T> destinationArrivalPaths() {
-    DestinationArrivalPaths<T> destinationArrivalPaths = pathConfig.createDestArrivalPaths(false);
+    var destinationArrivalPaths = pathConfig.createDestArrivalPathsWithoutGeneralizedCost();
 
     // Add egressArrivals to stops and bind them to the destination arrival paths. The
     // adapter notify the destination on each new egress stop arrival.
     EgressArrivalToPathAdapter<T> pathsAdapter = new EgressArrivalToPathAdapter<>(
       destinationArrivalPaths,
       ctx.calculator(),
+      ctx.slackProvider(),
       stopsCursor(),
       ctx.lifeCycle()
     );
@@ -240,6 +217,19 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
       bestTimes = new BestTimes(ctx.nStops(), ctx.calculator(), ctx.lifeCycle());
     }
     return bestTimes;
+  }
+
+  private UnknownPathFactory<T> unknownPathFactory() {
+    return new UnknownPathFactory<>(
+      bestTimes(),
+      simpleBestNumberOfTransfers(),
+      ctx.calculator(),
+      ctx.slackProvider().transferSlack(),
+      ctx.egressPaths(),
+      MIN_TRAVEL_DURATION.is(ctx.profile()),
+      paretoComparator(ctx.searchParams(), false, ctx.searchDirection()),
+      ctx.lifeCycle()
+    );
   }
 
   private ArrivedAtDestinationCheck destinationCheck() {
@@ -262,6 +252,10 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private SimpleArrivedAtDestinationCheck simpleDestinationCheck() {
-    return new SimpleArrivedAtDestinationCheck(ctx.egressStops(), bestTimes());
+    return new SimpleArrivedAtDestinationCheck(
+      bestTimes(),
+      ctx.egressPaths().egressesWitchStartByWalking(),
+      ctx.egressPaths().egressesWitchStartByARide()
+    );
   }
 }

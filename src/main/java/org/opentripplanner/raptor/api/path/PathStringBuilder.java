@@ -1,10 +1,12 @@
 package org.opentripplanner.raptor.api.path;
 
 import java.time.ZonedDateTime;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.spi.CostCalculator;
 
@@ -16,29 +18,15 @@ public class PathStringBuilder {
 
   private final RaptorStopNameResolver stopNameResolver;
   private final StringBuilder buf = new StringBuilder();
-  private final boolean padDuration;
-  private boolean elementAdded = false;
-  private boolean sepAdded = false;
 
-  public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver) {
-    this(stopNameResolver, false);
-  }
+  private boolean addPadding = false;
 
   /**
    * @param stopNameResolver Used to translate stopIndexes to stopNames, if {@code null} the index
    *                         is used in the result string.
-   * @param padDuration      This can be set to {@code true} for padding the duration output. This
-   *                         would be used in cases were several similar paths are listed. If the
-   *                         legs are similar, the path elements is more likely to be aligned.
    */
-  public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver, boolean padDuration) {
+  public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver) {
     this.stopNameResolver = RaptorStopNameResolver.nullSafe(stopNameResolver);
-    this.padDuration = padDuration;
-  }
-
-  public PathStringBuilder sep() {
-    sepAdded = true;
-    return this;
   }
 
   /**
@@ -50,31 +38,26 @@ public class PathStringBuilder {
   }
 
   public PathStringBuilder stop(String stop) {
-    return start().append(stop).end();
+    return legSep().text(stop);
   }
 
   public PathStringBuilder walk(int duration) {
-    return start().append("Walk").duration(duration).end();
+    return legSep().text("Walk").duration(duration);
   }
 
-  public PathStringBuilder rental(int duration) {
-    return start().append("Rental").space().duration(duration).end();
-  }
-
-  public PathStringBuilder flex(int duration, int nRides) {
-    // The 'tx' is short for eXtra Transfers added by the flex access/egress.
-    return start().append("Flex").duration(duration).space().append(nRides).append("x").end();
+  public PathStringBuilder pickupRental(String stop, int duration) {
+    return legSep().text(stop).text("Rental").duration(duration);
   }
 
   public PathStringBuilder accessEgress(RaptorAccessEgress leg) {
-    if (leg.hasRides()) {
-      return flex(leg.durationInSeconds(), leg.numberOfRides());
+    if (leg.isFree()) {
+      return this;
     }
-    return leg.durationInSeconds() == 0 ? this : walk(leg.durationInSeconds());
+    return legSep().text(leg.asString(false));
   }
 
   public PathStringBuilder transit(String description, int fromTime, int toTime) {
-    return start().append(description).space().time(fromTime, toTime).end();
+    return legSep().text(description).time(fromTime, toTime);
   }
 
   public PathStringBuilder transit(
@@ -83,17 +66,14 @@ public class PathStringBuilder {
     ZonedDateTime fromTime,
     ZonedDateTime toTime
   ) {
-    return start().append(modeName).space().append(trip).space().time(fromTime, toTime).end();
+    return legSep().text(modeName).text(trip).time(fromTime, toTime);
   }
 
   public PathStringBuilder street(String modeName, ZonedDateTime fromTime, ZonedDateTime toTime) {
-    return start().append(modeName).space().time(fromTime, toTime).end();
+    return legSep().text(modeName).time(fromTime, toTime);
   }
 
   public PathStringBuilder timeAndCostCentiSec(int fromTime, int toTime, int generalizedCost) {
-    if (buf.length() != 0) {
-      space();
-    }
     return time(fromTime, toTime).generalizedCostSentiSec(generalizedCost);
   }
 
@@ -111,33 +91,59 @@ public class PathStringBuilder {
    *     <li>{@code "pri"} - Transfer priority cost</li>
    * </ul>
    */
-  public PathStringBuilder costCentiSec(int cost, int defaultValue, String unit) {
-    if (cost == defaultValue) {
+  public PathStringBuilder costCentiSec(int generalizedCostCents, int defaultValue, String unit) {
+    if (generalizedCostCents == defaultValue) {
       return this;
     }
-    space().append(OtpNumberFormat.formatCostCenti(cost));
-    if (unit != null) {
-      append(unit);
-    }
-    return this;
-  }
-
-  public PathStringBuilder space() {
-    return append(" ");
+    var costText = OtpNumberFormat.formatCostCenti(generalizedCostCents);
+    return (unit != null) ? text(costText + unit) : text(costText);
   }
 
   public PathStringBuilder duration(int duration) {
-    String durationStr = DurationUtils.durationToStr(duration);
-    return space().append(padDuration ? String.format("%5s", durationStr) : durationStr);
+    return text(DurationUtils.durationToStr(duration));
   }
 
   public PathStringBuilder time(int from, int to) {
-    return append(TimeUtils.timeToStrCompact(from)).space().append(TimeUtils.timeToStrCompact(to));
+    return time(from).time(to);
   }
 
-  public PathStringBuilder append(String text) {
-    buf.append(text);
-    return this;
+  public PathStringBuilder time(int time) {
+    return time != RaptorConstants.TIME_NOT_SET ? text(TimeUtils.timeToStrCompact(time)) : this;
+  }
+
+  public PathStringBuilder numberOfTransfers(int nTransfers) {
+    return nTransfers != RaptorConstants.NOT_SET ? text(nTransfers + "tx") : this;
+  }
+
+  public PathStringBuilder summary(int generalizedCostCents) {
+    return summaryStart().generalizedCostSentiSec(generalizedCostCents).summaryEnd();
+  }
+
+  public PathStringBuilder summary(
+    int startTime,
+    int endTime,
+    int nTransfers,
+    int generalizedCostCents
+  ) {
+    return summary(startTime, endTime, nTransfers, generalizedCostCents, null);
+  }
+
+  public PathStringBuilder summary(
+    int startTime,
+    int endTime,
+    int nTransfers,
+    int generalizedCostCents,
+    @Nullable Consumer<PathStringBuilder> appendToSummary
+  ) {
+    summaryStart()
+      .time(startTime, endTime)
+      .duration(Math.abs(endTime - startTime))
+      .numberOfTransfers(nTransfers)
+      .generalizedCostSentiSec(generalizedCostCents);
+    if (appendToSummary != null) {
+      appendToSummary.accept(this);
+    }
+    return summaryEnd();
   }
 
   @Override
@@ -147,26 +153,39 @@ public class PathStringBuilder {
 
   /* private helpers */
 
+  private PathStringBuilder summaryStart() {
+    text("[");
+    addPadding = false;
+    return this;
+  }
+
+  private PathStringBuilder summaryEnd() {
+    buf.append(']');
+    return this;
+  }
+
   private PathStringBuilder time(ZonedDateTime from, ZonedDateTime to) {
-    return append(TimeUtils.timeToStrCompact(from)).space().append(TimeUtils.timeToStrCompact(to));
+    return text(TimeUtils.timeToStrCompact(from)).text(TimeUtils.timeToStrCompact(to));
   }
 
-  private PathStringBuilder append(int value) {
-    buf.append(value);
-    return this;
-  }
-
-  private PathStringBuilder end() {
-    elementAdded = true;
-    sepAdded = false;
-    return this;
-  }
-
-  private PathStringBuilder start() {
-    if (sepAdded && elementAdded) {
-      append(" ~ ");
+  private PathStringBuilder legSep() {
+    if (addPadding) {
+      text("~");
     }
-    elementAdded = false;
+    return this;
+  }
+
+  private PathStringBuilder sep() {
+    if (addPadding) {
+      buf.append(' ');
+    }
+    return this;
+  }
+
+  public PathStringBuilder text(String text) {
+    sep();
+    buf.append(text);
+    addPadding = true;
     return this;
   }
 }

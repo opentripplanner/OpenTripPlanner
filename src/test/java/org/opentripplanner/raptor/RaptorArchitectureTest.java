@@ -6,7 +6,6 @@ import static org.opentripplanner.OtpArchitectureModules.GNU_TROVE;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.arch.ArchComponent;
 import org.opentripplanner._support.arch.Module;
@@ -23,6 +22,7 @@ public class RaptorArchitectureTest {
   private static final Package RAPTOR_UTIL_PARETO_SET = RAPTOR_UTIL.subPackage("paretoset");
   private static final Module RAPTOR_UTILS = Module.of(RAPTOR_UTIL, RAPTOR_UTIL_PARETO_SET);
   private static final Package RAPTOR_SPI = RAPTOR.subPackage("spi");
+  private static final Package RAPTOR_PATH = RAPTOR.subPackage("path");
   private static final Package CONFIGURE = RAPTOR.subPackage("configure");
   private static final Package SERVICE = RAPTOR.subPackage("service");
   private static final Package RANGE_RAPTOR = RAPTOR.subPackage("rangeraptor");
@@ -52,7 +52,6 @@ public class RaptorArchitectureTest {
   }
 
   @Test
-  @Disabled
   void enforcePackageDependenciesRaptorSPI() {
     RAPTOR.subPackage("spi").dependsOn(FRAMEWORK_UTILS, API_MODEL, API_PATH).verify();
   }
@@ -64,8 +63,13 @@ public class RaptorArchitectureTest {
   }
 
   @Test
+  void enforcePackageDependenciesRaptorPath() {
+    RAPTOR_PATH.dependsOn(FRAMEWORK_UTILS, API_PATH, API_MODEL, RAPTOR_SPI, RR_TRANSIT).verify();
+  }
+
+  @Test
   void enforcePackageDependenciesInRaptorImplementation() {
-    var internalApi = RR_INTERNAL_API.dependsOn(RAPTOR_API, RAPTOR_SPI).verify();
+    var internalApi = RR_INTERNAL_API.dependsOn(FRAMEWORK_UTILS, RAPTOR_API, RAPTOR_SPI).verify();
 
     // RangeRaptor common allowed dependencies
     var common = Module.of(
@@ -81,7 +85,7 @@ public class RaptorArchitectureTest {
     RR_LIFECYCLE.dependsOn(common).verify();
     RR_TRANSIT.dependsOn(common, RR_DEBUG, RR_LIFECYCLE).verify();
     RR_CONTEXT.dependsOn(common, RR_DEBUG, RR_LIFECYCLE, RR_SUPPORT, RR_TRANSIT).verify();
-    RR_PATH.dependsOn(common, RR_DEBUG, RR_TRANSIT).verify();
+    RR_PATH.dependsOn(common, RR_DEBUG, RR_TRANSIT, RAPTOR_PATH).verify();
 
     var pathConfigure = RR_PATH
       .subPackage("configure")
@@ -95,7 +99,7 @@ public class RaptorArchitectureTest {
     // Standard Range Raptor Implementation
     var stdInternalApi = RR_STANDARD
       .subPackage("internalapi")
-      .dependsOn(RAPTOR_API, RAPTOR_SPI)
+      .dependsOn(RAPTOR_API, RAPTOR_SPI, RR_INTERNAL_API)
       .verify();
     var stdBestTimes = RR_STANDARD
       .subPackage("besttimes")
@@ -186,7 +190,6 @@ public class RaptorArchitectureTest {
   }
 
   @Test
-  @Disabled
   void enforceNoCyclicDependencies() {
     slices()
       .matching(RAPTOR.packageIdentifierAllSubPackages())

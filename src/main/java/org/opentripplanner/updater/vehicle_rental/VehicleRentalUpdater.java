@@ -16,15 +16,15 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.RentalFormFactor;
+import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetVehicleRentalLink;
-import org.opentripplanner.street.model.edge.VehicleRentalEdge;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
-import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -53,15 +53,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
   private final VertexLinker linker;
 
-  private final VehicleRentalService service;
-
-  private boolean isPrimed = false;
+  private final VehicleRentalRepository service;
 
   public VehicleRentalUpdater(
     VehicleRentalUpdaterParameters parameters,
     VehicleRentalDatasource source,
     VertexLinker vertexLinker,
-    VehicleRentalService vehicleRentalStationService
+    VehicleRentalRepository repository
   ) throws IllegalArgumentException {
     super(parameters);
     // Configure updater
@@ -73,7 +71,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     this.linker = vertexLinker;
 
     // Adding a vehicle rental station service needs a graph writer runnable
-    this.service = vehicleRentalStationService;
+    this.service = repository;
 
     try {
       // Do any setup if needed
@@ -96,11 +94,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   @Override
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
-  }
-
-  @Override
-  public boolean isPrimed() {
-    return isPrimed;
   }
 
   @Override
@@ -170,13 +163,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             // the toString includes the text "Bike rental station"
             LOG.info("VehicleRentalPlace {} is unlinked", vehicleRentalVertex);
           }
-          Set<FormFactor> formFactors = Stream
+          Set<RentalFormFactor> formFactors = Stream
             .concat(
               station.getAvailablePickupFormFactors(false).stream(),
               station.getAvailableDropoffFormFactors(false).stream()
             )
             .collect(Collectors.toSet());
-          for (FormFactor formFactor : formFactors) {
+          for (RentalFormFactor formFactor : formFactors) {
             tempEdges.addEdge(new VehicleRentalEdge(vehicleRentalVertex, formFactor));
           }
           verticesByStation.put(station.getId(), vehicleRentalVertex);
@@ -220,8 +213,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
           latestModifiedEdges.size()
         );
       }
-
-      isPrimed = true;
     }
   }
 }

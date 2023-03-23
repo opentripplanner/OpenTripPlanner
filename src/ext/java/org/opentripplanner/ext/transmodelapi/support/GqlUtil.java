@@ -22,7 +22,7 @@ import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactor
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -63,8 +63,7 @@ public class GqlUtil {
 
   public static VehicleRentalService getVehicleRentalService(DataFetchingEnvironment environment) {
     return ((TransmodelRequestContext) environment.getContext()).getServerContext()
-      .graph()
-      .getVehicleRentalService();
+      .vehicleRentalService();
   }
 
   public static VehicleParkingService getVehicleParkingService(

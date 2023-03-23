@@ -1,5 +1,6 @@
 package org.opentripplanner.datastore.file;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -8,10 +9,7 @@ import static org.opentripplanner.datastore.api.FileType.GRAPH;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +18,6 @@ import org.opentripplanner.datastore.api.DataSource;
 public class FileDataSourceTest {
 
   private static final String FILENAME = "a.obj";
-  private static final String UTF_8 = "UTF-8";
   private File tempDir;
 
   @BeforeEach
@@ -64,19 +61,19 @@ public class FileDataSourceTest {
     FileDataSource subject = new FileDataSource(target, GRAPH);
 
     // Write to file
-    FileUtils.write(target, "Hello!", UTF_8);
+    Files.writeString(target.toPath(), "Hello!");
 
     // Verify the subject exist - and that the exist status is not cached
     assertTrue(subject.exists());
 
     // Verify the content by reading the file using the subject input stream
-    assertEquals("Hello!", IOUtils.toString(subject.asInputStream(), StandardCharsets.UTF_8));
+    assertEquals("Hello!", new String(subject.asInputStream().readAllBytes(), UTF_8));
 
     // Then write something else - replacing the existing content
-    IOUtils.write("Go, go, go!", subject.asOutputStream(), UTF_8);
+    subject.asOutputStream().write("Go, go, go!".getBytes(UTF_8));
 
     // Assert content can be read using the subject and file
-    assertEquals("Go, go, go!", IOUtils.toString(subject.asInputStream(), StandardCharsets.UTF_8));
+    assertEquals("Go, go, go!", new String(subject.asInputStream().readAllBytes(), UTF_8));
   }
 
   @Test

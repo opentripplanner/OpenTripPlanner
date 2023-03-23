@@ -23,12 +23,11 @@ public class DataStoreArchitectureTest {
   private static final Package SERVICE = DATASTORE;
 
   private static final Package FRAMEWORK_IO = FRAMEWORK.subPackage("io");
-  private static final Package APACHE_IO = Package.of("org.apache.commons.io");
   private static final Package APACHE_HTTP = Package.of("org.apache.http..");
 
   @Test
   void enforceApiPackageDependencies() {
-    API.dependsOn(FRAMEWORK_UTILS, APACHE_IO).verify();
+    API.dependsOn(FRAMEWORK_UTILS).verify();
   }
 
   @Test
@@ -38,7 +37,7 @@ public class DataStoreArchitectureTest {
 
   @Test
   void enforceFilePackageDependencies() {
-    FILE.dependsOn(API, BASE, FRAMEWORK_UTILS, FRAMEWORK_IO, APACHE_IO).verify();
+    FILE.dependsOn(API, BASE, FRAMEWORK_UTILS, FRAMEWORK_IO).verify();
   }
 
   @Test

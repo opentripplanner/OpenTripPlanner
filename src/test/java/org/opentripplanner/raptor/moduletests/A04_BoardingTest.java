@@ -1,10 +1,8 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.minDuration;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -47,42 +45,6 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 @SuppressWarnings("FieldCanBeLocal")
 public class A04_BoardingTest implements RaptorTestConstants {
 
-  /** Board L2 at first possible stop B (not C) and arrive at F (the earliest arrival time) */
-  private static final String EXP_PATH_BEST_ARRIVAL_TIME =
-    "Walk 1m ~ A " +
-    "~ BUS L1_1 0:10 0:18 ~ B " +
-    "~ BUS L2 0:20 0:31 ~ F " +
-    "~ BUS L3_2 0:35 0:40 ~ H " +
-    "~ Walk 1m [0:09 0:41 32m 2tx]";
-  /**
-   * Searching in REVERSE we will "board" L2 at the first possible stop G and "alight" at the
-   * optimal stop C (the best "arrival-time").
-   */
-  private static final String EXP_PATH_BEST_ARRIVAL_TIME_REVERSE =
-    "Walk 1m ~ A " +
-    "~ BUS L1_2 0:14 0:18 ~ C " +
-    "~ BUS L2 0:21 0:32 ~ G " +
-    "~ BUS L3_3 0:35 0:44 ~ H " +
-    "~ Walk 1m [0:13 0:45 32m 2tx]";
-
-  /** Board L2 at stop C and alight at stop F */
-  private static final String OPTIMAL_PATH =
-    "Walk 1m ~ A " +
-    "~ BUS L1_2 0:14 0:18 ~ C " +
-    "~ BUS L2 0:21 0:31 ~ F " +
-    "~ BUS L3_2 0:35 0:40 ~ H " +
-    "~ Walk 1m [0:13 0:41 28m 2tx";
-
-  /** Expect the optimal path to be found. */
-  private static final String EXP_PATH_MIN_TRAVEL_DURATION = OPTIMAL_PATH + "]";
-
-  /**
-   * The multi-criteria search should find the best alternative, because it looks at the
-   * arrival-time, generalized-cost, and departure-time(travel-time). In this case the same path as
-   * the min-travel-duration will find.
-   */
-  private static final String EXP_PATH_MC = OPTIMAL_PATH + " $3600]";
-
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -120,24 +82,47 @@ public class A04_BoardingTest implements RaptorTestConstants {
   static List<RaptorModuleTestCase> testCases() {
     return RaptorModuleTestCase
       .of()
+      .addMinDuration("23m", TX_2, T00_00, T01_00)
       // A test on the standard profile is included to demonstrate that the
       // min-travel-duration and the standard give different results. The L2
       // boarding stop is different.
-      .add(standard().forwardOnly(), EXP_PATH_BEST_ARRIVAL_TIME)
+      .add(
+        standard().forwardOnly(),
+        // Board L2 at first possible stop B (not C) and arrive at F (the earliest arrival time)
+        "Walk 1m ~ A " +
+        "~ BUS L1_1 0:10 0:18 ~ B " +
+        "~ BUS L2 0:20 0:31 ~ F " +
+        "~ BUS L3_2 0:35 0:40 ~ H " +
+        "~ Walk 1m [0:09 0:41 32m 2tx]"
+      )
       // A reverse test on the standard profile is included to demonstrate
       // that the min-travel-duration and the standard give different results
       // when searching in reverse. The L2 alight stop is different.
-      .add(standard().reverseOnly(), EXP_PATH_BEST_ARRIVAL_TIME_REVERSE)
-      .add(minDuration(), EXP_PATH_MIN_TRAVEL_DURATION)
-      .add(multiCriteria(), EXP_PATH_MC)
+      .add(
+        standard().reverseOnly(),
+        // Searching in REVERSE we will "board" L2 at the first possible stop G and "alight" at the
+        // optimal stop C (the best "arrival-time").
+        "Walk 1m ~ A " +
+        "~ BUS L1_2 0:14 0:18 ~ C " +
+        "~ BUS L2 0:21 0:32 ~ G " +
+        "~ BUS L3_3 0:35 0:44 ~ H " +
+        "~ Walk 1m [0:13 0:45 32m 2tx]"
+      )
+      .add(
+        multiCriteria(),
+        // Board L2 at stop C and alight at stop F
+        "Walk 1m ~ A " +
+        "~ BUS L1_2 0:14 0:18 ~ C " +
+        "~ BUS L2 0:21 0:31 ~ F " +
+        "~ BUS L3_2 0:35 0:40 ~ H " +
+        "~ Walk 1m [0:13 0:41 28m 2tx $3600]"
+      )
       .build();
   }
 
   @ParameterizedTest
   @MethodSource("testCases")
   void testRaptor(RaptorModuleTestCase testCase) {
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 }

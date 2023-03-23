@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 
@@ -16,21 +17,6 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
  * parameters.
  */
 public class SearchParams {
-
-  /**
-   * The TIME_NOT_SET constant is used to mark a parameter as not set, we uses a large negative
-   * value to be sure we are not in conflict with a valid service time.
-   * <p>
-   * This would potentially support negative service times, which is not allowed, but in rear
-   * cases/system happens when DST is adjusted.
-   * <p>
-   * We do not use {@link Integer#MIN_VALUE} because this could potentially lead to overflow
-   * situations which would be very hard to debug. Add -1 to MIN_VALUE and you get a positive
-   * number - not an exception.
-   */
-  public static final int TIME_NOT_SET = -9_999_999;
-
-  public static final int NOT_SET = -1;
 
   private final int earliestDepartureTime;
   private final int latestArrivalTime;
@@ -46,24 +32,24 @@ public class SearchParams {
   private final boolean constrainedTransfers;
   private final Collection<RaptorAccessEgress> accessPaths;
   private final Collection<RaptorAccessEgress> egressPaths;
-  private final boolean allowEmptyEgressPaths;
+  private final boolean allowEmptyAccessEgressPaths;
 
   /**
    * Default values is defined in the default constructor.
    */
   private SearchParams() {
-    earliestDepartureTime = TIME_NOT_SET;
-    latestArrivalTime = TIME_NOT_SET;
-    searchWindowInSeconds = NOT_SET;
+    earliestDepartureTime = RaptorConstants.TIME_NOT_SET;
+    latestArrivalTime = RaptorConstants.TIME_NOT_SET;
+    searchWindowInSeconds = RaptorConstants.NOT_SET;
     preferLateArrival = false;
     numberOfAdditionalTransfers = 5;
-    maxNumberOfTransfers = NOT_SET;
+    maxNumberOfTransfers = RaptorConstants.NOT_SET;
     relaxCostAtDestination = null;
     timetable = false;
     constrainedTransfers = false;
     accessPaths = List.of();
     egressPaths = List.of();
-    allowEmptyEgressPaths = false;
+    allowEmptyAccessEgressPaths = false;
   }
 
   SearchParams(SearchParamsBuilder<?> builder) {
@@ -78,58 +64,50 @@ public class SearchParams {
     this.constrainedTransfers = builder.constrainedTransfers();
     this.accessPaths = List.copyOf(builder.accessPaths());
     this.egressPaths = List.copyOf(builder.egressPaths());
-    this.allowEmptyEgressPaths = builder.allowEmptyEgressPaths();
+    this.allowEmptyAccessEgressPaths = builder.allowEmptyAccessEgressPaths();
   }
 
   /**
-   * TODO OTP2 Cleanup doc:
-   * The beginning of the departure window, in seconds since midnight. Inclusive.
-   * The earliest a journey may start in seconds since midnight. In the case of a 'depart after'
-   * search this is a required. In the case of a 'arrive by' search this is optional.
-   * <p/>
-   * In Raptor terms this maps to the beginning of the departure window. The {@link #searchWindowInSeconds()}
-   * is used to find the end of the time window.
-   * <p/>
-   * Required. Must be a positive integer, seconds since midnight(transit service time).
-   * Required for 'depart after'. Must be a positive integer, seconds since midnight(transit service time).
+   * The earliest a journey can depart from the origin. The unit is seconds since midnight.
+   * Inclusive.
+   * <p>
+   * In the case of a 'depart after' search this is a required. In the case of a 'arrive by' search
+   * this is optional, but it will improve performance if it is set.
    */
   public int earliestDepartureTime() {
     return earliestDepartureTime;
   }
 
   public boolean isEarliestDepartureTimeSet() {
-    return earliestDepartureTime != TIME_NOT_SET;
+    return earliestDepartureTime != RaptorConstants.TIME_NOT_SET;
   }
 
   /**
-   * TODO OTP2 Cleanup doc:
-   * The end of the departure window, in seconds since midnight. Exclusive.
-   * The latest a journey may arrive in seconds since midnight. In the case of a 'arrive by'
-   * search this is a required. In the case of a 'depart after' search this is optional.
-   * <p/>
-   * Required. Must be a positive integer, seconds since midnight(transit service time).
-   * In Raptor terms this maps to the beginning of the departure window of a reverse search. The
-   * {@link #searchWindowInSeconds()} is used to find the end of the time window.
-   * <p/>
-   * Required for 'arrive by'. Must be a positive integer, seconds since midnight(transit service time).
+   * The latest a journey may arrive at the destination. The unit is seconds since midnight.
+   * Exclusive.
+   * <p>
+   * In the case of a 'arrive by' search this is a required. In the case of a 'depart after' search
+   * this is optional, but it will improve performance if it is set.
    */
   public int latestArrivalTime() {
     return latestArrivalTime;
   }
 
   public boolean isLatestArrivalTimeSet() {
-    return latestArrivalTime != TIME_NOT_SET;
+    return latestArrivalTime != RaptorConstants.TIME_NOT_SET;
   }
 
   /**
-   * TODO OTP2 Cleanup doc:
-   * The time window used to search. The unit is seconds. For a *depart by search*, this is
-   * added to the 'earliestDepartureTime' to find the 'latestDepartureTime'. For a *arrive
-   * by search* this is used to calculate the 'earliestArrivalTime'. The algorithm will find
-   * all optimal travels within the given time window.
-   * <p/>
+   * The time window used to search. The unit is seconds.
+   * <p>
+   * For a *depart by search*, this is added to the 'earliestDepartureTime' to find the
+   * 'latestDepartureTime'.
+   * <p>
+   * For a *arrive by search* this is used to calculate the 'earliestArrivalTime'. The algorithm
+   * will find all optimal travels within the given time window.
+   * <p>
    * Set the search window to 0 (zero) to run 1 iteration.
-   * <p/>
+   * <p>
    * Required. Must be a positive integer or 0(zero).
    */
   public int searchWindowInSeconds() {
@@ -137,7 +115,7 @@ public class SearchParams {
   }
 
   public boolean isSearchWindowSet() {
-    return searchWindowInSeconds != NOT_SET;
+    return searchWindowInSeconds != RaptorConstants.NOT_SET;
   }
 
   public boolean searchOneIterationOnly() {
@@ -148,6 +126,11 @@ public class SearchParams {
    * Keep the latest departures arriving before the given latest-arrival-time(LAT). LAT is required
    * if this parameter is set. This parameter is not allowed if the {@link #timetable} is
    * enabled.
+   * <p>
+   * TODO - Reactor, we should use an Enum value instead of this and 'timetable':
+   *      - timePreference : enum TimePreference{ TIMETABLE, DEPART_AFTER, ARRIVE_BY }
+   *      - PS! There are some corner cases here. E.g. DEPART_AFTER must work when
+   *        edt=null & lat!=null - same for ARRIVE_BY.
    */
   public boolean preferLateArrival() {
     return preferLateArrival;
@@ -174,7 +157,7 @@ public class SearchParams {
   }
 
   public boolean isMaxNumberOfTransfersSet() {
-    return maxNumberOfTransfers != NOT_SET;
+    return maxNumberOfTransfers != RaptorConstants.NOT_SET;
   }
 
   /**
@@ -242,11 +225,11 @@ public class SearchParams {
   }
 
   /**
-   * If enabled, the check for egress paths is skipped. This is required when wanting to eg. run a
-   * separate heuristic search, with no pre-defined destinations.
+   * If enabled, the check for access and egress paths is skipped. This is required when wanting to
+   * eg. run a separate heuristic search, with no pre-defined destinations.
    */
-  public boolean allowEmptyEgressPaths() {
-    return allowEmptyEgressPaths;
+  public boolean allowEmptyAccessEgressPaths() {
+    return allowEmptyAccessEgressPaths;
   }
 
   /**
@@ -298,8 +281,8 @@ public class SearchParams {
   public String toString() {
     return ToStringBuilder
       .of(SearchParams.class)
-      .addServiceTime("earliestDepartureTime", earliestDepartureTime, TIME_NOT_SET)
-      .addServiceTime("latestArrivalTime", latestArrivalTime, TIME_NOT_SET)
+      .addServiceTime("earliestDepartureTime", earliestDepartureTime, RaptorConstants.TIME_NOT_SET)
+      .addServiceTime("latestArrivalTime", latestArrivalTime, RaptorConstants.TIME_NOT_SET)
       .addDurationSec("searchWindow", searchWindowInSeconds)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
@@ -317,16 +300,19 @@ public class SearchParams {
 
   void verify() {
     assertProperty(
-      earliestDepartureTime != TIME_NOT_SET || latestArrivalTime != TIME_NOT_SET,
+      isEarliestDepartureTimeSet() || isLatestArrivalTimeSet(),
       "'earliestDepartureTime' or 'latestArrivalTime' is required."
     );
-    assertProperty(!accessPaths.isEmpty(), "At least one 'accessPath' is required.");
     assertProperty(
-      allowEmptyEgressPaths || !egressPaths.isEmpty(),
+      allowEmptyAccessEgressPaths || !accessPaths.isEmpty(),
+      "At least one 'accessPath' is required."
+    );
+    assertProperty(
+      allowEmptyAccessEgressPaths || !egressPaths.isEmpty(),
       "At least one 'egressPath' is required."
     );
     assertProperty(
-      !(preferLateArrival && latestArrivalTime == TIME_NOT_SET),
+      !(preferLateArrival && !isLatestArrivalTimeSet()),
       "The 'latestArrivalTime' is required when 'departAsLateAsPossible' is set."
     );
     assertProperty(

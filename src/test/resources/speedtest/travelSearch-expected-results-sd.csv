@@ -1,3 +1,0 @@
-tcId,nTransfers,duration,cost,walkDistance,startTime,endTime,agencies,modes,routes,stops,details
-1,0,55m6s,0,1458,18:15:46,19:10:52,TriMet,BUS,8,prt:6789|prt:6548,Walk 7m34s ~ NE 15th & Halsey(6789) ~ BUS 8 18:23:20 18:59:36 ~ SW 11th & Gibbs(6548) ~ Walk 11m16s
-2,0,55m6s,0,1458,18:15:46,19:10:52,TriMet,BUS,8,prt:6789|prt:6548,Walk 7m34s ~ NE 15th & Halsey(6789) ~ BUS 8 18:23:20 18:59:36 ~ SW 11th & Gibbs(6548) ~ Walk 11m16s

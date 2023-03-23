@@ -1,5 +1,9 @@
 package org.opentripplanner.raptor._data.transit;
 
+import static org.opentripplanner.raptor._data.transit.TestRoute.route;
+import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashSet;
@@ -191,13 +195,13 @@ public class TestTransitData
     return routes.get(index);
   }
 
-  public void debugToStdErr(RaptorRequestBuilder<TestTripSchedule> request) {
+  public void debugToStdErr(RaptorRequestBuilder<TestTripSchedule> request, boolean dryRun) {
     var debug = request.debug();
 
     if (debug.stops().isEmpty()) {
       debug.addStops(stopsVisited());
     }
-    var logger = new SystemErrDebugLogger(true);
+    var logger = new SystemErrDebugLogger(true, dryRun);
 
     debug
       .stopArrivalListener(logger::stopArrivalLister)
@@ -217,6 +221,19 @@ public class TestTransitData
       routeIndexesByStopIndex.get(stopIndex).add(routeIndex);
     }
     return this;
+  }
+
+  /**
+   * Same as:
+   * <pre>
+   * withRoute(
+   *   route(pattern(routeName, stopIndexes))
+   *     .withTimetable(schedule().times(times))
+   * )
+   * </pre>
+   */
+  public TestTransitData withTransit(String routeName, String times, int... stopIndexes) {
+    return withRoute(route(pattern(routeName, stopIndexes)).withTimetable(schedule().times(times)));
   }
 
   public TestTransitData withRoutes(TestRoute... routes) {

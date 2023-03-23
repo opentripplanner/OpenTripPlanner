@@ -8,6 +8,7 @@ import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -15,6 +16,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -64,7 +67,8 @@ public class ConstructApplication {
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
-    GraphBuilderDataSources graphBuilderDataSources
+    GraphBuilderDataSources graphBuilderDataSources,
+    DataImportIssueSummary issueSummary
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -83,6 +87,7 @@ public class ConstructApplication {
         .transitModel(transitModel)
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
+        .dataImportIssueSummary(issueSummary)
         .build();
   }
 
@@ -138,7 +143,13 @@ public class ConstructApplication {
     creatTransitLayerForRaptor(transitModel(), routerConfig().transitTuningConfig());
 
     /* Create updater modules from JSON config. */
-    UpdaterConfigurator.configure(graph(), transitModel(), routerConfig().updaterConfig());
+    UpdaterConfigurator.configure(
+      graph(),
+      vehiclePositionRepository(),
+      vehicleRentalRepository(),
+      transitModel(),
+      routerConfig().updaterConfig()
+    );
 
     initEllipsoidToGeoidDifference();
 
@@ -191,6 +202,18 @@ public class ConstructApplication {
 
   public TransitModel transitModel() {
     return factory.transitModel();
+  }
+
+  public DataImportIssueSummary dataImportIssueSummary() {
+    return factory.dataImportIssueSummary();
+  }
+
+  public VehiclePositionRepository vehiclePositionRepository() {
+    return factory.vehiclePositionRepository();
+  }
+
+  public VehicleRentalRepository vehicleRentalRepository() {
+    return factory.vehicleRentalRepository();
   }
 
   public Graph graph() {

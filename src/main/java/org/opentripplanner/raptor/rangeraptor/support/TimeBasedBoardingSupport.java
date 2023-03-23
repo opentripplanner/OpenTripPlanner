@@ -8,7 +8,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
-import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
@@ -22,7 +22,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripS
 public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
 
   private final SlackProvider slackProvider;
-  private final TransitCalculator<T> calculator;
+  private final RaptorTransitCalculator<T> calculator;
   private final RoundProvider roundProvider;
   private final boolean hasTimeDependentAccess;
   private boolean inFirstIteration = true;
@@ -32,7 +32,7 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
   public TimeBasedBoardingSupport(
     boolean hasTimeDependentAccess,
     SlackProvider slackProvider,
-    TransitCalculator<T> calculator,
+    RaptorTransitCalculator<T> calculator,
     RoundProvider roundProvider,
     WorkerLifeCycle subscriptions
   ) {

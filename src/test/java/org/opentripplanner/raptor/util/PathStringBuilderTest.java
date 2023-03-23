@@ -1,9 +1,10 @@
 package org.opentripplanner.raptor.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 
@@ -12,6 +13,7 @@ public class PathStringBuilderTest {
   private static final RaptorStopNameResolver STOP_NAME_RESOLVER = RaptorStopNameResolver.nullSafe(
     null
   );
+  private static final int ANY_STOP = 7;
   private static final String MODE = "BUS";
   private static final int T_10_46_05 = time(10, 46, 5);
   private static final int T_10_55 = time(10, 55, 0);
@@ -32,14 +34,9 @@ public class PathStringBuilderTest {
   @Test
   public void walkThenRent() {
     assertEquals(
-      "Walk 17s ~ oslo:1 Rental  2m",
-      subject.walk(17).sep().stop("oslo:1").space().rental(120).toString()
+      "Walk 17s ~ oslo:1 Rental 2m",
+      subject.walk(17).pickupRental("oslo:1", 120).toString()
     );
-  }
-
-  @Test
-  public void walkWithDurationPadded() {
-    assertEquals("Walk   17s", new PathStringBuilder(STOP_NAME_RESOLVER, true).walk(17).toString());
   }
 
   @Test
@@ -53,34 +50,42 @@ public class PathStringBuilderTest {
   }
 
   @Test
-  public void flexZeroLength() {
-    assertEquals("Flex 0s 0x", subject.flex(0, 0).toString());
+  public void ignoreFreeLeg() {
+    assertEquals("Walk 1s", subject.accessEgress(free(ANY_STOP)).walk(1).toString());
   }
 
   @Test
-  public void flexNoramlCase() {
-    assertEquals("Flex 5m12s 2x", subject.flex(D_5_12, 2).toString());
+  public void flexNormalCase() {
+    assertEquals("Flex 5m12s 2x", subject.accessEgress(flex(ANY_STOP, D_5_12, 2)).toString());
   }
 
   @Test
-  public void sep() {
-    assertEquals("1 ~ 2", subject.stop(1).sep().stop(2).toString());
+  public void summary() {
+    int START_TIME = time(12, 35, 0);
+    int END_TIME = time(13, 45, 0);
+    assertEquals(
+      "[12:35 13:45 1h10m 1tx $1.23]",
+      subject.summary(START_TIME, END_TIME, 1, 123).toString()
+    );
+  }
+
+  @Test
+  public void summaryGeneralizedCostOnly() {
+    assertEquals("[$0.01]", subject.summary(1).toString());
   }
 
   @Test
   public void path() {
+    int egressDuration = 3600 + 37 * 60 + 7;
     assertEquals(
-      "Walk 37s ~ 227 ~ BUS 10:46:05 10:55 ~ 112 ~ Walk 1h37m7s",
+      "Walk 37s ~ 227 ~ BUS 10:46:05 10:55 ~ 112 ~ Walk 1h37m7s [10:44 12:33 1h49m 0tx $567]",
       subject
         .walk(37)
-        .sep()
         .stop(227)
-        .sep()
         .transit(MODE, T_10_46_05, T_10_55)
-        .sep()
         .stop(112)
-        .sep()
-        .walk(3600 + 37 * 60 + 7)
+        .walk(egressDuration)
+        .summary(time(10, 44, 0), time(12, 33, 0), 0, 56700)
         .toString()
     );
   }
@@ -88,17 +93,14 @@ public class PathStringBuilderTest {
   @Test
   public void pathWithoutAccessAndEgress() {
     assertEquals(
-      "227 ~ BUS 10:46:05 10:55 ~ 112",
+      "227 ~ BUS 10:46:05 10:55 ~ 112 [10:46:05 10:55 8m55s 0tx $60 3pz]",
       subject
-        .accessEgress(TestAccessEgress.walk(227, 0, 0))
-        .sep()
+        .accessEgress(free(227))
         .stop(227)
-        .sep()
         .transit(MODE, T_10_46_05, T_10_55)
-        .sep()
         .stop(112)
-        .sep()
-        .accessEgress(TestAccessEgress.walk(112, 0, 0))
+        .accessEgress(free(112))
+        .summary(T_10_46_05, T_10_55, 0, 6000, b -> b.text("3pz"))
         .toString()
     );
   }

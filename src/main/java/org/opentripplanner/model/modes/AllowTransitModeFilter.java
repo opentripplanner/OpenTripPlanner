@@ -19,7 +19,7 @@ public interface AllowTransitModeFilter extends Serializable {
    */
   boolean match(TransitMode transitMode, SubMode netexSubMode);
 
-  public default boolean isSubMode() {
+  default boolean isSubMode() {
     return false;
   }
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config.framework.file;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -9,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +18,6 @@ import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 
 class ConfigFileLoaderTest {
-
-  private static final String UTF_8 = "UTF-8";
 
   private File tempDir;
 
@@ -113,7 +111,7 @@ class ConfigFileLoaderTest {
   @Test
   public void configFailsIfConfigDirIsAFile() throws IOException {
     File file = new File(tempDir, "AFile.txt");
-    FileUtils.write(file, "{}", UTF_8);
+    Files.writeString(file.toPath(), "{}", UTF_8);
 
     assertThrows(
       Exception.class,

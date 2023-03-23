@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
@@ -56,7 +59,6 @@ public class PruneIslands implements GraphBuilderModule {
   private int pruningThresholdWithStops;
   private int adaptivePruningDistance;
   private double adaptivePruningFactor;
-
   private VertexLinker vertexLinker;
   private StreetIndex streetIndex;
 
@@ -103,11 +105,30 @@ public class PruneIslands implements GraphBuilderModule {
       }
       LOG.info("{} stops remain isolated", isolated);
     }
+
     // clean up pruned street vertices
+    // note that visibility vertices must not be removed from the graph
+    // because serialization will break. Edge lists are reconstructed
+    // only for graph vertices after loading the graph
+    List<AreaEdge> areaEdges = graph.getEdgesOfType(AreaEdge.class);
+    HashSet<AreaEdgeList> areas = new HashSet<>();
+    HashSet<Vertex> visibilityVertices = new HashSet<>();
+
+    for (AreaEdge ae : areaEdges) {
+      areas.add(ae.getArea());
+    }
+    for (AreaEdgeList a : areas) {
+      for (Vertex v : a.visibilityVertices) {
+        visibilityVertices.add(v);
+      }
+    }
+
     int removed = 0;
     List<Vertex> toRemove = new LinkedList<>();
     for (Vertex v : graph.getVerticesOfType(StreetVertex.class)) {
-      if (v.getDegreeOut() + v.getDegreeIn() == 0) toRemove.add(v);
+      if (v.getDegreeOut() + v.getDegreeIn() == 0 && !visibilityVertices.contains(v)) {
+        toRemove.add(v);
+      }
     }
     for (Vertex v : toRemove) {
       graph.remove(v);
@@ -475,13 +496,6 @@ public class PruneIslands implements GraphBuilderModule {
       return false;
     }
 
-    for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {
-      Vertex v = vIter.next();
-      if (v.getDegreeOut() + v.getDegreeIn() == 0) {
-        graph.remove(v);
-      }
-    }
-
     if (stats.isEmpty()) {
       return false;
     }
@@ -495,9 +509,7 @@ public class PruneIslands implements GraphBuilderModule {
         Collection<Edge> edges = new ArrayList<>(v.getOutgoing());
         edges.addAll(v.getIncoming());
         for (Edge e : edges) {
-          if (e instanceof StreetTransitStopLink || e instanceof StreetTransitEntranceLink) {
-            graph.removeEdge(e);
-          }
+          graph.removeEdge(e);
         }
       }
       if (island.stopSize() > 0) {

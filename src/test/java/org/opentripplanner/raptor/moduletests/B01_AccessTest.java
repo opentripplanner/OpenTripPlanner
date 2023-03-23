@@ -1,11 +1,11 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToStringDetailed;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
 import java.time.Duration;
 import java.util.List;
@@ -21,7 +21,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig;
 
 /**
  * FEATURE UNDER TEST
@@ -55,6 +54,7 @@ public class B01_AccessTest implements RaptorTestConstants {
       .addEgressPaths(TestAccessEgress.walk(STOP_F, D1s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
+      .timetable(true)
       // Removing the search-window should not have any effect, but it does.
       .searchWindow(Duration.ofMinutes(20));
 
@@ -62,18 +62,18 @@ public class B01_AccessTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var expStd =
+      "Walk 7m 0:11 0:18 ~ D 0s ~ BUS R1 0:18 0:25 7m ~ F 0s ~ Walk 1s 0:25 0:25:01 [0:11 0:25:01 14m1s 0tx]";
+    var expStdOne =
+      "Walk 1s 0:09:59 0:10 ~ B 0s ~ BUS R1 0:10 0:25 15m ~ F 0s ~ Walk 1s 0:25 0:25:01 [0:09:59 0:25:01 15m2s 0tx]";
+
     return RaptorModuleTestCase
       .of()
-      .add(
-        RaptorModuleTestConfig.standard().not(TC_STANDARD_ONE),
-        "Walk 7m 0:11 0:18 ~ D 0s ~ BUS R1 0:18 0:25 7m ~ F 0s ~ Walk 1s 0:25 0:25:01 [0:11 0:25:01 14m1s 0tx]"
-      )
-      .add(
-        // When we run one iteration the access boarding first is used as long as it
-        // arrives at the origin at the same time. In this case the "worst" path is kept.
-        TC_STANDARD_ONE,
-        "Walk 1s 0:09:59 0:10 ~ B 0s ~ BUS R1 0:10 0:25 15m ~ F 0s ~ Walk 1s 0:25 0:25:01 [0:09:59 0:25:01 15m2s 0tx]"
-      )
+      .addMinDuration("14m1s", TX_0, T00_00, T00_30)
+      .add(standard().not(TC_STANDARD_ONE), expStd)
+      // When we run one iteration the  first access boarding is used as long as it
+      // arrives at the origin at the same time. In this case the "worst" path is kept.
+      .add(TC_STANDARD_ONE, expStdOne)
       .add(
         multiCriteria(),
         "Walk 7m 0:11 0:18 $840 ~ D 0s ~ BUS R1 0:18 0:25 7m $1020 ~ F 0s ~ Walk 1s 0:25 0:25:01 $2 [0:11 0:25:01 14m1s 0tx $1862]",
@@ -86,8 +86,9 @@ public class B01_AccessTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("testCases")
   void testRaptor(RaptorModuleTestCase testCase) {
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToStringDetailed(response));
+    assertEquals(
+      testCase.expected(),
+      testCase.runDetailedResult(raptorService, data, requestBuilder)
+    );
   }
 }

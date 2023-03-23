@@ -135,8 +135,16 @@ class RaptorRoutingRequestTransitDataCreator {
           tripPattern,
           patternsSorted,
           offsets,
-          filter.filterAvailableStops(tripPattern, tripPattern.getBoardingPossible()),
-          filter.filterAvailableStops(tripPattern, tripPattern.getAlightingPossible())
+          filter.filterAvailableStops(
+            tripPattern,
+            tripPattern.getBoardingPossible(),
+            BoardAlight.BOARD
+          ),
+          filter.filterAvailableStops(
+            tripPattern,
+            tripPattern.getAlightingPossible(),
+            BoardAlight.ALIGHT
+          )
         )
       );
     }
@@ -168,13 +176,19 @@ class RaptorRoutingRequestTransitDataCreator {
     // and any previous day, while on subsequent search days we only want to add the
     // TripPatternForDate objects that start on that particular day. This is to prevent duplicates.
     // This was previously a stream, but was unrolled for improved performance.
-    Predicate<TripTimes> tripTimesPredicate = tripTimes ->
+
+    Predicate<TripTimes> tripTimesWithSubmodesPredicate = tripTimes ->
       filter.tripTimesPredicate(tripTimes, filter.hasSubModeFilters());
+    Predicate<TripTimes> tripTimesWithoutSubmodesPredicate = tripTimes ->
+      filter.tripTimesPredicate(tripTimes, false);
     Collection<TripPatternForDate> tripPatternsForDate = transitLayer.getTripPatternsForDate(date);
     List<TripPatternForDate> result = new ArrayList<>(tripPatternsForDate.size());
     for (TripPatternForDate p : tripPatternsForDate) {
       if (firstDay || p.getStartOfRunningPeriod().equals(date)) {
         if (filter.tripPatternPredicate(p)) {
+          var tripTimesPredicate = p.getTripPattern().getPattern().getContainsMultipleModes()
+            ? tripTimesWithSubmodesPredicate
+            : tripTimesWithoutSubmodesPredicate;
           TripPatternForDate tripPatternForDate = p.newWithFilteredTripTimes(tripTimesPredicate);
           if (tripPatternForDate != null) {
             result.add(tripPatternForDate);

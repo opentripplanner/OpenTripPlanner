@@ -111,9 +111,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     // Combine transit legs and transfers
     var tails = findBestTransferOption(originalPath, transitLegs, possibleTransfers);
 
-    final int iterationDepartureTime = originalPath.rangeRaptorIterationDepartureTime();
-
-    return tails.stream().map(it -> it.build(iterationDepartureTime)).collect(Collectors.toSet());
+    return tails.stream().map(OptimizedPathTail::build).collect(Collectors.toSet());
   }
 
   private static <T> T last(List<T> list) {
@@ -125,11 +123,13 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     List<TransitPathLeg<T>> originalTransitLegs,
     List<List<TripToTripTransfer<T>>> possibleTransfers
   ) {
+    final int iterationDepartureTime = originalPath.rangeRaptorIterationDepartureTime();
     // Create a set of tails with the last transit leg in it (one element)
     Set<OptimizedPathTail<T>> tails = Set.of(
-      new OptimizedPathTail<T>(
+      new OptimizedPathTail<>(
         slackProvider,
         costCalculator,
+        iterationDepartureTime,
         waitTimeCostCalculator,
         stopBoardAlightCosts,
         extraStopBoardAlightCostsFactor,

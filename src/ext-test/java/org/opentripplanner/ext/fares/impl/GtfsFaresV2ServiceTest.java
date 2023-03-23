@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.plan.PlanTestConstants.place;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 
@@ -11,9 +12,12 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.fares.model.Distance;
+import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
+import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -276,6 +280,125 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .build();
       var result = service.getProducts(i1);
       assertEquals(Set.of(freeTransferFromInnerToOuter), result.itineraryProducts());
+    }
+  }
+
+  @Nested
+  class DistanceFares {
+
+    FareProduct threeStopProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "three-stop-product"),
+      "three-stop-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+
+    FareProduct fiveStopProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "five-stop-product"),
+      "five-stop-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+    FareProduct twelveStopProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "twelve-stop-product"),
+      "twelve-stop-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+
+    FareProduct tenKmProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "ten-km-product"),
+      "ten-km-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+    FareProduct threeKmProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "three-km-product"),
+      "three-km-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+    FareProduct twoKmProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, "two-km-product"),
+      "two-km-product",
+      Money.euros(100),
+      Duration.ofHours(1),
+      null,
+      null
+    );
+
+    List<FareLegRule> stopRules = List.of(
+      new FareLegRule(null, null, null, null, new FareDistance.Stops(0, 3), threeStopProduct),
+      new FareLegRule(null, null, null, null, new FareDistance.Stops(5, 10), fiveStopProduct),
+      new FareLegRule(null, null, null, null, new FareDistance.Stops(12, 20), twelveStopProduct)
+    );
+
+    List<FareLegRule> distanceRules = List.of(
+      new FareLegRule(
+        null,
+        null,
+        null,
+        null,
+        new FareDistance.LinearDistance(Distance.ofMeters(7000), Distance.ofMeters(10_000)),
+        tenKmProduct
+      ),
+      new FareLegRule(
+        null,
+        null,
+        null,
+        null,
+        new FareDistance.LinearDistance(Distance.ofMeters(3000), Distance.ofMeters(6000)),
+        threeKmProduct
+      ),
+      new FareLegRule(
+        null,
+        null,
+        null,
+        null,
+        new FareDistance.LinearDistance(Distance.ofMeters(0), Distance.ofMeters(2000)),
+        twoKmProduct
+      )
+    );
+
+    @Test
+    void stops() {
+      var i1 = newItinerary(A, 0).bus(ID, 0, 50, 1, 20, C).build();
+      var faresV2Service = new GtfsFaresV2Service(
+        stopRules,
+        List.of(),
+        Multimaps.forMap(
+          Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
+        )
+      );
+      assertEquals(faresV2Service.getProducts(i1).itineraryProducts(), Set.of(twelveStopProduct));
+    }
+
+    @Test
+    void directDistance() {
+      Place dest = place(
+        "Destination",
+        A.coordinate.latitude(),
+        A.coordinate.longitude() + SphericalDistanceLibrary.metersToDegrees(5_000)
+      );
+      var i1 = newItinerary(A, 0).bus(ID, 0, 50, dest).build();
+      var faresV2Service = new GtfsFaresV2Service(
+        distanceRules,
+        List.of(),
+        Multimaps.forMap(
+          Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
+        )
+      );
+      assertEquals(faresV2Service.getProducts(i1).itineraryProducts(), Set.of(threeKmProduct));
     }
   }
 }

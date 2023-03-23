@@ -164,6 +164,17 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return bus(tripId, startTime, endTime, TRIP_FROM_STOP_INDEX, TRIP_TO_STOP_INDEX, to, null);
   }
 
+  public TestItineraryBuilder bus(
+    int tripId,
+    int startTime,
+    int endTime,
+    int fromStopIndex,
+    int toStopIndex,
+    Place to
+  ) {
+    return bus(tripId, startTime, endTime, fromStopIndex, toStopIndex, to, null);
+  }
+
   public TestItineraryBuilder flex(int start, int end, Place to) {
     if (lastPlace == null) {
       throw new IllegalStateException("Trip from place is unknown!");

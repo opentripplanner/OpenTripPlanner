@@ -1,8 +1,11 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
+
+import org.opentripplanner.raptor.api.RaptorConstants;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.view.AccessPathView;
 
 /**
@@ -26,8 +29,8 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
   }
 
   @Override
-  public boolean arrivedByAccess() {
-    return true;
+  public PathLegType arrivedBy() {
+    return ACCESS;
   }
 
   @Override
@@ -39,12 +42,21 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
   public AbstractStopArrival<T> timeShiftNewArrivalTime(int newRequestedArrivalTime) {
     int newArrivalTime = access.latestArrivalTime(newRequestedArrivalTime);
 
-    if (newArrivalTime == SearchParams.TIME_NOT_SET || newArrivalTime == arrivalTime()) {
+    if (newArrivalTime == RaptorConstants.TIME_NOT_SET) {
+      throw new IllegalStateException(
+        "The arrival should not have been accepted if it does not have a legal arrival-time."
+      );
+    }
+    if (newArrivalTime == arrivalTime()) {
       return this;
     }
-
     int newDepartureTime = newArrivalTime - access.durationInSeconds();
 
     return new AccessStopArrival<>(newDepartureTime, access);
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return access.stopReachedOnBoard();
   }
 }

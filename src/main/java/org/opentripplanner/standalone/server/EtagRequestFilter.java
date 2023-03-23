@@ -9,8 +9,8 @@ import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpStatus;
+import org.opentripplanner.framework.text.HexString;
 
 public class EtagRequestFilter implements ContainerResponseFilter {
 
@@ -26,8 +26,7 @@ public class EtagRequestFilter implements ContainerResponseFilter {
     if (
       isEligibleForEtag(request, response) &&
       hasAllowedContentType(response) &&
-      response.getEntity() instanceof byte[] bytes &&
-      bytes.length > 0
+      response.getEntity() instanceof byte[] bytes && bytes.length > 0
     ) {
       var clientEtag = request.getHeaderString(HEADER_IF_NONE_MATCH);
       var etag = generateETagHeaderValue(bytes);
@@ -63,7 +62,7 @@ public class EtagRequestFilter implements ContainerResponseFilter {
     // Murmur is the fastest hash algorithm and has an acceptable number of collisions.
     // (It doesn't need to be cryptographically secure.)
     var hash = Hashing.murmur3_32_fixed().hashBytes(input).asBytes();
-    var hex = Hex.encodeHex(hash);
+    var hex = HexString.of(hash);
     builder.append(hex);
     builder.append('"');
     return builder.toString();

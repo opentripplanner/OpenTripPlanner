@@ -1,5 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.path;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.EGRESS;
+
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
@@ -72,6 +75,11 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   }
 
   @Override
+  public PathLegType arrivedBy() {
+    return EGRESS;
+  }
+
+  @Override
   public boolean arrivedAtDestination() {
     return true;
   }
@@ -79,6 +87,11 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   @Override
   public EgressPathView egressPath() {
     return () -> egress;
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return false;
   }
 
   @Override

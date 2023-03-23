@@ -70,10 +70,19 @@ public class TransitRouter {
       additionalSearchDays,
       debugTimingAggregator
     );
-    return transitRouter.route();
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        serverContext.graph(),
+        request,
+        request.journey().access().mode(),
+        request.journey().egress().mode()
+      )
+    ) {
+      return transitRouter.route(temporaryVertices);
+    }
   }
 
-  private TransitRouterResult route() {
+  private TransitRouterResult route(TemporaryVerticesContainer temporaryVertices) {
     if (!request.journey().transit().enabled()) {
       return new TransitRouterResult(List.of(), null);
     }
@@ -92,7 +101,7 @@ public class TransitRouter {
 
     debugTimingAggregator.finishedPatternFiltering();
 
-    var accessEgresses = getAccessEgresses();
+    var accessEgresses = getAccessEgresses(temporaryVertices);
 
     debugTimingAggregator.finishedAccessEgress(
       accessEgresses.getAccesses().size(),
@@ -150,46 +159,37 @@ public class TransitRouter {
     return new TransitRouterResult(itineraries, transitResponse.requestUsed().searchParams());
   }
 
-  private AccessEgresses getAccessEgresses() {
+  private AccessEgresses getAccessEgresses(TemporaryVerticesContainer temporaryVertices) {
     var accessEgressMapper = new AccessEgressMapper();
     var accessList = new ArrayList<DefaultAccessEgress>();
     var egressList = new ArrayList<DefaultAccessEgress>();
 
-    try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        serverContext.graph(),
-        request,
-        request.journey().access().mode(),
-        request.journey().egress().mode()
-      )
-    ) {
-      var accessCalculator = (Runnable) () -> {
-        debugTimingAggregator.startedAccessCalculating();
-        accessList.addAll(getAccessEgresses(accessEgressMapper, temporaryVertices, false));
-        debugTimingAggregator.finishedAccessCalculating();
-      };
+    var accessCalculator = (Runnable) () -> {
+      debugTimingAggregator.startedAccessCalculating();
+      accessList.addAll(getAccessEgresses(accessEgressMapper, temporaryVertices, false));
+      debugTimingAggregator.finishedAccessCalculating();
+    };
 
-      var egressCalculator = (Runnable) () -> {
-        debugTimingAggregator.startedEgressCalculating();
-        egressList.addAll(getAccessEgresses(accessEgressMapper, temporaryVertices, true));
-        debugTimingAggregator.finishedEgressCalculating();
-      };
+    var egressCalculator = (Runnable) () -> {
+      debugTimingAggregator.startedEgressCalculating();
+      egressList.addAll(getAccessEgresses(accessEgressMapper, temporaryVertices, true));
+      debugTimingAggregator.finishedEgressCalculating();
+    };
 
-      if (OTPFeature.ParallelRouting.isOn()) {
-        try {
-          CompletableFuture
-            .allOf(
-              CompletableFuture.runAsync(accessCalculator),
-              CompletableFuture.runAsync(egressCalculator)
-            )
-            .join();
-        } catch (CompletionException e) {
-          RoutingValidationException.unwrapAndRethrowCompletionException(e);
-        }
-      } else {
-        accessCalculator.run();
-        egressCalculator.run();
+    if (OTPFeature.ParallelRouting.isOn()) {
+      try {
+        CompletableFuture
+          .allOf(
+            CompletableFuture.runAsync(accessCalculator),
+            CompletableFuture.runAsync(egressCalculator)
+          )
+          .join();
+      } catch (CompletionException e) {
+        RoutingValidationException.unwrapAndRethrowCompletionException(e);
       }
+    } else {
+      accessCalculator.run();
+      egressCalculator.run();
     }
 
     verifyAccessEgress(accessList, egressList);
@@ -249,7 +249,7 @@ public class TransitRouter {
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
-      new RouteRequestTransitDataProviderFilter(request, serverContext.transitService()),
+      new RouteRequestTransitDataProviderFilter(request),
       request
     );
   }

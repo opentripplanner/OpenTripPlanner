@@ -7,7 +7,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import java.util.List;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 
 public class BikeRentalStationType {
 

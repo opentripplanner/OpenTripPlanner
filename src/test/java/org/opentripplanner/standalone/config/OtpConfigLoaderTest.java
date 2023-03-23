@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,6 @@ import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 
 public class OtpConfigLoaderTest {
 
-  private static final String UTF_8 = "UTF-8";
   private File tempDir;
 
   @BeforeEach
@@ -41,7 +40,7 @@ public class OtpConfigLoaderTest {
     String json = "{areaVisibility:true}";
 
     File file = new File(tempDir, BUILD_CONFIG_FILENAME);
-    FileUtils.write(file, json, UTF_8);
+    Files.writeString(file.toPath(), json, UTF_8);
 
     // when:
     BuildConfig parameters = new OtpConfigLoader(tempDir).loadBuildConfig();
@@ -54,7 +53,7 @@ public class OtpConfigLoaderTest {
   public void loadRouterConfig() throws IOException {
     // Given:
     File file = new File(tempDir, ROUTER_CONFIG_FILENAME);
-    FileUtils.write(file, "{requestLogFile : \"aFile.txt\"}", UTF_8);
+    Files.writeString(file.toPath(), "{requestLogFile : \"aFile.txt\"}", UTF_8);
 
     // when:
     RouterConfig params = new OtpConfigLoader(tempDir).loadRouterConfig();

@@ -24,10 +24,8 @@ import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarServi
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -96,9 +94,6 @@ public class Graph implements Serializable {
   // TODO refactoring transit model: remove  and instead always serialize directly from and to the
   //  static variable in CompactElevationProfile in SerializedGraphObject
   private double distanceBetweenElevationSamples;
-
-  private transient RealtimeVehiclePositionService vehiclePositionService;
-  private final VehicleRentalService vehicleRentalStationService = new VehicleRentalService();
 
   private final VehicleParkingService vehicleParkingService = new VehicleParkingService();
   private FareService fareService;
@@ -347,18 +342,6 @@ public class Graph implements Serializable {
   public void setDistanceBetweenElevationSamples(double distanceBetweenElevationSamples) {
     this.distanceBetweenElevationSamples = distanceBetweenElevationSamples;
     CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
-  }
-
-  public RealtimeVehiclePositionService getVehiclePositionService() {
-    if (vehiclePositionService == null) {
-      vehiclePositionService = new RealtimeVehiclePositionService();
-    }
-    return vehiclePositionService;
-  }
-
-  @Nonnull
-  public VehicleRentalService getVehicleRentalService() {
-    return vehicleRentalStationService;
   }
 
   @Nonnull

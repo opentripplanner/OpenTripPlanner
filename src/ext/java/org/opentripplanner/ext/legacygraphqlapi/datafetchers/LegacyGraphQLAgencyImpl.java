@@ -24,7 +24,7 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
     return environment -> {
       TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
       var args = new LegacyGraphQLTypes.LegacyGraphQLAgencyAlertsArgs(environment.getArguments());
-      Iterable<LegacyGraphQLTypes.LegacyGraphQLAgencyAlertType> types = args.getLegacyGraphQLTypes();
+      List<LegacyGraphQLTypes.LegacyGraphQLAgencyAlertType> types = args.getLegacyGraphQLTypes();
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
@@ -114,7 +114,7 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
+    return environment.<LegacyGraphQLRequestContext>getContext().transitService();
   }
 
   private Agency getSource(DataFetchingEnvironment environment) {

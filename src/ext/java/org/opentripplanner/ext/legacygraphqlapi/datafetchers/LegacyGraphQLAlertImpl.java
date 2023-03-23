@@ -15,7 +15,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertEffectType;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
@@ -52,7 +56,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   @Override
-  public DataFetcher<String> alertCause() {
+  public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLAlertCauseType> alertCause() {
     return environment -> getLegacyGraphQLCause(getSource(environment).cause());
   }
 
@@ -71,7 +75,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   @Override
-  public DataFetcher<String> alertEffect() {
+  public DataFetcher<LegacyGraphQLAlertEffectType> alertEffect() {
     return environment -> getLegacyGraphQLEffect(getSource(environment).effect());
   }
 
@@ -92,7 +96,8 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> alertHeaderText() {
-    return environment -> getSource(environment).headerText().toString(environment.getLocale());
+    return environment ->
+      LegacyGraphQLUtils.getTranslation(getSource(environment).headerText(), environment);
   }
 
   @Override
@@ -104,7 +109,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   @Override
-  public DataFetcher<String> alertSeverityLevel() {
+  public DataFetcher<LegacyGraphQLAlertSeverityLevelType> alertSeverityLevel() {
     return environment -> getLegacyGraphQLSeverity(getSource(environment).severity());
   }
 
@@ -384,7 +389,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
+    return environment.<LegacyGraphQLRequestContext>getContext().transitService();
   }
 
   private TransitAlert getSource(DataFetchingEnvironment environment) {

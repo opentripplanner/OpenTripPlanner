@@ -1,18 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.path.configure;
 
-import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandard;
-import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandardAndLatestDepature;
-import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCost;
-import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCostAndLatestDeparture;
-import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCost;
-import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCostAndLatestDeparture;
-import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetable;
-import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndCost;
-import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndRelaxedCost;
+import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
 
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
-import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
@@ -24,7 +15,6 @@ import org.opentripplanner.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
  * This class is responsible for creating a a result collector - the set of paths.
@@ -43,94 +33,70 @@ public class PathConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Create a new {@link DestinationArrivalPaths} each time it is invoked. The given {@code
-   * includeCost} decide if the cost should be included in the pareto set criteria or not.
+   * Create a new {@link DestinationArrivalPaths}. The generalized cost is included in the pareto
+   * set criteria and will be generated for each leg and a total for the path.
    */
-  public DestinationArrivalPaths<T> createDestArrivalPaths(boolean includeCost) {
+  public DestinationArrivalPaths<T> createDestArrivalPathsWithGeneralizedCost() {
+    return createDestArrivalPaths(true);
+  }
+
+  /**
+   * Create a new {@link DestinationArrivalPaths} without generalized-cost.
+   */
+  public DestinationArrivalPaths<T> createDestArrivalPathsWithoutGeneralizedCost() {
+    return createDestArrivalPaths(false);
+  }
+
+  /* private members */
+
+  private DestinationArrivalPaths<T> createDestArrivalPaths(boolean includeCost) {
     return new DestinationArrivalPaths<>(
-      paretoComparator(includeCost),
+      paretoComparator(ctx.searchParams(), includeCost, ctx.searchDirection()),
       ctx.calculator(),
-      ctx.costCalculator(),
+      includeCost ? ctx.costCalculator() : null,
       ctx.slackProvider(),
-      createPathMapper(),
+      createPathMapper(includeCost),
       ctx.debugFactory(),
       ctx.stopNameResolver(),
       ctx.lifeCycle()
     );
   }
 
-  private ParetoComparator<RaptorPath<T>> paretoComparator(boolean includeCost) {
-    boolean includeRelaxedCost =
-      includeCost && ctx.searchParams().relaxCostAtDestination().isPresent();
-    boolean includeTimetable = ctx.searchParams().timetable();
-    boolean preferLateArrival = ctx.searchParams().preferLateArrival();
-
-    if (includeRelaxedCost) {
-      double relaxedCost = ctx.searchParams().relaxCostAtDestination().get();
-
-      if (includeTimetable) {
-        return comparatorWithTimetableAndRelaxedCost(relaxedCost);
-      }
-      if (preferLateArrival) {
-        return comparatorWithRelaxedCostAndLatestDeparture(relaxedCost);
-      }
-      return comparatorWithRelaxedCost(relaxedCost);
-    }
-
-    if (includeCost) {
-      if (includeTimetable) {
-        return comparatorWithTimetableAndCost();
-      }
-      if (preferLateArrival) {
-        return comparatorWithCostAndLatestDeparture();
-      }
-      return comparatorWithCost();
-    }
-
-    if (includeTimetable) {
-      return comparatorWithTimetable();
-    }
-    if (preferLateArrival) {
-      return comparatorStandardAndLatestDepature();
-    }
-    return comparatorStandard();
-  }
-
-  private PathMapper<T> createPathMapper() {
+  private PathMapper<T> createPathMapper(boolean includeCost) {
     return createPathMapper(
-      ctx.transit().transferConstraintsSearch(),
-      ctx.costCalculator(),
-      ctx.stopNameResolver(),
-      ctx.lifeCycle(),
-      ctx.searchDirection(),
       ctx.profile(),
-      ctx.raptorSlackProvider()
+      ctx.searchDirection(),
+      ctx.raptorSlackProvider(),
+      includeCost ? ctx.costCalculator() : null,
+      ctx.stopNameResolver(),
+      ctx.transit().transferConstraintsSearch(),
+      ctx.lifeCycle()
     );
   }
 
   private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
-    RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
+    RaptorProfile profile,
+    SearchDirection searchDirection,
+    RaptorSlackProvider slackProvider,
     CostCalculator<S> costCalculator,
     RaptorStopNameResolver stopNameResolver,
-    WorkerLifeCycle lifeCycle,
-    SearchDirection searchDirection,
-    RaptorProfile profile,
-    RaptorSlackProvider slackProvider
+    RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
+    WorkerLifeCycle lifeCycle
   ) {
     return searchDirection.isForward()
-      ? new ForwardPathMapper<S>(
-        txConstraintsSearch,
+      ? new ForwardPathMapper<>(
         slackProvider,
         costCalculator,
         stopNameResolver,
+        txConstraintsSearch,
         lifeCycle,
         profile.useApproximateTripSearch()
       )
-      : new ReversePathMapper<S>(
-        txConstraintsSearch,
+      : new ReversePathMapper<>(
         slackProvider,
         costCalculator,
         stopNameResolver,
+        txConstraintsSearch,
         lifeCycle,
         profile.useApproximateTripSearch()
       );

@@ -22,7 +22,6 @@ import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -166,9 +165,7 @@ public class ScheduledDeviatedTrip
     for (int i = fromStopIndex; stopTime == MISSING_VALUE && i >= 0; i--) {
       stopTime = stopTimes[i].departureTime;
     }
-    return stopTime != MISSING_VALUE && stopTime >= departureTime
-      ? stopTime
-      : SearchParams.TIME_NOT_SET;
+    return stopTime >= departureTime ? stopTime : MISSING_VALUE;
   }
 
   @Override
@@ -182,9 +179,7 @@ public class ScheduledDeviatedTrip
     for (int i = toStopIndex; stopTime == MISSING_VALUE && i < stopTimes.length; i++) {
       stopTime = stopTimes[i].arrivalTime;
     }
-    return stopTime != MISSING_VALUE && stopTime <= arrivalTime
-      ? stopTime
-      : SearchParams.TIME_NOT_SET;
+    return stopTime <= arrivalTime ? stopTime : MISSING_VALUE;
   }
 
   @Override
@@ -310,17 +305,17 @@ public class ScheduledDeviatedTrip
       this.stop = st.getStop();
 
       // Store the time the user is guaranteed to arrive at latest
-      this.arrivalTime =
-        st.getFlexWindowEnd() != MISSING_VALUE ? st.getFlexWindowEnd() : st.getArrivalTime();
+      this.arrivalTime = st.getLatestPossibleArrivalTime();
       // Store the time the user needs to be ready for pickup
-      this.departureTime =
-        st.getFlexWindowStart() != MISSING_VALUE ? st.getFlexWindowStart() : st.getDepartureTime();
+      this.departureTime = st.getEarliestPossibleDepartureTime();
 
       // TODO: Store the window for a stop, and allow the user to have an "unguaranteed"
       // pickup/dropoff between the start and end of the window
 
-      this.pickupType = st.getPickupType();
-      this.dropOffType = st.getDropOffType();
+      // Do not allow for pickup/dropoff if times are not available. We do not support interpolation
+      // for flex trips currently
+      this.pickupType = departureTime == MISSING_VALUE ? PickDrop.NONE : st.getPickupType();
+      this.dropOffType = arrivalTime == MISSING_VALUE ? PickDrop.NONE : st.getDropOffType();
     }
   }
 }

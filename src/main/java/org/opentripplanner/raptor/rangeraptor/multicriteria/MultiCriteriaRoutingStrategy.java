@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 import static org.opentripplanner.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
@@ -54,14 +54,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime) {
-    int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
-
-    // This access is not available after the iteration departure time
-    if (departureTime == SearchParams.TIME_NOT_SET) {
-      return;
-    }
-
+  public void setAccessToStop(RaptorAccessEgress accessPath, int departureTime) {
     state.setAccessToStop(accessPath, departureTime);
   }
 
@@ -105,7 +98,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     final T trip = boarding.trip();
     final int boardTime = boarding.time();
 
-    if (prevArrival.arrivedByAccess()) {
+    if (prevArrival.arrivedBy(ACCESS)) {
       int latestArrivalTime = boardTime - slackProvider.boardSlack(trip.pattern().slackIndex());
       prevArrival = prevArrival.timeShiftNewArrivalTime(latestArrivalTime);
     }

@@ -3,28 +3,29 @@
   "extends": [
     "config:base"
   ],
-  "enabledManagers": [
-    "maven",
-    "pip_requirements"
-  ],
   "prConcurrentLimit": 3,
   "labels": [
     "skip changelog"
   ],
   "rebaseWhen": "conflicted",
+  "enabledManagers": [
+    "npm",
+    "maven",
+    "pip_requirements"
+  ],
   "packageRules": [
     {
       "matchPackageNames": [
         "jakarta.xml.bind:jakarta.xml.bind-api",
-        // need to ask Skanetrafiken if these can be auto-updated
-        "com.microsoft.azure:azure-servicebus",
-        "com.azure.resourcemanager:azure-resourcemanager-servicebus",
-        "com.azure:azure-core",
-        "com.azure:azure-messaging-servicebus",
         // need code changes, don't want to upgrade
         "io.github.origin-energy:java-snapshot-testing-junit5",
         "commons-cli:commons-cli",
-        "org.processing:core"
+        "org.processing:core",
+        // Skanetrafiken doesn't want automatic updates for these Azure libraries
+        "com.microsoft.azure:azure-servicebus",
+        "com.azure.resourcemanager:azure-resourcemanager-servicebus",
+        "com.azure:azure-core",
+        "com.azure:azure-messaging-servicebus"
       ],
       "enabled": false
     },
@@ -38,7 +39,13 @@
     },
     {
       "matchPackageNames": [
-        "org.onebusaway:onebusaway-gtfs"
+        "org.onebusaway:onebusaway-gtfs",
+        "com.google.cloud:libraries-bom",
+        "@graphql-codegen/add",
+        "@graphql-codegen/cli",
+        "@graphql-codegen/java",
+        "@graphql-codegen/java-resolvers",
+        "graphql"
       ],
       "extends": [
         "schedule:monthly"
@@ -55,15 +62,18 @@
       ]
     },
     {
-      "description": "automatically merge test dependencies",
+      "description": "automatically merge test and logging dependencies",
       "matchPackageNames": [
         "org.mockito:mockito-core",
         "org.junit.jupiter:",
-        "com.tngtech.archunit:archunit"
+        "com.tngtech.archunit:archunit",
+        "org.apache.maven.plugins:maven-surefire-plugin",
+        "org.apache.commons:commons-compress", // only used by tests
+        "org.slf4j:",
+        "ch.qos.logback:logback-classic"
       ],
       "automerge": true,
-      "automergeSchedule": "after 11pm and before 5am every weekday",
-      "schedule": "after 10pm and before 5am every weekday"
+      "schedule": "after 11pm and before 5am every weekday"
     }
   ],
   "timezone": "Europe/Berlin"

@@ -1,0 +1,54 @@
+{
+  "data" : {
+    "stops" : [
+      {
+        "gtfsId" : "F:A",
+        "lat" : 5.0,
+        "lon" : 8.0,
+        "name" : "A"
+      },
+      {
+        "gtfsId" : "F:B",
+        "lat" : 6.0,
+        "lon" : 8.5,
+        "name" : "B"
+      },
+      {
+        "gtfsId" : "F:C",
+        "lat" : 7.0,
+        "lon" : 9.0,
+        "name" : "C"
+      },
+      {
+        "gtfsId" : "F:D",
+        "lat" : 8.0,
+        "lon" : 9.5,
+        "name" : "D"
+      },
+      {
+        "gtfsId" : "F:E",
+        "lat" : 9.0,
+        "lon" : 10.0,
+        "name" : "E"
+      },
+      {
+        "gtfsId" : "F:F",
+        "lat" : 9.0,
+        "lon" : 10.5,
+        "name" : "F"
+      },
+      {
+        "gtfsId" : "F:G",
+        "lat" : 9.5,
+        "lon" : 11.0,
+        "name" : "G"
+      },
+      {
+        "gtfsId" : "F:H",
+        "lat" : 10.0,
+        "lon" : 11.5,
+        "name" : "H"
+      }
+    ]
+  }
+}

@@ -11,8 +11,8 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.VertexType;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 
@@ -60,7 +60,15 @@ public class PlanPlaceType {
           .name("latitude")
           .description("The latitude of the place.")
           .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-          .dataFetcher(environment -> ((Place) environment.getSource()).coordinate.latitude())
+          .dataFetcher(environment -> {
+            var coordinate = ((Place) environment.getSource()).coordinate;
+            if (coordinate == null) {
+              // TODO: Technically this is wrong, we should not return the place the user sends to
+              //  us, as that is the only place the value can be null
+              return 0;
+            }
+            return coordinate.latitude();
+          })
           .build()
       )
       .field(
@@ -69,7 +77,15 @@ public class PlanPlaceType {
           .name("longitude")
           .description("The longitude of the place.")
           .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-          .dataFetcher(environment -> ((Place) environment.getSource()).coordinate.longitude())
+          .dataFetcher(environment -> {
+            var coordinate = ((Place) environment.getSource()).coordinate;
+            if (coordinate == null) {
+              // TODO: Technically this is wrong, we should not return the place the user sends to
+              //  us, as that is the only place the value can be null
+              return 0;
+            }
+            return coordinate.longitude();
+          })
           .build()
       )
       .field(

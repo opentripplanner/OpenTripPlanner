@@ -3,9 +3,9 @@ package org.opentripplanner.ext.smoovebikerental;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GenericJsonDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
@@ -70,7 +70,7 @@ public class SmooveBikeRentalDataSource
       log.warn("Error parsing bike rental station {}", station.id, e);
       return null;
     }
-    if (!node.path("operative").asText().equals("true")) {
+    if (!node.path("style").asText().equals("Station on")) {
       station.isRenting = false;
       station.isReturning = false;
       station.vehiclesAvailable = 0;

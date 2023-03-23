@@ -4,21 +4,24 @@ package org.opentripplanner.raptor.api.debug;
  * The use of the API should provide a debug logger which map to what ever logging api the caller
  * use.
  */
-@FunctionalInterface
 public interface DebugLogger {
   static DebugLogger noop() {
-    return (topic, message) -> {};
+    return new DebugLogger() {
+      @Override
+      public boolean isEnabled() {
+        return false;
+      }
+
+      @Override
+      public void debug(DebugTopic topic, String message) {}
+    };
   }
 
   /**
    * Check if debugging is enabled before doing heavy work like calculating statistics before
    * logging it.
-   * <p/>
-   * PLEASE IMPLEMENT THIS AND RETURN TRUE TO ENABLE DEBUGGING.
    */
-  default boolean isEnabled() {
-    return false;
-  }
+  boolean isEnabled();
 
   /**
    * Prepare the debug logger for searching direction FORWARD or REVERSE. This method is optional to

@@ -19,7 +19,10 @@ public enum TraverseMode {
     return this == CAR;
   }
 
-  public boolean isCycling() {
+  /**
+   * For the purposes of this check, we pretend that scootering is like cycling.
+   */
+  public boolean isCyclingIsh() {
     return this == BICYCLE || this == SCOOTER;
   }
 

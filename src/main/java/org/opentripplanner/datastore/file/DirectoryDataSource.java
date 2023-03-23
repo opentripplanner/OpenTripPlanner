@@ -2,9 +2,11 @@ package org.opentripplanner.datastore.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import org.apache.commons.io.FileUtils;
+import java.util.Comparator;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
@@ -49,12 +51,16 @@ public class DirectoryDataSource extends AbstractFileDataSource implements Compo
 
   @Override
   public void delete() {
-    try {
-      if (file.exists()) {
-        FileUtils.deleteDirectory(file);
+    if (file.exists()) {
+      try (var files = Files.walk(file.toPath())) {
+        // Need to reverse stream to delete nested files before parent directory
+        files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+      } catch (IOException e) {
+        throw new RuntimeException(
+          "Failed to delete " + path() + ": " + e.getLocalizedMessage(),
+          e
+        );
       }
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to delete " + path() + ": " + e.getLocalizedMessage(), e);
     }
   }
 

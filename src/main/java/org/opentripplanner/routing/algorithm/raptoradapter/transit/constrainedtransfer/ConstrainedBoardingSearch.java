@@ -29,24 +29,7 @@ public final class ConstrainedBoardingSearch
 
   private static final ConstrainedBoardingSearchStrategy FORWARD_STRATEGY = new ConstrainedBoardingSearchForward();
   private static final ConstrainedBoardingSearchStrategy REVERSE_STRATEGY = new ConstrainedBoardingSearchReverse();
-  public static final RaptorConstrainedBoardingSearch<TripSchedule> NOOP_SEARCH = new RaptorConstrainedBoardingSearch<>() {
-    @Override
-    public boolean transferExist(int targetStopPos) {
-      return false;
-    }
-
-    @Override
-    public RaptorBoardOrAlightEvent<TripSchedule> find(
-      RaptorTimeTable<TripSchedule> targetTimetable,
-      int transferSlack,
-      TripSchedule sourceTrip,
-      int sourceStopIndex,
-      int prevTransitArrivalTime,
-      int earliestBoardTime
-    ) {
-      return RaptorBoardOrAlightEvent.empty(earliestBoardTime);
-    }
-  };
+  public static final RaptorConstrainedBoardingSearch<TripSchedule> NOOP_SEARCH = new NoopRaptorConstrainedBoardingSearch();
 
   /** Handle forward and reverse specific tasks */
   private final ConstrainedBoardingSearchStrategy searchStrategy;
@@ -215,5 +198,26 @@ public final class ConstrainedBoardingSearch
       }
     }
     return false;
+  }
+
+  private static final class NoopRaptorConstrainedBoardingSearch
+    implements RaptorConstrainedBoardingSearch<TripSchedule> {
+
+    @Override
+    public boolean transferExist(int targetStopPos) {
+      return false;
+    }
+
+    @Override
+    public RaptorBoardOrAlightEvent<TripSchedule> find(
+      RaptorTimeTable<TripSchedule> targetTimetable,
+      int transferSlack,
+      TripSchedule sourceTrip,
+      int sourceStopIndex,
+      int prevTransitArrivalTime,
+      int earliestBoardTime
+    ) {
+      return null;
+    }
   }
 }

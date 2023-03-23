@@ -38,6 +38,8 @@ public final class AccessibilityPreferences {
     this.inaccessibleCost = Units.cost(inaccessibleCost);
   }
 
+  private static AccessibilityPreferences DEFAULT_UNSET = ofCost(NOT_SET, NOT_SET);
+
   /**
    * Create a feature which only considers wheelchair-accessible trips/stops.
    */
@@ -92,14 +94,18 @@ public final class AccessibilityPreferences {
 
   @Override
   public String toString() {
+    return toString(DEFAULT_UNSET);
+  }
+
+  public String toString(AccessibilityPreferences defaultCosts) {
     if (onlyConsiderAccessible) {
       return "OnlyConsiderAccessible";
     }
 
     return ToStringBuilder
       .of(AccessibilityPreferences.class)
-      .addCost("unknownCost", unknownCost, NOT_SET)
-      .addCost("inaccessibleCost", inaccessibleCost, NOT_SET)
+      .addCost("unknownCost", unknownCost, defaultCosts.unknownCost)
+      .addCost("inaccessibleCost", inaccessibleCost, defaultCosts.inaccessibleCost)
       .toString();
   }
 }

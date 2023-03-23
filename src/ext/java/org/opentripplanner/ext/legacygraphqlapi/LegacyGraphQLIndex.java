@@ -81,7 +81,6 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLservic
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstepImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstopAtDistanceImpl;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,12 +171,12 @@ class LegacyGraphQLIndex {
 
   static ExecutionResult getGraphQLExecutionResult(
     String query,
-    OtpServerRequestContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,
     int timeoutMs,
-    Locale locale
+    Locale locale,
+    LegacyGraphQLRequestContext requestContext
   ) {
     Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
 
@@ -195,19 +194,11 @@ class LegacyGraphQLIndex {
       variables = new HashMap<>();
     }
 
-    LegacyGraphQLRequestContext requestContext = new LegacyGraphQLRequestContext(
-      serverContext,
-      serverContext.routingService(),
-      serverContext.transitService(),
-      serverContext.graph().getFareService()
-    );
-
     ExecutionInput executionInput = ExecutionInput
       .newExecutionInput()
       .query(query)
       .operationName(operationName)
       .context(requestContext)
-      .root(serverContext)
       .variables(variables)
       .locale(locale)
       .build();
@@ -220,21 +211,21 @@ class LegacyGraphQLIndex {
 
   static Response getGraphQLResponse(
     String query,
-    OtpServerRequestContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,
     int timeoutMs,
-    Locale locale
+    Locale locale,
+    LegacyGraphQLRequestContext requestContext
   ) {
     ExecutionResult executionResult = getGraphQLExecutionResult(
       query,
-      serverContext,
       variables,
       operationName,
       maxResolves,
       timeoutMs,
-      locale
+      locale,
+      requestContext
     );
 
     return Response

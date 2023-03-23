@@ -153,8 +153,8 @@ translation library. After you rebuild OTP, all new strings should be visible in
 ## For Translators: Creating New Translations
 
 The following can get a bit technical. If you want to do a translation but don't want to / know how
-to install all this software, post to the `opentripplanner-dev` mailing list stating what language
-you want to translate, and someone will make you a corresponding `.po` file.
+to install all this software, post to the [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner) 
+stating what language you want to translate, and someone will make you a corresponding `.po` file.
 
 ### Creating a New Translation File
 

@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator.testDummyCalculator;
+import static org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator.testDummyCalculator;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
@@ -29,7 +29,7 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
   private RaptorTripScheduleSearch<TestTripSchedule> subject;
 
   public void setup(boolean forward) {
-    TransitCalculator<TestTripSchedule> calculator = testDummyCalculator(forward);
+    RaptorTransitCalculator<TestTripSchedule> calculator = testDummyCalculator(forward);
     subject = calculator.createExactTripSearch(TIME_TABLE);
   }
 
@@ -76,7 +76,6 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
   }
 
   @Test
-  @SuppressWarnings("ConstantConditions")
   public void getCandidateTrip() {
     setup(FORWARD);
     var r = subject.search(TRIP_TIME, STOP_POS_0);
@@ -84,7 +83,6 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
   }
 
   @Test
-  @SuppressWarnings("ConstantConditions")
   public void getCandidateTripIndex() {
     setup(FORWARD);
     var r = subject.search(TRIP_TIME, STOP_POS_0);
@@ -92,7 +90,6 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
   }
 
   @Test
-  @SuppressWarnings("ConstantConditions")
   public void getCandidateTripTime() {
     setup(FORWARD);
     var r = subject.search(TRIP_TIME, STOP_POS_0);

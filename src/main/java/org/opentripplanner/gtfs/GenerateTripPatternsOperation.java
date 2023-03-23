@@ -159,7 +159,8 @@ public class GenerateTripPatternsOperation {
       if (
         tripPattern.getRoute().equals(route) &&
         tripPattern.getDirection().equals(direction) &&
-        tripPattern.getMode().equals(trip.getMode())
+        tripPattern.getMode().equals(trip.getMode()) &&
+        tripPattern.getNetexSubmode().equals(trip.getNetexSubMode())
       ) {
         return tripPattern;
       }
@@ -170,6 +171,7 @@ public class GenerateTripPatternsOperation {
       .withRoute(route)
       .withStopPattern(stopPattern)
       .withMode(trip.getMode())
+      .withNetexSubmode(trip.getNetexSubMode())
       .withHopGeometries(geometryProcessor.createHopGeometries(trip))
       .build();
     tripPatterns.put(stopPattern, tripPattern);

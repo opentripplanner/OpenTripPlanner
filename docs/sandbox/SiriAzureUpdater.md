@@ -12,6 +12,7 @@ developer.otp@skanetrafiken.se
 - Added configuration for turning off stop arrival time match feature. 
 - Initial version (April 2022)
 - Minor changes in logging (November 2022)
+- Retry fetch from history endpoint if it failed (February 2023)
 
 ## Documentation
 

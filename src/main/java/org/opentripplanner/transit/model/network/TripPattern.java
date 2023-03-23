@@ -18,6 +18,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -61,6 +62,8 @@ public final class TripPattern
   private final StopPattern stopPattern;
   private final Timetable scheduledTimetable;
   private final TransitMode mode;
+  private final SubMode netexSubMode;
+  private final boolean containsMultipleModes;
   private String name;
   /**
    * Geometries of each inter-stop segment of the tripPattern.
@@ -86,6 +89,8 @@ public final class TripPattern
     this.stopPattern = requireNonNull(builder.getStopPattern());
     this.createdByRealtimeUpdater = builder.isCreatedByRealtimeUpdate();
     this.mode = requireNonNullElseGet(builder.getMode(), route::getMode);
+    this.netexSubMode = requireNonNullElseGet(builder.getNetexSubmode(), route::getNetexSubmode);
+    this.containsMultipleModes = builder.getContainsMultipleModes();
 
     this.scheduledTimetable =
       builder.getScheduledTimetable() != null
@@ -123,6 +128,14 @@ public final class TripPattern
    */
   public TransitMode getMode() {
     return mode;
+  }
+
+  public SubMode getNetexSubmode() {
+    return netexSubMode;
+  }
+
+  public boolean getContainsMultipleModes() {
+    return containsMultipleModes;
   }
 
   public LineString getHopGeometry(int stopPosInPattern) {
@@ -388,12 +401,18 @@ public final class TripPattern
     return originalTripPattern;
   }
 
+  /**
+   * Returns trip headsign from the scheduled timetables or from the original pattern's scheduled
+   * timetables if this pattern is added by realtime and the stop sequence has not changed apart
+   * from pickup/dropoff values.
+   *
+   * @return trip headsign
+   */
   public I18NString getTripHeadsign() {
     var tripTimes = scheduledTimetable.getRepresentativeTripTimes();
-    if (tripTimes == null) {
-      return null;
-    }
-    return tripTimes.getTrip().getHeadsign();
+    return tripTimes == null
+      ? getTripHeadsignFromOriginalPattern()
+      : getTripHeadSignFromTripTimes(tripTimes);
   }
 
   public I18NString getStopHeadsign(int stopIndex) {
@@ -442,6 +461,8 @@ public final class TripPattern
       getId().equals(other.getId()) &&
       Objects.equals(this.route, other.route) &&
       Objects.equals(this.mode, other.mode) &&
+      Objects.equals(this.netexSubMode, other.netexSubMode) &&
+      Objects.equals(this.containsMultipleModes, other.containsMultipleModes) &&
       Objects.equals(this.name, other.name) &&
       Objects.equals(this.stopPattern, other.stopPattern) &&
       Objects.equals(this.scheduledTimetable, other.scheduledTimetable)
@@ -451,5 +472,31 @@ public final class TripPattern
   @Override
   public TripPatternBuilder copy() {
     return new TripPatternBuilder(this);
+  }
+
+  /**
+   * Checks if the stops in this trip pattern are the same as in the original pattern (if this trip
+   * is added through a realtime update. The pickup and dropoff values don't have to be the same.
+   */
+  private boolean containsSameStopsAsOriginalPattern() {
+    return originalTripPattern != null && getStops().equals(originalTripPattern.getStops());
+  }
+
+  /**
+   * Helper method for getting the trip headsign from the {@link TripTimes}.
+   */
+  private I18NString getTripHeadSignFromTripTimes(TripTimes tripTimes) {
+    return tripTimes != null ? tripTimes.getTripHeadsign() : null;
+  }
+
+  /**
+   * Returns trip headsign from the original pattern if one exists.
+   */
+  private I18NString getTripHeadsignFromOriginalPattern() {
+    if (containsSameStopsAsOriginalPattern()) {
+      var tripTimes = originalTripPattern.getScheduledTimetable().getRepresentativeTripTimes();
+      return getTripHeadSignFromTripTimes(tripTimes);
+    }
+    return null;
   }
 }

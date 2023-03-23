@@ -26,11 +26,11 @@ import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
-import org.opentripplanner.raptor.rangeraptor.transit.ForwardTransitCalculator;
-import org.opentripplanner.raptor.rangeraptor.transit.ReverseTransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.ForwardRaptorTransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.ReverseRaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.raptor.rangeraptor.transit.SlackProviderAdapter;
-import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
@@ -53,15 +53,16 @@ public class SearchContext<T extends RaptorTripSchedule> {
    */
   protected final RaptorTransitDataProvider<T> transit;
 
-  private final TransitCalculator<T> calculator;
-  private final CostCalculator<T> costCalculator;
+  private final RaptorTransitCalculator<T> calculator;
   private final RaptorTuningParameters tuningParameters;
   private final RoundTracker roundTracker;
   private final DebugHandlerFactory<T> debugFactory;
   private final EgressPaths egressPaths;
   private final AccessPaths accessPaths;
-
   private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
+
+  /** Lazy initialized */
+  private CostCalculator<T> costCalculator = null;
 
   public SearchContext(
     RaptorRequest<T> request,
@@ -76,10 +77,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     // Note that it is the "new" request that is passed in.
     this.calculator = createCalculator(this.request, tuningParameters);
-    this.costCalculator =
-      request.profile().is(RaptorProfile.MULTI_CRITERIA)
-        ? transit.multiCriteriaCostCalculator()
-        : null;
     this.roundTracker =
       new RoundTracker(
         nRounds(),
@@ -117,7 +114,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return transit;
   }
 
-  public TransitCalculator<T> calculator() {
+  public RaptorTransitCalculator<T> calculator() {
     return calculator;
   }
 
@@ -134,8 +131,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   /**
-   * The board-slack (duration time in seconds) to add to the stop arrival time, before boarding the
-   * given trip pattern. THIS DO NOT INCLUDE THE transfer-slack, and should only be used to
+   * The board-slack (duration time in seconds) to add to the stop arrival time, before boarding
+   * the given trip pattern. THIS DOES NOT INCLUDE THE transfer-slack, and should only be used to
    * time-shift the access-path.
    * <p>
    * Unit: seconds.
@@ -146,6 +143,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
   @Nullable
   public CostCalculator<T> costCalculator() {
+    if (costCalculator == null) {
+      this.costCalculator = transit.multiCriteriaCostCalculator();
+    }
     return costCalculator;
   }
 
@@ -245,14 +245,14 @@ public class SearchContext<T extends RaptorTripSchedule> {
   /**
    * Create a new calculator depending on the desired search direction.
    */
-  private static <T extends RaptorTripSchedule> TransitCalculator<T> createCalculator(
+  private static <T extends RaptorTripSchedule> RaptorTransitCalculator<T> createCalculator(
     RaptorRequest<T> r,
     RaptorTuningParameters t
   ) {
     SearchParams s = r.searchParams();
     return r.searchDirection().isForward()
-      ? new ForwardTransitCalculator<>(s, t)
-      : new ReverseTransitCalculator<>(s, t);
+      ? new ForwardRaptorTransitCalculator<>(s, t)
+      : new ReverseRaptorTransitCalculator<>(s, t);
   }
 
   private static DebugRequest debugRequest(RaptorRequest<?> request) {

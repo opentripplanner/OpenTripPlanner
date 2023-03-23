@@ -3,7 +3,7 @@ package org.opentripplanner.api.mapping;
 import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.api.model.ApiVehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 
 public class VehicleRentalStationMapper {
 

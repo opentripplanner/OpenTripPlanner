@@ -1,23 +1,21 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.response.StopArrivals;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
-import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;
 
@@ -32,14 +30,14 @@ import org.opentripplanner.raptor.spi.IntIterator;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
-  implements WorkerState<T> {
+  implements RaptorWorkerState<T> {
 
   private final McStopArrivals<T> arrivals;
   private final DestinationArrivalPaths<T> paths;
   private final HeuristicsProvider<T> heuristics;
   private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
   private final CostCalculator<T> costCalculator;
-  private final TransitCalculator<T> transitCalculator;
+  private final RaptorTransitCalculator<T> transitCalculator;
 
   /**
    * create a RaptorState for a network with a particular number of stops, and a given maximum
@@ -50,7 +48,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     DestinationArrivalPaths<T> paths,
     HeuristicsProvider<T> heuristics,
     CostCalculator<T> costCalculator,
-    TransitCalculator<T> transitCalculator,
+    RaptorTransitCalculator<T> transitCalculator,
     WorkerLifeCycle lifeCycle
   ) {
     this.arrivals = arrivals;
@@ -113,14 +111,9 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public Collection<RaptorPath<T>> extractPaths() {
+  public RaptorWorkerResult<T> results() {
     arrivals.debugStateInfo();
-    return paths.listPaths();
-  }
-
-  @Override
-  public StopArrivals extractStopArrivals() {
-    return arrivals;
+    return new McRaptorWorkerResult<T>(arrivals, paths);
   }
 
   Iterable<? extends AbstractStopArrival<T>> listStopArrivalsPreviousRound(int stop) {

@@ -28,11 +28,11 @@ public class RaptorModuleTestConfigSetBuilder {
     return remove(RaptorModuleTestConfig::isForward);
   }
 
-  public RaptorModuleTestConfigSetBuilder oneIterationOnly() {
+  public RaptorModuleTestConfigSetBuilder oneIteration() {
     return remove(RaptorModuleTestConfig::withManyIterations);
   }
 
-  public RaptorModuleTestConfigSetBuilder manyIterationOnly() {
+  public RaptorModuleTestConfigSetBuilder manyIterations() {
     return remove(RaptorModuleTestConfig::withOneIteration);
   }
 

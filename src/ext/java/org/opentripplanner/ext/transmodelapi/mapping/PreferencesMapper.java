@@ -1,14 +1,21 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputType;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 class PreferencesMapper {
 
+  @SuppressWarnings("unchecked")
   static void mapPreferences(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
@@ -24,6 +31,20 @@ class PreferencesMapper {
         setStreetReluctance(preferences, streetReluctance);
       }
     );
+
+    if (GqlUtil.hasArgument(environment, "maxAccessEgressDurationForMode")) {
+      preferences.withStreet(street -> {
+        for (var entry : (List<Map<String, ?>>) environment.getArgument(
+          "maxAccessEgressDurationForMode"
+        )) {
+          street.withMaxAccessEgressDuration(
+            (StreetMode) entry.get("streetMode"),
+            (Duration) entry.get("duration")
+          );
+        }
+      });
+    }
+
     preferences.withBike(bike -> {
       callWith.argument("bikeSpeed", bike::withSpeed);
       callWith.argument("bikeSwitchTime", bike::withSwitchTime);

@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -117,6 +118,7 @@ class FlexStopsMapper {
   /**
    * Allows pickup / drop off at any regular Stop inside the area
    */
+  @Nullable
   GroupStop mapStopsInFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
     GroupStopBuilder result = GroupStop
       .of(idFactory.createId(flexibleStopPlace.getId()))
@@ -133,6 +135,21 @@ class FlexStopsMapper {
       if (geometry.contains(p)) {
         result.addLocation(stop);
       }
+    }
+
+    if (result.stopLocations().isEmpty()) {
+      issueStore.add(
+        Issue.issue(
+          "MissingStopsInUnrestrictedPublicTransportAreas",
+          "FlexibleArea %s with type UnrestrictedPublicTransportAreas does not contain any regular stop.",
+          area.getId()
+        )
+      );
+      LOG.warn(
+        "FlexibleArea {} with type UnrestrictedPublicTransportAreas does not contain any regular stop.",
+        area.getId()
+      );
+      return null;
     }
 
     return result.build();

@@ -15,8 +15,8 @@ public class TripUpdateBuilder {
   public static final String ROUTE_NAME = "A route that was added dynamically";
   private static final StopTimeUpdate.ScheduleRelationship DEFAULT_SCHEDULE_RELATIONSHIP =
     StopTimeUpdate.ScheduleRelationship.SCHEDULED;
-  public static final int NO_VALUE = -1;
-  public static final int NO_DELAY = Integer.MIN_VALUE;
+  private static final int NO_VALUE = -1;
+  private static final int NO_DELAY = Integer.MIN_VALUE;
   private final GtfsRealtime.TripDescriptor.Builder tripDescriptorBuilder;
   private final GtfsRealtime.TripUpdate.Builder tripUpdateBuilder;
   private final ZonedDateTime midnight;

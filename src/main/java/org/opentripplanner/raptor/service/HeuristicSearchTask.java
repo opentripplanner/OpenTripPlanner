@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.service;
 
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
-import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -9,14 +8,15 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicSearch;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Thin wrapper around a {@link HeuristicSearch} to allow for some small additional features. This
+ * Thin wrapper around a {@link RaptorWorker} to allow for some small additional features. This
  * is mostly to extracted some "glue" out of the {@link RangeRaptorDynamicSearch} to make that
  * simpler and let it focus on the main bossiness logic.
  * <p>
@@ -33,9 +33,10 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
   private final RaptorTransitDataProvider<T> transitData;
 
   private boolean run = false;
-  private HeuristicSearch<T> search = null;
+  private RaptorWorker<T> search = null;
   private RaptorRequest<T> originalRequest;
-  private RaptorRequest<T> heuristicReq;
+  private RaptorRequest<T> heuristicRequest;
+  private RaptorWorkerResult<T> result = null;
 
   public HeuristicSearchTask(
     RaptorRequest<T> request,
@@ -76,7 +77,10 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
 
   @Nullable
   public Heuristics result() {
-    return search == null ? null : search.heuristics();
+    if (result == null) {
+      return null;
+    }
+    return config.createHeuristic(transitData, heuristicRequest, result);
   }
 
   public HeuristicSearchTask<T> withRequest(RaptorRequest<T> request) {
@@ -108,11 +112,11 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
 
     createHeuristicSearchIfNotExist(originalRequest);
 
-    LOG.debug("Heuristic search: {}", heuristicReq);
-    search.route();
-    LOG.debug("Heuristic result: {}", search.heuristics());
+    LOG.debug("Heuristic search: {}", heuristicRequest);
+    this.result = search.route();
+    LOG.debug("Heuristic result: {}", result);
 
-    if (!search.destinationReached()) {
+    if (!result.isDestinationReached()) {
       throw new DestinationNotReachedException();
     }
     if (LOG.isDebugEnabled()) {
@@ -123,13 +127,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
 
   private void createHeuristicSearchIfNotExist(RaptorRequest<T> request) {
     if (search == null) {
-      var profile = MIN_TRAVEL_DURATION_BEST_TIME;
-
-      if (request.searchParams().constrainedTransfers()) {
-        // We need to look up the previous transit arrival, this is not possible with the
-        // BEST_TIMES only states.
-        profile = MIN_TRAVEL_DURATION;
-      }
+      var profile = MIN_TRAVEL_DURATION;
 
       var builder = request
         .mutate()
@@ -145,14 +143,8 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
         request.performanceTimers().withNamePrefix(builder.generateAlias())
       );
 
-      heuristicReq = builder.build();
-
-      search =
-        config.createHeuristicSearch(
-          transitData,
-          transitData.multiCriteriaCostCalculator(),
-          heuristicReq
-        );
+      heuristicRequest = builder.build();
+      search = config.createHeuristicSearch(transitData, heuristicRequest);
     }
   }
 }

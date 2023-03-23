@@ -6,7 +6,6 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
@@ -95,8 +94,9 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
         Siri updates = getUpdates();
         if (updates != null) {
           ServiceDelivery serviceDelivery = updates.getServiceDelivery();
-          // Use isTrue in case isMoreData returns null. Mark the updater as primed after last page of updates.
-          moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
+          moreData = Boolean.TRUE.equals(serviceDelivery.isMoreData());
+          // Mark this updater as primed after last page of updates. Copy moreData into a final
+          // primitive, because the object moreData persists across iterations.
           final boolean markPrimed = !moreData;
           if (serviceDelivery.getSituationExchangeDeliveries() != null) {
             saveResultOnGraph.execute((graph, transitModel) -> {

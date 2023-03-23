@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.commons.lang3.ArrayUtils;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 import org.locationtech.jts.algorithm.Orientation;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -20,7 +21,7 @@ import org.opentripplanner.openstreetmap.model.OSMNode;
 
 public class Ring {
 
-  private final Coordinate[] geometry;
+  private final LinearRing shell;
   private final List<Ring> holes = new ArrayList<>();
   public List<OSMNode> nodes;
   // equivalent to the ring representation, but used for JTS operations
@@ -33,33 +34,29 @@ public class Ring {
       Coordinate point = new Coordinate(node.lon, node.lat);
       vertices.add(point);
     }
-    geometry = vertices.toArray(new Coordinate[0]);
     // Make sure rings are always clockwise, in order to be able to calculate if it is concave/convex
-    if (Orientation.isCCW(new CoordinateArrayListSequence(new ArrayList<>(List.of(geometry))))) {
+    if (Orientation.isCCW(new CoordinateArrayListSequence(vertices))) {
       nodes = new ArrayList<>(nodes);
       Collections.reverse(nodes);
-      ArrayUtils.reverse(geometry);
+      Collections.reverse(vertices);
+    }
+    GeometryFactory factory = GeometryUtils.getGeometryFactory();
+    try {
+      shell = factory.createLinearRing(vertices.toArray(new Coordinate[0]));
+    } catch (IllegalArgumentException e) {
+      throw new RingConstructionException();
     }
     jtsPolygon = calculateJtsPolygon();
   }
 
   public Ring(TLongList osmNodes, TLongObjectMap<OSMNode> _nodes) {
-    ArrayList<Coordinate> vertices = new ArrayList<>();
-    nodes = new ArrayList<>(osmNodes.size());
-    osmNodes.forEach(nodeId -> {
-      OSMNode node = _nodes.get(nodeId);
-      Coordinate point = new Coordinate(node.lon, node.lat);
-      nodes.add(node);
-      vertices.add(point);
-      return true;
-    });
-    // Make sure rings are always clockwise, in order to be able to calculate if it is concave/convex
-    if (Orientation.isCCW(new CoordinateArrayListSequence(vertices))) {
-      Collections.reverse(nodes);
-      Collections.reverse(vertices);
-    }
-    geometry = vertices.toArray(new Coordinate[0]);
-    jtsPolygon = calculateJtsPolygon();
+    // The collection needs to be mutable, so collect into an ArrayList
+    this(
+      LongStream
+        .of(osmNodes.toArray())
+        .mapToObj(_nodes::get)
+        .collect(Collectors.toCollection(ArrayList::new))
+    );
   }
 
   public List<Ring> getHoles() {
@@ -87,21 +84,13 @@ public class Ring {
   private Polygon calculateJtsPolygon() {
     GeometryFactory factory = GeometryUtils.getGeometryFactory();
 
-    LinearRing shell;
-    try {
-      shell = factory.createLinearRing(geometry);
-    } catch (IllegalArgumentException e) {
-      throw new RingConstructionException();
-    }
-
     // we need to merge connected holes here, because JTS does not believe in
     // holes that touch at multiple points (and, weirdly, does not have a method
     // to detect this other than this crazy DE-9IM stuff
 
     List<Polygon> polygonHoles = new ArrayList<>();
     for (Ring ring : holes) {
-      LinearRing linearRing = factory.createLinearRing(ring.geometry);
-      Polygon polygon = factory.createPolygon(linearRing, new LinearRing[0]);
+      Polygon polygon = factory.createPolygon(ring.shell, new LinearRing[0]);
       for (Iterator<Polygon> it = polygonHoles.iterator(); it.hasNext();) {
         Polygon otherHole = it.next();
         if (otherHole.relate(polygon, "F***1****")) {

@@ -29,9 +29,9 @@ import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.model.UpdateSuccess;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
-import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
+import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
+import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -52,7 +52,7 @@ public class VehiclePositionPatternMatcher {
   private static final Logger LOG = LoggerFactory.getLogger(VehiclePositionPatternMatcher.class);
 
   private final String feedId;
-  private final RealtimeVehiclePositionService service;
+  private final VehiclePositionRepository repository;
   private final ZoneId timeZoneId;
 
   private final Function<FeedScopedId, Trip> getTripForId;
@@ -66,14 +66,14 @@ public class VehiclePositionPatternMatcher {
     Function<FeedScopedId, Trip> getTripForId,
     Function<Trip, TripPattern> getStaticPattern,
     BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
-    RealtimeVehiclePositionService service,
+    VehiclePositionRepository repository,
     ZoneId timeZoneId
   ) {
     this.feedId = feedId;
     this.getTripForId = getTripForId;
     this.getStaticPattern = getStaticPattern;
     this.getRealtimePattern = getRealtimePattern;
-    this.service = service;
+    this.repository = repository;
     this.timeZoneId = timeZoneId;
   }
 
@@ -111,13 +111,13 @@ public class VehiclePositionPatternMatcher {
         )
       );
 
-    positions.forEach(service::setVehiclePositions);
+    positions.forEach(repository::setVehiclePositions);
     Set<TripPattern> patternsInCurrentUpdate = positions.keySet();
 
     // if there was a position in the previous update but not in the current one, we assume
     // that the pattern has no more vehicle positions.
     var toDelete = Sets.difference(patternsInPreviousUpdate, patternsInCurrentUpdate);
-    toDelete.forEach(service::clearVehiclePositions);
+    toDelete.forEach(repository::clearVehiclePositions);
     patternsInPreviousUpdate = patternsInCurrentUpdate;
 
     if (!vehiclePositions.isEmpty() && patternsInCurrentUpdate.isEmpty()) {

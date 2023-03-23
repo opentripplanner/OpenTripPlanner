@@ -9,6 +9,7 @@ import org.opentripplanner.framework.geometry.CompactLineStringUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.SlackProvider;
+import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -19,6 +20,8 @@ public final class TripPatternBuilder
 
   private Route route;
   private TransitMode mode;
+  private SubMode netexSubMode;
+  private boolean containsMultipleModes;
   private StopPattern stopPattern;
   private Timetable scheduledTimetable;
   private String name;
@@ -37,6 +40,8 @@ public final class TripPatternBuilder
     this.name = original.getName();
     this.route = original.getRoute();
     this.mode = original.getMode();
+    this.netexSubMode = original.getNetexSubmode();
+    this.containsMultipleModes = original.getContainsMultipleModes();
     this.stopPattern = original.getStopPattern();
     this.scheduledTimetable = original.getScheduledTimetable();
     this.createdByRealtimeUpdate = original.isCreatedByRealtimeUpdater();
@@ -59,6 +64,16 @@ public final class TripPatternBuilder
 
   public TripPatternBuilder withMode(TransitMode mode) {
     this.mode = mode;
+    return this;
+  }
+
+  public TripPatternBuilder withNetexSubmode(SubMode netexSubmode) {
+    this.netexSubMode = netexSubmode;
+    return this;
+  }
+
+  public TripPatternBuilder withContainsMultipleModes(boolean containsMultipleModes) {
+    this.containsMultipleModes = containsMultipleModes;
     return this;
   }
 
@@ -103,6 +118,14 @@ public final class TripPatternBuilder
 
   public TransitMode getMode() {
     return mode;
+  }
+
+  public SubMode getNetexSubmode() {
+    return netexSubMode;
+  }
+
+  public boolean getContainsMultipleModes() {
+    return containsMultipleModes;
   }
 
   public StopPattern getStopPattern() {

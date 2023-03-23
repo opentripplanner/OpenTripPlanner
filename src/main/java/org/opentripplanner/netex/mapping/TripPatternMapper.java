@@ -14,6 +14,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.EntityById;
@@ -32,7 +33,7 @@ import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -89,7 +90,7 @@ class TripPatternMapper {
     EntityById<GroupStop> groupStopById,
     EntityById<org.opentripplanner.transit.model.network.Route> otpRouteById,
     ReadOnlyHierarchicalMap<String, Route> routeById,
-    ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById,
+    ReadOnlyHierarchicalMap<String, JourneyPattern_VersionStructure> journeyPatternById,
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
     ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
     ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
@@ -151,7 +152,7 @@ class TripPatternMapper {
     }
   }
 
-  TripPatternMapperResult mapTripPattern(JourneyPattern journeyPattern) {
+  TripPatternMapperResult mapTripPattern(JourneyPattern_VersionStructure journeyPattern) {
     // Make sure the result is clean, by creating a new object.
     result = new TripPatternMapperResult();
     Collection<ServiceJourney> serviceJourneys = serviceJourniesByPatternId.get(
@@ -214,11 +215,14 @@ class TripPatternMapper {
     );
 
     var tripPatternModes = new HashSet<TransitMode>();
+    var tripPatternSubmodes = new HashSet<SubMode>();
     for (Trip trip : trips) {
       tripPatternModes.add(trip.getMode());
+      tripPatternSubmodes.add(trip.getNetexSubMode());
     }
 
-    if (tripPatternModes.size() > 1) {
+    boolean hasMultipleModes = tripPatternModes.size() > 1;
+    if (hasMultipleModes) {
       issueStore.add(
         "ServiceJourneyPatternHasMultipleModes",
         "ServiceJourneyPattern %s contains multiple modes: %s",
@@ -227,11 +231,23 @@ class TripPatternMapper {
       );
     }
 
+    boolean hasMultipleSubmodes = tripPatternSubmodes.size() > 1;
+    if (hasMultipleSubmodes) {
+      issueStore.add(
+        "ServiceJourneyPatternHasMultipleSubModes",
+        "ServiceJourneyPattern %s contains multiple sub-modes: %s",
+        journeyPattern.getId(),
+        tripPatternSubmodes.stream().map(SubMode::name).collect(Collectors.joining(", "))
+      );
+    }
+
     TripPatternBuilder tripPatternBuilder = TripPattern
       .of(idFactory.createId(journeyPattern.getId()))
       .withRoute(lookupRoute(journeyPattern))
       .withStopPattern(stopPattern)
       .withMode(trips.get(0).getMode())
+      .withNetexSubmode(trips.get(0).getNetexSubMode())
+      .withContainsMultipleModes(hasMultipleModes || hasMultipleSubmodes)
       .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue())
       .withHopGeometries(
         serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)
@@ -246,7 +262,7 @@ class TripPatternMapper {
   }
 
   private void mapDatedServiceJourney(
-    JourneyPattern journeyPattern,
+    JourneyPattern_VersionStructure journeyPattern,
     ServiceJourney serviceJourney,
     Trip trip
   ) {
@@ -262,7 +278,7 @@ class TripPatternMapper {
   }
 
   private TripOnServiceDate mapDatedServiceJourney(
-    JourneyPattern journeyPattern,
+    JourneyPattern_VersionStructure journeyPattern,
     Trip trip,
     DatedServiceJourney datedServiceJourney
   ) {
@@ -326,7 +342,7 @@ class TripPatternMapper {
   }
 
   private org.opentripplanner.transit.model.network.Route lookupRoute(
-    JourneyPattern journeyPattern
+    JourneyPattern_VersionStructure journeyPattern
   ) {
     Route route = routeById.lookup(journeyPattern.getRouteRef().getRef());
     return otpRouteById.get(idFactory.createId(route.getLineRef().getValue().getRef()));
@@ -347,14 +363,20 @@ class TripPatternMapper {
     }
   }
 
-  private Trip mapTrip(JourneyPattern journeyPattern, ServiceJourney serviceJourney) {
+  private Trip mapTrip(
+    JourneyPattern_VersionStructure journeyPattern,
+    ServiceJourney serviceJourney
+  ) {
     return tripMapper.mapServiceJourney(
       serviceJourney,
       () -> findTripHeadsign(journeyPattern, serviceJourney)
     );
   }
 
-  private String findTripHeadsign(JourneyPattern journeyPattern, ServiceJourney serviceJourney) {
+  private String findTripHeadsign(
+    JourneyPattern_VersionStructure journeyPattern,
+    ServiceJourney serviceJourney
+  ) {
     var times = serviceJourney.getPassingTimes().getTimetabledPassingTime();
     if (times == null || times.isEmpty()) {
       return HEADSIGN_EMPTY;

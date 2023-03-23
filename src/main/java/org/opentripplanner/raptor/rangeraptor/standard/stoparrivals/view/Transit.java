@@ -1,5 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.TransitPathView;
@@ -29,8 +32,8 @@ final class Transit<T extends RaptorTripSchedule>
   }
 
   @Override
-  public boolean arrivedByTransit() {
-    return true;
+  public PathLegType arrivedBy() {
+    return TRANSIT;
   }
 
   @Override
@@ -50,5 +53,10 @@ final class Transit<T extends RaptorTripSchedule>
 
   public int boardTime() {
     return arrival.boardTime();
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return true;
   }
 }

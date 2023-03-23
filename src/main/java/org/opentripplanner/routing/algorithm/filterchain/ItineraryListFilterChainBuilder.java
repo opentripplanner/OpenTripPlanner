@@ -281,11 +281,13 @@ public class ItineraryListFilterChainBuilder {
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
-    filters.addAll(buildGroupBySameRoutesAndStopsFilter());
+    if (removeItinerariesWithSameRoutesAndStops) {
+      filters.addAll(buildGroupBySameRoutesAndStopsFilter());
+    }
 
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
-      filters.add(new SameFirstOrLastTripFilter());
+      filters.add(new DeletionFlaggingFilter(new SameFirstOrLastTripFilter()));
     }
 
     if (minBikeParkingDistance > 0) {
@@ -402,19 +404,15 @@ public class ItineraryListFilterChainBuilder {
    * meanings we chose to use a long, but descriptive name instead.
    */
   private List<ItineraryListFilter> buildGroupBySameRoutesAndStopsFilter() {
-    if (removeItinerariesWithSameRoutesAndStops) {
-      return List.of(
-        new GroupByFilter<>(
-          GroupBySameRoutesAndStops::new,
-          List.of(
-            new SortingFilter(SortOrderComparator.comparator(sortOrder)),
-            new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
-          )
+    return List.of(
+      new GroupByFilter<>(
+        GroupBySameRoutesAndStops::new,
+        List.of(
+          new SortingFilter(SortOrderComparator.comparator(sortOrder)),
+          new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
         )
-      );
-    } else {
-      return List.of();
-    }
+      )
+    );
   }
 
   /**

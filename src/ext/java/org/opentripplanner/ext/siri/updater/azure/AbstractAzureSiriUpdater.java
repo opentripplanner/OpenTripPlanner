@@ -13,7 +13,6 @@ import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Duration;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.UUID;
@@ -258,12 +257,5 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     } else {
       LOG.error(e.getLocalizedMessage(), e);
     }
-  }
-
-  /**
-   * @return the current datetime adjusted to the current timezone
-   */
-  protected long now() {
-    return ZonedDateTime.now().toInstant().toEpochMilli();
   }
 }

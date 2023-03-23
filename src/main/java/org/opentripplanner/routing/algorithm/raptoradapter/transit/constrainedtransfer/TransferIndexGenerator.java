@@ -26,8 +26,12 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TransferIndexGenerator {
+
+  private static final Logger LOG = LoggerFactory.getLogger(TransferIndexGenerator.class);
 
   private static final boolean BOARD = true;
   private static final boolean ALIGHT = false;
@@ -227,17 +231,70 @@ public class TransferIndexGenerator {
 
   private List<TPoint> findTPoints(TripTransferPoint point) {
     var trip = point.getTrip();
-    // All trips have at least one pattern, no need to chech for null here
+
+    // All trips have at least one pattern, no need to check for null here
     var patterns = patternsByTrip.get(trip);
-    int stopPosInPattern = point.getStopPositionInPattern();
-    return patterns
+    var patternsByRealtimeOrScheduled = patterns
       .stream()
-      .map(pattern -> {
-        int stopIndex = pattern.stopIndex(stopPosInPattern);
-        var sourcePoint = createTransferPointForPattern(trip, stopIndex);
-        return new TPoint(pattern, sourcePoint, trip, stopPosInPattern);
-      })
-      .toList();
+      .collect(Collectors.groupingBy(pattern -> pattern.getPattern().isCreatedByRealtimeUpdater()));
+
+    // Process first the pattern for which stopPosInPattern was calculated for
+    List<RoutingTripPattern> scheduledPatterns = patternsByRealtimeOrScheduled.get(Boolean.FALSE);
+    if (scheduledPatterns == null || scheduledPatterns.size() != 1) {
+      LOG.warn(
+        "Trip {} does not have exactly one scheduled trip pattern, found: {}. " +
+        "Skipping transfer generation.",
+        trip,
+        scheduledPatterns
+      );
+      return List.of();
+    }
+
+    int stopPosInPattern = point.getStopPositionInPattern();
+    var scheduledPattern = scheduledPatterns.get(0);
+    int stopIndex = scheduledPattern.stopIndex(stopPosInPattern);
+    var sourcePoint = createTransferPointForPattern(trip, stopIndex);
+    TPoint scheduledPoint = new TPoint(scheduledPattern, sourcePoint, trip, stopPosInPattern);
+
+    // Return early if only scheduled pattern exists
+    var realtimePatterns = patternsByRealtimeOrScheduled.get(Boolean.TRUE);
+    if (realtimePatterns == null || realtimePatterns.isEmpty()) {
+      return List.of(scheduledPoint);
+    }
+
+    // Process the other patterns based on the scheduled pattern
+    StopLocation scheduledStop = scheduledPattern.getPattern().getStop(stopPosInPattern);
+
+    List<TPoint> res = new ArrayList<>();
+    res.add(scheduledPoint);
+    for (RoutingTripPattern pattern : realtimePatterns) {
+      // Check if the same stop or its sibling is at the same position, if yes, generate a transfer point
+      if (stopPosInPattern < pattern.numberOfStopsInPattern()) {
+        StopLocation stop = pattern.getPattern().getStop(stopPosInPattern);
+        if (stop.equals(scheduledStop) || stop.isPartOfSameStationAs(scheduledStop)) {
+          res.add(
+            new TPoint(
+              pattern,
+              createTransferPointForPattern(trip, pattern.stopIndex(stopPosInPattern)),
+              trip,
+              stopPosInPattern
+            )
+          );
+          continue;
+        }
+      }
+      LOG.info(
+        "Updated pattern for trip {}, does not match original for stop {} at pos {}. " +
+        "Skipping transfer generation.",
+        trip,
+        scheduledStop,
+        stopPosInPattern
+      );
+      // TODO - Find the expected stop in the new pattern, as its position in the pattern has been
+      //  shifted due to added or removed (not just cancelled) stops in the realtime pattern.
+    }
+
+    return List.copyOf(res);
   }
 
   private static class TPoint {

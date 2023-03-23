@@ -1,0 +1,8 @@
+{
+    stops {
+        gtfsId
+        lat
+        lon
+        name
+    }
+}

@@ -5,13 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.datastore.api.CompositeDataSource;
@@ -105,7 +106,11 @@ class ZipStreamDataSourceDecoratorTest {
 
     DataSource entry = subject.entry("agency.txt");
 
-    List<String> lines = IOUtils.readLines(entry.asInputStream(), StandardCharsets.UTF_8);
+    List<String> lines = new BufferedReader(
+      new InputStreamReader(entry.asInputStream(), StandardCharsets.UTF_8)
+    )
+      .lines()
+      .toList();
     assertEquals("agency_id,agency_name,agency_url,agency_timezone", lines.get(0));
 
     // Close zip

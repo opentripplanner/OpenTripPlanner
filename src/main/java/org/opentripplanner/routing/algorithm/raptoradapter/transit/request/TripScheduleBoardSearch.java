@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.function.IntUnaryOperator;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
@@ -33,7 +34,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
   private IntUnaryOperator departureTimes;
 
   private T candidateTrip;
-  private int candidateTripIndex = NOT_FOUND;
+  private int candidateTripIndex = RaptorConstants.NOT_FOUND;
 
   /**
    * Use {@link TripScheduleSearchFactory#create(SearchDirection, TripSearchTimetable)} to create a
@@ -80,7 +81,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
 
   @Override
   public boolean empty() {
-    return candidateTripIndex == NOT_FOUND;
+    return candidateTripIndex == RaptorConstants.NOT_FOUND;
   }
 
   /* TripScheduleSearch implementation */
@@ -105,7 +106,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
     this.stopPositionInPattern = stopPositionInPattern;
     this.departureTimes = timetable.getDepartureTimes(stopPositionInPattern);
     this.candidateTrip = null;
-    this.candidateTripIndex = NOT_FOUND;
+    this.candidateTripIndex = RaptorConstants.NOT_FOUND;
 
     // No previous trip is found
     if (tripIndexUpperBound == UNBOUNDED_TRIP_INDEX) {
@@ -176,7 +177,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
         break;
       }
     }
-    if (candidateTripIndex != NOT_FOUND) {
+    if (candidateTripIndex != RaptorConstants.NOT_FOUND) {
       candidateTrip = timetable.getTripSchedule(candidateTripIndex);
     }
     return this;

@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.opentripplanner.model.plan.Itinerary.UNKNOWN;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
@@ -89,6 +91,12 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
 
   @Override
   public int getGeneralizedCost() {
+    if (first.getGeneralizedCost() == UNKNOWN) {
+      return second.getGeneralizedCost();
+    }
+    if (second.getGeneralizedCost() == UNKNOWN) {
+      return first.getGeneralizedCost();
+    }
     return first.getGeneralizedCost() + second.getGeneralizedCost();
   }
 

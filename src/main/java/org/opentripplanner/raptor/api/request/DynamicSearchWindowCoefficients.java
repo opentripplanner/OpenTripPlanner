@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.api.request;
 
+import java.time.Duration;
+
 /**
  * The dynamic search window coefficients is used to calculate EDT(earliest-departure-time),
  * LAT(latest-arrival-time) and SW(raptor-search-window) request parameters using heuristics. The
@@ -21,13 +23,13 @@ package org.opentripplanner.raptor.api.request;
  * <p>
  * The 3 coefficients above are:
  * <ol>
- *     <li>{@code C} - {@link #minWinTimeMinutes()}</li>
+ *     <li>{@code C} - {@link #minWindow()}</li>
  *     <li>{@code T} - {@link #minTransitTimeCoefficient()}</li>
  *     <li>{@code W} - {@link #minWaitTimeCoefficient()}</li>
  *     <li>{@code N} - {@link #stepMinutes()}</li>
  * </ol>
  * In addition the this an upper bound on the calculation of the search window:
- * {@link #maxWinTimeMinutes()}.
+ * {@link #maxWindow()}.
  */
 public interface DynamicSearchWindowCoefficients {
   /**
@@ -52,8 +54,8 @@ public interface DynamicSearchWindowCoefficients {
    * {@code C} - The constant minimum number of minutes for a raptor search window. Use a value
    * between 20-180 minutes in a normal deployment.
    */
-  default int minWinTimeMinutes() {
-    return 40;
+  default Duration minWindow() {
+    return Duration.ofMinutes(40);
   }
 
   /**
@@ -66,8 +68,8 @@ public interface DynamicSearchWindowCoefficients {
    * <p>
    * The default is 3 hours. The unit is minutes.
    */
-  default int maxWinTimeMinutes() {
-    return 3 * 60;
+  default Duration maxWindow() {
+    return Duration.ofHours(3);
   }
 
   /**

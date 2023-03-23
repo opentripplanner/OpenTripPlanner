@@ -6,7 +6,6 @@ import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedC
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 class RequestToPreferencesMapper {
@@ -36,7 +35,6 @@ class RequestToPreferencesMapper {
 
     maptRental();
     mapItineraryFilter();
-    mapParking();
     mapSystem();
   }
 
@@ -164,13 +162,6 @@ class RequestToPreferencesMapper {
         );
     }
     return result;
-  }
-
-  private void mapParking() {
-    setIfNotNull(
-      req.useVehicleParkingAvailabilityInformation,
-      value -> preferences.withParking(VehicleParkingPreferences.of(value))
-    );
   }
 
   private void mapSystem() {

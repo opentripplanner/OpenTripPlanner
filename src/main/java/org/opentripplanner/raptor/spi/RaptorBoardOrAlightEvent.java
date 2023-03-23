@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.spi;
 
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
@@ -20,13 +21,10 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface RaptorBoardOrAlightEvent<T extends RaptorTripSchedule> {
-  /** Used to indicate that no trip is found. */
-  int NOT_FOUND = -1;
-
   /**
    * The trip timetable index for the trip  found.
    * <p>
-   * If not found {@link #NOT_FOUND} is returned.
+   * If not found {@link RaptorConstants#NOT_FOUND} is returned.
    */
   int tripIndex();
 

@@ -11,9 +11,13 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
+import org.opentripplanner.transit.model.network.GroupOfRoutesBuilder;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -55,9 +59,20 @@ public class TransitModelForTest {
     return Route.of(id(id)).withAgency(AGENCY).withShortName("R" + id).withMode(TransitMode.BUS);
   }
 
+  /**
+   * Create groupOfRoutes entity to use in unit tests
+   */
+  public static GroupOfRoutesBuilder groupOfRoutes(String id) {
+    return GroupOfRoutes.of(id(id)).withName("GOR" + id);
+  }
+
   /** Create a valid Bus Route to use in unit tests */
   public static RouteBuilder route(FeedScopedId id) {
     return Route.of(id).withAgency(AGENCY).withShortName("R" + id).withMode(TransitMode.BUS);
+  }
+
+  public static TripPatternBuilder tripPattern(String id, Route route) {
+    return TripPattern.of(id(id)).withRoute(route);
   }
 
   /** Create a valid Bus Route to use in unit tests */
@@ -180,6 +195,16 @@ public class TransitModelForTest {
     var builder = StopPattern.create(numberOfStops);
     for (int i = 0; i < numberOfStops; i++) {
       builder.stops[i] = TransitModelForTest.stop("Stop_" + i).build();
+      builder.pickups[i] = PickDrop.SCHEDULED;
+      builder.dropoffs[i] = PickDrop.SCHEDULED;
+    }
+    return builder.build();
+  }
+
+  public static StopPattern stopPattern(RegularStop... stops) {
+    var builder = StopPattern.create(stops.length);
+    for (int i = 0; i < stops.length; i++) {
+      builder.stops[i] = stops[i];
       builder.pickups[i] = PickDrop.SCHEDULED;
       builder.dropoffs[i] = PickDrop.SCHEDULED;
     }

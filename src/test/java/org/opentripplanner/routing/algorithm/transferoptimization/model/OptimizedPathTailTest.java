@@ -58,8 +58,9 @@ class OptimizedPathTailTest implements RaptorTestConstants {
   private final int[] stopBoardAlightCost = new int[] { 0, 0, 3000, 0, 1000, 0 };
 
   private final OptimizedPathTail<TestTripSchedule> subject = new OptimizedPathTail<>(
-    BasicPathTestCase.SLACK_PROVIDER,
+    SLACK_PROVIDER,
     BasicPathTestCase.COST_CALCULATOR,
+    0,
     waitTimeCalc,
     stopBoardAlightCost,
     2.0,
@@ -79,13 +80,13 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     subject.access(orgPath.accessLeg().access());
 
     var exp =
-      "Walk 3m15s ~ A " +
+      "Walk 3m ~ A " +
       "~ BUS L11 10:04 10:35 ~ B " +
       "~ Walk 2m ~ C " +
       "~ BUS L21 11:00 11:23 ~ D " +
       "~ BUS L31 11:40 11:52 ~ E " +
       "~ Walk 7m45s " +
-      "[$8019 $46pri $-93107wtc]";
+      "[$7989 $46pri $-93137wtc]";
 
     assertEquals(exp, subject.toString());
   }
@@ -96,11 +97,11 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     subject.access(orgPath.accessLeg().access());
 
     var exp =
-      "Walk 3m15s ~ A " +
+      "Walk 3m ~ A " +
       "~ BUS L11 10:04 10:35 ~ B " +
       "~ Walk 3m45s ~ E " +
       "~ Flex 7m45s 1x " +
-      "[$3936 $0pri $3996wtc]";
+      "[$3906 $0pri $3966wtc]";
 
     assertEquals(exp, subject.toString());
   }
@@ -137,17 +138,17 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     subject.addTransitAndTransferLeg(t1, tx12);
     subject.access(orgPath.accessLeg().access());
 
-    var path = subject.build(0);
+    var path = subject.build();
 
     // We have replaced the first transfer with a 2 minute walk
     var expPath =
-      "Walk 3m15s 10:00 10:03:15 $390 ~ A 45s " +
+      "Walk 3m 10:00:15 10:03:15 $360 ~ A 45s " +
       "~ BUS L11 10:04 10:35 31m $1998 ~ B 15s " +
       "~ Walk 2m 10:35:15 10:37:15 $240 ~ C 22m45s " +
       "~ BUS L21 11:00 11:23 23m $2724 ~ D 17m {staySeated} " +
       "~ BUS L31 11:40 11:52 12m $1737 ~ E 15s " +
       "~ Walk 7m45s 11:52:15 12:00 $930 " +
-      "[10:00 12:00 2h 1tx $8019 $46pri $-93107wtc]";
+      "[10:00:15 12:00 1h59m45s 1tx $7989 $46pri $-93137wtc]";
 
     assertEquals(expPath, path.toStringDetailed(this::stopIndexToName));
   }

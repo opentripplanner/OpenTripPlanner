@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.BOARD_SLACK;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -43,7 +44,7 @@ public class RaptorPathToItineraryMapperTest {
   public static final double WAIT_RELUCTANCE = 0.8;
   private static final int[] STOP_COSTS = { 0, 0, 3_000, 0, 6_000, 0, 0, 0, 0, 0 };
 
-  private static final int ACCESS_START = TimeUtils.time("10:00");
+  private static final int TRANSIT_START = TimeUtils.time("10:00");
   private static final int TRANSIT_END = TimeUtils.time("11:00");
 
   private final TestTransitData data = new TestTransitData();
@@ -62,19 +63,21 @@ public class RaptorPathToItineraryMapperTest {
     // Arrange
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
-    RaptorPath<TestTripSchedule> path = getTestTripSchedulePath(getTestTripSchedule())
-      .egress(
-        TestAccessEgress.zeroDurationAccess(2, RaptorCostConverter.toRaptorCost(LAST_LEG_COST))
-      );
+    RaptorPath<TestTripSchedule> path = createTestTripSchedulePath(getTestTripSchedule())
+      .egress(TestAccessEgress.free(2, RaptorCostConverter.toRaptorCost(LAST_LEG_COST)));
+
+    int transitLegCost = path.accessLeg().nextLeg().generalizedCost();
+    int egressLegCost = path.accessLeg().nextLeg().nextLeg().generalizedCost();
 
     // Act
-    var itineraries = mapper.createItinerary(path);
+    var itinerary = mapper.createItinerary(path);
+
     // Assert
-    assertNotNull(itineraries);
-    assertEquals(1, itineraries.getLegs().size(), "The wrong number of legs was returned");
+    assertNotNull(itinerary);
+    assertEquals(1, itinerary.getLegs().size(), "The wrong number of legs was returned");
     assertEquals(
-      TRANSIT_END - ACCESS_START + BOARD_COST_SEC + LAST_LEG_COST,
-      itineraries.getLegs().get(0).getGeneralizedCost(),
+      RaptorCostConverter.toOtpDomainCost(transitLegCost + egressLegCost),
+      itinerary.getLegs().get(0).getGeneralizedCost(),
       "Incorrect cost returned"
     );
   }
@@ -101,11 +104,9 @@ public class RaptorPathToItineraryMapperTest {
     return builder.build();
   }
 
-  private TestPathBuilder getTestTripSchedulePath(TestTripSchedule testTripSchedule) {
-    TestPathBuilder pathBuilder = new TestPathBuilder(0, COST_CALCULATOR);
-    return pathBuilder
-      .access(ACCESS_START, TestAccessEgress.zeroDurationAccess(1, 0))
-      .bus(testTripSchedule, 2);
+  private TestPathBuilder createTestTripSchedulePath(TestTripSchedule testTripSchedule) {
+    TestPathBuilder pathBuilder = new TestPathBuilder(COST_CALCULATOR);
+    return pathBuilder.access(TRANSIT_START - BOARD_SLACK, 1).bus(testTripSchedule, 2);
   }
 
   private RaptorPathToItineraryMapper<TestTripSchedule> getRaptorPathToItineraryMapper() {
@@ -139,7 +140,7 @@ public class RaptorPathToItineraryMapperTest {
     var pattern = TestTripPattern.pattern("TestPattern", 1, 2).withRoute(route);
 
     var timetable = new TestTripSchedule.Builder()
-      .times(ACCESS_START, TRANSIT_END)
+      .times(TRANSIT_START, TRANSIT_END)
       .pattern(pattern)
       .originalPattern(getOriginalPattern(pattern))
       .build();

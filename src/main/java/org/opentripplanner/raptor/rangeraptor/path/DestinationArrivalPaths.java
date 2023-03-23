@@ -5,20 +5,19 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.logging.ThrottleLogger;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.view.ArrivalView;
+import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.DebugHandler;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
-import org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions;
-import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.CostCalculator;
-import org.opentripplanner.raptor.spi.Path;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 import org.slf4j.Logger;
@@ -44,7 +43,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private static final Logger LOG_MISS_MATCH = ThrottleLogger.throttle(LOG);
 
   private final ParetoSet<RaptorPath<T>> paths;
-  private final TransitCalculator<T> transitCalculator;
+  private final RaptorTransitCalculator<T> transitCalculator;
 
   @Nullable
   private final CostCalculator<T> costCalculator;
@@ -58,7 +57,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
   public DestinationArrivalPaths(
     ParetoComparator<RaptorPath<T>> paretoComparator,
-    TransitCalculator<T> transitCalculator,
+    RaptorTransitCalculator<T> transitCalculator,
     @Nullable CostCalculator<T> costCalculator,
     SlackProvider slackProvider,
     PathMapper<T> pathMapper,
@@ -126,7 +125,10 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
   public void debugReject(ArrivalView<T> stopArrival, RaptorAccessEgress egress, String reason) {
     if (isDebugOn()) {
-      debugReject(createDestinationArrivalView(stopArrival, egress), reason);
+      var destinationArrival = createDestinationArrivalView(stopArrival, egress);
+      if (destinationArrival != null) {
+        debugReject(destinationArrival, reason);
+      }
     }
   }
 
@@ -158,18 +160,17 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     }
   }
 
+  @Nullable
   private DestinationArrival<T> createDestinationArrivalView(
     ArrivalView<T> stopArrival,
     RaptorAccessEgress egressPath
   ) {
-    int departureTime = AccessEgressFunctions.calculateEgressDepartureTime(
+    int departureTime = transitCalculator.calculateEgressDepartureTime(
       stopArrival.arrivalTime(),
       egressPath,
-      slackProvider,
-      transitCalculator
+      slackProvider.transferSlack()
     );
-
-    if (departureTime == SearchParams.TIME_NOT_SET) {
+    if (departureTime == RaptorConstants.TIME_NOT_SET) {
       return null;
     }
 

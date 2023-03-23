@@ -1,6 +1,8 @@
 package org.opentripplanner.raptor.service;
 
 import static java.util.Comparator.comparingInt;
+import static org.opentripplanner.raptor.api.RaptorConstants.N_TRANSFERS_UNREACHED;
+import static org.opentripplanner.raptor.api.RaptorConstants.UNREACHED_HIGH;
 import static org.opentripplanner.raptor.api.debug.DebugTopic.HEURISTICS;
 
 import org.opentripplanner.framework.lang.IntUtils;
@@ -15,9 +17,6 @@ import org.opentripplanner.raptor.util.CompareIntArrays;
  * Utility class to log computed heuristic data.
  */
 public class DebugHeuristics {
-
-  // Any big negative number will do, but -1 is a legal value
-  private static final int UNREACHED = -9999;
 
   private final String aName;
   private final String bName;
@@ -53,10 +52,10 @@ public class DebugHeuristics {
       CompareIntArrays.compare(
         "NUMBER OF TRANSFERS",
         aName,
-        fwdHeur.bestNumOfTransfersToIntArray(UNREACHED),
+        fwdHeur.bestNumOfTransfersToIntArray(N_TRANSFERS_UNREACHED),
         bName,
-        revHeur.bestNumOfTransfersToIntArray(UNREACHED),
-        UNREACHED,
+        revHeur.bestNumOfTransfersToIntArray(N_TRANSFERS_UNREACHED),
+        N_TRANSFERS_UNREACHED,
         stops,
         comparingInt(i -> i)
       )
@@ -65,10 +64,10 @@ public class DebugHeuristics {
       CompareIntArrays.compareTime(
         "TRAVEL DURATION",
         aName,
-        fwdHeur.bestTravelDurationToIntArray(UNREACHED),
+        fwdHeur.bestTravelDurationToIntArray(UNREACHED_HIGH),
         bName,
-        revHeur.bestTravelDurationToIntArray(UNREACHED),
-        UNREACHED,
+        revHeur.bestTravelDurationToIntArray(UNREACHED_HIGH),
+        UNREACHED_HIGH,
         stops,
         direction.isForward() ? comparingInt(i -> i) : (l, r) -> r - l
       )
@@ -77,10 +76,10 @@ public class DebugHeuristics {
       CompareIntArrays.compareTime(
         "GENERALIZED COST",
         aName,
-        fwdHeur.bestGeneralizedCostToIntArray(UNREACHED),
+        fwdHeur.bestGeneralizedCostToIntArray(UNREACHED_HIGH),
         bName,
-        revHeur.bestGeneralizedCostToIntArray(UNREACHED),
-        UNREACHED,
+        revHeur.bestGeneralizedCostToIntArray(UNREACHED_HIGH),
+        UNREACHED_HIGH,
         stops,
         direction.isForward() ? comparingInt(i -> i) : (l, r) -> r - l
       )

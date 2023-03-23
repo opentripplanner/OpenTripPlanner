@@ -3,6 +3,7 @@ package org.opentripplanner.raptor._data.api;
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
@@ -33,6 +34,14 @@ public class PathUtils {
 
   public static String join(String... paths) {
     return String.join("\n", paths);
+  }
+
+  public static String withoutCost(String path) {
+    return path.replaceAll(" \\$\\d+", "");
+  }
+
+  public static String[] withoutCost(String... paths) {
+    return Stream.of(paths).map(path -> withoutCost(path)).toList().toArray(new String[0]);
   }
 
   /* private methods */

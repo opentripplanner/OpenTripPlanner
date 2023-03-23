@@ -21,7 +21,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
@@ -49,7 +49,7 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Ed
     CAR_RENTAL,
     SCOOTER_RENTAL
   );
-  private final Function<RegularStop, Set<Route>> getRoutesForStop;
+  private final Function<RegularStop, Collection<TripPattern>> getPatternsForStop;
   private final int maxScore;
   private final List<TransitFilter> filters;
   private double sumOfScores;
@@ -57,12 +57,12 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Ed
   private final Set<FeedScopedId> stopsCounted = new HashSet<>();
 
   public VehicleToStopSkipEdgeStrategy(
-    Function<RegularStop, Set<Route>> getRoutesForStop,
+    Function<RegularStop, Collection<TripPattern>> getPatternsForStop,
     Collection<TransitFilter> filters
   ) {
     this.filters = new ArrayList<>(filters);
     this.maxScore = 300;
-    this.getRoutesForStop = getRoutesForStop;
+    this.getPatternsForStop = getPatternsForStop;
   }
 
   @Override
@@ -76,12 +76,12 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Ed
         var stop = stopVertex.getStop();
 
         // Not using streams. Performance is important here
-        var routes = getRoutesForStop.apply(stop);
+        var patterns = getPatternsForStop.apply(stop);
         var score = 0;
-        for (var route : routes) {
+        for (var pattern : patterns) {
           for (var filter : filters) {
-            if (filter.matchRoute(route)) {
-              score += VehicleToStopSkipEdgeStrategy.score(route.getMode());
+            if (filter.matchTripPattern(pattern)) {
+              score += VehicleToStopSkipEdgeStrategy.score(pattern.getMode());
               break;
             }
           }

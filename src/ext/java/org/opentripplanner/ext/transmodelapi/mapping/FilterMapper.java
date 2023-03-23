@@ -14,7 +14,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -29,7 +28,10 @@ class FilterMapper {
     RouteRequest request
   ) {
     if (
-      !GqlUtil.hasArgument(environment, "modes.transportModes") &&
+      !(
+        GqlUtil.hasArgument(environment, "modes") &&
+        ((Map<String, Object>) environment.getArgument("modes")).containsKey("transportModes")
+      ) &&
       !GqlUtil.hasArgument(environment, "whiteListed") &&
       !GqlUtil.hasArgument(environment, "banned")
     ) {
@@ -53,9 +55,7 @@ class FilterMapper {
       (List<String> lines) -> bannedLines.addAll(mapIDsToDomain(lines))
     );
     if (!bannedLines.isEmpty()) {
-      filterRequestBuilder.addSelect(
-        SelectRequest.of().withRoutes(RouteMatcher.idMatcher(bannedLines)).build()
-      );
+      filterRequestBuilder.addNot(SelectRequest.of().withRoutes(bannedLines).build());
     }
 
     var selectors = new ArrayList<SelectRequest.Builder>();
@@ -75,7 +75,7 @@ class FilterMapper {
       (List<String> lines) -> whiteListedLines.addAll(mapIDsToDomain(lines))
     );
     if (!whiteListedLines.isEmpty()) {
-      selectors.add(SelectRequest.of().withRoutes(RouteMatcher.idMatcher(whiteListedLines)));
+      selectors.add(SelectRequest.of().withRoutes(whiteListedLines));
     }
 
     // Create modes filter for the request

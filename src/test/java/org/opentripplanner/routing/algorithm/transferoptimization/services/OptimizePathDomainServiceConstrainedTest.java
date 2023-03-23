@@ -82,7 +82,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     testPriority(
       STOP_D,
       ALLOWED,
-      "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 1m ~ C ~ BUS T2 10:13 10:18 ~ D [10:00:20 10:18:20 18m 1tx $1180 $33pri]"
+      "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 1m ~ C ~ BUS T2 10:13 10:18 ~ D [10:01:20 10:18:20 17m 1tx $1120 $33pri]"
     );
   }
 
@@ -91,7 +91,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     testPriority(
       STOP_E,
       RECOMMENDED,
-      "A ~ BUS T1 10:02 10:15 ~ C ~ Walk 2m ~ D ~ BUS T2 10:18 10:24 ~ E [10:00:20 10:24:20 24m 1tx $1600 $32pri]"
+      "A ~ BUS T1 10:02 10:15 ~ C ~ Walk 2m ~ D ~ BUS T2 10:18 10:24 ~ E [10:01:20 10:24:20 23m 1tx $1540 $32pri]"
     );
   }
 
@@ -100,7 +100,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     testPriority(
       STOP_F,
       PREFERRED,
-      "A ~ BUS T1 10:02 10:20 ~ D ~ Walk 3m ~ E ~ BUS T2 10:24 10:30 ~ F [10:00:20 10:30:20 30m 1tx $2020 $31pri]"
+      "A ~ BUS T1 10:02 10:20 ~ D ~ Walk 3m ~ E ~ BUS T2 10:24 10:30 ~ F [10:01:20 10:30:20 29m 1tx $1960 $31pri]"
     );
   }
 
@@ -108,7 +108,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
   public void testTransferGuaranteed() {
     testGuaranteed(
       STOP_G,
-      "A ~ BUS T1 10:02 10:25 ~ E ~ Walk 4m ~ F ~ BUS T2 10:30 10:36 ~ G [10:00:20 10:36:20 36m 1tx $2410 $23pri]"
+      "A ~ BUS T1 10:02 10:25 ~ E ~ Walk 4m ~ F ~ BUS T2 10:30 10:36 ~ G [10:01:20 10:36:20 35m 1tx $2350 $23pri]"
     );
   }
 
@@ -116,7 +116,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
   public void testTransferStaySeated() {
     testStaySeated(
       STOP_H,
-      "A ~ BUS T1 10:02 10:30 ~ F ~ Walk 5m ~ G ~ BUS T2 10:36 10:40 ~ H [10:00:20 10:40:20 40m 0tx $2710 $13pri]"
+      "A ~ BUS T1 10:02 10:30 ~ F ~ Walk 5m ~ G ~ BUS T2 10:36 10:40 ~ H [10:01:20 10:40:20 39m 0tx $2650 $13pri]"
     );
   }
 
@@ -143,7 +143,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
   ) {
     var original = OptimizePathDomainServiceTest
       .pathBuilder()
-      .access(START_TIME_T1, 0, STOP_A)
+      .access(START_TIME_T1, STOP_A)
       .bus(trip1, STOP_B)
       .walk(D1m, STOP_C)
       .bus(trip2, egressStop)

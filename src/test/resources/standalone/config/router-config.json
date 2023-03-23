@@ -56,6 +56,11 @@
     "ignoreRealtimeUpdates": false,
     "geoidElevation": false,
     "maxJourneyDuration": "36h",
+    "unpreferred": {
+      "agencies": ["HSL:123"],
+      "routes": ["HSL:456"]
+    },
+    "unpreferredCost": "600 + 2.0 x",
     "transferOptimization": {
       "optimizeTransferWaitTime": true,
       "minSafeWaitTimeFactor": 5.0,
@@ -73,7 +78,16 @@
         "onlyConsiderAccessible": false,
         "unknownCost": 600,
         "inaccessibleCost": 3600
-      }
+      },
+      "elevator": {
+        "onlyConsiderAccessible": false,
+        "unknownCost": 20,
+        "inaccessibleCost": 3600
+      },
+      "inaccessibleStreetReluctance": 25,
+      "maxSlope": 0.083,
+      "slopeExceededReluctance":  1,
+      "stairsReluctance": 100
     }
   },
   "flex": {
@@ -87,8 +101,8 @@
     "dynamicSearchWindow": {
       "minTransitTimeCoefficient": 0.5,
       "minWaitTimeCoefficient": 0.5,
-      "minWinTimeMinutes": 60,
-      "maxWinTimeMinutes": 300
+      "minWindow": "1h",
+      "maxWindow": "5h"
     },
     "stopTransferCost": {
       "DISCOURAGED": 1500,

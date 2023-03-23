@@ -54,6 +54,7 @@ public class TripPatternCache {
         .of(id)
         .withRoute(route)
         .withMode(trip.getMode())
+        .withNetexSubmode(trip.getNetexSubMode())
         .withStopPattern(stopPattern);
 
       tripPatternBuilder.withCreatedByRealtimeUpdater(true);

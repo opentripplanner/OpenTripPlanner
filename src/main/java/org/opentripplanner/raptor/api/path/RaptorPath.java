@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.api.path;
 
 import java.util.List;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
@@ -57,12 +58,18 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
   /**
    * The first leg/path of this journey - which is linked to the next and so on. The leg can contain
    * sub-legs, for example: walk-flex-walk.
+   * <p>
+   * {@code null} if the legs in the path is unknown.
    */
+  @Nullable
   AccessPathLeg<T> accessLeg();
 
   /**
    * The last leg of this journey. The leg can contain sub-legs, for example: walk-flex-walk.
+   * <p>
+   * {@code null} if the legs in the path is unknown.
    */
+  @Nullable
   EgressPathLeg<T> egressLeg();
 
   /**

@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi.mapping;
 
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertCauseType;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 
 /**
@@ -11,28 +12,23 @@ public class LegacyGraphQLCauseMapper {
    * Returns LegacyGraphQL API string counter part for internal {@link AlertCause} enum. Defaults to
    * returning UNKNOWN_CAUSE.
    */
-  public static String getLegacyGraphQLCause(AlertCause cause) {
+  public static LegacyGraphQLAlertCauseType getLegacyGraphQLCause(AlertCause cause) {
     if (cause == null) {
-      return "UNKNOWN_CAUSE";
+      return LegacyGraphQLAlertCauseType.UNKNOWN_CAUSE;
     }
-    switch (cause) {
-      case OTHER_CAUSE:
-      case TECHNICAL_PROBLEM:
-      case STRIKE:
-      case DEMONSTRATION:
-      case ACCIDENT:
-      case HOLIDAY:
-      case WEATHER:
-      case MAINTENANCE:
-      case CONSTRUCTION:
-      case POLICE_ACTIVITY:
-      case MEDICAL_EMERGENCY:
-        return cause.name();
-      case UNKNOWN_CAUSE:
-      default:
-        {
-          return "UNKNOWN_CAUSE";
-        }
-    }
+    return switch (cause) {
+      case UNKNOWN_CAUSE -> LegacyGraphQLAlertCauseType.UNKNOWN_CAUSE;
+      case OTHER_CAUSE -> LegacyGraphQLAlertCauseType.OTHER_CAUSE;
+      case TECHNICAL_PROBLEM -> LegacyGraphQLAlertCauseType.TECHNICAL_PROBLEM;
+      case STRIKE -> LegacyGraphQLAlertCauseType.STRIKE;
+      case DEMONSTRATION -> LegacyGraphQLAlertCauseType.DEMONSTRATION;
+      case ACCIDENT -> LegacyGraphQLAlertCauseType.ACCIDENT;
+      case HOLIDAY -> LegacyGraphQLAlertCauseType.HOLIDAY;
+      case WEATHER -> LegacyGraphQLAlertCauseType.WEATHER;
+      case MAINTENANCE -> LegacyGraphQLAlertCauseType.MAINTENANCE;
+      case CONSTRUCTION -> LegacyGraphQLAlertCauseType.CONSTRUCTION;
+      case POLICE_ACTIVITY -> LegacyGraphQLAlertCauseType.POLICE_ACTIVITY;
+      case MEDICAL_EMERGENCY -> LegacyGraphQLAlertCauseType.MEDICAL_EMERGENCY;
+    };
   }
 }

@@ -187,9 +187,9 @@ type DestinationDisplay {
 
 "List of visits to quays as part of vehicle journeys. Updated with real time information where available"
 type EstimatedCall {
-  "Actual time of arrival at quay. Updated from real time information if available. NOT IMPLEMENTED"
+  "Actual time of arrival at quay. Updated from real time information if available."
   actualArrivalTime: DateTime
-  "Actual time of departure from quay. Updated with real time information if available. NOT IMPLEMENTED"
+  "Actual time of departure from quay. Updated with real time information if available."
   actualDepartureTime: DateTime
   "Scheduled time of arrival at quay. Not affected by read time updated"
   aimedArrivalTime: DateTime!
@@ -534,7 +534,7 @@ type Quay implements PlaceInterface {
   estimatedCalls(
     "Filters results by either departures, arrivals or both. For departures forBoarding has to be true and the departure time has to be within the specified time range. For arrivals, forAlight has to be true and the arrival time has to be within the specified time range. If both are asked for, either the conditions for arrivals or the conditions for departures will have to be true for an EstimatedCall to show."
     arrivalDeparture: ArrivalDeparture = departures,
-    "Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED"
+    "Indicates that realtime-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
     "Limit the total number of departures returned."
     numberOfDepartures: Int = 5,
@@ -777,6 +777,8 @@ type QueryType {
     itineraryFilters: ItineraryFilters,
     "The preferable language to use for text targeted the end user. Note! The data quality is limited, only stop and quay names are translates, and not in all places of the API."
     locale: Locale = no,
+    "Maximum duration for access/egress for street searches per respective mode."
+    maxAccessEgressDurationForMode: [StreetModeDurationInput!],
     "Maximum number of additional transfers compared to the best number of transfers allowed. Note! The best way to reduce the number of transfers is to set the `transferPenalty` parameter."
     maximumAdditionalTransfers: Int = 5,
     "Maximum number of transfers. Note! The best way to reduce the number of transfers is to set the `transferPenalty` parameter."
@@ -878,7 +880,7 @@ type QueryType {
     via: [ViaLocationInput!]!,
     "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit yet."
     wheelchairAccessible: Boolean = false
-  ): ViaTrip! @deprecated @timingData
+  ): ViaTrip! @timingData
 }
 
 type RentalVehicle implements PlaceInterface {
@@ -1069,7 +1071,7 @@ type StopPlace implements PlaceInterface {
   "List of visits to this stop place as part of vehicle journeys."
   estimatedCalls(
     arrivalDeparture: ArrivalDeparture = departures,
-    "Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED"
+    "Indicates that realtime-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
     "Limit the total number of departures returned."
     numberOfDepartures: Int = 5,
@@ -1852,6 +1854,12 @@ input Modes {
   transportModes: [TransportModes]
 }
 
+"A combination of street mode and corresponding duration"
+input StreetModeDurationInput {
+  duration: Duration!
+  streetMode: StreetMode!
+}
+
 "Input format for specifying which modes will be allowed for this search. If this element is not present, it will default to all to foot."
 input StreetModes {
   "The mode used to get from the origin to the access stops in the transit network the transit network (first-mile). If the element is not present or null,only transit that can be immediately boarded from the origin will be used."
@@ -1904,6 +1912,8 @@ input TripFilterInput {
 input TripFilterSelectInput {
   "Set of ids for authorities that should be included in/excluded from search"
   authorities: [ID!]
+  "Set of ids for group of lines that should be included in/excluded from the search"
+  groupOfLines: [ID!]
   "Set of ids for lines that should be included in/excluded from search"
   lines: [ID!]
   "Set of ids for service journeys that should be included in/excluded from search"

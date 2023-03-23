@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 
 public class RoutingPreferencesTest {
@@ -25,7 +24,6 @@ public class RoutingPreferencesTest {
     assertSame(pref.wheelchair(), copy.wheelchair());
     assertSame(pref.transit(), copy.transit());
     assertSame(pref.street(), copy.street());
-    assertSame(pref.parking(), copy.parking());
     assertSame(pref.rental(), copy.rental());
     assertSame(pref.itineraryFilter(), copy.itineraryFilter());
     assertSame(pref.system(), copy.system());
@@ -111,17 +109,6 @@ public class RoutingPreferencesTest {
 
     assertNotSame(pref, copy);
     assertNotSame(pref.street(), copy.street());
-    assertSame(pref.parking(), copy.parking());
-  }
-
-  @Test
-  public void copyOfWithParkingChanges() {
-    var pref = new RoutingPreferences();
-    var copy = pref.copyOf().withParking(VehicleParkingPreferences.of(true)).build();
-
-    assertNotSame(pref, copy);
-    assertNotSame(pref.parking(), copy.parking());
-    assertSame(pref.rental(), copy.rental());
   }
 
   @Test

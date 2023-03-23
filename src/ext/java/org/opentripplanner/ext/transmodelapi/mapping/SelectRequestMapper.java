@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
-import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -20,12 +19,17 @@ class SelectRequestMapper {
 
     if (input.containsKey("lines")) {
       var lines = (List<String>) input.get("lines");
-      selectRequestBuilder.withRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)));
+      selectRequestBuilder.withRoutes(mapIDsToDomain(lines));
     }
 
     if (input.containsKey("authorities")) {
       var authorities = (List<String>) input.get("authorities");
       selectRequestBuilder.withAgencies(mapIDsToDomain(authorities));
+    }
+
+    if (input.containsKey("groupOfLines")) {
+      var groupOfLines = (List<String>) input.get("groupOfLines");
+      selectRequestBuilder.withGroupOfRoutes(mapIDsToDomain(groupOfLines));
     }
 
     if (input.containsKey("transportModes")) {

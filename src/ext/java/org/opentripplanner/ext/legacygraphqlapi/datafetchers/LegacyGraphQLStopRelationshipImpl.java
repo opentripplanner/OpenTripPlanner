@@ -4,7 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers.LegacyGraphQLStopRelationship;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVehicleStopStatus;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship;
+import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship;
 
 public class LegacyGraphQLStopRelationshipImpl implements LegacyGraphQLStopRelationship {
 

@@ -26,18 +26,18 @@ import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.StreetLegBuilder;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
-import org.opentripplanner.street.model.edge.VehicleRentalEdge;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
-import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -257,11 +257,7 @@ public class GraphPathToItineraryMapper {
         if (mode != null) {
           // Resolve correct mode if renting vehicle
           if (state.isRentingVehicle()) {
-            return switch (state.stateData.rentalVehicleFormFactor) {
-              case BICYCLE, OTHER -> TraverseMode.BICYCLE;
-              case SCOOTER, MOPED -> TraverseMode.SCOOTER;
-              case CAR -> TraverseMode.CAR;
-            };
+            return state.stateData.rentalVehicleFormFactor.traverseMode;
           } else {
             return mode;
           }

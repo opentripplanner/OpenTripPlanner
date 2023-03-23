@@ -77,7 +77,7 @@ public enum StreetTraversalPermission {
   public boolean allows(TraverseMode mode) {
     if (mode == TraverseMode.WALK && allows(StreetTraversalPermission.PEDESTRIAN)) {
       return true;
-    } else if (mode == TraverseMode.BICYCLE && allows(StreetTraversalPermission.BICYCLE)) {
+    } else if (mode.isCyclingIsh() && allows(StreetTraversalPermission.BICYCLE)) {
       return true;
     } else if (mode == TraverseMode.CAR && allows(StreetTraversalPermission.CAR)) {
       return true;

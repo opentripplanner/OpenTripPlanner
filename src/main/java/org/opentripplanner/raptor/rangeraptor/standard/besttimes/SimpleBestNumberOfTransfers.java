@@ -2,7 +2,9 @@ package org.opentripplanner.raptor.rangeraptor.standard.besttimes;
 
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
+import org.opentripplanner.raptor.rangeraptor.support.IntArraySingleCriteriaArrivals;
 
 /**
  * The responsibility for this class is to keep track of the best (minimun) number of transfers for
@@ -31,5 +33,10 @@ public class SimpleBestNumberOfTransfers implements BestNumberOfTransfers {
     if (numOfTransfers < bestNumOfTransfers[stop]) {
       bestNumOfTransfers[stop] = numOfTransfers;
     }
+  }
+
+  @Override
+  public SingleCriteriaStopArrivals extractBestNumberOfTransfers() {
+    return new IntArraySingleCriteriaArrivals(unreachedMinNumberOfTransfers(), bestNumOfTransfers);
   }
 }

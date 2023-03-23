@@ -53,7 +53,8 @@ like "program arguments".
 OpenTripPlanner is a community based open source project, and we welcome all who wish to contribute.
 There are several ways to get involved:
 
-* Join the [developer mailing list](http://groups.google.com/group/opentripplanner-dev)
+* Join the [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner) and the 
+  [user mailing list](http://groups.google.com/group/opentripplanner-users).
 
 * Fix typos and improve the documentation within the `/docs` directory of the project (details
   below).

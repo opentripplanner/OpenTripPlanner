@@ -1,6 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
-import java.time.Duration;
+import org.opentripplanner.framework.lang.OtpNumberFormat;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.raptor.api.RaptorConstants;
 
 /**
  * Heuristic data for a given stop.
@@ -10,22 +12,21 @@ public record HeuristicAtStop(int minTravelDuration, int minNumTransfers, int mi
    * Representation for a stop, which has not been reached by the heuristic search
    */
   public static final HeuristicAtStop UNREACHED = new HeuristicAtStop(
-    Integer.MAX_VALUE,
-    Integer.MAX_VALUE,
-    Integer.MAX_VALUE
+    RaptorConstants.UNREACHED_HIGH,
+    RaptorConstants.UNREACHED_HIGH,
+    RaptorConstants.UNREACHED_HIGH
   );
 
   @Override
   public String toString() {
-    return (
-      "HeuristicAtStop{" +
-      "minTravelDuration: " +
-      Duration.ofSeconds(minTravelDuration).toString() +
-      ", minNumTransfers: " +
-      minNumTransfers +
-      ", minCost: $" +
-      (minCost / 100.0) +
-      "}"
-    );
+    return this == UNREACHED
+      ? "[]"
+      : (
+        "[" +
+        (DurationUtils.durationToStr(minTravelDuration) + " ") +
+        (minNumTransfers + "tx ") +
+        OtpNumberFormat.formatCostCenti(minCost) +
+        "]"
+      );
   }
 }

@@ -10,7 +10,7 @@ import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
+import org.opentripplanner.service.vehiclerental.street.NoRestriction;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 
@@ -39,7 +39,7 @@ public class GeofencingZonesLayerBuilder extends LayerBuilder<Vertex> {
     return streetIndex
       .getVerticesForEnvelope(query)
       .stream()
-      .filter(se -> !(se.rentalRestrictions() instanceof RentalRestrictionExtension.NoRestriction))
+      .filter(se -> !(se.rentalRestrictions() instanceof NoRestriction))
       .map(vertex -> {
         Geometry geometry = GeometryUtils.getGeometryFactory().createPoint(vertex.getCoordinate());
         geometry.setUserData(vertex);

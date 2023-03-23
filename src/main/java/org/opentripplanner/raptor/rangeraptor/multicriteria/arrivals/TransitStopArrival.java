@@ -1,5 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.api.view.TransitPathView;
@@ -22,7 +25,7 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
   ) {
     super(
       previousState,
-      previousState.arrivedByTransit() ? 2 : 1,
+      previousState.arrivedBy(TRANSIT) ? 2 : 1,
       stopIndex,
       arrivalTime,
       totalCost
@@ -46,12 +49,17 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
   }
 
   @Override
-  public boolean arrivedByTransit() {
-    return true;
+  public PathLegType arrivedBy() {
+    return TRANSIT;
   }
 
   @Override
   public TransitPathView<T> transitPath() {
     return this;
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return true;
   }
 }

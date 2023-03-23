@@ -1,11 +1,14 @@
 package org.opentripplanner.raptor.api.view;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
+import org.opentripplanner.raptor.spi.CostCalculator;
 
 /**
  * The purpose of the stop-arrival-view is to provide a common interface for stop-arrivals for
@@ -76,12 +79,13 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
    * The accumulated cost. 0 (zero) is returned if no cost exist.
    */
   default int cost() {
-    return 0;
+    return CostCalculator.ZERO_COST;
   }
 
   /**
    * The previous stop arrival state or {@code null} if first arrival (access stop arrival).
    */
+  @Nullable
   ArrivalView<T> previous();
 
   /**
@@ -102,8 +106,10 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   /**
    * First stop arrival, arrived by a given access path.
    */
-  default boolean arrivedByAccess() {
-    return false;
+  PathLegType arrivedBy();
+
+  default boolean arrivedBy(PathLegType expected) {
+    return arrivedBy().is(expected);
   }
 
   default AccessPathView accessPath() {
@@ -112,9 +118,8 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
 
   /* Transit */
 
-  /** @return true if transit arrival, otherwise false. */
   default boolean arrivedByTransit() {
-    return false;
+    return this.arrivedBy(TRANSIT);
   }
 
   default TransitPathView<T> transitPath() {
@@ -122,11 +127,6 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   }
 
   /* Transfer */
-
-  /** @return true if transfer arrival, otherwise false. */
-  default boolean arrivedByTransfer() {
-    return false;
-  }
 
   default TransferPathView transferPath() {
     throw new UnsupportedOperationException();
@@ -143,46 +143,44 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
     throw new UnsupportedOperationException();
   }
 
+  boolean arrivedOnBoard();
+
   /** Use this to easy create a to String implementation. */
   default String asString() {
-    if (arrivedByAccess()) {
-      return String.format(
-        "Access { stop: %d, duration: %s, arrival-time: %s %s }",
+    String arrival =
+      "[" +
+      TimeUtils.timeToStrCompact(arrivalTime()) +
+      " " +
+      OtpNumberFormat.formatCostCenti(cost()) +
+      "]";
+    return switch (arrivedBy()) {
+      case ACCESS -> String.format(
+        "Access { stop: %d, arrival: %s, path: %s }",
         stop(),
-        DurationUtils.durationToStr(accessPath().access().durationInSeconds()),
-        TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCostCenti(cost())
+        arrival,
+        accessPath().access()
       );
-    }
-    if (arrivedByTransit()) {
-      return String.format(
-        "Transit { round: %d, stop: %d, pattern: %s, arrival-time: %s %s }",
+      case TRANSIT -> String.format(
+        "Transit { round: %d, stop: %d, arrival: %s, pattern: %s }",
         round(),
         stop(),
-        transitPath().trip().pattern().debugInfo(),
-        TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCostCenti(cost())
+        arrival,
+        transitPath().trip().pattern().debugInfo()
       );
-    }
-    if (arrivedByTransfer()) {
-      return String.format(
-        "Walk { round: %d, stop: %d, arrival-time: %s %s }",
+      case TRANSFER -> String.format(
+        "Walk { round: %d, stop: %d, arrival: %s, path: %s }",
         round(),
         stop(),
-        TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCostCenti(cost())
+        arrival,
+        transferPath().transfer()
       );
-    }
-    if (arrivedAtDestination()) {
-      return String.format(
-        "Egress { round: %d, from-stop: %d, duration: %s, arrival-time: %s %s }",
+      case EGRESS -> String.format(
+        "Egress { round: %d, from-stop: %d, arrival: %s, path: %s }",
         round(),
-        previous().stop(),
-        DurationUtils.durationToStr(egressPath().egress().durationInSeconds()),
-        TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCostCenti(cost())
+        egressPath().egress().stop(),
+        arrival,
+        egressPath().egress()
       );
-    }
-    throw new IllegalStateException("Unknown type of stop-arrival: " + getClass());
+    };
   }
 }

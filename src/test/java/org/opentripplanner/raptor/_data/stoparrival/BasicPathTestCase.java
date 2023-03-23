@@ -24,13 +24,11 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.raptor.spi.CostCalculator;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
-import org.opentripplanner.raptor.spi.Path;
-import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 
 /**
@@ -40,15 +38,18 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultC
  * unit-tests:
  * <pre>
  *   ~
- *   Origin 10:00:00
- *   ~ Walk 3m15s ~ A
+ *   Origin 10:00:15
+ *   ~ Walk 3m ~ A
  *   ~ BUS L11 10:04 10:35 ~ B
  *   ~ Walk 3m45s ~ C
  *   ~ BUS L21 11:00 11:23 ~ D
  *   ~ BUS L31 11:40 11:52 ~ E
  *   ~ Walk 7m45s
  *   ~ Destination 12:00
- *   Duration: 2h $8184
+ *
+ *   Duration: 1h59m45s
+ *   Transfers: 2
+ *   Generalized-cost: $8154
  * </pre>
  * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and ends at
  * 12:00, total 2 hours.
@@ -58,7 +59,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   private static final RaptorConstrainedTransfer EMPTY_CONSTRAINTS = null;
 
   public static final String BASIC_PATH_AS_DETAILED_STRING =
-    "Walk 3m15s 10:00 10:03:15 $390 " +
+    "Walk 3m 10:00:15 10:03:15 $360 " +
     "~ A 45s ~ " +
     "BUS L11 10:04 10:35 31m $1998 " +
     "~ B 15s ~ " +
@@ -69,16 +70,16 @@ public class BasicPathTestCase implements RaptorTestConstants {
     "BUS L31 11:40 11:52 12m $1776 " +
     "~ E 15s ~ " +
     "Walk 7m45s 11:52:15 12:00 $930 " +
-    "[10:00 12:00 2h 2tx $8184]";
+    "[10:00:15 12:00 1h59m45s 2tx $8154]";
 
   public static final String BASIC_PATH_AS_STRING =
-    "Walk 3m15s ~ A" +
+    "Walk 3m ~ A" +
     " ~ BUS L11 10:04 10:35 ~ B" +
     " ~ Walk 3m45s ~ C" +
     " ~ BUS L21 11:00 11:23 ~ D" +
     " ~ BUS L31 11:40 11:52 ~ E" +
     " ~ Walk 7m45s " +
-    "[10:00 12:00 2h 2tx $8184]";
+    "[10:00:15 12:00 1h59m45s 2tx $8154]";
 
   private static final int BOARD_COST_SEC = 60;
   private static final int TRANSFER_COST_SEC = 120;
@@ -96,7 +97,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final int RAPTOR_ITERATION_START_TIME = time("09:00");
 
   // Access (Walk 3m15s ~ A)
-  public static final int ACCESS_START = time("10:00");
+  public static final int ACCESS_START = time("10:00:15");
   public static final int ACCESS_END = time("10:03:15");
   public static final int ACCESS_DURATION = ACCESS_END - ACCESS_START;
   public static final RaptorAccessEgress ACCESS_TRANSFER = TestAccessEgress.walk(
@@ -207,12 +208,6 @@ public class BasicPathTestCase implements RaptorTestConstants {
     STOP_COSTS
   );
 
-  public static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
-    TRANSFER_SLACK,
-    BOARD_SLACK,
-    ALIGHT_SLACK
-  );
-
   public static final int TOTAL_COST =
     ACCESS_COST + LINE_11_COST + TX_COST + LINE_21_COST + LINE_31_COST + EGRESS_COST;
 
@@ -230,7 +225,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     AbstractStopArrival prevArrival;
     prevArrival = new Access(STOP_A, ACCESS_START, ACCESS_END, ACCESS_COST);
     prevArrival = new Bus(1, STOP_B, L11_END, LINE_11_COST, TRIP_1, prevArrival);
-    prevArrival = new Walk(1, STOP_C, TX_START, TX_END, TX_COST, prevArrival);
+    prevArrival = new Transfer(1, STOP_C, TX_START, TX_END, TX_COST, prevArrival);
     prevArrival = new Bus(2, STOP_D, L21_END, LINE_21_COST, TRIP_2, prevArrival);
     prevArrival = new Bus(3, STOP_E, L31_END, LINE_31_COST, TRIP_3, prevArrival);
     Egress egress = new Egress(EGRESS_START, EGRESS_END, EGRESS_COST, prevArrival);
@@ -252,7 +247,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     // Board slack is subtracted from the arrival time to get the latest possible
     nextArrival = new Bus(1, STOP_D, L31_START, LINE_31_COST, TRIP_3, nextArrival);
     nextArrival = new Bus(2, STOP_C, L21_START, LINE_21_COST, TRIP_2, nextArrival);
-    nextArrival = new Walk(2, STOP_B, TX_END, TX_START, TX_COST, nextArrival);
+    nextArrival = new Transfer(2, STOP_B, TX_END, TX_START, TX_COST, nextArrival);
     nextArrival = new Bus(3, STOP_A, L11_START, LINE_11_COST, TRIP_1, nextArrival);
     Egress egress = new Egress(ACCESS_END, ACCESS_START, ACCESS_COST, nextArrival);
     return new DestinationArrival<>(

@@ -1,13 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import org.opentripplanner.raptor.api.request.SearchParams;
+import org.opentripplanner.raptor.api.RaptorConstants;
 
 public interface TimeCalculator {
-  /**
-   * Use this constant to represent an uninitialized time value.
-   */
-  int TIME_NOT_SET = SearchParams.TIME_NOT_SET;
-
   /**
    * Return {@code true} is searching forward in space and time, {@code false} if search direction
    * is in reverse.
@@ -58,12 +53,10 @@ public interface TimeCalculator {
   boolean isAfter(int subject, int candidate);
 
   /**
-   * Uninitialized time values is set to this value to mark them as not set, and to mark the arrival
-   * as unreached. A big value(or very small value) is used to simplify the comparisons to see if a
-   * new arrival time is better (less).
+   * Result time values is set to this value to mark them as UNREACHED.
    * <p/>
-   * For a normal forward search this should be Integer.MAX_VALUE and for a reverse search this
-   * should be Integer.MIN_VALUE.
+   * For a normal forward search this should be {@link RaptorConstants#TIME_UNREACHED_FORWARD}
+   * and for a reverse search this should be {@link RaptorConstants#TIME_UNREACHED_REVERSE}.
    */
   int unreachedTime();
 }

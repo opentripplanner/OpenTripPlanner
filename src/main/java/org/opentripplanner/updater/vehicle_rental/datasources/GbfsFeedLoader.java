@@ -9,10 +9,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-import org.entur.gbfs.v2_2.gbfs.GBFS;
-import org.entur.gbfs.v2_2.gbfs.GBFSFeed;
-import org.entur.gbfs.v2_2.gbfs.GBFSFeedName;
-import org.entur.gbfs.v2_2.gbfs.GBFSFeeds;
+import org.entur.gbfs.v2_3.gbfs.GBFS;
+import org.entur.gbfs.v2_3.gbfs.GBFSFeed;
+import org.entur.gbfs.v2_3.gbfs.GBFSFeedName;
+import org.entur.gbfs.v2_3.gbfs.GBFSFeeds;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.updater.UpdaterConstructionException;
 import org.slf4j.Logger;
@@ -44,16 +44,15 @@ public class GbfsFeedLoader {
       throw new UpdaterConstructionException("Invalid url " + url);
     }
 
-    if (!url.endsWith("gbfs.json")) {
-      LOG.warn(
-        "GBFS autoconfiguration url {} does not end with gbfs.json. Make sure it follows the specification, if you get any errors using it.",
-        url
-      );
-    }
-
     // Fetch autoconfiguration file
     GBFS data = fetchFeed(uri, httpHeaders, GBFS.class);
     if (data == null) {
+      if (!url.endsWith("gbfs.json")) {
+        LOG.warn(
+          "GBFS autoconfiguration url {} does not end with gbfs.json. Make sure it follows the specification, if you get any errors using it.",
+          url
+        );
+      }
       throw new UpdaterConstructionException(
         "Could not fetch the feed auto-configuration file from " + uri
       );

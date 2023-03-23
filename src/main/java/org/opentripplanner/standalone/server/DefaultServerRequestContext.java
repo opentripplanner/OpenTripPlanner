@@ -15,6 +15,8 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.service.DefaultRoutingService;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -41,6 +43,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final FlexConfig flexConfig;
   private final TraverseVisitor traverseVisitor;
   private final WorldEnvelopeService worldEnvelopeService;
+  private final VehiclePositionService vehiclePositionService;
+  private final VehicleRentalService vehicleRentalService;
 
   /**
    * Make sure all mutable components are copied/cloned before calling this constructor.
@@ -57,8 +61,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     TileRendererManager tileRendererManager,
     VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
     WorldEnvelopeService worldEnvelopeService,
-    FlexConfig flexConfig,
-    TraverseVisitor traverseVisitor
+    VehiclePositionService vehiclePositionService,
+    VehicleRentalService vehicleRentalService,
+    TraverseVisitor traverseVisitor,
+    FlexConfig flexConfig
   ) {
     this.graph = graph;
     this.transitService = transitService;
@@ -69,10 +75,12 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.requestLogger = requestLogger;
     this.tileRendererManager = tileRendererManager;
     this.vectorTileLayers = vectorTileLayers;
+    this.vehicleRentalService = vehicleRentalService;
     this.flexConfig = flexConfig;
     this.traverseVisitor = traverseVisitor;
     this.routeRequestDefaults = routeRequestDefaults;
     this.worldEnvelopeService = worldEnvelopeService;
+    this.vehiclePositionService = vehiclePositionService;
   }
 
   /**
@@ -88,6 +96,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     MeterRegistry meterRegistry,
     VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
     WorldEnvelopeService worldEnvelopeService,
+    VehiclePositionService vehiclePositionService,
+    VehicleRentalService vehicleRentalService,
     FlexConfig flexConfig,
     @Nullable TraverseVisitor traverseVisitor,
     @Nullable String requestLogFile
@@ -104,8 +114,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       new TileRendererManager(graph, routeRequestDefaults.preferences()),
       vectorTileLayers,
       worldEnvelopeService,
-      flexConfig,
-      traverseVisitor
+      vehiclePositionService,
+      vehicleRentalService,
+      traverseVisitor,
+      flexConfig
     );
   }
 
@@ -149,6 +161,16 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public WorldEnvelopeService worldEnvelopeService() {
     return worldEnvelopeService;
+  }
+
+  @Override
+  public VehiclePositionService vehiclePositionService() {
+    return vehiclePositionService;
+  }
+
+  @Override
+  public VehicleRentalService vehicleRentalService() {
+    return vehicleRentalService;
   }
 
   @Override

@@ -31,7 +31,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -119,14 +118,8 @@ public abstract class GtfsTest {
     }
 
     if (excludedRoute != null && !excludedRoute.isEmpty()) {
-      filterRequestBuilder.addNot(
-        SelectRequest
-          .of()
-          .withRoutes(
-            RouteMatcher.idMatcher(List.of(new FeedScopedId(feedId.getId(), excludedRoute)))
-          )
-          .build()
-      );
+      List<FeedScopedId> routeIds = List.of(new FeedScopedId(feedId.getId(), excludedRoute));
+      filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
     }
 
     routingRequest.journey().transit().setFilters(List.of(filterRequestBuilder.build()));

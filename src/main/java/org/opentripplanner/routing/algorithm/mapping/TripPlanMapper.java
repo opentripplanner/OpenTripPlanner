@@ -21,8 +21,16 @@ public class TripPlanMapper {
     Place to;
 
     if (itineraries.isEmpty()) {
-      from = placeFromGeoLocation(request.from(), new LocalizedString("origin"));
-      to = placeFromGeoLocation(request.to(), new LocalizedString("destination"));
+      from =
+        placeFromGeoLocation(
+          request != null ? request.from() : null,
+          new LocalizedString("origin")
+        );
+      to =
+        placeFromGeoLocation(
+          request != null ? request.to() : null,
+          new LocalizedString("destination")
+        );
     } else {
       List<Leg> legs = itineraries.get(0).getLegs();
       from = legs.get(0).getFrom();
@@ -32,6 +40,10 @@ public class TripPlanMapper {
   }
 
   private static Place placeFromGeoLocation(GenericLocation location, I18NString defaultName) {
+    if (location == null) {
+      return Place.normal(null, null, defaultName);
+    }
+
     return Place.normal(
       location.lat,
       location.lng,

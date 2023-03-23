@@ -1,9 +1,10 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
+import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -13,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -31,11 +33,6 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
  */
 public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
-  private static final String EXP_PATH =
-    "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B " +
-    "~ BUS R2 0:05 0:10 ~ C ~ Walk 30s [0:01:10 0:10:40 9m30s 1tx";
-  private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
-  private static final String EXP_PATH_WITH_COST = EXP_PATH + " $1230]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -71,24 +68,31 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
     // Make sure the slack have values which prevent the normal from happening transfer.
     // The test scenario have zero seconds to transfer, so any slack will do.
-    data.withSlackProvider(new DefaultSlackProvider(30, 20, 10));
+    data.withSlackProvider(new DefaultSlackProvider(D30s, D20s, D10s));
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    var path =
+      "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R2 0:05 0:10 ~ C ~ Walk 30s " +
+      "[0:01:10 0:10:40 9m30s 1tx $1230]";
     return RaptorModuleTestCase
       .of()
-      .add(standard(), EXP_PATH_NO_COST)
-      .add(multiCriteria(), EXP_PATH_WITH_COST)
+      // TODO - board-slack is added for FORWARD search, while alight-slack is added for
+      //      - REVERSE. We should add both, but that requires a bit of refactoring and
+      //      - providing constraint-transfer information at the place where alight-slack
+      //      - should be added in Raptor.
+      .add(TC_MIN_DURATION, "[0:00 0:09:20 9m20s 1tx]")
+      .add(TC_MIN_DURATION_REV, "[0:20:50 0:30 9m10s 1tx]")
+      .add(standard(), PathUtils.withoutCost(path))
+      .add(multiCriteria(), path)
       .build();
   }
 
   @ParameterizedTest
   @MethodSource("testCases")
   void testRaptor(RaptorModuleTestCase testCase) {
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 }

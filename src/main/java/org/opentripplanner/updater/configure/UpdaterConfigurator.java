@@ -6,13 +6,14 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
-import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdater;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
+import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -45,25 +46,40 @@ public class UpdaterConfigurator {
   private final Graph graph;
   private final TransitModel transitModel;
   private final UpdatersParameters updatersParameters;
+  private final VehiclePositionRepository vehiclePositionRepository;
+  private final VehicleRentalRepository vehicleRentalRepository;
   private SiriTimetableSnapshotSource siriTimetableSnapshotSource = null;
   private TimetableSnapshotSource gtfsTimetableSnapshotSource = null;
 
   private UpdaterConfigurator(
     Graph graph,
+    VehiclePositionRepository vehiclePositionRepository,
+    VehicleRentalRepository vehicleRentalRepository,
     TransitModel transitModel,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
+    this.vehiclePositionRepository = vehiclePositionRepository;
+    this.vehicleRentalRepository = vehicleRentalRepository;
     this.transitModel = transitModel;
     this.updatersParameters = updatersParameters;
   }
 
   public static void configure(
     Graph graph,
+    VehiclePositionRepository vehiclePositionService,
+    VehicleRentalRepository vehicleRentalService,
     TransitModel transitModel,
     UpdatersParameters updatersParameters
   ) {
-    new UpdaterConfigurator(graph, transitModel, updatersParameters).configure();
+    new UpdaterConfigurator(
+      graph,
+      vehiclePositionService,
+      vehicleRentalService,
+      transitModel,
+      updatersParameters
+    )
+      .configure();
   }
 
   private void configure() {
@@ -113,7 +129,7 @@ public class UpdaterConfigurator {
     return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(
       parameters,
       graph.getLinker(),
-      graph.getVehicleRentalService()
+      vehicleRentalRepository
     );
   }
 
@@ -128,12 +144,7 @@ public class UpdaterConfigurator {
     for (var configItem : updatersParameters.getVehicleRentalParameters()) {
       var source = VehicleRentalDataSourceFactory.create(configItem.sourceParameters());
       updaters.add(
-        new VehicleRentalUpdater(
-          configItem,
-          source,
-          graph.getLinker(),
-          graph.getVehicleRentalService()
-        )
+        new VehicleRentalUpdater(configItem, source, graph.getLinker(), vehicleRentalRepository)
       );
     }
     for (var configItem : updatersParameters.getGtfsRealtimeAlertsUpdaterParameters()) {
@@ -146,11 +157,7 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {
       updaters.add(
-        new PollingVehiclePositionUpdater(
-          configItem,
-          graph.getVehiclePositionService(),
-          transitModel
-        )
+        new PollingVehiclePositionUpdater(configItem, vehiclePositionRepository, transitModel)
       );
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
@@ -163,9 +170,6 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
       updaters.add(new SiriSXUpdater(configItem, transitModel));
-    }
-    for (var configItem : updatersParameters.getSiriVMUpdaterParameters()) {
-      updaters.add(new SiriVMUpdater(provideSiriTimetableSnapshot(), configItem, transitModel));
     }
     for (var configItem : updatersParameters.getWebsocketGtfsRealtimeUpdaterParameters()) {
       updaters.add(

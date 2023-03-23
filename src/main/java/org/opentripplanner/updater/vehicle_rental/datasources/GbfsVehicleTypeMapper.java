@@ -1,7 +1,8 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class GbfsVehicleTypeMapper {
@@ -16,9 +17,22 @@ public class GbfsVehicleTypeMapper {
     return new RentalVehicleType(
       new FeedScopedId(systemId, vehicleType.getVehicleTypeId()),
       vehicleType.getName(),
-      RentalVehicleType.FormFactor.fromGbfs(vehicleType.getFormFactor()),
+      fromGbfs(vehicleType.getFormFactor()),
       RentalVehicleType.PropulsionType.fromGbfs(vehicleType.getPropulsionType()),
       vehicleType.getMaxRangeMeters()
     );
+  }
+
+  private static RentalFormFactor fromGbfs(GBFSVehicleType.FormFactor formFactor) {
+    return switch (formFactor) {
+      case BICYCLE -> RentalFormFactor.BICYCLE;
+      case CARGO_BICYCLE -> RentalFormFactor.CARGO_BICYCLE;
+      case CAR -> RentalFormFactor.CAR;
+      case MOPED -> RentalFormFactor.MOPED;
+      case SCOOTER -> RentalFormFactor.SCOOTER;
+      case SCOOTER_STANDING -> RentalFormFactor.SCOOTER_STANDING;
+      case SCOOTER_SEATED -> RentalFormFactor.SCOOTER_SEATED;
+      case OTHER -> RentalFormFactor.OTHER;
+    };
   }
 }

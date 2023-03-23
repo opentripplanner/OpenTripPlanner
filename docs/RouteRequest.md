@@ -71,8 +71,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [transferSlack](#rd_transferSlack)                                                                   |        `integer`       | The extra time needed to make a safe transfer in seconds.                                                                          | *Optional* | `120`                    |  2.0  |
 | turnReluctance                                                                                       |        `double`        | Multiplicative factor on expected turning time.                                                                                    | *Optional* | `1.0`                    |  2.0  |
 | [unpreferredCost](#rd_unpreferredCost)                                                               |    `linear-function`   | A cost function used to calculate penalty for an unpreferred route.                                                                | *Optional* | `"f(x) = 0 + 1.0 x"`     |  2.2  |
+| [unpreferredVehicleParkingTagCost](#rd_unpreferredVehicleParkingTagCost)                             |        `integer`       | What cost to add if a parking facility doesn't contain a preferred tag.                                                            | *Optional* | `300`                    |  2.3  |
 | useBikeRentalAvailabilityInformation                                                                 |        `boolean`       | Whether or not bike rental availability information will be used to plan bike rental trips.                                        | *Optional* | `false`                  |  2.0  |
-| useVehicleParkingAvailabilityInformation                                                             |        `boolean`       | TODO: Add short summary.                                                                                                           | *Optional* | `false`                  |  2.1  |
 | waitReluctance                                                                                       |        `double`        | How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.                                  | *Optional* | `1.0`                    |  2.0  |
 | walkBoardCost                                                                                        |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that is used when boarding while walking. | *Optional* | `600`                    |  2.0  |
 | [walkReluctance](#rd_walkReluctance)                                                                 |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                       | *Optional* | `2.0`                    |  2.0  |
@@ -80,7 +80,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | walkSpeed                                                                                            |        `double`        | The user's walking speed in meters/second.                                                                                         | *Optional* | `1.33`                   |  2.0  |
 | [alightSlackForMode](#rd_alightSlackForMode)                                                         | `enum map of duration` | How much extra time should be given when alighting a vehicle for each given mode.                                                  | *Optional* |                          |  2.0  |
 | [allowedVehicleRentalNetworks](#rd_allowedVehicleRentalNetworks)                                     |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                  | *Optional* |                          |  2.1  |
-| [bannedVehicleParkingTags](#rd_bannedVehicleParkingTags)                                             |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned                                                   | *Optional* |                          |  2.1  |
+| [bannedVehicleParkingTags](#rd_bannedVehicleParkingTags)                                             |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned.                                                  | *Optional* |                          |  2.1  |
 | [bannedVehicleRentalNetworks](#rd_bannedVehicleRentalNetworks)                                       |       `string[]`       | he vehicle rental networks which may not be used. If empty, no networks are banned.                                                | *Optional* |                          |  2.1  |
 | [boardSlackForMode](#rd_boardSlackForMode)                                                           | `enum map of duration` | How much extra time should be given when boarding a vehicle for each given mode.                                                   | *Optional* |                          |  2.0  |
 | [itineraryFilters](#rd_itineraryFilters)                                                             |        `object`        | Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results.                       | *Optional* |                          |  2.0  |
@@ -100,7 +100,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                  |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                 | *Optional* | `0.4`                    |  2.2  |
 | [maxAccessEgressDurationForMode](#rd_maxAccessEgressDurationForMode)                                 | `enum map of duration` | Limit access/egress per street mode.                                                                                               | *Optional* |                          |  2.1  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                                 | `enum map of duration` | Limit direct route duration per street mode.                                                                                       | *Optional* |                          |  2.2  |
-| [requiredVehicleParkingTags](#rd_requiredVehicleParkingTags)                                         |       `string[]`       | Tags which are required to use a vehicle parking. If empty, no tags are required.                                                  | *Optional* |                          |  2.1  |
+| [preferredVehicleParkingTags](#rd_preferredVehicleParkingTags)                                       |       `string[]`       | Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.           | *Optional* |                          |  2.3  |
+| [requiredVehicleParkingTags](#rd_requiredVehicleParkingTags)                                         |       `string[]`       | Tags without which a vehicle parking will not be used. If empty, no tags are required.                                             | *Optional* |                          |  2.1  |
 | [transferOptimization](#rd_transferOptimization)                                                     |        `object`        | Optimize where a transfer between to trip happens.                                                                                 | *Optional* |                          |  2.1  |
 |    [backTravelWaitTimeFactor](#rd_to_backTravelWaitTimeFactor)                                       |        `double`        | To reduce back-travel we favor waiting, this reduces the cost of waiting.                                                          | *Optional* | `1.0`                    |  2.1  |
 |    [extraStopBoardAlightCostsFactor](#rd_to_extraStopBoardAlightCostsFactor)                         |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                         | *Optional* | `0.0`                    |  2.1  |
@@ -108,6 +109,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [optimizeTransferWaitTime](#rd_to_optimizeTransferWaitTime)                                       |        `boolean`       | This enables the transfer wait time optimization.                                                                                  | *Optional* | `true`                   |  2.1  |
 | [transitReluctanceForMode](#rd_transitReluctanceForMode)                                             |  `enum map of double`  | Transit reluctance for a given transport mode                                                                                      | *Optional* |                          |  2.1  |
 | [unpreferred](#rd_unpreferred)                                                                       |        `object`        | Parameters listing authorities or lines that preferably should not be used in trip patters.                                        | *Optional* |                          |  2.2  |
+|    [agencies](#rd_unpreferred_agencies)                                                              |   `feed-scoped-id[]`   | The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`                                        | *Optional* |                          |  2.2  |
+|    [routes](#rd_unpreferred_routes)                                                                  |   `feed-scoped-id[]`   | The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`                                           | *Optional* |                          |  2.2  |
 | wheelchairAccessibility                                                                              |        `object`        | See [Wheelchair Accessibility](Accessibility.md)                                                                                   | *Optional* |                          |  2.2  |
 |    enabled                                                                                           |        `boolean`       | Enable wheelchair accessibility.                                                                                                   | *Optional* | `false`                  |  2.0  |
 |    inaccessibleStreetReluctance                                                                      |        `double`        | The factor to multiply the cost of traversing a street edge that is not wheelchair-accessible.                                     | *Optional* | `25.0`                   |  2.2  |
@@ -115,6 +118,9 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [slopeExceededReluctance](#rd_wheelchairAccessibility_slopeExceededReluctance)                    |        `double`        | How much streets with high slope should be avoided.                                                                                | *Optional* | `1.0`                    |  2.2  |
 |    [stairsReluctance](#rd_wheelchairAccessibility_stairsReluctance)                                  |        `double`        | How much stairs should be avoided.                                                                                                 | *Optional* | `100.0`                  |  2.2  |
 |    elevator                                                                                          |        `object`        | Configuration for when to use inaccessible elevators.                                                                              | *Optional* |                          |  2.2  |
+|       inaccessibleCost                                                                               |        `integer`       | The cost to add when traversing an entity which is know to be inaccessible.                                                        | *Optional* | `3600`                   |  2.2  |
+|       onlyConsiderAccessible                                                                         |        `boolean`       | Whether to only use this entity if it is explicitly marked as wheelchair accessible.                                               | *Optional* | `false`                  |  2.2  |
+|       unknownCost                                                                                    |        `integer`       | The cost to add when traversing an entity with unknown accessibility information.                                                  | *Optional* | `20`                     |  2.2  |
 |    stop                                                                                              |        `object`        | Configuration for when to use inaccessible stops.                                                                                  | *Optional* |                          |  2.2  |
 |       inaccessibleCost                                                                               |        `integer`       | The cost to add when traversing an entity which is know to be inaccessible.                                                        | *Optional* | `3600`                   |  2.2  |
 |       onlyConsiderAccessible                                                                         |        `boolean`       | Whether to only use this entity if it is explicitly marked as wheelchair accessible.                                               | *Optional* | `true`                   |  2.2  |
@@ -334,6 +340,15 @@ Function should return number of seconds that we are willing to wait for preferr
 or for an unpreferred agency's departure. For example, 600 + 2.0 x
 
 
+<h3 id="rd_unpreferredVehicleParkingTagCost">unpreferredVehicleParkingTagCost</h3>
+
+**Since version:** `2.3` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `300`   
+**Path:** /routingDefaults 
+
+What cost to add if a parking facility doesn't contain a preferred tag.
+
+See `preferredVehicleParkingTags`.
+
 <h3 id="rd_walkReluctance">walkReluctance</h3>
 
 **Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`   
@@ -379,7 +394,7 @@ The vehicle rental networks which may be used. If empty all networks may be used
 **Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults 
 
-Tags with which a vehicle parking will not be used. If empty, no tags are banned
+Tags with which a vehicle parking will not be used. If empty, no tags are banned.
 
 <h3 id="rd_bannedVehicleRentalNetworks">bannedVehicleRentalNetworks</h3>
 
@@ -592,12 +607,19 @@ Override the settings in `maxDirectStreetDuration` for specific street modes. Th
 done because some street modes searches are much more resource intensive than others.
 
 
+<h3 id="rd_preferredVehicleParkingTags">preferredVehicleParkingTags</h3>
+
+**Since version:** `2.3` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults 
+
+Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.
+
 <h3 id="rd_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
 
 **Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults 
 
-Tags which are required to use a vehicle parking. If empty, no tags are required.
+Tags without which a vehicle parking will not be used. If empty, no tags are required.
 
 <h3 id="rd_transferOptimization">transferOptimization</h3>
 
@@ -703,6 +725,24 @@ cost function. The cost function (`unpreferredCost`) is defined as a linear func
 `A + B x`, where `A` is a fixed cost (in seconds) and `B` is reluctance multiplier for transit leg
 travel time `x` (in seconds).
 
+
+<h3 id="rd_unpreferred_agencies">agencies</h3>
+
+**Since version:** `2.2` ∙ **Type:** `feed-scoped-id[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/unpreferred 
+
+The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`
+
+How much cost is added is configured in `unpreferredCost`.
+
+<h3 id="rd_unpreferred_routes">routes</h3>
+
+**Since version:** `2.2` ∙ **Type:** `feed-scoped-id[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/unpreferred 
+
+The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`
+
+How much cost is added is configured in `unpreferredCost`.
 
 <h3 id="rd_wheelchairAccessibility_maxSlope">maxSlope</h3>
 

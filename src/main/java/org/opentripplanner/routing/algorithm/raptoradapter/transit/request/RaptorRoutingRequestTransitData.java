@@ -224,7 +224,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   public RaptorConstrainedBoardingSearch<TripSchedule> transferConstraintsForwardSearch(
     int routeIndex
   ) {
-    TransferForPatternByStopPos transfers = forwardConstrainedTransfers.get(routeIndex);
+    var transfers = forwardConstrainedTransfers.get(routeIndex);
     if (transfers == null) {
       return ConstrainedBoardingSearch.NOOP_SEARCH;
     }

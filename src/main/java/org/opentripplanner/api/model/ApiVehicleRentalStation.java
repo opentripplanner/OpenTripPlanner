@@ -1,7 +1,7 @@
 package org.opentripplanner.api.model;
 
 import java.util.List;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 
 public class ApiVehicleRentalStation {
 

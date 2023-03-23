@@ -4,7 +4,9 @@ import static org.opentripplanner.framework.lang.IntUtils.intArray;
 
 import java.util.BitSet;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
+import org.opentripplanner.raptor.rangeraptor.support.IntArraySingleCriteriaArrivals;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.util.BitSetIterator;
 
@@ -109,7 +111,7 @@ public final class BestTimes {
    */
   public boolean updateBestTransitArrivalTime(int stop, int time) {
     if (isBestTransitArrivalTime(stop, time)) {
-      setBestTime(stop, time);
+      setBestTransitTime(stop, time);
       return true;
     }
     return false;
@@ -130,6 +132,14 @@ public final class BestTimes {
     return times.length;
   }
 
+  public SingleCriteriaStopArrivals extractBestOverallArrivals() {
+    return new IntArraySingleCriteriaArrivals(calculator.unreachedTime(), times);
+  }
+
+  public SingleCriteriaStopArrivals extractBestTransitArrivals() {
+    return new IntArraySingleCriteriaArrivals(calculator.unreachedTime(), transitArrivalTimes);
+  }
+
   @Override
   public String toString() {
     final int unreachedTime = calculator.unreachedTime();
@@ -148,6 +158,13 @@ public final class BestTimes {
    */
   boolean isStopReachedOnBoardInCurrentRound(int stop) {
     return reachedByTransitCurrentRound.get(stop);
+  }
+
+  /**
+   * @return true if the given stop was reached by transfer or on-board in the current round.
+   */
+  boolean isStopReachedInCurrentRound(int stop) {
+    return reachedCurrentRound.get(stop);
   }
 
   /**
@@ -184,7 +201,7 @@ public final class BestTimes {
     return calculator.isBefore(time, transitArrivalTimes[stop]);
   }
 
-  private void setBestTime(int stop, int time) {
+  private void setBestTransitTime(int stop, int time) {
     transitArrivalTimes[stop] = time;
     reachedByTransitCurrentRound.set(stop);
   }

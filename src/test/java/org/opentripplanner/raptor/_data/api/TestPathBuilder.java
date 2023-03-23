@@ -3,15 +3,17 @@ package org.opentripplanner.raptor._data.api;
 import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.findTripTimes;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
+import org.opentripplanner.raptor.path.PathBuilder;
 import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
-import org.opentripplanner.raptor.spi.PathBuilder;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
  * Utility to help build paths for testing. The path builder is "reusable", every time the {@code
@@ -19,38 +21,50 @@ import org.opentripplanner.raptor.spi.PathBuilder;
  * <p>
  * If the {@code costCalculator} is null, paths will not include cost.
  */
-public class TestPathBuilder {
+public class TestPathBuilder implements RaptorTestConstants {
 
   private static final int BOARD_ALIGHT_OFFSET = 30;
 
   @Nullable
   private final CostCalculator<TestTripSchedule> costCalculator;
 
-  private final int alightSlack;
+  private final RaptorSlackProvider slackProvider;
   private PathBuilder<TestTripSchedule> builder;
   private int startTime;
 
   public TestPathBuilder(
-    int alightSlack,
+    RaptorSlackProvider slackProvider,
     @Nullable CostCalculator<TestTripSchedule> costCalculator
   ) {
-    this.alightSlack = alightSlack;
+    this.slackProvider = slackProvider;
     this.costCalculator = costCalculator;
+  }
+
+  /**
+   * Uses the slacks in {@link RaptorTestConstants}.
+   */
+  public TestPathBuilder(@Nullable CostCalculator<TestTripSchedule> costCalculator) {
+    this(new DefaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK), costCalculator);
   }
 
   /**
    * Create access starting at the fixed given {@code starting}. Opening hours is used to enforce
    * the access start time and prevent time-shifting it.
    */
-  public TestPathBuilder access(int startTime, int duration, int toStop) {
-    return access(startTime, TestAccessEgress.walk(toStop, duration, startTime, startTime));
+  public TestPathBuilder access(int startTime, int toStop, int duration) {
+    return access(startTime, TestAccessEgress.walk(toStop, duration));
+  }
+
+  /** Same as {@link #access(int, int, int)} , but with a free access - duration is 0s. */
+  public TestPathBuilder access(int startTime, int toStop) {
+    return access(startTime, TestAccessEgress.free(toStop));
   }
 
   /**
    * Create access with the given {@code startTime}, but allow the access to be time-shifted
    * according to the opening hours of the given {@code transfer}.
    */
-  public TestPathBuilder access(int startTime, TestAccessEgress transfer) {
+  private TestPathBuilder access(int startTime, TestAccessEgress transfer) {
     reset(startTime);
     builder.access(transfer);
     return this;
@@ -93,12 +107,16 @@ public class TestPathBuilder {
   }
 
   public RaptorPath<TestTripSchedule> egress(int duration) {
-    return egress(TestAccessEgress.walk(currentStop(), duration));
+    return egress(
+      duration == 0
+        ? TestAccessEgress.free(currentStop())
+        : TestAccessEgress.walk(currentStop(), duration)
+    );
   }
 
   public RaptorPath<TestTripSchedule> egress(TestAccessEgress transfer) {
     builder.egress(transfer);
-    return builder.build(startTime);
+    return builder.build();
   }
 
   /* private methods */
@@ -111,10 +129,11 @@ public class TestPathBuilder {
     this.startTime = startTime;
     this.builder =
       PathBuilder.tailPathBuilder(
-        null,
-        new DefaultSlackProvider(0, 0, alightSlack),
+        slackProvider,
+        startTime,
         costCalculator,
-        RaptorStopNameResolver.nullSafe(null)
+        RaptorStopNameResolver.nullSafe(null),
+        null
       );
   }
 }

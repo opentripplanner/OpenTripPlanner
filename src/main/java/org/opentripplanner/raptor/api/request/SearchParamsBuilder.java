@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
@@ -29,7 +30,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   private Double relaxCostAtDestination;
   private boolean timetable;
   private boolean constrainedTransfers;
-  private boolean allowEmptyEgressPaths;
+  private boolean allowEmptyAccessEgressPaths;
 
   public SearchParamsBuilder(RaptorRequestBuilder<T> parent, SearchParams defaults) {
     this.parent = parent;
@@ -44,7 +45,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     this.constrainedTransfers = defaults.constrainedTransfers();
     this.accessPaths.addAll(defaults.accessPaths());
     this.egressPaths.addAll(defaults.egressPaths());
-    this.allowEmptyEgressPaths = defaults.allowEmptyEgressPaths();
+    this.allowEmptyAccessEgressPaths = defaults.allowEmptyAccessEgressPaths();
   }
 
   public int earliestDepartureTime() {
@@ -76,7 +77,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
 
   public SearchParamsBuilder<T> searchWindow(Duration searchWindow) {
     this.searchWindowInSeconds =
-      searchWindow == null ? SearchParams.NOT_SET : (int) searchWindow.toSeconds();
+      searchWindow == null ? RaptorConstants.NOT_SET : (int) searchWindow.toSeconds();
     return this;
   }
 
@@ -172,13 +173,13 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     return addEgressPaths(Arrays.asList(egressPaths));
   }
 
-  public SearchParamsBuilder<T> allowEmptyEgressPaths(boolean allowEmptyEgressPaths) {
-    this.allowEmptyEgressPaths = allowEmptyEgressPaths;
+  public SearchParamsBuilder<T> allowEmptyAccessEgressPaths(boolean allowEmptyEgressPaths) {
+    this.allowEmptyAccessEgressPaths = allowEmptyEgressPaths;
     return this;
   }
 
-  public boolean allowEmptyEgressPaths() {
-    return allowEmptyEgressPaths;
+  public boolean allowEmptyAccessEgressPaths() {
+    return allowEmptyAccessEgressPaths;
   }
 
   public RaptorRequest<T> build() {
@@ -194,8 +195,8 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   public String toString() {
     return ToStringBuilder
       .of(SearchParams.class)
-      .addServiceTime("earliestDepartureTime", earliestDepartureTime, SearchParams.TIME_NOT_SET)
-      .addServiceTime("latestArrivalTime", latestArrivalTime, SearchParams.TIME_NOT_SET)
+      .addServiceTime("earliestDepartureTime", earliestDepartureTime, RaptorConstants.TIME_NOT_SET)
+      .addServiceTime("latestArrivalTime", latestArrivalTime, RaptorConstants.TIME_NOT_SET)
       .addDurationSec("searchWindow", searchWindowInSeconds)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)

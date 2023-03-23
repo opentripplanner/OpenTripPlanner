@@ -59,6 +59,12 @@ public class SiriTripPatternCache {
     @Nonnull final Trip trip,
     @Nonnull LocalDate serviceDate
   ) {
+    TripPattern originalTripPattern = getPatternForTrip.apply(trip);
+
+    if (originalTripPattern.getStopPattern().equals(stopPattern)) {
+      return originalTripPattern;
+    }
+
     // Check cache for trip pattern
     StopPatternServiceDateKey key = new StopPatternServiceDateKey(stopPattern, serviceDate);
     TripPattern tripPattern = cache.get(key);
@@ -70,11 +76,10 @@ public class SiriTripPatternCache {
         .of(id)
         .withRoute(trip.getRoute())
         .withMode(trip.getMode())
+        .withNetexSubmode(trip.getNetexSubMode())
         .withStopPattern(stopPattern);
 
       // TODO - SIRI: Add pattern to transitModel index?
-
-      TripPattern originalTripPattern = getPatternForTrip.apply(trip);
 
       tripPatternBuilder.withCreatedByRealtimeUpdater(true);
       tripPatternBuilder.withOriginalTripPattern(originalTripPattern);

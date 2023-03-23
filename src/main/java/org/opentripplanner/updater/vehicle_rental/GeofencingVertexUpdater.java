@@ -13,12 +13,12 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.street.BusinessAreaBorder;
+import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
+import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.BusinessAreaBorder;
-import org.opentripplanner.street.model.vertex.RentalRestrictionExtension.GeofencingZoneExtension;
 
 /**
  * Even though the data is kept on the vertex this updater operates mostly on edges which then

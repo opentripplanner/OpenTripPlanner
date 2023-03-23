@@ -2,40 +2,15 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.api.mapping.StreetNoteMaperMapper;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.ext.legacygraphqlapi.mapping.StreetNoteMapper;
 import org.opentripplanner.model.plan.ElevationProfile.Step;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
-import org.opentripplanner.street.model.note.StreetNote;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStep {
-
-  /**
-   * Similar to {@link StreetNoteMaperMapper::mapToApi}.
-   */
-  public static TransitAlert mapStreetNoteToAlert(StreetNote note) {
-    // TODO: The ID is used only in the mapping, we should instead have two mappers for the fields
-    TransitAlertBuilder alert = TransitAlert.of(
-      new FeedScopedId("StreetNote", Integer.toString(note.hashCode()))
-    );
-    alert.withHeaderText(note.note);
-    alert.withDescriptionText(note.descriptionText);
-    alert.withUrl(new NonLocalizedString(note.url));
-    alert.addTimePeriod(
-      new TimePeriod(
-        note.effectiveStartDate.getTime() / 1000,
-        note.effectiveEndDate.getTime() / 1000
-      )
-    );
-    return alert.build();
-  }
 
   @Override
   public DataFetcher<LegacyGraphQLAbsoluteDirection> absoluteDirection() {
@@ -58,7 +33,7 @@ public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGr
       getSource(environment)
         .getStreetNotes()
         .stream()
-        .map(LegacyGraphQLstepImpl::mapStreetNoteToAlert)
+        .map(StreetNoteMapper::mapStreetNoteToAlert)
         .toList();
   }
 

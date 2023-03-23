@@ -15,12 +15,6 @@ import javax.annotation.Nonnull;
  */
 public class TimeUtils {
 
-  /**
-   * This constant is used to represent a service time, which is not set. This typically is used in
-   * the requestWhen an integer is used to represent a service time in seconds
-   */
-  public static final int NOT_SET = -1_000_000;
-
   private static final Pattern DAYS_SUFFIX = Pattern.compile("([-+])(\\d+)d");
   public static final Integer ONE_DAY_SECONDS = 24 * 60 * 60;
 

@@ -3,8 +3,10 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.SearchParams;
@@ -24,14 +26,14 @@ public class RaptorSearchWindowCalculatorTest {
 
     /** 10 minutes = 600s */
     @Override
-    public int minWinTimeMinutes() {
-      return 10;
+    public Duration minWindow() {
+      return Duration.ofMinutes(10);
     }
 
     /** Set the max search-window length to 30 minutes (1_800 seconds) */
     @Override
-    public int maxWinTimeMinutes() {
-      return 30;
+    public Duration maxWindow() {
+      return Duration.ofMinutes(30);
     }
 
     /** Round search-window to nearest 1 minute (60 seconds) */
@@ -94,7 +96,7 @@ public class RaptorSearchWindowCalculatorTest {
     assertEquals(840, subject.getSearchWindowSeconds());
     // Given - verify not changed
     assertEquals(10_200, subject.getEarliestDepartureTime());
-    assertEquals(SearchParams.TIME_NOT_SET, subject.getLatestArrivalTime());
+    assertEquals(RaptorConstants.TIME_NOT_SET, subject.getLatestArrivalTime());
   }
 
   @Test
@@ -120,7 +122,7 @@ public class RaptorSearchWindowCalculatorTest {
     assertEquals(1_800, subject.getSearchWindowSeconds());
     // Given - verify not changed
     assertEquals(12_000, subject.getEarliestDepartureTime());
-    assertEquals(SearchParams.TIME_NOT_SET, subject.getLatestArrivalTime());
+    assertEquals(RaptorConstants.TIME_NOT_SET, subject.getLatestArrivalTime());
   }
 
   @Test

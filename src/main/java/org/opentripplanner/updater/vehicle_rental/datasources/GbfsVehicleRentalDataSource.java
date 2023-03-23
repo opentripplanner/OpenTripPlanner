@@ -6,19 +6,20 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.entur.gbfs.v2_2.free_bike_status.GBFSFreeBikeStatus;
-import org.entur.gbfs.v2_2.geofencing_zones.GBFSGeofencingZones;
-import org.entur.gbfs.v2_2.station_information.GBFSStationInformation;
-import org.entur.gbfs.v2_2.station_status.GBFSStation;
-import org.entur.gbfs.v2_2.station_status.GBFSStationStatus;
-import org.entur.gbfs.v2_2.system_information.GBFSSystemInformation;
-import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
+import org.entur.gbfs.v2_3.free_bike_status.GBFSFreeBikeStatus;
+import org.entur.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
+import org.entur.gbfs.v2_3.station_information.GBFSStationInformation;
+import org.entur.gbfs.v2_3.station_status.GBFSStation;
+import org.entur.gbfs.v2_3.station_status.GBFSStationStatus;
+import org.entur.gbfs.v2_3.system_information.GBFSSystemInformation;
+import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
+import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
 /**
@@ -63,13 +64,8 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
     GBFSVehicleTypes rawVehicleTypes = loader.getFeed(GBFSVehicleTypes.class);
     if (rawVehicleTypes != null) {
       GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper(system.systemId);
-      vehicleTypes =
-        rawVehicleTypes
-          .getData()
-          .getVehicleTypes()
-          .stream()
-          .map(vehicleTypeMapper::mapRentalVehicleType)
-          .collect(Collectors.toMap(v -> v.id.getId(), Function.identity()));
+      List<GBFSVehicleType> gbfsVehicleTypes = rawVehicleTypes.getData().getVehicleTypes();
+      vehicleTypes = mapVehicleTypes(vehicleTypeMapper, gbfsVehicleTypes);
     }
 
     List<VehicleRentalPlace> stations = new LinkedList<>();
@@ -157,5 +153,16 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
   @Override
   public List<GeofencingZone> getGeofencingZones() {
     return this.geofencingZones;
+  }
+
+  protected static Map<String, RentalVehicleType> mapVehicleTypes(
+    GbfsVehicleTypeMapper vehicleTypeMapper,
+    List<GBFSVehicleType> gbfsVehicleTypes
+  ) {
+    return gbfsVehicleTypes
+      .stream()
+      .map(vehicleTypeMapper::mapRentalVehicleType)
+      .distinct()
+      .collect(Collectors.toMap(v -> v.id.getId(), Function.identity()));
   }
 }
