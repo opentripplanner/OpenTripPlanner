@@ -2,21 +2,15 @@ package org.opentripplanner;
 
 import com.csvreader.CsvReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -85,10 +79,7 @@ public class ConstantsForTests {
 
   private static final String NETEX_NORDIC_FILENAME = "netex_minimal.zip";
   private static final String NETEX_EPIP_DIR = "src/test/resources/netex/epip/";
-  private static final String NETEX_EPIP_DATA_DIR =
-    NETEX_EPIP_DIR + "netex_epip_minimal/NeTEx_20230203_OTP/";
-  private static final String NETEX_EPIP_FILENAME = "netex_epip_minimal.zip";
-
+  private static final String NETEX_EPIP_DATA_DIR = NETEX_EPIP_DIR + "netex_epip_minimal/";
   /* Stuttgart area, Germany */
   public static final String DEUFRINGEN_OSM =
     "src/test/resources/germany/deufringen-minimal.osm.pbf";
@@ -143,21 +134,12 @@ public class ConstantsForTests {
 
   public static NetexBundle createMinimalNetexEpipBundle() {
     var buildConfig = createNetexEpipBuilderParameters();
-    List<String> fileList = new ArrayList<>();
-    generateFileList(new File(NETEX_EPIP_DATA_DIR), fileList, NETEX_EPIP_DATA_DIR);
-    zipIt(NETEX_EPIP_DIR + NETEX_EPIP_FILENAME, NETEX_EPIP_DATA_DIR, fileList);
 
-    var netexZipFile = new File(NETEX_EPIP_DIR, NETEX_EPIP_FILENAME);
+    var netexZipFile = new File(NETEX_EPIP_DATA_DIR);
 
-    var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
+    var dataSource = new DirectoryDataSource(netexZipFile, FileType.NETEX);
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
     return new NetexConfigure(buildConfig).netexBundle(configuredDataSource);
-  }
-
-  public static void cleanupNetexEpipTestZip() {
-    try {
-      Files.deleteIfExists(Path.of(NETEX_EPIP_DIR + NETEX_EPIP_FILENAME));
-    } catch (IOException ignored) {}
   }
 
   /**
@@ -399,59 +381,5 @@ public class ConstantsForTests {
 
   private static BuildConfig createNetexEpipBuilderParameters() {
     return new OtpConfigLoader(new File(ConstantsForTests.NETEX_EPIP_DIR)).loadBuildConfig();
-  }
-
-  private static void zipIt(String zipFile, String sourceFolder, List<String> fileList) {
-    byte[] buffer = new byte[1024];
-    String source = new File(sourceFolder).getName();
-    FileOutputStream fos;
-    ZipOutputStream zos = null;
-    try {
-      fos = new FileOutputStream(zipFile);
-      zos = new ZipOutputStream(fos);
-
-      System.out.println("Output to Zip : " + zipFile);
-      FileInputStream in = null;
-
-      for (String file : fileList) {
-        System.out.println("File Added : " + file);
-        ZipEntry ze = new ZipEntry(source + File.separator + file);
-        zos.putNextEntry(ze);
-        try {
-          in = new FileInputStream(sourceFolder + File.separator + file);
-          int len;
-          while ((len = in.read(buffer)) > 0) {
-            zos.write(buffer, 0, len);
-          }
-        } finally {
-          in.close();
-        }
-      }
-
-      zos.closeEntry();
-      System.out.println("Folder successfully compressed");
-    } catch (IOException ex) {
-      ex.printStackTrace();
-    } finally {
-      try {
-        zos.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-  }
-
-  private static void generateFileList(File node, List<String> fileList, String sourceFolder) {
-    // add file only
-    if (node.isFile()) {
-      fileList.add(node.toString().substring(sourceFolder.length()));
-    }
-
-    if (node.isDirectory()) {
-      String[] subNode = node.list();
-      for (String filename : subNode) {
-        generateFileList(new File(node, filename), fileList, sourceFolder);
-      }
-    }
   }
 }

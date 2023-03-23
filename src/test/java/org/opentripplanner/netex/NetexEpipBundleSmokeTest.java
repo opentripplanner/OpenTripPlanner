@@ -73,8 +73,6 @@ class NetexEpipBundleSmokeTest {
 
     // And then - smoke test service calendar
     assetServiceCalendar(transitBuilder.buildCalendarServiceData());
-
-    ConstantsForTests.cleanupNetexEpipTestZip();
   }
 
   /* private methods */
