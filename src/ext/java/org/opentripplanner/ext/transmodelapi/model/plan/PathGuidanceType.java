@@ -4,8 +4,8 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import java.util.Locale;
-import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.plan.WalkStep;
 
 public class PathGuidanceType {
@@ -39,10 +39,12 @@ public class PathGuidanceType {
           .name("streetName")
           .description("The name of the street.")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> {
-            Locale locale = TransmodelGraphQLUtils.getLocale(environment);
-            return ((WalkStep) environment.getSource()).getStreetName().toString(locale);
-          })
+          .dataFetcher(environment ->
+            GraphQLUtils.getTranslation(
+              ((WalkStep) environment.getSource()).getStreetName(),
+              environment
+            )
+          )
           .build()
       )
       .field(
