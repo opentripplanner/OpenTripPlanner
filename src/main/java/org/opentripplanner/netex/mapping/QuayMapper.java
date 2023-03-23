@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -48,7 +48,7 @@ class QuayMapper {
    */
   @Nullable
   RegularStop mapQuayToStop(
-    @NotNull Quay quay,
+    @Nonnull Quay quay,
     Station parentStation,
     Collection<FareZone> fareZones,
     NetexMainAndSubMode transitMode,
