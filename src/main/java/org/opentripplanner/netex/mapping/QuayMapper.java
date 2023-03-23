@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -47,7 +48,7 @@ class QuayMapper {
    */
   @Nullable
   RegularStop mapQuayToStop(
-    Quay quay,
+    @NotNull Quay quay,
     Station parentStation,
     Collection<FareZone> fareZones,
     NetexMainAndSubMode transitMode,
@@ -60,12 +61,10 @@ class QuayMapper {
       transitMode,
       wheelchair
     );
-    return quay == null
-      ? null
-      : regularStopIndex.computeIfAbsent(
-        idFactory.createId(quay.getId()),
-        ignored -> map(parameters)
-      );
+    return regularStopIndex.computeIfAbsent(
+      idFactory.createId(quay.getId()),
+      ignored -> map(parameters)
+    );
   }
 
   private RegularStop map(MappingParameters parameters) {
