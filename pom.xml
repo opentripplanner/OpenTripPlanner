@@ -68,7 +68,6 @@
         <netty.version>4.1.74.Final</netty.version>
         <logback.version>1.4.6</logback.version>
         <lucene.version>9.5.0</lucene.version>
-        <graphql.version>20.0</graphql.version>
         <slf4j.version>2.0.7</slf4j.version>
         <netex-java-model.version>2.0.14</netex-java-model.version>
         <siri-java-model.version>1.21</siri-java-model.version>
@@ -897,12 +896,12 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>${graphql.version}</version>
+            <version>20.1</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-extended-scalars</artifactId>
-            <version>${graphql.version}</version>
+            <version>20.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
