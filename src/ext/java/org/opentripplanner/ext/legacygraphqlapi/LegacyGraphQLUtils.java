@@ -1,9 +1,7 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
-import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
 import java.util.Locale;
-import java.util.Map;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFilterPlaceType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
@@ -19,30 +17,6 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class LegacyGraphQLUtils {
-
-  public static Locale getLocale(DataFetchingEnvironment environment) {
-    return getLocale(environment, environment.getArgument("language"));
-  }
-
-  public static Locale getLocale(DataFetchingEnvironment environment, String localeString) {
-    if (localeString != null) {
-      return Locale.forLanguageTag(localeString);
-    }
-
-    Map<String, ?> localContext = environment.getLocalContext();
-    if (localContext != null && localContext.get("locale") != null) {
-      return (Locale) localContext.get("locale");
-    }
-
-    return environment.getLocale();
-  }
-
-  public static String getTranslation(I18NString input, DataFetchingEnvironment environment) {
-    if (input == null) {
-      return null;
-    }
-    return input.toString(getLocale(environment));
-  }
 
   public static LegacyGraphQLWheelchairBoarding toGraphQL(Accessibility boarding) {
     if (boarding == null) return null;
