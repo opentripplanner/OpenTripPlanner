@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR;
 import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
@@ -66,7 +65,7 @@ public class TestIntermediatePlaces {
       FakeGraph.addPerpendicularRoutes(graph, transitModel);
       FakeGraph.link(graph, transitModel);
       model.index();
-      TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
+      TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(null);
       timeZone = transitModel.getTimeZone();
 
       graphPathToItineraryMapper =

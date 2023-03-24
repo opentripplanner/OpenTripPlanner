@@ -104,7 +104,6 @@ public class SpeedTest {
       DefaultServerRequestContext.create(
         config.transitRoutingParams,
         config.request,
-        null,
         new RaptorConfig<>(config.transitRoutingParams),
         graph,
         new DefaultTransitService(transitModel),
