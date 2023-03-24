@@ -30,7 +30,9 @@ public abstract class CachingRideHailingService implements RideHailingService {
 
   protected String wheelchairAccessibleRideType;
 
-  // get the next arrivals for a specific location
+  /**
+   * Get the next arrivals for a specific location.
+   */
   @Override
   public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) throws ExecutionException {
     return arrivalTimeCache.get(

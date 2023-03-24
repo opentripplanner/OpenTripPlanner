@@ -3,6 +3,7 @@ package org.opentripplanner.ext.ridehailing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.ext.ridehailing.TestRideHailingService.DEFAULT_ARRIVAL_TIMES;
 import static org.opentripplanner.ext.ridehailing.model.RideHailingProvider.UBER;
 
 import java.io.IOException;
@@ -30,22 +31,10 @@ class RideHailingFilterTest implements PlanTestConstants {
     "foo",
     false
   );
-  RideHailingService mockService = new RideHailingService() {
-    @Override
-    public RideHailingProvider provider() {
-      return UBER;
-    }
-
-    @Override
-    public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) {
-      return List.of(new ArrivalTime(UBER, "car", "car", Duration.ofMinutes(15), false));
-    }
-
-    @Override
-    public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end) {
-      return List.of(RIDE_ESTIMATE);
-    }
-  };
+  RideHailingService mockService = new TestRideHailingService(
+    DEFAULT_ARRIVAL_TIMES,
+    List.of(RIDE_ESTIMATE)
+  );
   RideHailingService failingService = new RideHailingService() {
     @Override
     public RideHailingProvider provider() {
