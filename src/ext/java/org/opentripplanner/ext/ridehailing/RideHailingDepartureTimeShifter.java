@@ -36,15 +36,19 @@ public class RideHailingDepartureTimeShifter {
     List<RideHailingService> services,
     Instant now
   ) {
-    if (
-      req.journey().modes().accessMode == StreetMode.CAR_HAILING &&
-      req.dateTime().isBefore(now.plus(MAX_DURATION_FROM_NOW)) &&
-      !req.arriveBy()
-    ) {
+    if (shouldShift(req, now)) {
       return shiftTime(req, services, now);
     } else {
       return Result.success(req);
     }
+  }
+
+  public static boolean shouldShift(RouteRequest req, Instant now) {
+    return (
+      req.journey().modes().accessMode == StreetMode.CAR_HAILING &&
+      req.dateTime().isBefore(now.plus(MAX_DURATION_FROM_NOW)) &&
+      !req.arriveBy()
+    );
   }
 
   private static Result<RouteRequest, Error> shiftTime(
