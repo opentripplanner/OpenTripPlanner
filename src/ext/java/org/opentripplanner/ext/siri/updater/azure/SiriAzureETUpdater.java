@@ -167,7 +167,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
             DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
           );
         } catch (Exception e) {
-          LOG.error("Could not process ET history: {}", ExceptionUtils.getStackTrace(e));
+          LOG.error("Could not process ET history", e);
         }
       });
       f.get();

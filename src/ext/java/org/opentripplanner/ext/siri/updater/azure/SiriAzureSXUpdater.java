@@ -167,7 +167,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
           );
           setPrimed(true);
         } catch (Exception e) {
-          LOG.error("Could not process SX history: {}", ExceptionUtils.getStackTrace(e));
+          LOG.error("Could not process SX history", e);
         }
       });
       f.get();
