@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.transit.model.basic.Locales.NORWEGIAN_BOKMAL;
 import static org.opentripplanner.transit.model.basic.Locales.NORWEGIAN_NYNORSK;
@@ -8,6 +10,7 @@ import static org.opentripplanner.transit.model.basic.Locales.NORWEGIAN_NYNORSK;
 import java.util.Currency;
 import java.util.Locale;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.test.support.VariableSource;
@@ -15,8 +18,9 @@ import org.opentripplanner.transit.model.basic.Money;
 
 class MoneyTest {
 
-  static Money hundredNOK = new Money(Currency.getInstance("NOK"), 10000);
-  static Money oneDollar = Money.usDollars(100);
+  private static final Money hundredNOK = new Money(Currency.getInstance("NOK"), 10000);
+  private static final Money oneDollar = Money.usDollars(100);
+  private static final Money twoDollars = Money.usDollars(200);
   static Money threeEuroTwelve = Money.euros(312);
 
   static Stream<Arguments> testCases = Stream.of(
@@ -55,5 +59,22 @@ class MoneyTest {
 
   private static Money yen(int amount) {
     return new Money(Currency.getInstance("JPY"), amount);
+  }
+
+  @Test
+  void plus() {
+    assertEquals(twoDollars, oneDollar.plus(oneDollar));
+  }
+
+  @Test
+  void minus() {
+    assertEquals(oneDollar, twoDollars.minus(oneDollar));
+  }
+
+  @Test
+  void greaterThan() {
+    assertTrue(twoDollars.greaterThan(oneDollar));
+    assertFalse(oneDollar.greaterThan(oneDollar));
+    assertFalse(oneDollar.greaterThan(twoDollars));
   }
 }

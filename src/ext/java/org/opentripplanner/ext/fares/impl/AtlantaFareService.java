@@ -18,6 +18,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
 
 public class AtlantaFareService extends DefaultFareService {
@@ -70,7 +71,7 @@ public class AtlantaFareService extends DefaultFareService {
     List<ItineraryFares> fares = new ArrayList<>();
     final FareType fareType;
     final Currency currency;
-    float lastFareWithTransfer;
+    Money lastFareWithTransfer;
     int maxRides;
     Duration transferWindow;
 
@@ -85,13 +86,13 @@ public class AtlantaFareService extends DefaultFareService {
      * @param defaultFare Default fare to use for transfer calculations (usually from GTFS)
      * @return Whether the added ride is valid or not. If invalid, then this transfer has ended and a new one is needed for the ride.
      */
-    public boolean addLeg(Leg leg, float defaultFare) {
+    public boolean addLeg(Leg leg, Money defaultFare) {
       // A transfer will always contain at least one ride.
       ItineraryFares fare = new ItineraryFares();
       RideType toRideType = classify(leg);
       if (legs.size() == 0) {
         legs.add(leg);
-        fare.addFare(fareType, getMoney(currency, defaultFare));
+        fare.addFare(fareType, defaultFare);
         fares.add(fare);
         lastFareWithTransfer = defaultFare;
         maxRides = getMaxTransfers(toRideType);
@@ -131,7 +132,7 @@ public class AtlantaFareService extends DefaultFareService {
       fares.add(fare);
 
       if (transferClassification.type.equals(TransferType.NO_TRANSFER)) {
-        fare.addFare(fareType, getMoney(currency, defaultFare));
+        fare.addFare(fareType, defaultFare);
         // Full fare is charged, but transfer is still valid.
         // Ride is not added to rides list since it doesn't count towards transfer limit.
         // NOTE: Rides and fares list will not always be in sync because of this.
@@ -145,11 +146,11 @@ public class AtlantaFareService extends DefaultFareService {
         lastFareWithTransfer = defaultFare;
         return true;
       } else if (transferClassification.type.equals(TransferType.TRANSFER_PAY_DIFFERENCE)) {
-        float newCost = 0;
-        if (defaultFare > lastFareWithTransfer) {
-          newCost = defaultFare - lastFareWithTransfer;
+        Money newCost = Money.usDollars(0);
+        if (defaultFare.greaterThan(lastFareWithTransfer)) {
+          newCost = defaultFare.minus(lastFareWithTransfer);
         }
-        fare.addFare(fareType, getMoney(currency, newCost));
+        fare.addFare(fareType, newCost);
         lastFareWithTransfer = defaultFare;
         return true;
       } else if (transferClassification.type.equals(TransferType.TRANSFER_WITH_UPCHARGE)) {
@@ -173,8 +174,8 @@ public class AtlantaFareService extends DefaultFareService {
    * Get the leg price for a single leg. If testing, this class is being called directly so the required agency cash
    * values are not available therefore the default test price is used instead.
    */
-  protected float getLegPrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
-    return calculateCost(fareType, Lists.newArrayList(leg), fareRules);
+  protected Money getLegPrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
+    return calculateCost(fareType, Lists.newArrayList(leg), fareRules).orElse(Money.usDollars(0));
   }
 
   private static class TransferMeta {
@@ -370,7 +371,7 @@ public class AtlantaFareService extends DefaultFareService {
   ) {
     List<ATLTransfer> transfers = new ArrayList<>();
     for (var ride : rides) {
-      float defaultFare = getLegPrice(ride, fareType, fareRules);
+      Money defaultFare = getLegPrice(ride, fareType, fareRules);
       if (transfers.isEmpty()) {
         transfers.add(new ATLTransfer(currency, fareType));
       }

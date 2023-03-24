@@ -177,7 +177,7 @@ public class FaresIntegrationTest {
 
     fareComponents = fare.getComponents(FareType.regular);
     assertEquals(fareComponents.size(), 1);
-    assertEquals(fareComponents.get(0).price(), tenUSD);
+    assertEquals(tenUSD, fareComponents.get(0).price());
     assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "EG"));
     assertEquals(fareComponents.get(0).routes().get(0), new FeedScopedId(feedId, "5"));
     assertEquals(fareComponents.get(0).routes().get(1), new FeedScopedId(feedId, "6"));

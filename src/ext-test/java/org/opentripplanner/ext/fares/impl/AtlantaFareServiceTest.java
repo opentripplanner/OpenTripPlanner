@@ -6,6 +6,7 @@ import static org.opentripplanner.ext.fares.impl.AtlantaFareService.GCT_AGENCY_I
 import static org.opentripplanner.ext.fares.impl.AtlantaFareService.MARTA_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.AtlantaFareService.XPRESS_AGENCY_ID;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import java.util.Collection;
 import java.util.Currency;
@@ -24,6 +25,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -32,8 +34,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 public class AtlantaFareServiceTest implements PlanTestConstants {
 
-  public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
-  public static final float DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE * 100;
+  public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(349);
+  public static final float DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE.cents();
   public static final Currency USD = Currency.getInstance("USD");
   private static AtlantaFareService atlFareService;
 
@@ -273,7 +275,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     }
 
     @Override
-    protected float getLegPrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
+    protected Money getLegPrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
       var routeShortName = leg.getRoute().getShortName();
       if (routeShortName == null) {
         return DEFAULT_TEST_RIDE_PRICE;
@@ -282,10 +284,10 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
 
       // Testing, return default test ride price.
       return switch (routeShortName) {
-        case "101" -> DEFAULT_TEST_RIDE_PRICE + 1;
-        case "102" -> DEFAULT_TEST_RIDE_PRICE + 2;
-        case "atlsc" -> DEFAULT_TEST_RIDE_PRICE - 1;
-        case "blue" -> 0;
+        case "101" -> DEFAULT_TEST_RIDE_PRICE.plus(usDollars(100));
+        case "102" -> DEFAULT_TEST_RIDE_PRICE.plus(usDollars(200));
+        case "atlsc" -> DEFAULT_TEST_RIDE_PRICE.minus(usDollars(100));
+        case "blue" -> usDollars(0);
         default -> DEFAULT_TEST_RIDE_PRICE; // free circulator
       };
     }

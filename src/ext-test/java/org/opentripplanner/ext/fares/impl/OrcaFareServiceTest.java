@@ -19,6 +19,7 @@ import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assertions;
@@ -36,6 +37,8 @@ import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -46,8 +49,8 @@ public class OrcaFareServiceTest {
 
   public static final Currency USD = Currency.getInstance("USD");
   private static TestOrcaFareService orcaFareService;
-  public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
-  private static final int DEFAULT_RIDE_PRICE_IN_CENTS = (int) (DEFAULT_TEST_RIDE_PRICE * 100);
+  public static final Money DEFAULT_TEST_RIDE_PRICE = Money.usDollars(349);
+  private static final int DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE.cents();
 
   @BeforeAll
   public static void setUpClass() {
@@ -630,12 +633,12 @@ public class OrcaFareServiceTest {
     }
 
     @Override
-    protected float calculateCost(
+    protected Optional<Money> calculateCost(
       FareType fareType,
       List<Leg> rides,
       Collection<FareRuleSet> fareRules
     ) {
-      return DEFAULT_TEST_RIDE_PRICE;
+      return Optional.of(DEFAULT_TEST_RIDE_PRICE);
     }
   }
 }

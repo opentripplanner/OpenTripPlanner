@@ -6,6 +6,8 @@ import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.function.Function;
+import javax.annotation.Nonnull;
 
 /**
  * @param currency The currency of the money.
@@ -21,6 +23,17 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
 
   public static Money usDollars(int cents) {
     return new Money(Currency.getInstance("USD"), cents);
+  }
+
+  public static Money max(Money first, Money second) {
+    if (!first.currency.equals(second.currency)) {
+      throw new RuntimeException("Can't compare %s to %s as the currencies are not equal.");
+    }
+    if (first.greaterThan(second)) {
+      return first;
+    } else {
+      return second;
+    }
   }
 
   @Override
@@ -53,5 +66,47 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
   @Override
   public String toString() {
     return localize(Locale.ENGLISH);
+  }
+
+  public Money minus(Money other) {
+    return op(other, o -> new Money(currency, cents - o.cents));
+  }
+  public Money plus(Money other) {
+    return op(other, o -> new Money(currency, cents + o.cents));
+  }
+
+  public boolean greaterThan(Money other) {
+    return booleanOp(other, cents > other.cents);
+  }
+
+  public boolean lessThan(Money other) {
+    return booleanOp(other, cents < other.cents);
+  }
+
+  private boolean booleanOp(Money other, boolean cents) {
+    if (currency.equals(other.currency)) {
+      return cents;
+    } else {
+      throw new IllegalArgumentException(
+        "Cannot perform operations on %s and %s because they have unequal currency.".formatted(
+            this,
+            other
+          )
+      );
+    }
+  }
+
+  @Nonnull
+  private Money op(Money other, Function<Money, Money> op) {
+    if (currency.equals(other.currency)) {
+      return op.apply(other);
+    } else {
+      throw new IllegalArgumentException(
+        "Cannot perform operations on %s and %s because they have unequal currency.".formatted(
+            this,
+            other
+          )
+      );
+    }
   }
 }

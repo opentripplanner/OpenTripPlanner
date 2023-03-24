@@ -141,6 +141,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
 
     FareAttribute fareAttributeD2 = FareAttribute
       .of(new FeedScopedId(FEED_ID, "D2"))
+      .setCurrencyType("EUR")
       .setAgency(agency2.getId())
       .build();
 

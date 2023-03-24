@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
@@ -12,6 +13,7 @@ import org.opentripplanner.ext.fares.model.RouteOriginDestination;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 public class HSLFareServiceImpl extends DefaultFareService {
 
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
+  public static final Money MAX_PRICE = Money.euros(Integer.MAX_VALUE);
 
   @Override
   protected boolean shouldCombineInterlinedLegs(
@@ -32,7 +35,7 @@ public class HSLFareServiceImpl extends DefaultFareService {
   }
 
   @Override
-  protected FareAndId getBestFareAndId(
+  protected Optional<FareAndId> getBestFareAndId(
     FareType fareType,
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
@@ -41,7 +44,7 @@ public class HSLFareServiceImpl extends DefaultFareService {
     ZonedDateTime startTime = legs.get(0).getStartTime();
     ZonedDateTime lastRideStartTime = startTime;
 
-    float specialRouteFare = Float.POSITIVE_INFINITY;
+    Money specialRouteFare = MAX_PRICE;
     FareAttribute specialFareAttribute = null;
 
     String agency = null;
@@ -56,7 +59,7 @@ public class HSLFareServiceImpl extends DefaultFareService {
       }
       /* HSL specific logic: all exception routes start and end from the defined zone set,
                but visit temporarily (maybe 1 stop only) an 'external' zone */
-      float bestSpecialFare = Float.POSITIVE_INFINITY;
+      Money bestSpecialFare = MAX_PRICE;
       Set<String> ruleZones = null;
 
       for (FareRuleSet ruleSet : fareRules) {
@@ -98,8 +101,8 @@ public class HSLFareServiceImpl extends DefaultFareService {
             Duration.between(lastRideStartTime, startTime).getSeconds() <
             attribute.getTransferDuration()
           ) {
-            float newFare = getFarePrice(attribute, fareType);
-            if (newFare < bestSpecialFare) {
+            Money newFare = getFarePrice(attribute, fareType);
+            if (newFare.lessThan(bestSpecialFare)) {
               bestSpecialFare = newFare;
               ruleZones = ruleSet.getContains();
               if (isSpecialRoute) {
@@ -123,7 +126,7 @@ public class HSLFareServiceImpl extends DefaultFareService {
     }
 
     FareAttribute bestAttribute = null;
-    float bestFare = Float.POSITIVE_INFINITY;
+    Money bestFare = MAX_PRICE;
     long tripTime = Duration.between(startTime, lastRideStartTime).getSeconds();
 
     if (zones.size() > 0) {
@@ -131,8 +134,7 @@ public class HSLFareServiceImpl extends DefaultFareService {
       for (FareRuleSet ruleSet : fareRules) {
         // make sure the rule is applicable by agency requirements
         if (
-          ruleSet.hasAgencyDefined() &&
-          (singleAgency == false || agency != ruleSet.getAgency().getId())
+          ruleSet.hasAgencyDefined() && (!singleAgency || agency != ruleSet.getAgency().getId())
         ) {
           continue;
         }
@@ -161,18 +163,22 @@ public class HSLFareServiceImpl extends DefaultFareService {
               );
             }
           }
-          float newFare = getFarePrice(attribute, fareType);
-          if (newFare < bestFare) {
+          Money newFare = getFarePrice(attribute, fareType);
+          if (newFare.cents() < bestFare.cents()) {
             bestAttribute = attribute;
             bestFare = newFare;
           }
         }
       }
-    } else if (specialRouteFare != Float.POSITIVE_INFINITY && specialFareAttribute != null) {
+    } else if (!specialRouteFare.equals(MAX_PRICE) && specialFareAttribute != null) {
       bestFare = specialRouteFare;
       bestAttribute = specialFareAttribute;
     }
     LOG.debug("HSL {} best for {}", bestAttribute, legs);
-    return new FareAndId(bestFare, bestAttribute == null ? null : bestAttribute.getId());
+    final FareAndId value = new FareAndId(
+      bestFare,
+      bestAttribute == null ? null : bestAttribute.getId()
+    );
+    return Optional.of(value);
   }
 }
