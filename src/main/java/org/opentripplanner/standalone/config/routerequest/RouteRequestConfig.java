@@ -58,7 +58,7 @@ public class RouteRequestConfig {
     }
 
     LOG.debug("Loading default routing parameters from JSON.");
-    RouteRequest request = new RouteRequest();
+    RouteRequest request = dft.clone();
     VehicleRentalRequest vehicleRental = request.journey().rental();
     VehicleParkingRequest vehicleParking = request.journey().parking();
 
