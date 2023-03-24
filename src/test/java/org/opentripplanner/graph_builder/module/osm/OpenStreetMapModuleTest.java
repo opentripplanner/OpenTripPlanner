@@ -12,7 +12,6 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -377,7 +376,7 @@ public class OpenStreetMapModuleTest {
     Vertex bottomV = graph.getVertex("osm:node:580290955");
     Vertex topV = graph.getVertex("osm:node:559271124");
 
-    GraphPathFinder graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
+    GraphPathFinder graphPathFinder = new GraphPathFinder(null);
     List<GraphPath<State, Edge, Vertex>> pathList = graphPathFinder.graphPathFinderEntryPoint(
       request,
       Set.of(bottomV),
