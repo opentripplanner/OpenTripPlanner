@@ -2,6 +2,7 @@ package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 
+@Deprecated
 public enum FareType implements Serializable {
   regular,
   student,

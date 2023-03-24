@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.model.plan.FareProductInstance;
+import org.opentripplanner.ext.fares.model.FareProductInstance;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;

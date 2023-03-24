@@ -2,8 +2,8 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.opentripplanner.ext.fares.model.FareProductInstance;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.model.plan.FareProductInstance;
 
 public class LegacyGraphQLFareProductInstanceImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLFareProductInstance {

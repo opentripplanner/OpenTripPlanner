@@ -19,6 +19,7 @@ import org.opentripplanner.api.model.ApiLegProducts;
 import org.opentripplanner.api.model.ApiMoney;
 import org.opentripplanner.ext.fares.model.FareMedium;
 import org.opentripplanner.ext.fares.model.FareProduct;
+import org.opentripplanner.ext.fares.model.FareProductInstance;
 import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -49,7 +50,7 @@ public class FareMapper {
 
   private List<ApiLegProducts> toApiLegProducts(
     Itinerary itinerary,
-    Multimap<Leg, FareProduct> legProducts
+    Multimap<Leg, FareProductInstance> legProducts
   ) {
     if (legProducts.isEmpty()) {
       return null;
@@ -60,7 +61,10 @@ public class FareMapper {
         .map(leg -> {
           var index = itinerary.getLegIndex(leg);
           // eventually we want to implement products that span multiple legs (but not the entire itinerary)
-          return new ApiLegProducts(List.of(index), toApiFareProducts(legProducts.get(leg)));
+          return new ApiLegProducts(
+            List.of(index),
+            instancesToApiFareProducts(legProducts.get(leg))
+          );
         })
         .toList();
     }
@@ -78,6 +82,10 @@ public class FareMapper {
       .ofNullable(nullable)
       .map(c -> new ApiFareQualifier(c.id().getId(), c.name()))
       .orElse(null);
+  }
+
+  private List<ApiFareProduct> instancesToApiFareProducts(Collection<FareProductInstance> product) {
+    return toApiFareProducts(product.stream().map(FareProductInstance::product).toList());
   }
 
   private List<ApiFareProduct> toApiFareProducts(Collection<FareProduct> product) {

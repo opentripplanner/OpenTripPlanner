@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.ext.fares.model.FareProductInstance;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.street.model.note.StreetNote;

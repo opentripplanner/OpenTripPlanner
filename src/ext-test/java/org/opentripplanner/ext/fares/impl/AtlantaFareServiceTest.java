@@ -8,6 +8,7 @@ import static org.opentripplanner.ext.fares.impl.AtlantaFareService.XPRESS_AGENC
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.Collection;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
 
   public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
   public static final float DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE * 100;
+  public static final Currency USD = Currency.getInstance("USD");
   private static AtlantaFareService atlFareService;
 
   @BeforeAll
@@ -205,7 +207,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
    */
   private static void calculateFare(List<Leg> rides, float expectedFareInCents) {
     ItineraryFares fare = new ItineraryFares();
-    atlFareService.populateFare(fare, null, FareType.electronicRegular, rides, null);
+    atlFareService.populateFare(fare, USD, FareType.electronicRegular, rides, null);
     assertEquals(expectedFareInCents, fare.getFare(FareType.electronicRegular).cents());
   }
 

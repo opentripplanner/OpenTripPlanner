@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.fares.model.FareProduct;
+import org.opentripplanner.ext.fares.model.FareProductInstance;
 import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Leg;
@@ -30,7 +31,7 @@ public class ItineraryFares {
   private final Set<FareProduct> itineraryProducts = new LinkedHashSet<>();
 
   // LinkedHashMultimap keeps the insertion order
-  private final Multimap<Leg, FareProduct> legProducts = LinkedHashMultimap.create();
+  private final Multimap<Leg, FareProductInstance> legProducts = LinkedHashMultimap.create();
 
   @Deprecated
   private final Multimap<FareType, FareComponent> components = LinkedHashMultimap.create();
@@ -51,13 +52,20 @@ public class ItineraryFares {
     return Set.copyOf(itineraryProducts);
   }
 
-  public Multimap<Leg, FareProduct> getLegProducts() {
+  public Multimap<Leg, FareProductInstance> getLegProducts() {
     return ImmutableMultimap.copyOf(legProducts);
   }
 
   public void addFare(FareType fareType, Money money) {
     itineraryProducts.add(
-      new FareProduct(faresV1Id(fareType), fareType.name(), money, null, null, null)
+      new FareProduct(
+        faresV1Id(fareType),
+        "Itinerary fare for type %s".formatted(fareType.name()),
+        money,
+        null,
+        null,
+        null
+      )
     );
   }
 
@@ -67,14 +75,23 @@ public class ItineraryFares {
   }
 
   @Deprecated
-  public void addFareDetails(FareType fareType, List<FareComponent> components) {
+  public void addFareComponent(FareType fareType, List<FareComponent> components) {
     this.components.replaceValues(fareType, components);
 
     for (var c : components) {
+      var firstLegStartTime = c.legs().get(0).getStartTime();
       for (var leg : c.legs()) {
+        final FareProduct fareProduct = new FareProduct(
+          c.fareId(),
+          fareType.name(),
+          c.price(),
+          null,
+          null,
+          null
+        );
         legProducts.put(
           leg,
-          new FareProduct(c.fareId(), fareType.name(), c.price(), null, null, null)
+          new FareProductInstance(fareProduct.uniqueCompositeUUID(firstLegStartTime), fareProduct)
         );
       }
     }
@@ -132,15 +149,22 @@ public class ItineraryFares {
   }
 
   public void addLegProducts(Collection<LegProducts> legProducts) {
-    legProducts.forEach(lp ->
-      this.legProducts.putAll(
-          lp.leg(),
-          lp.products().stream().map(LegProducts.ProductWithTransfer::product).toList()
-        )
-    );
+    legProducts.forEach(lp -> {
+      var time = lp.leg().getStartTime();
+      var products = lp
+        .products()
+        .stream()
+        .map(LegProducts.ProductWithTransfer::product)
+        .map(fp -> new FareProductInstance(fp.uniqueCompositeUUID(time), fp))
+        .toList();
+      this.legProducts.putAll(lp.leg(), products);
+    });
   }
 
   public void addFareProduct(Leg leg, FareProduct fareProduct) {
-    this.legProducts.put(leg, fareProduct);
+    this.legProducts.put(
+        leg,
+        new FareProductInstance(fareProduct.uniqueCompositeUUID(leg.getStartTime()), fareProduct)
+      );
   }
 }

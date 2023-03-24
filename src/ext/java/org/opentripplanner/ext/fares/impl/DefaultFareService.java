@@ -116,12 +116,12 @@ public class DefaultFareService implements FareService {
       FareType fareType = kv.getKey();
       Collection<FareRuleSet> fareRules = kv.getValue();
       // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
-      Currency currency = null;
       if (fareRules.size() > 0) {
-        currency =
-          Currency.getInstance(fareRules.iterator().next().getFareAttribute().getCurrencyType());
+        Currency currency = Currency.getInstance(
+          fareRules.iterator().next().getFareAttribute().getCurrencyType()
+        );
+        hasFare = populateFare(fare, currency, fareType, fareLegs, fareRules);
       }
-      hasFare = populateFare(fare, currency, fareType, fareLegs, fareRules);
     }
     return hasFare ? fare : null;
   }
@@ -169,7 +169,7 @@ public class DefaultFareService implements FareService {
   ) {
     FareSearch r = performSearch(fareType, legs, fareRules);
 
-    List<FareComponent> details = new ArrayList<>();
+    List<FareComponent> components = new ArrayList<>();
     int count = 0;
     int start = 0;
     int end = legs.size() - 1;
@@ -191,14 +191,19 @@ public class DefaultFareService implements FareService {
       for (int i = start; i <= via; ++i) {
         componentLegs.add(legs.get(i));
       }
-      var component = new FareComponent(fareId, null, getMoney(currency, cost), componentLegs);
-      details.add(component);
+      var component = new FareComponent(
+        fareId,
+        "Fares V1 itinerary fare for %s".formatted(fareId.getId()),
+        getMoney(currency, cost),
+        componentLegs
+      );
+      components.add(component);
       ++count;
       start = via + 1;
     }
 
     fare.addFare(fareType, getMoney(currency, r.resultTable[0][legs.size() - 1]));
-    fare.addFareDetails(fareType, details);
+    fare.addFareComponent(fareType, components);
     return count > 0;
   }
 

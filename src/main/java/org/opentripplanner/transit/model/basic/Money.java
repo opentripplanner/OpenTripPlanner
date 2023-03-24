@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.basic;
 import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * @param currency The currency of the money.
@@ -10,6 +11,10 @@ import java.util.Locale;
  *                 fraction digits from currency after the decimal point.
  */
 public record Money(Currency currency, int cents) implements Comparable<Money> {
+  public Money {
+    Objects.requireNonNull(currency);
+  }
+
   public static Money euros(int cents) {
     return new Money(Currency.getInstance("EUR"), cents);
   }
