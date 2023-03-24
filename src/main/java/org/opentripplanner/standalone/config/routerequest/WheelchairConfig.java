@@ -124,6 +124,21 @@ public class WheelchairConfig {
       .since(V2_2)
       .summary("The cost to add when traversing an entity which is know to be inaccessible.")
       .asInt(defaultCosts.inaccessibleCost());
+
+    if (
+      !adapter.exist("onlyConsiderAccessible") &&
+      (adapter.exist("unknownCost") || adapter.exist("inaccessibleCost"))
+    ) {
+      onlyAccessible = false;
+    }
+
+    if (onlyAccessible && (adapter.exist("unknownCost") || adapter.exist("inaccessibleCost"))) {
+      throw new IllegalStateException(
+        "If `onlyConsiderAccessible` is set then `unknownCost` and `inaccessibleCost` may not be set at " +
+        adapter.contextPath()
+      );
+    }
+
     if (onlyAccessible) {
       return AccessibilityPreferences.ofOnlyAccessible();
     } else {
