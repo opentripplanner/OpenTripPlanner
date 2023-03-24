@@ -237,7 +237,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * trip down the line.
    */
   public int sortIndex() {
-    return getArrivalTime(0);
+    return getDepartureTime(0);
   }
 
   /** @return the time in seconds after midnight that the vehicle arrives at the stop. */
