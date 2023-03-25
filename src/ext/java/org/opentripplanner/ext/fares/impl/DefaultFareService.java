@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
@@ -220,7 +221,8 @@ public class DefaultFareService implements FareService {
     }
 
     FareAttribute bestAttribute = null;
-    Money bestFare = MAX_DOLLARS;
+    @Nullable
+    Money bestFare = null;
     Duration tripTime = Duration.between(startTime, lastRideStartTime);
     Duration journeyTime = Duration.between(startTime, lastRideEndTime);
 
@@ -231,34 +233,27 @@ public class DefaultFareService implements FareService {
       // check only if the fare is not mapped to an agency
       if (!attribute.getId().getFeedId().equals(feedId)) continue;
 
-      if (ruleSet.matches(startZone, endZone, zones, routes, trips)) {
-        // TODO Maybe move the code below in FareRuleSet::matches() ?
-        if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
-          continue;
-        }
-        // assume transfers are evaluated at boarding time,
-        // as trimet does
-        if (
-          attribute.isTransferDurationSet() &&
-          tripTime.getSeconds() > attribute.getTransferDuration()
-        ) {
-          continue;
-        }
-        if (
-          attribute.isJourneyDurationSet() &&
-          journeyTime.getSeconds() > attribute.getJourneyDuration()
-        ) {
-          continue;
-        }
+      if (
+        ruleSet.matches(
+          startZone,
+          endZone,
+          zones,
+          routes,
+          trips,
+          transfersUsed,
+          tripTime,
+          journeyTime
+        )
+      ) {
         Money newFare = getFarePrice(attribute, fareType);
-        if (newFare.cents() < bestFare.cents()) {
+        if (bestFare == null || newFare.lessThan(bestFare)) {
           bestAttribute = attribute;
           bestFare = newFare;
         }
       }
     }
     LOG.debug("{} best for {}", bestAttribute, legs);
-    if (bestFare.equals(MAX_DOLLARS)) {
+    if (bestFare == null) {
       return Optional.empty();
     } else {
       final FareAndId value = new FareAndId(
@@ -329,23 +324,23 @@ public class DefaultFareService implements FareService {
   private FareSearch performSearch(
     Currency currency,
     FareType fareType,
-    List<Leg> rides,
+    List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
-    FareSearch r = new FareSearch(rides.size());
+    FareSearch r = new FareSearch(legs.size());
 
     // Dynamic algorithm to calculate fare cost.
     // This is a modified Floyd-Warshall algorithm, a key thing to remember is that
-    // rides are already edges, so when comparing "via" routes, i -> k is connected
+    // legs are already edges, so when comparing "via" routes, i -> k is connected
     // to k+1 -> j.
-    for (int i = 0; i < rides.size(); i++) {
+    for (int i = 0; i < legs.size(); i++) {
       // each diagonal
-      for (int j = 0; j < rides.size() - i; j++) {
+      for (int j = 0; j < legs.size() - i; j++) {
         FareAndId UNKNOWN = new FareAndId(
           new Money(currency, 999_000),
           new FeedScopedId("max", "max")
         );
-        FareAndId best = getBestFareAndId(fareType, rides.subList(j, j + i + 1), fareRules)
+        FareAndId best = getBestFareAndId(fareType, legs.subList(j, j + i + 1), fareRules)
           .orElse(UNKNOWN);
         Money cost = best.fare();
         if (!cost.equals(UNKNOWN.fare())) {

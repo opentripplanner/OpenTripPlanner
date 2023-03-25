@@ -12,6 +12,12 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.fares.model.Distance;
+import org.opentripplanner.ext.fares.model.FareDistance;
+import org.opentripplanner.ext.fares.model.FareDistance.LinearDistance;
+import org.opentripplanner.ext.fares.model.FareLegRule;
+import org.opentripplanner.ext.fares.model.FareProduct;
+import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.fare.Distance;
 import org.opentripplanner.model.fare.FareDistance;
@@ -349,7 +355,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         null,
         null,
         null,
-        new FareDistance.LinearDistance(Distance.ofMeters(7000), Distance.ofMeters(10_000)),
+        new LinearDistance(Distance.ofKilometers(7), Distance.ofKilometers(10)),
         tenKmProduct
       ),
       new FareLegRule(
@@ -357,7 +363,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         null,
         null,
         null,
-        new FareDistance.LinearDistance(Distance.ofMeters(3000), Distance.ofMeters(6000)),
+        new LinearDistance(Distance.ofKilometers(3), Distance.ofKilometers(6)),
         threeKmProduct
       ),
       new FareLegRule(
@@ -365,7 +371,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         null,
         null,
         null,
-        new FareDistance.LinearDistance(Distance.ofMeters(0), Distance.ofMeters(2000)),
+        new LinearDistance(Distance.ofMeters(0), Distance.ofMeters(2000)),
         twoKmProduct
       )
     );
