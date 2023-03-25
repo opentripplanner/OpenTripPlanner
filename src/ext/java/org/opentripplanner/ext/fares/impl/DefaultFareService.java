@@ -71,7 +71,6 @@ record FareAndId(Money fare, FeedScopedId fareId) {}
 public class DefaultFareService implements FareService {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultFareService.class);
-  public static final Money MAX_DOLLARS = Money.usDollars(Integer.MAX_VALUE);
 
   /** For each fare type (regular, student, etc...) the collection of rules that apply. */
   protected Map<FareType, Collection<FareRuleSet>> fareRulesPerType;
@@ -220,6 +219,7 @@ public class DefaultFareService implements FareService {
       transfersUsed += 1;
     }
 
+    @Nullable
     FareAttribute bestAttribute = null;
     @Nullable
     Money bestFare = null;
