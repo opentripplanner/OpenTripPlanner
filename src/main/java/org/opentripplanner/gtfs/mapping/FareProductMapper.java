@@ -20,9 +20,9 @@ public class FareProductMapper {
 
   public FareProduct map(org.onebusaway.gtfs.model.FareProduct rhs) {
     var currency = Currency.getInstance(rhs.getCurrency());
-    var price = new Money(
+    var price = Money.ofFractionalAmount(
       currency,
-      (int) (rhs.getAmount() * Math.pow(10, currency.getDefaultFractionDigits()))
+      rhs.getAmount()
     );
 
     Duration duration = null;

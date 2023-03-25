@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.opentripplanner.transit.model.basic.Money.USD;
+
 import java.util.Map;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
@@ -259,9 +261,9 @@ class OrcaFaresData {
       name,
       Map.of(
         FareType.regular,
-        Money.usDollars((int) (100 * regularFare)),
+        Money.ofFractionalAmount(USD, regularFare),
         FareType.electronicRegular,
-        Money.usDollars((int) (100 * electronicRegularFare))
+        Money.ofFractionalAmount(USD, electronicRegularFare)
       )
     );
   }

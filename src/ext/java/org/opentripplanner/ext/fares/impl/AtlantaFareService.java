@@ -142,7 +142,7 @@ public class AtlantaFareService extends DefaultFareService {
       // All conditions below this point "use" the transfer, so we add the ride.
       legs.add(leg);
       if (transferClassification.type.equals(TransferType.FREE_TRANSFER)) {
-        fare.addFare(fareType, getMoney(currency, 0));
+        fare.addFare(fareType, Money.ofFractionalAmount(currency, 0));
         lastFareWithTransfer = defaultFare;
         return true;
       } else if (transferClassification.type.equals(TransferType.TRANSFER_PAY_DIFFERENCE)) {
@@ -154,7 +154,10 @@ public class AtlantaFareService extends DefaultFareService {
         lastFareWithTransfer = defaultFare;
         return true;
       } else if (transferClassification.type.equals(TransferType.TRANSFER_WITH_UPCHARGE)) {
-        fare.addFare(fareType, getMoney(currency, (float) transferClassification.upcharge / 100));
+        fare.addFare(
+          fareType,
+          Money.ofFractionalAmount(currency, (float) transferClassification.upcharge / 100)
+        );
         lastFareWithTransfer = defaultFare;
         return true;
       }
@@ -388,9 +391,7 @@ public class AtlantaFareService extends DefaultFareService {
     for (ATLTransfer transfer : transfers) {
       cost += transfer.getTotal();
     }
-
-    final Money money = getMoney(currency, cost);
-    fare.addFare(fareType, money);
+    var money = Money.ofFractionalAmount(currency, cost)
     var fareProduct = new FareProduct(
       new FeedScopedId(FEED_ID, fareType.name()),
       fareType.name(),
@@ -400,6 +401,7 @@ public class AtlantaFareService extends DefaultFareService {
       null
     );
     fare.addItineraryProducts(List.of(fareProduct));
+    fare.addFare(fareType, money);
 
     return true;
   }

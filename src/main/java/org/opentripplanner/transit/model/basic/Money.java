@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
  * @param amount   The actual currency value in the minor unit, so 1 Euro is represented as 100.
  */
 public record Money(Currency currency, int amount) implements Comparable<Money> {
+  public static final Currency USD = Currency.getInstance("USD");
   public Money {
     Objects.requireNonNull(currency);
   }
@@ -22,18 +23,34 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
   }
 
   public static Money usDollars(int cents) {
-    return new Money(Currency.getInstance("USD"), cents);
+    return new Money(USD, cents);
   }
 
+  /**
+   * Take two money instances and return the higher one.
+   */
   public static Money max(Money first, Money second) {
     if (!first.currency.equals(second.currency)) {
-      throw new RuntimeException("Can't compare %s to %s as the currencies are not equal.");
+      throw new RuntimeException("Can't operate on %s and %s as the currencies are not equal.");
     }
     if (first.greaterThan(second)) {
       return first;
     } else {
       return second;
     }
+  }
+
+  /**
+   * Take a fractional amount of money, ie 1.5 and convert it to cents using the number of default
+   * fraction digits of the currency.
+   */
+  public static Money ofFractionalAmount(Currency currency, float cost) {
+    int fractionDigits = 2;
+    if (currency != null) {
+      fractionDigits = currency.getDefaultFractionDigits();
+    }
+    int cents = (int) Math.round(cost * Math.pow(10, fractionDigits));
+    return new Money(currency, cents);
   }
 
   @Override
@@ -68,9 +85,16 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
     return localize(Locale.ENGLISH);
   }
 
+  /**
+   * Subtract the money amount from this instance and return the result.
+   */
   public Money minus(Money other) {
     return op(other, o -> new Money(currency, cents - o.cents));
   }
+
+  /**
+   * Add another money amoutn to this instance and return it.
+   */
   public Money plus(Money other) {
     return op(other, o -> new Money(currency, cents + o.cents));
   }

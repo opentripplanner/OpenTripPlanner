@@ -119,15 +119,6 @@ public class DefaultFareService implements FareService {
     return hasFare ? fare : null;
   }
 
-  protected static Money getMoney(Currency currency, float cost) {
-    int fractionDigits = 2;
-    if (currency != null) {
-      fractionDigits = currency.getDefaultFractionDigits();
-    }
-    int cents = (int) Math.round(cost * Math.pow(10, fractionDigits));
-    return new Money(currency, cents);
-  }
-
   /**
    * Builds the Fare object for the given currency, fareType and fareRules.
    * <p>
@@ -283,14 +274,14 @@ public class DefaultFareService implements FareService {
     return switch (type) {
       case senior:
         if (fare.getSeniorPrice() >= 0) {
-          yield getMoney(currency, fare.getSeniorPrice());
+          yield Money.ofFractionalAmount(currency, fare.getSeniorPrice());
         }
       case youth:
         if (fare.getYouthPrice() >= 0) {
-          yield getMoney(currency, fare.getYouthPrice());
+          yield Money.ofFractionalAmount(currency, fare.getYouthPrice());
         }
       default:
-        yield getMoney(currency, fare.getPrice());
+        yield Money.ofFractionalAmount(currency, fare.getPrice());
     };
   }
 
