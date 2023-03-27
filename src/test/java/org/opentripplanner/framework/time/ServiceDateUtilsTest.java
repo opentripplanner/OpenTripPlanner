@@ -2,6 +2,7 @@ package org.opentripplanner.framework.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -96,6 +97,23 @@ public class ServiceDateUtilsTest {
       "2019-03-30T00:00+01:00[Europe/Paris]",
       asStartOfService(time, ZONE_ID).toString()
     );
+  }
+
+  @Test
+  public void test() {
+    var sd1 = asStartOfService(D2019_03_30, ZONE_ID);
+    var sd2 = asStartOfService(D2019_03_31, ZONE_ID);
+    var sd3 = asStartOfService(D2019_04_01, ZONE_ID);
+
+    assertEquals(D2019_03_30, ServiceDateUtils.asServiceDay(sd1));
+    assertEquals(D2019_03_31, ServiceDateUtils.asServiceDay(sd2));
+    assertEquals(D2019_04_01, ServiceDateUtils.asServiceDay(sd3));
+
+    // When DST adjustment happens the startTime is not on the same date as
+    // the serviceDate
+    assertEquals(sd1.toLocalDate(), ServiceDateUtils.asServiceDay(sd1));
+    assertNotEquals(sd2.toLocalDate(), ServiceDateUtils.asServiceDay(sd2));
+    assertEquals(sd3.toLocalDate(), ServiceDateUtils.asServiceDay(sd3));
   }
 
   @Test

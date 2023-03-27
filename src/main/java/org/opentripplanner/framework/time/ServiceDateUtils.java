@@ -54,6 +54,15 @@ public class ServiceDateUtils {
   }
 
   /**
+   * Calculate the service day from start of the service day. On days with daylight saving
+   * time adjustments this may not be the same as {@code startOfService.toLocalDate()}.
+   * Adding 12 hours is necessary.
+   */
+  public static LocalDate asServiceDay(ZonedDateTime startOfService) {
+    return startOfService.plusHours(12).toLocalDate();
+  }
+
+  /**
    * Create a ZonedDateTime based on the service date, time zone and seconds-offset. This
    * method add the offset seconds to the service date start time, which is defined to be NOON - 12
    * hours. This is midnight for most days, except days where the time is adjusted for daylight
