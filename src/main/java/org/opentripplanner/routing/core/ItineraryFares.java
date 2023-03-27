@@ -28,7 +28,7 @@ public class ItineraryFares {
   /**
    * The fare products that are valid for all legs of an itinerary, like a day pass.
    * <p>
-   * Note: LinkedHashMultimap keeps the insertion order
+   * Note: LinkedHashSet keeps the insertion order
    */
   private final Set<FareProduct> itineraryProducts = new LinkedHashSet<>();
 
@@ -66,8 +66,8 @@ public class ItineraryFares {
   /**
    * Get those fare products that cover the entire itinerary.
    */
-  public Set<FareProduct> getItineraryProducts() {
-    return Set.copyOf(itineraryProducts);
+  public List<FareProduct> getItineraryProducts() {
+    return List.copyOf(itineraryProducts);
   }
 
   /**

@@ -51,6 +51,17 @@
               "alerts" : [ ],
               "fareProducts" : [
                 {
+                  "instanceId" : "26433fdf-0fe0-32ed-992b-2d1fb4e189e4",
+                  "id" : "faresv1:regular",
+                  "name" : "Itinerary fare for type regular",
+                  "price" : {
+                    "currency" : "EUR",
+                    "cents" : 310
+                  },
+                  "riderCategory" : null,
+                  "medium" : null
+                },
+                {
                   "instanceId" : "2c50a9d9-df41-35ea-870f-85663769f187",
                   "id" : "F:day-pass",
                   "name" : "day-pass",
@@ -66,6 +77,17 @@
                     "id" : "F:oyster",
                     "name" : "TfL Oyster Card"
                   }
+                },
+                {
+                  "instanceId" : "0a4db067-ba53-3f9e-ac16-3d1cb58cb24c",
+                  "id" : "F:AB",
+                  "name" : "regular",
+                  "price" : {
+                    "currency" : "EUR",
+                    "cents" : 310
+                  },
+                  "riderCategory" : null,
+                  "medium" : null
                 },
                 {
                   "instanceId" : "31d6d0e1-7b75-3ced-8b87-3e97b9f26a4a",
@@ -128,6 +150,17 @@
               ],
               "fareProducts" : [
                 {
+                  "instanceId" : "26433fdf-0fe0-32ed-992b-2d1fb4e189e4",
+                  "id" : "faresv1:regular",
+                  "name" : "Itinerary fare for type regular",
+                  "price" : {
+                    "currency" : "EUR",
+                    "cents" : 310
+                  },
+                  "riderCategory" : null,
+                  "medium" : null
+                },
+                {
                   "instanceId" : "2c50a9d9-df41-35ea-870f-85663769f187",
                   "id" : "F:day-pass",
                   "name" : "day-pass",
@@ -160,6 +193,25 @@
                     "id" : "F:oyster",
                     "name" : "TfL Oyster Card"
                   }
+                }
+              ]
+            }
+          ],
+          "fares" : [
+            {
+              "type" : "regular",
+              "cents" : 310,
+              "currency" : "EUR",
+              "components" : [
+                {
+                  "currency" : "EUR",
+                  "cents" : 310,
+                  "fareId" : "F:AB",
+                  "routes" : [
+                    {
+                      "gtfsId" : "F:BUS"
+                    }
+                  ]
                 }
               ]
             }

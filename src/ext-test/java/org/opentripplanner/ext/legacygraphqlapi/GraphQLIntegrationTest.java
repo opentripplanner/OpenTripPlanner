@@ -47,6 +47,8 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.FareComponent;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
@@ -95,30 +97,44 @@ class GraphQLIntegrationTest {
     var transitModel = new TransitModel(stopModel.build(), new Deduplicator());
     transitModel.initTimeZone(ZoneIds.BERLIN);
     transitModel.index();
-    Arrays
+    var routes = Arrays
       .stream(TransitMode.values())
       .sorted(Comparator.comparing(Enum::name))
-      .forEach(m ->
-        transitModel
-          .getTransitModelIndex()
-          .addRoutes(
-            TransitModelForTest
-              .route(m.name())
-              .withMode(m)
-              .withLongName(new NonLocalizedString("Long name for %s".formatted(m)))
-              .build()
-          )
-      );
+      .map(m ->
+        TransitModelForTest
+          .route(m.name())
+          .withMode(m)
+          .withLongName(new NonLocalizedString("Long name for %s".formatted(m)))
+          .build()
+      )
+      .toList();
+
+    var busRoute = routes
+      .stream()
+      .filter(r -> r.getMode().equals(TransitMode.BUS))
+      .findFirst()
+      .get();
+
+    routes.forEach(route -> transitModel.getTransitModelIndex().addRoutes(route));
 
     Itinerary i1 = newItinerary(A, T11_00)
       .walk(20, B)
-      .bus(122, T11_01, T11_15, C)
+      .bus(busRoute, 122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
       .build();
     var busLeg = i1.getTransitLeg(1);
     var railLeg = i1.getTransitLeg(2);
 
     var fares = new ItineraryFares();
+    fares.addFare(FareType.regular, Money.euros(310));
+    fares.addFareComponent(
+      FareType.regular,
+      List.of(
+        new FareComponent(id("AB"), "Fare component for AB", Money.euros(310), List.of(busLeg))
+      )
+    );
+    i1.setFare(fares);
+
     var dayPass = fareProduct("day-pass");
     fares.addItineraryProducts(List.of(dayPass));
 

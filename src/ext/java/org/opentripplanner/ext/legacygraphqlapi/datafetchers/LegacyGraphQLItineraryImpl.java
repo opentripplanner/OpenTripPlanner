@@ -3,7 +3,6 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -48,13 +47,13 @@ public class LegacyGraphQLItineraryImpl
         return null;
       }
       return fare
-        .getItineraryProducts()
+        .getFaresV1Types()
         .stream()
-        .map(fareProduct -> {
+        .map(fareKey -> {
           Map<String, Object> result = new HashMap<>();
-          result.put("name", fareProduct.name());
-          result.put("fare", fareProduct.amount());
-          result.put("details", List.of());
+          result.put("name", fareKey);
+          result.put("fare", fare.getFare(fareKey));
+          result.put("details", fare.getComponents(fareKey));
           return result;
         })
         .collect(Collectors.toList());
