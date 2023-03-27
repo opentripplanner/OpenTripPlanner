@@ -59,7 +59,7 @@ HTTP headers to add to the request
   "updaters" : [
     {
       "type" : "siri-et-updater",
-      "url" : "https://example.com",
+      "url" : "https://example.com/some/path",
       "feedId" : "feed_id",
       "timeoutSec" : 30,
       "headers" : {

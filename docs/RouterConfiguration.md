@@ -646,7 +646,7 @@ Http headers.
     },
     {
       "type" : "siri-et-updater",
-      "url" : "https://example.com",
+      "url" : "https://example.com/some/path",
       "feedId" : "feed_id",
       "timeoutSec" : 30,
       "headers" : {
