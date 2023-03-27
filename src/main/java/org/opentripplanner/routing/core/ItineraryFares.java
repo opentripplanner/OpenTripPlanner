@@ -19,20 +19,35 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
- * <p>
- * ItineraryFares is a set of fares for different classes of users.
- * </p>
+ * ItineraryFares is a set of fares for different legs, rider categories or fare media.
  */
 public class ItineraryFares {
 
   private static final String FARES_V1_FEED_ID = "faresv1";
 
-  // LinkedHashSet for insertion order
+  /**
+   * The fare products that are valid for all legs of an itinerary, like a day pass.
+   * <p>
+   * Note: LinkedHashMultimap keeps the insertion order
+   */
   private final Set<FareProduct> itineraryProducts = new LinkedHashSet<>();
 
-  // LinkedHashMultimap keeps the insertion order
+  /**
+   * Fare products that apply to one or more legs but _not_ the entire journey.
+   * <p>
+   * Note: LinkedHashMultimap keeps the insertion order
+   */
   private final Multimap<Leg, FareProductInstance> legProducts = LinkedHashMultimap.create();
 
+  /**
+   * The fares V1 fare "components" that apply to individual legs (not the entire price of the
+   * itinerary).
+   * <p>
+   * This is an ill-thought-out concept that was bolted onto the existing implementation in 2016 and
+   * is going to be removed once HSL has migrated off it.
+   * <p>
+   * Note: LinkedHashMultimap keeps the insertion order
+   */
   @Deprecated
   private final Multimap<FareType, FareComponent> components = LinkedHashMultimap.create();
 
@@ -48,10 +63,16 @@ public class ItineraryFares {
     return new ItineraryFares();
   }
 
+  /**
+   * Get those fare products that cover the entire itinerary.
+   */
   public Set<FareProduct> getItineraryProducts() {
     return Set.copyOf(itineraryProducts);
   }
 
+  /**
+   * Get those fare products that are valid for a subset of legs but not the entire itinerary.
+   */
   public Multimap<Leg, FareProductInstance> getLegProducts() {
     return ImmutableMultimap.copyOf(legProducts);
   }
@@ -67,11 +88,6 @@ public class ItineraryFares {
         null
       )
     );
-  }
-
-  @Nonnull
-  private static FeedScopedId faresV1Id(FareType fareType) {
-    return new FeedScopedId(FARES_V1_FEED_ID, fareType.name());
   }
 
   @Deprecated
@@ -97,6 +113,9 @@ public class ItineraryFares {
     }
   }
 
+  /**
+   * Add fare products that cover the entire itinerary, i.e. are valid for all legs.
+   */
   public void addItineraryProducts(Collection<FareProduct> products) {
     itineraryProducts.addAll(products);
   }
@@ -166,5 +185,10 @@ public class ItineraryFares {
         leg,
         new FareProductInstance(fareProduct.uniqueInstanceId(leg.getStartTime()), fareProduct)
       );
+  }
+
+  @Nonnull
+  private static FeedScopedId faresV1Id(FareType fareType) {
+    return new FeedScopedId(FARES_V1_FEED_ID, fareType.name());
   }
 }
