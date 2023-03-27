@@ -9,7 +9,7 @@ SIRI profile which is a subset of the SIRI specification.
 
 ## Documentation
 
-This updater consumes SIRI real time information. It is developed by Entur and support the Nordic
+This updater consumes SIRI real time information. It is developed by Entur and supports the Nordic
 Profile for SIRI. It should be possible to develop it further to support a broader set of the SIRI
 specification.
 
