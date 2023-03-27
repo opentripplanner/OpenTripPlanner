@@ -3,7 +3,6 @@ package org.opentripplanner.standalone.config.routerconfig.updaters;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
-import java.util.UUID;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -26,11 +25,7 @@ public class SiriETUpdaterConfig {
         .since(V2_0)
         .summary("How often the updates should be retrieved.")
         .asInt(60),
-      c
-        .of("requestorRef")
-        .since(V2_0)
-        .summary("The requester reference.")
-        .asString("otp-" + UUID.randomUUID()),
+      c.of("requestorRef").since(V2_0).summary("The requester reference.").asString(null),
       c.of("timeoutSec").since(V2_0).summary("The HTTP timeout to download the updates.").asInt(15),
       c.of("previewIntervalMinutes").since(V2_0).summary("TODO").asInt(-1),
       c
