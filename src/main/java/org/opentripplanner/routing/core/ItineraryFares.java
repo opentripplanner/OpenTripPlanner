@@ -77,6 +77,15 @@ public class ItineraryFares {
     return ImmutableMultimap.copyOf(legProducts);
   }
 
+  /**
+   * Add a "fare". This is an ill-defined concept (is it for the entire itinerary or only some
+   * legs?) from the early days of OTP which will be removed in the future.
+   * <p>
+   * Use {@link ItineraryFares#addFareProduct(Leg, FareProduct)},
+   * {@link ItineraryFares#addLegProducts(Collection)} or
+   * {@link ItineraryFares#addItineraryProducts(Collection)} instead.
+   */
+  @Deprecated
   public void addFare(FareType fareType, Money money) {
     itineraryProducts.add(
       new FareProduct(
@@ -90,6 +99,14 @@ public class ItineraryFares {
     );
   }
 
+  /**
+   * Add a collection of "fare components" for a type. These concepts are ill-defined and will be
+   * removed in the future.
+   * <p>
+   * Use @{link {@link ItineraryFares#addItineraryProducts(Collection)}},
+   * {@link ItineraryFares#addFareProduct(Leg, FareProduct)} or
+   * {@link ItineraryFares#addLegProducts(Collection)} instead.
+   */
   @Deprecated
   public void addFareComponent(FareType fareType, List<FareComponent> components) {
     this.components.replaceValues(fareType, components);
@@ -120,6 +137,14 @@ public class ItineraryFares {
     itineraryProducts.addAll(products);
   }
 
+  /**
+   * Get the "fare" for a specific fare type.
+   * <p>
+   * It is ill-defined what this actually means (entire itinerary?, some legs?).
+   * <p>
+   * Use {@link ItineraryFares#getItineraryProducts()} or {@link ItineraryFares#getLegProducts()}
+   * instead.
+   */
   public Money getFare(FareType type) {
     return itineraryProducts
       .stream()
@@ -129,10 +154,21 @@ public class ItineraryFares {
       .orElse(null);
   }
 
+  /**
+   * Get the "components" of a fare for a specific type.
+   * <p>
+   * Use {@link ItineraryFares#getItineraryProducts()} or {@link ItineraryFares#getLegProducts()}
+   * instead.
+   */
+  @Deprecated
   public List<FareComponent> getComponents(FareType type) {
     return List.copyOf(components.get(type));
   }
 
+  /**
+   * Return the set of {@link FareType}s that are contained in this instance.
+   */
+  @Deprecated
   public Set<FareType> getFaresV1Types() {
     return itineraryProducts
       .stream()
@@ -144,7 +180,7 @@ public class ItineraryFares {
 
   @Override
   public int hashCode() {
-    return Objects.hash(itineraryProducts, legProducts);
+    return Objects.hash(itineraryProducts, legProducts, components);
   }
 
   @Override
@@ -167,6 +203,9 @@ public class ItineraryFares {
       .toString();
   }
 
+  /**
+   * Add a complex set of fare products for a specific leg;
+   */
   public void addLegProducts(Collection<LegProducts> legProducts) {
     legProducts.forEach(lp -> {
       var time = lp.leg().getStartTime();
@@ -180,6 +219,9 @@ public class ItineraryFares {
     });
   }
 
+  /**
+   * Add a single fare product for a single leg.
+   */
   public void addFareProduct(Leg leg, FareProduct fareProduct) {
     this.legProducts.put(
         leg,

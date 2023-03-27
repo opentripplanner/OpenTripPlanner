@@ -540,7 +540,7 @@ public class Itinerary {
   }
 
   /**
-   * The cost of this trip
+   * The fare products of this itinerary.
    */
   public ItineraryFares getFares() {
     return fare;
@@ -553,8 +553,8 @@ public class Itinerary {
       .getItineraryProducts()
       .stream()
       .map(fp -> {
-        var id = fp.uniqueInstanceId(firstLeg().getStartTime());
-        return new FareProductInstance(id, fp);
+        var instanceId = fp.uniqueInstanceId(firstLeg().getStartTime());
+        return new FareProductInstance(instanceId, fp);
       })
       .toList();
 
