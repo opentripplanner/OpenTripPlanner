@@ -91,7 +91,7 @@ public class ItineraryFares {
         );
         legProducts.put(
           leg,
-          new FareProductInstance(fareProduct.uniqueCompositeUUID(firstLegStartTime), fareProduct)
+          new FareProductInstance(fareProduct.uniqueInstanceId(firstLegStartTime), fareProduct)
         );
       }
     }
@@ -155,7 +155,7 @@ public class ItineraryFares {
         .products()
         .stream()
         .map(LegProducts.ProductWithTransfer::product)
-        .map(fp -> new FareProductInstance(fp.uniqueCompositeUUID(time), fp))
+        .map(fp -> new FareProductInstance(fp.uniqueInstanceId(time), fp))
         .toList();
       this.legProducts.putAll(lp.leg(), products);
     });
@@ -164,7 +164,7 @@ public class ItineraryFares {
   public void addFareProduct(Leg leg, FareProduct fareProduct) {
     this.legProducts.put(
         leg,
-        new FareProductInstance(fareProduct.uniqueCompositeUUID(leg.getStartTime()), fareProduct)
+        new FareProductInstance(fareProduct.uniqueInstanceId(leg.getStartTime()), fareProduct)
       );
   }
 }

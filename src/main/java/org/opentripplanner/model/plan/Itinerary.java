@@ -553,7 +553,7 @@ public class Itinerary {
       .getItineraryProducts()
       .stream()
       .map(fp -> {
-        var id = fp.uniqueCompositeUUID(firstLeg().getStartTime());
+        var id = fp.uniqueInstanceId(firstLeg().getStartTime());
         return new FareProductInstance(id, fp);
       })
       .toList();

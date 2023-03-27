@@ -51,7 +51,7 @@
               "alerts" : [ ],
               "fareProducts" : [
                 {
-                  "instanceId" : "ecfd2190-afb9-398f-bbaa-43e1787285e3",
+                  "instanceId" : "2c50a9d9-df41-35ea-870f-85663769f187",
                   "id" : "F:day-pass",
                   "name" : "day-pass",
                   "price" : {
@@ -68,7 +68,7 @@
                   }
                 },
                 {
-                  "instanceId" : "76cd490b-fe04-33d7-9b2f-391daeec3c62",
+                  "instanceId" : "31d6d0e1-7b75-3ced-8b87-3e97b9f26a4a",
                   "id" : "F:single-ticket",
                   "name" : "single-ticket",
                   "price" : {
@@ -128,7 +128,7 @@
               ],
               "fareProducts" : [
                 {
-                  "instanceId" : "ecfd2190-afb9-398f-bbaa-43e1787285e3",
+                  "instanceId" : "2c50a9d9-df41-35ea-870f-85663769f187",
                   "id" : "F:day-pass",
                   "name" : "day-pass",
                   "price" : {
@@ -145,7 +145,7 @@
                   }
                 },
                 {
-                  "instanceId" : "b8446fd5-ebfe-3a1b-8490-a6503e169321",
+                  "instanceId" : "f2363402-f63b-3435-9729-297cca1b9895",
                   "id" : "F:single-ticket",
                   "name" : "single-ticket",
                   "price" : {
