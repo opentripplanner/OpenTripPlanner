@@ -189,11 +189,23 @@ class PickDropMapperTest {
   public void testCancellationWithNoPlannedBoarding() {
     var originalPickUpType = PickDrop.NONE;
     TestCall call = TestCall.of().withCancellation(Boolean.TRUE).build();
-    var testResult = PickDropMapper.mapDropOffType(call, originalPickUpType);
+    var testResult = PickDropMapper.mapPickUpType(call, originalPickUpType);
 
     assertTrue(
       testResult.isEmpty(),
       "There is no change in routability - pickup should not be changed"
+    );
+  }
+
+  @Test
+  public void testCancellationWithPlannedBoarding() {
+    var originalPickUpType = PickDrop.SCHEDULED;
+    TestCall call = TestCall.of().withCancellation(Boolean.TRUE).build();
+    var testResult = PickDropMapper.mapPickUpType(call, originalPickUpType);
+
+    assertFalse(
+      testResult.isEmpty(),
+      "There is no change in routability - pickup should be changed"
     );
   }
 
@@ -206,6 +218,18 @@ class PickDropMapperTest {
     assertTrue(
       testResult.isEmpty(),
       "There is no change in routability - dropoff should not be changed"
+    );
+  }
+
+  @Test
+  public void testCancellationWithPlannedAlighting() {
+    var originalDropOffType = PickDrop.SCHEDULED;
+    TestCall call = TestCall.of().withCancellation(Boolean.TRUE).build();
+    var testResult = PickDropMapper.mapDropOffType(call, originalDropOffType);
+
+    assertFalse(
+      testResult.isEmpty(),
+      "There is no change in routability - dropoff should be changed"
     );
   }
 }
