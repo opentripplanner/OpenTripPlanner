@@ -13,6 +13,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
 import org.rutebanken.netex.model.LocaleStructure;
@@ -30,20 +31,30 @@ class StationMapper {
   private final ZoneId defaultTimeZone;
 
   private final boolean noTransfersOnIsolatedStops;
+  private final EntityById<Station> stationsById;
 
   StationMapper(
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
     ZoneId defaultTimeZone,
-    boolean noTransfersOnIsolatedStops
+    boolean noTransfersOnIsolatedStops,
+    EntityById<Station> stationsById
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
     this.defaultTimeZone = defaultTimeZone;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
+    this.stationsById = stationsById;
   }
 
   Station map(StopPlace stopPlace) {
+    return stationsById.computeIfAbsent(
+      idFactory.createId(stopPlace.getId()),
+      ignored -> mapStopPlaceToStation(stopPlace)
+    );
+  }
+
+  Station mapStopPlaceToStation(StopPlace stopPlace) {
     var builder = Station
       .of(idFactory.createId(stopPlace.getId()))
       .withName(resolveName(stopPlace))

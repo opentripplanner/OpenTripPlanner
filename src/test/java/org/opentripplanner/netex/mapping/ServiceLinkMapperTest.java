@@ -105,7 +105,7 @@ class ServiceLinkMapperTest {
     EntityById<RegularStop> stopsById = new EntityById<>();
     issueStore = new DefaultDataImportIssueStore();
 
-    QuayMapper quayMapper = new QuayMapper(ID_FACTORY, issueStore);
+    QuayMapper quayMapper = new QuayMapper(ID_FACTORY, issueStore, stopsById);
     stopPatternBuilder = StopPattern.create(3);
 
     Station parentStation = Station
