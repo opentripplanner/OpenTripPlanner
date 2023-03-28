@@ -30,12 +30,8 @@ import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilt
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RouteRequestConfig {
-
-  private static final Logger LOG = LoggerFactory.getLogger(RouteRequestConfig.class);
   private static final String WHEELCHAIR_ACCESSIBILITY = "wheelchairAccessibility";
 
   public static RouteRequest mapDefaultRouteRequest(NodeAdapter root, String parameterName) {
@@ -57,7 +53,6 @@ public class RouteRequestConfig {
       return dft;
     }
 
-    LOG.debug("Loading default routing parameters from JSON.");
     RouteRequest request = dft.clone();
     VehicleRentalRequest vehicleRental = request.journey().rental();
     VehicleParkingRequest vehicleParking = request.journey().parking();
