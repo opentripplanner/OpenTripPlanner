@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone.server;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
@@ -188,11 +187,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public List<RideHailingService> rideHailingServices() {
     return rideHailingServices;
-  }
-
-  @Override
-  public Duration streetRoutingTimeout() {
-    return streetRoutingTimeout;
   }
 
   @Override

@@ -8,11 +8,11 @@ This sandbox feature allows you to use ride hailing services like Uber.
 
 ## Configuration
 
-In order enable it add an entry to the `rideHailingServices` section in `router-config.json`.
+In order enable this feature, add a new section `rideHailingServices` in `router-config.json`.
 
-The individual providers are listed below:
+The supported ride-hailing providers are listed below.
 
-## Uber
+### Uber
 
 <!-- uber-car-hailing BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
