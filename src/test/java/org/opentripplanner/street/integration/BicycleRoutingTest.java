@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
-import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
@@ -82,7 +81,7 @@ public class BicycleRoutingTest {
       request.journey().direct().mode(),
       request.journey().direct().mode()
     );
-    var gpf = new GraphPathFinder(null, Duration.ofSeconds(5));
+    var gpf = new GraphPathFinder(null);
     var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(

@@ -99,6 +99,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Filter out duplicate-like legs in alternative legs [#4868](https://github.com/opentripplanner/OpenTripPlanner/pull/4868)
 - Fix timeshifting of Flex ~ Walk ~ Flex paths in Raptor [#4952](https://github.com/opentripplanner/OpenTripPlanner/pull/4952)
 - Validate the number of service links mapped to a JourneyPattern [#4963](https://github.com/opentripplanner/OpenTripPlanner/pull/4963)
+- Make sure the default streetRoutingTimeout is used [#4998](https://github.com/opentripplanner/OpenTripPlanner/pull/4998)
+- Validate service date for SCHEDULED updates [#4861](https://github.com/opentripplanner/OpenTripPlanner/pull/4861)
+- Fix quay duplicates overwriting stop index [#4964](https://github.com/opentripplanner/OpenTripPlanner/pull/4964)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

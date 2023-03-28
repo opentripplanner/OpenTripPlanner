@@ -19,6 +19,9 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.StopModelBuilder;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
@@ -73,14 +76,7 @@ public class StopAndStationMapperTest {
     var stopPlaceById = new HierarchicalVersionMapById<StopPlace>();
     stopPlaceById.add(stopPlace);
 
-    var stopAndStationMapper = new StopAndStationMapper(
-      MappingSupport.ID_FACTORY,
-      new HierarchicalVersionMapById<>(),
-      null,
-      DEFAULT_TIME_ZONE,
-      DataImportIssueStore.NOOP,
-      false
-    );
+    StopAndStationMapper stopAndStationMapper = createStopAndStationMapper(StopModel.of());
 
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
 
@@ -157,6 +153,7 @@ public class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       quaysById,
       null,
+      StopModel.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
       false
@@ -226,6 +223,7 @@ public class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       new HierarchicalVersionMapById<>(),
       null,
+      StopModel.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
       isolated
@@ -240,6 +238,57 @@ public class StopAndStationMapperTest {
     } else {
       assertFalse(stations.stream().findFirst().get().isTransfersNotAllowed());
     }
+  }
+
+  @Test
+  public void testDuplicateStopIndices() {
+    StopLocation.initIndexCounter(0);
+    var stopPlace = createStopPlace(
+      "ST:StopPlace:1",
+      "Lunce C",
+      "1",
+      55.707005,
+      13.186816,
+      VehicleModeEnumeration.BUS
+    );
+
+    // Create on quay with access, one without, and one with NULL
+    var quay1 = createQuay("ST:Quay:1", "Quay1", "1", 55.706063, 13.186708, "a");
+
+    stopPlace.setQuays(new Quays_RelStructure().withQuayRefOrQuay(quay1));
+
+    StopModelBuilder stopModelBuilder = StopModel.of();
+
+    StopAndStationMapper stopAndStationMapper = createStopAndStationMapper(stopModelBuilder);
+    stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
+    stopModelBuilder.regularStopsById().addAll(stopAndStationMapper.resultStops);
+
+    StopAndStationMapper stopAndStationMapper2 = createStopAndStationMapper(stopModelBuilder);
+    stopAndStationMapper2.mapParentAndChildStops(List.of(stopPlace));
+    stopModelBuilder.regularStopsById().addAll(stopAndStationMapper2.resultStops);
+
+    assertEquals(1, stopModelBuilder.regularStopsById().size());
+    assertEquals(
+      0,
+      stopModelBuilder
+        .regularStopsById()
+        .get(MappingSupport.ID_FACTORY.createId("ST:Quay:1"))
+        .getIndex()
+    );
+  }
+
+  private static StopAndStationMapper createStopAndStationMapper(
+    StopModelBuilder stopModelBuilder
+  ) {
+    return new StopAndStationMapper(
+      MappingSupport.ID_FACTORY,
+      new HierarchicalVersionMapById<>(),
+      null,
+      stopModelBuilder,
+      DEFAULT_TIME_ZONE,
+      DataImportIssueStore.NOOP,
+      false
+    );
   }
 
   private static StopPlace createStopPlace(

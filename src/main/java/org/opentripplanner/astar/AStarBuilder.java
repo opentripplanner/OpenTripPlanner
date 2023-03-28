@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.AStarEdge;
@@ -33,7 +34,6 @@ public abstract class AStarBuilder<
   private Set<Vertex> toVertices;
   private SearchTerminationStrategy<State> terminationStrategy;
   private DominanceFunction<State> dominanceFunction;
-  private Duration timeout;
   private Edge originBackEdge;
   private Collection<State> initialStates;
 
@@ -98,10 +98,8 @@ public abstract class AStarBuilder<
     return builder;
   }
 
-  public Builder setTimeout(Duration timeout) {
-    this.timeout = timeout;
-    return builder;
-  }
+  @Nonnull
+  protected abstract Duration streetRoutingTimeout();
 
   public Builder setOriginBackEdge(Edge originBackEdge) {
     this.originBackEdge = originBackEdge;
@@ -151,7 +149,7 @@ public abstract class AStarBuilder<
       destination,
       terminationStrategy,
       Optional.ofNullable(dominanceFunction).orElseGet(this::createDefaultDominanceFunction),
-      timeout,
+      streetRoutingTimeout(),
       initialStates
     );
   }

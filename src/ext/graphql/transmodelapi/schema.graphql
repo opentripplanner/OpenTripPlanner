@@ -679,7 +679,7 @@ type QueryType {
     minimumLatitude: Float!,
     minimumLongitude: Float!
   ): [Quay]! @timingData
-  "Get all quays within the specified walking radius from a location. The returned type has two fields quay and distance"
+  "Get all quays within the specified walking radius from a location. There are no maximum limits for the input parameters, but the query will timeout and return if the parameters are too high."
   quaysByRadius(
     "fetching only nodes after this node (exclusive)"
     after: String,
