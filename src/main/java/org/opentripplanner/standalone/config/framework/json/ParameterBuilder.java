@@ -225,10 +225,7 @@ public class ParameterBuilder {
       List.of(),
       it -> parseOptionalEnum(it.asText(), enumClass)
     );
-    List<T> result = optionalList.stream()
-      .filter(Optional::isPresent)
-      .map(Optional::get)
-      .toList();
+    List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
     return result.isEmpty() ? EnumSet.noneOf(enumClass) : EnumSet.copyOf(result);
   }
 
