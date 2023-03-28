@@ -19,6 +19,7 @@ class StreetPreferencesTest {
     IntersectionTraversalModel.NORWAY;
   private static final Duration MAX_ACCESS_EGRESS = Duration.ofMinutes(5);
   private static final Duration MAX_DIRECT = Duration.ofMinutes(10);
+  public static final Duration ROUTING_TIMEOUT = Duration.ofSeconds(3);
 
   private final StreetPreferences subject = StreetPreferences
     .of()
@@ -28,6 +29,7 @@ class StreetPreferencesTest {
     .withIntersectionTraversalModel(INTERSECTION_TRAVERSAL_MODEL)
     .withMaxAccessEgressDuration(MAX_ACCESS_EGRESS, Map.of())
     .withMaxDirectDuration(MAX_DIRECT, Map.of())
+    .withRoutingTimeout(ROUTING_TIMEOUT)
     .build();
 
   @Test
@@ -61,6 +63,11 @@ class StreetPreferencesTest {
   }
 
   @Test
+  void routingTimeout() {
+    assertEquals(ROUTING_TIMEOUT, subject.routingTimeout());
+  }
+
+  @Test
   void testOfAndCopyOf() {
     // Return same object if no value is set
     assertSame(StreetPreferences.DEFAULT, StreetPreferences.of().build());
@@ -82,6 +89,7 @@ class StreetPreferencesTest {
       "StreetPreferences{" +
       "turnReluctance: 2.0, " +
       "drivingDirection: LEFT, " +
+      "routingTimeout: 3s, " +
       "elevator: ElevatorPreferences{boardTime: 2m}, " +
       "intersectionTraversalModel: NORWAY, " +
       "maxAccessEgressDuration: DurationForStreetMode{default:5m}, " +

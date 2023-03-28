@@ -33,7 +33,6 @@ public class TestServerContext {
     DefaultServerRequestContext context = DefaultServerRequestContext.create(
       routerConfig.transitTuningConfig(),
       routerConfig.routingRequestDefaults(),
-      routerConfig.streetRoutingTimeout(),
       new RaptorConfig<>(routerConfig.transitTuningConfig()),
       graph,
       new DefaultTransitService(transitModel),

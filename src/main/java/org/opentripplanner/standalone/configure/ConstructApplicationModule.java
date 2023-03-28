@@ -37,7 +37,6 @@ public class ConstructApplicationModule {
     return DefaultServerRequestContext.create(
       routerConfig.transitTuningConfig(),
       routerConfig.routingRequestDefaults(),
-      routerConfig.streetRoutingTimeout(),
       raptorConfig,
       graph,
       transitService,

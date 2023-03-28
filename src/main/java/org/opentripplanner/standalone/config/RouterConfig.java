@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
  */
 public class RouterConfig implements Serializable {
 
-  private static final Duration DEFAULT_STREET_ROUTING_TIMEOUT = Duration.ofSeconds(5);
   private static final Logger LOG = LoggerFactory.getLogger(RouterConfig.class);
 
   public static final RouterConfig DEFAULT = new RouterConfig(
@@ -47,7 +46,6 @@ public class RouterConfig implements Serializable {
   private final String configVersion;
   private final String requestLogFile;
   private final TransmodelAPIConfig transmodelApi;
-  private final Duration streetRoutingTimeout;
   private final RouteRequest routingRequestDefaults;
   private final TransitRoutingConfig transitConfig;
   private final UpdatersParameters updatersParameters;
@@ -110,7 +108,6 @@ number of transit vehicles used in that itinerary.
           .summary("Configuration for the Transmodel GraphQL API.")
           .asObject()
       );
-    this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
     this.transitConfig = new TransitRoutingConfig("transit", root);
     this.routingRequestDefaults =
       RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
@@ -118,6 +115,12 @@ number of transit vehicles used in that itinerary.
     this.rideHailingServiceParameters = new RideHailingServicesConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig = new FlexConfig(root, "flex");
+
+    this.routingRequestDefaults.withPreferences(p ->
+        p.withStreet(s ->
+          s.withRoutingTimeout(parseStreetRoutingTimeout(root, s.original().routingTimeout()))
+        )
+      );
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllUnusedParameters(LOG::warn);
@@ -143,15 +146,6 @@ number of transit vehicles used in that itinerary.
 
   public String requestLogFile() {
     return requestLogFile;
-  }
-
-  /**
-   * The preferred way to limit the search is to limit the distance for each street mode(WALK, BIKE,
-   * CAR). So the default timeout for a street search is set quite high. This is used to abort the
-   * search if the max distance is not reached within the timeout.
-   */
-  public Duration streetRoutingTimeout() {
-    return streetRoutingTimeout;
   }
 
   public TransmodelAPIConfig transmodelApi() {
@@ -208,7 +202,7 @@ number of transit vehicles used in that itinerary.
    *
    * @since 2.2 - The support for the old format can be removed in version > 2.2.
    */
-  static Duration parseStreetRoutingTimeout(NodeAdapter adapter) {
+  static Duration parseStreetRoutingTimeout(NodeAdapter adapter, Duration defaultValue) {
     return adapter
       .of("streetRoutingTimeout")
       .since(V2_2)
@@ -229,6 +223,6 @@ search-window.
 The search aborts after this duration and any paths found are returned to the client.
 """
       )
-      .asDuration(DEFAULT_STREET_ROUTING_TIMEOUT);
+      .asDuration(defaultValue);
   }
 }

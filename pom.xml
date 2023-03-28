@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>92</otp.serialization.version.id>
+        <otp.serialization.version.id>93</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>28.2</geotools.version>
         <google.dagger.version>2.45</google.dagger.version>
@@ -186,7 +186,7 @@
             <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
                 <artifactId>enunciate-maven-plugin</artifactId>
-                <version>2.15.0</version>
+                <version>2.15.1</version>
                 <executions>
                     <execution>
                         <!-- override default binding to process-sources phase (enunciate generates web services). -->
@@ -219,7 +219,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.3.1</version>
                 <configuration>
                     <propertiesEncoding>UTF-8</propertiesEncoding>
                 </configuration>
