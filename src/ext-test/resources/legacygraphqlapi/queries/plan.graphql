@@ -53,19 +53,21 @@
                 }
                 fareProducts {
                     instanceId
-                    id
-                    name
-                    price {
-                        currency
-                        cents
-                    }
-                    riderCategory {
+                    product {
                         id
                         name
-                    }
-                    medium {
-                        id
-                        name
+                        price {
+                            currency
+                            cents
+                        }
+                        riderCategory {
+                            id
+                            name
+                        }
+                        medium {
+                            id
+                            name
+                        }
                     }
                 }
             }

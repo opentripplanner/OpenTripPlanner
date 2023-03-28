@@ -1308,7 +1308,7 @@ type FareMedium {
     name: String
 }
 
-"A fare product (ticket) to cover the entire or a subset of an itinerary."
+"A container for both a fare product (a ticket) and its relationship to the itinerary."
 type FareProductInstance {
     """
     Identifier local to the itinerary that allows to cross-reference fare products that span
@@ -1331,6 +1331,12 @@ type FareProductInstance {
     """
     instanceId: String!
 
+    "The purchasable fare product"
+    product: FareProduct
+}
+
+"A fare product (a ticket) to be bought by a passenger"
+type FareProduct {
     "Identifier for the fare product."
     id: String!
 

@@ -97,4 +97,8 @@ config:
     PropulsionType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType
     RentalVehicleType: org.opentripplanner.service.vehiclerental.model.RentalVehicleType#RentalVehicleType
     OpeningHours: org.opentripplanner.model.calendar.openinghours.OHCalendar#OHCalendar
+    Money: org.opentripplanner.transit.model.basic.Money#Money
     FareProductInstance: org.opentripplanner.ext.fares.model.FareProductInstance#FareProductInstance
+    FareProduct: org.opentripplanner.ext.fares.model.FareProduct#FareProduct
+    FareMedium: org.opentripplanner.ext.fares.model.FareMedium#FareMedium
+    RiderCategory: org.opentripplanner.ext.fares.model.RiderCategory#RiderCategory

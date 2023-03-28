@@ -9,8 +9,11 @@ import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
+import org.opentripplanner.ext.fares.model.FareMedium;
+import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareProductInstance;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
+import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertCauseType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertEffectType;
@@ -43,6 +46,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -297,19 +301,24 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> name();
   }
 
-  /** A fare product (ticket) to cover the entire or a subset of an itinerary. */
-  public interface LegacyGraphQLFareProductInstance {
+  /** A fare product (a ticket) to be bought by a passenger */
+  public interface LegacyGraphQLFareProduct {
     public DataFetcher<String> id();
 
-    public DataFetcher<String> instanceId();
-
-    public DataFetcher<Object> medium();
+    public DataFetcher<FareMedium> medium();
 
     public DataFetcher<String> name();
 
-    public DataFetcher<Object> price();
+    public DataFetcher<Money> price();
 
-    public DataFetcher<Object> riderCategory();
+    public DataFetcher<RiderCategory> riderCategory();
+  }
+
+  /** A container for both a fare product (a ticket) and its relationship to the itinerary. */
+  public interface LegacyGraphQLFareProductInstance {
+    public DataFetcher<String> instanceId();
+
+    public DataFetcher<FareProduct> product();
   }
 
   /** A feed provides routing data (stops, routes, timetables, etc.) from one or more public transport agencies. */
