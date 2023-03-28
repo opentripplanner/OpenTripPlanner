@@ -9,9 +9,9 @@
             preferred: [{ not: [{tags: ["a", "b", "c"]}] }],
             filters: [{ select: [{tags:["e"]}] }]
         },
-        transportModes : [
+        transportModes: [
             {
-                mode:CAR,
+                mode: CAR,
                 qualifier: HAIL
             }
         ]) {
