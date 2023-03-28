@@ -1,6 +1,6 @@
 # Siri Updater
 
-Support for consuming SIRI ET, SX and ET messages. The updater is developed to support the Norwegian
+Support for consuming SIRI ET and SX messages. The updater is developed to support the Nordic
 SIRI profile which is a subset of the SIRI specification.
 
 ## Contact Info
@@ -20,9 +20,10 @@ the [Norwegian SIRI profile](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pa
 
 ## Configuration
 
+To enable the SIRI updater you need to add it to the updaters section of the `router-config.json`.
+
 ### Siri-ET via HTTPS
 
-To enable the SIRI updater you need to add it to the updaters section of the `router-config.json`.
 <!-- INSERT: siri-et-updater -->
 
 ## Changelog
