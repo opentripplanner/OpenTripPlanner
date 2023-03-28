@@ -15,7 +15,7 @@ public class JourneyPatternHelper {
    * Get lineId from RouteRef (Nordic profile) or RouteView (EPIP)
    *
    * @param routeById needed in Nordic profile to look up the route reference
-   * @param journesPattern the JourneyPatten to get the lineId from
+   * @param journeyPattern the JourneyPatten to get the lineId from
    */
   public static String getLineFromRoute(
     ReadOnlyHierarchicalMap<String, Route> routeById,
