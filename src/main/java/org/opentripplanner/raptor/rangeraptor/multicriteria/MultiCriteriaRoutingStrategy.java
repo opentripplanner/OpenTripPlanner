@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 import static org.opentripplanner.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -97,7 +98,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     final T trip = boarding.trip();
     final int boardTime = boarding.time();
 
-    if (prevArrival.arrivedByAccess()) {
+    if (prevArrival.arrivedBy(ACCESS)) {
       int latestArrivalTime = boardTime - slackProvider.boardSlack(trip.pattern().slackIndex());
       prevArrival = prevArrival.timeShiftNewArrivalTime(latestArrivalTime);
     }

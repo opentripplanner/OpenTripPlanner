@@ -75,9 +75,7 @@ public class ConstructApplication {
 
     // We create the optional GraphVisualizer here, because it would be significant more complex to
     // use Dagger DI to do it - passing in a parameter to enable it or not.
-    var graphVisualizer = cli.visualize
-      ? new GraphVisualizer(graph, config.routerConfig().streetRoutingTimeout())
-      : null;
+    var graphVisualizer = cli.visualize ? new GraphVisualizer(graph) : null;
 
     this.factory =
       DaggerConstructApplicationFactory

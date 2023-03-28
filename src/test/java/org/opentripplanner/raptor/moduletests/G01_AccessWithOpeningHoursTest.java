@@ -1,14 +1,11 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
@@ -31,8 +28,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.ExpectedList;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCaseBuilder;
-import org.opentripplanner.raptor.spi.UnknownPathString;
+import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCaseFactory;
 
 /*
  * FEATURE UNDER TEST
@@ -124,10 +120,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   @MethodSource("openAllDayTestCases")
   void openAllDayTest(RaptorModuleTestCase testCase) {
     requestBuilder.searchParams().addAccessPaths(walk(STOP_B, D2m));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> openInSearchIntervalTestCases() {
@@ -138,10 +131,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   @MethodSource("openInSearchIntervalTestCases")
   public void openInSearchIntervalTest(RaptorModuleTestCase testCase) {
     requestBuilder.searchParams().addAccessPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> openInSearchIntervalStartSearchNextDayTestCase() {
@@ -152,6 +142,12 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
     );
 
     return tcBuilderWithMinDuration(T24_10, T24_40)
+      .withRequest(r ->
+        r
+          .searchParams()
+          .earliestDepartureTime(T24_10)
+          .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00))
+      )
       .add(standard().manyIterations(), withoutCost(expected.all()))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
       .add(TC_STANDARD_REV_ONE, withoutCost(expected.last()))
@@ -162,14 +158,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("openInSearchIntervalStartSearchNextDayTestCase")
   public void openInSearchIntervalStartSearchNextDayTest(RaptorModuleTestCase testCase) {
-    requestBuilder
-      .searchParams()
-      .earliestDepartureTime(T24_10)
-      .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> openInSecondHalfTodayTestCase() {
@@ -182,9 +171,15 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
     );
 
     return tcBuilderWithMinDuration(T00_00, T24_40)
+      .withRequest(r ->
+        r
+          .searchParams()
+          .searchWindow(Duration.ofHours(1))
+          .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_23, T01_00))
+      )
       .add(TC_STANDARD, withoutCost(expected.first(3)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
-      .add(TC_STANDARD_REV, withoutCost(expected.last(3)))
+      .add(TC_STANDARD_REV, withoutCost(expected.range(1, 3)))
       .add(TC_STANDARD_REV_ONE, withoutCost(expected.last()))
       .add(multiCriteria(), expected.first(3))
       .build();
@@ -193,14 +188,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("openInSecondHalfTodayTestCase")
   public void openInSecondHalfTodayTest(RaptorModuleTestCase testCase) {
-    requestBuilder
-      .searchParams()
-      .searchWindow(Duration.ofHours(1))
-      .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_23, T01_00));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> openInFirstHalfIntervalTestCase() {
@@ -215,9 +203,15 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
     );
 
     return tcBuilderWithMinDuration(T00_00, T24_40)
+      .withRequest(r ->
+        r
+          .searchParams()
+          .searchWindow(Duration.ofHours(1))
+          .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_20))
+      )
       .add(TC_STANDARD, withoutCost(expected.get(0, 1, 2, 4)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
-      .add(TC_STANDARD_REV, withoutCost(expected.fromTo(3, 6)))
+      .add(TC_STANDARD_REV, withoutCost(expected.range(3, 6)))
       .add(TC_STANDARD_REV_ONE, withoutCost(expected.last()))
       .add(multiCriteria(), expected.get(0, 1, 2, 4))
       .build();
@@ -230,14 +224,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("openInFirstHalfIntervalTestCase")
   public void openInFirstHalfIntervalTest(RaptorModuleTestCase testCase) {
-    requestBuilder
-      .searchParams()
-      .searchWindow(Duration.ofHours(1))
-      .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_20));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> partiallyOpenIntervalTestNextDayTestCase() {
@@ -248,6 +235,14 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
     );
 
     return tcBuilderWithMinDuration(T24_10, T25_00)
+      .withRequest(r ->
+        r
+          .searchParams()
+          .searchWindow(Duration.ofMinutes(30))
+          .earliestDepartureTime(T24_10)
+          .latestArrivalTime(T25_00)
+          .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_18, T00_20))
+      )
       .add(TC_STANDARD, withoutCost(expected.all()))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
       .add(TC_STANDARD_REV, withoutCost(expected.all()))
@@ -263,21 +258,18 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("partiallyOpenIntervalTestNextDayTestCase")
   public void partiallyOpenIntervalTestNextDayTest(RaptorModuleTestCase testCase) {
-    requestBuilder
-      .searchParams()
-      .searchWindow(Duration.ofMinutes(30))
-      .earliestDepartureTime(T24_10)
-      .latestArrivalTime(T25_00)
-      .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_18, T00_20));
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
   private static List<RaptorModuleTestCase> closedTestCase() {
     return RaptorModuleTestCase
       .of()
+      .withRequest(r ->
+        r
+          .searchParams()
+          .searchWindow(Duration.ofHours(2))
+          .addAccessPaths(free(STOP_B).openingHoursClosed())
+      )
       .add(minDuration())
       .add(standard())
       .add(multiCriteria())
@@ -291,24 +283,15 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("closedTestCase")
   public void closedTest(RaptorModuleTestCase testCase) {
-    requestBuilder
-      .searchParams()
-      .searchWindow(Duration.ofHours(2))
-      .addAccessPaths(free(STOP_B).openingHoursClosed());
-
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response.paths()));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
-  private static RaptorModuleTestCaseBuilder tcBuilderWithMinDuration(
+  private static RaptorModuleTestCaseFactory tcBuilderWithMinDuration(
     int earliestDepartureTime,
     int latestArrivalTime
   ) {
-    var expMinDuration = UnknownPathString.of("18m", 0);
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, expMinDuration.departureAt(earliestDepartureTime))
-      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(latestArrivalTime));
+      .addMinDuration("18m", TX_0, earliestDepartureTime, latestArrivalTime);
   }
 }

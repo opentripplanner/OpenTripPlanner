@@ -174,15 +174,18 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    * egress. So, if the NEXT leg is a transit or egress leg it is time-shifted. This make it safe to
    * call this method on any leg - just make sure the legs are linked first.
    */
-  public void timeShiftThisAndNextLeg(RaptorSlackProvider slackProvider) {
+  public void timeShiftThisAndNextLeg(
+    RaptorSlackProvider slackProvider,
+    int iterationDepartureTime
+  ) {
     if (isAccess()) {
-      timeShiftAccessTime(slackProvider);
+      timeShiftAccessTime(slackProvider, iterationDepartureTime);
     }
     if (next != null) {
       if (next.isTransfer()) {
         next.timeShiftTransferTime(slackProvider);
         if (next.next().isEgress()) {
-          next.timeShiftThisAndNextLeg(slackProvider);
+          next.timeShiftThisAndNextLeg(slackProvider, iterationDepartureTime);
         }
       } else if (next.isEgress()) {
         next.timeShiftEgressTime(slackProvider);
@@ -474,26 +477,39 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    *     <li>Normal case: Walk ~ boardSlack ~ transit (access can be time-shifted)</li>
    *     <li>Flex and transit: Flex ~ (transferSlack + boardSlack) ~ transit</li>
    *     <li>Flex, walk and transit: Flex ~ Walk ~ (transferSlack + boardSlack) ~ transit</li>
+   *     <li>Flex, walk and Flex: Flex ~ Walk ~ Flex (will be timeshifted in relation to the iteration departure time)</li>
    * </ol>
    * Flex access may or may not be time-shifted.
    */
-  private void timeShiftAccessTime(RaptorSlackProvider slackProvider) {
+  private void timeShiftAccessTime(RaptorSlackProvider slackProvider, int iterationDepartureTime) {
     var accessPath = asAccessLeg().streetPath;
     var nextTransitLeg = nextTransitLeg();
 
-    @SuppressWarnings("ConstantConditions")
-    int newToTime = nextTransitLeg.transitStopArrivalTimeBefore(slackProvider, hasRides());
-
-    if (next.isTransfer()) {
-      newToTime -= next.asTransferLeg().transfer.durationInSeconds();
+    // if there is no next transit leg then move the access as early as possible relative to
+    // the iteration-departure-time
+    if (nextTransitLeg == null) {
+      int fromTime = accessPath.earliestDepartureTime(iterationDepartureTime);
+      assertTimeExist(
+        fromTime,
+        accessPath,
+        "Access can not be time-shifted after iteration-departure-time."
+      );
+      setTime(fromTime, fromTime + accessPath.durationInSeconds());
     }
-    newToTime = accessPath.latestArrivalTime(newToTime);
-
-    if (newToTime == RaptorConstants.TIME_NOT_SET) {
-      throw new IllegalStateException("Can not time-shift accessPath: " + accessPath);
+    // For transit, we time-shift the access as late as possible to fit with the transit.
+    else {
+      int toTime = nextTransitLeg.transitStopArrivalTimeBefore(slackProvider, hasRides());
+      if (next.isTransfer()) {
+        toTime -= next.asTransferLeg().transfer.durationInSeconds();
+      }
+      toTime = accessPath.latestArrivalTime(toTime);
+      assertTimeExist(
+        toTime,
+        accessPath,
+        "Access can not be time-shifted before first transit leg."
+      );
+      setTime(toTime - accessPath.durationInSeconds(), toTime);
     }
-
-    setTime(newToTime - accessPath.durationInSeconds(), newToTime);
   }
 
   private void timeShiftTransferTime(RaptorSlackProvider slackProvider) {
@@ -519,9 +535,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       slackProvider.transferSlack()
     );
 
-    if (egressDepartureTime == RaptorConstants.TIME_NOT_SET) {
-      throw egressDepartureNotAvailable(stopArrivalTime, egressPath);
-    }
+    assertTimeExist(
+      egressDepartureTime,
+      egressPath,
+      "Transit does not arrive in time to board flex access."
+    );
 
     setTime(egressDepartureTime, egressDepartureTime + egressPath.durationInSeconds());
   }
@@ -587,7 +605,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return waitCost + egressCost;
   }
 
-  private IllegalStateException egressDepartureNotAvailable(
+  private static IllegalStateException egressDepartureNotAvailable(
     int arrivalTime,
     RaptorAccessEgress egressPath
   ) {
@@ -598,6 +616,20 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       " Egress: " +
       egressPath
     );
+  }
+
+  private static int assertTimeExist(int time, RaptorAccessEgress path, String details) {
+    if (time == RaptorConstants.TIME_NOT_SET) {
+      throw new IllegalStateException(
+        String.format(
+          "Unable to reconstruct path. %s. Arrival-time stop: %s, path: %s",
+          details,
+          TimeUtils.timeToStrCompact(time),
+          path
+        )
+      );
+    }
+    return time;
   }
 
   /* PRIVATE INTERFACES */

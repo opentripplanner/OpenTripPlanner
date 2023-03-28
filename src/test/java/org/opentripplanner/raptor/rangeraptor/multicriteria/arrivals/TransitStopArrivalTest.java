@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
@@ -60,8 +60,7 @@ public class TransitStopArrivalTest {
   @Test
   public void arrivedByTransit() {
     assertTrue(subject.arrivedByTransit());
-    assertFalse(subject.arrivedByTransfer());
-    assertFalse(subject.arrivedByAccess());
+    assertTrue(subject.arrivedBy(TRANSIT));
   }
 
   @Test
@@ -97,7 +96,7 @@ public class TransitStopArrivalTest {
   @Test
   public void testToString() {
     assertEquals(
-      "Transit { round: 1, stop: 101, pattern: BUS T1, arrival-time: 9:20 $1880 }",
+      "Transit { round: 1, stop: 101, arrival: [9:20 $1880], pattern: BUS T1 }",
       subject.toString()
     );
   }

@@ -94,6 +94,14 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix initial A* state of car rental [#4934](https://github.com/opentripplanner/OpenTripPlanner/pull/4934)
 - Remove check for (now optional) ENV-variable for GCP Authentication [#4966](https://github.com/opentripplanner/OpenTripPlanner/pull/4966)
 - Optimal walking routes when walking starts or ends in an area [#4936](https://github.com/opentripplanner/OpenTripPlanner/pull/4936)
+- Publish container to Github Container Registry [#4970](https://github.com/opentripplanner/OpenTripPlanner/pull/4970)
+- Remove unconnected walking areas from graph [#4981](https://github.com/opentripplanner/OpenTripPlanner/pull/4981)
+- Filter out duplicate-like legs in alternative legs [#4868](https://github.com/opentripplanner/OpenTripPlanner/pull/4868)
+- Fix timeshifting of Flex ~ Walk ~ Flex paths in Raptor [#4952](https://github.com/opentripplanner/OpenTripPlanner/pull/4952)
+- Validate the number of service links mapped to a JourneyPattern [#4963](https://github.com/opentripplanner/OpenTripPlanner/pull/4963)
+- Make sure the default streetRoutingTimeout is used [#4998](https://github.com/opentripplanner/OpenTripPlanner/pull/4998)
+- Validate service date for SCHEDULED updates [#4861](https://github.com/opentripplanner/OpenTripPlanner/pull/4861)
+- Fix quay duplicates overwriting stop index [#4964](https://github.com/opentripplanner/OpenTripPlanner/pull/4964)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

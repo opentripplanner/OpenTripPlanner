@@ -303,6 +303,7 @@ public class NetexMapper {
       idFactory,
       currentNetexIndex.getQuayById(),
       tariffZoneMapper,
+      transitBuilder.stopModelBuilder(),
       zoneId,
       issueStore,
       noTransfersOnIsolatedStops

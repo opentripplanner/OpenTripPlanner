@@ -23,7 +23,14 @@ jobs:
       - uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 0
-          
+
+      # nodejs is needed because the dynamic download of it via the prettier maven plugin often
+      # times out
+      # Example: https://github.com/opentripplanner/OpenTripPlanner/actions/runs/4490450225/jobs/7897533439
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       # Java setup step completes very fast, no need to run in a preconfigured docker container
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -38,7 +45,7 @@ jobs:
         # NAT drops them
         # https://github.com/actions/runner-images/issues/1499
         run: |
-          mvn --batch-mode jacoco:prepare-agent test jacoco:report -P prettierCheck
+          mvn --batch-mode jacoco:prepare-agent test jacoco:report -P prettierCheck -Dprettier.nodePath=node
           mvn --batch-mode package -Dmaven.test.skip -P prettierSkip
 
       - name: Send coverage data to codecov.io
@@ -159,10 +166,6 @@ jobs:
     needs:
       - build-windows
       - build-linux
-    env:
-      CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
-      CONTAINER_REGISTRY_USER: otpbot
-      CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v3.1.0
         with:
@@ -174,6 +177,29 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Build container image with Jib, push to Dockerhub
+        env:
+          CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
+          CONTAINER_REGISTRY_USER: otpbot
+          CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        run: |
+          # we give the container two tags
+          #   - "latest"
+          #   - a string like "2.3_2022-12-12T21-38"
+          
+          version_with_snapshot=`mvn -q help:evaluate -Dexpression=project.version -q -DforceStdout`
+          version=${version_with_snapshot/-SNAPSHOT/}
+          image_date=`date +%Y-%m-%dT%H-%M`
+          image_version="${version}_${image_date}"
+          
+          mvn --batch-mode -P prettierSkip compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,$image_version
+
+      # March '23: we temporarily publish to both Dockerhub and Github Container Registry as the
+      # Dockerhub free team registry is going away
+      - name: Build container image with Jib, push to Github Container Registry 
+        env:
+          CONTAINER_REPO: ghcr.io/opentripplanner/opentripplanner
+          CONTAINER_REGISTRY_USER: ${{ github.repository_owner }}
+          CONTAINER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # we give the container two tags
           #   - "latest"

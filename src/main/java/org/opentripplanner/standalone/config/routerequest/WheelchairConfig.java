@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routerequest;
 
 import static org.opentripplanner.routing.api.request.preference.WheelchairPreferences.DEFAULT;
+import static org.opentripplanner.routing.api.request.preference.WheelchairPreferences.DEFAULT_COSTS;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
@@ -29,7 +30,8 @@ public class WheelchairConfig {
           .since(V2_2)
           .summary("Configuration for when to use inaccessible trips.")
           .asObject(),
-        DEFAULT.trip()
+        DEFAULT.trip(),
+        DEFAULT_COSTS
       ),
       mapAccessibilityPreferences(
         a
@@ -37,7 +39,8 @@ public class WheelchairConfig {
           .since(V2_2)
           .summary("Configuration for when to use inaccessible stops.")
           .asObject(),
-        DEFAULT.stop()
+        DEFAULT.stop(),
+        DEFAULT_COSTS
       ),
       mapAccessibilityPreferences(
         a
@@ -45,6 +48,7 @@ public class WheelchairConfig {
           .since(V2_2)
           .summary("Configuration for when to use inaccessible elevators.")
           .asObject(),
+        DEFAULT.elevator(),
         DEFAULT.elevator()
       ),
       a
@@ -97,9 +101,10 @@ public class WheelchairConfig {
     return a;
   }
 
-  private static AccessibilityPreferences mapAccessibilityPreferences(
+  static AccessibilityPreferences mapAccessibilityPreferences(
     NodeAdapter adapter,
-    AccessibilityPreferences defaultValue
+    AccessibilityPreferences defaultValue,
+    AccessibilityPreferences defaultCosts
   ) {
     var onlyAccessible = adapter
       .of("onlyConsiderAccessible")
@@ -113,12 +118,27 @@ public class WheelchairConfig {
       .of("unknownCost")
       .since(V2_2)
       .summary("The cost to add when traversing an entity with unknown accessibility information.")
-      .asInt(60 * 10);
+      .asInt(defaultCosts.unknownCost());
     var inaccessibleCost = adapter
       .of("inaccessibleCost")
       .since(V2_2)
       .summary("The cost to add when traversing an entity which is know to be inaccessible.")
-      .asInt(60 * 60);
+      .asInt(defaultCosts.inaccessibleCost());
+
+    if (
+      !adapter.exist("onlyConsiderAccessible") &&
+      (adapter.exist("unknownCost") || adapter.exist("inaccessibleCost"))
+    ) {
+      onlyAccessible = false;
+    }
+
+    if (onlyAccessible && (adapter.exist("unknownCost") || adapter.exist("inaccessibleCost"))) {
+      throw new IllegalStateException(
+        "If `onlyConsiderAccessible` is set then `unknownCost` and `inaccessibleCost` may not be set at " +
+        adapter.contextPath()
+      );
+    }
+
     if (onlyAccessible) {
       return AccessibilityPreferences.ofOnlyAccessible();
     } else {

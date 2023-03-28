@@ -187,9 +187,9 @@ type DestinationDisplay {
 
 "List of visits to quays as part of vehicle journeys. Updated with real time information where available"
 type EstimatedCall {
-  "Actual time of arrival at quay. Updated from real time information if available. NOT IMPLEMENTED"
+  "Actual time of arrival at quay. Updated from real time information if available."
   actualArrivalTime: DateTime
-  "Actual time of departure from quay. Updated with real time information if available. NOT IMPLEMENTED"
+  "Actual time of departure from quay. Updated with real time information if available."
   actualDepartureTime: DateTime
   "Scheduled time of arrival at quay. Not affected by read time updated"
   aimedArrivalTime: DateTime!
@@ -534,7 +534,7 @@ type Quay implements PlaceInterface {
   estimatedCalls(
     "Filters results by either departures, arrivals or both. For departures forBoarding has to be true and the departure time has to be within the specified time range. For arrivals, forAlight has to be true and the arrival time has to be within the specified time range. If both are asked for, either the conditions for arrivals or the conditions for departures will have to be true for an EstimatedCall to show."
     arrivalDeparture: ArrivalDeparture = departures,
-    "Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED"
+    "Indicates that realtime-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
     "Limit the total number of departures returned."
     numberOfDepartures: Int = 5,
@@ -679,7 +679,7 @@ type QueryType {
     minimumLatitude: Float!,
     minimumLongitude: Float!
   ): [Quay]! @timingData
-  "Get all quays within the specified walking radius from a location. The returned type has two fields quay and distance"
+  "Get all quays within the specified walking radius from a location. There are no maximum limits for the input parameters, but the query will timeout and return if the parameters are too high."
   quaysByRadius(
     "fetching only nodes after this node (exclusive)"
     after: String,
@@ -1071,7 +1071,7 @@ type StopPlace implements PlaceInterface {
   "List of visits to this stop place as part of vehicle journeys."
   estimatedCalls(
     arrivalDeparture: ArrivalDeparture = departures,
-    "Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED"
+    "Indicates that realtime-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
     "Limit the total number of departures returned."
     numberOfDepartures: Int = 5,

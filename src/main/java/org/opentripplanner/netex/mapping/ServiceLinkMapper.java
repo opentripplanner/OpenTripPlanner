@@ -60,32 +60,7 @@ class ServiceLinkMapper {
     JourneyPattern_VersionStructure journeyPattern,
     StopPattern stopPattern
   ) {
-    LineString[] geometries = new LineString[stopPattern.getSize() - 1];
-    if (journeyPattern.getLinksInSequence() != null) {
-      List<LinkInLinkSequence_VersionedChildStructure> linksInJourneyPattern = journeyPattern
-        .getLinksInSequence()
-        .getServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern();
-      for (int i = 0; i < linksInJourneyPattern.size(); i++) {
-        var linkInLinkSequence = linksInJourneyPattern.get(i);
-        if (
-          linkInLinkSequence instanceof ServiceLinkInJourneyPattern_VersionedChildStructure serviceLinkInJourneyPattern
-        ) {
-          String serviceLinkRef = serviceLinkInJourneyPattern.getServiceLinkRef().getRef();
-          ServiceLink serviceLink = serviceLinkById.lookup(serviceLinkRef);
-
-          if (serviceLink != null) {
-            geometries[i] = mapServiceLink(serviceLink, stopPattern, i);
-          } else {
-            issueStore.add(
-              "MissingServiceLink",
-              "ServiceLink %s not found in journey pattern %s",
-              serviceLinkRef,
-              journeyPattern.getId()
-            );
-          }
-        }
-      }
-    }
+    LineString[] geometries = generateGeometriesFromServiceLinks(journeyPattern, stopPattern);
 
     // Make sure all geometries are generated
     for (int i = 0; i < stopPattern.getSize() - 1; ++i) {
@@ -94,6 +69,51 @@ class ServiceLinkMapper {
       }
     }
     return Arrays.asList(geometries);
+  }
+
+  private LineString[] generateGeometriesFromServiceLinks(
+    JourneyPattern_VersionStructure journeyPattern,
+    StopPattern stopPattern
+  ) {
+    LineString[] geometries = new LineString[stopPattern.getSize() - 1];
+    if (journeyPattern.getLinksInSequence() == null) {
+      return geometries;
+    }
+    List<LinkInLinkSequence_VersionedChildStructure> linksInJourneyPattern = journeyPattern
+      .getLinksInSequence()
+      .getServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern();
+
+    if (linksInJourneyPattern.size() != stopPattern.getSize() - 1) {
+      issueStore.add(
+        "WrongNumberOfServiceLinks",
+        "The journey pattern %s should have exactly %d ServiceLinks",
+        journeyPattern.getId(),
+        stopPattern.getSize() - 1
+      );
+      return geometries;
+    }
+
+    for (int i = 0; i < linksInJourneyPattern.size(); i++) {
+      var linkInLinkSequence = linksInJourneyPattern.get(i);
+      if (
+        linkInLinkSequence instanceof ServiceLinkInJourneyPattern_VersionedChildStructure serviceLinkInJourneyPattern
+      ) {
+        String serviceLinkRef = serviceLinkInJourneyPattern.getServiceLinkRef().getRef();
+        ServiceLink serviceLink = serviceLinkById.lookup(serviceLinkRef);
+
+        if (serviceLink != null) {
+          geometries[i] = mapServiceLink(serviceLink, stopPattern, i);
+        } else {
+          issueStore.add(
+            "MissingServiceLink",
+            "ServiceLink %s not found in journey pattern %s",
+            serviceLinkRef,
+            journeyPattern.getId()
+          );
+        }
+      }
+    }
+    return geometries;
   }
 
   private LineString mapServiceLink(

@@ -6,7 +6,6 @@ import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
@@ -177,7 +176,7 @@ public class BarrierRoutingTest {
     options.accept(request);
 
     var temporaryVertices = new TemporaryVerticesContainer(graph, request, streetMode, streetMode);
-    var gpf = new GraphPathFinder(null, Duration.ofSeconds(5));
+    var gpf = new GraphPathFinder(null);
     var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(

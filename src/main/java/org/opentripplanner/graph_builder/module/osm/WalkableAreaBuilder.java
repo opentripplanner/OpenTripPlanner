@@ -305,6 +305,11 @@ public class WalkableAreaBuilder {
 
       if (edgeList.visibilityVertices.size() == 0) {
         issueStore.add(new UnconnectedArea(group));
+        // Area is not connected to graph. Remove it immediately before it causes any trouble.
+        for (Edge edge : edges) {
+          graph.removeEdge(edge);
+        }
+        continue;
       }
 
       createNamedAreas(edgeList, ring, group.areas);

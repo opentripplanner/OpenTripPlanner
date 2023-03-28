@@ -705,7 +705,9 @@ public class TransmodelGraphQLSchema {
           .newFieldDefinition()
           .name("quaysByRadius")
           .description(
-            "Get all quays within the specified walking radius from a location. The returned type has two fields quay and distance"
+            "Get all quays within the specified walking radius from a location. There are no maximum " +
+            "limits for the input parameters, but the query will timeout and return if the parameters " +
+            "are too high."
           )
           .withDirective(gqlUtil.timingData)
           .type(

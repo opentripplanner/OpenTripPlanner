@@ -413,6 +413,19 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return UpdateError.result(tripId, NO_UPDATES);
     }
 
+    final FeedScopedId serviceId = transitService.getTripForId(tripId).getServiceId();
+    final Set<LocalDate> serviceDates = transitService
+      .getCalendarService()
+      .getServiceDatesForServiceId(serviceId);
+    if (!serviceDates.contains(serviceDate)) {
+      debug(
+        tripId,
+        "SCHEDULED trip has service date {} for which trip's service is not valid, skipping.",
+        serviceDate.toString()
+      );
+      return UpdateError.result(tripId, NO_SERVICE_ON_DATE);
+    }
+
     // If this trip_id has been used for previously ADDED/MODIFIED trip message (e.g. when the
     // sequence of stops has changed, and is now changing back to the originally scheduled one),
     // mark that previously created trip as DELETED.
