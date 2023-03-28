@@ -44,7 +44,7 @@ public abstract class CachingRideHailingService implements RideHailingService {
   protected abstract List<ArrivalTime> queryArrivalTimes(WgsCoordinate position) throws IOException;
 
   /**
-   * Get the estimated trip time for a specific rideType
+   * Get the ride estimate for a specific start and end pair.
    */
   @Override
   public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end)
