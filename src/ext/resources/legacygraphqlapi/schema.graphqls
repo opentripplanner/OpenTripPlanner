@@ -1314,7 +1314,7 @@ type FareProductInstance {
     Identifier local to the itinerary that allows to cross-reference fare products that span
     more than one leg.
 
-    If you want to uniquely identify the fare product itself (not its instance) use `id`.
+    If you want to uniquely identify the fare product itself (not its instance) use the product's `id`.
 
     ### Example: Day pass
 
@@ -1327,7 +1327,7 @@ type FareProductInstance {
     ### Example: Several single tickets
 
     If you have two legs and need to buy two single tickets they will appear in each leg with the
-    same `id` but different `instanceId`.
+    same `product.id` but different `instanceId`.
     """
     instanceId: String!
 
