@@ -73,7 +73,7 @@ class QuayMapper {
       issueStore.add(
         "QuayWithoutCoordinates",
         "Quay %s does not contain any coordinates.",
-        quay.getId()
+        parameters.quay.getId()
       );
       return null;
     }
