@@ -12,7 +12,7 @@ import org.opentripplanner.ext.ridehailing.model.RideEstimateRequest;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 
 /**
- * A base class for ride hailing services that want to cache their results.
+ * A base class for caching API responses from ride hailing services.
  */
 public abstract class CachingRideHailingService implements RideHailingService {
 
