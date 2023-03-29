@@ -24,7 +24,7 @@ locations = [
     {"name": "HH Mümmelmannsberg", "coordinates": "53.5281075,10.1500277"},
 ]
 
-failing_cases = [48,81,112,127,142,157,172,187,202,217]
+failing_cases = [21,48,112,127,142,157,172,187,202,217]
 
 rows = []
 

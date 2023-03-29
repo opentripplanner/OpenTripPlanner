@@ -22,7 +22,7 @@
   ],
   "osm": [
     {
-      "source": "https://geofoxdata.blob.core.windows.net/opentripplanner/hvv_filtered.osm.pbf"
+      "source": "https://geofoxdata.blob.core.windows.net/opentripplanner/hvv_cropped.osm.pbf"
     }
   ]
 }

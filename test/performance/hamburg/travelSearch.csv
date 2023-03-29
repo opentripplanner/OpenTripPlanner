@@ -19,7 +19,6 @@ testCaseId,description,departure,fromLat,fromLon,toLat,toLon,origin,destination,
 18,Stade to Henstedt-Ulzburg (transit),10:00,53.5960704,9.4775887,53.7952480,9.9822267,Stade,Henstedt-Ulzburg,TRANSIT|WALK,transit
 19,Stade to Elmshorn (transit),10:00,53.5960704,9.4775887,53.7542251,9.6592636,Stade,Elmshorn,TRANSIT|WALK,transit
 20,Stade to Pinneberg (transit),10:00,53.5960704,9.4775887,53.6550342,9.7976864,Stade,Pinneberg,TRANSIT|WALK,transit
-21,Stade to Buchholz (transit),10:00,53.5960704,9.4775887,53.3243628,9.8749387,Stade,Buchholz,TRANSIT|WALK,transit
 22,Stade to HH Hbf (transit),10:00,53.5960704,9.4775887,53.5531993,10.0064364,Stade,HH Hbf,TRANSIT|WALK,transit
 23,Stade to HH Flughafen (transit),10:00,53.5960704,9.4775887,53.6326466,10.0066778,Stade,HH Flughafen,TRANSIT|WALK,transit
 24,Stade to HH Landungsbrücken (S) (transit),10:00,53.5960704,9.4775887,53.5462334,9.9711435,Stade,HH Landungsbrücken (S),TRANSIT|WALK,transit
@@ -78,6 +77,7 @@ testCaseId,description,departure,fromLat,fromLon,toLat,toLon,origin,destination,
 78,Pinneberg to Bad Oldesloe (transit),10:00,53.6550342,9.7976864,53.8052678,10.3822381,Pinneberg,Bad Oldesloe,TRANSIT|WALK,transit
 79,Pinneberg to Henstedt-Ulzburg (transit),10:00,53.6550342,9.7976864,53.7952480,9.9822267,Pinneberg,Henstedt-Ulzburg,TRANSIT|WALK,transit
 80,Pinneberg to Elmshorn (transit),10:00,53.6550342,9.7976864,53.7542251,9.6592636,Pinneberg,Elmshorn,TRANSIT|WALK,transit
+81,Pinneberg to Buchholz (transit),10:00,53.6550342,9.7976864,53.3243628,9.8749387,Pinneberg,Buchholz,TRANSIT|WALK,transit
 82,Pinneberg to HH Hbf (transit),10:00,53.6550342,9.7976864,53.5531993,10.0064364,Pinneberg,HH Hbf,TRANSIT|WALK,transit
 83,Pinneberg to HH Flughafen (transit),10:00,53.6550342,9.7976864,53.6326466,10.0066778,Pinneberg,HH Flughafen,TRANSIT|WALK,transit
 84,Pinneberg to HH Landungsbrücken (S) (transit),10:00,53.6550342,9.7976864,53.5462334,9.9711435,Pinneberg,HH Landungsbrücken (S),TRANSIT|WALK,transit
