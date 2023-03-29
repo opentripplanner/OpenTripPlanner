@@ -623,8 +623,8 @@ Variable substitution is performed on the value, use `${VARIABLE-NAME}`:
       "sourceType" : "bikely",
       "url" : "https://api.safebikely.com/api/v1/s/locations",
       "headers" : {
-        "X-Bikely-Token" : "$----{BIKELY_TOKEN}",
-        "Authorization" : "$----{BIKELY_AUTHORIZATION}"
+        "X-Bikely-Token" : "[BIKELY_TOKEN]",
+        "Authorization" : "[BIKELY_AUTHORIZATION]"
       }
     },
     {

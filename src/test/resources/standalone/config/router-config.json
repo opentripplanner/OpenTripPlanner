@@ -237,10 +237,8 @@
       "sourceType": "bikely",
       "url": "https://api.safebikely.com/api/v1/s/locations",
       "headers": {
-        // The environment variables do not exist on every computer using this config running tests
-        // Hence, the inserted `----`
-        "X-Bikely-Token": "$----{BIKELY_TOKEN}",
-        "Authorization": "$----{BIKELY_AUTHORIZATION}"
+        "X-Bikely-Token": "[BIKELY_TOKEN]",
+        "Authorization": "[BIKELY_AUTHORIZATION]"
       }
     },
     {
