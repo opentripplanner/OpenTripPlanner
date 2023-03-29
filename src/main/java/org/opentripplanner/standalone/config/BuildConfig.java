@@ -5,7 +5,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -649,7 +648,7 @@ Netex data is also often supplied in a ZIP file.
     transferRequests = TransferRequestConfig.map(root, "transferRequests");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      root.logAllUnusedParameters(LOG::warn);
+      root.logAllWarnings(LOG::warn);
     }
   }
 

@@ -56,7 +56,7 @@ public class SpeedTestConfig {
     request = mapRouteRequest(adapter.of("routingDefaults").asObject());
     updatersConfig = new UpdatersConfig(adapter);
     ignoreStreetResults = adapter.of("ignoreStreetResults").asBoolean(false);
-    adapter.logAllUnusedParameters(LOG::warn);
+    adapter.logAllWarnings(LOG::warn);
   }
 
   public static SpeedTestConfig config(File dir) {
