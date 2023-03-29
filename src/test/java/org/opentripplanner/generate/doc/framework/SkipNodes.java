@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Optional;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 
-
 /**
  * When generating the configuration we might want to stop processing the node three at some
  * point. We do not have reusable types in the config, so instead we might document a node

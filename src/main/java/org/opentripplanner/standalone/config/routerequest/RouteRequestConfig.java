@@ -32,6 +32,7 @@ import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class RouteRequestConfig {
+
   private static final String WHEELCHAIR_ACCESSIBILITY = "wheelchairAccessibility";
 
   public static RouteRequest mapDefaultRouteRequest(NodeAdapter root, String parameterName) {

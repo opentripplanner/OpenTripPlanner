@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.config;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -62,10 +62,14 @@ public class OtpConfig {
         .description(CONFIG_VERSION_DESCRIPTION)
         .asString(null);
     this.otpFeatures =
-      root.of("otpFeatures").since(NA).summary("TODO").asEnumMap(OTPFeature.class, Boolean.class);
+      root
+        .of("otpFeatures")
+        .since(V2_0)
+        .summary("Turn features on/off.")
+        .asEnumMap(OTPFeature.class, Boolean.class);
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      root.logAllUnusedParameters(LOG::warn);
+      root.logAllWarnings(LOG::warn);
     }
   }
 }

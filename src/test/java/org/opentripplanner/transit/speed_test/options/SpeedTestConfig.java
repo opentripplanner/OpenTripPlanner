@@ -56,7 +56,7 @@ public class SpeedTestConfig {
     flexConfig = new FlexConfig(adapter, "flex");
     updatersConfig = new UpdatersConfig(adapter);
     ignoreStreetResults = adapter.of("ignoreStreetResults").asBoolean(false);
-    adapter.logAllUnusedParameters(LOG::warn);
+    adapter.logAllWarnings(LOG::warn);
   }
 
   public static SpeedTestConfig config(File dir) {

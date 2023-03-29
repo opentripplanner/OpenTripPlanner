@@ -20,12 +20,12 @@ public record PollingTripUpdaterParameters(
   }
 
   @Override
-  public String getUrl() {
+  public String url() {
     return httpSourceUrl;
   }
 
   @Override
-  public String getFeedId() {
+  public String feedId() {
     return feedId;
   }
 
