@@ -162,7 +162,7 @@ public final class WgsCoordinate implements Serializable {
    * See https://wiki.openstreetmap.org/wiki/Precision_of_coordinates
    * <p>
    * This is useful when you want to cache coordinate-based computations but don't need absolute
-   * precision. DO NOT USE THIS IN ROUTING(USE AT LEAST 7 DECIMALS)!
+   * precision. DO NOT USE THIS IN ROUTING (USE AT LEAST 7 DECIMALS)!
    */
   public WgsCoordinate roundToApproximate10m() {
     var lat = DoubleUtils.roundTo4Decimals(latitude);

@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A base class for OAuth implementations that want to cache their access tokens.
+ * A base class for OAuth implementations for retrieving and caching access tokens.
  */
 public abstract class CachingOAuthService implements OAuthService {
 

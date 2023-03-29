@@ -35,7 +35,7 @@ public class RideHailingDocTest {
   public void rideHailingDoc() {
     NodeAdapter node = readServices();
 
-    // Read and close inout file (same as output file)
+    // Read and close input file (same as output file)
     String template = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 

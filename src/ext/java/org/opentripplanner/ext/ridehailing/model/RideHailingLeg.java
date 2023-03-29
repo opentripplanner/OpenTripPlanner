@@ -6,7 +6,7 @@ import org.opentripplanner.model.plan.StreetLegBuilder;
 
 /**
  * This is a special leg for ride hailing that adds information about the ride estimate like
- * price, which type of vehicle and arrival time.
+ * price, the type of vehicle and arrival time.
  */
 public class RideHailingLeg extends StreetLeg {
 
