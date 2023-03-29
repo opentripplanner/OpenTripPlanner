@@ -36,6 +36,7 @@ import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.Route;
+import org.rutebanken.netex.model.RouteView;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceLink;
 
@@ -344,8 +345,15 @@ class TripPatternMapper {
   private org.opentripplanner.transit.model.network.Route lookupRoute(
     JourneyPattern_VersionStructure journeyPattern
   ) {
-    Route route = routeById.lookup(journeyPattern.getRouteRef().getRef());
-    return otpRouteById.get(idFactory.createId(route.getLineRef().getValue().getRef()));
+    String lineId = null;
+    if (journeyPattern.getRouteRef() != null) {
+      Route route = routeById.lookup(journeyPattern.getRouteRef().getRef());
+      lineId = route.getLineRef().getValue().getRef();
+    } else {
+      RouteView routeView = journeyPattern.getRouteView();
+      lineId = routeView.getLineRef().getValue().getRef();
+    }
+    return otpRouteById.get(idFactory.createId(lineId));
   }
 
   private void createTripTimes(List<Trip> trips, TripPattern tripPattern) {
