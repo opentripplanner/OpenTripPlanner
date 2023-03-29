@@ -29,7 +29,7 @@ public final class AccessibilityPreferences {
   private final int unknownCost;
   private final int inaccessibleCost;
 
-  private static AccessibilityPreferences DEFAULT_UNSET = ofCost(NOT_SET, NOT_SET);
+  private static final AccessibilityPreferences DEFAULT_UNSET = ofCost(NOT_SET, NOT_SET);
 
   private AccessibilityPreferences(
     boolean onlyConsiderAccessible,
@@ -39,17 +39,6 @@ public final class AccessibilityPreferences {
     this.onlyConsiderAccessible = onlyConsiderAccessible;
     this.unknownCost = Units.cost(unknownCost);
     this.inaccessibleCost = Units.cost(inaccessibleCost);
-  }
-
-  private AccessibilityPreferences(Builder builder) {
-    this.onlyConsiderAccessible = builder.onlyConsiderAccessible;
-    if (builder.onlyConsiderAccessible) {
-      this.unknownCost = NOT_SET;
-      this.inaccessibleCost = NOT_SET;
-    } else {
-      this.unknownCost = Units.cost(builder.unknownCost);
-      this.inaccessibleCost = Units.cost(builder.inaccessibleCost);
-    }
   }
 
   /**
@@ -189,7 +178,9 @@ public final class AccessibilityPreferences {
     }
 
     public AccessibilityPreferences build() {
-      var value = new AccessibilityPreferences(this);
+      var value = onlyConsiderAccessible
+        ? ofOnlyAccessible()
+        : ofCost(unknownCost, inaccessibleCost);
       return original.equals(value) ? original : value;
     }
   }
