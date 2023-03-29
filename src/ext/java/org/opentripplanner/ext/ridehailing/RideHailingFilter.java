@@ -3,7 +3,6 @@ package org.opentripplanner.ext.ridehailing;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
-import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -67,7 +66,7 @@ public class RideHailingFilter implements ItineraryListFilter {
           flagForDeletion(i);
           return leg;
         } else {
-          return new RideHailingLeg(sl, RideHailingProvider.UBER, estimates.get(0));
+          return new RideHailingLeg(sl, service.provider(), estimates.get(0));
         }
       } else {
         return leg;
