@@ -116,6 +116,13 @@ public class EnvironmentVariableReplacerTest {
     );
   }
 
+  @Test
+  public void verifyUUID() {
+    var result = insertEnvironmentVariables("THIS IS A UNIQUE ID '${UUID}'", "test");
+
+    System.out.println(result);
+  }
+
   /**
    * Test replacing environment variable fails for unknown environment variable.
    */

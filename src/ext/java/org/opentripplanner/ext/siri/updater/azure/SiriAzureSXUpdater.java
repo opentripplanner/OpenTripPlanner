@@ -13,12 +13,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.framework.io.HttpUtils;
@@ -27,6 +25,7 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,10 +89,11 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       LOG.info("Fetching initial Siri SX data from {}, timeout is {}ms", uri, timeout);
 
       final long t1 = System.currentTimeMillis();
-      HashMap<String, String> headers = new HashMap<>();
-      headers.put("Accept", "application/xml");
 
-      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), headers);
+      // Maybe put this in the config?
+      HttpHeaders rh = HttpHeaders.of(getClass().getSimpleName()).acceptApplicationXML().build();
+
+      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.headers());
       final long t2 = System.currentTimeMillis();
 
       if (data == null) {

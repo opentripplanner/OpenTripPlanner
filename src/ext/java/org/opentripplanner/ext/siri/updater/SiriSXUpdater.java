@@ -3,8 +3,6 @@ package org.opentripplanner.ext.siri.updater;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
@@ -14,6 +12,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
@@ -25,11 +24,11 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
   private static final long RETRY_INTERVAL_MILLIS = 5000;
-  private static final Map<String, String> requestHeaders = new HashMap<>();
   private final String url;
   private final String originalRequestorRef;
   private final TransitAlertService transitAlertService;
   private final SiriAlertsUpdateHandler updateHandler;
+  private final HttpHeaders requestHeaders;
   private WriteToGraphCallback saveResultOnGraph;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
   private String requestorRef;
@@ -55,7 +54,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     }
 
     blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-    requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-SX"));
+    requestHeaders = config.requestHeaders();
 
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
     this.updateHandler =
@@ -135,7 +134,12 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
       creating = System.currentTimeMillis() - t1;
       t1 = System.currentTimeMillis();
 
-      InputStream is = SiriHttpUtils.postData(url, sxServiceRequest, timeout, requestHeaders);
+      InputStream is = SiriHttpUtils.postData(
+        url,
+        sxServiceRequest,
+        timeout,
+        requestHeaders.headers()
+      );
 
       fetching = System.currentTimeMillis() - t1;
       t1 = System.currentTimeMillis();

@@ -64,7 +64,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |    updaterNetworkName                                                                     |        `string`       | Json tag name for the network name for each source.                                               | *Optional* | `"id"`        |   na  |
 |    updaterUrlName                                                                         |        `string`       | Json tag name for endpoint urls for each source.                                                  | *Optional* | `"url"`       |   na  |
 |    url                                                                                    |         `uri`         | Endpoint for the VehicleRentalServiceDirectory                                                    | *Required* |               |   na  |
-|    [headers](#vehicleRentalServiceDirectory_headers)                                      |    `map of string`    | Http headers.                                                                                     | *Optional* |               |   na  |
+|    [headers](#vehicleRentalServiceDirectory_headers)                                      |    `map of string`    | HTTP headers to add to the request. Any header key, value can be inserted.                        | *Optional* |               |   na  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -371,7 +371,12 @@ Used to group requests when monitoring OTP.
 **Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /vehicleRentalServiceDirectory 
 
-Http headers.
+HTTP headers to add to the request. Any header key, value can be inserted.
+
+Variable substitution is performed on the value, use `${VARIABLE-NAME}`:
+  - `${UUID}` to insert a unique identifier
+  - `${` + ENVIRONMENT-VARIABLE-NAME + `}` to insert environment variable
+
 
 
 <!-- PARAMETERS-DETAILS END -->
@@ -618,8 +623,8 @@ Http headers.
       "sourceType" : "bikely",
       "url" : "https://api.safebikely.com/api/v1/s/locations",
       "headers" : {
-        "X-Bikely-Token" : "${BIKELY_TOKEN}",
-        "Authorization" : "${BIKELY_AUTHORIZATION}"
+        "X-Bikely-Token" : "$----{BIKELY_TOKEN}",
+        "Authorization" : "$----{BIKELY_AUTHORIZATION}"
       }
     },
     {

@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public class SiriSXUpdaterParameters implements PollingGraphUpdaterParameters {
@@ -13,6 +14,8 @@ public class SiriSXUpdaterParameters implements PollingGraphUpdaterParameters {
   private final int timeoutSec;
   private final boolean blockReadinessUntilInitialized;
 
+  private final HttpHeaders requestHeaders;
+
   public SiriSXUpdaterParameters(
     String configRef,
     String feedId,
@@ -21,7 +24,8 @@ public class SiriSXUpdaterParameters implements PollingGraphUpdaterParameters {
     int frequencySec,
     int earlyStartSec,
     int timeoutSec,
-    boolean blockReadinessUntilInitialized
+    boolean blockReadinessUntilInitialized,
+    HttpHeaders requestHeaders
   ) {
     this.configRef = configRef;
     this.feedId = feedId;
@@ -31,6 +35,11 @@ public class SiriSXUpdaterParameters implements PollingGraphUpdaterParameters {
     this.earlyStartSec = earlyStartSec;
     this.timeoutSec = timeoutSec;
     this.blockReadinessUntilInitialized = blockReadinessUntilInitialized;
+    this.requestHeaders = requestHeaders;
+  }
+
+  String getFeedId() {
+    return feedId;
   }
 
   public String getUrl() {
@@ -63,7 +72,7 @@ public class SiriSXUpdaterParameters implements PollingGraphUpdaterParameters {
     return blockReadinessUntilInitialized;
   }
 
-  String getFeedId() {
-    return feedId;
+  public HttpHeaders requestHeaders() {
+    return requestHeaders;
   }
 }

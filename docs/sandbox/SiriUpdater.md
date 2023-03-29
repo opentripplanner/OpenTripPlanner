@@ -38,7 +38,7 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 | requestorRef                   |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
 | timeoutSec                     |    `integer`    | The HTTP timeout to download the updates.                                                              | *Optional* | `15`          |  2.0  |
 | url                            |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |
-| [headers](#u__8__headers)      | `map of string` | HTTP headers to add to the request                                                                     | *Optional* |               |  2.3  |
+| [headers](#u__8__headers)      | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                             | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
@@ -48,7 +48,12 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[8] 
 
-HTTP headers to add to the request
+HTTP headers to add to the request. Any header key, value can be inserted.
+
+Variable substitution is performed on the value, use `${VARIABLE-NAME}`:
+  - `${UUID}` to insert a unique identifier
+  - `${` + ENVIRONMENT-VARIABLE-NAME + `}` to insert environment variable
+
 
 
 
