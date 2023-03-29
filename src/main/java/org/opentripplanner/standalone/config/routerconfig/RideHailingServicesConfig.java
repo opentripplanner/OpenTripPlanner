@@ -6,11 +6,11 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.List;
 import java.util.function.Function;
-import org.opentripplanner.RideHailingServicesParameters;
+import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.services.UberConfig;
 
-public class RideHailingServicesConfig implements RideHailingServicesParameters {
+public class RideHailingServicesConfig {
 
   private final Multimap<Type, Object> configList = ArrayListMultimap.create();
 
@@ -32,18 +32,13 @@ public class RideHailingServicesConfig implements RideHailingServicesParameters 
       });
   }
 
-  @Override
-  public List<org.opentripplanner.ext.ridehailing.RideHailingServiceParameters> rideHailingServiceParameters() {
+  public List<RideHailingServiceParameters> rideHailingServiceParameters() {
     return configList
       .values()
       .stream()
-      .filter(org.opentripplanner.ext.ridehailing.RideHailingServiceParameters.class::isInstance)
-      .map(org.opentripplanner.ext.ridehailing.RideHailingServiceParameters.class::cast)
+      .filter(RideHailingServiceParameters.class::isInstance)
+      .map(RideHailingServiceParameters.class::cast)
       .toList();
-  }
-
-  private <T> List<T> getParameters(Type key) {
-    return (List<T>) configList.get(key);
   }
 
   public enum Type {

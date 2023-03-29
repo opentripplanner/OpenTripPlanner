@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.List;
-import org.opentripplanner.RideHailingServicesParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -49,7 +48,7 @@ public class RouterConfig implements Serializable {
   private final RouteRequest routingRequestDefaults;
   private final TransitRoutingConfig transitConfig;
   private final UpdatersParameters updatersParameters;
-  private final RideHailingServicesParameters rideHailingServiceParameters;
+  private final RideHailingServicesConfig rideHailingConfig;
   private final VectorTileConfig vectorTileLayers;
   private final FlexConfig flexConfig;
 
@@ -112,7 +111,7 @@ number of transit vehicles used in that itinerary.
     this.routingRequestDefaults =
       RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
     this.updatersParameters = new UpdatersConfig(root);
-    this.rideHailingServiceParameters = new RideHailingServicesConfig(root);
+    this.rideHailingConfig = new RideHailingServicesConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig = new FlexConfig(root, "flex");
 
@@ -165,7 +164,7 @@ number of transit vehicles used in that itinerary.
   }
 
   public List<RideHailingServiceParameters> rideHailingServiceParameters() {
-    return rideHailingServiceParameters.rideHailingServiceParameters();
+    return rideHailingConfig.rideHailingServiceParameters();
   }
 
   public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
