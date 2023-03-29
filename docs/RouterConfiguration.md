@@ -37,11 +37,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
 | [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |  2.2  |
 | [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |  2.1  |
-| [rideHailingServices](#rideHailingServices)                                               |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                         | *Optional* |               |  2.3  |
-|       type = "UBER_CAR_HAILING"                                                           |         `enum`        | The type of the service.                                                                          | *Required* |               |  2.3  |
-|       clientId                                                                            |        `string`       | OAuth client id to access the API.                                                                | *Required* |               |  2.3  |
-|       clientSecret                                                                        |        `string`       | OAuth client secret to access the API.                                                            | *Required* |               |  2.3  |
-|       wheelchairAccessibleRideType                                                        |        `string`       | The id of the requested wheelchair accessible ride type.                                          | *Required* |               |  2.3  |
+| [rideHailingServices](sandbox/RideHailing.md)                                             |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                         | *Optional* |               |  2.3  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
 | [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                   | *Optional* |               |   na  |
@@ -147,13 +143,6 @@ search-window.
 
 The search aborts after this duration and any paths found are returned to the client.
 
-
-<h3 id="rideHailingServices">rideHailingServices</h3>
-
-**Since version:** `2.3` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
-**Path:** / 
-
-Configuration for interfaces to external ride hailing services like Uber.
 
 <h3 id="transit">transit</h3>
 

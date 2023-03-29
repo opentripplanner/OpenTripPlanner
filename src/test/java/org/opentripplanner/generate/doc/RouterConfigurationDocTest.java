@@ -34,6 +34,7 @@ public class RouterConfigurationDocTest {
     .add("routingDefaults", "RouteRequest.md")
     .add("updaters", "UpdaterConfig.md")
     .add("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
+    .add("rideHailingServices", "sandbox/RideHailing.md")
     .build();
 
   /**
