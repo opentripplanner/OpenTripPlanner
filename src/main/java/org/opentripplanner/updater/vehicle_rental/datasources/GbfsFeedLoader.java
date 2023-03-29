@@ -14,7 +14,7 @@ import org.entur.gbfs.v2_3.gbfs.GBFSFeed;
 import org.entur.gbfs.v2_3.gbfs.GBFSFeedName;
 import org.entur.gbfs.v2_3.gbfs.GBFSFeeds;
 import org.opentripplanner.framework.io.HttpUtils;
-import org.opentripplanner.updater.UpdaterConstructionException;
+import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

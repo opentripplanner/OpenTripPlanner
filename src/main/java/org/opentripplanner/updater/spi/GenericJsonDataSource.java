@@ -1,4 +1,4 @@
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.spi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;

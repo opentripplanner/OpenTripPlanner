@@ -8,7 +8,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.updater.GenericXmlDataSource;
+import org.opentripplanner.updater.spi.GenericXmlDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

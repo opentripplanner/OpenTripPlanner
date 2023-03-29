@@ -23,10 +23,10 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.DataSource;
+import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

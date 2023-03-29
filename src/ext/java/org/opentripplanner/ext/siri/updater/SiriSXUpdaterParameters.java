@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public class SiriSXUpdaterParameters implements PollingGraphUpdaterParameters {
 

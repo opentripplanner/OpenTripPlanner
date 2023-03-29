@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 import java.util.Map;
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 public record SiriETUpdaterParameters(

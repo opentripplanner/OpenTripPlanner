@@ -19,10 +19,10 @@ import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.DataSource;
-import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.spi.DataSource;
+import org.opentripplanner.updater.spi.GraphUpdater;
 
 class VehicleParkingUpdaterTest {
 
