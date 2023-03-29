@@ -559,7 +559,7 @@ public class Itinerary {
       .toList();
 
     this.legs.forEach(l -> {
-        var legInstances = fare.getLegProducts().get(l).stream().toList();
+        var legInstances = fare.getLegProducts().get(l);
         l.addFareProducts(ListUtils.combine(itineraryInstances, legInstances));
       });
   }
