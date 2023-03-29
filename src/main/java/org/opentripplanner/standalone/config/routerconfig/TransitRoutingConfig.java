@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routerconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
@@ -106,7 +107,7 @@ no extra threads are started and the search is done in one thread.
     this.stopTransferCost =
       c
         .of("stopTransferCost")
-        .since(NA)
+        .since(V2_0)
         .summary("Use this to set a stop transfer cost for the given transfer priority")
         .description(
           """

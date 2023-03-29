@@ -122,7 +122,7 @@ number of transit vehicles used in that itinerary.
       );
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      root.logAllUnusedParameters(LOG::warn);
+      root.logAllWarnings(LOG::warn);
     }
   }
 

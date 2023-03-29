@@ -53,7 +53,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |       [minWindow](#transit_dynamicSearchWindow_minWindow)                                 |       `duration`      | The constant minimum duration for a raptor-search-window.                                         | *Optional* | `"PT40M"`     |  2.2  |
 |       [stepMinutes](#transit_dynamicSearchWindow_stepMinutes)                             |       `integer`       | Used to set the steps the search-window is rounded to.                                            | *Optional* | `10`          |  2.1  |
 |    [pagingSearchWindowAdjustments](#transit_pagingSearchWindowAdjustments)                |      `duration[]`     | The provided array of durations is used to increase the search-window for the next/previous page. | *Optional* |               |   na  |
-|    [stopTransferCost](#transit_stopTransferCost)                                          | `enum map of integer` | Use this to set a stop transfer cost for the given transfer priority                              | *Optional* |               |   na  |
+|    [stopTransferCost](#transit_stopTransferCost)                                          | `enum map of integer` | Use this to set a stop transfer cost for the given transfer priority                              | *Optional* |               |  2.0  |
 | transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                     | *Optional* |               |  2.1  |
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                           | *Optional* | `false`       |   na  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                       | *Optional* |               |   na  |
@@ -326,7 +326,7 @@ for more info."
 
 <h3 id="transit_stopTransferCost">stopTransferCost</h3>
 
-**Since version:** `na` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.0` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
 **Path:** /transit   
 **Enum keys:** `discouraged` | `allowed` | `recommended` | `preferred`
 
