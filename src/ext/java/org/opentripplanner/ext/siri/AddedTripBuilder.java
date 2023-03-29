@@ -206,7 +206,7 @@ class AddedTripBuilder {
       );
     }
 
-    if (cancellation || stopPattern.isAllStopsCancelled()) {
+    if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       updatedTripTimes.cancelTrip();
     } else {
       updatedTripTimes.setRealTimeState(RealTimeState.ADDED);
