@@ -15,13 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Add vehicle positions to OTP patterns via a realtime source *
- * <pre>
- * rt.type = vehicle-positions
- * rt.frequencySec = 60
- * rt.url = http://host.tld/path
- * rt.feedId = TA
- * </pre>
+ * Add vehicle positions to OTP patterns via a GTFS-RT source.
  */
 public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
 
@@ -30,7 +24,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
   /**
    * Update streamer
    */
-  private final VehiclePositionSource vehiclePositionSource;
+  private final GtfsRealtimeHttpVehiclePositionSource vehiclePositionSource;
 
   private final VehiclePositionPatternMatcher vehiclePositionPatternMatcher;
 

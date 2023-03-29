@@ -96,7 +96,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 | feedId                                                                |     `string`    | Which feed the updates apply to.                            | *Optional* |                      |  1.5  |
 | frequencySec                                                          |    `integer`    | How often the data should be downloaded in seconds.         | *Optional* | `60`                 |  1.5  |
 | fuzzyTripMatching                                                     |    `boolean`    | If the trips should be matched fuzzily.                     | *Optional* | `false`              |  1.5  |
-| url                                                                   |     `string`    | The URL of the GTFS-RT resource.                            | *Required* |                      |  1.5  |
+| [url](#u__5__url)                                                     |     `string`    | The URL of the GTFS-RT resource.                            | *Required* |                      |  1.5  |
 | [headers](#u__5__headers)                                             | `map of string` | Extra headers to add to the HTTP request fetching the data. | *Optional* |                      |  2.3  |
 
 
@@ -123,6 +123,15 @@ How backwards propagation should be handled.
   Propagates delays backwards on stops with no estimates regardless if it's required or not.
   The updated times are exposed through APIs.
 
+
+<h4 id="u__5__url">url</h4>
+
+**Since version:** `1.5` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[5] 
+
+The URL of the GTFS-RT resource.
+
+`file:` URLs are also supported if you want to read a file from the local disk.
 
 <h4 id="u__5__headers">headers</h4>
 

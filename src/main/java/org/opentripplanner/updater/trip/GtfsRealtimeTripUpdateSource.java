@@ -17,9 +17,9 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
+public class GtfsRealtimeTripUpdateSource {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeHttpTripUpdateSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeTripUpdateSource.class);
   public static final Map<String, String> DEFAULT_HEADERS = Map.of(
     "Accept",
     "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
@@ -30,21 +30,16 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
   private final String feedId;
   private final String url;
   private final Map<String, String> headers;
-  /**
-   * True iff the last list with updates represent all updates that are active right now, i.e. all
-   * previous updates should be disregarded
-   */
   private boolean fullDataset = true;
-  private ExtensionRegistry registry = ExtensionRegistry.newInstance();
+  private final ExtensionRegistry registry = ExtensionRegistry.newInstance();
 
-  public GtfsRealtimeHttpTripUpdateSource(Parameters config) {
-    this.feedId = config.getFeedId();
-    this.url = config.getUrl();
+  public GtfsRealtimeTripUpdateSource(PollingTripUpdaterParameters config) {
+    this.feedId = config.feedId();
+    this.url = config.url();
     this.headers = MapUtils.combine(config.headers(), DEFAULT_HEADERS);
     MfdzRealtimeExtensions.registerAllExtensions(registry);
   }
 
-  @Override
   public List<TripUpdate> getUpdates() {
     FeedMessage feedMessage;
     List<FeedEntity> feedEntityList;
@@ -83,22 +78,20 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     return updates;
   }
 
-  @Override
-  public boolean getFullDatasetValueOfLastUpdates() {
-    return fullDataset;
-  }
-
-  @Override
-  public String getFeedId() {
-    return this.feedId;
-  }
-
   public String toString() {
     return ToStringBuilder
       .of(this.getClass())
       .addStr("feedId", feedId)
       .addStr("url", url)
       .toString();
+  }
+
+  /**
+   * @return true iff the last list with updates represent all updates that are active right now,
+   * i.e. all previous updates should be disregarded
+   */
+  public boolean getFullDatasetValueOfLastUpdates() {
+    return fullDataset;
   }
 
   interface Parameters {

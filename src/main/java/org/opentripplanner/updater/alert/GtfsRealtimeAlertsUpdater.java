@@ -19,16 +19,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * GTFS-RT alerts updater
- * <p>
- * Usage example:
- *
- * <pre>
- * myalert.type = real-time-alerts
- * myalert.frequencySec = 60
- * myalert.url = http://host.tld/path
- * myalert.earlyStartSec = 3600
- * myalert.feedId = TA
- * </pre>
  */
 public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements TransitAlertProvider {
 

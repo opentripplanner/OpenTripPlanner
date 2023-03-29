@@ -15,22 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Update OTP stop time tables from some (realtime) source
- * <p>
- * Usage example:
- *
- * <pre>
- * rt.type = stop-time-updater
- * rt.frequencySec = 60
- * rt.url = http://host.tld/path
- * rt.feedId = TA
- * </pre>
+ * Update OTP stop timetables from some a GTFS-RT source.
  */
 public class PollingTripUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingTripUpdater.class);
 
-  private final TripUpdateSource updateSource;
+  private final GtfsRealtimeTripUpdateSource updateSource;
   private final TimetableSnapshotSource snapshotSource;
 
   /**
@@ -62,8 +53,8 @@ public class PollingTripUpdater extends PollingGraphUpdater {
     super(parameters);
     // Create update streamer from preferences
     this.feedId = parameters.feedId();
-    this.updateSource = createSource(parameters);
-    this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
+    this.updateSource = new GtfsRealtimeTripUpdateSource(parameters);
+    this.backwardsDelayPropagationType = parameters.backwardsDelayPropagationType();
     this.snapshotSource = snapshotSource;
     if (parameters.fuzzyTripMatching()) {
       this.fuzzyTripMatcher =
@@ -117,18 +108,5 @@ public class PollingTripUpdater extends PollingGraphUpdater {
       .addStr("feedId", feedId)
       .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatcher != null)
       .toString();
-  }
-
-  private static TripUpdateSource createSource(PollingTripUpdaterParameters parameters) {
-    if (parameters.httpSourceParameters().getUrl() != null) {
-      return new GtfsRealtimeHttpTripUpdateSource(parameters.httpSourceParameters());
-    } else if (parameters.fileSourceParameters().getFile() != null) {
-      return new GtfsRealtimeFileTripUpdateSource(parameters.fileSourceParameters());
-    } else {
-      throw new IllegalArgumentException(
-        "Need either a url or file argument to construct a" +
-        PollingTripUpdater.class.getSimpleName()
-      );
-    }
   }
 }
