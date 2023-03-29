@@ -61,7 +61,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
   ) {
     super(parameters);
     // Create update streamer from preferences
-    this.feedId = parameters.getFeedId();
+    this.feedId = parameters.feedId();
     this.updateSource = createSource(parameters);
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
     this.snapshotSource = snapshotSource;

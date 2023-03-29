@@ -23,31 +23,23 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 @GeneratesDocumentation
-public class UpdaterConfigDocTest {
+public class SiriConfigDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "UpdaterConfig.md");
-  private static final File OUT_FILE = new File(DOCS_ROOT, "UpdaterConfig.md");
+  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "SiriUpdater.md");
+  private static final File OUT_FILE = new File(DOCS_ROOT, "sandbox/SiriUpdater.md");
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
-  private static final Set<String> SKIP_UPDATERS = Set.of(
-    "siri-azure-sx-updater",
-    "vehicle-parking",
-    "siri-et-updater"
-  );
+  private static final Set<String> INCLUDE_UPDATERS = Set.of("siri-et-updater");
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
   public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
-   * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
-   * version of the code. The following is auto generated:
-   * <ul>
-   *   <li>The configuration type table</li>
-   *   <li>The list of OTP features</li>
-   * </ul>
+   * NOTE! This test updates the {@code docs/sandbox/SiriUpdator.md} document based on the latest
+   * version of the code.
    */
   @Test
-  public void updateRouterConfigurationDoc() {
-    NodeAdapter node = readBuildConfig();
+  public void updateSiriDoc() {
+    NodeAdapter node = readUpdaterConfig();
 
     // Read and close inout file (same as output file)
     String template = readFile(TEMPLATE);
@@ -57,7 +49,7 @@ public class UpdaterConfigDocTest {
       var child = node.child(childName);
       var type = child.typeQualifier();
 
-      if (!SKIP_UPDATERS.contains(type)) {
+      if (INCLUDE_UPDATERS.contains(type)) {
         template = replaceSection(template, type, updaterDoc(child));
       }
     }
@@ -66,7 +58,7 @@ public class UpdaterConfigDocTest {
     assertFileEquals(original, OUT_FILE);
   }
 
-  private NodeAdapter readBuildConfig() {
+  private NodeAdapter readUpdaterConfig() {
     var json = jsonNodeFromResource(ROUTER_CONFIG_PATH);
     var conf = new RouterConfig(json, ROUTER_CONFIG_PATH, false);
     return conf.asNodeAdapter().child("updaters");

@@ -645,6 +645,15 @@ Http headers.
       "type" : "websocket-gtfs-rt-updater"
     },
     {
+      "type" : "siri-et-updater",
+      "url" : "https://example.com/some/path",
+      "feedId" : "feed_id",
+      "timeoutSec" : 30,
+      "headers" : {
+        "Authorization" : "Some-Token"
+      }
+    },
+    {
       "type" : "siri-azure-sx-updater",
       "topic" : "some_topic",
       "servicebus-url" : "service_bus_url",
