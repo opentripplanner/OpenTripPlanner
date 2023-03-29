@@ -171,14 +171,14 @@ public class NetexBundle implements Closeable {
 
     // map current NeTEx objects into the OTP Transit Model
     mapper.mapNetexToOtp(index.readOnlyView());
-    issueStore.setFilename(null);
+    issueStore.stopProcessingSource();
   }
 
   /** Load a single entry and store it in the index for later */
   private void loadSingeFileEntry(String fileDescription, DataSource entry) {
     try {
       LOG.info("reading entity {}: {}", fileDescription, entry.name());
-      issueStore.setFilename(entry.name());
+      issueStore.startProcessingSource(entry.name());
       PublicationDeliveryStructure doc = xmlParser.parseXmlDoc(entry.asInputStream());
       NetexDocumentParser.parseAndPopulateIndex(index, doc, ignoreFareFrame);
     } catch (JAXBException e) {

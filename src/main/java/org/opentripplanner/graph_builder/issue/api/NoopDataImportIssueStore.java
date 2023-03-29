@@ -18,7 +18,10 @@ class NoopDataImportIssueStore implements DataImportIssueStore {
   public void add(String type, String message, Object... arguments) {}
 
   @Override
-  public void setFilename(String filename) {}
+  public void startProcessingSource(String source) {}
+
+  @Override
+  public void stopProcessingSource() {}
 
   @Override
   public List<DataImportIssue> listIssues() {
