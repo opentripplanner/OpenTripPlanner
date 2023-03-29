@@ -28,7 +28,7 @@ class RideHailingDepartureTimeShifterTest {
 
   static Stream<Arguments> testCases = Stream.of(
     // leave now, so shift by 10 minutes
-    Arguments.of(instant, instant.plus(ofMinutes(10))),
+    Arguments.of(instant, instant.plus(TestRideHailingService.DEFAULT_ARRIVAL_DURATION)),
     Arguments.of(instant.plus(ofMinutes(15)), instant.plus(ofMinutes(15))),
     // no shifting because it's in the future
     Arguments.of(instant.plus(ofMinutes(30)), instant.plus(ofMinutes(30))),

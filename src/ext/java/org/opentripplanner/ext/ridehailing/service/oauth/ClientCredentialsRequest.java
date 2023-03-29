@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.ridehailing.service.oauth;
 
 /**
- * Data structure for requesting an Uber access token.
+ * Data structure for requesting an OAuth client credentials access token.
  */
 public class ClientCredentialsRequest {
 

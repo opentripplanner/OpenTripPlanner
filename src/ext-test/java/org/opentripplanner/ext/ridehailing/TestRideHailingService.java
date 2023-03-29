@@ -11,8 +11,9 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 
 public class TestRideHailingService implements RideHailingService {
 
+  public static final Duration DEFAULT_ARRIVAL_DURATION = Duration.ofMinutes(10);
   public static final List<ArrivalTime> DEFAULT_ARRIVAL_TIMES = List.of(
-    new ArrivalTime(UBER, "123", "a ride", Duration.ofMinutes(10), false)
+    new ArrivalTime(UBER, "123", "a ride", DEFAULT_ARRIVAL_DURATION, false)
   );
   private final List<ArrivalTime> arrivalTimes;
   private final List<RideEstimate> rideEstimates;

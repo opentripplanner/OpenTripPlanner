@@ -52,7 +52,6 @@ public class GenericLocation {
   }
 
   /**
-   *
    * Returns this as a Coordinate object.
    */
   @Nullable

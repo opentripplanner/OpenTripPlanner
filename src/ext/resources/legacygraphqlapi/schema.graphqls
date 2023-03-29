@@ -1358,7 +1358,7 @@ scalar Duration
 
 "An estimate for a ride on a hailed vehicle, like an Uber car."
 type RideHailingEstimate {
-    "The lower bound of the price estimate of this ride."
+    "The provider of the ride hailing service."
     provider: String!
     "The lower bound of the price estimate of this ride."
     minPrice: Money!

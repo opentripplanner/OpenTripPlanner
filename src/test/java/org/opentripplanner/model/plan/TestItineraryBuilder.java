@@ -379,6 +379,9 @@ public class TestItineraryBuilder implements PlanTestConstants {
         true
       )
     );
+    // the removal is necessary because the call to streetLeg() also adds a leg to the list
+    // since we want to override this and there is no replace() method we remove the last leg
+    // and re-add another one
     legs.remove(legs.size() - 1);
     legs.add(rhl);
 
