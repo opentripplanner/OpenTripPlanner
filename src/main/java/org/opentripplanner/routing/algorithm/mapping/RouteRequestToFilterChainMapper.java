@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
+import org.opentripplanner.ext.ridehailing.RideHailingFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
@@ -77,8 +78,11 @@ public class RouteRequestToFilterChainMapper {
       .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
       .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
-      .withRideHailingServices(context.rideHailingServices())
       .withDebugEnabled(params.debug());
+
+    if (!context.rideHailingServices().isEmpty()) {
+      builder.withRideHailingFilter(new RideHailingFilter(context.rideHailingServices()));
+    }
 
     return builder.build();
   }
