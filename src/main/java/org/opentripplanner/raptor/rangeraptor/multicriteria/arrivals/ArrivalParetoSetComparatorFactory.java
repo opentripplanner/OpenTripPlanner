@@ -12,7 +12,7 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
    * {@code arrivedOnBoard}. Normally arriving on-board should give the arrival an advantage
    * - you can continue on foot, walking to the next stop. But, we only do this if it happens
    * in the same Raptor iteration and round - if it does it is taken care of by the order
-   * witch the algorithm work - not by this comparator.
+   * which the algorithm works - not by this comparator.
    */
   ParetoComparator<T> compareArrivalTimeRoundAndCost();
 

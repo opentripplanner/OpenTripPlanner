@@ -20,7 +20,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  * Pattern. We take advantage of this by excluding all "constant" criteria from the pattern-ride
  * comparator used by the pareto-set of patternRides.
  * <p>
- * This implementation of the multi-criteria Range Raptor keep all pareto-optimal _rides_ for each
+ * This implementation of the multi-criteria Range Raptor keeps all pareto-optimal _rides_ for each
  * pattern while possessing each stops down the line. This class keep the needed state for these
  * rides to avoid recalculating each value more than once and to be able put then in a {@link
  * ParetoSet}.

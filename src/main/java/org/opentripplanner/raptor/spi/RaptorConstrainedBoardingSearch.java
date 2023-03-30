@@ -15,7 +15,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
  */
 public interface RaptorConstrainedBoardingSearch<T extends RaptorTripSchedule> {
   /**
-   * Check if the current pattern have any constrained transfers for the given target stop position.
+   * Check if the current pattern has any constrained transfers for the given target stop position.
    * If not, then Raptor will fall back to a regular trip search.
    * <p>
    * The target stop position is the boarding "to" stop position for a forward search, and the
@@ -24,7 +24,7 @@ public interface RaptorConstrainedBoardingSearch<T extends RaptorTripSchedule> {
   boolean transferExistTargetStop(int targetStopPos);
 
   /**
-   * Check if the current pattern have any constrained transfers for the given source stop position.
+   * Check if the current pattern has any constrained transfers for the given source stop position.
    * If not, then Raptor will fall back to a regular trip search.
    * <p>
    * The source stop position is the alighting "from" stop position for a forward search, and the

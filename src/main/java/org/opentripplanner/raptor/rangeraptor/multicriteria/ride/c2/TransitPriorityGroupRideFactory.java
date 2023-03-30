@@ -8,7 +8,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
 
 /**
- * This factory create new {@link PatternRide}s and merge in transit-priority-group ids
+ * This factory creates new {@link PatternRide}s and merge in transit-priority-group ids
  * into c2.
  */
 public class TransitPriorityGroupRideFactory<T extends RaptorTripSchedule>

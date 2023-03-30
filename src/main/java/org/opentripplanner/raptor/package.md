@@ -74,7 +74,7 @@ a *pareto-optimal* set of paths which simultaneously optimize at least these cri
 We will also experiment with separating other criteria out from the _cost_, such as
 _walkingDistance_ or _operator_. The goal is to make this configurable so each deployment may tune
 this to their needs. Due to performance reasons it might not be 100% dynamic. The 
-`generalized-cost` is value computed to represent the "human" cost of traveling. In McRaptor state
+`generalized-cost` value is computed to represent the "human" cost of traveling. In McRaptor state
 we store this value in `c1` (criteria-one). The criteria-one can in theory be used for anything and
 is not limited to the `generalized-cost`. The McRaptor also support storing a second criteria `c2`.
 The pareto-functions must be altered to support these criteria. Using independent pareto-criteria
