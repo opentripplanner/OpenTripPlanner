@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.service;
 
 import java.time.ZoneId;
+import org.opentripplanner.ext.ridehailing.RideHailingDepartureTimeShifter;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.via.ViaRoutingWorker;
 import org.opentripplanner.routing.api.RoutingService;
@@ -20,16 +21,21 @@ public class DefaultRoutingService implements RoutingService {
 
   private final ZoneId timeZone;
 
-  public final RequestModifier requestModified = RequestModifier.NOOP;
+  public final RequestModifier requestModifier;
 
   public DefaultRoutingService(OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
     this.timeZone = serverContext.transitService().getTimeZone();
+    if (serverContext.rideHailingServices().isEmpty()) {
+      this.requestModifier = RequestModifier.NOOP;
+    } else {
+      this.requestModifier = RideHailingDepartureTimeShifter::modifyRequest;
+    }
   }
 
   @Override
   public RoutingResponse route(RouteRequest request) {
-    var modificationResult = requestModified.modify(serverContext, request);
+    var modificationResult = requestModifier.modify(serverContext, request);
 
     if (modificationResult.isSuccess()) {
       RoutingWorker worker = new RoutingWorker(
