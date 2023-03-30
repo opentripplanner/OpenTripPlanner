@@ -76,16 +76,12 @@ public class HttpHeaders {
     }
 
     public Builder add(String name, String value) {
-      headers.put(name, tokenSubstitution(value));
+      headers.put(name, value);
       return this;
     }
 
     public HttpHeaders build() {
       return new HttpHeaders(this);
-    }
-
-    private String tokenSubstitution(String value) {
-      return EnvironmentVariableReplacer.insertEnvironmentVariables(value, source);
     }
   }
 }

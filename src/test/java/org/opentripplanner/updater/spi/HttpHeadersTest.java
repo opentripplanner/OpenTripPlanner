@@ -2,12 +2,9 @@ package org.opentripplanner.updater.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.application.OtpAppException;
 
 class HttpHeadersTest {
 
@@ -31,24 +28,6 @@ class HttpHeadersTest {
 
     subject = HttpHeaders.of(Map.of(), "Test");
     assertEquals(HttpHeaders.empty(), subject);
-  }
-
-  @Test
-  void assertEnvSubstitution() {
-    var key = "testKey";
-    String value = "UUID='${UUID}'";
-    var subject = HttpHeaders.of("Test").add(key, value).build();
-    String result = subject.headers().get(key);
-    assertNotEquals(value, result);
-    assertTrue(result.matches("UUID='[-\\da-f]+'"), result);
-  }
-
-  @Test
-  void assertEnvSubstitutionFailsOnMissingKey() {
-    assertThrows(
-      OtpAppException.class,
-      () -> HttpHeaders.of("Test").add("test", "${NONE_EXISTING_ENV_VARIABLE_d8j9r0X}")
-    );
   }
 
   @Test
