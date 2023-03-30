@@ -10,18 +10,53 @@ import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.response.InputField;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility method to shift the start of the journey to the earliest time that a vehicle can arrive.
  */
 public class RideHailingDepartureTimeShifter {
 
+  private static final Logger LOG = LoggerFactory.getLogger(RideHailingDepartureTimeShifter.class);
   /**
    * When is a start time far enough in the future so that we don't need to check the service and
    * simply presume that a vehicle can arrive on time.
    */
   private static final Duration MAX_DURATION_FROM_NOW = Duration.ofMinutes(30);
+
+  public static Result<RouteRequest, RoutingError> modifyRequest(
+    OtpServerRequestContext serverContext,
+    RouteRequest request
+  ) {
+    // we have to shift the start time of a car hailing request because often we cannot leave right
+    // away
+    if (RideHailingDepartureTimeShifter.shouldShift(request, Instant.now())) {
+      var shiftingResult = RideHailingDepartureTimeShifter.shiftDepartureTime(
+        request,
+        serverContext.rideHailingServices(),
+        Instant.now()
+      );
+      if (shiftingResult.isSuccess()) {
+        return Result.success(shiftingResult.successValue());
+      } else {
+        LOG.error(
+          "Could not fetch arrival time for car hailing service: {}",
+          shiftingResult.failureValue()
+        );
+        return Result.failure(
+          new RoutingError(RoutingErrorCode.SYSTEM_ERROR, InputField.FROM_PLACE)
+        );
+      }
+    } else {
+      return Result.success(request);
+    }
+  }
 
   /**
    * When you start a car hailing search for right now (which is common) you cannot assume to leave

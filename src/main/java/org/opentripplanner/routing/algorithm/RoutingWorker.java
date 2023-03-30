@@ -129,21 +129,12 @@ public class RoutingWorker {
       request.journey().direct().mode() == StreetMode.FLEXIBLE;
 
     ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
-      request.itinerariesSortOrder(),
-      request.preferences().itineraryFilter(),
-      request.numItineraries(),
+      request,
+      serverContext,
       filterOnLatestDepartureTime(),
       emptyDirectModeHandler.removeWalkAllTheWayResults() ||
       removeWalkAllTheWayResultsFromDirectFlex,
-      request.maxNumberOfItinerariesCropHead(),
-      it -> firstRemovedItinerary = it,
-      request.wheelchair(),
-      request.preferences().wheelchair().maxSlope(),
-      serverContext.graph().getFareService(),
-      minBikeParkingDistance(request),
-      serverContext.transitService().getTransitAlertService(),
-      serverContext.transitService()::getMultiModalStationForStation,
-      rideHailingServices()
+      it -> firstRemovedItinerary = it
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
@@ -186,19 +177,6 @@ public class RoutingWorker {
     } else {
       return List.of();
     }
-  }
-
-  private static double minBikeParkingDistance(RouteRequest request) {
-    var modes = request.journey().modes();
-    boolean hasBikePark = List
-      .of(modes.accessMode, modes.egressMode)
-      .contains(StreetMode.BIKE_TO_PARK);
-
-    double minBikeParkingDistance = 0;
-    if (hasBikePark) {
-      minBikeParkingDistance = request.preferences().itineraryFilter().minBikeParkingDistance();
-    }
-    return minBikeParkingDistance;
   }
 
   private static AdditionalSearchDays createAdditionalSearchDays(

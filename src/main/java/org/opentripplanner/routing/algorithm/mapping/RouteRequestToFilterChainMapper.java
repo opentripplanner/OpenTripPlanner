@@ -3,19 +3,15 @@ package org.opentripplanner.routing.algorithm.mapping;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
-import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model.site.MultiModalStation;
-import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 public class RouteRequestToFilterChainMapper {
 
@@ -26,23 +22,15 @@ public class RouteRequestToFilterChainMapper {
   private static final int MAX_NUMBER_OF_ITINERARIES = 200;
 
   public static ItineraryListFilterChain createFilterChain(
-    SortOrder sortOrder,
-    ItineraryFilterPreferences params,
-    int maxNumOfItineraries,
+    RouteRequest request,
+    OtpServerRequestContext context,
     Instant filterOnLatestDepartureTime,
     boolean removeWalkAllTheWayResults,
-    boolean maxNumberOfItinerariesCropHead,
-    Consumer<Itinerary> maxLimitReachedSubscriber,
-    boolean wheelchairAccessible,
-    double wheelchairMaxSlope,
-    FareService fareService,
-    double minBikeParkingDistance,
-    TransitAlertService transitAlertService,
-    Function<Station, MultiModalStation> getMultiModalStation,
-    List<RideHailingService> rideHailingServices
+    Consumer<Itinerary> maxLimitReachedSubscriber
   ) {
-    var builder = new ItineraryListFilterChainBuilder(sortOrder);
+    var builder = new ItineraryListFilterChainBuilder(request.itinerariesSortOrder());
 
+    ItineraryFilterPreferences params = request.preferences().itineraryFilter();
     // Group by similar legs filter
     if (params.groupSimilarityKeepOne() >= 0.5) {
       builder.addGroupBySimilarity(
@@ -61,34 +49,50 @@ public class RouteRequestToFilterChainMapper {
       );
     }
 
-    if (maxNumberOfItinerariesCropHead) {
+    if (request.maxNumberOfItinerariesCropHead()) {
       builder.withMaxNumberOfItinerariesCrop(ListSection.HEAD);
     }
 
     builder
-      .withMaxNumberOfItineraries(Math.min(maxNumOfItineraries, MAX_NUMBER_OF_ITINERARIES))
+      .withMaxNumberOfItineraries(Math.min(request.numItineraries(), MAX_NUMBER_OF_ITINERARIES))
       .withTransitGeneralizedCostLimit(params.transitGeneralizedCostLimit())
       .withBikeRentalDistanceRatio(params.bikeRentalDistanceRatio())
       .withParkAndRideDurationRatio(params.parkAndRideDurationRatio())
       .withNonTransitGeneralizedCostLimit(params.nonTransitGeneralizedCostLimit())
       .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip())
       .withAccessibilityScore(
-        params.useAccessibilityScore() && wheelchairAccessible,
-        wheelchairMaxSlope
+        params.useAccessibilityScore() && request.wheelchair(),
+        request.preferences().wheelchair().maxSlope()
       )
-      .withFares(fareService)
-      .withMinBikeParkingDistance(minBikeParkingDistance)
+      .withFares(context.graph().getFareService())
+      .withMinBikeParkingDistance(minBikeParkingDistance(request))
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
         params.removeItinerariesWithSameRoutesAndStops()
       )
-      .withTransitAlerts(transitAlertService, getMultiModalStation)
+      .withTransitAlerts(
+        context.transitService().getTransitAlertService(),
+        context.transitService()::getMultiModalStationForStation
+      )
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
       .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
       .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
-      .withRideHailingServices(rideHailingServices)
+      .withRideHailingServices(context.rideHailingServices())
       .withDebugEnabled(params.debug());
 
     return builder.build();
+  }
+
+  private static double minBikeParkingDistance(RouteRequest request) {
+    var modes = request.journey().modes();
+    boolean hasBikePark = List
+      .of(modes.accessMode, modes.egressMode)
+      .contains(StreetMode.BIKE_TO_PARK);
+
+    double minBikeParkingDistance = 0;
+    if (hasBikePark) {
+      minBikeParkingDistance = request.preferences().itineraryFilter().minBikeParkingDistance();
+    }
+    return minBikeParkingDistance;
   }
 }
