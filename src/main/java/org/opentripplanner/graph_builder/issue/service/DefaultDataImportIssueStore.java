@@ -24,7 +24,7 @@ public class DefaultDataImportIssueStore implements DataImportIssueStore {
   public void add(DataImportIssue issue) {
     ISSUE_LOG.debug("{} - {}", issue.getType(), issue.getMessage());
     if (currentSource != null) {
-      this.issues.add(IssueWithSource.issue(issue, currentSource));
+      this.issues.add(new IssueWithSource(issue, currentSource));
     } else {
       this.issues.add(issue);
     }

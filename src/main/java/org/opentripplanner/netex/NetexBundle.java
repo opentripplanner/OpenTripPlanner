@@ -171,7 +171,6 @@ public class NetexBundle implements Closeable {
 
     // map current NeTEx objects into the OTP Transit Model
     mapper.mapNetexToOtp(index.readOnlyView());
-    issueStore.stopProcessingSource();
   }
 
   /** Load a single entry and store it in the index for later */
@@ -183,6 +182,8 @@ public class NetexBundle implements Closeable {
       NetexDocumentParser.parseAndPopulateIndex(index, doc, ignoreFareFrame);
     } catch (JAXBException e) {
       throw new RuntimeException(e.getMessage(), e);
+    } finally {
+      issueStore.stopProcessingSource();
     }
   }
 }
