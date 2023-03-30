@@ -376,6 +376,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
         Money.euros(1000),
         Money.euros(2000),
         "VW",
+        "UberX",
         true
       )
     );

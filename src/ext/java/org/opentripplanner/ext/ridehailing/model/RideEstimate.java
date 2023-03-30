@@ -14,5 +14,6 @@ public record RideEstimate(
   Money minPrice,
   Money maxPrice,
   String rideType,
+  String productName,
   boolean wheelchairAccessible
 ) {}

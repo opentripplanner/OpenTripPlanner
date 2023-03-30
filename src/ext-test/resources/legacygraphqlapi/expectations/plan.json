@@ -115,6 +115,7 @@
               "alerts" : [ ],
               "rideHailingEstimate" : {
                 "provider" : "UBER",
+                "name" : "UberX",
                 "minPrice" : {
                   "currency" : "EUR",
                   "cents" : 1000

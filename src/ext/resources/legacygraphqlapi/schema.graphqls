@@ -1366,6 +1366,8 @@ type RideHailingEstimate {
     maxPrice: Money!
     "The estimated time it takes for the vehicle to arrive."
     arrival: Duration!
+    "The name of the ride, ie. UberX"
+    name: String
 }
 
 type Leg {

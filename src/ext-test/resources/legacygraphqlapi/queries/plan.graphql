@@ -60,6 +60,7 @@
                 }
                 rideHailingEstimate {
                     provider
+                    name
                     minPrice {
                         currency
                         cents

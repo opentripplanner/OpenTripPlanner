@@ -26,6 +26,11 @@ public class LegacyGraphQLRideHailingEstimateImpl
   }
 
   @Override
+  public DataFetcher<String> name() {
+    return env -> getSource(env).productName();
+  }
+
+  @Override
   public DataFetcher<String> provider() {
     return env -> getSource(env).provider().toString();
   }

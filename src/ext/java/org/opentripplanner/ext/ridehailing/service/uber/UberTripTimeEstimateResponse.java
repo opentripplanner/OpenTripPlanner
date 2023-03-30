@@ -10,5 +10,6 @@ public record UberTripTimeEstimateResponse(List<UberTripTimeEstimate> prices) {
     public int high_estimate;
     public int low_estimate;
     public String product_id;
+    public String display_name;
   }
 }

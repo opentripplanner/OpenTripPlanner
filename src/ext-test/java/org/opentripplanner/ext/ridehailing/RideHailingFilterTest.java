@@ -29,6 +29,7 @@ class RideHailingFilterTest implements PlanTestConstants {
     Money.usDollars(1500),
     Money.usDollars(3000),
     "foo",
+    "UberX",
     false
   );
   RideHailingService mockService = new TestRideHailingService(

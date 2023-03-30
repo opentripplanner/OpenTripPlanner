@@ -148,6 +148,7 @@ public class UberService extends CachingRideHailingService {
           new Money(currency, price.low_estimate * 100),
           new Money(currency, price.high_estimate * 100),
           price.product_id,
+          price.display_name,
           productIsWheelchairAccessible(price.product_id)
         );
       })

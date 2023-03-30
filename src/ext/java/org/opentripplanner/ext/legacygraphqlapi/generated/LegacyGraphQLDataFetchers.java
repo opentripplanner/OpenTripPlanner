@@ -662,12 +662,15 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType> propulsionType();
   }
 
+  /** An estimate for a ride on a hailed vehicle, like an Uber car. */
   public interface LegacyGraphQLRideHailingEstimate {
     public DataFetcher<java.time.Duration> arrival();
 
     public DataFetcher<Money> maxPrice();
 
     public DataFetcher<Money> minPrice();
+
+    public DataFetcher<String> name();
 
     public DataFetcher<String> provider();
   }

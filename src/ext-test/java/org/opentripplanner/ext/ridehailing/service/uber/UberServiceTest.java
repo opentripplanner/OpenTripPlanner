@@ -26,5 +26,9 @@ class UberServiceTest {
   void rideEstimates() throws ExecutionException {
     var estimates = service.rideEstimates(WgsCoordinate.GREENWICH, WgsCoordinate.GREENWICH);
     assertEquals(8, estimates.size());
+
+    var firstEstimate = estimates.get(0);
+
+    assertEquals("POOL", firstEstimate.productName());
   }
 }
