@@ -13,6 +13,7 @@ developer.otp@skanetrafiken.se
 - Initial version (April 2022)
 - Minor changes in logging (November 2022)
 - Retry fetch from history endpoint if it failed (February 2023)
+- Solve a bug in SiriAzureETUpdater and improve error logging (March 2023)
 
 ## Documentation
 

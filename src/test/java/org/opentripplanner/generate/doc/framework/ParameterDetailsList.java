@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.EN
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
 
 import java.util.EnumSet;
+import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
 import org.opentripplanner.standalone.config.framework.json.EnumMapper;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -18,31 +19,34 @@ public class ParameterDetailsList {
   public static final char SPACE = ' ';
 
   private final DocBuilder doc = new DocBuilder();
-  private final SkipFunction skipNodeOp;
+  private final SkipNodes skipNodes;
   private final int headerLevel;
 
-  private ParameterDetailsList(SkipFunction skipNodeOp, int headerLevel) {
-    this.skipNodeOp = skipNodeOp;
+  private ParameterDetailsList(SkipNodes skipNodes, int headerLevel) {
+    this.skipNodes = skipNodes;
     this.headerLevel = headerLevel;
   }
 
   public static String listParametersWithDetails(
     NodeAdapter root,
-    SkipFunction skipNodeOp,
+    SkipNodes skipNodes,
     int headerLevel
   ) {
-    var details = new ParameterDetailsList(skipNodeOp, headerLevel);
+    var details = new ParameterDetailsList(skipNodes, headerLevel);
     details.addParametersList(root);
     return details.doc.toDoc();
   }
 
   private void addParametersList(NodeAdapter node) {
     for (NodeInfo it : node.parametersSorted()) {
-      if (skipNodeOp.skip(it)) {
+      if (skipNodes.skipDetails(it)) {
         continue;
       }
       printNode(node, it);
 
+      if (skipNodes.skipDetailsForNestedElements(it)) {
+        continue;
+      }
       if (!it.type().isComplex()) {
         continue;
       }
@@ -92,7 +96,14 @@ public class ParameterDetailsList {
     if (info.type().isSimple() && info.defaultValue() != null) {
       doc.dotSeparator().label("Default value:").code(info.type().quote(info.defaultValue()));
     }
+
     doc.lineBreak().label("Path:").path(path == null ? "/" : "/" + path.replace('.', '/'));
+
+    skipNodes
+      .linkDetails(info)
+      .ifPresent(link ->
+        doc.dotSeparator().label("See:").text(MarkdownFormatter.linkToDoc(link, link))
+      );
 
     // Document enums
     if (EnumSet.of(ConfigType.ENUM, ConfigType.ENUM_SET).contains(info.type())) {

@@ -3,9 +3,9 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Locale;
-import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVertexType;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
@@ -61,10 +61,8 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> name() {
-    return environment -> {
-      Locale locale = LegacyGraphQLUtils.getLocale(environment);
-      return getSource(environment).place.name.toString(locale);
-    };
+    return environment ->
+      GraphQLUtils.getTranslation(getSource(environment).place.name, environment);
   }
 
   @Override

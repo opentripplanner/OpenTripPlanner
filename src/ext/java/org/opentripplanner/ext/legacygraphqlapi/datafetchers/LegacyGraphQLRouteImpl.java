@@ -12,6 +12,7 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLTransitMode;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -164,7 +165,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
   @Override
   public DataFetcher<String> longName() {
     return environment ->
-      LegacyGraphQLUtils.getTranslation(getSource(environment).getLongName(), environment);
+      GraphQLUtils.getTranslation(getSource(environment).getLongName(), environment);
   }
 
   @Override

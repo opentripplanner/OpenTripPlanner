@@ -3,10 +3,10 @@ package org.opentripplanner.ext.siri.updater;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
@@ -14,7 +14,7 @@ import uk.org.siri.siri20.Siri;
 public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETHttpTripUpdateSource.class);
-  private static final Map<String, String> requestHeaders = new HashMap<>();
+  private final Map<String, String> requestHeaders;
   /**
    * Feed id that is used to match trip ids in the TripUpdates
    */
@@ -36,6 +36,12 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   public SiriETHttpTripUpdateSource(Parameters parameters) {
     this.feedId = parameters.getFeedId();
     this.url = parameters.getUrl();
+    this.requestHeaders =
+      MapUtils.combine(
+        parameters.headers(),
+        Map.of("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-ET"))
+      );
+
     this.requestorRef =
       parameters.getRequestorRef() == null || parameters.getRequestorRef().isEmpty()
         ? "otp-" + UUID.randomUUID()
@@ -44,8 +50,6 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
     int min = parameters.getPreviewIntervalMinutes();
     this.previewIntervalMillis = min > 0 ? 1000 * 60 * min : -1;
-
-    requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-ET"));
   }
 
   @Override
@@ -80,6 +84,8 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
         //All subsequent requests will return changes since last request
         fullDataset = false;
         return siri;
+      } else {
+        LOG.error("Could not fetch SIRI-ET data from {}", url);
       }
     } catch (IOException e) {
       LOG.info("Failed after {} ms", (System.currentTimeMillis() - t1));
@@ -123,5 +129,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
     int getTimeoutSec();
 
     int getPreviewIntervalMinutes();
+
+    Map<String, String> headers();
   }
 }

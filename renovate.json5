@@ -68,7 +68,9 @@
         "org.junit.jupiter:",
         "com.tngtech.archunit:archunit",
         "org.apache.maven.plugins:maven-surefire-plugin",
-        "org.slf4j:"
+        "org.apache.commons:commons-compress", // only used by tests
+        "org.slf4j:",
+        "ch.qos.logback:logback-classic"
       ],
       "automerge": true,
       "schedule": "after 11pm and before 5am every weekday"

@@ -3,6 +3,7 @@ package org.opentripplanner.raptor._data.transit;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -19,6 +20,7 @@ public class TestConstrainedBoardingSearch
 
   /** Index of guaranteed transfers by fromStopPos */
   private final TIntObjectMap<List<TestConstrainedTransfer>> transfersByFromStopPos = new TIntObjectHashMap<>();
+  private final BitSet transfersByToStopPosExist = new BitSet();
   private final BiPredicate<Integer, Integer> timeAfterOrEqual;
   private int currentTargetStopPos;
 
@@ -27,9 +29,15 @@ public class TestConstrainedBoardingSearch
   }
 
   @Override
-  public boolean transferExist(int targetStopPos) {
+  public boolean transferExistTargetStop(int targetStopPos) {
     this.currentTargetStopPos = targetStopPos;
     return transfersByFromStopPos.containsKey(targetStopPos);
+  }
+
+  @Override
+  public boolean transferExistSourceStop(int targetStopPos) {
+    // This is only used to check for
+    return transfersByToStopPosExist.get(targetStopPos);
   }
 
   @Nullable
@@ -105,9 +113,11 @@ public class TestConstrainedBoardingSearch
         targetTime
       )
     );
+    transfersByToStopPosExist.set(sourceStopPos);
   }
 
   void clear() {
     transfersByFromStopPos.clear();
+    transfersByToStopPosExist.clear();
   }
 }

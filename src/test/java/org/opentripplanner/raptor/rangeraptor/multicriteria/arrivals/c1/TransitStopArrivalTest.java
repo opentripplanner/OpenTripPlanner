@@ -1,7 +1,8 @@
-package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
+package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
@@ -11,7 +12,7 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
-public class TransitStopArrivalTest {
+class TransitStopArrivalTest {
 
   private static final int BOARD_SLACK = 80;
 
@@ -43,7 +44,7 @@ public class TransitStopArrivalTest {
     ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
     TRANSIT_TO_STOP,
     TRANSIT_ALIGHT_TIME,
-    ACCESS_ARRIVAL.cost() + TRANSIT_COST,
+    ACCESS_ARRIVAL.c1() + TRANSIT_COST,
     TRANSIT_TRIP
   );
 
@@ -59,7 +60,7 @@ public class TransitStopArrivalTest {
 
   @Test
   public void arrivedByTransit() {
-    assertTrue(subject.arrivedByTransit());
+    assertTrue(subject.arrivedBy(TRANSIT));
     assertTrue(subject.arrivedBy(TRANSIT));
   }
 
@@ -74,8 +75,13 @@ public class TransitStopArrivalTest {
   }
 
   @Test
-  public void cost() {
-    assertEquals(ACCESS_COST + TRANSIT_COST, subject.cost());
+  public void c1() {
+    assertEquals(ACCESS_COST + TRANSIT_COST, subject.c1());
+  }
+
+  @Test
+  public void c2() {
+    assertThrows(UnsupportedOperationException.class, subject::c2);
   }
 
   @Test

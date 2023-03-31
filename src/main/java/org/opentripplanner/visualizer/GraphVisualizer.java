@@ -16,7 +16,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -176,9 +175,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   /* The set of callbacks that display search progress on the showGraph Processing applet. */
   public TraverseVisitor<State, Edge> traverseVisitor;
 
-  /* Needed by the GraphPathFinder */
-  private final Duration streetRoutingTimeout;
-
   public JList<DisplayVertex> nearbyVertices;
 
   private JList<Edge> outgoingEdges;
@@ -249,12 +245,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   protected State lastStateClicked = null;
   private JCheckBox longDistanceModeCheckbox;
 
-  public GraphVisualizer(Graph graph, Duration streetRoutingTimeout) {
+  public GraphVisualizer(Graph graph) {
     super();
     setTitle("GraphVisualizer");
     setExtendedState(JFrame.MAXIMIZED_BOTH);
     this.graph = graph;
-    this.streetRoutingTimeout = streetRoutingTimeout;
   }
 
   public void run() {
@@ -501,7 +496,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     // if( dontUseGraphicalCallbackCheckBox.isSelected() ){
     // TODO perhaps avoid using a GraphPathFinder and go one level down the call chain directly to a GenericAStar
     // TODO perhaps instead of giving the pathservice a callback, we can just put the visitor in the routing request
-    GraphPathFinder finder = new GraphPathFinder(traverseVisitor, streetRoutingTimeout);
+    GraphPathFinder finder = new GraphPathFinder(traverseVisitor);
 
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)

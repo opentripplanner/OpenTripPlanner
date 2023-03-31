@@ -5,8 +5,8 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.request.ViaLocation;
@@ -57,7 +57,7 @@ public class ViaRequestMapper {
       .withWheelchair(
         environment.getArgumentOrDefault("wheelchairAccessible", request.wheelchair())
       )
-      .withLocale(TransmodelGraphQLUtils.getLocale(environment))
+      .withLocale(GraphQLUtils.getLocale(environment))
       .build();
   }
 }

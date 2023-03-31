@@ -87,12 +87,12 @@ public class SystemErrDebugLogger implements DebugLogger {
    * This should be passed into the {@link DebugRequestBuilder#patternRideDebugListener(Consumer)}
    * using a lambda to enable debugging pattern ride events.
    */
-  public void patternRideLister(DebugEvent<PatternRideView<?>> e) {
+  public void patternRideLister(DebugEvent<PatternRideView<?, ?>> e) {
     printIterationHeader(e.iterationStartTime());
     printRoundHeader(e.element().prevArrival().round() + 1);
     print(e.element(), e.action().toString());
 
-    PatternRideView<?> byElement = e.rejectedDroppedByElement();
+    var byElement = e.rejectedDroppedByElement();
     if (e.action() == DebugEvent.Action.DROP && byElement != null) {
       print(byElement, "->by");
     }
@@ -121,7 +121,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         aLeg != null ? timeToStrLong(aLeg.fromTime()) : null,
         eLeg != null ? timeToStrLong(eLeg.toTime()) : null,
         DurationUtils.durationToStr(p.durationInSeconds()),
-        OtpNumberFormat.formatCostCenti(p.generalizedCost()),
+        OtpNumberFormat.formatCostCenti(p.c1()),
         details(e.action().toString(), e.reason(), e.element().toString())
       )
     );
@@ -166,7 +166,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   private static int legDuration(ArrivalView<?> a) {
     return switch (a.arrivedBy()) {
       case ACCESS -> a.accessPath().access().durationInSeconds();
-      case TRANSFER -> a.transferPath().durationInSeconds();
+      case TRANSFER -> a.transfer().durationInSeconds();
       case EGRESS -> a.egressPath().egress().durationInSeconds();
       case TRANSIT -> throw new IllegalStateException("Unsupported type: " + a.getClass());
     };
@@ -196,14 +196,14 @@ public class SystemErrDebugLogger implements DebugLogger {
         a.round(),
         IntUtils.intToString(a.stop(), NOT_SET),
         timeToStrLong(a.arrivalTime()),
-        numFormat.format(a.cost()),
+        numFormat.format(a.c1()),
         pattern,
         details(action, optReason, path(a))
       )
     );
   }
 
-  private void print(PatternRideView<?> p, String action) {
+  private void print(PatternRideView<?, ?> p, String action) {
     println(
       arrivalTable.rowAsText(
         action,
@@ -211,7 +211,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         p.prevArrival().round() + 1,
         p.boardStopIndex(),
         timeToStrLong(p.boardTime()),
-        numFormat.format(p.relativeCost()),
+        numFormat.format(p.relativeC1()),
         p.trip().pattern().debugInfo(),
         p.toString()
       )
@@ -219,7 +219,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private String path(ArrivalView<?> a) {
-    return path(a, new PathStringBuilder(null)).summary(a.cost()).toString();
+    return path(a, new PathStringBuilder(null)).summary(a.c1()).toString();
   }
 
   private PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {

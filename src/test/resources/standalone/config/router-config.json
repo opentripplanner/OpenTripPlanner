@@ -109,7 +109,11 @@
       "ALLOWED": 75,
       "RECOMMENDED": 30,
       "PREFERRED": 0
-    }
+    },
+    "transferCacheRequests": [
+      { "modes": "WALK"                                                     },
+      { "modes": "WALK",    "wheelchairAccessibility": { "enabled": true  } }
+    ]
   },
   "vehicleRentalServiceDirectory": {
     "url": "https://entur.no/bikeRentalServiceDirectory",
@@ -264,6 +268,16 @@
     // Streaming differential GTFS-RT TripUpdates over websockets
     {
       "type": "websocket-gtfs-rt-updater"
+    },
+    // Siri-ET over HTTP
+    {
+      "type": "siri-et-updater",
+      "url": "https://example.com/some/path",
+      "feedId": "feed_id",
+      "timeoutSec": 30,
+      "headers": {
+        "Authorization": "Some-Token"
+      }
     },
     // SIRI SX updater for Azure Service Bus
     {

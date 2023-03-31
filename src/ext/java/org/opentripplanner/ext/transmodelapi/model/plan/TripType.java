@@ -9,9 +9,9 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
-import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 
 public class TripType {
@@ -100,7 +100,7 @@ public class TripType {
           .dataFetcher(env ->
             ((PlanResponse) env.getSource()).messages.stream()
               .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
-              .map(message -> message.get(TransmodelGraphQLUtils.getLocale(env)))
+              .map(message -> message.get(GraphQLUtils.getLocale(env)))
               .collect(Collectors.toList())
           )
           .build()

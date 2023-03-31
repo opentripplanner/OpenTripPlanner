@@ -7,7 +7,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.api.view.TransferPathView;
 
 public class Transfer extends AbstractStopArrival {
 
@@ -43,8 +42,8 @@ public class Transfer extends AbstractStopArrival {
   }
 
   @Override
-  public TransferPathView transferPath() {
-    return () -> transfer;
+  public RaptorTransfer transfer() {
+    return transfer;
   }
 
   @Override

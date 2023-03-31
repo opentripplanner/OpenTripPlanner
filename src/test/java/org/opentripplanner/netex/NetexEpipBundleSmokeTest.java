@@ -28,6 +28,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -48,6 +49,8 @@ class NetexEpipBundleSmokeTest {
     // Given
     OtpTransitServiceBuilder transitBuilder;
     try (NetexBundle netexBundle = ConstantsForTests.createMinimalNetexEpipBundle()) {
+      // Ensure that the smoke test runs independently
+      StopLocation.initIndexCounter(0);
       // Run the check to make sure it does not throw an exception
       netexBundle.checkInputs();
 
@@ -83,7 +86,7 @@ class NetexEpipBundleSmokeTest {
   }
 
   private void assertAgencies(Collection<Agency> agencies) {
-    assertEquals(2, agencies.size());
+    assertEquals(3, agencies.size());
     Agency a = list(agencies).get(0);
     assertEquals("DE::Authority:41::", a.getId().getId());
     assertEquals("HOCHBAHN, Bus", a.getName());
@@ -96,8 +99,8 @@ class NetexEpipBundleSmokeTest {
   }
 
   private void assertOperators(Collection<Operator> operators) {
-    assertEquals(1, operators.size());
-    Operator o = list(operators).get(0);
+    assertEquals(2, operators.size());
+    Operator o = list(operators).get(1);
     assertEquals("DE::Operator:66::", o.getId().getId());
     assertEquals("Hamburger Hochbahn AG - Bus", o.getName());
     assertNull(o.getUrl());
@@ -114,8 +117,10 @@ class NetexEpipBundleSmokeTest {
     assertEquals(53.5515679274852, quay.getLat(), 0.000001);
     assertEquals(9.93422080466927, quay.getLon(), 0.000001);
     assertEquals("HH:DE::StopPlace:80026_Master::", quay.getParentStation().getId().toString());
+    // Assert that quay duplicates are not overriding existing values
+    assertEquals(0, quay.getIndex());
     assertNull(quay.getPlatformCode());
-    assertEquals(4, stops.size());
+    assertEquals(31, stops.size());
   }
 
   private void assertStations(Collection<Station> stations) {
@@ -127,8 +132,8 @@ class NetexEpipBundleSmokeTest {
     assertEquals(53.5515403864306, station.getLat(), 0.000001);
     assertEquals(9.9342956397828, station.getLon(), 0.000001);
     assertEquals("Europe/Berlin", station.getTimezone().toString());
-    assertEquals(2, station.getChildStops().size());
-    assertEquals(2, stations.size());
+    assertEquals(3, station.getChildStops().size());
+    assertEquals(20, stations.size());
   }
 
   private void assertTripPatterns(Collection<TripPattern> patterns) {
@@ -146,7 +151,7 @@ class NetexEpipBundleSmokeTest {
     List<Trip> trips = p.scheduledTripsAsStream().toList();
     assertEquals("Trip{HH:DE::ServiceJourney:36439031_0:: X86}", trips.get(0).toString());
     assertEquals(55, trips.size());
-    assertEquals(2, patterns.size());
+    assertEquals(4, patterns.size());
   }
 
   private void assertTrips(Collection<Trip> trips) {
@@ -160,7 +165,7 @@ class NetexEpipBundleSmokeTest {
     assertEquals("X86", t.getRoute().getName());
     assertEquals(BikeAccess.UNKNOWN, t.getBikesAllowed());
     assertEquals(Accessibility.NO_INFORMATION, t.getWheelchairBoarding());
-    assertEquals(98, trips.size());
+    assertEquals(110, trips.size());
   }
 
   private void assertServiceIds(Collection<Trip> trips, Collection<FeedScopedId> serviceIds) {
@@ -173,7 +178,7 @@ class NetexEpipBundleSmokeTest {
 
   private void assetServiceCalendar(CalendarServiceData cal) {
     ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());
-    assertEquals(1, sIds.size());
+    assertEquals(2, sIds.size());
     FeedScopedId serviceId1 = sIds.get(0);
 
     List<LocalDate> dates = cal.getServiceDatesForServiceId(serviceId1);

@@ -14,8 +14,8 @@ import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
@@ -39,7 +39,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     ALIGHT_SLACK
   );
 
-  public static final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
+  public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
     TRANSFER_COST_SEC,
     WAIT_RELUCTANCE,

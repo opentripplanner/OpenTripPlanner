@@ -84,5 +84,7 @@ public class PageCursorTest {
     assertNull(PageCursor.decode(null));
     assertNull(PageCursor.decode(""));
     assertNull(PageCursor.decode(" "));
+    assertNull(PageCursor.decode("null"));
+    assertNull(PageCursor.decode("09#$%+1~^§€"));
   }
 }

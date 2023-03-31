@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone.api;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.Duration;
 import java.util.Locale;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
@@ -89,8 +88,6 @@ public interface OtpServerRequestContext {
   TransitTuningParameters transitTuningParameters();
 
   RaptorTuningParameters raptorTuningParameters();
-
-  Duration streetRoutingTimeout();
 
   MeterRegistry meterRegistry();
 

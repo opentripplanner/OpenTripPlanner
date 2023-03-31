@@ -31,9 +31,9 @@ public class BuildConfigurationDocTest {
   private static final String CONFIG_PATH = "standalone/config/" + CONFIG_JSON;
   private static final SkipNodes SKIP_NODES = SkipNodes
     .of()
-    .add("dataOverlay", "sandbox/DataOverlay.md")
-    .add("fares", "sandbox/Fares.md")
-    .add("transferRequests", "RouteRequest.md")
+    .skip("dataOverlay", "sandbox/DataOverlay.md")
+    .skip("fares", "sandbox/Fares.md")
+    .skip("transferRequests", "RouteRequest.md")
     .build();
 
   /**

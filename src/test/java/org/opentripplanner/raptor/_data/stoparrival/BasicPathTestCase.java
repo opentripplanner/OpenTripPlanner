@@ -28,7 +28,7 @@ import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 
 /**
@@ -200,7 +200,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
-  public static final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
+  public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
     TRANSFER_COST_SEC,
     WAIT_RELUCTANCE,

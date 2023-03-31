@@ -4,9 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 
 public class RoutingPreferencesTest {
 
@@ -74,16 +72,15 @@ public class RoutingPreferencesTest {
     var pref = new RoutingPreferences();
     var copy = pref
       .copyOf()
-      .withWheelchair(
-        new WheelchairPreferences(
-          AccessibilityPreferences.ofOnlyAccessible(),
-          AccessibilityPreferences.ofOnlyAccessible(),
-          AccessibilityPreferences.ofOnlyAccessible(),
-          5,
-          0.01,
-          12,
-          3
-        )
+      .withWheelchair(it ->
+        it
+          .withStopOnlyAccessible()
+          .withTripOnlyAccessible()
+          .withElevatorOnlyAccessible()
+          .withInaccessibleStreetReluctance(5)
+          .withMaxSlope(0.01)
+          .withSlopeExceededReluctance(12)
+          .withStairsReluctance(3)
       )
       .build();
 

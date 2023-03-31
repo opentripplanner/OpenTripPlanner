@@ -19,16 +19,7 @@ import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 
 /**
- * Update OTP stop time tables from some (realtime) source
- * <p>
- * Usage example ('rt' name is an example) in file 'Graph.properties':
- *
- * <pre>
- * rt.type = stop-time-updater
- * rt.frequencySec = 60
- * rt.url = http://host.tld/path
- * rt.feedId = TA
- * </pre>
+ * Update OTP stop timetables from some a Siri-ET HTTP sources.
  */
 public class SiriETUpdater extends PollingGraphUpdater {
 
@@ -65,7 +56,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
   ) {
     super(config);
     // Create update streamer from preferences
-    this.feedId = config.getFeedId();
+    this.feedId = config.feedId();
 
     this.updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters());
 
@@ -75,7 +66,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
     TransitService transitService = new DefaultTransitService(transitModel);
     this.entityResolver = new EntityResolver(transitService, feedId);
     this.fuzzyTripMatcher =
-      config.isFuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
+      config.fuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
 
     LOG.info(
       "Creating stop time updater (SIRI ET) running every {} seconds : {}",

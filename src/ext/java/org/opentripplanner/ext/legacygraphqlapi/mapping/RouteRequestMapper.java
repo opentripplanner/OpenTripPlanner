@@ -16,7 +16,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
-import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
@@ -263,7 +263,7 @@ public class RouteRequestMapper {
 
     callWith.argument(
       "locale",
-      (String v) -> request.setLocale(LegacyGraphQLUtils.getLocale(environment, v))
+      (String v) -> request.setLocale(GraphQLUtils.getLocale(environment, v))
     );
     return request;
   }
