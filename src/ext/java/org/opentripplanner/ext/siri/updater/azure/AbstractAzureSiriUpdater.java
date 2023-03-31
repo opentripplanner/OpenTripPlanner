@@ -62,7 +62,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     this.topicName = config.getTopicName();
     this.dataInitializationUrl = config.getDataInitializationUrl();
     this.timeout = config.getTimeout();
-    this.feedId = config.getFeedId();
+    this.feedId = config.feedId();
     TransitService transitService = new DefaultTransitService(transitModel);
     this.entityResolver = new EntityResolver(transitService, feedId);
     this.fuzzyTripMatcher =

@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.impl;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
@@ -54,24 +53,17 @@ public class GraphPathFinder {
   @Nullable
   private final TraverseVisitor<State, Edge> traverseVisitor;
 
-  private final Duration streetRoutingTimeout;
-
   private final DataOverlayContext dataOverlayContext;
 
-  public GraphPathFinder(
-    @Nullable TraverseVisitor<State, Edge> traverseVisitor,
-    Duration streetRoutingTimeout
-  ) {
-    this(traverseVisitor, streetRoutingTimeout, null);
+  public GraphPathFinder(@Nullable TraverseVisitor<State, Edge> traverseVisitor) {
+    this(traverseVisitor, null);
   }
 
   public GraphPathFinder(
     @Nullable TraverseVisitor<State, Edge> traverseVisitor,
-    Duration streetRoutingTimeout,
     @Nullable DataOverlayContext dataOverlayContext
   ) {
     this.traverseVisitor = traverseVisitor;
-    this.streetRoutingTimeout = streetRoutingTimeout;
     this.dataOverlayContext = dataOverlayContext;
   }
 
@@ -100,8 +92,7 @@ public class GraphPathFinder {
       .setStreetRequest(request.journey().direct())
       .setFrom(from)
       .setTo(to)
-      .setDataOverlayContext(dataOverlayContext)
-      .setTimeout(streetRoutingTimeout);
+      .setDataOverlayContext(dataOverlayContext);
 
     // If the search has a traverseVisitor(GraphVisualizer) attached to it, set it as a callback
     // for the AStar search

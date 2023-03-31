@@ -23,10 +23,7 @@ public class PickDropMapper {
    * @return Mapped PickDrop type, empty if routability is not changed.
    */
   public static Optional<PickDrop> mapDropOffType(CallWrapper call, PickDrop currentValue) {
-    if (
-      TRUE.equals(call.isCancellation()) ||
-      call.getArrivalStatus() == CallStatusEnumeration.CANCELLED
-    ) {
+    if (shouldBeCancelled(currentValue, call.isCancellation(), call.getArrivalStatus())) {
       return Optional.of(CANCELLED);
     }
 
@@ -53,10 +50,7 @@ public class PickDropMapper {
    * @return Mapped PickDrop type, empty if routability is not changed.
    */
   public static Optional<PickDrop> mapPickUpType(CallWrapper call, PickDrop currentValue) {
-    if (
-      TRUE.equals(call.isCancellation()) ||
-      call.getDepartureStatus() == CallStatusEnumeration.CANCELLED
-    ) {
+    if (shouldBeCancelled(currentValue, call.isCancellation(), call.getDepartureStatus())) {
       return Optional.of(CANCELLED);
     }
 
@@ -70,5 +64,26 @@ public class PickDropMapper {
       case NO_BOARDING -> Optional.of(NONE);
       case PASS_THRU -> Optional.of(CANCELLED);
     };
+  }
+
+  /**
+   * Considers if PickDrop should be set to CANCELLED.
+   *
+   * If the existing PickDrop is non-routable, the value is not changed.
+   *
+   * @param currentValue The current pick drop value on a stopTime
+   * @param isCallCancellation The incoming call cancellation-flag
+   * @param callStatus The incoming call arrival/departure status
+   * @return
+   */
+  private static boolean shouldBeCancelled(
+    PickDrop currentValue,
+    Boolean isCallCancellation,
+    CallStatusEnumeration callStatus
+  ) {
+    if (currentValue.isNotRoutable()) {
+      return false;
+    }
+    return TRUE.equals(isCallCancellation) || callStatus == CallStatusEnumeration.CANCELLED;
   }
 }

@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.framework.io.HttpUtils;
@@ -166,7 +167,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
           );
           setPrimed(true);
         } catch (Exception e) {
-          LOG.error("Could not process history: {}", e.getMessage());
+          LOG.error("Could not process SX history", e);
         }
       });
       f.get();

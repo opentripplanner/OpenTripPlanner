@@ -99,7 +99,7 @@ public class PathTest implements RaptorTestConstants {
 
   @Test
   public void cost() {
-    assertEquals(TOTAL_COST, subject.generalizedCost());
+    assertEquals(TOTAL_COST, subject.c1());
   }
 
   @Test

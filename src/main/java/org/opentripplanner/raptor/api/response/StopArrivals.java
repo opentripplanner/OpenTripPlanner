@@ -29,13 +29,4 @@ public interface StopArrivals {
    * the behavior is undefined; It may return an arbitrary value or throw an exception.
    */
   int bestTransitArrivalTime(int stopIndex);
-
-  /**
-   * The smallest number of transfers needed to reach the given stop. If the stop is not reached,
-   * the behavior is undefined; It may return an arbitrary value or throw an exception.
-   * <p>
-   * This is currently unused in OTP, but useful for analyses/comparing the results.
-   */
-  @SuppressWarnings("unused")
-  int smallestNumberOfTransfers(int stopIndex);
 }

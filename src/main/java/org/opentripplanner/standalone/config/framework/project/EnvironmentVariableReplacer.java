@@ -59,7 +59,7 @@ public class EnvironmentVariableReplacer {
    * environment variable.
    *
    * @param source is used only to generate human friendly error message in case the text contain a
-   *               placeholder whitch can not be found.
+   *               placeholder which can not be found.
    * @throws IllegalArgumentException if a placeholder exist in the {@code text}, but the
    *                                  environment variable do not exist.
    */

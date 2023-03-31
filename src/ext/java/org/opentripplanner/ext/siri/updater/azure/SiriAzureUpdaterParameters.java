@@ -52,7 +52,7 @@ public abstract class SiriAzureUpdaterParameters {
     this.dataInitializationUrl = dataInitializationUrl;
   }
 
-  public String getFeedId() {
+  public String feedId() {
     return feedId;
   }
 

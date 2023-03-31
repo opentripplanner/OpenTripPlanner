@@ -22,7 +22,7 @@ public class SiriAzureETUpdaterParameters
   }
 
   @Override
-  public String getUrl() {
+  public String url() {
     return getDataInitializationUrl();
   }
 }

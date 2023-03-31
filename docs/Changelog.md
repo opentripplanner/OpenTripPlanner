@@ -98,6 +98,15 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove unconnected walking areas from graph [#4981](https://github.com/opentripplanner/OpenTripPlanner/pull/4981)
 - Filter out duplicate-like legs in alternative legs [#4868](https://github.com/opentripplanner/OpenTripPlanner/pull/4868)
 - Fix timeshifting of Flex ~ Walk ~ Flex paths in Raptor [#4952](https://github.com/opentripplanner/OpenTripPlanner/pull/4952)
+- Validate the number of service links mapped to a JourneyPattern [#4963](https://github.com/opentripplanner/OpenTripPlanner/pull/4963)
+- Make sure the default streetRoutingTimeout is used [#4998](https://github.com/opentripplanner/OpenTripPlanner/pull/4998)
+- Validate service date for SCHEDULED updates [#4861](https://github.com/opentripplanner/OpenTripPlanner/pull/4861)
+- Fix quay duplicates overwriting stop index [#4964](https://github.com/opentripplanner/OpenTripPlanner/pull/4964)
+- Allow OTP to start when unexpected enum values is encountered in config. [#4983](https://github.com/opentripplanner/OpenTripPlanner/pull/4983)
+- Add filename to graph report [#4984](https://github.com/opentripplanner/OpenTripPlanner/pull/4984)
+- Catch and log exceptions when generating transfers [#4987](https://github.com/opentripplanner/OpenTripPlanner/pull/4987)
+- Support for second  criteria in McRaptor  [#4996](https://github.com/opentripplanner/OpenTripPlanner/pull/4996)
+- Initialize RAPTOR stop-to-stop transfers on server startup [#4977](https://github.com/opentripplanner/OpenTripPlanner/pull/4977)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

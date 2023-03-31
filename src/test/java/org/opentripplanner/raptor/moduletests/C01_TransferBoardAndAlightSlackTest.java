@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -74,9 +72,6 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    // TODO expMinDuration= walk 50s + Transit 1m20s + 1x transfer 1m + 2x board/alight slack 1m20s
-    //      = 4m30s
-
     var expected =
       "Walk 30s ~ B " +
       "~ BUS R1 0:02:11 0:03:01 ~ C " +
@@ -86,10 +81,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
 
     return RaptorModuleTestCase
       .of()
-      // TODO: 2x10s alight slack is ignored in forward search for min-duration
-      .add(TC_MIN_DURATION, "[0:00 0:04 4m 1tx]")
-      // TODO: 2x30s Board- and 1x1m transfer slack is ignored in reverse search for min-duration
-      .add(TC_MIN_DURATION_REV, "[0:26:40 0:30 3m20s 1tx]")
+      .addMinDuration("4m20s", TX_1, T00_00, T00_30)
       .add(standard(), PathUtils.withoutCost(expected))
       .add(multiCriteria(), expected)
       .build();

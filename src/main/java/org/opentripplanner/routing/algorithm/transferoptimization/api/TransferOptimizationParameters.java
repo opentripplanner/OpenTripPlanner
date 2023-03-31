@@ -15,7 +15,7 @@ public interface TransferOptimizationParameters {
 
   /**
    * This enables the transfer wait time optimization. If not enabled the {@link
-   * RaptorPath#generalizedCost()} function is used to pick the optimal transfer point.
+   * RaptorPath#c1()} function is used to pick the optimal transfer point.
    */
   boolean optimizeTransferWaitTime();
 

@@ -11,8 +11,8 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.path.PathBuilder;
-import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
@@ -26,7 +26,7 @@ public class TestPathBuilder implements RaptorTestConstants {
   private static final int BOARD_ALIGHT_OFFSET = 30;
 
   @Nullable
-  private final CostCalculator<TestTripSchedule> costCalculator;
+  private final RaptorCostCalculator<TestTripSchedule> costCalculator;
 
   private final RaptorSlackProvider slackProvider;
   private PathBuilder<TestTripSchedule> builder;
@@ -34,7 +34,7 @@ public class TestPathBuilder implements RaptorTestConstants {
 
   public TestPathBuilder(
     RaptorSlackProvider slackProvider,
-    @Nullable CostCalculator<TestTripSchedule> costCalculator
+    @Nullable RaptorCostCalculator<TestTripSchedule> costCalculator
   ) {
     this.slackProvider = slackProvider;
     this.costCalculator = costCalculator;
@@ -43,7 +43,7 @@ public class TestPathBuilder implements RaptorTestConstants {
   /**
    * Uses the slacks in {@link RaptorTestConstants}.
    */
-  public TestPathBuilder(@Nullable CostCalculator<TestTripSchedule> costCalculator) {
+  public TestPathBuilder(@Nullable RaptorCostCalculator<TestTripSchedule> costCalculator) {
     this(new DefaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK), costCalculator);
   }
 

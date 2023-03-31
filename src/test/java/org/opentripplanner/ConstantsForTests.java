@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -77,10 +78,8 @@ public class ConstantsForTests {
   private static final String NETEX_NORDIC_DIR = "src/test/resources/netex/nordic";
 
   private static final String NETEX_NORDIC_FILENAME = "netex_minimal.zip";
-  private static final String NETEX_EPIP_DIR = "src/test/resources/netex/epip";
-
-  private static final String NETEX_EPIP_FILENAME = "netex_epip_minimal.zip";
-
+  private static final String NETEX_EPIP_DIR = "src/test/resources/netex/epip/";
+  private static final String NETEX_EPIP_DATA_DIR = NETEX_EPIP_DIR + "netex_epip_minimal/";
   /* Stuttgart area, Germany */
   public static final String DEUFRINGEN_OSM =
     "src/test/resources/germany/deufringen-minimal.osm.pbf";
@@ -135,9 +134,10 @@ public class ConstantsForTests {
 
   public static NetexBundle createMinimalNetexEpipBundle() {
     var buildConfig = createNetexEpipBuilderParameters();
-    var netexZipFile = new File(NETEX_EPIP_DIR, NETEX_EPIP_FILENAME);
 
-    var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
+    var netexZipFile = new File(NETEX_EPIP_DATA_DIR);
+
+    var dataSource = new DirectoryDataSource(netexZipFile, FileType.NETEX);
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
     return new NetexConfigure(buildConfig).netexBundle(configuredDataSource);
   }

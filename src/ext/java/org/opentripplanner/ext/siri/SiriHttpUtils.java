@@ -33,7 +33,7 @@ public class SiriHttpUtils extends HttpUtils {
       }
     }
 
-    org.apache.http.client.HttpClient httpclient = getClient(timeout, timeout);
+    HttpClient httpclient = getClient(timeout, timeout);
 
     HttpResponse response = httpclient.execute(httppost);
     if (response.getStatusLine().getStatusCode() != 200) {

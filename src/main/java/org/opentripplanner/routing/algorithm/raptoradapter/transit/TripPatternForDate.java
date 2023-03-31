@@ -12,12 +12,16 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A TripPattern with its TripSchedules filtered by validity on a particular date. This is to avoid
  * having to do any filtering by date during the search itself.
  */
 public class TripPatternForDate implements Comparable<TripPatternForDate> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(TripPatternForDate.class);
 
   /**
    * The original TripPattern whose TripSchedules were filtered to produce this.tripSchedules. Its
@@ -90,13 +94,15 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
           .toLocalDate();
     } else {
       // These depend on the tripTimes array being sorted
+      var first = tripTimes.get(0);
       this.startOfRunningPeriod =
-        ServiceDateUtils.asDateTime(localDate, tripTimes.get(0).getDepartureTime(0)).toLocalDate();
+        ServiceDateUtils.asDateTime(localDate, first.getDepartureTime(0)).toLocalDate();
       var last = tripTimes.get(tripTimes.size() - 1);
       this.endOfRunningPeriod =
         ServiceDateUtils
           .asDateTime(localDate, last.getArrivalTime(last.getNumStops() - 1))
           .toLocalDate();
+      assertValidRunningPeriod(startOfRunningPeriod, endOfRunningPeriod, first, last);
     }
   }
 
@@ -209,5 +215,25 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     }
 
     return new TripPatternForDate(tripPattern, filteredTripTimes, filteredFrequencies, localDate);
+  }
+
+  private static void assertValidRunningPeriod(
+    LocalDate startOfRunningPeriod,
+    LocalDate endOfRunningPeriod,
+    TripTimes first,
+    TripTimes last
+  ) {
+    if (startOfRunningPeriod.isAfter(endOfRunningPeriod)) {
+      LOG.warn(
+        "Could not construct as start of the running period {} in trip {} is after the end {} in trip {}",
+        startOfRunningPeriod,
+        first.getTrip().getId(),
+        endOfRunningPeriod,
+        last.getTrip().getId()
+      );
+      throw new IllegalArgumentException(
+        "Start of the running period is after end of the running period"
+      );
+    }
   }
 }

@@ -14,7 +14,7 @@ import org.opentripplanner.raptor.api.view.PatternRideView;
  * This class configure the amount of debugging you want for your request. Debugging is supported by
  * an event model and event listeners must be provided to receive any debug info.
  * <p/>
- * To debug unexpected results is sometimes very time consuming. This class make it possible to list
+ * To debug unexpected results is sometimes very time-consuming. This class make it possible to list
  * all stop arrival events during the search for a given list of stops and/or a path.
  * <p/>
  * The debug events are not returned as part of the result, instead they are posted to registered
@@ -47,7 +47,7 @@ public record DebugRequest(
    */
   int debugPathFromStopIndex,
   Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener,
-  Consumer<DebugEvent<PatternRideView<?>>> patternRideDebugListener,
+  Consumer<DebugEvent<PatternRideView<?, ?>>> patternRideDebugListener,
   Consumer<DebugEvent<RaptorPath<?>>> pathFilteringListener,
   DebugLogger logger
 ) {

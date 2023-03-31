@@ -15,9 +15,9 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.support.SemanticHash;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
-import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -158,7 +158,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   @Override
   public DataFetcher<String> headsign() {
     return environment ->
-      LegacyGraphQLUtils.getTranslation(getSource(environment).getTripHeadsign(), environment);
+      GraphQLUtils.getTranslation(getSource(environment).getTripHeadsign(), environment);
   }
 
   @Override

@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPatternByStopPos;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -138,12 +137,9 @@ public class TransitLayer {
     return transferCache;
   }
 
-  public List<TransferForPatternByStopPos> getForwardConstrainedTransfers() {
-    return constrainedTransfers != null ? constrainedTransfers.forward() : null;
-  }
-
-  public List<TransferForPatternByStopPos> getReverseConstrainedTransfers() {
-    return constrainedTransfers != null ? constrainedTransfers.reverse() : null;
+  @Nullable
+  public ConstrainedTransfersForPatterns getConstrainedTransfers() {
+    return constrainedTransfers;
   }
 
   public TransferIndexGenerator getTransferIndexGenerator() {

@@ -25,7 +25,7 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
 
   private final DebugHandler<ArrivalView<?>> stopHandler;
   private final DebugHandler<RaptorPath<?>> pathHandler;
-  private final DebugHandler<PatternRideView<?>> patternRideHandler;
+  private final DebugHandler<PatternRideView<?, ?>> patternRideHandler;
   private final DebugLogger logger;
 
   public DebugHandlerFactory(DebugRequest request, WorkerLifeCycle lifeCycle) {
@@ -70,7 +70,7 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
   /* PatternRide */
 
   @Nullable
-  public ParetoSetEventListener<PatternRideView<?>> paretoSetPatternRideListener() {
+  public ParetoSetEventListener<PatternRideView<?, ?>> paretoSetPatternRideListener() {
     return patternRideHandler == null
       ? null
       : new ParetoSetDebugHandlerAdapter<>(patternRideHandler);

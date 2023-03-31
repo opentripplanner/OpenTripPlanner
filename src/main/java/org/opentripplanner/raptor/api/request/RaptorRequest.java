@@ -25,6 +25,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
   private final RaptorProfile profile;
   private final SearchDirection searchDirection;
   private final Set<Optimization> optimizations;
+  private final MultiCriteriaRequest<T> multiCriteria;
   private final DebugRequest debug;
   private final RaptorTimers performanceTimers;
 
@@ -33,6 +34,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     profile = RaptorProfile.MULTI_CRITERIA;
     searchDirection = SearchDirection.FORWARD;
     optimizations = Collections.emptySet();
+    multiCriteria = MultiCriteriaRequest.<T>of().build();
     performanceTimers = RaptorTimers.NOOP;
     debug = DebugRequest.defaults();
     alias = RaptorRequestBuilder.generateRequestAlias(profile, searchDirection, optimizations);
@@ -44,6 +46,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     this.profile = builder.profile();
     this.searchDirection = builder.searchDirection();
     this.optimizations = Set.copyOf(builder.optimizations());
+    this.multiCriteria = builder.multiCriteria();
     this.performanceTimers = builder.performanceTimers();
     this.debug = builder.debug().build();
     verify();
@@ -134,6 +137,10 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     return optimizationEnabled(Optimization.PARALLEL);
   }
 
+  public MultiCriteriaRequest<T> multiCriteria() {
+    return multiCriteria;
+  }
+
   public RaptorTimers performanceTimers() {
     return performanceTimers;
   }
@@ -149,7 +156,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(searchParams, profile, debug);
+    return Objects.hash(profile, searchParams, multiCriteria, debug);
   }
 
   @Override
@@ -164,18 +171,21 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     return (
       profile == that.profile &&
       Objects.equals(searchParams, that.searchParams) &&
+      Objects.equals(multiCriteria, that.multiCriteria) &&
       Objects.equals(debug, that.debug)
     );
   }
 
   @Override
   public String toString() {
+    var defaults = RaptorRequest.defaults();
     return ToStringBuilder
       .of(RaptorRequest.class)
       .addEnum("profile", profile)
       .addBoolIfTrue("reverse", searchDirection.isInReverse())
       .addCol("optimizations", optimizations)
-      .addObj("debug", debug, DebugRequest.defaults())
+      .addObj("multiCriteria", multiCriteria, defaults.multiCriteria())
+      .addObj("debug", debug, defaults.debug())
       .addObj("searchParams", searchParams)
       .addBoolIfTrue("withPerformanceTimers", performanceTimers != RaptorTimers.NOOP)
       .toString();

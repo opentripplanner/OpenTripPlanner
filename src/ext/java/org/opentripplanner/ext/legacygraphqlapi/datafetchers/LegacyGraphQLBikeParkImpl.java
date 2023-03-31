@@ -3,8 +3,8 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
@@ -34,7 +34,7 @@ public class LegacyGraphQLBikeParkImpl implements LegacyGraphQLDataFetchers.Lega
   @Override
   public DataFetcher<String> name() {
     return environment ->
-      LegacyGraphQLUtils.getTranslation(getSource(environment).getName(), environment);
+      GraphQLUtils.getTranslation(getSource(environment).getName(), environment);
   }
 
   @Override

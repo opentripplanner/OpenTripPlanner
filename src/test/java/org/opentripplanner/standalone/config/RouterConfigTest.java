@@ -28,7 +28,7 @@ class RouterConfigTest {
 
     // Test for unused parameters
     var buf = new StringBuilder();
-    a.logAllUnusedParameters(m -> buf.append("\n").append(m));
+    a.logAllWarnings(m -> buf.append("\n").append(m));
     if (!buf.isEmpty()) {
       fail(buf.toString());
     }
@@ -36,22 +36,33 @@ class RouterConfigTest {
 
   @Test
   void parseStreetRoutingTimeout() {
-    var DEFAULT_TIMEOUT = RouterConfig.DEFAULT.streetRoutingTimeout();
+    var DEFAULT_TIMEOUT = RouterConfig.DEFAULT
+      .routingRequestDefaults()
+      .preferences()
+      .street()
+      .routingTimeout();
     NodeAdapter c;
 
     // Fall back to default 5 seconds
     c = createNodeAdaptor("{}");
-    assertEquals(DEFAULT_TIMEOUT, RouterConfig.parseStreetRoutingTimeout(c));
+    assertEquals(DEFAULT_TIMEOUT, RouterConfig.parseStreetRoutingTimeout(c, DEFAULT_TIMEOUT));
 
     // New format: 33 seconds
     c = createNodeAdaptor("{streetRoutingTimeout: '33s'}");
-    assertEquals(Duration.ofSeconds(33), RouterConfig.parseStreetRoutingTimeout(c));
+    assertEquals(
+      Duration.ofSeconds(33),
+      RouterConfig.parseStreetRoutingTimeout(c, DEFAULT_TIMEOUT)
+    );
   }
 
   @Test
   void parseStreetRoutingTimeoutWithIllegalFormat() {
+    Duration defaultTimeout = Duration.ZERO;
     final var c = createNodeAdaptor("{streetRoutingTimeout: 'Hi'}");
-    assertThrows(OtpAppException.class, () -> RouterConfig.parseStreetRoutingTimeout(c));
+    assertThrows(
+      OtpAppException.class,
+      () -> RouterConfig.parseStreetRoutingTimeout(c, defaultTimeout)
+    );
   }
 
   private static NodeAdapter createNodeAdaptor(String jsonText) {

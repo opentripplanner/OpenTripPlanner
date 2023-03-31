@@ -183,6 +183,12 @@ public final class RoutingPreferences implements Serializable {
       return this;
     }
 
+    public Builder withWheelchair(Consumer<WheelchairPreferences.Builder> body) {
+      this.wheelchair =
+        ifNotNull(this.wheelchair, original.wheelchair).copyOf().apply(body).build();
+      return this;
+    }
+
     public BikePreferences bike() {
       return bike == null ? original.bike : bike;
     }

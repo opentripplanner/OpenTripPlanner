@@ -1,14 +1,14 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 public class CostCalculatorFactory {
 
-  public static <T extends DefaultTripSchedule> CostCalculator<T> createCostCalculator(
+  public static <T extends DefaultTripSchedule> RaptorCostCalculator<T> createCostCalculator(
     GeneralizedCostParameters generalizedCostParameters,
     int[] stopBoardAlightCosts
   ) {
-    CostCalculator<T> calculator = new DefaultCostCalculator<>(
+    RaptorCostCalculator<T> calculator = new DefaultCostCalculator<>(
       generalizedCostParameters,
       stopBoardAlightCosts
     );

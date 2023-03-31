@@ -18,6 +18,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      # nodejs is needed because the dynamic download of it via the prettier maven plugin often
+      # times out
+      # Example: https://github.com/opentripplanner/OpenTripPlanner/actions/runs/4490450225/jobs/7897533439
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       # Java setup step completes very fast, no need to run in a preconfigured docker container.
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -32,7 +39,7 @@ jobs:
         # NAT drops them
         # https://github.com/actions/runner-images/issues/1499
         run: |
-          mvn --batch-mode jacoco:prepare-agent test jacoco:report -P prettierCheck,unit-tests
+          mvn --batch-mode jacoco:prepare-agent test jacoco:report -P prettierCheck,unit-tests -Dprettier.nodePath=node
           mvn --batch-mode package -Dmaven.test.skip -P prettierSkip
 
       - name: Send coverage data to codecov.io
