@@ -459,10 +459,6 @@
                                 /var/opentripplanner/
                             </volume>
                         </volumes>
-                        <ports>
-                            <port>8080</port>
-                            <port>8081</port>
-                        </ports>
                     </container>
                     <from>
                         <platforms>
