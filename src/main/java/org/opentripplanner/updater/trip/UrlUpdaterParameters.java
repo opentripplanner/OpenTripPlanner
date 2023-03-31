@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip;
 
 public interface UrlUpdaterParameters {
-  String getUrl();
+  String url();
   String configRef();
-  String getFeedId();
+  String feedId();
 }

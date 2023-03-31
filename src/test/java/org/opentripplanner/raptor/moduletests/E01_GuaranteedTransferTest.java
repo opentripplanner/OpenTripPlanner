@@ -3,8 +3,6 @@ package org.opentripplanner.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -79,12 +77,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
       "[0:01:10 0:10:40 9m30s 1tx $1230]";
     return RaptorModuleTestCase
       .of()
-      // TODO - board-slack is added for FORWARD search, while alight-slack is added for
-      //      - REVERSE. We should add both, but that requires a bit of refactoring and
-      //      - providing constraint-transfer information at the place where alight-slack
-      //      - should be added in Raptor.
-      .add(TC_MIN_DURATION, "[0:00 0:09:20 9m20s 1tx]")
-      .add(TC_MIN_DURATION_REV, "[0:20:50 0:30 9m10s 1tx]")
+      .addMinDuration("9m30s", TX_1, T00_00, T00_30)
       .add(standard(), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)
       .build();

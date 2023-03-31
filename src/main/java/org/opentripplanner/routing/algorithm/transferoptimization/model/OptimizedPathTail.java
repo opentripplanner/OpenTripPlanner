@@ -10,7 +10,7 @@ import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.path.PathBuilder;
 import org.opentripplanner.raptor.path.PathBuilderLeg;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimized;
@@ -35,11 +35,11 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 
   private int transferPriorityCost = TransferConstraint.ZERO_COST;
   private int waitTimeOptimizedCost = TransferWaitTimeCostCalculator.ZERO_COST;
-  private int generalizedCost = CostCalculator.ZERO_COST;
+  private int generalizedCost = RaptorCostCalculator.ZERO_COST;
 
   public OptimizedPathTail(
     RaptorSlackProvider slackProvider,
-    CostCalculator<T> costCalculator,
+    RaptorCostCalculator<T> costCalculator,
     int iterationDepartureTime,
     TransferWaitTimeCostCalculator waitTimeCostCalculator,
     int[] stopBoardAlightCosts,
@@ -261,10 +261,10 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 
   private int extraStopPriorityCost(PathBuilderLeg<?> leg) {
     if (stopPriorityCostCalculator == null) {
-      return CostCalculator.ZERO_COST;
+      return RaptorCostCalculator.ZERO_COST;
     }
 
-    int extraCost = CostCalculator.ZERO_COST;
+    int extraCost = RaptorCostCalculator.ZERO_COST;
     // Ideally we would like to add the board- & alight-stop-cost when a new transit-leg
     // is added to the path. But, the board stop is unknown until the leg before it is
     // added. So, instead of adding the board-stop-cost when it is added, we wait and add it

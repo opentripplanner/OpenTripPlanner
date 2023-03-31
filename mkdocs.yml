@@ -80,7 +80,7 @@ nav:
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
     - HSL Legacy GraphQL API: 'sandbox/LegacyGraphQLApi.md'
     - Transmodel(NeTEx) GraphQL API: 'sandbox/TransmodelApi.md'
-    - SIRI Updater (Google Cloud): 'sandbox/SiriUpdator.md'
+    - SIRI Updaters: 'sandbox/SiriUpdater.md'
     - SIRI Updater (Azure): 'sandbox/SiriAzureUpdater.md'
     - Vehicle Rental Service Directory API support: 'sandbox/VehicleRentalServiceDirectory.md'
     - Smoove Bike Rental Updator Support: 'sandbox/SmooveBikeRental.md'

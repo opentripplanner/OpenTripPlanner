@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
+package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,13 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
-public class AccessStopArrivalTest {
+class AccessStopArrivalC2Test {
 
   private static final int ALIGHT_STOP = 100;
   private static final int DEPARTURE_TIME = 8 * 60 * 60;
@@ -21,15 +24,15 @@ public class AccessStopArrivalTest {
   private static final TestAccessEgress WALK = TestAccessEgress.walk(ALIGHT_STOP, ACCESS_DURATION);
   private static final int COST = WALK.generalizedCost();
 
-  private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
+  private final AccessStopArrivalC2<RaptorTripSchedule> subject = new AccessStopArrivalC2<>(
     DEPARTURE_TIME,
     WALK
   );
 
   @Test
-  public void arrivedByAccessLeg() {
+  public void arrivedBy() {
+    assertEquals(ACCESS, subject.arrivedBy());
     assertTrue(subject.arrivedBy(ACCESS));
-    assertFalse(subject.arrivedByTransit());
   }
 
   @Test
@@ -43,8 +46,14 @@ public class AccessStopArrivalTest {
   }
 
   @Test
-  public void cost() {
-    assertEquals(COST, subject.cost());
+  public void c1() {
+    assertEquals(COST, subject.c1());
+  }
+
+  @Test
+  public void c2() {
+    // We will add a more meaning-full implementation later
+    assertEquals(RaptorCostCalculator.ZERO_COST, subject.c2());
   }
 
   @Test
@@ -80,12 +89,10 @@ public class AccessStopArrivalTest {
   @Test
   public void timeShiftDefaultBehaviour() {
     final int dTime = 60;
-    AbstractStopArrival<RaptorTripSchedule> result = subject.timeShiftNewArrivalTime(
-      ALIGHT_TIME + dTime
-    );
+    McStopArrival<RaptorTripSchedule> result = subject.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
 
     assertEquals(result.arrivalTime(), ALIGHT_TIME + dTime);
-    assertEquals(subject.cost(), result.cost());
+    assertEquals(subject.c1(), result.c1());
     assertEquals(subject.travelDuration(), result.travelDuration());
     assertEquals(subject.round(), result.round());
     assertEquals(subject.stop(), result.stop());
@@ -96,21 +103,21 @@ public class AccessStopArrivalTest {
   @Test
   public void timeShiftNotAllowed() {
     var access = TestAccessEgress.free(ALIGHT_STOP).openingHoursClosed();
-    var original = new AccessStopArrival<>(DEPARTURE_TIME, access);
+    var original = new AccessStopArrivalC2<>(DEPARTURE_TIME, access);
     assertThrows(IllegalStateException.class, () -> original.timeShiftNewArrivalTime(6000));
   }
 
   @Test
   public void timeShiftPartiallyAllowed() {
     final int dTime = 60;
-    AbstractStopArrival<RaptorTripSchedule> original, result;
+    McStopArrival<RaptorTripSchedule> original, result;
 
     // Allow time-shift, but only by dTime (a free edge has zero duration)
     RaptorAccessEgress access = TestAccessEgress
       .free(ALIGHT_STOP)
       .openingHours(0, ALIGHT_TIME + dTime);
 
-    original = new AccessStopArrival<>(DEPARTURE_TIME, access);
+    original = new AccessStopArrivalC2<>(DEPARTURE_TIME, access);
 
     result = original.timeShiftNewArrivalTime(ALIGHT_TIME + 7200);
 

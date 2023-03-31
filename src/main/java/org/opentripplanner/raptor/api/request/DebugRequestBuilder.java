@@ -24,7 +24,7 @@ public class DebugRequestBuilder {
   private List<Integer> path = new ArrayList<>();
   private int debugPathFromStopIndex;
   private Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener;
-  private Consumer<DebugEvent<PatternRideView<?>>> patternRideDebugListener;
+  private Consumer<DebugEvent<PatternRideView<?, ?>>> patternRideDebugListener;
   private Consumer<DebugEvent<RaptorPath<?>>> pathFilteringListener;
   private DebugLogger logger;
 
@@ -91,12 +91,12 @@ public class DebugRequestBuilder {
     return this;
   }
 
-  public Consumer<DebugEvent<PatternRideView<?>>> patternRideDebugListener() {
+  public Consumer<DebugEvent<PatternRideView<?, ?>>> patternRideDebugListener() {
     return patternRideDebugListener;
   }
 
   public DebugRequestBuilder patternRideDebugListener(
-    Consumer<DebugEvent<PatternRideView<?>>> listener
+    Consumer<DebugEvent<PatternRideView<?, ?>>> listener
   ) {
     this.patternRideDebugListener = listener;
     return this;

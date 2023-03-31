@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
+package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
 
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSFER;
 
@@ -6,18 +6,17 @@ import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
-import org.opentripplanner.raptor.api.view.TransferPathView;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 
 /**
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class TransferStopArrival<T extends RaptorTripSchedule>
-  extends AbstractStopArrival<T> {
+final class TransferStopArrival<T extends RaptorTripSchedule> extends McStopArrival<T> {
 
   private final RaptorTransfer transfer;
 
-  public TransferStopArrival(
-    AbstractStopArrival<T> previousState,
+  TransferStopArrival(
+    McStopArrival<T> previousState,
     RaptorTransfer transferPath,
     int arrivalTime
   ) {
@@ -26,9 +25,14 @@ public final class TransferStopArrival<T extends RaptorTripSchedule>
       1,
       transferPath.stop(),
       arrivalTime,
-      previousState.cost() + transferPath.generalizedCost()
+      previousState.c1() + transferPath.generalizedCost()
     );
     this.transfer = transferPath;
+  }
+
+  @Override
+  public int c2() {
+    throw new UnsupportedOperationException("C2 is not available for the C1 implementation");
   }
 
   @Override
@@ -42,8 +46,8 @@ public final class TransferStopArrival<T extends RaptorTripSchedule>
   }
 
   @Override
-  public TransferPathView transferPath() {
-    return () -> transfer;
+  public RaptorTransfer transfer() {
+    return transfer;
   }
 
   @Override

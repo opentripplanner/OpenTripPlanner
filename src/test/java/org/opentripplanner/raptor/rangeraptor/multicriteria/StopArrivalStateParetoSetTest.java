@@ -15,10 +15,11 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
+import org.opentripplanner.raptor.api.model.RelaxFunction;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.StopArrivalFactoryC1;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
 
 public class StopArrivalStateParetoSetTest {
 
@@ -44,32 +45,47 @@ public class StopArrivalStateParetoSetTest {
 
   // Make sure all "base" arrivals have the same cost
   private static final int BASE_COST = 1;
-  private static final AbstractStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = newAccessStopState(
+
+  private static final StopArrivalFactoryC1<RaptorTripSchedule> STOP_ARRIVAL_FACTORY = new StopArrivalFactoryC1<>();
+  private static final McStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = newAccessStopState(
     999,
     5,
     BASE_COST
   );
 
-  private static final AbstractStopArrival<RaptorTripSchedule> TRANSIT_L1 = newTransitStopState(
+  private static final McStopArrival<RaptorTripSchedule> TRANSIT_L1 = newTransitStopState(
     ROUND_1,
     998,
     10,
     BASE_COST
   );
 
-  private static final AbstractStopArrival<RaptorTripSchedule> TRANSIT_L2 = newTransitStopState(
+  private static final McStopArrival<RaptorTripSchedule> TRANSIT_L2 = newTransitStopState(
     ROUND_2,
     997,
     20,
     BASE_COST
   );
-
-  private final StopArrivalParetoSet<RaptorTripSchedule> subject = createStopArrivalSet(null);
+  public static final ArrivalParetoSetComparatorFactory<McStopArrival<RaptorTripSchedule>> COMPARATOR_FACTORY = ArrivalParetoSetComparatorFactory.factory(
+    RelaxFunction.NORMAL,
+    null
+  );
 
   private static Stream<Arguments> testCases() {
     return Stream.of(
-      Arguments.of("Stop Arrival - regular", createStopArrivalSet(null)),
-      Arguments.of("Stop Arrival - w/egress", createEgressStopArrivalSet(List.of(), null, null))
+      Arguments.of(
+        "Stop Arrival - regular",
+        createStopArrivalSet(COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost(), null)
+      ),
+      Arguments.of(
+        "Stop Arrival - w/egress",
+        createEgressStopArrivalSet(
+          COMPARATOR_FACTORY.compareArrivalTimeRoundCostAndOnBoardArrival(),
+          List.of(),
+          null,
+          null
+        )
+      )
     );
   }
 
@@ -153,7 +169,7 @@ public class StopArrivalStateParetoSetTest {
    */
   @Test
   public void testTransitAndTransferDoesNotAffectDominance() {
-    var subject = createStopArrivalSet(null);
+    var subject = createStopArrivalSet(COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost(), null);
     subject.add(newAccessStopState(STOP_1, 20, ANY));
     subject.add(newTransitStopState(ROUND_1, STOP_2, 10, ANY));
     subject.add(newTransferStopState(ROUND_1, STOP_4, 8, ANY));
@@ -168,66 +184,68 @@ public class StopArrivalStateParetoSetTest {
    */
   @Test
   public void testTransitAndTransferDoesAffectDominanceForStopArrivalsWithEgress() {
-    var subject = createEgressStopArrivalSet(List.of(), null, null);
+    var subject = createEgressStopArrivalSet(
+      COMPARATOR_FACTORY.compareArrivalTimeRoundCostAndOnBoardArrival(),
+      List.of(),
+      null,
+      null
+    );
     subject.add(newAccessStopState(STOP_1, 20, ANY));
     subject.add(newTransitStopState(ROUND_1, STOP_2, 10, ANY));
     subject.add(newTransferStopState(ROUND_1, STOP_4, 8, ANY));
     assertStopsInSet(subject, STOP_1, STOP_2, STOP_4);
   }
 
-  private static AccessStopArrival<RaptorTripSchedule> newAccessStopState(
+  private static McStopArrival<RaptorTripSchedule> newAccessStopState(
     int stop,
     int accessDurationInSeconds,
     int cost
   ) {
-    return new AccessStopArrival<>(
+    return STOP_ARRIVAL_FACTORY.createAccessStopArrival(
       A_TIME,
       TestAccessEgress.walk(stop, accessDurationInSeconds, cost)
     );
   }
 
-  private static TransitStopArrival<RaptorTripSchedule> newTransitStopState(
+  private static McStopArrival<RaptorTripSchedule> newTransitStopState(
     int round,
     int stop,
     int arrivalTime,
     int cost
   ) {
     var prev = prev(round);
-    return new TransitStopArrival<>(prev, stop, arrivalTime, cost, ANY_TRIP);
+    var anyRide = new PatternRideC1<>(prev, ANY, ANY, ANY, ANY, ANY, ANY, ANY_TRIP);
+    return STOP_ARRIVAL_FACTORY.createTransitStopArrival(anyRide, stop, arrivalTime, cost);
   }
 
-  private static TransferStopArrival<RaptorTripSchedule> newTransferStopState(
+  private static McStopArrival<RaptorTripSchedule> newTransferStopState(
     int round,
     int stop,
     int arrivalTime,
     int cost
   ) {
     var prev = prev(round);
-    return new TransferStopArrival<>(
+    return STOP_ARRIVAL_FACTORY.createTransferStopArrival(
       prev,
-      TestTransfer.transfer(stop, ANY, cost - prev.cost()),
+      TestTransfer.transfer(stop, ANY, cost - prev.c1()),
       arrivalTime
     );
   }
 
-  private static AbstractStopArrival<RaptorTripSchedule> prev(int round) {
-    switch (round) {
-      case 1:
-        return ACCESS_ARRIVAL;
-      case 2:
-        return TRANSIT_L1;
-      case 3:
-        return TRANSIT_L2;
-      default:
-        throw new IllegalArgumentException();
-    }
+  private static McStopArrival<RaptorTripSchedule> prev(int round) {
+    return switch (round) {
+      case 1 -> ACCESS_ARRIVAL;
+      case 2 -> TRANSIT_L1;
+      case 3 -> TRANSIT_L2;
+      default -> throw new IllegalArgumentException();
+    };
   }
 
   private void assertStopsInSet(
     StopArrivalParetoSet<RaptorTripSchedule> subject,
     int... expStopIndexes
   ) {
-    int[] result = subject.stream().mapToInt(AbstractStopArrival::stop).sorted().toArray();
+    int[] result = subject.stream().mapToInt(McStopArrival::stop).sorted().toArray();
     assertEquals(Arrays.toString(expStopIndexes), Arrays.toString(result), "Stop indexes");
   }
 }

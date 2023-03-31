@@ -30,11 +30,12 @@ public class RouterConfigurationDocTest {
   private static final String CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final SkipNodes SKIP_NODES = SkipNodes
     .of()
-    .add("flex", "sandbox/Flex.md")
-    .add("routingDefaults", "RouteRequest.md")
-    .add("updaters", "UpdaterConfig.md")
-    .add("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
-    .add("rideHailingServices", "sandbox/RideHailing.md")
+    .skip("flex", "sandbox/Flex.md")
+    .skip("routingDefaults", "RouteRequest.md")
+    .skip("updaters", "UpdaterConfig.md")
+    .skip("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
+    .skipNestedElements("transferCacheRequests", "RouteRequest.md")
+    .skip("rideHailingServices", "sandbox/RideHailing.md")
     .build();
 
   /**

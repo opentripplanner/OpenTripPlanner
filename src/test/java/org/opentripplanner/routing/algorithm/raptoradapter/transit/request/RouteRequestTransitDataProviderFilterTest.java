@@ -62,15 +62,12 @@ public class RouteRequestTransitDataProviderFilterTest {
     0,
     10
   );
-  private static final WheelchairPreferences RELAXED_ACCESSIBILITY = new WheelchairPreferences(
-    RELAXED_ACCESSIBILITY_PREFERENCE,
-    RELAXED_ACCESSIBILITY_PREFERENCE,
-    RELAXED_ACCESSIBILITY_PREFERENCE,
-    DEFAULT_ACCESSIBILITY.inaccessibleStreetReluctance(),
-    DEFAULT_ACCESSIBILITY.maxSlope(),
-    DEFAULT_ACCESSIBILITY.slopeExceededReluctance(),
-    DEFAULT_ACCESSIBILITY.stairsReluctance()
-  );
+  private static final WheelchairPreferences RELAXED_ACCESSIBILITY = WheelchairPreferences
+    .of()
+    .withTrip(RELAXED_ACCESSIBILITY_PREFERENCE)
+    .withStop(RELAXED_ACCESSIBILITY_PREFERENCE)
+    .withElevator(RELAXED_ACCESSIBILITY_PREFERENCE)
+    .build();
 
   static Stream<Arguments> wheelchairCases = Stream.of(
     Arguments.of(Accessibility.POSSIBLE, DEFAULT_ACCESSIBILITY),

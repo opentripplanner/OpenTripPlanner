@@ -2,12 +2,18 @@ package org.opentripplanner.raptor.api.view;
 
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
-public interface PatternRideView<T extends RaptorTripSchedule> {
-  ArrivalView<T> prevArrival();
+/**
+ * TODO C2 AddJavaDoc
+ *
+ * @param <T>
+ */
+public interface PatternRideView<T extends RaptorTripSchedule, A extends ArrivalView<T>> {
+  A prevArrival();
   int boardStopIndex();
   int boardPos();
   int boardTime();
   T trip();
-  int relativeCost();
-  int boardCost();
+  int relativeC1();
+  int boardC1();
+  int c2();
 }

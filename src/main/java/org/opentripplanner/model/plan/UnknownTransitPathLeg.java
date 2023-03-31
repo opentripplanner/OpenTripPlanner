@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**
  * A transit search may return an unknown transit path. A path consisting of a mix of
@@ -78,7 +78,7 @@ public class UnknownTransitPathLeg implements Leg {
 
   @Override
   public int getGeneralizedCost() {
-    return CostCalculator.ZERO_COST;
+    return RaptorCostCalculator.ZERO_COST;
   }
 
   public int getNumberOfTransfers() {

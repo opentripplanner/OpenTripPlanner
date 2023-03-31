@@ -103,6 +103,10 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Validate service date for SCHEDULED updates [#4861](https://github.com/opentripplanner/OpenTripPlanner/pull/4861)
 - Fix quay duplicates overwriting stop index [#4964](https://github.com/opentripplanner/OpenTripPlanner/pull/4964)
 - Allow OTP to start when unexpected enum values is encountered in config. [#4983](https://github.com/opentripplanner/OpenTripPlanner/pull/4983)
+- Add filename to graph report [#4984](https://github.com/opentripplanner/OpenTripPlanner/pull/4984)
+- Catch and log exceptions when generating transfers [#4987](https://github.com/opentripplanner/OpenTripPlanner/pull/4987)
+- Support for second  criteria in McRaptor  [#4996](https://github.com/opentripplanner/OpenTripPlanner/pull/4996)
+- Initialize RAPTOR stop-to-stop transfers on server startup [#4977](https://github.com/opentripplanner/OpenTripPlanner/pull/4977)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

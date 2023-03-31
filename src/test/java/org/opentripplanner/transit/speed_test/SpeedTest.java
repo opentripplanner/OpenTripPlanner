@@ -2,6 +2,7 @@ package org.opentripplanner.transit.speed_test;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 import static org.opentripplanner.standalone.configure.ConstructApplication.creatTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.initializeTransferCache;
 import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetup.assertTestDateHasData;
 
 import java.io.File;
@@ -120,6 +121,8 @@ public class SpeedTest {
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now
     // we do it manually here
     creatTransitLayerForRaptor(transitModel, config.transitRoutingParams);
+
+    initializeTransferCache(config.transitRoutingParams, transitModel);
 
     timer.setUp(opts.groupResultsByCategory());
   }

@@ -40,7 +40,7 @@ curl --request POST \
 
 ## Built-in API client
 
-A browser based GraphQL API client is available at [http://localhost:8080/legacygraphql/graphiql](http://localhost:8080/legacygraphql/graphiql)
+A browser based GraphQL API client is available at [http://localhost:8080/graphiql](http://localhost:8080/graphiql)
 
 ![GraphiQL](../images/graphiql.png)
 

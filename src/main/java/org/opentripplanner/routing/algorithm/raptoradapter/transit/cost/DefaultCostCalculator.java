@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**
  * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
@@ -12,7 +12,7 @@ import org.opentripplanner.raptor.spi.CostCalculator;
  * This class is immutable and thread safe.
  */
 public final class DefaultCostCalculator<T extends DefaultTripSchedule>
-  implements CostCalculator<T> {
+  implements RaptorCostCalculator<T> {
 
   private final int boardCostOnly;
   private final int transferCostOnly;

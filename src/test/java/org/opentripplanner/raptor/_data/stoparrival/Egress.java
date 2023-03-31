@@ -46,7 +46,7 @@ public class Egress {
       previous.round(),
       previous.stop(),
       TimeUtils.timeToStrCompact(arrivalTime),
-      previous.cost() + additionalCost()
+      previous.c1() + additionalCost()
     );
   }
 }

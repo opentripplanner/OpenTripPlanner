@@ -31,7 +31,5 @@ public interface RaptorWorkerResult<T extends RaptorTripSchedule> {
   /**
    * Return {@code true} if the destination was reached at least once.
    */
-  default boolean isDestinationReached() {
-    return !extractPaths().isEmpty();
-  }
+  boolean isDestinationReached();
 }

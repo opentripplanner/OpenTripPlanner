@@ -50,6 +50,7 @@ public interface RaptorTestConstants {
   int STOP_F = 6;
   int STOP_G = 7;
   int STOP_H = 8;
+  int STOP_I = 9;
 
   // Stop position in pattern
   int STOP_POS_0 = 0;
