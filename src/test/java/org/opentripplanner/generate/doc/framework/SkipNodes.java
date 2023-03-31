@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 
 /**
- * When generating the configuration we might want to stop processing the node three at some
+ * When generating the configuration we might want to stop processing the node tree at some
  * point. We do not have reusable types in the config, so instead we might document a node
  * in one place and then link to it if we are reusing the same structure in another. A little
  * duplication is ok(like updaters), but listing all parameters of the routingRequest in several
