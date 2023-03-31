@@ -100,6 +100,12 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
     return slackIndex;
   }
 
+  @Override
+  public int priorityGroupId() {
+    // TODO C2 - Implement this.
+    throw new UnsupportedOperationException();
+  }
+
   public int transitReluctanceFactorIndex() {
     return transitReluctanceFactorIndex;
   }

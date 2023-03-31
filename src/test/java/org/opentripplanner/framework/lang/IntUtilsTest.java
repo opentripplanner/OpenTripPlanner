@@ -20,6 +20,13 @@ class IntUtilsTest {
   }
 
   @Test
+  void testShiftArray() {
+    assertArrayEquals(new int[] {}, IntUtils.shiftArray(3, new int[] {}));
+    assertArrayEquals(new int[] { 2, 6 }, IntUtils.shiftArray(3, new int[] { -1, 3 }));
+    assertArrayEquals(new int[] { -5, -1 }, IntUtils.shiftArray(-4, new int[] { -1, 3 }));
+  }
+
+  @Test
   void concat() {
     assertArrayEquals(new int[] { 1, 2, 5, 6 }, IntUtils.concat(List.of(1, 2), List.of(5, 6)));
   }

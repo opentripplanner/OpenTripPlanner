@@ -62,18 +62,26 @@ package._
 
 Raptor gives us the optimal trips considering all trade-offs between _arrival time_ and _number of
 transfers_. _Range Raptor_ also gives us the shortest travel duration (within its search-window).
-The OTP McRangeRaptor adds another criterion: `generalized-cost`, which is a function of
+The OTP McRangeRaptor adds another criterion: `generalized-cost/c1`, which is a function of
 `travel-time`, `waiting-time`, `walking-distance`, `transfers` and so on. McRR search will return
 a *pareto-optimal* set of paths which simultaneously optimize at least these criteria:
 
 - arrival time (seconds)
 - number of transfers (scalar)
 - travel duration (seconds)
-- generalized cost (scalar) (a function of anything other than the above criteria)
+- generalized cost/c1 (scalar) (a function of anything other than the above criteria)
 
 We will also experiment with separating other criteria out from the _cost_, such as
 _walkingDistance_ or _operator_. The goal is to make this configurable so each deployment may tune
-this to their needs. Due to performance reasons it might not be 100% dynamic.
+this to their needs. Due to performance reasons it might not be 100% dynamic. The 
+`generalized-cost` value is computed to represent the "human" cost of traveling. In McRaptor state
+we store this value in `c1` (criteria-one). The criteria-one can in theory be used for anything and
+is not limited to the `generalized-cost`. The McRaptor also support storing a second criteria `c2`.
+The pareto-functions must be altered to support these criteria. Using independent pareto-criteria
+`c1` and `c2` like this `(left.c1 < right.c1 || left.c2 < right.c2)` will usually lead to poor
+performance so another way to use `c2` is to alter the pareto-function when left.c2 dominates
+right.c2: `left.c1 < right.c1 + slack`. In the algorithm you will find variable `cost` and 
+`generalized-cost`, while in the state you will find `c1` and `c2`.
 
 Because plain _Raptor_ is much faster than _multi-criteria_ Raptor we will provide an option
 (request parameter) to run both _RR_  and _McRR_. We use a _single iteration Rator_ search as a
@@ -81,6 +89,7 @@ heuristic optimization, establishing travel time bounds that then feed into McRR
 test(SpeedTest), RR may take 80ms while the McRR with the same configuration typically takes 400ms.
 If we add _walking distance_ as an extra criteria the average time increase to 1000ms. These times
 are examples to give you an idea of the exponential growth of adding criteria to Raptor search.
+
 
 ## Paths and Itineraries
 

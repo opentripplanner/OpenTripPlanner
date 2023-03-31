@@ -29,7 +29,7 @@ public class OptimizedPath<T extends RaptorTripSchedule>
     this(
       originalPath.accessLeg(),
       originalPath.rangeRaptorIterationDepartureTime(),
-      originalPath.generalizedCost(),
+      originalPath.c1(),
       priorityCost(originalPath),
       NEUTRAL_COST,
       NEUTRAL_COST
@@ -72,7 +72,7 @@ public class OptimizedPath<T extends RaptorTripSchedule>
 
   @Override
   public int generalizedCostWaitTimeOptimized() {
-    return generalizedCost() + waitTimeOptimizedCost;
+    return c1() + waitTimeOptimizedCost;
   }
 
   @Override
@@ -110,6 +110,6 @@ public class OptimizedPath<T extends RaptorTripSchedule>
 
   private void appendSummary(PathStringBuilder buf) {
     buf.costCentiSec(transferPriorityCost, TransferConstraint.ZERO_COST, "pri");
-    buf.costCentiSec(generalizedCostWaitTimeOptimized(), generalizedCost(), "wtc");
+    buf.costCentiSec(generalizedCostWaitTimeOptimized(), c1(), "wtc");
   }
 }

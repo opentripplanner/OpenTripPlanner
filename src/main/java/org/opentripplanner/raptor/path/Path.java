@@ -65,11 +65,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
 
   /** Copy constructor */
   protected Path(RaptorPath<T> original) {
-    this(
-      original.rangeRaptorIterationDepartureTime(),
-      original.accessLeg(),
-      original.generalizedCost()
-    );
+    this(original.rangeRaptorIterationDepartureTime(), original.accessLeg(), original.c1());
   }
 
   /**
@@ -117,7 +113,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   }
 
   @Override
-  public final int generalizedCost() {
+  public final int c1() {
     return generalizedCost;
   }
 

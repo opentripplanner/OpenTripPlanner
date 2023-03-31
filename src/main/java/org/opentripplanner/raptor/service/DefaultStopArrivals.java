@@ -39,11 +39,6 @@ public class DefaultStopArrivals implements StopArrivals {
     return bestTransitArrivalTime().value(stopIndex);
   }
 
-  @Override
-  public int smallestNumberOfTransfers(int stopIndex) {
-    return bestNumberOfTransfers().value(stopIndex);
-  }
-
   private SingleCriteriaStopArrivals bestOverallArrivalTime() {
     if (bestOverallArrivalTime == null) {
       this.bestOverallArrivalTime = results.extractBestOverallArrivals();

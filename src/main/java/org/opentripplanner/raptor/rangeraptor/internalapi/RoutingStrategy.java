@@ -4,6 +4,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 
 /**
@@ -13,9 +14,9 @@ import org.opentripplanner.raptor.spi.RaptorTimeTable;
  */
 public interface RoutingStrategy<T extends RaptorTripSchedule> {
   /**
-   * Sets the access time for the departure stop. This method is called for each access path in
-   * every Raptor iteration. The access path can have more than one "leg"; hence the implementation
-   * need to be aware of the round (Walk access in round 0, Flex with one leg in round 1, ...).
+   * Add access path to state. This should be called in the matching round and appropriate place in
+   * the algorithm according to the {@link RaptorAccessEgress#numberOfRides()} and {@link
+   * RaptorAccessEgress#stopReachedOnBoard()}.
    *
    * @param departureTime The access departure time. The current iteration departure time or
    *                      the time-shifted departure time for access with opening hours.
@@ -25,12 +26,25 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   /**
    * Prepare the {@link RoutingStrategy} to route using the {@link RaptorTimeTable}.
    */
-  void prepareForTransitWith(RaptorTimeTable<T> timeTable);
+  void prepareForTransitWith(RaptorRoute<T> route);
+
+  /**
+   * Alight the current trip at the given stop.
+   */
+  void alightOnlyRegularTransferExist(
+    final int stopIndex,
+    final int stopPos,
+    final int alightSlack
+  );
 
   /**
    * Alight the current trip at the given stop with the arrival times.
    */
-  void alight(final int stopIndex, final int stopPos, final int alightSlack);
+  void alightConstrainedTransferExist(
+    final int stopIndex,
+    final int stopPos,
+    final int alightSlack
+  );
 
   /**
    * Board the given trip(event) at the given stop index.

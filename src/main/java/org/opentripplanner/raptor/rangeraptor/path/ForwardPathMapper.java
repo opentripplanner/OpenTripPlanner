@@ -7,7 +7,7 @@ import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.path.PathBuilder;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
@@ -18,7 +18,7 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 public final class ForwardPathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
 
   private final RaptorSlackProvider slackProvider;
-  private final CostCalculator<T> costCalculator;
+  private final RaptorCostCalculator<T> costCalculator;
   private final RaptorStopNameResolver stopNameResolver;
   private final BoardAndAlightTimeSearch tripSearch;
   private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
@@ -27,7 +27,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
   public ForwardPathMapper(
     RaptorSlackProvider slackProvider,
-    CostCalculator<T> costCalculator,
+    RaptorCostCalculator<T> costCalculator,
     RaptorStopNameResolver stopNameResolver,
     RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
     WorkerLifeCycle lifeCycle,
@@ -60,7 +60,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
           var times = tripSearch.find(arrival);
           pathBuilder.transit(arrival.transitPath().trip(), times);
         }
-        case TRANSFER -> pathBuilder.transfer(arrival.transferPath().transfer(), arrival.stop());
+        case TRANSFER -> pathBuilder.transfer(arrival.transfer(), arrival.stop());
         case ACCESS -> pathBuilder.access(arrival.accessPath().access());
         case EGRESS -> throw new RuntimeException(
           "Unknown arrival type: " + arrival.getClass().getSimpleName()
