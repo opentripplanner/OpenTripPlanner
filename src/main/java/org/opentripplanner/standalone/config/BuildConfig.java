@@ -150,7 +150,7 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final boolean banDiscouragedWalking;
   public final boolean banDiscouragedBiking;
-  public final double maxTransferDurationSeconds;
+  public final Duration maxTransferDuration;
   public final Boolean extraEdgesStopPlatformLink;
   public final NetexFeedParameters netexDefaults;
   public final GtfsFeedParameters gtfsDefaults;
@@ -310,14 +310,14 @@ all of the elevation values in the street edges.
             """
         )
         .asInt(1000);
-    maxTransferDurationSeconds =
+    maxTransferDuration =
       root
         .of("maxTransferDurationSeconds")
         .since(V2_1)
         .summary(
           "Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph."
         )
-        .asDouble((double) Duration.ofMinutes(30).toSeconds());
+        .asDuration(Duration.ofMinutes(30));
     maxStopToShapeSnapDistance =
       root
         .of("maxStopToShapeSnapDistance")
