@@ -51,9 +51,9 @@ public class SpeedTestConfig {
     testDate = adapter.of("testDate").asDateOrRelativePeriod("PT0D", ZoneId.of("UTC"));
     graph = adapter.of("graph").asUri(null);
     feedId = adapter.of("feedId").asString();
-    transitRoutingParams = new TransitRoutingConfig("tuningParameters", adapter);
-    flexConfig = new FlexConfig(adapter, "flex");
     request = mapRouteRequest(adapter.of("routingDefaults").asObject());
+    transitRoutingParams = new TransitRoutingConfig("tuningParameters", adapter, request);
+    flexConfig = new FlexConfig(adapter, "flex");
     updatersConfig = new UpdatersConfig(adapter);
     ignoreStreetResults = adapter.of("ignoreStreetResults").asBoolean(false);
     adapter.logAllWarnings(LOG::warn);
