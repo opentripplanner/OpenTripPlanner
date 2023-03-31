@@ -9,7 +9,6 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,13 +27,6 @@ public class ServiceDateUtils {
   private static final DateTimeFormatter COMPACT_FORMATTER = DateTimeFormatter.ofPattern(
     "uuuuMMdd"
   );
-
-  /**
-   * Calculate the start of the service day for the given {@link ZonedDateTime}
-   */
-  public static ZonedDateTime asStartOfService(ZonedDateTime date) {
-    return date.truncatedTo(ChronoUnit.HOURS).withHour(12).minusHours(12);
-  }
 
   /**
    * Calculate the start of the service day for the given {@link Instant} at the given

@@ -22,7 +22,6 @@ import org.opentripplanner._support.time.ZoneIds;
 public class ServiceDateUtilsTest {
 
   private static final ZoneId ZONE_ID = ZoneIds.PARIS;
-  private static final LocalTime TIME = LocalTime.of(10, 26);
 
   private static final LocalDate D2019_03_30 = LocalDate.of(2019, 3, 30);
   // Daylight Saving Time change from Winter to Summer time on MAR 03 2019 in Europe
@@ -39,27 +38,6 @@ public class ServiceDateUtilsTest {
     LocalTime.MIDNIGHT,
     ZONE_ID
   );
-
-  // Zoned dates in spring around DST switch
-  private static final ZonedDateTime Z1 = ZonedDateTime.of(D2019_03_30, TIME, ZONE_ID);
-  private static final ZonedDateTime Z2 = ZonedDateTime.of(D2019_03_31, TIME, ZONE_ID);
-  private static final ZonedDateTime Z3 = ZonedDateTime.of(D2019_04_01, TIME, ZONE_ID);
-
-  // Zoned dates in fall around DST switch
-  private static final ZonedDateTime Z4 = ZonedDateTime.of(D2019_10_26, TIME, ZONE_ID);
-  private static final ZonedDateTime Z5 = ZonedDateTime.of(D2019_10_27, TIME, ZONE_ID);
-  private static final ZonedDateTime Z6 = ZonedDateTime.of(D2019_10_28, TIME, ZONE_ID);
-
-  @Test
-  public void testAsStartOfServiceWithZonedDatesAroundDST() {
-    // Test Zoned dates around DST
-    assertEquals("2019-03-30T00:00+01:00[Europe/Paris]", asStartOfService(Z1).toString());
-    assertEquals("2019-03-30T23:00+01:00[Europe/Paris]", asStartOfService(Z2).toString());
-    assertEquals("2019-04-01T00:00+02:00[Europe/Paris]", asStartOfService(Z3).toString());
-    assertEquals("2019-10-26T00:00+02:00[Europe/Paris]", asStartOfService(Z4).toString());
-    assertEquals("2019-10-27T01:00+02:00[Europe/Paris]", asStartOfService(Z5).toString());
-    assertEquals("2019-10-28T00:00+01:00[Europe/Paris]", asStartOfService(Z6).toString());
-  }
 
   @Test
   public void testAsStartOfServiceWithLocalDatesAndZoneAroundDST() {
