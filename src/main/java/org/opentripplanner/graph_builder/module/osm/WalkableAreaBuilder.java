@@ -296,13 +296,6 @@ public class WalkableAreaBuilder {
         }
       }
 
-      // FIXME: temporary hard limit on size of
-      // areas to prevent way explosion
-      if (polygon.getNumPoints() > maxAreaNodes) {
-        issueStore.add(new AreaTooComplicated(group, visibilityNodes.size(), maxAreaNodes));
-        continue;
-      }
-
       if (edgeList.visibilityVertices.size() == 0) {
         issueStore.add(new UnconnectedArea(group));
         // Area is not connected to graph. Remove it immediately before it causes any trouble.
@@ -313,6 +306,13 @@ public class WalkableAreaBuilder {
       }
 
       createNamedAreas(edgeList, ring, group.areas);
+
+      // FIXME: temporary hard limit on size of
+      // areas to prevent way explosion
+      if (polygon.getNumPoints() > maxAreaNodes) {
+        issueStore.add(new AreaTooComplicated(group, visibilityNodes.size(), maxAreaNodes));
+        continue;
+      }
 
       for (OSMNode nodeI : visibilityNodes) {
         IntersectionVertex startEndpoint = handler.getVertexForOsmNode(nodeI, areaEntity);
