@@ -22,33 +22,6 @@
     </encoder>
   </appender>
 
-  <!-- Entur's custom log format  -->
-  <appender name="entur" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-      <providers>
-        <!-- provides the timestamp <timestamp/> -->
-        <!-- provides the version <version/> -->
-        <!-- provides the fields in the configured pattern -->
-        <pattern>
-          <!-- the pattern that defines what to include -->
-          <pattern>
-            {
-              "serviceContext": {
-                "service": "otp2"
-              },
-              "message": "%message\n%ex{full}",
-              "severity": "%level",
-              "reportLocation": {
-                "filePath": "%logger",
-                "lineNumber": "%line",
-                "functionName": "%method"
-              }
-            }
-          </pattern>
-        </pattern>
-      </providers>
-    </encoder>
-  </appender>
 
   <!-- JSON format in the standard Logstash format understood by many log parsing tools  -->
   <appender name="json" class="ch.qos.logback.core.ConsoleAppender">
