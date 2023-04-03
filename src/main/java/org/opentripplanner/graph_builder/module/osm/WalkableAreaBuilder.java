@@ -307,20 +307,34 @@ public class WalkableAreaBuilder {
 
       createNamedAreas(edgeList, ring, group.areas);
 
-      // FIXME: temporary hard limit on size of
-      // areas to prevent way explosion
-      if (polygon.getNumPoints() > maxAreaNodes) {
+      if (visibilityNodes.size() > maxAreaNodes) {
         issueStore.add(new AreaTooComplicated(group, visibilityNodes.size(), maxAreaNodes));
-        continue;
       }
 
+      // if area is too complex, consider only part of visibility nodes
+      // so that at least some edges passing through the area is added
+      // otherwise routing can use only area boundary edges
+      float skip_ratio = (float) maxAreaNodes / (float) visibilityNodes.size();
+      int i = 0;
+      float sum_i = 0;
       for (OSMNode nodeI : visibilityNodes) {
+        sum_i += skip_ratio;
+        if (Math.floor(sum_i) < i + 1) {
+          continue;
+        }
+        i = (int) Math.floor(sum_i);
         IntersectionVertex startEndpoint = handler.getVertexForOsmNode(nodeI, areaEntity);
         if (startingNodes.contains(nodeI)) {
           startingVertices.add(startEndpoint);
         }
-
+        int j = 0;
+        float sum_j = 0;
         for (OSMNode nodeJ : visibilityNodes) {
+          sum_j += skip_ratio;
+          if (Math.floor(sum_j) < j + 1) {
+            continue;
+          }
+          j = (int) Math.floor(sum_j);
           NodeEdge edge = new NodeEdge(nodeI, nodeJ);
           if (alreadyAddedEdges.contains(edge)) continue;
 

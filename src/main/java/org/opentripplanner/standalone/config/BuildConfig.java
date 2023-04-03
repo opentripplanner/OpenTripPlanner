@@ -504,7 +504,7 @@ recommended.
         .summary(
           "Visibility calculations for an area will not be done if there are more nodes than this limit."
         )
-        .asInt(500);
+        .asInt(150);
     maxElevationPropagationMeters =
       root
         .of("maxElevationPropagationMeters")
