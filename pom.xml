@@ -602,6 +602,13 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
+        <!-- JSON-formatted logging -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>7.3</version>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- dependency injection -->
         <dependency>
