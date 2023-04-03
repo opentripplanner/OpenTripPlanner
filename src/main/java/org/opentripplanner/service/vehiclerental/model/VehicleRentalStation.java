@@ -151,7 +151,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     return vehicleSpacesAvailable
       .entrySet()
       .stream()
-      .filter(e -> !includeRealtimeAvailability || e.getValue() > 0)
+      .filter(e -> !includeRealtimeAvailability || allowOverloading || e.getValue() > 0)
       .map(e -> e.getKey().formFactor)
       .collect(Collectors.toSet());
   }
