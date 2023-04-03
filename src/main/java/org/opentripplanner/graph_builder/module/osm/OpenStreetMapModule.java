@@ -87,7 +87,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    * Whether we should create bike P+R stations from OSM data. (default false)
    */
   public boolean staticBikeParkAndRide;
-  public int maxAreaNodes = 500;
+  public int maxAreaNodes = 150;
   /**
    * Whether ways tagged foot/bicycle=discouraged should be marked as inaccessible
    */
