@@ -72,6 +72,7 @@ public class VehicleRentalServiceDirectoryFetcher {
             false,
             parameters.getHeaders(),
             null,
+            false,
             false
           )
         );

@@ -42,7 +42,8 @@ public class VehicleRentalSourceFactory {
         allowKeepingRentedVehicleAtDestination(),
         headers(),
         network(),
-        geofencingZones()
+        geofencingZones(),
+        allowOverloading()
       );
       case SMOOVE -> new SmooveBikeRentalDataSourceParameters(
         url(),

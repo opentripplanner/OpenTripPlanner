@@ -20,15 +20,18 @@ public class GbfsStationInformationMapper {
   private final VehicleRentalSystem system;
   private final Map<String, RentalVehicleType> vehicleTypes;
   private final boolean allowKeepingRentedVehicleAtDestination;
+  private final boolean allowOverloading;
 
   public GbfsStationInformationMapper(
     VehicleRentalSystem system,
     Map<String, RentalVehicleType> vehicleTypes,
-    boolean allowKeepingRentedVehicleAtDestination
+    boolean allowKeepingRentedVehicleAtDestination,
+    boolean allowOverloading
   ) {
     this.system = system;
     this.vehicleTypes = vehicleTypes;
     this.allowKeepingRentedVehicleAtDestination = allowKeepingRentedVehicleAtDestination;
+    this.allowOverloading = allowOverloading;
   }
 
   public VehicleRentalStation mapStationInformation(GBFSStation station) {
@@ -102,6 +105,7 @@ public class GbfsStationInformationMapper {
       String webUri = rentalUris.getWeb();
       rentalStation.rentalUris = new VehicleRentalStationUris(androidUri, iosUri, webUri);
     }
+    rentalStation.allowOverloading = allowOverloading;
     return rentalStation;
   }
 }
