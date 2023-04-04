@@ -73,7 +73,7 @@ public class GbfsFreeVehicleStatusMapper {
   private String getName(GBFSBike vehicle) {
     var typeId = vehicle.getVehicleTypeId();
     if (typeId != null) {
-      var type = vehicleTypes.get(vehicle.getVehicleTypeId());
+      var type = vehicleTypes.get(typeId);
       if (type != null && type.name != null) {
         return type.name;
       } else {
