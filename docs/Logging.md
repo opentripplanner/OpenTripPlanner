@@ -31,8 +31,14 @@ java -Dotp.logging.format=json -jar otp.jar --load --serve data
 
 ### Further customization
 
-If you want to customize the exact log output even further, then you can adapt `logback.xml` to 
-your needs. For example, Entur has their own custom log format configured as follows:
+If you want to customize the exact log output even further you can use your own logback configuration 
+by starting OTP with the following parameter:
+
+```
+java -Dlogback.configurationFile=/path/to/logback.xml -jar otp.jar --load --serve data
+```
+
+For example, Entur has their own custom log format configured as follows:
 
 ```xml
 <!-- Entur's custom log format  -->
