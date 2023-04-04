@@ -28,7 +28,8 @@ works with your website, mobile app, physical signage or other applications in o
 relevant customer information and meaningful trip plans to riders.
 
 There's no official OTP user interface, although the OpenTripPlanner ecosystem includes several user 
-interface projects (for example ['Digitransit'] (https://github.com/HSLdevcom/digitransit-ui) and ['OTP-react-redux'] (https://github.com/opentripplanner/otp-react-redux). 
+interface projects (for example [Digitransit](https://github.com/HSLdevcom/digitransit-ui) and 
+[OTP-react-redux](https://github.com/opentripplanner/otp-react-redux)). 
 How your OTP deployment looks is entirely up to you. 
 
 ## What OTP can do for you
@@ -47,7 +48,7 @@ combined trip plans rather than presented in alternative trip plans
 mode, time, transfers, and other preferences while delivering balanced results
 - One OTP backend can power both a website and app for use by riders, along with a separate frontend 
 with a different configuration for use by a customer service team
-- Active development by dozens of agencies means new features every year ['(see the OTP common roadmap here)'] (https://github.com/orgs/opentripplanner/projects/3)
+- Active development by dozens of agencies means new features every year [(see the OTP common roadmap here)](https://github.com/orgs/opentripplanner/projects/3)
 
 ### Regions, countries, and private entities
 
@@ -62,12 +63,14 @@ Regional, provincial, or national governments, or any private entity, can set up
 
 While historically, OpenTripPlanner has often been used by researchers for the programmatic calculation 
 of large numbers of trip plans, this is no longer an intended use case of OTP. You are welcome to use 
-OTP for any purpose, but you may also find applications like ['r5'] (https://github.com/conveyal/r5) to 
+OTP for any purpose, but you may also find applications like [r5](https://github.com/conveyal/r5) to 
 be more appropriate for these purposes.
 
 ## Talk to an expert about OTP
 
-Everyone interested in OTP is welcome to post questions on the ['OpenTripPlanner-users group'] (https://groups.google.com/g/opentripplanner-users) or ['Gitter chat'] (https://gitter.im/opentripplanner/OpenTripPlanner). 
+Everyone interested in OTP is welcome to post questions on the [Gitter chat](https://gitter.im/opentripplanner/OpenTripPlanner)
+or [OpenTripPlanner-users group](https://groups.google.com/g/opentripplanner-users).
+
 If you’re looking for a conversation with an individual from a similar organizational type, you can 
 make that request and include some info about your organization on the forum linked above and a member 
 of the OTP community will connect with you.
