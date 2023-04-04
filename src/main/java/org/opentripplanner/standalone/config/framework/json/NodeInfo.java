@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.framework.json;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -134,7 +135,7 @@ public record NodeInfo(
    */
   public String toMarkdownString(Object value) {
     if (enumType != null) {
-      value = EnumMapper.mapToEnum2((String) value, enumType).orElseThrow();
+      value= EnumMapper.kebabCase(value.toString());
     }
     return type.quote(value);
   }

@@ -11,6 +11,7 @@ import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.framework.text.TableBuilder;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
+import org.opentripplanner.standalone.config.framework.json.EnumMapper;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 import org.slf4j.Logger;
@@ -91,7 +92,7 @@ abstract class AbstractTable {
     String parameter = info.name();
 
     if (info.isTypeQualifier()) {
-      parameter += " = " + info.toMarkdownString(node.typeQualifier());
+      parameter += " = " + info.toMarkdownString(EnumMapper.kebabCase(node.typeQualifier()));
     }
     if (skipFunction.skip(info)) {
       parameter =
