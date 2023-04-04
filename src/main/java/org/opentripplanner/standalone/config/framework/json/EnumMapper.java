@@ -26,6 +26,6 @@ public class EnumMapper {
   }
 
   public static String kebabCase(String input) {
-   return input.toLowerCase().replace('_', '-');
+    return input.toLowerCase().replace('_', '-');
   }
 }
