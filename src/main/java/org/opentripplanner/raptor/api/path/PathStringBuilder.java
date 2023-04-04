@@ -8,7 +8,7 @@ import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**
  * Create a path like: {@code Walk 5m - 101 - Transit 10:07 10:35 - 2111 - Walk 4m }
@@ -79,7 +79,7 @@ public class PathStringBuilder {
 
   /** Add generalizedCostCentiSec {@link #costCentiSec(int, int, String)} */
   public PathStringBuilder generalizedCostSentiSec(int cost) {
-    return costCentiSec(cost, CostCalculator.ZERO_COST, null);
+    return costCentiSec(cost, RaptorCostCalculator.ZERO_COST, null);
   }
 
   /**

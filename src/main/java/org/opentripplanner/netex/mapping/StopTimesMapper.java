@@ -20,6 +20,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.netex.support.JourneyPatternHelper;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -29,7 +30,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplay_VersionStructure;
 import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
@@ -110,7 +111,7 @@ class StopTimesMapper {
    */
   @Nullable
   StopTimesMapperResult mapToStopTimes(
-    JourneyPattern journeyPattern,
+    JourneyPattern_VersionStructure journeyPattern,
     Trip trip,
     List<TimetabledPassingTime> passingTimes,
     ServiceJourney serviceJourney
@@ -129,7 +130,15 @@ class StopTimesMapper {
       StopPointInJourneyPattern stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
 
       StopLocation stop = lookUpStopLocation(stopPoint);
+
       if (stop == null) {
+        if (
+          stopPoint != null &&
+          isFalse(stopPoint.isForAlighting()) &&
+          isFalse(stopPoint.isForBoarding())
+        ) {
+          continue;
+        }
         issueStore.add(
           "JourneyPatternStopNotFound",
           "Stop with id %s not found for StopPoint %s in JourneyPattern %s. " +
@@ -167,7 +176,10 @@ class StopTimesMapper {
    * @return a map of stop-times indexed by the TimetabledPassingTime id.
    */
   @Nullable
-  String findTripHeadsign(JourneyPattern journeyPattern, TimetabledPassingTime firstPassingTime) {
+  String findTripHeadsign(
+    JourneyPattern_VersionStructure journeyPattern,
+    TimetabledPassingTime firstPassingTime
+  ) {
     String pointInJourneyPattern = firstPassingTime
       .getPointInJourneyPatternRef()
       .getValue()
@@ -195,7 +207,7 @@ class StopTimesMapper {
   @Nullable
   private static StopPointInJourneyPattern findStopPoint(
     String pointInJourneyPatterRef,
-    JourneyPattern journeyPattern
+    JourneyPattern_VersionStructure journeyPattern
   ) {
     var points = journeyPattern
       .getPointsInSequence()
@@ -393,7 +405,7 @@ class StopTimesMapper {
 
   private FlexibleLine lookUpFlexibleLine(
     ServiceJourney serviceJourney,
-    JourneyPattern journeyPattern
+    JourneyPattern_VersionStructure journeyPattern
   ) {
     if (serviceJourney == null) {
       return null;
@@ -407,8 +419,7 @@ class StopTimesMapper {
       lineRef = lineRefStruct.getValue().getRef();
     } else if (serviceJourney.getJourneyPatternRef() != null) {
       // Connect to Line referenced through JourneyPattern->Route
-      String routeRef = journeyPattern.getRouteRef().getRef();
-      lineRef = routeByid.lookup(routeRef).getLineRef().getValue().getRef();
+      lineRef = JourneyPatternHelper.getLineFromRoute(routeByid, journeyPattern);
     }
     return flexibleLinesById.lookup(lineRef);
   }

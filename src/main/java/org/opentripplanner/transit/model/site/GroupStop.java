@@ -30,7 +30,7 @@ public class GroupStop
     this.index = INDEX_COUNTER.getAndIncrement();
     this.name = builder.name();
     this.geometry = builder.geometry();
-    this.centroid = builder.centroid();
+    this.centroid = Objects.requireNonNull(builder.centroid());
     this.stopLocations = builder.stopLocations();
   }
 
@@ -87,11 +87,6 @@ public class GroupStop
   public boolean isPartOfSameStationAs(StopLocation alternativeStop) {
     return false;
   }
-
-  /**
-   * Adds a new location to the location group. This should ONLY be used during the graph build
-   * process.
-   */
 
   /**
    * Returns all the locations belonging to this location group.

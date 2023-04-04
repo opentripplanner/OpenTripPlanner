@@ -48,7 +48,7 @@ public class TestPathBuilderTest implements RaptorTestConstants {
 
     int accessEgressCost = COST_CALCULATOR.costEgress(walk(STOP_B, D2m + D1m));
 
-    assertEquals(accessEgressCost + transitCost, path.generalizedCost());
+    assertEquals(accessEgressCost + transitCost, path.c1());
     assertEquals(
       "Walk 1m 10:00:15 10:01:15 $120 ~ A 45s " +
       "~ BUS L1 10:02 10:07 5m $438 ~ B 15s " +
@@ -90,6 +90,6 @@ public class TestPathBuilderTest implements RaptorTestConstants {
       BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING,
       path.toStringDetailed(this::stopIndexToName)
     );
-    Assertions.assertEquals(BasicPathTestCase.TOTAL_COST, path.generalizedCost());
+    Assertions.assertEquals(BasicPathTestCase.TOTAL_COST, path.c1());
   }
 }

@@ -1,11 +1,8 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
@@ -23,7 +20,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /**
  * FEATURE UNDER TEST
@@ -83,15 +79,12 @@ public class E02_NotAllowedConstrainedTransferTest implements RaptorTestConstant
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var expMinDuration = UnknownPathString.of("9m", 1);
-
     var path =
       "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R3 0:15 0:20 ~ C ~ Walk 30s " +
       "[0:01:30 0:20:30 19m 1tx $2500]";
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_00))
-      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
+      .addMinDuration("9m", TX_1, T00_00, T00_30)
       .add(standard().not(TC_STANDARD_REV), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)
       .build();
@@ -100,8 +93,6 @@ public class E02_NotAllowedConstrainedTransferTest implements RaptorTestConstant
   @ParameterizedTest
   @MethodSource("testCases")
   void testRaptor(RaptorModuleTestCase testCase) {
-    var request = testCase.withConfig(requestBuilder);
-    var response = raptorService.route(request, data);
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 }

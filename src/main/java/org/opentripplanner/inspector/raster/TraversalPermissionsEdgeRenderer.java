@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.VertexVisualAttributes;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
@@ -17,7 +18,6 @@ import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitPathwayNodeVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
-import org.opentripplanner.street.model.vertex.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**

@@ -1,9 +1,7 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
-import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
 import java.util.Locale;
-import java.util.Map;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFilterPlaceType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
@@ -14,35 +12,11 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.graphfinder.PlaceType;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class LegacyGraphQLUtils {
-
-  public static Locale getLocale(DataFetchingEnvironment environment) {
-    return getLocale(environment, environment.getArgument("language"));
-  }
-
-  public static Locale getLocale(DataFetchingEnvironment environment, String localeString) {
-    if (localeString != null) {
-      return Locale.forLanguageTag(localeString);
-    }
-
-    Map<String, ?> localContext = environment.getLocalContext();
-    if (localContext != null && localContext.get("locale") != null) {
-      return (Locale) localContext.get("locale");
-    }
-
-    return environment.getLocale();
-  }
-
-  public static String getTranslation(I18NString input, DataFetchingEnvironment environment) {
-    if (input == null) {
-      return null;
-    }
-    return input.toString(getLocale(environment));
-  }
 
   public static LegacyGraphQLWheelchairBoarding toGraphQL(Accessibility boarding) {
     if (boarding == null) return null;
@@ -96,17 +70,17 @@ public class LegacyGraphQLUtils {
     };
   }
 
-  public static FormFactor toModel(LegacyGraphQLFormFactor formFactor) {
+  public static RentalFormFactor toModel(LegacyGraphQLFormFactor formFactor) {
     if (formFactor == null) return null;
     return switch (formFactor) {
-      case BICYCLE -> FormFactor.BICYCLE;
-      case SCOOTER -> FormFactor.SCOOTER;
-      case CAR -> FormFactor.CAR;
-      case CARGO_BICYCLE -> FormFactor.CARGO_BICYCLE;
-      case MOPED -> FormFactor.MOPED;
-      case OTHER -> FormFactor.OTHER;
-      case SCOOTER_SEATED -> FormFactor.SCOOTER_SEATED;
-      case SCOOTER_STANDING -> FormFactor.SCOOTER_STANDING;
+      case BICYCLE -> RentalFormFactor.BICYCLE;
+      case SCOOTER -> RentalFormFactor.SCOOTER;
+      case CAR -> RentalFormFactor.CAR;
+      case CARGO_BICYCLE -> RentalFormFactor.CARGO_BICYCLE;
+      case MOPED -> RentalFormFactor.MOPED;
+      case OTHER -> RentalFormFactor.OTHER;
+      case SCOOTER_SEATED -> RentalFormFactor.SCOOTER_SEATED;
+      case SCOOTER_STANDING -> RentalFormFactor.SCOOTER_STANDING;
     };
   }
 

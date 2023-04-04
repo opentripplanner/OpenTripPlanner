@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.NotSame;
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.Same;
@@ -572,6 +573,48 @@ public class TimetableSnapshotSourceTest {
       assertEquals(80, originalTripTimesForToday.getDepartureDelay(1));
       assertEquals(90, originalTripTimesForToday.getArrivalDelay(2));
       assertEquals(90, originalTripTimesForToday.getDepartureDelay(2));
+    }
+
+    /**
+     * This test just asserts that trip with start date that is outside the service period doesn't
+     * throw an exception and is ignored instead.
+     */
+    @Test
+    public void invalidTripDate() {
+      // GIVEN
+
+      String scheduledTripId = "1.1";
+
+      var serviceDateOutsideService = SERVICE_DATE.minusYears(10);
+      var builder = new TripUpdateBuilder(
+        scheduledTripId,
+        serviceDateOutsideService,
+        SCHEDULED,
+        transitModel.getTimeZone()
+      )
+        .addDelayedStopTime(1, 0)
+        .addDelayedStopTime(2, 60, 80)
+        .addDelayedStopTime(3, 90, 90);
+
+      var tripUpdate = builder.build();
+
+      var updater = defaultUpdater();
+
+      // WHEN
+      var result = updater.applyTripUpdates(
+        TRIP_MATCHER_NOOP,
+        REQUIRED_NO_DATA,
+        fullDataset,
+        List.of(tripUpdate),
+        feedId
+      );
+
+      // THEN
+      final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+      assertNull(snapshot);
+      assertEquals(1, result.failed());
+      var errors = result.failures();
+      assertEquals(1, errors.get(NO_SERVICE_ON_DATE).size());
     }
 
     @Test

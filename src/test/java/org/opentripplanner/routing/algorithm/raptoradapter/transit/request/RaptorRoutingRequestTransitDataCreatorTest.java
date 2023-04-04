@@ -149,7 +149,11 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     }
 
     @Override
-    public BitSet filterAvailableStops(RoutingTripPattern tripPattern, BitSet boardingPossible) {
+    public BitSet filterAvailableStops(
+      RoutingTripPattern tripPattern,
+      BitSet boardingPossible,
+      BoardAlight boardAlight
+    ) {
       return boardingPossible;
     }
   }

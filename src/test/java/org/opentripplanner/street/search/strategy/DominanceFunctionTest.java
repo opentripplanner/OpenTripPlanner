@@ -2,7 +2,6 @@ package org.opentripplanner.street.search.strategy;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import java.time.Instant;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model._data.StreetModelForTest;
-import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -21,8 +19,8 @@ public class DominanceFunctionTest {
   @Test
   public void testGeneralDominanceFunction() {
     DominanceFunction minimumWeightDominanceFunction = new DominanceFunctions.MinimumWeight();
-    Vertex fromVertex = mock(TransitStopVertex.class);
-    Vertex toVertex = mock(TransitStopVertex.class);
+    Vertex fromVertex = intersectionVertex(1, 1);
+    Vertex toVertex = intersectionVertex(2, 2);
 
     // Test if domination works in the general case
 

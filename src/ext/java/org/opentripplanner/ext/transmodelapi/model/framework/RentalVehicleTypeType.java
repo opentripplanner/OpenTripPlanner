@@ -4,7 +4,7 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 
 public class RentalVehicleTypeType {
 

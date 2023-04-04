@@ -1,45 +1,68 @@
 package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 
-// TODO VIA: Javadoc
+/**
+ * Class that stores information about what kind of parking lots should be used for Park & Ride
+ * and Bike & Ride searches.
+ */
 public class VehicleParkingRequest implements Cloneable, Serializable {
 
-  private Set<String> requiredTags = Set.of();
-  private Set<String> bannedTags = Set.of();
+  private VehicleParkingFilterRequest filter = VehicleParkingFilterRequest.empty();
+  private VehicleParkingFilterRequest preferred = VehicleParkingFilterRequest.empty();
+  private int unpreferredTagCost = 5 * 60;
 
-  // TODO: Move useAvailabilityInformation here
+  private boolean useAvailabilityInformation = false;
 
-  public void setRequiredTags(Set<String> requiredTags) {
-    this.requiredTags = requiredTags;
+  public void setFilter(VehicleParkingFilterRequest filter) {
+    this.filter = filter;
   }
 
-  /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
-  public Set<String> requiredTags() {
-    return requiredTags;
+  public void setPreferred(VehicleParkingFilterRequest filter) {
+    this.preferred = filter;
   }
 
-  public void setBannedTags(Set<String> bannedTags) {
-    this.bannedTags = bannedTags;
+  /**
+   * Which vehicle parking tags are preferred. Vehicle parking facilities that don't have one of these
+   * tags receive an extra cost.
+   * <p>
+   * This is useful if you want to use certain kind of facilities, like lockers for expensive e-bikes.
+   */
+  public VehicleParkingFilterRequest preferred() {
+    return this.preferred;
   }
 
-  /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
-  public Set<String> bannedTags() {
-    return bannedTags;
+  public void setUnpreferredCost(int cost) {
+    unpreferredTagCost = cost;
+  }
+
+  public int unpreferredCost() {
+    return unpreferredTagCost;
+  }
+
+  /**
+   * If realtime availability data should be used when deciding af a parking facility should be
+   * used.
+   */
+  public void setUseAvailabilityInformation(boolean b) {
+    useAvailabilityInformation = b;
+  }
+
+  public boolean useAvailabilityInformation() {
+    return useAvailabilityInformation;
   }
 
   public VehicleParkingRequest clone() {
     try {
-      var clone = (VehicleParkingRequest) super.clone();
-      clone.requiredTags = new HashSet<>(this.requiredTags);
-      clone.bannedTags = new HashSet<>(this.bannedTags);
-
-      return clone;
+      return (VehicleParkingRequest) super.clone();
     } catch (CloneNotSupportedException e) {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
+  }
+
+  public VehicleParkingFilterRequest filter() {
+    return filter;
   }
 }

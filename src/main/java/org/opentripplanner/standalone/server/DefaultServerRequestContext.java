@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone.server;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.Duration;
 import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
@@ -16,6 +15,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -32,7 +32,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final Graph graph;
   private final TransitService transitService;
   private final TransitRoutingConfig transitRoutingConfig;
-  private final Duration streetRoutingTimeout;
   private final RouteRequest routeRequestDefaults;
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
@@ -43,6 +42,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final TraverseVisitor traverseVisitor;
   private final WorldEnvelopeService worldEnvelopeService;
   private final VehiclePositionService vehiclePositionService;
+  private final VehicleRentalService vehicleRentalService;
 
   /**
    * Make sure all mutable components are copied/cloned before calling this constructor.
@@ -51,7 +51,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     Graph graph,
     TransitService transitService,
     TransitRoutingConfig transitRoutingConfig,
-    Duration streetRoutingTimeout,
     RouteRequest routeRequestDefaults,
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
@@ -60,18 +59,19 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
     WorldEnvelopeService worldEnvelopeService,
     VehiclePositionService vehiclePositionService,
-    FlexConfig flexConfig,
-    TraverseVisitor traverseVisitor
+    VehicleRentalService vehicleRentalService,
+    TraverseVisitor traverseVisitor,
+    FlexConfig flexConfig
   ) {
     this.graph = graph;
     this.transitService = transitService;
     this.transitRoutingConfig = transitRoutingConfig;
-    this.streetRoutingTimeout = streetRoutingTimeout;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
     this.requestLogger = requestLogger;
     this.tileRendererManager = tileRendererManager;
     this.vectorTileLayers = vectorTileLayers;
+    this.vehicleRentalService = vehicleRentalService;
     this.flexConfig = flexConfig;
     this.traverseVisitor = traverseVisitor;
     this.routeRequestDefaults = routeRequestDefaults;
@@ -85,7 +85,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   public static DefaultServerRequestContext create(
     TransitRoutingConfig transitRoutingConfig,
     RouteRequest routeRequestDefaults,
-    Duration streetRoutingTimeout,
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
     TransitService transitService,
@@ -93,6 +92,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
     WorldEnvelopeService worldEnvelopeService,
     VehiclePositionService vehiclePositionService,
+    VehicleRentalService vehicleRentalService,
     FlexConfig flexConfig,
     @Nullable TraverseVisitor traverseVisitor,
     @Nullable String requestLogFile
@@ -101,7 +101,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       graph,
       transitService,
       transitRoutingConfig,
-      streetRoutingTimeout,
       routeRequestDefaults,
       meterRegistry,
       raptorConfig,
@@ -110,8 +109,9 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       vectorTileLayers,
       worldEnvelopeService,
       vehiclePositionService,
-      flexConfig,
-      traverseVisitor
+      vehicleRentalService,
+      traverseVisitor,
+      flexConfig
     );
   }
 
@@ -163,6 +163,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
+  public VehicleRentalService vehicleRentalService() {
+    return vehicleRentalService;
+  }
+
+  @Override
   public TransitTuningParameters transitTuningParameters() {
     return transitRoutingConfig;
   }
@@ -170,11 +175,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public RaptorTuningParameters raptorTuningParameters() {
     return transitRoutingConfig;
-  }
-
-  @Override
-  public Duration streetRoutingTimeout() {
-    return streetRoutingTimeout;
   }
 
   @Override

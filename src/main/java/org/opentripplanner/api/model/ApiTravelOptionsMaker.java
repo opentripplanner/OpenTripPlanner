@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -25,11 +26,15 @@ public final class ApiTravelOptionsMaker {
     staticTravelOptions.add(new ApiTravelOption(ApiRequestMode.CAR.toString()));
   }
 
-  public static List<ApiTravelOption> makeOptions(Graph graph, TransitService transitService) {
+  public static List<ApiTravelOption> makeOptions(
+    Graph graph,
+    VehicleRentalService vehicleRentalService,
+    TransitService transitService
+  ) {
     var service = graph.getVehicleParkingService();
     return makeOptions(
       transitService.getTransitModes(),
-      graph.getVehicleRentalService().hasRentalBikes(),
+      vehicleRentalService.hasRentalBikes(),
       service.hasBikeParking(),
       service.hasCarParking()
     );

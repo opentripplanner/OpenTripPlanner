@@ -22,7 +22,6 @@ public final class RoutingPreferences implements Serializable {
   private final BikePreferences bike;
   private final CarPreferences car;
   private final VehicleRentalPreferences rental;
-  private final VehicleParkingPreferences parking;
   private final SystemPreferences system;
   private final ItineraryFilterPreferences itineraryFilter;
 
@@ -35,7 +34,6 @@ public final class RoutingPreferences implements Serializable {
     this.bike = BikePreferences.DEFAULT;
     this.car = CarPreferences.DEFAULT;
     this.rental = VehicleRentalPreferences.DEFAULT;
-    this.parking = VehicleParkingPreferences.DEFAULT;
     this.system = SystemPreferences.DEFAULT;
     this.itineraryFilter = ItineraryFilterPreferences.DEFAULT;
   }
@@ -49,7 +47,6 @@ public final class RoutingPreferences implements Serializable {
     this.bike = requireNonNull(builder.bike());
     this.car = requireNonNull(builder.car());
     this.rental = requireNonNull(builder.rental());
-    this.parking = requireNonNull(builder.parking());
     this.system = requireNonNull(builder.system());
     this.itineraryFilter = requireNonNull(builder.itineraryFilter());
   }
@@ -98,10 +95,6 @@ public final class RoutingPreferences implements Serializable {
     return rental;
   }
 
-  public VehicleParkingPreferences parking() {
-    return parking;
-  }
-
   @Nonnull
   public ItineraryFilterPreferences itineraryFilter() {
     return itineraryFilter;
@@ -134,7 +127,6 @@ public final class RoutingPreferences implements Serializable {
     private BikePreferences bike = null;
     private CarPreferences car = null;
     private VehicleRentalPreferences rental = null;
-    private VehicleParkingPreferences parking = null;
     private SystemPreferences system = null;
     private ItineraryFilterPreferences itineraryFilter = null;
 
@@ -191,6 +183,12 @@ public final class RoutingPreferences implements Serializable {
       return this;
     }
 
+    public Builder withWheelchair(Consumer<WheelchairPreferences.Builder> body) {
+      this.wheelchair =
+        ifNotNull(this.wheelchair, original.wheelchair).copyOf().apply(body).build();
+      return this;
+    }
+
     public BikePreferences bike() {
       return bike == null ? original.bike : bike;
     }
@@ -215,15 +213,6 @@ public final class RoutingPreferences implements Serializable {
 
     public Builder withRental(Consumer<VehicleRentalPreferences.Builder> body) {
       this.rental = ifNotNull(this.rental, original.rental).copyOf().apply(body).build();
-      return this;
-    }
-
-    public VehicleParkingPreferences parking() {
-      return parking == null ? original.parking : parking;
-    }
-
-    public Builder withParking(VehicleParkingPreferences parking) {
-      this.parking = parking;
       return this;
     }
 

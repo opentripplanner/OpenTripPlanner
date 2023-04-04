@@ -2,6 +2,7 @@ package org.opentripplanner.transit.speed_test;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 import static org.opentripplanner.standalone.configure.ConstructApplication.creatTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.initializeTransferCache;
 import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetup.assertTestDateHasData;
 
 import java.io.File;
@@ -22,6 +23,7 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -91,6 +93,7 @@ public class SpeedTest {
     UpdaterConfigurator.configure(
       graph,
       new DefaultVehiclePositionService(),
+      new DefaultVehicleRentalService(),
       transitModel,
       config.updatersConfig
     );
@@ -102,7 +105,6 @@ public class SpeedTest {
       DefaultServerRequestContext.create(
         config.transitRoutingParams,
         config.request,
-        null,
         new RaptorConfig<>(config.transitRoutingParams),
         graph,
         new DefaultTransitService(transitModel),
@@ -110,6 +112,7 @@ public class SpeedTest {
         List::of,
         TestServerContext.createWorldEnvelopeService(),
         TestServerContext.createVehiclePositionService(),
+        TestServerContext.createVehicleRentalService(),
         config.flexConfig,
         null,
         null
@@ -117,6 +120,8 @@ public class SpeedTest {
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now
     // we do it manually here
     creatTransitLayerForRaptor(transitModel, config.transitRoutingParams);
+
+    initializeTransferCache(config.transitRoutingParams, transitModel);
 
     timer.setUp(opts.groupResultsByCategory());
   }

@@ -1,14 +1,16 @@
 package org.opentripplanner.netex.validation;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 
 class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, ServiceJourney> {
 
   @Override
   public Status validate(ServiceJourney sj) {
-    JourneyPattern journeyPattern = index.getJourneyPatternsById().lookup(getPatternId(sj));
+    JourneyPattern_VersionStructure journeyPattern = index
+      .getJourneyPatternsById()
+      .lookup(getPatternId(sj));
 
     int nStopPointsInJourneyPattern = journeyPattern
       .getPointsInSequence()

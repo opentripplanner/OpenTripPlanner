@@ -1136,6 +1136,66 @@ input InputPreferred {
 }
 
 """
+Preferences for parking facilities used during the routing.
+"""
+input VehicleParkingInput {
+    """
+    Selection filters to include or exclude parking facilities.
+    An empty list will include all facilities in the routing search.
+    """
+    filters: [ParkingFilter]
+
+    """
+    If `preferred` is non-empty, using a parking facility that doesn't contain
+    at least one of the preferred conditions, will receive this extra cost and therefore avoided if
+    preferred options are available.
+    """
+    unpreferredCost: Int
+
+    """
+    If non-empty every parking facility that doesn't match this set of conditions will
+    receive an extra cost (defined by `unpreferredCost`) and therefore avoided.
+    """
+    preferred: [ParkingFilter]
+}
+
+input ParkingFilterOperation {
+    """Filter parking facilities based on their tag"""
+    tags: [String]
+}
+
+"""
+The filter definition to include or exclude parking facilities used during routing.
+
+Logically, the filter algorithm work as follows:
+
+- The starting point is the set of all facilities, lets call it `A`.
+- Then all `select` filters are applied to `A`, potentially reducing the number of facilities used.
+  Let's call the result of this `B`.
+  An empty `select` will lead to `A` being equal to `B`.
+- Lastly, the `not` filters are applied to `B`, reducing the set further.
+  Lets call this final set `C`.
+  An empty `not` will lead to `B` being equal to `C`.
+- The remaining parking facilities in `C` are used for routing.
+"""
+input ParkingFilter {
+    """
+    Exclude parking facilities based on their properties.
+
+    If empty nothing is excluded from the initial set of facilities but may be filtered down
+    further by the `select` filter.
+    """
+    not: [ParkingFilterOperation!]
+    """
+    Include parking facilities based on their properties.
+
+    If empty everything is included from the initial set of facilities but may be filtered down
+    further by the `not` filter.
+    """
+    select: [ParkingFilterOperation!]
+}
+
+"""
 Relative importances of optimization factors. Only effective for bicycling legs.
 Invariant: `timeFactor + slopeFactor + safetyFactor == 1`
 """
@@ -1424,7 +1484,9 @@ type Leg {
         Transportation modes for which all stops in the parent station are used as possible destination stops
         for the next legs. For modes not listed, only the exact destination stop of the leg is considered.
         """
-        destinationModesWithParentStation: [TransitMode!]): [Leg!]
+        destinationModesWithParentStation: [TransitMode!]
+
+        ): [Leg!]
 }
 
 """A span of time."""
@@ -2807,6 +2869,9 @@ type QueryType {
         If the value is set to be 0, safety is ignored. Default is 1.0.
         """
         walkSafetyFactor: Float
+
+        "Preferences for vehicle parking"
+        parking: VehicleParkingInput
     ): Plan @async
 }
 

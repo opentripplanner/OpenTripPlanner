@@ -14,6 +14,7 @@ import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.state.State;
@@ -68,6 +69,9 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     if (this.getCoordinate() != null) {
       sb.append(" lat,lng=").append(this.getCoordinate().y);
       sb.append(",").append(this.getCoordinate().x);
+    }
+    if (!rentalRestrictions.toList().isEmpty()) {
+      sb.append(", traversalExtension=").append(rentalRestrictions);
     }
     sb.append("}");
     return sb.toString();
@@ -167,16 +171,6 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return new Coordinate(getX(), getY());
   }
 
-  /** Get the bearing, in degrees, between this vertex and another coordinate. */
-  public double azimuthTo(Coordinate other) {
-    return DirectionUtils.getAzimuth(getCoordinate(), other);
-  }
-
-  /** Get the bearing, in degrees, between this vertex and another. */
-  public double azimuthTo(Vertex other) {
-    return azimuthTo(other.getCoordinate());
-  }
-
   public List<StreetEdge> getIncomingStreetEdges() {
     List<StreetEdge> result = new ArrayList<>();
     for (Edge out : this.getIncoming()) {
@@ -197,6 +191,23 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
       result.add((StreetEdge) out);
     }
     return result;
+  }
+
+  /**
+   * Returns true if vertex is connected to another one by an edge
+   */
+  public boolean isConnected(Vertex v) {
+    for (Edge e : outgoing) {
+      if (e.getToVertex() == v) {
+        return true;
+      }
+    }
+    for (Edge e : incoming) {
+      if (e.getFromVertex() == v) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public boolean rentalTraversalBanned(State currentState) {

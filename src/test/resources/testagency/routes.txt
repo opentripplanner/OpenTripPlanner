@@ -17,3 +17,4 @@ route_id,route_short_name,route_long_name,route_type,route_bikes_allowed
 16,16,16,2,
 17,17,17,2,
 18,18,18,2,
+19,19,19,3,

@@ -40,7 +40,7 @@ curl --request POST \
 
 ## Built-in API client
 
-A browser based GraphQL API client is available at [http://localhost:8080/legacygraphql/graphiql](http://localhost:8080/legacygraphql/graphiql)
+A browser based GraphQL API client is available at [http://localhost:8080/graphiql](http://localhost:8080/graphiql)
 
 ![GraphiQL](../images/graphiql.png)
 
@@ -76,3 +76,5 @@ on this API and the [Legacy GraphQL Api](LegacyGraphQLApi.md). The new API will 
 - Implement support for omitCanceled parameter in some stop's stoptime queries (October 2022, [#4504]([#4504](https://github.com/opentripplanner/OpenTripPlanner/pull/4504)))
 - Rename unpreferredRouteCost to unpreferredCost (October 2022, [#4543](https://github.com/opentripplanner/OpenTripPlanner/pull/4543))
 - Make plan fetcher async (December 2022, [#4676](https://github.com/opentripplanner/OpenTripPlanner/pull/4676))
+- Fix alerts query severity, effect and cause filters (February 2023, [#4909](https://github.com/opentripplanner/OpenTripPlanner/pull/4909))
+- Use accept-language header instead of the default route request locale in the plan query (March 2023, [#4971](https://github.com/opentripplanner/OpenTripPlanner/pull/4971))

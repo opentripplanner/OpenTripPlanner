@@ -33,9 +33,10 @@ import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.Route;
+import org.rutebanken.netex.model.RouteView;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceLink;
 
@@ -90,7 +91,7 @@ class TripPatternMapper {
     EntityById<GroupStop> groupStopById,
     EntityById<org.opentripplanner.transit.model.network.Route> otpRouteById,
     ReadOnlyHierarchicalMap<String, Route> routeById,
-    ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById,
+    ReadOnlyHierarchicalMap<String, JourneyPattern_VersionStructure> journeyPatternById,
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
     ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
     ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
@@ -152,7 +153,7 @@ class TripPatternMapper {
     }
   }
 
-  TripPatternMapperResult mapTripPattern(JourneyPattern journeyPattern) {
+  TripPatternMapperResult mapTripPattern(JourneyPattern_VersionStructure journeyPattern) {
     // Make sure the result is clean, by creating a new object.
     result = new TripPatternMapperResult();
     Collection<ServiceJourney> serviceJourneys = serviceJourniesByPatternId.get(
@@ -262,7 +263,7 @@ class TripPatternMapper {
   }
 
   private void mapDatedServiceJourney(
-    JourneyPattern journeyPattern,
+    JourneyPattern_VersionStructure journeyPattern,
     ServiceJourney serviceJourney,
     Trip trip
   ) {
@@ -278,7 +279,7 @@ class TripPatternMapper {
   }
 
   private TripOnServiceDate mapDatedServiceJourney(
-    JourneyPattern journeyPattern,
+    JourneyPattern_VersionStructure journeyPattern,
     Trip trip,
     DatedServiceJourney datedServiceJourney
   ) {
@@ -342,10 +343,17 @@ class TripPatternMapper {
   }
 
   private org.opentripplanner.transit.model.network.Route lookupRoute(
-    JourneyPattern journeyPattern
+    JourneyPattern_VersionStructure journeyPattern
   ) {
-    Route route = routeById.lookup(journeyPattern.getRouteRef().getRef());
-    return otpRouteById.get(idFactory.createId(route.getLineRef().getValue().getRef()));
+    String lineId = null;
+    if (journeyPattern.getRouteRef() != null) {
+      Route route = routeById.lookup(journeyPattern.getRouteRef().getRef());
+      lineId = route.getLineRef().getValue().getRef();
+    } else {
+      RouteView routeView = journeyPattern.getRouteView();
+      lineId = routeView.getLineRef().getValue().getRef();
+    }
+    return otpRouteById.get(idFactory.createId(lineId));
   }
 
   private void createTripTimes(List<Trip> trips, TripPattern tripPattern) {
@@ -363,14 +371,20 @@ class TripPatternMapper {
     }
   }
 
-  private Trip mapTrip(JourneyPattern journeyPattern, ServiceJourney serviceJourney) {
+  private Trip mapTrip(
+    JourneyPattern_VersionStructure journeyPattern,
+    ServiceJourney serviceJourney
+  ) {
     return tripMapper.mapServiceJourney(
       serviceJourney,
       () -> findTripHeadsign(journeyPattern, serviceJourney)
     );
   }
 
-  private String findTripHeadsign(JourneyPattern journeyPattern, ServiceJourney serviceJourney) {
+  private String findTripHeadsign(
+    JourneyPattern_VersionStructure journeyPattern,
+    ServiceJourney serviceJourney
+  ) {
     var times = serviceJourney.getPassingTimes().getTimetabledPassingTime();
     if (times == null || times.isEmpty()) {
       return HEADSIGN_EMPTY;

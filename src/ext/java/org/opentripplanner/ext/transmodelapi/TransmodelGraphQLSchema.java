@@ -104,7 +104,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -705,7 +705,9 @@ public class TransmodelGraphQLSchema {
           .newFieldDefinition()
           .name("quaysByRadius")
           .description(
-            "Get all quays within the specified walking radius from a location. The returned type has two fields quay and distance"
+            "Get all quays within the specified walking radius from a location. There are no maximum " +
+            "limits for the input parameters, but the query will timeout and return if the parameters " +
+            "are too high."
           )
           .withDirective(gqlUtil.timingData)
           .type(

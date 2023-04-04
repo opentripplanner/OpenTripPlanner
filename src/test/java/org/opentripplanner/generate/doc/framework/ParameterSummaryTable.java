@@ -12,8 +12,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 
 public class ParameterSummaryTable extends AbstractTable {
 
-  public ParameterSummaryTable(SkipFunction skipFunction) {
-    super(skipFunction);
+  public ParameterSummaryTable(SkipNodes skipNodes) {
+    super(skipNodes);
   }
 
   @Override

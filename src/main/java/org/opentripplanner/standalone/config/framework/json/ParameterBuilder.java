@@ -197,9 +197,17 @@ public class ParameterBuilder {
     return buildAndListComplexArrayElements(defaultValues, mapper);
   }
 
+  /**
+   * @deprecated Avoid using required enum types, when adding/removing new Enum values
+   *             you potentially break forward/backward compatibility. If the new enum
+   *             value is used in the config, an earlier version of OTP can not read
+   *             the required value.
+   */
+  @Deprecated
   public <T extends Enum<T>> T asEnum(Class<T> enumType) {
     info.withRequired().withEnum(enumType);
-    return parseEnum(build().asText(), enumType);
+    // throws exception if enum value is missing
+    return parseRequiredEnum(build().asText(), enumType);
   }
 
   /** Get optional enum value. Parser is not case sensitive. */
@@ -207,17 +215,17 @@ public class ParameterBuilder {
   public <T extends Enum<T>> T asEnum(T defaultValue) {
     info.withEnum((Class<? extends Enum<?>>) defaultValue.getClass());
     setInfoOptional(defaultValue);
-    // Do not inline the node, calling the build is required.
-    var node = build();
-    return exist() ? parseEnum(node.asText(), (Class<T>) defaultValue.getClass()) : defaultValue;
+    return parseOptionalEnum(build().asText(), (Class<T>) defaultValue.getClass())
+      .orElse(defaultValue);
   }
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass) {
     info.withOptional().withEnumSet(enumClass);
-    List<T> result = buildAndListSimpleArrayElements(
+    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(
       List.of(),
-      it -> parseEnum(it.asText(), enumClass)
+      it -> parseOptionalEnum(it.asText(), enumClass)
     );
+    List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
     return result.isEmpty() ? EnumSet.noneOf(enumClass) : EnumSet.copyOf(result);
   }
 
@@ -250,9 +258,11 @@ public class ParameterBuilder {
     Iterator<String> it = mapNode.listExistingChildNodes();
     while (it.hasNext()) {
       String name = it.next();
-      E key = parseEnum(name, enumType);
-      var child = mapNode.rawNode(name);
-      result.put(key, parseConfigType(elementType, child));
+      Optional<E> key = parseOptionalEnum(name, enumType);
+      if (key.isPresent()) {
+        var child = mapNode.rawNode(name);
+        result.put(key.get(), parseConfigType(elementType, child));
+      }
     }
     return result;
   }
@@ -550,7 +560,7 @@ public class ParameterBuilder {
     }
   }
 
-  private <E extends Enum<E>> E parseEnum(String value, Class<E> ofType) {
+  private <E extends Enum<E>> E parseRequiredEnum(String value, Class<E> ofType) {
     return EnumMapper
       .mapToEnum(value, ofType)
       .orElseThrow(() -> {
@@ -561,6 +571,20 @@ public class ParameterBuilder {
             )
         );
       });
+  }
+
+  private <E extends Enum<E>> Optional<E> parseOptionalEnum(String value, Class<E> ofType) {
+    Optional<E> enumValue = EnumMapper.mapToEnum(value, ofType);
+    if (enumValue.isEmpty()) {
+      warning(
+        "The enum value '%s' is not legal. Expected one of %s.".formatted(
+            value,
+            List.of(ofType.getEnumConstants())
+          )
+      );
+      return Optional.empty();
+    }
+    return enumValue;
   }
 
   private LocalDate parseRelativeLocalDate(String value, ZoneId zoneId) {
@@ -653,5 +677,9 @@ public class ParameterBuilder {
 
   private OtpAppException error(String message, Exception e) {
     return target.createException(message, paramName(), e);
+  }
+
+  private void warning(String message) {
+    target.addWarning(message, paramName());
   }
 }

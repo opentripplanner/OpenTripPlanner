@@ -21,6 +21,7 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.logging.ProgressTracker;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
@@ -71,6 +72,7 @@ public class SerializedGraphObject implements Serializable {
    */
   private final List<SubMode> allTransitSubModes;
 
+  public final DataImportIssueSummary issueSummary;
   private final int stopLocationCounter;
   private final int routingTripPatternCounter;
 
@@ -79,7 +81,8 @@ public class SerializedGraphObject implements Serializable {
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
     BuildConfig buildConfig,
-    RouterConfig routerConfig
+    RouterConfig routerConfig,
+    DataImportIssueSummary issueSummary
   ) {
     this.graph = graph;
     this.edges = graph.getEdges();
@@ -87,6 +90,7 @@ public class SerializedGraphObject implements Serializable {
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
+    this.issueSummary = issueSummary;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
     this.stopLocationCounter = StopLocation.indexCounter();
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();

@@ -7,6 +7,8 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
@@ -30,7 +32,6 @@ public class TestServerContext {
     DefaultServerRequestContext context = DefaultServerRequestContext.create(
       routerConfig.transitTuningConfig(),
       routerConfig.routingRequestDefaults(),
-      routerConfig.streetRoutingTimeout(),
       new RaptorConfig<>(routerConfig.transitTuningConfig()),
       graph,
       new DefaultTransitService(transitModel),
@@ -38,6 +39,7 @@ public class TestServerContext {
       routerConfig.vectorTileLayers(),
       createWorldEnvelopeService(),
       createVehiclePositionService(),
+      createVehicleRentalService(),
       routerConfig.flexConfig(),
       null,
       routerConfig.requestLogFile()
@@ -53,5 +55,9 @@ public class TestServerContext {
 
   public static VehiclePositionService createVehiclePositionService() {
     return new DefaultVehiclePositionService();
+  }
+
+  public static VehicleRentalService createVehicleRentalService() {
+    return new DefaultVehicleRentalService();
   }
 }

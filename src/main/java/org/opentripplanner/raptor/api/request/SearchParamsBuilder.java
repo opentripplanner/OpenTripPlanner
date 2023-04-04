@@ -27,10 +27,9 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   private boolean preferLateArrival;
   private int numberOfAdditionalTransfers;
   private int maxNumberOfTransfers;
-  private Double relaxCostAtDestination;
   private boolean timetable;
   private boolean constrainedTransfers;
-  private boolean allowEmptyEgressPaths;
+  private boolean allowEmptyAccessEgressPaths;
 
   public SearchParamsBuilder(RaptorRequestBuilder<T> parent, SearchParams defaults) {
     this.parent = parent;
@@ -40,12 +39,11 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     this.preferLateArrival = defaults.preferLateArrival();
     this.numberOfAdditionalTransfers = defaults.numberOfAdditionalTransfers();
     this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
-    this.relaxCostAtDestination = defaults.relaxCostAtDestination().orElse(null);
     this.timetable = defaults.timetable();
     this.constrainedTransfers = defaults.constrainedTransfers();
     this.accessPaths.addAll(defaults.accessPaths());
     this.egressPaths.addAll(defaults.egressPaths());
-    this.allowEmptyEgressPaths = defaults.allowEmptyEgressPaths();
+    this.allowEmptyAccessEgressPaths = defaults.allowEmptyAccessEgressPaths();
   }
 
   public int earliestDepartureTime() {
@@ -116,15 +114,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     return this;
   }
 
-  public Double relaxCostAtDestination() {
-    return relaxCostAtDestination;
-  }
-
-  public SearchParamsBuilder<T> relaxCostAtDestination(Double relaxCostAtDestination) {
-    this.relaxCostAtDestination = relaxCostAtDestination;
-    return this;
-  }
-
   public boolean timetable() {
     return timetable;
   }
@@ -173,13 +162,13 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     return addEgressPaths(Arrays.asList(egressPaths));
   }
 
-  public SearchParamsBuilder<T> allowEmptyEgressPaths(boolean allowEmptyEgressPaths) {
-    this.allowEmptyEgressPaths = allowEmptyEgressPaths;
+  public SearchParamsBuilder<T> allowEmptyAccessEgressPaths(boolean allowEmptyEgressPaths) {
+    this.allowEmptyAccessEgressPaths = allowEmptyEgressPaths;
     return this;
   }
 
-  public boolean allowEmptyEgressPaths() {
-    return allowEmptyEgressPaths;
+  public boolean allowEmptyAccessEgressPaths() {
+    return allowEmptyAccessEgressPaths;
   }
 
   public RaptorRequest<T> build() {
@@ -200,7 +189,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
       .addDurationSec("searchWindow", searchWindowInSeconds)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
-      .addNum("relaxCostAtDestination", relaxCostAtDestination)
       .addCollection("accessPaths", accessPaths, 5)
       .addCollection("egressPaths", egressPaths, 5)
       .toString();

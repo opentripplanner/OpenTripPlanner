@@ -5,6 +5,8 @@ import static org.opentripplanner.framework.text.Table.Align.Left;
 import static org.opentripplanner.framework.text.Table.Align.Right;
 import static org.opentripplanner.framework.time.TimeUtils.timeToStrCompact;
 import static org.opentripplanner.framework.time.TimeUtils.timeToStrLong;
+import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -85,12 +87,12 @@ public class SystemErrDebugLogger implements DebugLogger {
    * This should be passed into the {@link DebugRequestBuilder#patternRideDebugListener(Consumer)}
    * using a lambda to enable debugging pattern ride events.
    */
-  public void patternRideLister(DebugEvent<PatternRideView<?>> e) {
+  public void patternRideLister(DebugEvent<PatternRideView<?, ?>> e) {
     printIterationHeader(e.iterationStartTime());
     printRoundHeader(e.element().prevArrival().round() + 1);
     print(e.element(), e.action().toString());
 
-    PatternRideView<?> byElement = e.rejectedDroppedByElement();
+    var byElement = e.rejectedDroppedByElement();
     if (e.action() == DebugEvent.Action.DROP && byElement != null) {
       print(byElement, "->by");
     }
@@ -119,7 +121,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         aLeg != null ? timeToStrLong(aLeg.fromTime()) : null,
         eLeg != null ? timeToStrLong(eLeg.toTime()) : null,
         DurationUtils.durationToStr(p.durationInSeconds()),
-        OtpNumberFormat.formatCostCenti(p.generalizedCost()),
+        OtpNumberFormat.formatCostCenti(p.c1()),
         details(e.action().toString(), e.reason(), e.element().toString())
       )
     );
@@ -162,16 +164,12 @@ public class SystemErrDebugLogger implements DebugLogger {
    * The absolute time duration in seconds of a trip.
    */
   private static int legDuration(ArrivalView<?> a) {
-    if (a.arrivedByAccess()) {
-      return a.accessPath().access().durationInSeconds();
-    }
-    if (a.arrivedByTransfer()) {
-      return a.transferPath().durationInSeconds();
-    }
-    if (a.arrivedAtDestination()) {
-      return a.egressPath().egress().durationInSeconds();
-    }
-    throw new IllegalStateException("Unsupported type: " + a.getClass());
+    return switch (a.arrivedBy()) {
+      case ACCESS -> a.accessPath().access().durationInSeconds();
+      case TRANSFER -> a.transfer().durationInSeconds();
+      case EGRESS -> a.egressPath().egress().durationInSeconds();
+      case TRANSIT -> throw new IllegalStateException("Unsupported type: " + a.getClass());
+    };
   }
 
   private static boolean isNotBlank(String text) {
@@ -190,7 +188,7 @@ public class SystemErrDebugLogger implements DebugLogger {
 
   private void print(ArrivalView<?> a, String action, String optReason) {
     printPathHeader = true;
-    String pattern = a.arrivedByTransit() ? a.transitPath().trip().pattern().debugInfo() : "";
+    String pattern = a.arrivedBy(TRANSIT) ? a.transitPath().trip().pattern().debugInfo() : "";
     println(
       arrivalTable.rowAsText(
         action,
@@ -198,14 +196,14 @@ public class SystemErrDebugLogger implements DebugLogger {
         a.round(),
         IntUtils.intToString(a.stop(), NOT_SET),
         timeToStrLong(a.arrivalTime()),
-        numFormat.format(a.cost()),
+        numFormat.format(a.c1()),
         pattern,
         details(action, optReason, path(a))
       )
     );
   }
 
-  private void print(PatternRideView<?> p, String action) {
+  private void print(PatternRideView<?, ?> p, String action) {
     println(
       arrivalTable.rowAsText(
         action,
@@ -213,7 +211,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         p.prevArrival().round() + 1,
         p.boardStopIndex(),
         timeToStrLong(p.boardTime()),
-        numFormat.format(p.relativeCost()),
+        numFormat.format(p.relativeC1()),
         p.trip().pattern().debugInfo(),
         p.toString()
       )
@@ -221,34 +219,34 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private String path(ArrivalView<?> a) {
-    return path(a, new PathStringBuilder(null)).summary(a.cost()).toString();
+    return path(a, new PathStringBuilder(null)).summary(a.c1()).toString();
   }
 
   private PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {
-    if (a.arrivedByAccess()) {
-      return buf.accessEgress(a.accessPath().access()).stop(a.stop());
-    }
-    // Recursively call this method to insert arrival in front of this arrival
-    path(a.previous(), buf);
-
-    if (a.arrivedByTransit()) {
-      String tripInfo = a.transitPath().trip().pattern().debugInfo();
-
-      if (forwardSearch) {
-        var t = TripTimesSearch.findTripForwardSearchApproximateTime(a);
-        buf.transit(tripInfo, t.boardTime(), t.alightTime());
-      }
-      // reverse search
-      else {
-        var t = TripTimesSearch.findTripReverseSearchApproximateTime(a);
-        buf.transit(tripInfo, t.alightTime(), t.boardTime());
-      }
-    } else if (a.arrivedByTransfer()) {
-      buf.walk(legDuration(a));
-    } else {
-      buf.accessEgress(a.egressPath().egress());
+    if (a.arrivedBy().not(ACCESS)) {
+      // Recursively call this method to insert arrival in front of this arrival
+      path(a.previous(), buf);
     }
 
+    switch (a.arrivedBy()) {
+      case ACCESS -> buf.accessEgress(a.accessPath().access());
+      case TRANSIT -> {
+        String tripInfo = a.transitPath().trip().pattern().debugInfo();
+        if (forwardSearch) {
+          var t = TripTimesSearch.findTripForwardSearchApproximateTime(a);
+          buf.transit(tripInfo, t.boardTime(), t.alightTime());
+        }
+        // reverse search
+        else {
+          var t = TripTimesSearch.findTripReverseSearchApproximateTime(a);
+          buf.transit(tripInfo, t.alightTime(), t.boardTime());
+        }
+      }
+      case TRANSFER -> buf.walk(legDuration(a));
+      case EGRESS -> buf.accessEgress(a.egressPath().egress());
+    }
+
+    // This is a bit strange - why do we add the stop after EGRESS?
     return buf.stop(a.stop());
   }
 
@@ -263,20 +261,12 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private String legType(ArrivalView<?> a) {
-    if (a.arrivedByAccess()) {
-      return "Access";
-    }
-    if (a.arrivedByTransit()) {
-      return "Transit";
-    }
-    // We use Walk instead of Transfer so it is easier to distinguish from Transit
-    if (a.arrivedByTransfer()) {
-      return "Walk";
-    }
-    if (a.arrivedAtDestination()) {
-      return "Egress";
-    }
-    throw new IllegalStateException("Unknown mode for: " + this);
+    return switch (a.arrivedBy()) {
+      case ACCESS -> "Access";
+      case TRANSIT -> "Transit";
+      case TRANSFER -> "Walk";
+      case EGRESS -> "Egress";
+    };
   }
 
   private void println() {

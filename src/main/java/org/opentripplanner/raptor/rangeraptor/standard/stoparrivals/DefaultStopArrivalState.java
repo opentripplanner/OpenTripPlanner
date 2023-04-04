@@ -175,7 +175,7 @@ class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArriv
   void setAccessTime(int time, boolean isBestTimeOverall, boolean onBoard) {
     if (isBestTimeOverall) {
       this.bestArrivalTime = time;
-      // Clear transit to avoid mistakes
+      // Clear transfer to avoid mistakes
       this.transferFromStop = NOT_SET;
       this.transferPath = null;
     }

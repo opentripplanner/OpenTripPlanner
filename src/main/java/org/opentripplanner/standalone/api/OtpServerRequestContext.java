@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone.api;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.Duration;
 import java.util.Locale;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
@@ -17,6 +16,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
@@ -83,11 +83,11 @@ public interface OtpServerRequestContext {
 
   VehiclePositionService vehiclePositionService();
 
+  VehicleRentalService vehicleRentalService();
+
   TransitTuningParameters transitTuningParameters();
 
   RaptorTuningParameters raptorTuningParameters();
-
-  Duration streetRoutingTimeout();
 
   MeterRegistry meterRegistry();
 

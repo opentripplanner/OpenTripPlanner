@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.linking;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -8,18 +9,24 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
+import org.locationtech.jts.operation.distance.DistanceOp;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.EdgeSpatialIndex;
 import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporarySplitterVertex;
@@ -67,7 +74,7 @@ public class VertexLinker {
   private final StopModel stopModel;
 
   // TODO Temporary code until we refactor WalkableAreaBuilder  (#3152)
-  private Boolean addExtraEdgesToAreas = false;
+  private Boolean addExtraEdgesToAreas = true;
 
   /**
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
@@ -272,11 +279,15 @@ public class VertexLinker {
       return Set.of();
     }
 
-    Set<DistanceTo<StreetEdge>> closesEdges = getClosestEdgesPerMode(traverseModes, candidateEdges);
-
-    return closesEdges
+    Set<DistanceTo<StreetEdge>> closestEdges = getClosestEdgesPerMode(
+      traverseModes,
+      candidateEdges
+    );
+    Set<AreaEdgeList> linkedAreas = new HashSet<>();
+    return closestEdges
       .stream()
-      .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges))
+      .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
+      .filter(v -> v != null)
       .collect(Collectors.toSet());
   }
 
@@ -342,7 +353,8 @@ public class VertexLinker {
     double xScale,
     Scope scope,
     LinkingDirection direction,
-    DisposableEdgeCollection tempEdges
+    DisposableEdgeCollection tempEdges,
+    Set<AreaEdgeList> linkedAreas
   ) {
     // TODO: we've already built this line string, we should save it
     LineString orig = edge.getGeometry();
@@ -350,6 +362,8 @@ public class VertexLinker {
     LocationIndexedLine il = new LocationIndexedLine(transformed);
     LinearLocation ll = il.project(new Coordinate(vertex.getLon() * xScale, vertex.getLat()));
     double length = SphericalDistanceLibrary.length(orig);
+
+    IntersectionVertex start = null;
 
     // if we're very close to one end of the line or the other, or endwise, don't bother to split,
     // cut to the chase and link directly
@@ -359,37 +373,52 @@ public class VertexLinker {
       ll.getSegmentIndex() == 0 &&
       (ll.getSegmentFraction() < 1e-8 || ll.getSegmentFraction() * length < 0.1)
     ) {
-      return (StreetVertex) edge.getFromVertex();
+      start = (IntersectionVertex) edge.getFromVertex();
     }
     // -1 converts from count to index. Because of the fencepost problem, npoints - 1 is the "segment"
     // past the last point
     else if (ll.getSegmentIndex() == orig.getNumPoints() - 1) {
-      return (StreetVertex) edge.getToVertex();
+      start = (IntersectionVertex) edge.getToVertex();
     }
     // nPoints - 2: -1 to correct for index vs count, -1 to account for fencepost problem
     else if (
       ll.getSegmentIndex() == orig.getNumPoints() - 2 &&
       (ll.getSegmentFraction() > 1 - 1e-8 || (1 - ll.getSegmentFraction()) * length < 0.1)
     ) {
-      return (StreetVertex) edge.getToVertex();
+      start = (IntersectionVertex) edge.getToVertex();
     } else {
-      // split the edge, get the split vertex
-      SplitterVertex v0 = split(edge, ll, scope, direction, tempEdges);
-
-      // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
-      // edges that were missed by WalkableAreaBuilder
-      // TODO Temporary code until we refactor the WalkableAreaBuilder (#3152)
-      if (scope == Scope.PERMANENT && this.addExtraEdgesToAreas && edge instanceof AreaEdge) {
-        ((AreaEdge) edge).getArea().addVertex(v0);
+      boolean split = true;
+      // if vertex is inside an area, no need to snap to nearest edge and split it
+      if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
+        AreaEdgeList ael = aEdge.getArea();
+        if (ael.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))) {
+          // do not relink again to the area when many edges are equally close
+          if (!linkedAreas.add(ael)) {
+            return null;
+          }
+          if (vertex instanceof IntersectionVertex iv) {
+            start = iv;
+          } else {
+            start = splitVertex(aEdge, scope, direction, vertex.getLon(), vertex.getLat());
+          }
+          split = false;
+        }
       }
-
-      // TODO Consider moving this code
-      if (OTPFeature.FlexRouting.isOn()) {
-        FlexLocationAdder.addFlexLocations(edge, v0, stopModel);
+      if (split) {
+        // split the edge, get the split vertex
+        start = (IntersectionVertex) split(edge, ll, scope, direction, tempEdges);
       }
-
-      return v0;
     }
+
+    if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
+      addAreaVertex(start, aEdge.getArea(), scope, tempEdges);
+    }
+    // TODO Consider moving this code
+    if (OTPFeature.FlexRouting.isOn()) {
+      FlexLocationAdder.addFlexLocations(edge, start, stopModel);
+    }
+
+    return start;
   }
 
   /**
@@ -414,31 +443,7 @@ public class VertexLinker {
     // create the geometries
     Coordinate splitPoint = ll.getCoordinate(geometry);
 
-    SplitterVertex v;
-    String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
-
-    if (scope != Scope.PERMANENT) {
-      TemporarySplitterVertex tsv = new TemporarySplitterVertex(
-        uniqueSplitLabel,
-        splitPoint.x,
-        splitPoint.y,
-        originalEdge,
-        direction == LinkingDirection.OUTGOING
-      );
-      tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
-      v = tsv;
-    } else {
-      v =
-        new SplitterVertex(
-          graph,
-          uniqueSplitLabel,
-          splitPoint.x,
-          splitPoint.y,
-          originalEdge.getName()
-        );
-    }
-
-    v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
+    SplitterVertex v = splitVertex(originalEdge, scope, direction, splitPoint.x, splitPoint.y);
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
@@ -465,6 +470,35 @@ public class VertexLinker {
         graph.removeEdge(originalEdge);
       }
     }
+
+    return v;
+  }
+
+  private SplitterVertex splitVertex(
+    StreetEdge originalEdge,
+    Scope scope,
+    LinkingDirection direction,
+    double x,
+    double y
+  ) {
+    SplitterVertex v;
+    String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
+
+    if (scope != Scope.PERMANENT) {
+      TemporarySplitterVertex tsv = new TemporarySplitterVertex(
+        uniqueSplitLabel,
+        x,
+        y,
+        originalEdge,
+        direction == LinkingDirection.OUTGOING
+      );
+      tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
+      v = tsv;
+    } else {
+      v = new SplitterVertex(graph, uniqueSplitLabel, x, y, originalEdge.getName());
+    }
+    v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
+    v.addRentalRestriction(originalEdge.getToVertex().rentalRestrictions());
 
     return v;
   }
@@ -500,4 +534,126 @@ public class VertexLinker {
   }
 
   private record StreetEdgePair(StreetEdge e0, StreetEdge e1) {}
+
+  /**
+   * Link a new vertex permanently with area geometry
+   */
+  public void addPermanentAreaVertex(IntersectionVertex newVertex, AreaEdgeList edgeList) {
+    addAreaVertex(newVertex, edgeList, Scope.PERMANENT, null);
+  }
+
+  /**
+   * Safely add a vertex to an area. This creates edges to all other vertices unless those edges
+   * would cross one of the original edges.
+   */
+
+  public void addAreaVertex(
+    IntersectionVertex newVertex,
+    AreaEdgeList edgeList,
+    Scope scope,
+    DisposableEdgeCollection tempEdges
+  ) {
+    List<NamedArea> areas = edgeList.getAreas();
+    Geometry origPolygon = edgeList.getGeometry();
+    Geometry polygon = origPolygon.union(origPolygon.getBoundary()).buffer(0.000001);
+    HashSet<IntersectionVertex> visibilityVertices = edgeList.visibilityVertices;
+
+    // Due to truncating of precision in storage of the edge geometry, the new split vertex
+    // might be located just outside the area, so we calculate the point closest to the polygon
+    // for the comparison.
+    Coordinate[] nearestPoints = DistanceOp.nearestPoints(
+      polygon,
+      GEOMETRY_FACTORY.createPoint(newVertex.getCoordinate())
+    );
+
+    int added = 0;
+
+    for (IntersectionVertex v : visibilityVertices) {
+      LineString newGeometry = GEOMETRY_FACTORY.createLineString(
+        new Coordinate[] { nearestPoints[0], v.getCoordinate() }
+      );
+
+      // ensure that new edge does not leave the bounds of the original area, or
+      // fall into any holes
+      if (!polygon.contains(newGeometry)) {
+        continue;
+      }
+
+      // check to see if this splits multiple NamedAreas. This code is rather similar to
+      // code in OSMGBI, but the data structures are different
+      createSegments(newVertex, v, edgeList, areas, scope, tempEdges);
+      added++;
+    }
+    // TODO: Temporary fix for unconnected area edges. This should go away when moving walkable
+    // area calculation to be done after stop linking
+    if (added == 0) {
+      for (IntersectionVertex v : visibilityVertices) {
+        createSegments(newVertex, v, edgeList, areas, scope, tempEdges);
+      }
+    }
+    if (scope == Scope.PERMANENT) {
+      visibilityVertices.add(newVertex);
+    }
+  }
+
+  private void createSegments(
+    IntersectionVertex from,
+    IntersectionVertex to,
+    AreaEdgeList ael,
+    List<NamedArea> areas,
+    Scope scope,
+    DisposableEdgeCollection tempEdges
+  ) {
+    // Check that vertices are not yet linked
+    if (from.isConnected(to)) {
+      return;
+    }
+    LineString line = GEOMETRY_FACTORY.createLineString(
+      new Coordinate[] { from.getCoordinate(), to.getCoordinate() }
+    );
+
+    List<NamedArea> intersects = new ArrayList<>();
+    NamedArea hit = null;
+    for (NamedArea area : areas) {
+      Geometry polygon = area.getPolygon();
+      Geometry intersection = polygon.intersection(line);
+      if (intersection.getLength() > 0.000001) {
+        hit = area;
+        break;
+      }
+    }
+    if (hit != null) {
+      // If more than one area intersects, we pick one by random for the name & properties
+      double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
+
+      AreaEdge ae = new AreaEdge(
+        from,
+        to,
+        line,
+        hit.getName(),
+        length,
+        hit.getPermission(),
+        false,
+        ael
+      );
+      if (scope != Scope.PERMANENT) {
+        tempEdges.addEdge(ae);
+      }
+
+      ae =
+        new AreaEdge(
+          to,
+          from,
+          line.reverse(),
+          hit.getName(),
+          length,
+          hit.getPermission(),
+          true,
+          ael
+        );
+      if (scope != Scope.PERMANENT) {
+        tempEdges.addEdge(ae);
+      }
+    }
+  }
 }

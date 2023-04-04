@@ -10,7 +10,7 @@ import org.entur.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.UnsupportedGeometryException;
-import org.opentripplanner.routing.vehicle_rental.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

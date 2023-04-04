@@ -23,6 +23,7 @@ import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeMode
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -95,7 +96,8 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> alertHeaderText() {
-    return environment -> getSource(environment).headerText().toString(environment.getLocale());
+    return environment ->
+      GraphQLUtils.getTranslation(getSource(environment).headerText(), environment);
   }
 
   @Override

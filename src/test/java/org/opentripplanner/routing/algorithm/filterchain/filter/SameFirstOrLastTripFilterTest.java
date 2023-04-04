@@ -35,17 +35,17 @@ public class SameFirstOrLastTripFilterTest implements PlanTestConstants {
     List<Itinerary> input = List.of(i1, i2, i3, i4, i5);
 
     final SameFirstOrLastTripFilter filter = new SameFirstOrLastTripFilter();
-    filter.filter(input);
+    var flagged = filter.flagForRemoval(input);
 
     // First journey should always be included
-    assertFalse(i1.isFlaggedForDeletion());
+    assertFalse(flagged.contains(i1));
     // Does not match with i1
-    assertFalse(i2.isFlaggedForDeletion());
+    assertFalse(flagged.contains(i2));
     // Matches with i1
-    assertTrue(i3.isFlaggedForDeletion());
+    assertTrue(flagged.contains(i3));
     // Matches with i2
-    assertTrue(i4.isFlaggedForDeletion());
+    assertTrue(flagged.contains(i4));
     // Would match with i3 and i4, but they are filtered out
-    assertFalse(i5.isFlaggedForDeletion());
+    assertFalse(flagged.contains(i5));
   }
 }

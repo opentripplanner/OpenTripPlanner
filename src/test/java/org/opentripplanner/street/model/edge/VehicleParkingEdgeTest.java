@@ -9,7 +9,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
+import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -161,12 +161,9 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
     vehicleParkingEdge = new VehicleParkingEdge(vertex);
 
-    this.request =
-      StreetSearchRequest
-        .of()
-        .withMode(parkingMode)
-        .withPreferences(p -> p.withParking(VehicleParkingPreferences.of(realtime)))
-        .build();
+    var parking = new VehicleParkingRequest();
+    parking.setUseAvailabilityInformation(realtime);
+    this.request = StreetSearchRequest.of().withMode(parkingMode).withParking(parking).build();
   }
 
   private VehicleParking createVehicleParking(

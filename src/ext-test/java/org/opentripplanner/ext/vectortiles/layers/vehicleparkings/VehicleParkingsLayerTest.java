@@ -10,10 +10,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
@@ -141,7 +143,10 @@ public class VehicleParkingsLayerTest {
     assertFalse((Boolean) map.get("wheelchairAccessibleCarPlaces"));
     assertTrue((Boolean) map.get("realTimeData"));
 
-    assertEquals("tag1,tag2", map.get("tags").toString());
+    assertEquals(
+      Set.of("tag1", "tag2"),
+      Set.copyOf(Arrays.asList(map.get("tags").toString().split(",")))
+    );
 
     assertEquals(5, map.get("capacity.bicyclePlaces"));
     assertEquals(6, map.get("capacity.carPlaces"));

@@ -28,7 +28,7 @@ public class MqttGtfsRealtimeUpdaterParameters implements UrlUpdaterParameters {
     this.backwardsDelayPropagationType = backwardsDelayPropagationType;
   }
 
-  public String getUrl() {
+  public String url() {
     return url;
   }
 
@@ -36,7 +36,7 @@ public class MqttGtfsRealtimeUpdaterParameters implements UrlUpdaterParameters {
     return topic;
   }
 
-  public String getFeedId() {
+  public String feedId() {
     return feedId;
   }
 

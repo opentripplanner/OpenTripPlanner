@@ -18,7 +18,7 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
@@ -148,12 +148,15 @@ public class PatternCostCalculatorTest {
     // TODO: preferred agency
   }
 
-  private int transitArrivalCost(TestTripSchedule schedule, CostCalculator<TestTripSchedule> calc) {
+  private int transitArrivalCost(
+    TestTripSchedule schedule,
+    RaptorCostCalculator<TestTripSchedule> calc
+  ) {
     int boardCost = boardingCost(schedule, calc);
     return calc.transitArrivalCost(boardCost, 0, TRANSIT_TIME, schedule, 6);
   }
 
-  private int boardingCost(TestTripSchedule schedule, CostCalculator<TestTripSchedule> calc) {
+  private int boardingCost(TestTripSchedule schedule, RaptorCostCalculator<TestTripSchedule> calc) {
     return calc.boardingCost(true, 0, 5, 100, schedule, RaptorTransferConstraint.REGULAR_TRANSFER);
   }
 
@@ -197,7 +200,7 @@ public class PatternCostCalculatorTest {
       return !(prefAgency || prefRoute || unPrefAgency || unPrefRoute);
     }
 
-    CostCalculator<TestTripSchedule> createCostCalculator(TestTripSchedule schedule) {
+    RaptorCostCalculator<TestTripSchedule> createCostCalculator(TestTripSchedule schedule) {
       GeneralizedCostParameters costParams = GeneralizedCostParametersMapper.map(
         createRouteRequest(),
         List.of(schedule.pattern())

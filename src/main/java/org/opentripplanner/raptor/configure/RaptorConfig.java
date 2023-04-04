@@ -48,8 +48,9 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
-    SearchContext<T> context = context(transitData, request);
-    return new StdRangeRaptorConfig<>(context).createSearch((s, w) -> createWorker(context, s, w));
+    var context = context(transitData, request);
+    var stdConfig = new StdRangeRaptorConfig<>(context);
+    return createWorker(context, stdConfig.state(), stdConfig.strategy());
   }
 
   public RaptorWorker<T> createMcWorker(
@@ -59,15 +60,19 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   ) {
     final SearchContext<T> context = context(transitData, request);
     return new McRangeRaptorConfig<>(context)
-      .createWorker(heuristics, (s, w) -> createWorker(context, s, w));
+      .createWorker(
+        heuristics,
+        (state, routingStrategy) -> createWorker(context, state, routingStrategy)
+      );
   }
 
   public RaptorWorker<T> createHeuristicSearch(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
-    SearchContext<T> context = context(transitData, request);
-    return new StdRangeRaptorConfig<>(context).createSearch((s, w) -> createWorker(context, s, w));
+    var context = context(transitData, request);
+    var stdConfig = new StdRangeRaptorConfig<>(context);
+    return createWorker(context, stdConfig.state(), stdConfig.strategy());
   }
 
   public Heuristics createHeuristic(

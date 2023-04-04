@@ -9,6 +9,7 @@ import static org.opentripplanner.standalone.config.routerequest.TransferConfig.
 import static org.opentripplanner.standalone.config.routerequest.WheelchairConfig.mapWheelchairPreferences;
 
 import java.time.Duration;
+import java.util.List;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -20,20 +21,18 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
-import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RouteRequestConfig {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RouteRequestConfig.class);
   private static final String WHEELCHAIR_ACCESSIBILITY = "wheelchairAccessibility";
 
   public static RouteRequest mapDefaultRouteRequest(NodeAdapter root, String parameterName) {
@@ -47,14 +46,15 @@ public class RouteRequestConfig {
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c) {
-    RouteRequest dft = new RouteRequest();
+    return mapRouteRequest(c, new RouteRequest());
+  }
 
+  public static RouteRequest mapRouteRequest(NodeAdapter c, RouteRequest dft) {
     if (c.isEmpty()) {
       return dft;
     }
 
-    LOG.debug("Loading default routing parameters from JSON.");
-    RouteRequest request = new RouteRequest();
+    RouteRequest request = dft.clone();
     VehicleRentalRequest vehicleRental = request.journey().rental();
     VehicleParkingRequest vehicleParking = request.journey().parking();
 
@@ -77,13 +77,7 @@ public class RouteRequestConfig {
         .summary("Whether the trip should depart or arrive at the specified date and time.")
         .asBoolean(dft.arriveBy())
     );
-    vehicleParking.setBannedTags(
-      c
-        .of("bannedVehicleParkingTags")
-        .since(V2_1)
-        .summary("Tags with which a vehicle parking will not be used. If empty, no tags are banned")
-        .asStringSet(vehicleParking.bannedTags())
-    );
+
     vehicleRental.setBannedNetworks(
       c
         .of("bannedVehicleRentalNetworks")
@@ -159,14 +153,43 @@ public class RouteRequestConfig {
         )
         .asDuration(dft.searchWindow())
     );
-    vehicleParking.setRequiredTags(
+
+    vehicleParking.setUnpreferredCost(
       c
-        .of("requiredVehicleParkingTags")
-        .since(V2_1)
-        .summary(
-          "Tags which are required to use a vehicle parking. If empty, no tags are required."
-        )
-        .asStringSet(vehicleParking.requiredTags())
+        .of("unpreferredVehicleParkingTagCost")
+        .since(V2_3)
+        .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
+        .description("See `preferredVehicleParkingTags`.")
+        .asInt(vehicleParking.unpreferredCost())
+    );
+
+    var bannedTags = c
+      .of("bannedVehicleParkingTags")
+      .since(V2_1)
+      .summary("Tags with which a vehicle parking will not be used. If empty, no tags are banned.")
+      .asStringSet(List.of());
+
+    var requiredTags = c
+      .of("requiredVehicleParkingTags")
+      .since(V2_1)
+      .summary(
+        "Tags without which a vehicle parking will not be used. If empty, no tags are required."
+      )
+      .asStringSet(List.of());
+    vehicleParking.setFilter(
+      new VehicleParkingFilterRequest(new TagsFilter(bannedTags), new TagsFilter(requiredTags))
+    );
+
+    var preferredTags = c
+      .of("preferredVehicleParkingTags")
+      .since(V2_3)
+      .summary(
+        "Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised."
+      )
+      .asStringSet(List.of());
+
+    vehicleParking.setPreferred(
+      new VehicleParkingFilterRequest(List.of(), List.of(new TagsFilter(preferredTags)))
     );
 
     request.setWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
@@ -230,9 +253,8 @@ travel time `x` (in seconds).
     preferences.withCar(it -> mapCarPreferences(c, it));
     preferences.withSystem(it -> mapSystemPreferences(c, it));
     preferences.withTransfer(it -> mapTransferPreferences(c, it));
-    preferences.withParking(mapParkingPreferences(c, preferences));
     preferences.withWalk(it -> mapWalkPreferences(c, it));
-    preferences.withWheelchair(mapWheelchairPreferences(c, WHEELCHAIR_ACCESSIBILITY));
+    preferences.withWheelchair(it -> mapWheelchairPreferences(c, it, WHEELCHAIR_ACCESSIBILITY));
     preferences.withItineraryFilter(it -> mapItineraryFilterParams("itineraryFilters", c, it));
   }
 
@@ -748,18 +770,6 @@ search, hence, making it a bit slower. Recommended values would be from 12 hours
         )
       );
     }
-  }
-
-  private static VehicleParkingPreferences mapParkingPreferences(
-    NodeAdapter c,
-    RoutingPreferences.Builder preferences
-  ) {
-    return VehicleParkingPreferences.of(
-      c
-        .of("useVehicleParkingAvailabilityInformation")
-        .since(V2_1)
-        .asBoolean(preferences.parking().useAvailabilityInformation())
-    );
   }
 
   private static void mapWalkPreferences(NodeAdapter c, WalkPreferences.Builder walk) {

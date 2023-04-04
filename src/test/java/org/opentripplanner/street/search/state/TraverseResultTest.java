@@ -2,6 +2,7 @@ package org.opentripplanner.street.search.state;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,12 @@ public class TraverseResultTest {
     StreetSearchRequest streetSearchRequest = StreetSearchRequest.of().build();
     for (int i = 0; i < 4; i++) {
       StateData stateData = StateData.getInitialStateData(streetSearchRequest);
-      State r = new State(null, Instant.ofEpochSecond(i * 1000), stateData, streetSearchRequest);
+      State r = new State(
+        intersectionVertex(1, 1),
+        Instant.ofEpochSecond(i * 1000),
+        stateData,
+        streetSearchRequest
+      );
       resultChain = r.addToExistingResultChain(resultChain);
     }
 

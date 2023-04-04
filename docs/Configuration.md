@@ -96,10 +96,10 @@ documentation below we will refer to the following types:
 
 ## System environment and project information substitution
 
-OTP support injecting system environment variables and project information parameters into the
+OTP supports injecting system environment variables and project information parameters into the
 configuration. A pattern like `${VAR_NAME}` in a configuration file is substituted with an
 environment variable with name `VAR_NAME`. The substitution is done BEFORE the JSON is parsed, so
-both json keys and values is subject to substitution. This is useful if you want OTPs version number
+both json keys and values are subject to substitution. This is useful if you want OTPs version number
 to be part of the _graph-file-name_, or you want to inject credentials in a cloud based deployment.
 
 ```JSON
@@ -139,15 +139,15 @@ in your build-pipeline, at deployment time or use system environment variable su
 
 ## OTP Serialization version id and _Graph.obj_ file header
 
-OTP has a _OTP Serialization Version Id_ maintained in the pom.xml_ file. OTP store the id in the
-serialized _Graph.obj_ file header, allowing OTP the check for compatibility issues when loading the
+OTP has a _OTP Serialization Version Id_ maintained in the pom.xml_ file. OTP stores the id in the
+serialized _Graph.obj_ file header, allowing OTP to check for compatibility issues when loading the
 graph. The header info is available to configuration substitution:
 
 - `${graph.file.header}` Will expand to: `OpenTripPlannerGraph;0000007;`
 - `${otp.serialization.version.id}` Will expand to: `7`
 
-The intended usage is to be able to have a graph build pipeline which "knows" which graph that
-matches OTP planner instances. For example, you may build new graphs for every OTP serialization
+The intended usage is to be able to have a graph build pipeline that "knows" the matching graph and
+OTP planner instance. For example, you may build new graphs for every OTP serialization
 version id in use by the planning OTP instances you have deployed and plan to deploy. This way you
 can roll forward and backward new OTP instances without worrying about building new graphs.
 

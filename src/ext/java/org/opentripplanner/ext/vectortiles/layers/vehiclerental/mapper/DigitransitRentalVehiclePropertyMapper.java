@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 
 public class DigitransitRentalVehiclePropertyMapper extends PropertyMapper<VehicleRentalVehicle> {
 
