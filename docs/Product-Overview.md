@@ -3,7 +3,7 @@
 ## OpenTripPlanner project
 
 OpenTripPlanner is a group of open source software applications that help individuals and organizations 
-calculate and publish multimodal trip plans based on OpenStreetMap (OSM) and other standardized data 
+calculate and deliver multimodal trip plans based on OpenStreetMap (OSM) and other standardized data 
 sources (e.g. GTFS, GBFS, NeTEx).
 
 A community of dozens of individuals and organizations work on OpenTripPlanner collaboratively to 
@@ -11,7 +11,7 @@ improve multimodal trip planning best practices and to make it easier for public
 public transit riders to publish and access information about transit services.
 
 OpenTripPlanner deployments are locally managed in many different ways by many different types of organizations. 
-OpenTripPlanner consistently and dependably delivers multimodal trip plans to millions or riders 
+OpenTripPlanner consistently and dependably delivers multimodal trip plans to millions of riders 
 everyday in dozens of countries around the globe. The project is actively maintained by the community, 
 with more than 50 commits most weeks during 2022, and 20 different developers having made 50 or more 
 commits during the life of the project.
@@ -19,13 +19,13 @@ commits during the life of the project.
 ## What exactly is OTP?
 
 The most commonly used OpenTripPlanner component is a server-side Java application that is primarily 
-designed to input map, transit service, and other mobility data sets, receive user origins and 
-destinations, and expose API endpoints that return trip plans to other applications along with  
-vector map tiles, stop departures, and other rider information.
+designed to interpret and combine map, transit service, and other mobility data sets, providing API 
+endpoints that receive user origins and destinations and return trip plans to other applications 
+along with vector map tiles, stop departures, and other rider information.
 
 In other words, OTP is a backend application that can work with other frontend user interfaces. OTP 
 works with your website, mobile app, physical signage or other applications in order to provide 
-relevant customer information and a meaningful trip plan to riders.
+relevant customer information and meaningful trip plans to riders.
 
 There's no official OTP user interface, although the OpenTripPlanner ecosystem includes several user 
 interface projects (for example ['Digitransit'] (https://github.com/HSLdevcom/digitransit-ui) and ['OTP-react-redux'] (https://github.com/opentripplanner/otp-react-redux). 
@@ -67,7 +67,7 @@ be more appropriate for these purposes.
 
 ## Talk to an expert about OTP
 
-Everyone interested in OTP is welcome to post questions on the ['OpenTripPlanner-users group'] (https://groups.google.com/g/opentripplanner-users) or ['Gitter page'] (https://gitter.im/opentripplanner/OpenTripPlanner). 
+Everyone interested in OTP is welcome to post questions on the ['OpenTripPlanner-users group'] (https://groups.google.com/g/opentripplanner-users) or ['Gitter chat'] (https://gitter.im/opentripplanner/OpenTripPlanner). 
 If you’re looking for a conversation with an individual from a similar organizational type, you can 
 make that request and include some info about your organization on the forum linked above and a member 
 of the OTP community will connect with you.
