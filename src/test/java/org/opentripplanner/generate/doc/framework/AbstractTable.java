@@ -92,7 +92,7 @@ abstract class AbstractTable {
     String parameter = info.name();
 
     if (info.isTypeQualifier()) {
-      parameter += " = " + info.toMarkdownString(EnumMapper.kebabCase(node.typeQualifier()));
+      parameter += " = " + info.toMarkdownString(node.typeQualifier());
     }
     var link = skipNodes.linkOverview(info);
     if (link.isPresent()) {
