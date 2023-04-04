@@ -3,7 +3,6 @@ package org.opentripplanner.standalone.config.framework.json;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 
 import java.util.Arrays;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
