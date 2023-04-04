@@ -38,13 +38,12 @@ markdown_extensions:
 nav:
 - Home: 'index.md'
 - About:
+    - Product Overview: 'Product-Overview.md'
     - Governance: 'Governance.md'
     - History: 'History.md'
     - Presentations: 'Presentations.md'
     - Deployments: 'Deployments.md'
     - Changelog: 'Changelog.md'
-    - Comparing OTP2 to OTP1: 'Version-Comparison.md'
-    - OTP2 Migration Guide: 'OTP2-MigrationGuide.md'
     - Visual Identity: 'Visual-Identity.md'
 - 'Usage':
     - Basic Tutorial: 'Basic-Tutorial.md'
@@ -65,6 +64,8 @@ nav:
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
+    - Comparing OTP2 to OTP1: 'Version-Comparison.md'
+    - OTP2 Migration Guide: 'OTP2-MigrationGuide.md'  
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
     - Interfaces and Data Sources: 'Interfaces-Data-Sources.md'
