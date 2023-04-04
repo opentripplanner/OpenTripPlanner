@@ -10,6 +10,9 @@ docs_dir: docs
 site_dir: target/mkdocs
 strict: true
 
+plugins:
+    - "no-sitemap"
+
 theme:
     name: material
     features:
