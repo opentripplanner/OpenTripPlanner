@@ -113,11 +113,38 @@ class RouteRequestMapperTest implements PlanTestConstants {
   void banning(Map<String, Object> banned, String expectedFilters) {
     Map<String, Object> arguments = Map.of("banned", banned);
 
-    var env = executionContext(arguments);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
     assertNotNull(routeRequest);
 
     assertEquals(expectedFilters, routeRequest.journey().transit().filters().toString());
+  }
+
+  static Stream<Arguments> transportModesCases = Stream.of(
+    of(List.of(), "[ExcludeAllTransitFilter{}]"),
+    of(List.of(mode("BICYCLE")), "[ExcludeAllTransitFilter{}]"),
+    of(
+      List.of(mode("BUS")),
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH]}]}]"
+    ),
+    of(
+      List.of(mode("BUS"), mode("MONORAIL")),
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH, MONORAIL]}]}]"
+    )
+  );
+
+  @ParameterizedTest
+  @VariableSource("transportModesCases")
+  void modes(List<Map<String, Object>> modes, String expectedFilters) {
+    Map<String, Object> arguments = Map.of("transportModes", modes);
+
+    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
+    assertNotNull(routeRequest);
+
+    assertEquals(expectedFilters, routeRequest.journey().transit().filters().toString());
+  }
+
+  private static Map<String, Object> mode(String mode) {
+    return Map.of("mode", mode);
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
