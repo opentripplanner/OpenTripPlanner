@@ -12,16 +12,20 @@ strict: true
 
 plugins:
     - "no-sitemap"
+    - search
 
 theme:
     name: material
     features:
         - toc.integrate
         - content.code.copy
+        - search.suggest
+        - search.highlight
     palette:
         primary: blue
         accent: blue
         scheme: default
+
 
 extra:
     version:
