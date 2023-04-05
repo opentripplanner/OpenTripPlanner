@@ -51,7 +51,7 @@ class GbfsFreeVehicleStatusMapperTest {
     bike.setLon(1d);
     var mapped = MAPPER.mapFreeVehicleStatus(bike);
 
-    assertEquals("1.0,1.0", mapped.name.toString());
+    assertEquals("Default vehicle type", mapped.name.toString());
   }
 
   @Test

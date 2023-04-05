@@ -76,11 +76,8 @@ public class GbfsFreeVehicleStatusMapper {
       var type = vehicleTypes.get(typeId);
       if (type != null && type.name != null) {
         return type.name;
-      } else {
-        return RentalVehicleType.getDefaultType(system.systemId).name;
       }
-    } else {
-      return "%s,%s".formatted(vehicle.getLat(), vehicle.getLon());
     }
+    return RentalVehicleType.getDefaultType(system.systemId).name;
   }
 }
