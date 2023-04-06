@@ -82,6 +82,11 @@ public final class TripPatternBuilder
     return this;
   }
 
+  public TripPatternBuilder withScheduledTimeTable(Timetable scheduledTimetable) {
+    this.scheduledTimetable = scheduledTimetable;
+    return this;
+  }
+
   public TripPatternBuilder withCreatedByRealtimeUpdater(boolean createdByRealtimeUpdate) {
     this.createdByRealtimeUpdate = createdByRealtimeUpdate;
     return this;
