@@ -7,12 +7,12 @@ import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 /**
- * @param allowOverloading Do the stations in the network allow overloading (ignoring available spaces)
+ * @param overloadingAllowed Do the stations in the network allow overloading (ignoring available spaces)
  */
 public record SmooveBikeRentalDataSourceParameters(
   String url,
   String network,
-  boolean allowOverloading,
+  boolean overloadingAllowed,
   @Nonnull Map<String, String> httpHeaders
 )
   implements VehicleRentalDataSourceParameters {

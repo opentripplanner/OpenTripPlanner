@@ -25,7 +25,7 @@ public class SmooveBikeRentalDataSource
 
   public static final String DEFAULT_NETWORK_NAME = "smoove";
 
-  private final boolean allowOverloading;
+  private final boolean overloadingAllowed;
 
   private final String networkName;
   private final RentalVehicleType vehicleType;
@@ -34,7 +34,7 @@ public class SmooveBikeRentalDataSource
     super(config.url(), "result", config.httpHeaders());
     networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
     vehicleType = RentalVehicleType.getDefaultType(networkName);
-    allowOverloading = config.allowOverloading();
+    overloadingAllowed = config.overloadingAllowed();
   }
 
   /**
@@ -83,7 +83,7 @@ public class SmooveBikeRentalDataSource
     }
     station.vehicleTypesAvailable = Map.of(vehicleType, station.vehiclesAvailable);
     station.vehicleSpacesAvailable = Map.of(vehicleType, station.spacesAvailable);
-    station.allowOverloading = allowOverloading;
+    station.overloadingAllowed = overloadingAllowed;
     return station;
   }
 }

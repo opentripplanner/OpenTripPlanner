@@ -11,8 +11,7 @@ public record GbfsVehicleRentalDataSourceParameters(
   Map<String, String> httpHeaders,
   String network,
   boolean geofencingZones,
-
-  boolean allowOverloading
+  boolean overloadingAllowed
 )
   implements VehicleRentalDataSourceParameters {
   @Nonnull

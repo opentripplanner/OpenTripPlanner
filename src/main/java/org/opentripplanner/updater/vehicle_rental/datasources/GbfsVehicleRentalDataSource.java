@@ -88,7 +88,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
         system,
         vehicleTypes,
         params.allowKeepingRentedVehicleAtDestination(),
-        params.allowOverloading()
+        params.overloadingAllowed()
       );
 
       // Iterate over all known stations, and if we have any status information add it to those station objects.

@@ -38,7 +38,7 @@ class SmooveBikeRentalDataSourceTest {
     assertEquals(60.167913, hamn.getLatitude());
     assertEquals(11, hamn.getSpacesAvailable());
     assertEquals(1, hamn.getVehiclesAvailable());
-    assertTrue(hamn.isAllowOverloading());
+    assertTrue(hamn.overloadingAllowed());
     assertTrue(hamn.isAllowDropoff());
     assertTrue(hamn.isAllowPickup());
     assertTrue(hamn.allowDropoffNow());
@@ -92,7 +92,7 @@ class SmooveBikeRentalDataSourceTest {
 
     VehicleRentalPlace hamn = rentalStations.get(0);
     assertEquals(11, hamn.getSpacesAvailable());
-    assertFalse(hamn.isAllowOverloading());
+    assertFalse(hamn.overloadingAllowed());
     // spaces available and overloading is not allowed
     assertTrue(hamn.allowDropoffNow());
 

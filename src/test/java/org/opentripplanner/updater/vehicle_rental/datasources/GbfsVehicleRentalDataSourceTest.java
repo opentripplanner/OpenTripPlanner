@@ -73,7 +73,7 @@ class GbfsVehicleRentalDataSourceTest {
     );
 
     assertTrue(
-      stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isAllowOverloading())
+      stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.overloadingAllowed())
     );
   }
 
@@ -205,7 +205,7 @@ class GbfsVehicleRentalDataSourceTest {
         )
     );
     assertTrue(
-      stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.isAllowOverloading())
+      stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.overloadingAllowed())
     );
   }
 

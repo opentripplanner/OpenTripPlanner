@@ -8,7 +8,7 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRent
 public record VilkkuBikeRentalDataSourceParameters(
   String url,
   String network,
-  boolean allowOverloading,
+  boolean overloadingAllowed,
   @Nonnull Map<String, String> httpHeaders
 )
   implements VehicleRentalDataSourceParameters {

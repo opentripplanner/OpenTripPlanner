@@ -43,18 +43,18 @@ public class VehicleRentalSourceFactory {
         headers(),
         network(),
         geofencingZones(),
-        allowOverloading()
+        overloadingAllowed()
       );
       case SMOOVE -> new SmooveBikeRentalDataSourceParameters(
         url(),
         network(),
-        allowOverloading(),
+        overloadingAllowed(),
         headers()
       );
       case VILKKU -> new VilkkuBikeRentalDataSourceParameters(
         url(),
         network(),
-        allowOverloading(),
+        overloadingAllowed(),
         headers()
       );
     };
@@ -108,9 +108,9 @@ public class VehicleRentalSourceFactory {
       .asBoolean(false);
   }
 
-  private boolean allowOverloading() {
+  private boolean overloadingAllowed() {
     return c
-      .of("allowOverloading")
+      .of("overloadingAllowed")
       .since(V2_2)
       .summary("Allow leaving vehicles at a station even though there are no free slots.")
       .asBoolean(false);
