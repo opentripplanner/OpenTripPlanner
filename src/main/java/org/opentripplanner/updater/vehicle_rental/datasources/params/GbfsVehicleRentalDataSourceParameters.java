@@ -15,9 +15,6 @@ public record GbfsVehicleRentalDataSourceParameters(
   boolean allowOverloading
 )
   implements VehicleRentalDataSourceParameters {
-  public boolean isAllowOverloading() {
-    return allowOverloading;
-  }
   @Nonnull
   @Override
   public VehicleRentalSourceType sourceType() {

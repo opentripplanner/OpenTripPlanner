@@ -34,7 +34,7 @@ public class SmooveBikeRentalDataSource
     super(config.url(), "result", config.httpHeaders());
     networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
     vehicleType = RentalVehicleType.getDefaultType(networkName);
-    allowOverloading = config.isAllowOverloading();
+    allowOverloading = config.allowOverloading();
   }
 
   /**

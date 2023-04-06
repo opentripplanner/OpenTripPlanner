@@ -26,10 +26,6 @@ public record SmooveBikeRentalDataSourceParameters(
     return network == null || network.isEmpty() ? defaultValue : network;
   }
 
-  public boolean isAllowOverloading() {
-    return allowOverloading;
-  }
-
   @Nonnull
   @Override
   public VehicleRentalSourceType sourceType() {
