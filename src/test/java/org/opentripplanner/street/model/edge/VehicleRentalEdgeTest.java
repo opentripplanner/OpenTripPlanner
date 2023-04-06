@@ -122,11 +122,7 @@ class VehicleRentalEdgeTest extends GraphRoutingTest {
     assertNotNull(s1);
   }
 
-  private void initEdgeAndRequest(
-    StreetMode mode,
-    int vehicles,
-    int spaces
-  ) {
+  private void initEdgeAndRequest(StreetMode mode, int vehicles, int spaces) {
     initEdgeAndRequest(mode, vehicles, spaces, false, true, true);
   }
 
@@ -146,7 +142,17 @@ class VehicleRentalEdgeTest extends GraphRoutingTest {
     vehicleRentalEdge = new VehicleRentalEdge(vertex, RentalFormFactor.BICYCLE);
 
     var rentalRequest = new VehicleRentalRequest();
-    this.request = StreetSearchRequest.of().withMode(mode).withRental(rentalRequest).withPreferences(preferences -> preferences.withRental(rental -> rental.withUseAvailabilityInformation(useRealtime).build()).build()).build();
+    this.request =
+      StreetSearchRequest
+        .of()
+        .withMode(mode)
+        .withRental(rentalRequest)
+        .withPreferences(preferences ->
+          preferences
+            .withRental(rental -> rental.withUseAvailabilityInformation(useRealtime).build())
+            .build()
+        )
+        .build();
   }
 
   private VehicleRentalStation createVehicleRentalStation(
@@ -158,7 +164,7 @@ class VehicleRentalEdgeTest extends GraphRoutingTest {
     var station = new VehicleRentalStation();
     var stationName = "FooStation";
     var networkName = "bar";
-    var vehicleType = RentalVehicleType.getDefaultType(networkName);;
+    var vehicleType = RentalVehicleType.getDefaultType(networkName);
     station.id = new FeedScopedId(networkName, stationName);
     station.name = new NonLocalizedString(stationName);
     station.latitude = 47.510;
