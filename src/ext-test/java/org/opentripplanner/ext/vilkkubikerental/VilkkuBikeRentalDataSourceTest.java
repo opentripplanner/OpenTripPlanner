@@ -20,7 +20,7 @@ public class VilkkuBikeRentalDataSourceTest {
         new VilkkuBikeRentalDataSourceParameters(
           "file:src/ext-test/resources/vilkkubikerental/vilkku.xml",
           null,
-          false,
+          true,
           Map.of()
         )
       );
@@ -41,6 +41,7 @@ public class VilkkuBikeRentalDataSourceTest {
 
     assertEquals(8, station.getVehiclesAvailable());
     assertTrue(station.getSpacesAvailable() > 0);
+    assertTrue(station.overloadingAllowed());
     assertTrue(station.isAllowDropoff());
     assertTrue(station.isAllowPickup());
     assertTrue(station.allowDropoffNow());
