@@ -137,7 +137,6 @@ public class VehiclePositionPatternMatcher {
     ResultLogger.logUpdateResult(
       feedId,
       "vehicle-positions",
-      vehiclePositions.size(),
       updateResult
     );
 

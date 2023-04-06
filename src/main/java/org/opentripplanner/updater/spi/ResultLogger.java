@@ -17,9 +17,9 @@ public class ResultLogger {
   public static void logUpdateResult(
     String feedId,
     String type,
-    int totalUpdates,
     UpdateResult updateResult
   ) {
+    var totalUpdates = updateResult.successful() + updateResult.failed();
     if (totalUpdates > 0) {
       LOG.info(
         "[feedId: {}, type={}] {} of {} update messages were applied successfully (success rate: {}%)",

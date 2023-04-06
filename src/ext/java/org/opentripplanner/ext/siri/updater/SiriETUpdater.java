@@ -9,6 +9,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
@@ -108,6 +109,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
               fullDataset,
               etds
             );
+            ResultLogger.logUpdateResult(feedId, "siri-et", result);
             recordMetrics.accept(result);
             if (markPrimed) primed = true;
           });
