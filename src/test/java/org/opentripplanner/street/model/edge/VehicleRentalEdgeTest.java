@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -19,7 +18,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-class VehicleRentalEdgeTest extends GraphRoutingTest {
+class VehicleRentalEdgeTest {
 
   Graph graph;
   VehicleRentalEdge vehicleRentalEdge;
