@@ -342,7 +342,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship,
     UpdateResult updateResult
   ) {
-    ResultLogger.logUpdateResult(feedId, "trip-updates", updateResult);
+    ResultLogger.logUpdateResult(feedId, "gtfs-rt-trip-updates", updateResult);
 
     if (!failuresByRelationship.isEmpty()) {
       LOG.info("[feedId: {}] Failures by scheduleRelationship {}", feedId, failuresByRelationship);

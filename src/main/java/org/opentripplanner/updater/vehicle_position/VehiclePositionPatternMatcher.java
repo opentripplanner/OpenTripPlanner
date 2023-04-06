@@ -134,11 +134,7 @@ public class VehiclePositionPatternMatcher {
       .toList();
     // needs to be put into a new list so the types are correct
     var updateResult = UpdateResult.ofResults(new ArrayList<>(results));
-    ResultLogger.logUpdateResult(
-      feedId,
-      "vehicle-positions",
-      updateResult
-    );
+    ResultLogger.logUpdateResult(feedId, "gtfs-rt-vehicle-positions", updateResult);
 
     return updateResult;
   }

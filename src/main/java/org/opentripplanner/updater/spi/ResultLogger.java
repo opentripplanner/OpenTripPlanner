@@ -14,11 +14,7 @@ public class ResultLogger {
 
   private static final Logger LOG = LoggerFactory.getLogger(ResultLogger.class);
 
-  public static void logUpdateResult(
-    String feedId,
-    String type,
-    UpdateResult updateResult
-  ) {
+  public static void logUpdateResult(String feedId, String type, UpdateResult updateResult) {
     var totalUpdates = updateResult.successful() + updateResult.failed();
     if (totalUpdates > 0) {
       LOG.info(
