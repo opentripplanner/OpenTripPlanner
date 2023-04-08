@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.org.siri.siri20.ArrivalBoardingActivityEnumeration.ALIGHTING;
 import static uk.org.siri.siri20.ArrivalBoardingActivityEnumeration.NO_ALIGHTING;
@@ -181,6 +182,54 @@ class PickDropMapperTest {
     assertTrue(
       testResult.isEmpty(),
       "There is no change in routability - only arrival is cancelled"
+    );
+  }
+
+  @Test
+  public void testCancellationWithNoPlannedBoarding() {
+    var originalPickUpType = PickDrop.NONE;
+    TestCall call = TestCall.of().withCancellation(Boolean.TRUE).build();
+    var testResult = PickDropMapper.mapPickUpType(call, originalPickUpType);
+
+    assertTrue(
+      testResult.isEmpty(),
+      "There is no change in routability - pickup should not be changed"
+    );
+  }
+
+  @Test
+  public void testCancellationWithPlannedBoarding() {
+    var originalPickUpType = PickDrop.SCHEDULED;
+    TestCall call = TestCall.of().withCancellation(Boolean.TRUE).build();
+    var testResult = PickDropMapper.mapPickUpType(call, originalPickUpType);
+
+    assertFalse(
+      testResult.isEmpty(),
+      "There is no change in routability - pickup should be changed"
+    );
+  }
+
+  @Test
+  public void testCancellationWithNoPlannedAlighting() {
+    var originalDropOffType = PickDrop.NONE;
+    TestCall call = TestCall.of().withCancellation(Boolean.TRUE).build();
+    var testResult = PickDropMapper.mapDropOffType(call, originalDropOffType);
+
+    assertTrue(
+      testResult.isEmpty(),
+      "There is no change in routability - dropoff should not be changed"
+    );
+  }
+
+  @Test
+  public void testCancellationWithPlannedAlighting() {
+    var originalDropOffType = PickDrop.SCHEDULED;
+    TestCall call = TestCall.of().withCancellation(Boolean.TRUE).build();
+    var testResult = PickDropMapper.mapDropOffType(call, originalDropOffType);
+
+    assertFalse(
+      testResult.isEmpty(),
+      "There is no change in routability - dropoff should be changed"
     );
   }
 }

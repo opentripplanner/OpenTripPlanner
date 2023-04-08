@@ -1,19 +1,19 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
  * Abstract super class for multi-criteria stop arrival.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
+public abstract class McStopArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
 
-  private final AbstractStopArrival<T> previous;
+  private final McStopArrival<T> previous;
   /**
-   * We want transits to dominate transfers so we increment the round not only between RangeRaptor
+   * We want transits to dominate transfers, so we increment the round not only between RangeRaptor
    * rounds, but for transits and transfers also. The access path is paretoRound 0, the first
    * transit path is 1. The following transfer path, if it exists, is paretoRound 2, and the next
    * transit is 3, and so on.
@@ -27,7 +27,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
   private final int stop;
   private final int arrivalTime;
   private final int travelDuration;
-  private final int generalizedCost;
+  private final int c1;
 
   /**
    * Transit or transfer.
@@ -36,31 +36,31 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
    * @param paretoRoundIncrement the increment to add to the paretoRound
    * @param stop                 stop index for this arrival
    * @param arrivalTime          the arrival time for this stop index
-   * @param generalizedCost                 the total accumulated cost at this stop arrival
+   * @param c1                   the accumulated criteria-one(cost) at this stop arrival
    */
-  AbstractStopArrival(
-    AbstractStopArrival<T> previous,
+  protected McStopArrival(
+    McStopArrival<T> previous,
     int paretoRoundIncrement,
     int stop,
     int arrivalTime,
-    int generalizedCost
+    int c1
   ) {
     this.previous = previous;
     this.paretoRound = previous.paretoRound + paretoRoundIncrement;
     this.stop = stop;
     this.arrivalTime = arrivalTime;
     this.travelDuration = previous.travelDuration() + (arrivalTime - previous.arrivalTime());
-    this.generalizedCost = generalizedCost;
+    this.c1 = c1;
   }
 
   /**
    * Initial state - first stop visited during the RAPTOR algorithm.
    */
-  AbstractStopArrival(
+  protected McStopArrival(
     int stop,
     int departureTime,
     int travelDuration,
-    int initialCost,
+    int initialC1,
     int paretoRound
   ) {
     this.previous = null;
@@ -68,42 +68,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     this.stop = stop;
     this.arrivalTime = departureTime + travelDuration;
     this.travelDuration = travelDuration;
-    this.generalizedCost = initialCost;
-  }
-
-  /**
-   * This comparator is used to compare regular stop arrivals. It uses {@code arrivalTime},
-   * {@code paretoRound} and {@code generalizedCost} to compare arrivals. It does NOT include
-   * {@code arrivedOnBoard}. Normally arriving on-board should give the arrival an advantage
-   * - you can continue on foot, walking to the next stop. But, we only do this if it happens
-   * in the same Raptor iteration and round - if it does it is taken care of by the order
-   * which the algorithm work - not by this comparator.
-   */
-  public static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundAndCost() {
-    // This is important with respect to performance. Using the short-circuit logical OR(||) is
-    // faster than bitwise inclusive OR(|) (even between boolean expressions)
-    return (l, r) ->
-      l.arrivalTime < r.arrivalTime ||
-      l.paretoRound < r.paretoRound ||
-      l.generalizedCost < r.generalizedCost;
-  }
-
-  /**
-   * This include {@code arrivedOnBoard} in the comparison compared with
-   * {@link #compareArrivalTimeRoundAndCost()}.
-   */
-  public static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundCostAndOnBoardArrival() {
-    // This is important with respect to performance. Using the short-circuit logical OR(||) is
-    // faster than bitwise inclusive OR(|) (even between boolean expressions)
-    return (l, r) ->
-      l.arrivalTime < r.arrivalTime ||
-      l.paretoRound < r.paretoRound ||
-      l.generalizedCost < r.generalizedCost ||
-      (l.arrivedOnBoard() && !r.arrivedOnBoard());
+    this.c1 = initialC1;
   }
 
   @Override
@@ -116,25 +81,29 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     return (paretoRound + 1) / 2;
   }
 
+  protected final int paretoRound() {
+    return paretoRound;
+  }
+
   @Override
   public final int arrivalTime() {
     return arrivalTime;
   }
 
-  public int cost() {
-    return generalizedCost;
+  public final int c1() {
+    return c1;
   }
 
   @Override
-  public final AbstractStopArrival<T> previous() {
+  public final McStopArrival<T> previous() {
     return previous;
   }
 
-  public int travelDuration() {
+  public final int travelDuration() {
     return travelDuration;
   }
 
-  public AbstractStopArrival<T> timeShiftNewArrivalTime(int newArrivalTime) {
+  public McStopArrival<T> timeShiftNewArrivalTime(int newArrivalTime) {
     throw new UnsupportedOperationException("No accessEgress for transfer stop arrival");
   }
 
@@ -156,7 +125,41 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
   /**
    * @return previous state or throw a NPE if no previousArrival exist.
    */
-  final int previousStop() {
+  protected final int previousStop() {
     return previous.stop;
+  }
+
+  /**
+   * Compare arrivalTime, paretoRound and c1.
+   */
+  protected static boolean compareBase(McStopArrival<?> l, McStopArrival<?> r) {
+    // This is important with respect to performance. Using the short-circuit logical OR(||) is
+    // faster than bitwise inclusive OR(|) (even between boolean expressions)
+    return (
+      l.arrivalTime() < r.arrivalTime() || l.paretoRound() < r.paretoRound() || l.c1() < r.c1()
+    );
+  }
+
+  /**
+   * Compare arrivalTime, paretoRound and c1, relaxing arrivalTime and c1.
+   */
+  protected static boolean relaxedCompareBase(
+    final RelaxFunction relaxC1,
+    McStopArrival<?> l,
+    McStopArrival<?> r
+  ) {
+    return (
+      l.arrivalTime() < r.arrivalTime() ||
+      l.paretoRound() < r.paretoRound() ||
+      l.c1() < relaxC1.relax(r.c1())
+    );
+  }
+
+  /**
+   * Compare arrivedOnBoard. On-board arrival dominate arrive by transfer(foot) since
+   * you can continue on foot; hence has more options.
+   */
+  protected static boolean compareArrivedOnBoard(McStopArrival<?> l, McStopArrival<?> r) {
+    return l.arrivedOnBoard() && !r.arrivedOnBoard();
   }
 }

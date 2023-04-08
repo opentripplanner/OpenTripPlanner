@@ -6,7 +6,6 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 
 /**
@@ -92,15 +91,5 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule>
   @Override
   public Collection<RaptorPath<T>> extractPaths() {
     return unknownPathFactory.extractPaths();
-  }
-
-  @Override
-  public int calculateMinNumberOfTransfers(int stopIndex) {
-    return bestNumberOfTransfers.calculateMinNumberOfTransfers(stopIndex);
-  }
-
-  @Override
-  public SingleCriteriaStopArrivals extractBestNumberOfTransfers() {
-    return bestNumberOfTransfers.extractBestNumberOfTransfers();
   }
 }

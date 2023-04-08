@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
@@ -12,7 +13,6 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.reques
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -153,17 +153,21 @@ public class ConstrainedBoardingSearchTest {
     // Forward
     var subject = new ConstrainedBoardingSearch(
       true,
-      constrainedTransfers.forward().get(routingPattern2.patternIndex())
+      constrainedTransfers.fromStop(routingPattern2.patternIndex()),
+      constrainedTransfers.toStop(routingPattern2.patternIndex())
     );
-    assertTrue(subject.transferExist(toStopPos));
+    assertTrue(subject.transferExistTargetStop(toStopPos));
+    assertFalse(subject.transferExistSourceStop(toStopPos));
 
-    // Reverse
+    // Reverse -
     subject =
       new ConstrainedBoardingSearch(
         false,
-        constrainedTransfers.reverse().get(routingPattern1.patternIndex())
+        constrainedTransfers.toStop(routingPattern1.patternIndex()),
+        constrainedTransfers.fromStop(routingPattern1.patternIndex())
       );
-    assertTrue(subject.transferExist(fromStopPos));
+    assertTrue(subject.transferExistTargetStop(fromStopPos));
+    assertFalse(subject.transferExistSourceStop(fromStopPos));
   }
 
   @Test
@@ -319,24 +323,24 @@ public class ConstrainedBoardingSearchTest {
 
   @Test
   void findDefinitiveMinTimeTransfer() {
-    // we set a very low minimum transfer time of 0 seconds. we expect this to work similar
-    // to a guaranteed transfer and hence it has the same expectation.
-    OTPFeature.enableFeatures(Map.of(OTPFeature.MinimumTransferTimeIsDefinitive, true));
-    var txMinTransferTime = new ConstrainedTransfer(
-      ID,
-      STOP_B_TX_POINT,
-      STOP_B_TX_POINT,
-      MIN_TRANSFER_TIME_0_MIN_CONSTRAINT
-    );
+    OTPFeature.MinimumTransferTimeIsDefinitive.testOn(() -> {
+      // we set a very low minimum transfer time of 0 seconds. we expect this to work similar
+      // to a guaranteed transfer and hence it has the same expectation.
+      var txMinTransferTime = new ConstrainedTransfer(
+        ID,
+        STOP_B_TX_POINT,
+        STOP_B_TX_POINT,
+        MIN_TRANSFER_TIME_0_MIN_CONSTRAINT
+      );
 
-    testTransferSearch(
-      STOP_B,
-      List.of(txMinTransferTime),
-      TRIP_1_INDEX,
-      TRIP_2_INDEX,
-      MIN_TRANSFER_TIME_0_MIN_CONSTRAINT
-    );
-    OTPFeature.enableFeatures(Map.of(OTPFeature.MinimumTransferTimeIsDefinitive, false));
+      testTransferSearch(
+        STOP_B,
+        List.of(txMinTransferTime),
+        TRIP_1_INDEX,
+        TRIP_2_INDEX,
+        MIN_TRANSFER_TIME_0_MIN_CONSTRAINT
+      );
+    });
   }
 
   void testTransferSearch(
@@ -357,20 +361,20 @@ public class ConstrainedBoardingSearchTest {
     TransferConstraint expectedConstraint
   ) {
     var constrainedTransfers = generateTransfersForPatterns(txList);
-    TransferForPatternByStopPos transfers = constrainedTransfers
-      .forward()
-      .get(routingPattern2.patternIndex());
-    var subject = new ConstrainedBoardingSearch(true, transfers);
+    var transfersFromStop = constrainedTransfers.fromStop(routingPattern2.patternIndex());
+    var transfersToStop = constrainedTransfers.toStop(routingPattern2.patternIndex());
+
+    var subject = new ConstrainedBoardingSearch(true, transfersFromStop, transfersToStop);
 
     int targetStopPos = route2.stopPosition(transferStop);
     int stopIndex = transferStop.getIndex();
     int sourceArrivalTime = route1.lastTrip().getStopTime(transferStop).getArrivalTime();
 
     // Check that transfer exist
-    assertTrue(subject.transferExist(targetStopPos));
+    assertTrue(subject.transferExistTargetStop(targetStopPos));
 
     // Check that transfers are sorted
-    assertTransfersAreSorted(transfers, targetStopPos);
+    assertTransfersAreSorted(transfersToStop, targetStopPos);
 
     var boarding = subject.find(
       route2.getTimetable(),
@@ -401,7 +405,8 @@ public class ConstrainedBoardingSearchTest {
     var constrainedTransfers = generateTransfersForPatterns(txList);
     var subject = new ConstrainedBoardingSearch(
       false,
-      constrainedTransfers.reverse().get(routingPattern1.patternIndex())
+      constrainedTransfers.toStop(routingPattern1.patternIndex()),
+      constrainedTransfers.fromStop(routingPattern1.patternIndex())
     );
     int targetStopPos = route1.stopPosition(transferStop);
 
@@ -409,7 +414,7 @@ public class ConstrainedBoardingSearchTest {
     int sourceArrivalTime = route2.firstTrip().getStopTime(transferStop).getDepartureTime();
 
     // Check that transfer exist
-    assertTrue(subject.transferExist(targetStopPos));
+    assertTrue(subject.transferExistTargetStop(targetStopPos));
 
     var boarding = subject.find(
       route1.getTimetable(),

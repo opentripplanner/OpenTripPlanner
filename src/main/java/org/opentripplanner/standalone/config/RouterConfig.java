@@ -103,9 +103,9 @@ number of transit vehicles used in that itinerary.
           .summary("Configuration for the Transmodel GraphQL API.")
           .asObject()
       );
-    this.transitConfig = new TransitRoutingConfig("transit", root);
     this.routingRequestDefaults =
       RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
+    this.transitConfig = new TransitRoutingConfig("transit", root, routingRequestDefaults);
     this.updatersParameters = new UpdatersConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig = new FlexConfig(root, "flex");

@@ -118,6 +118,12 @@ public class TestTripPattern implements DefaultTripPattern {
   }
 
   @Override
+  public int priorityGroupId() {
+    // TODO C2 - Add routing tests for priority groups later ...
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public int patternIndex() {
     return patternIndex;
   }

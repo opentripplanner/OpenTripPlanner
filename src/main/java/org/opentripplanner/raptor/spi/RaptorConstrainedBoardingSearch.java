@@ -15,10 +15,22 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
  */
 public interface RaptorConstrainedBoardingSearch<T extends RaptorTripSchedule> {
   /**
-   * Check if the current pattern have any guaranteed transfers for the given stop position in
-   * pattern. If not, then Raptor will fall back to a regular trip search.
+   * Check if the current pattern has any constrained transfers for the given target stop position.
+   * If not, then Raptor will fall back to a regular trip search.
+   * <p>
+   * The target stop position is the boarding "to" stop position for a forward search, and the
+   * source "from" stop position for a reverse search.
    */
-  boolean transferExist(int targetStopPos);
+  boolean transferExistTargetStop(int targetStopPos);
+
+  /**
+   * Check if the current pattern has any constrained transfers for the given source stop position.
+   * If not, then Raptor will fall back to a regular trip search.
+   * <p>
+   * The source stop position is the alighting "from" stop position for a forward search, and the
+   * target "to" stop position for a reverse search.
+   */
+  boolean transferExistSourceStop(int targetStopPos);
 
   /**
    * Get the board-/alight-event for the current pattern at the target stop position coming from the

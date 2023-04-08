@@ -82,7 +82,7 @@ public class PathDiff<T extends RaptorTripSchedule> {
         e.status("EQ", "DROPPED", "NEW"),
         it.path.numberOfTransfers(),
         DurationUtils.durationToStr(it.path.durationInSeconds()),
-        it.path.generalizedCost(),
+        it.path.c1(),
         DurationUtils.durationToStr(it.walkDuration),
         TimeUtils.timeToStrCompact(it.path.startTime()),
         TimeUtils.timeToStrCompact(it.path.endTime()),
@@ -110,7 +110,7 @@ public class PathDiff<T extends RaptorTripSchedule> {
     return new CompositeComparator<>(
       Comparator.comparingInt(o -> o.path.endTime()),
       Comparator.comparingInt(o -> -o.path.startTime()),
-      Comparator.comparingInt(o -> skipCost ? 0 : -o.path.generalizedCost()),
+      Comparator.comparingInt(o -> skipCost ? 0 : -o.path.c1()),
       (o1, o2) -> compareLists(o1.routes, o2.routes, String::compareTo),
       (o1, o2) -> compareLists(o1.stops, o2.stops, Integer::compareTo)
     );

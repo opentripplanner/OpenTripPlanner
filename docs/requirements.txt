@@ -1,3 +1,4 @@
 mkdocs==1.4.2
-mkdocs-material==9.0.6
+mkdocs-material==9.1.5
 mike==1.1.2
+mkdocs-no-sitemap-plugin==0.0.1

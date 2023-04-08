@@ -16,7 +16,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
  */
 public final class StdStopArrivals<T extends RaptorTripSchedule> implements BestNumberOfTransfers {
 
-  // Arrivals by round and stop - [round][stop]
+  /** Arrivals by round and stop - [round][stop] */
   private final StopArrivalState<T>[][] arrivals;
   private final RoundProvider roundProvider;
 

@@ -30,12 +30,9 @@ import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilt
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RouteRequestConfig {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RouteRequestConfig.class);
   private static final String WHEELCHAIR_ACCESSIBILITY = "wheelchairAccessibility";
 
   public static RouteRequest mapDefaultRouteRequest(NodeAdapter root, String parameterName) {
@@ -49,14 +46,15 @@ public class RouteRequestConfig {
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c) {
-    RouteRequest dft = new RouteRequest();
+    return mapRouteRequest(c, new RouteRequest());
+  }
 
+  public static RouteRequest mapRouteRequest(NodeAdapter c, RouteRequest dft) {
     if (c.isEmpty()) {
       return dft;
     }
 
-    LOG.debug("Loading default routing parameters from JSON.");
-    RouteRequest request = new RouteRequest();
+    RouteRequest request = dft.clone();
     VehicleRentalRequest vehicleRental = request.journey().rental();
     VehicleParkingRequest vehicleParking = request.journey().parking();
 
@@ -256,7 +254,7 @@ travel time `x` (in seconds).
     preferences.withSystem(it -> mapSystemPreferences(c, it));
     preferences.withTransfer(it -> mapTransferPreferences(c, it));
     preferences.withWalk(it -> mapWalkPreferences(c, it));
-    preferences.withWheelchair(mapWheelchairPreferences(c, WHEELCHAIR_ACCESSIBILITY));
+    preferences.withWheelchair(it -> mapWheelchairPreferences(c, it, WHEELCHAIR_ACCESSIBILITY));
     preferences.withItineraryFilter(it -> mapItineraryFilterParams("itineraryFilters", c, it));
   }
 
