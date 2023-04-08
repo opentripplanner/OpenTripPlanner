@@ -39,6 +39,10 @@ public class TimetableHelperTest {
   private static final FeedScopedId SCOPED_STOP_ID = new FeedScopedId(FEED_ID, STOP_ID);
   private static final FeedScopedId SCOPED_AGENCY_ID = new FeedScopedId(FEED_ID, AGENCY_ID);
   private static final FeedScopedId SCOPED_LINE_ID = new FeedScopedId(FEED_ID, LINE_ID);
+  private static final ZonedDateTime START_OF_SERVICE = ZonedDateTime.of(
+    LocalDateTime.of(2022, 12, 9, 0, 0),
+    ZoneId.of("CET")
+  );
 
   private TripTimes tripTimes;
 
@@ -74,7 +78,6 @@ public class TimetableHelperTest {
   @Test
   public void testApplyUpdates_MapPredictionInaccurate_EstimatedCall() {
     // Arrange
-    var startOfService = ZonedDateTime.of(LocalDateTime.of(2022, 12, 9, 0, 0), ZoneId.of("CET"));
 
     CallWrapper estimatedCall = TestCall
       .of()
@@ -85,7 +88,7 @@ public class TimetableHelperTest {
       .build();
 
     // Act
-    TimetableHelper.applyUpdates(startOfService, tripTimes, 0, false, false, estimatedCall, null);
+    TimetableHelper.applyUpdates(START_OF_SERVICE, tripTimes, 0, false, false, estimatedCall, null);
 
     // Assert
     assertStatuses(0, OccupancyStatus.MANY_SEATS_AVAILABLE, false, false, true);
@@ -94,7 +97,6 @@ public class TimetableHelperTest {
   @Test
   public void testApplyUpdates_CancellationPriorityOverPredictionInaccurate_EstimatedCall() {
     // Arrange
-    var startOfService = ZonedDateTime.of(LocalDateTime.of(2022, 12, 9, 0, 0), ZoneId.of("CET"));
 
     CallWrapper estimatedCall = TestCall
       .of()
@@ -105,7 +107,7 @@ public class TimetableHelperTest {
       .build();
 
     // Act
-    TimetableHelper.applyUpdates(startOfService, tripTimes, 0, false, false, estimatedCall, null);
+    TimetableHelper.applyUpdates(START_OF_SERVICE, tripTimes, 0, false, false, estimatedCall, null);
 
     // Assert
 
@@ -115,9 +117,8 @@ public class TimetableHelperTest {
   @Test
   public void testApplyUpdates_CancellationPriorityOverPredictionInaccurate_RecordedCall() {
     // Arrange
-    var startOfService = ZonedDateTime.of(LocalDateTime.of(2022, 12, 9, 0, 0), ZoneId.of("CET"));
 
-    ZonedDateTime actualTime = startOfService.plus(Duration.ofHours(1));
+    ZonedDateTime actualTime = START_OF_SERVICE.plus(Duration.ofHours(1));
     CallWrapper recordedCall = TestCall
       .of()
       .withStopPointRef(STOP_ID)
@@ -128,7 +129,7 @@ public class TimetableHelperTest {
       .build();
 
     // Act
-    TimetableHelper.applyUpdates(startOfService, tripTimes, 0, false, false, recordedCall, null);
+    TimetableHelper.applyUpdates(START_OF_SERVICE, tripTimes, 0, false, false, recordedCall, null);
 
     // Assert
 
@@ -138,7 +139,6 @@ public class TimetableHelperTest {
   @Test
   public void testApplyUpdates_PredictionInaccuratePriorityOverRecorded() {
     // Arrange
-    var startOfService = ZonedDateTime.of(LocalDateTime.of(2022, 12, 9, 0, 0), ZoneId.of("CET"));
 
     CallWrapper recordedCall = TestCall
       .of()
@@ -146,11 +146,11 @@ public class TimetableHelperTest {
       .withPredictionInaccurate(true)
       .withOccupancy(OccupancyEnumeration.FULL)
       .withCancellation(false)
-      .withActualDepartureTime(startOfService.plus(Duration.ofHours(1)))
+      .withActualDepartureTime(START_OF_SERVICE.plus(Duration.ofHours(1)))
       .build();
 
     // Act
-    TimetableHelper.applyUpdates(startOfService, tripTimes, 0, false, false, recordedCall, null);
+    TimetableHelper.applyUpdates(START_OF_SERVICE, tripTimes, 0, false, false, recordedCall, null);
 
     // Assert
     assertStatuses(0, OccupancyStatus.FULL, false, false, true);
@@ -159,7 +159,6 @@ public class TimetableHelperTest {
   @Test
   public void testApplyUpdates_ActualTimeResultsInRecorded() {
     // Arrange
-    var startOfService = ZonedDateTime.of(LocalDateTime.of(2022, 12, 9, 0, 0), ZoneId.of("CET"));
 
     CallWrapper recordedCall = TestCall
       .of()
@@ -167,11 +166,11 @@ public class TimetableHelperTest {
       .withPredictionInaccurate(false)
       .withOccupancy(OccupancyEnumeration.STANDING_AVAILABLE)
       .withCancellation(false)
-      .withActualDepartureTime(startOfService.plus(Duration.ofHours(1)))
+      .withActualDepartureTime(START_OF_SERVICE.plus(Duration.ofHours(1)))
       .build();
 
     // Act
-    TimetableHelper.applyUpdates(startOfService, tripTimes, 0, false, false, recordedCall, null);
+    TimetableHelper.applyUpdates(START_OF_SERVICE, tripTimes, 0, false, false, recordedCall, null);
 
     // Assert
     assertStatuses(0, OccupancyStatus.STANDING_ROOM_ONLY, false, true, false);
@@ -180,12 +179,11 @@ public class TimetableHelperTest {
   @Test
   public void testApplyUpdates_JourneyDefaultValues() {
     // Arrange
-    var startOfService = ZonedDateTime.of(LocalDateTime.of(2022, 12, 9, 0, 0), ZoneId.of("CET"));
     CallWrapper recordedCall = TestCall.of().withStopPointRef(STOP_ID).build();
 
     // Act
     TimetableHelper.applyUpdates(
-      startOfService,
+      START_OF_SERVICE,
       tripTimes,
       0,
       false,
