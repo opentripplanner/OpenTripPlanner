@@ -102,7 +102,6 @@ public class SiriETUpdater extends PollingGraphUpdater {
         if (etds != null) {
           saveResultOnGraph.execute((graph, transitModel) -> {
             var result = snapshotSource.applyEstimatedTimetable(
-              transitModel,
               fuzzyTripMatcher,
               entityResolver,
               feedId,

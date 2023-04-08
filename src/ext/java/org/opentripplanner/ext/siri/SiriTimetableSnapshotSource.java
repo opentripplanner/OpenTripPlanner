@@ -64,7 +64,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * messages.
    */
   private final SiriTripPatternCache tripPatternCache;
-  private final ZoneId timeZone;
+  private final TransitModel transitModel;
 
   private final TransitService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
@@ -92,7 +92,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     TimetableSnapshotSourceParameters parameters,
     TransitModel transitModel
   ) {
-    this.timeZone = transitModel.getTimeZone();
+    this.transitModel = transitModel;
     this.transitService = new DefaultTransitService(transitModel);
     this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
     this.maxSnapshotFrequency = parameters.maxSnapshotFrequencyMs();
@@ -135,13 +135,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
    *
-   * @param transitModel transitModel to update (needed for adding/changing stop patterns)
    * @param fullDataset  true iff the list with updates represent all updates that are active right
    *                     now, i.e. all previous updates should be disregarded
    * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public UpdateResult applyEstimatedTimetable(
-    TransitModel transitModel,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
     String feedId,
@@ -339,7 +337,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       pattern,
       estimatedVehicleJourney,
       serviceDate,
-      timeZone,
+      transitModel.getTimeZone(),
       entityResolver
     )
       .build();
@@ -449,7 +447,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean purgeExpiredData() {
-    final LocalDate today = LocalDate.now(timeZone);
+    final LocalDate today = LocalDate.now(transitModel.getTimeZone());
     final LocalDate previously = today.minusDays(2); // Just to be safe...
 
     if (lastPurgeDate != null && lastPurgeDate.compareTo(previously) > 0) {
