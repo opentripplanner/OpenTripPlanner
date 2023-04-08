@@ -655,8 +655,8 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "sourceType" : "bikely",
       "url" : "https://api.safebikely.com/api/v1/s/locations",
       "headers" : {
-        "X-Bikely-Token" : "[BIKELY_TOKEN]",
-        "Authorization" : "[BIKELY_AUTHORIZATION]"
+        "X-Bikely-Token" : "${BIKELY_TOKEN}",
+        "Authorization" : "${BIKELY_AUTHORIZATION}"
       }
     },
     {
