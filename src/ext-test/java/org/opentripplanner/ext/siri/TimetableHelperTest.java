@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import uk.org.siri.siri20.OccupancyEnumeration;
 
-public class TimeTableHelperTest {
+public class TimetableHelperTest {
 
   private static final String FEED_ID = "FEED_ID";
 
