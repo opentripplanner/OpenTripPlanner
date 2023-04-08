@@ -91,7 +91,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       final long t1 = System.currentTimeMillis();
 
       // Maybe put this in the config?
-      HttpHeaders rh = HttpHeaders.of(getClass().getSimpleName()).acceptApplicationXML().build();
+      HttpHeaders rh = HttpHeaders.of().acceptApplicationXML().build();
 
       final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.headers());
       final long t2 = System.currentTimeMillis();

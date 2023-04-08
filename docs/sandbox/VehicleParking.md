@@ -150,11 +150,6 @@ Used for converting abstract opening hours into concrete points in time.
 
 HTTP headers to add to the request. Any header key, value can be inserted.
 
-Variable substitution is performed on the value, use `${VARIABLE-NAME}`:
-  - `${UUID}` to insert a unique identifier
-  - `${` + ENVIRONMENT-VARIABLE-NAME + `}` to insert environment variable
-
-
 <h4 id="u__3__tags">tags</h4>
 
 **Since version:** `2.2` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
@@ -230,11 +225,6 @@ The source of the vehicle updates.
 **Path:** /updaters/[4] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
-
-Variable substitution is performed on the value, use `${VARIABLE-NAME}`:
-  - `${UUID}` to insert a unique identifier
-  - `${` + ENVIRONMENT-VARIABLE-NAME + `}` to insert environment variable
-
 
 
 

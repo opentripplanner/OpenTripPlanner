@@ -5,7 +5,6 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,8 +84,6 @@ public class EnvironmentVariableReplacer {
           substitutions.put(subKey, value);
         } else if (PROJECT_INFO.containsKey(nameOnly)) {
           substitutions.put(subKey, PROJECT_INFO.get(nameOnly));
-        } else if ("UUID".equals(nameOnly)) {
-          substitutions.put(subKey, UUID.randomUUID().toString());
         } else {
           throw new OtpAppException(
             "Environment variable name '" +

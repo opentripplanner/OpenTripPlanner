@@ -337,11 +337,6 @@ What source of vehicle rental updater to use.
 
 HTTP headers to add to the request. Any header key, value can be inserted.
 
-Variable substitution is performed on the value, use `${VARIABLE-NAME}`:
-  - `${UUID}` to insert a unique identifier
-  - `${` + ENVIRONMENT-VARIABLE-NAME + `}` to insert environment variable
-
-
 
 
 ##### Example configuration

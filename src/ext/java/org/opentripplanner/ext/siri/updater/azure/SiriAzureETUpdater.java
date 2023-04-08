@@ -90,7 +90,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       LOG.info("Fetching initial Siri ET data from {}, timeout is {}ms", uri, timeout);
 
       // Maybe put this in the config?
-      HttpHeaders rh = HttpHeaders.of(getClass().getSimpleName()).acceptApplicationXML().build();
+      HttpHeaders rh = HttpHeaders.of().acceptApplicationXML().build();
 
       final long t1 = System.currentTimeMillis();
       final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.headers());

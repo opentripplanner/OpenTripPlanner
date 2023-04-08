@@ -14,15 +14,7 @@ public class HttpHeadersConfig {
         .of(PARAM_NAME)
         .since(version)
         .summary("HTTP headers to add to the request. Any header key, value can be inserted.")
-        .description(
-          """
-        Variable substitution is performed on the value, use `${VARIABLE-NAME}`:
-          - `${UUID}` to insert a unique identifier
-          - `${` + ENVIRONMENT-VARIABLE-NAME + `}` to insert environment variable
-        """.stripIndent()
-        )
-        .asStringMap(),
-      c.fullPath(PARAM_NAME)
+        .asStringMap()
     );
   }
 }

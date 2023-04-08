@@ -19,15 +19,15 @@ public class HttpHeaders {
     this.headers = Map.copyOf(builder.headers);
   }
 
-  public static Builder of(String source) {
-    return new Builder(source);
+  public static Builder of() {
+    return new Builder();
   }
 
-  public static HttpHeaders of(Map<String, String> map, String source) {
+  public static HttpHeaders of(Map<String, String> map) {
     if (map.isEmpty()) {
       return empty();
     }
-    var builder = of(source);
+    var builder = of();
     for (Map.Entry<String, String> e : map.entrySet()) {
       builder.add(e.getKey(), e.getValue());
     }
@@ -35,7 +35,7 @@ public class HttpHeaders {
   }
 
   public static HttpHeaders empty() {
-    return of("<EMPTY>").build();
+    return of().build();
   }
 
   public Map<String, String> headers() {
@@ -62,13 +62,7 @@ public class HttpHeaders {
 
   public static class Builder {
 
-    private final String source;
-
     private final HashMap<String, String> headers = new HashMap<>();
-
-    public Builder(String source) {
-      this.source = source;
-    }
 
     public Builder acceptApplicationXML() {
       headers.put("Accept", "application/xml");

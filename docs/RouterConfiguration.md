@@ -373,11 +373,6 @@ Used to group requests when monitoring OTP.
 
 HTTP headers to add to the request. Any header key, value can be inserted.
 
-Variable substitution is performed on the value, use `${VARIABLE-NAME}`:
-  - `${UUID}` to insert a unique identifier
-  - `${` + ENVIRONMENT-VARIABLE-NAME + `}` to insert environment variable
-
-
 
 <!-- PARAMETERS-DETAILS END -->
 
