@@ -107,6 +107,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Catch and log exceptions when generating transfers [#4987](https://github.com/opentripplanner/OpenTripPlanner/pull/4987)
 - Support for second  criteria in McRaptor  [#4996](https://github.com/opentripplanner/OpenTripPlanner/pull/4996)
 - Initialize RAPTOR stop-to-stop transfers on server startup [#4977](https://github.com/opentripplanner/OpenTripPlanner/pull/4977)
+- A few small tweaks to the new product overview [#5025](https://github.com/opentripplanner/OpenTripPlanner/pull/5025)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
