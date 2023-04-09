@@ -130,6 +130,21 @@ public final class WgsCoordinate implements Serializable {
   }
 
   /**
+   * Return a new version of this coordinate where latitude/longitude are rounded to 4 decimal
+   * places which at the equator has ~11 meter precision.
+   * <p>
+   * See https://wiki.openstreetmap.org/wiki/Precision_of_coordinates
+   * <p>
+   * This is useful when you want to cache coordinate-based computations but don't need absolute
+   * precision. DO NOT USE THIS IN ROUTING (USE AT LEAST 7 DECIMALS)!
+   */
+  public WgsCoordinate roundToApproximate10m() {
+    var lat = DoubleUtils.roundTo4Decimals(latitude);
+    var lng = DoubleUtils.roundTo4Decimals(longitude);
+    return new WgsCoordinate(lat, lng);
+  }
+
+  /**
    * Return a string on the form: {@code "(60.12345, 11.12345)"}. Up to 5 digits are used after the
    * period(.), even if the coordinate is specified with a higher precision.
    */
@@ -153,21 +168,6 @@ public final class WgsCoordinate implements Serializable {
     }
     WgsCoordinate other = (WgsCoordinate) o;
     return latitude == other.latitude && longitude == other.longitude;
-  }
-
-  /**
-   * Return a new version of this coordinate where latitude/longitude are rounded to 4 decimal
-   * places which at the equator has ~11 meter precision.
-   * <p>
-   * See https://wiki.openstreetmap.org/wiki/Precision_of_coordinates
-   * <p>
-   * This is useful when you want to cache coordinate-based computations but don't need absolute
-   * precision. DO NOT USE THIS IN ROUTING (USE AT LEAST 7 DECIMALS)!
-   */
-  public WgsCoordinate roundToApproximate10m() {
-    var lat = DoubleUtils.roundTo4Decimals(latitude);
-    var lng = DoubleUtils.roundTo4Decimals(longitude);
-    return new WgsCoordinate(lat, lng);
   }
 
   @Override
