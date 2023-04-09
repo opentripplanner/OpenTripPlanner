@@ -16,6 +16,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.service.DefaultRoutingService;
+import org.opentripplanner.routing.service.RequestModifier;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   private final List<RideHailingService> rideHailingServices;
+  private final RequestModifier requestModifier;
   private RouteRequest routeRequest = null;
   private final Graph graph;
   private final TransitService transitService;
@@ -64,6 +66,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehiclePositionService vehiclePositionService,
     VehicleRentalService vehicleRentalService,
     List<RideHailingService> rideHailingServices,
+    RequestModifier modifier,
     TraverseVisitor traverseVisitor,
     FlexConfig flexConfig
   ) {
@@ -82,6 +85,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.worldEnvelopeService = worldEnvelopeService;
     this.vehiclePositionService = vehiclePositionService;
     this.rideHailingServices = rideHailingServices;
+    this.requestModifier = modifier;
   }
 
   /**
@@ -100,6 +104,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehicleRentalService vehicleRentalService,
     FlexConfig flexConfig,
     List<RideHailingService> rideHailingServices,
+    RequestModifier requestModifier,
     @Nullable TraverseVisitor traverseVisitor,
     @Nullable String requestLogFile
   ) {
@@ -117,6 +122,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       vehiclePositionService,
       vehicleRentalService,
       rideHailingServices,
+      requestModifier,
       traverseVisitor,
       flexConfig
     );
@@ -156,7 +162,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Override
   public RoutingService routingService() {
-    return new DefaultRoutingService(this);
+    return new DefaultRoutingService(this, requestModifier);
   }
 
   @Override

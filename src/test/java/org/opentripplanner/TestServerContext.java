@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.service.RequestModifier;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -43,6 +44,7 @@ public class TestServerContext {
       createVehicleRentalService(),
       routerConfig.flexConfig(),
       List.of(),
+      RequestModifier.NOOP,
       null,
       routerConfig.requestLogFile()
     );
