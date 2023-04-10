@@ -5,7 +5,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -314,7 +313,7 @@ all of the elevation values in the street edges.
     maxTransferDuration =
       root
         .of("maxTransferDuration")
-        .since(V2_3)
+        .since(V2_1)
         .summary(
           "Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph."
         )
