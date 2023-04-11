@@ -16,7 +16,7 @@ public class PortlandSmokeTest {
   WgsCoordinate cennentenial = new WgsCoordinate(45.504602, -122.4968719);
   WgsCoordinate hazelwood = new WgsCoordinate(45.52463, -122.5583);
   WgsCoordinate piedmont = new WgsCoordinate(45.5746, -122.6697);
-  WgsCoordinate mountTaborPark = new WgsCoordinate(45.511399,-122.594203);
+  WgsCoordinate mountTaborPark = new WgsCoordinate(45.511399, -122.594203);
 
   @Test
   public void railTrip() {
