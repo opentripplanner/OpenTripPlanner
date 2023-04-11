@@ -194,6 +194,8 @@ public class TransmodelAPI {
         .entity(GraphQLResponseSerializer.serializeBatch(queries, results))
         .build();
     } catch (InterruptedException e) {
+      // TODO Why are we not returning REQUEST_TIMEOUT here?
+      // return Response.status(Response.Status.REQUEST_TIMEOUT).build();
       LOG.error("Batch query interrupted", e);
       throw new RuntimeException(e);
     }

@@ -100,6 +100,8 @@ public class GrizzlyServer {
       cc.setCompressionMinSize(50000); // the min number of bytes to compress
       cc.setCompressableMimeTypes("application/json", "text/json"); // the mime types to compress
       listener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
+      // TODO: Add config parameter to router-config and use it here
+      listener.setTransactionTimeout(1);
       httpServer.addListener(listener);
     }
 

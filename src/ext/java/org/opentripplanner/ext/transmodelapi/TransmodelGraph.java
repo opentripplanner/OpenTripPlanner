@@ -19,12 +19,8 @@ import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class TransmodelGraph {
-
-  static final Logger LOG = LoggerFactory.getLogger(TransmodelGraph.class);
 
   private final GraphQLSchema indexSchema;
 
