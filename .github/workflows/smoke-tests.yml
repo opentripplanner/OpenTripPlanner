@@ -29,7 +29,7 @@ jobs:
             sleep: 15
           - name: portland
             # have to sleep longer since computing geofencing zones takes a while
-            sleep: 70
+            sleep: 80
 
     steps:
       - uses: actions/checkout@v3
