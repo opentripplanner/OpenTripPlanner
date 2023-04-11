@@ -1,4 +1,4 @@
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.spi;
 
 public class UpdaterConstructionException extends RuntimeException {
 

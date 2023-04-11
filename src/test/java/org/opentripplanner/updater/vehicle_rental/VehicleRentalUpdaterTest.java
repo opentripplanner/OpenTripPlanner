@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.util.concurrent.Futures;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
@@ -15,6 +14,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
@@ -78,8 +78,8 @@ class VehicleRentalUpdaterTest {
 
     @Nonnull
     @Override
-    public Map<String, String> httpHeaders() {
-      return Map.of();
+    public HttpHeaders httpHeaders() {
+      return HttpHeaders.empty();
     }
   }
 }

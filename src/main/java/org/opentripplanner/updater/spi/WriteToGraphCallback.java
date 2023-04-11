@@ -1,6 +1,7 @@
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.spi;
 
 import java.util.concurrent.Future;
+import org.opentripplanner.updater.GraphWriterRunnable;
 
 public interface WriteToGraphCallback {
   /**

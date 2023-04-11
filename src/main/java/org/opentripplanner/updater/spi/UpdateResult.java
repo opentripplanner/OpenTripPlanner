@@ -1,4 +1,4 @@
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.spi;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;

@@ -1,4 +1,4 @@
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.spi;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

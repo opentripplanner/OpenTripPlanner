@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.vilkkubikerental;
 
-import java.util.Map;
 import javax.annotation.Nonnull;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
@@ -9,7 +9,7 @@ public record VilkkuBikeRentalDataSourceParameters(
   String url,
   String network,
   boolean overloadingAllowed,
-  @Nonnull Map<String, String> httpHeaders
+  HttpHeaders httpHeaders
 )
   implements VehicleRentalDataSourceParameters {
   @Nonnull

@@ -1,4 +1,4 @@
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.spi;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public interface DataSource<T> {
   List<T> getUpdates();
 
   /**
-   * @see org.opentripplanner.updater.GraphUpdater#setup
+   * @see GraphUpdater#setup
    */
   default void setup() {}
 }

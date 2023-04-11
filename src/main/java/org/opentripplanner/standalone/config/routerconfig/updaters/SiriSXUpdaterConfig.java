@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import java.util.UUID;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
@@ -17,7 +18,8 @@ public class SiriSXUpdaterConfig {
       c.of("frequencySec").since(NA).summary("TODO").asInt(60),
       c.of("earlyStartSec").since(NA).summary("TODO").asInt(-1),
       c.of("timeoutSec").since(NA).summary("TODO").asInt(-1),
-      c.of("blockReadinessUntilInitialized").since(NA).summary("TODO").asBoolean(false)
+      c.of("blockReadinessUntilInitialized").since(NA).summary("TODO").asBoolean(false),
+      HttpHeadersConfig.headers(c, V2_3)
     );
   }
 }

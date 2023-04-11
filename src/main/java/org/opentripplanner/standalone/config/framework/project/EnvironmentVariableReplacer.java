@@ -72,18 +72,18 @@ public class EnvironmentVariableReplacer {
     String source,
     Function<String, String> getEnvVar
   ) {
-    Map<String, String> environmentVariables = new HashMap<>();
+    Map<String, String> substitutions = new HashMap<>();
     Matcher matcher = PATTERN.matcher(text);
 
     while (matcher.find()) {
-      String envVar = matcher.group(0);
+      String subKey = matcher.group(0);
       String nameOnly = matcher.group(1);
-      if (!environmentVariables.containsKey(nameOnly)) {
+      if (!substitutions.containsKey(nameOnly)) {
         String value = getEnvVar.apply(nameOnly);
         if (value != null) {
-          environmentVariables.put(envVar, value);
+          substitutions.put(subKey, value);
         } else if (PROJECT_INFO.containsKey(nameOnly)) {
-          environmentVariables.put(envVar, PROJECT_INFO.get(nameOnly));
+          substitutions.put(subKey, PROJECT_INFO.get(nameOnly));
         } else {
           throw new OtpAppException(
             "Environment variable name '" +
@@ -95,7 +95,7 @@ public class EnvironmentVariableReplacer {
         }
       }
     }
-    for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
+    for (Map.Entry<String, String> entry : substitutions.entrySet()) {
       text = text.replace(entry.getKey(), entry.getValue());
     }
     return text;
