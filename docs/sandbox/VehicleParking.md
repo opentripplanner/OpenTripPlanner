@@ -34,7 +34,7 @@ All updaters have the following parameters in common:
 
 | Config Parameter                |     Type    | Summary                                      |  Req./Opt. | Default Value | Since |
 |---------------------------------|:-----------:|----------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_PARKING"        |    `enum`   | The type of the updater.                     | *Required* |               |  1.5  |
+| type = "vehicle-parking"        |    `enum`   | The type of the updater.                     | *Required* |               |  1.5  |
 | facilitiesFrequencySec          |  `integer`  | How often the facilities should be updated.  | *Optional* | `3600`        |  2.2  |
 | facilitiesUrl                   |   `string`  | URL of the facilities.                       | *Optional* |               |  2.2  |
 | [feedId](#u__2__feedId)         |   `string`  | The name of the data source.                 | *Optional* |               |  2.2  |
@@ -105,7 +105,7 @@ Used for converting abstract opening hours into concrete points in time.
 
 | Config Parameter                |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
 |---------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_PARKING"        |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| type = "vehicle-parking"        |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
 | [feedId](#u__3__feedId)         |     `string`    | The name of the data source.                                               | *Optional* |               |  2.2  |
 | frequencySec                    |    `integer`    | How often to update the source.                                            | *Optional* | `60`          |  2.2  |
 | [sourceType](#u__3__sourceType) |      `enum`     | The source of the vehicle updates.                                         | *Required* |               |  2.2  |
@@ -192,7 +192,7 @@ Tags to add to the parking lots.
 
 | Config Parameter                |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
 |---------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_PARKING"        |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| type = "vehicle-parking"        |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
 | [feedId](#u__4__feedId)         |     `string`    | The name of the data source.                                               | *Optional* |               |  2.2  |
 | frequencySec                    |    `integer`    | How often to update the source.                                            | *Optional* | `60`          |  2.3  |
 | [sourceType](#u__4__sourceType) |      `enum`     | The source of the vehicle updates.                                         | *Required* |               |  2.2  |
