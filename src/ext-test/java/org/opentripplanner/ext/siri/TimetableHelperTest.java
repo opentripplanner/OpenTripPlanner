@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -41,7 +41,7 @@ public class TimetableHelperTest {
   private static final FeedScopedId SCOPED_LINE_ID = new FeedScopedId(FEED_ID, LINE_ID);
   private static final ZonedDateTime START_OF_SERVICE = ZonedDateTime.of(
     LocalDateTime.of(2022, 12, 9, 0, 0),
-    ZoneId.of("CET")
+    ZoneIds.CET
   );
 
   private TripTimes tripTimes;
