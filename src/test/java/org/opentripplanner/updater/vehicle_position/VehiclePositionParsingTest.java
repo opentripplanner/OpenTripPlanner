@@ -1,9 +1,9 @@
 package org.opentripplanner.updater.vehicle_position;
 
 import java.net.URI;
-import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class VehiclePositionParsingTest {
 
@@ -36,7 +36,7 @@ public class VehiclePositionParsingTest {
   private GtfsRealtimeHttpVehiclePositionSource getVehiclePositionSource(String filename) {
     return new GtfsRealtimeHttpVehiclePositionSource(
       URI.create("file:src/test/resources/gtfs-rt/vehicle-positions/" + filename),
-      Map.of()
+      HttpHeaders.empty()
     );
   }
 }

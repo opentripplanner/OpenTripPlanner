@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.alert;
 
 import java.util.Map;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public record GtfsRealtimeAlertsUpdaterParameters(
@@ -10,10 +11,6 @@ public record GtfsRealtimeAlertsUpdaterParameters(
   int earlyStartSec,
   boolean fuzzyTripMatching,
   int frequencySec,
-  Map<String, String> headers
+  HttpHeaders headers
 )
-  implements PollingGraphUpdaterParameters {
-  public GtfsRealtimeAlertsUpdaterParameters {
-    headers = Map.copyOf(headers);
-  }
-}
+  implements PollingGraphUpdaterParameters {}

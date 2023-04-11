@@ -7,10 +7,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,23 +27,26 @@ public class GtfsRealtimeHttpVehiclePositionSource {
    */
   private final URI url;
 
-  private final Map<String, String> DEFAULT_HEADERS = Map.of(
-    "Accept",
-    "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
-  );
+  private final HttpHeaders DEFAULT_HEADERS = HttpHeaders
+    .of()
+    .add(
+      "Accept",
+      "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
+    )
+    .build();
 
-  private final Map<String, String> headers;
+  private final HttpHeaders headers;
 
-  public GtfsRealtimeHttpVehiclePositionSource(URI url, Map<String, String> headers) {
+  public GtfsRealtimeHttpVehiclePositionSource(URI url, HttpHeaders headers) {
     this.url = url;
-    this.headers = MapUtils.combine(headers, DEFAULT_HEADERS);
+    this.headers = HttpHeaders.of(headers, DEFAULT_HEADERS);
   }
 
   /**
    * Parses raw GTFS-RT data into vehicle positions
    */
   public List<VehiclePosition> getPositions() {
-    try (InputStream is = HttpUtils.openInputStream(url.toString(), headers)) {
+    try (InputStream is = HttpUtils.openInputStream(url.toString(), headers.asMap())) {
       if (is == null) {
         LOG.warn("Failed to get data from url {}", url);
         return List.of();

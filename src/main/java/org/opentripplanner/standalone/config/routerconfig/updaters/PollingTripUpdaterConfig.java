@@ -20,11 +20,7 @@ public class PollingTripUpdaterConfig {
       )
       .asString();
 
-    var headers = c
-      .of("headers")
-      .since(V2_3)
-      .summary("Extra headers to add to the HTTP request fetching the data.")
-      .asStringMap();
+    var headers = HttpHeadersConfig.headers(c, V2_3);
 
     return new PollingTripUpdaterParameters(
       configRef,

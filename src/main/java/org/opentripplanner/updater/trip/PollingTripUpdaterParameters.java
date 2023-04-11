@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip;
 
 import java.util.Map;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public record PollingTripUpdaterParameters(
@@ -11,10 +12,6 @@ public record PollingTripUpdaterParameters(
 
   String feedId,
   String url,
-  Map<String, String> headers
+  HttpHeaders headers
 )
-  implements PollingGraphUpdaterParameters, UrlUpdaterParameters {
-  public PollingTripUpdaterParameters {
-    headers = Map.copyOf(headers);
-  }
-}
+  implements PollingGraphUpdaterParameters, UrlUpdaterParameters {}

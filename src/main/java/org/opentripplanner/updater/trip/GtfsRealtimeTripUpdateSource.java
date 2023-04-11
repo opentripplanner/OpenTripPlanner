@@ -11,32 +11,35 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GtfsRealtimeTripUpdateSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeTripUpdateSource.class);
-  public static final Map<String, String> DEFAULT_HEADERS = Map.of(
-    "Accept",
-    "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
-  );
+  public static final HttpHeaders DEFAULT_HEADERS = HttpHeaders
+    .of()
+    .add(
+      "Accept",
+      "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
+    )
+    .build();
   /**
    * Feed id that is used to match trip ids in the TripUpdates
    */
   private final String feedId;
   private final String url;
-  private final Map<String, String> headers;
+  private final HttpHeaders headers;
   private boolean fullDataset = true;
   private final ExtensionRegistry registry = ExtensionRegistry.newInstance();
 
   public GtfsRealtimeTripUpdateSource(PollingTripUpdaterParameters config) {
     this.feedId = config.feedId();
     this.url = config.url();
-    this.headers = MapUtils.combine(config.headers(), DEFAULT_HEADERS);
+    this.headers = HttpHeaders.of(config.headers(), DEFAULT_HEADERS);
     MfdzRealtimeExtensions.registerAllExtensions(registry);
   }
 
@@ -46,7 +49,7 @@ public class GtfsRealtimeTripUpdateSource {
     List<TripUpdate> updates = null;
     fullDataset = true;
     try {
-      InputStream is = HttpUtils.openInputStream(URI.create(url), this.headers);
+      InputStream is = HttpUtils.openInputStream(URI.create(url), this.headers.asMap());
       if (is != null) {
         // Decode message
         feedMessage = FeedMessage.parseFrom(is, registry);

@@ -1,8 +1,10 @@
 package org.opentripplanner.updater.spi;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer;
 
 /**
@@ -23,6 +25,13 @@ public class HttpHeaders {
     return new Builder();
   }
 
+  public static HttpHeaders of(HttpHeaders... headers) {
+    Map<String, String> combined = MapUtils.combine(
+      Arrays.stream(headers).map(HttpHeaders::asMap).toArray(Map[]::new)
+    );
+    return HttpHeaders.of(combined);
+  }
+
   public static HttpHeaders of(Map<String, String> map) {
     if (map.isEmpty()) {
       return empty();
@@ -38,7 +47,7 @@ public class HttpHeaders {
     return of().build();
   }
 
-  public Map<String, String> headers() {
+  public Map<String, String> asMap() {
     return headers;
   }
 
