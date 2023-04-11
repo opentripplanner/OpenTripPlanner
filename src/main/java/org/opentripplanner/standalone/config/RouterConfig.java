@@ -105,16 +105,15 @@ number of transit vehicles used in that itinerary.
       );
     this.routingRequestDefaults =
       RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
-    this.transitConfig = new TransitRoutingConfig("transit", root, routingRequestDefaults);
-    this.updatersParameters = new UpdatersConfig(root);
-    this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
-    this.flexConfig = new FlexConfig(root, "flex");
-
     this.routingRequestDefaults.withPreferences(p ->
         p.withStreet(s ->
           s.withRoutingTimeout(parseStreetRoutingTimeout(root, s.original().routingTimeout()))
         )
       );
+    this.transitConfig = new TransitRoutingConfig("transit", root, routingRequestDefaults);
+    this.updatersParameters = new UpdatersConfig(root);
+    this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
+    this.flexConfig = new FlexConfig(root, "flex");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllWarnings(LOG::warn);
