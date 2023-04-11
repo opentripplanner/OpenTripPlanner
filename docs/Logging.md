@@ -16,7 +16,7 @@ Some loggers useful for debugging.
 
 ## Format
 
-By default, OTP logs in plain text to the console. However, it is possible also log in JSON format.
+By default, OTP logs in plain text to the console. However, it is possible to also log in JSON format.
 
 To enable it, set the Java property `otp.logging.format` to one of these values:
 
