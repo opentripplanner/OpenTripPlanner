@@ -10,7 +10,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces.VehicleParkingSpacesBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.updater.DataSource;
+import org.opentripplanner.updater.spi.DataSource;
 
 /**
  * Vehicle parking updater class for https://github.com/HSLdevcom/parkandrideAPI format APIs. There

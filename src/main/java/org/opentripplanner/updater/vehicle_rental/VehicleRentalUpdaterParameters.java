@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental;
 
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 public class VehicleRentalUpdaterParameters implements PollingGraphUpdaterParameters {

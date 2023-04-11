@@ -3,7 +3,7 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 import java.util.List;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
-import org.opentripplanner.updater.DataSource;
+import org.opentripplanner.updater.spi.DataSource;
 
 public interface VehicleRentalDatasource extends DataSource<VehicleRentalPlace> {
   default List<GeofencingZone> getGeofencingZones() {

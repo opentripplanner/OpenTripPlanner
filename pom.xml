@@ -56,14 +56,14 @@
 
 
     <properties>
-        <otp.serialization.version.id>94</otp.serialization.version.id>
+        <otp.serialization.version.id>96</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>28.2</geotools.version>
+        <geotools.version>29.0</geotools.version>
         <google.dagger.version>2.45</google.dagger.version>
         <jackson.version>2.14.2</jackson.version>
         <jersey.version>3.1.1</jersey.version>
         <junit.version>5.9.2</junit.version>
-        <micrometer.version>1.10.5</micrometer.version>
+        <micrometer.version>1.10.6</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
         <logback.version>1.4.6</logback.version>
@@ -325,7 +325,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.8</version>
+                <version>0.8.9</version>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -583,7 +583,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.9.0</version>
+                <version>26.11.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -915,7 +915,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-extended-scalars</artifactId>
-            <version>20.0</version>
+            <version>20.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
