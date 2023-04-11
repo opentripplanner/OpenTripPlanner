@@ -9,7 +9,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
-import org.opentripplanner.updater.ResultLogger;
+import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;

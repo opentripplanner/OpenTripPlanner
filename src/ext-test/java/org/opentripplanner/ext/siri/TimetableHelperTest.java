@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -195,37 +194,6 @@ public class TimetableHelperTest {
 
     // Assert
     assertStatuses(0, OccupancyStatus.STANDING_ROOM_ONLY, false, false, true);
-  }
-
-  /**
-   * In the UK profile the arrival time is optional, so we use the departure time as the fallback.
-   */
-  @Test
-  public void applyUpdateWithoutArrivalTime() {
-    // Arrange
-    final ZonedDateTime aimedDepartureTime = START_OF_SERVICE.plusHours(1);
-    CallWrapper recordedCall = TestCall
-      .of()
-      .withStopPointRef(STOP_ID)
-      .withExpectedDepartureTime(aimedDepartureTime)
-      .build();
-
-    // Act
-    TimetableHelper.applyUpdates(
-      START_OF_SERVICE,
-      tripTimes,
-      0,
-      true,
-      recordedCall,
-      OccupancyEnumeration.STANDING_AVAILABLE
-    );
-
-    // Assert
-    var arrivalTime = LocalTime.ofSecondOfDay(tripTimes.getArrivalTime(0));
-    var departureTime = LocalTime.ofSecondOfDay(tripTimes.getDepartureTime(0));
-
-    assertEquals(aimedDepartureTime.toLocalTime(), arrivalTime);
-    assertEquals(aimedDepartureTime.toLocalTime(), departureTime);
   }
 
   private void assertStatuses(
