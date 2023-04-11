@@ -171,23 +171,17 @@ public class RouteRequestMapper {
     if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
       var filterRequestBuilder = TransitFilterRequest.of();
 
-      if (hasArgument(environment, "banned.routes")) {
-        callWith.argument(
-          "banned.routes",
-          s ->
-            filterRequestBuilder.addNot(SelectRequest.of().withRoutesFromString((String) s).build())
-        );
-      }
+      callWith.argument(
+        "banned.routes",
+        s ->
+          filterRequestBuilder.addNot(SelectRequest.of().withRoutesFromString((String) s).build())
+      );
 
-      if (hasArgument(environment, "banned.agencies")) {
-        callWith.argument(
-          "banned.agencies",
-          s ->
-            filterRequestBuilder.addNot(
-              SelectRequest.of().withAgenciesFromString((String) s).build()
-            )
-        );
-      }
+      callWith.argument(
+        "banned.agencies",
+        s ->
+          filterRequestBuilder.addNot(SelectRequest.of().withAgenciesFromString((String) s).build())
+      );
 
       callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
 

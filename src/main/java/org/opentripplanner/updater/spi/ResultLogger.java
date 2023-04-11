@@ -1,4 +1,4 @@
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.spi;
 
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.lang.DoubleUtils;

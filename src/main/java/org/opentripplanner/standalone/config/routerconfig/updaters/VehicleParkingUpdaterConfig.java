@@ -52,7 +52,7 @@ public class VehicleParkingUpdaterConfig {
         c.of("url").since(V2_2).summary("URL of the resource.").asString(null),
         feedId,
         c.of("frequencySec").since(V2_2).summary("How often to update the source.").asInt(60),
-        c.of("headers").since(V2_2).summary("HTTP headers to add.").asStringMap(),
+        HttpHeadersConfig.headers(c, V2_2),
         new ArrayList<>(
           c.of("tags").since(V2_2).summary("Tags to add to the parking lots.").asStringSet(Set.of())
         ),
@@ -64,7 +64,7 @@ public class VehicleParkingUpdaterConfig {
         c.of("url").since(V2_3).summary("URL of the locations endpoint.").asString(null),
         feedId,
         c.of("frequencySec").since(V2_3).summary("How often to update the source.").asInt(60),
-        c.of("headers").since(V2_3).summary("HTTP headers to add.").asStringMap()
+        HttpHeadersConfig.headers(c, V2_3)
       );
     };
   }

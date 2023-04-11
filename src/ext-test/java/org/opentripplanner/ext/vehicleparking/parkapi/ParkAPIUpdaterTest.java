@@ -13,6 +13,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class ParkAPIUpdaterTest {
 
@@ -25,7 +26,7 @@ public class ParkAPIUpdaterTest {
       url,
       "park-api",
       30,
-      null,
+      HttpHeaders.empty(),
       List.of(),
       null,
       timeZone
@@ -69,7 +70,7 @@ public class ParkAPIUpdaterTest {
       url,
       "park-api",
       30,
-      null,
+      HttpHeaders.empty(),
       List.of(),
       null,
       timeZone
@@ -101,7 +102,7 @@ public class ParkAPIUpdaterTest {
       url,
       "park-api",
       30,
-      null,
+      HttpHeaders.empty(),
       List.of(),
       null,
       ZoneIds.BERLIN

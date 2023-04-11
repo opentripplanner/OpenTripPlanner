@@ -3,7 +3,6 @@ package org.opentripplanner.ext.siri;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -45,17 +44,6 @@ public class SiriHttpUtils extends HttpUtils {
       return null;
     }
     return entity.getContent();
-  }
-
-  /**
-   * Gets a unique ET-Client-Name HTTP header for this instance of OTP.
-   */
-  public static String getUniqueETClientName(String postFix) {
-    String hostname = System.getenv("HOSTNAME");
-    if (hostname == null) {
-      hostname = "otp-" + UUID.randomUUID();
-    }
-    return hostname + postFix;
   }
 
   private static HttpClient getClient(int socketTimeout, int connectionTimeout) {
