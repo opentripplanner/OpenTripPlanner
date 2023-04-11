@@ -184,7 +184,7 @@
   ],
   "timetableUpdates": {
     "purgeExpiredData": false,
-    "snapshotFrequency": "2s"
+    "maxSnapshotFrequency": "2s"
   },
   "updaters": [
     // GTFS-RT service alerts (frequent polling)

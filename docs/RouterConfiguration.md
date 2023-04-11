@@ -613,7 +613,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
   ],
   "timetableUpdates" : {
     "purgeExpiredData" : false,
-    "snapshotFrequency" : "2s"
+    "maxSnapshotFrequency" : "2s"
   },
   "updaters" : [
     {
