@@ -845,6 +845,7 @@ high values.
             "Value should be between 0 and 1." + " If the value is set to be 0, safety is ignored."
           )
           .asDouble(dft.safetyFactor())
-      );
+      )
+      .withEscalatorReluctance(c.of("escalatorReluctance").asDouble(dft.escalatorReluctance()));
   }
 }

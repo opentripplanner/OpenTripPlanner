@@ -962,9 +962,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         street.setHasBogusName(true);
       }
 
+      if (way.isEscalator()) {
+        street.setEscalator(true);
+      } else {
+        street.setStairs(way.isSteps());
+      }
       boolean steps = way.isSteps();
-      street.setStairs(steps);
-
+      //      street.setStairs(steps);
+      //
+      //      boolean escalator = way.isEscalator();
+      //      street.setEscalator(escalator);
       /* TODO: This should probably generalized somehow? */
       if ((way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair")))) {
         street.setWheelchairAccessible(false);

@@ -16,10 +16,14 @@ class StreetEdgeReluctanceCalculator {
     RoutingPreferences pref,
     TraverseMode traverseMode,
     boolean walkingBike,
-    boolean edgeIsStairs
+    boolean edgeIsStairs,
+    boolean edgeIsEscalator
   ) {
     if (edgeIsStairs) {
       return pref.walk().stairsReluctance();
+    } else if (edgeIsEscalator) {
+      if (traverseMode == TraverseMode.BICYCLE) return Double.POSITIVE_INFINITY;
+      return pref.walk().escalatorReluctance();
     } else {
       return switch (traverseMode) {
         case WALK -> walkingBike ? pref.bike().walkingReluctance() : pref.walk().reluctance();
@@ -30,6 +34,15 @@ class StreetEdgeReluctanceCalculator {
         );
       };
     }
+  }
+
+  static double computeReluctance(
+    RoutingPreferences pref,
+    TraverseMode traverseMode,
+    boolean walkingBike,
+    boolean edgeIsStairs
+  ) {
+    return computeReluctance(pref, traverseMode, walkingBike, edgeIsStairs, false);
   }
 
   static double computeWheelchairReluctance(

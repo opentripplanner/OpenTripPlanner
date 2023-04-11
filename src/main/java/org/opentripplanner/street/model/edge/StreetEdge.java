@@ -64,6 +64,8 @@ public class StreetEdge
   private static final int BICYCLE_NOTHRUTRAFFIC = 7;
   private static final int WALK_NOTHRUTRAFFIC = 8;
   private static final int CLASS_LINK = 9;
+
+  private static final int ESCALATOR_FLAG_INDEX = 10;
   private StreetEdgeCostExtension costExtension;
   /** back, roundabout, stairs, ... */
   private short flags;
@@ -706,6 +708,15 @@ public class StreetEdge
     flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
   }
 
+  public boolean isEscalator() {
+    return BitSetUtils.get(flags, ESCALATOR_FLAG_INDEX);
+  }
+
+  public void setEscalator(boolean escalator) {
+    permission = StreetTraversalPermission.PEDESTRIAN;
+    flags = BitSetUtils.set(flags, ESCALATOR_FLAG_INDEX, escalator);
+  }
+
   /**
    * The edge is part of an osm way, which is of type link
    */
@@ -1226,8 +1237,19 @@ public class StreetEdge
         preferences,
         traverseMode,
         walkingBike,
-        isStairs()
+        isStairs(),
+        isEscalator()
       );
+    if (isEscalator()) System.out.println(
+      "Escalator reluctance" +
+      StreetEdgeReluctanceCalculator.computeReluctance(
+        preferences,
+        traverseMode,
+        walkingBike,
+        isStairs(),
+        isEscalator()
+      )
+    );
     return new TraversalCosts(time, weight);
   }
 
@@ -1266,7 +1288,8 @@ public class StreetEdge
       pref,
       TraverseMode.BICYCLE,
       false,
-      isStairs()
+      isStairs(),
+      isEscalator()
     );
     weight *= reluctance;
     return new TraversalCosts(time, weight);
@@ -1309,12 +1332,18 @@ public class StreetEdge
           (1 - preferences.walk().safetyFactor());
         weight /= speed;
       }
+      if (isEscalator()) {
+        //weight = Double.POSITIVE_INFINITY;
+        permission = StreetTraversalPermission.PEDESTRIAN;
+        System.out.println("isEscalator()");
+      }
       weight *=
         StreetEdgeReluctanceCalculator.computeReluctance(
           preferences,
           traverseMode,
           walkingBike,
-          isStairs()
+          isStairs(),
+          isEscalator()
         );
     }
 
