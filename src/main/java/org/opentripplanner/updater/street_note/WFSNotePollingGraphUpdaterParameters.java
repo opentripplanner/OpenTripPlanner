@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.street_note;
 
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public class WFSNotePollingGraphUpdaterParameters implements PollingGraphUpdaterParameters {
 

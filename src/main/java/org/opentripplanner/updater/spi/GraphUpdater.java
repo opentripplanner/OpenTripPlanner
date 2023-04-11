@@ -1,4 +1,4 @@
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.spi;
 
 /**
  * Interface for graph updaters. Objects that implement this interface should always be configured

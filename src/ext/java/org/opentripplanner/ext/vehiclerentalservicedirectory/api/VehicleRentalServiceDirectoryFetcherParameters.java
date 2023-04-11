@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.vehiclerentalservicedirectory.api;
 
 import java.net.URI;
-import java.util.Map;
+import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class VehicleRentalServiceDirectoryFetcherParameters {
 
@@ -38,7 +38,7 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
    * <p>
    * Optional, default value is null
    */
-  private final Map<String, String> headers;
+  private final HttpHeaders headers;
 
   private final String language;
 
@@ -48,7 +48,7 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
     String updaterUrlName,
     String networkName,
     String language,
-    Map<String, String> headers
+    HttpHeaders headers
   ) {
     this.url = url;
     this.sourcesName = sourcesName;
@@ -74,7 +74,7 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
     return sourceNetworkName;
   }
 
-  public Map<String, String> getHeaders() {
+  public HttpHeaders getHeaders() {
     return headers;
   }
 
