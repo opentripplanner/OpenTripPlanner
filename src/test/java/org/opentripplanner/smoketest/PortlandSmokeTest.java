@@ -14,13 +14,15 @@ import org.opentripplanner.smoketest.util.SmokeTestRequest;
 public class PortlandSmokeTest {
 
   WgsCoordinate cennentenial = new WgsCoordinate(45.504602, -122.4968719);
-  WgsCoordinate hillside = new WgsCoordinate(45.5275, -122.7110);
+  WgsCoordinate hazelwood = new WgsCoordinate(45.52463, -122.5583);
   WgsCoordinate piedmont = new WgsCoordinate(45.5746, -122.6697);
 
   @Test
-  public void railRouteAcrossTheCity() {
+  public void railTrip() {
+    // this used to be across the city by since the train is interrupter in April '23 this is a
+    // much shorter trip
     SmokeTest.basicRouteTest(
-      new SmokeTestRequest(cennentenial, hillside, Set.of("TRAM", "WALK")),
+      new SmokeTestRequest(cennentenial, hazelwood, Set.of("TRAM", "WALK")),
       List.of("WALK", "TRAM", "WALK")
     );
   }
@@ -33,7 +35,7 @@ public class PortlandSmokeTest {
   @ValueSource(booleans = { true, false })
   public void geofencingZone(boolean arriveBy) {
     SmokeTest.basicRouteTest(
-      new SmokeTestRequest(cennentenial, hillside, Set.of("SCOOTER_RENT", "WALK"), arriveBy),
+      new SmokeTestRequest(cennentenial, hazelwood, Set.of("SCOOTER_RENT", "WALK"), arriveBy),
       List.of("WALK", "SCOOTER", "WALK")
     );
   }

@@ -19,7 +19,7 @@ denver/osm.pbf:
 	${CURL} http://osm.ibi-transit.com/vex/39.65857056750545,-105.0567626953125,39.8578370694061,-104.86862182617188.pbf -o $@
 
 denver/gtfs.zip:
-	${CURL} https://www.rtd-denver.com/files/gtfs/google_transit.zip -o $@
+	echo "Downloaded by OTP"
 
 septa/osm.pbf:
 	${CURL} http://osm.ibi-transit.com/vex/39.85441086976069,-75.29136657714844,40.0433862595006,-75.06202697753906.pbf -o $@

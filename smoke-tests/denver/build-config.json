@@ -1,0 +1,9 @@
+{
+  "transitFeeds" : [
+    {
+      "type" : "gtfs",
+      "feedId" : "denver",
+      "source" : "https://www.rtd-denver.com/files/gtfs/google_transit.zip"
+    }
+  ]
+}
