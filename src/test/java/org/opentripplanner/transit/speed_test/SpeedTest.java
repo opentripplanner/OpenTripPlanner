@@ -308,8 +308,8 @@ public class SpeedTest {
 
   /**
    * Save the result for the last sample run for each profile. Nothing happens if not all test-cases
-   * are run. This prevents the excluded tests-cases in the result file to deleted, and the result
-   * to be copied to the expected-result by a mistake.
+   * are run. This prevents the excluded tests-cases in the result file to be deleted, and the result
+   * to be copied to the expected-results file by mistake.
    */
   private void saveTestCasesToResultFile() {
     var currentTestCases = lastSampleResult.get(profile);
