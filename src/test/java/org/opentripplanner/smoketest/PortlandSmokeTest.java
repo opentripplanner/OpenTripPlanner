@@ -16,6 +16,7 @@ public class PortlandSmokeTest {
   WgsCoordinate cennentenial = new WgsCoordinate(45.504602, -122.4968719);
   WgsCoordinate hazelwood = new WgsCoordinate(45.52463, -122.5583);
   WgsCoordinate piedmont = new WgsCoordinate(45.5746, -122.6697);
+  WgsCoordinate mountTaborPark = new WgsCoordinate(45.511399,-122.594203);
 
   @Test
   public void railTrip() {
@@ -28,14 +29,14 @@ public class PortlandSmokeTest {
   }
 
   /**
-   * Checks that a scooter rental finishes at the edge of the business area and is continued on
+   * Checks that a scooter rental finishes at the edge of the park area and is continued on
    * foot rather than scootering all the way to the destination.
    */
   @ParameterizedTest(name = "scooter rental with arriveBy={0}")
   @ValueSource(booleans = { true, false })
   public void geofencingZone(boolean arriveBy) {
     SmokeTest.basicRouteTest(
-      new SmokeTestRequest(cennentenial, hazelwood, Set.of("SCOOTER_RENT", "WALK"), arriveBy),
+      new SmokeTestRequest(cennentenial, mountTaborPark, Set.of("SCOOTER_RENT", "WALK"), arriveBy),
       List.of("WALK", "SCOOTER", "WALK")
     );
   }
