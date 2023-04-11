@@ -67,6 +67,7 @@ public class NetexMapper {
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final double maxStopToShapeSnapDistance;
   private final boolean noTransfersOnIsolatedStops;
+  private final String codeTagKey;
 
   /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
   private GroupNetexMapper groupMapper;
@@ -93,7 +94,8 @@ public class NetexMapper {
     DataImportIssueStore issueStore,
     Set<String> ferryIdsNotAllowedForBicycle,
     double maxStopToShapeSnapDistance,
-    boolean noTransfersOnIsolatedStops
+    boolean noTransfersOnIsolatedStops,
+    String codeTagKey
   ) {
     this.transitBuilder = transitBuilder;
     this.deduplicator = deduplicator;
@@ -102,6 +104,7 @@ public class NetexMapper {
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.codeTagKey = codeTagKey;
     this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
     this.tripCalendarBuilder = new TripCalendarBuilder(this.calendarServiceBuilder, issueStore);
   }
@@ -306,7 +309,8 @@ public class NetexMapper {
       transitBuilder.stopModelBuilder(),
       zoneId,
       issueStore,
-      noTransfersOnIsolatedStops
+      noTransfersOnIsolatedStops,
+      codeTagKey
     );
     for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
       Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex

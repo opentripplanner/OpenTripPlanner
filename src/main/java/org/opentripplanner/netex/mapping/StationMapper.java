@@ -15,6 +15,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.Station;
+import org.rutebanken.netex.model.KeyValueStructure;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
 import org.rutebanken.netex.model.LocaleStructure;
 import org.rutebanken.netex.model.MultilingualString;
@@ -33,18 +34,22 @@ class StationMapper {
   private final boolean noTransfersOnIsolatedStops;
   private final EntityById<Station> stationsById;
 
+  private final String codeTagKey;
+
   StationMapper(
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
     ZoneId defaultTimeZone,
     boolean noTransfersOnIsolatedStops,
-    EntityById<Station> stationsById
+    EntityById<Station> stationsById,
+    String codeTagKey
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
     this.defaultTimeZone = defaultTimeZone;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
     this.stationsById = stationsById;
+    this.codeTagKey = codeTagKey;
   }
 
   Station map(StopPlace stopPlace) {
@@ -75,6 +80,21 @@ class StationMapper {
       builder.withTransfersNotAllowed(
         LimitedUseTypeEnumeration.ISOLATED.equals(stopPlace.getLimitedUse())
       );
+    }
+
+    /* handle IFOTP id stored in KV GlobalID in the DELFI feed to allow matching to OSM */
+    if (stopPlace.getKeyList() != null && !codeTagKey.isEmpty()) {
+      String code = stopPlace
+        .getKeyList()
+        .getKeyValue()
+        .stream()
+        .filter(keyValueStructure -> keyValueStructure.getKey().equals(codeTagKey))
+        .map(KeyValueStructure::getValue)
+        .findFirst()
+        .orElse(null);
+      if (code != null) {
+        builder.withCode(code);
+      }
     }
 
     return builder.build();

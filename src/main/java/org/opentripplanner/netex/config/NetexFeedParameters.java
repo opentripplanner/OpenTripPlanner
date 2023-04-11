@@ -13,7 +13,7 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
 
 /**
- * Parameters to configure the NETEX import. Se the generated build-config documentation or
+ * Parameters to configure the NETEX import. See the generated build-config documentation or
  * the config mapping for documentation.
  */
 public class NetexFeedParameters implements DataSourceConfig {
@@ -49,6 +49,7 @@ public class NetexFeedParameters implements DataSourceConfig {
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final boolean noTransfersOnIsolatedStops;
   private final boolean ignoreFareFrame;
+  private final String codeTagKey;
 
   private NetexFeedParameters() {
     this.source = null;
@@ -64,6 +65,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     this.ferryIdsNotAllowedForBicycle = FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE;
     this.noTransfersOnIsolatedStops = NO_TRANSFERS_ON_ISOLATED_STOPS;
     this.ignoreFareFrame = IGNORE_FARE_FRAME;
+    this.codeTagKey = "";
   }
 
   private NetexFeedParameters(Builder builder) {
@@ -76,6 +78,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     this.ferryIdsNotAllowedForBicycle = Set.copyOf(builder.ferryIdsNotAllowedForBicycle);
     this.noTransfersOnIsolatedStops = builder.noTransfersOnIsolatedStops;
     this.ignoreFareFrame = builder.ignoreFareFrame;
+    this.codeTagKey = builder.codeTagKey;
   }
 
   public static Builder of() {
@@ -130,6 +133,11 @@ public class NetexFeedParameters implements DataSourceConfig {
     return ignoreFareFrame;
   }
 
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
+  public String codeTagKey() {
+    return codeTagKey;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -143,7 +151,8 @@ public class NetexFeedParameters implements DataSourceConfig {
       sharedGroupFilePattern.equals(that.sharedGroupFilePattern) &&
       groupFilePattern.equals(that.groupFilePattern) &&
       ignoreFareFrame == that.ignoreFareFrame &&
-      ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle)
+      ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle) &&
+      codeTagKey.equals(that.codeTagKey)
     );
   }
 
@@ -157,7 +166,8 @@ public class NetexFeedParameters implements DataSourceConfig {
       sharedGroupFilePattern,
       groupFilePattern,
       ignoreFareFrame,
-      ferryIdsNotAllowedForBicycle
+      ferryIdsNotAllowedForBicycle,
+      codeTagKey
     );
   }
 
@@ -173,6 +183,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       .addStr("ignoreFilePattern", ignoreFilePattern, DEFAULT.ignoreFilePattern)
       .addBoolIfTrue("ignoreFareFrame", ignoreFareFrame)
       .addCol("ferryIdsNotAllowedForBicycle", ferryIdsNotAllowedForBicycle, Set.of())
+      .addStr("codeTagKey", codeTagKey, "")
       .toString();
   }
 
@@ -188,6 +199,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     private final Set<String> ferryIdsNotAllowedForBicycle = new HashSet<>();
     private boolean noTransfersOnIsolatedStops;
     private boolean ignoreFareFrame;
+    private String codeTagKey;
 
     private Builder(NetexFeedParameters original) {
       this.original = original;
@@ -200,6 +212,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       this.ferryIdsNotAllowedForBicycle.addAll(original.ferryIdsNotAllowedForBicycle);
       this.noTransfersOnIsolatedStops = original.noTransfersOnIsolatedStops;
       this.ignoreFareFrame = original.ignoreFareFrame;
+      this.codeTagKey = original.codeTagKey;
     }
 
     public URI source() {
@@ -248,6 +261,11 @@ public class NetexFeedParameters implements DataSourceConfig {
 
     public Builder withIgnoreFareFrame(boolean ignoreFareFrame) {
       this.ignoreFareFrame = ignoreFareFrame;
+      return this;
+    }
+
+    public Builder withcodeTagKey(String codeTagKey) {
+      this.codeTagKey = codeTagKey;
       return this;
     }
 

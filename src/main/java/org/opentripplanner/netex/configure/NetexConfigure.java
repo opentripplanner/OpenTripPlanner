@@ -66,7 +66,8 @@ public class NetexConfigure {
       config.ferryIdsNotAllowedForBicycle(),
       buildParams.maxStopToShapeSnapDistance,
       config.noTransfersOnIsolatedStops(),
-      config.ignoreFareFrame()
+      config.ignoreFareFrame(),
+      config.codeTagKey()
     );
   }
 

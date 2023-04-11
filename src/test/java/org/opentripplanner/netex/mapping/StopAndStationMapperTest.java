@@ -156,7 +156,8 @@ public class StopAndStationMapperTest {
       StopModel.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
-      false
+      false,
+      null
     );
 
     stopMapper.mapParentAndChildStops(stopPlaces);
@@ -226,7 +227,8 @@ public class StopAndStationMapperTest {
       StopModel.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
-      isolated
+      isolated,
+      null
     );
 
     stopMapper.mapParentAndChildStops(stopPlaces);
@@ -287,7 +289,8 @@ public class StopAndStationMapperTest {
       stopModelBuilder,
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
-      false
+      false,
+      null
     );
   }
 

@@ -121,6 +121,7 @@ class NetexEpipBundleSmokeTest {
     assertEquals(0, quay.getIndex());
     assertNull(quay.getPlatformCode());
     assertEquals(31, stops.size());
+    assertEquals("de:02000:80026::800091", quay.getCode());
   }
 
   private void assertStations(Collection<Station> stations) {
@@ -134,6 +135,7 @@ class NetexEpipBundleSmokeTest {
     assertEquals("Europe/Berlin", station.getTimezone().toString());
     assertEquals(3, station.getChildStops().size());
     assertEquals(20, stations.size());
+    assertEquals("de:02000:80026", station.getCode());
   }
 
   private void assertTripPatterns(Collection<TripPattern> patterns) {

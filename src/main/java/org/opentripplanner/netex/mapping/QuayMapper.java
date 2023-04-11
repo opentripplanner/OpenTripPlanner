@@ -13,6 +13,7 @@ import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.rutebanken.netex.model.KeyValueStructure;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 
@@ -32,14 +33,18 @@ class QuayMapper {
     Accessibility wheelchair
   ) {}
 
+  private final String codeTagKey;
+
   QuayMapper(
     FeedScopedIdFactory idFactory,
     DataImportIssueStore issueStore,
-    EntityById<RegularStop> regularStopIndex
+    EntityById<RegularStop> regularStopIndex,
+    String codeTagKey
   ) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;
     this.regularStopIndex = regularStopIndex;
+    this.codeTagKey = codeTagKey;
   }
 
   /**
@@ -95,6 +100,21 @@ class QuayMapper {
       .withNetexVehicleSubmode(parameters.transitMode.subMode());
 
     builder.fareZones().addAll(parameters.fareZones);
+
+    /* handle IFOTP id stored in KV GlobalID in the DELFI feed to allow matching to OSM */
+    if (parameters.quay.getKeyList() != null && !codeTagKey.isEmpty()) {
+      String code = parameters.quay
+        .getKeyList()
+        .getKeyValue()
+        .stream()
+        .filter(keyValueStructure -> keyValueStructure.getKey().equals(codeTagKey))
+        .map(KeyValueStructure::getValue)
+        .findFirst()
+        .orElse(null);
+      if (code != null) {
+        builder.withCode(code);
+      }
+    }
 
     return builder.build();
   }
