@@ -62,7 +62,9 @@ public class TriangleInequalityTest {
       Set.of(),
       graph,
       DataImportIssueStore.NOOP,
-      true
+      true,
+      false,
+      false
     );
     osmModule.buildGraph();
   }

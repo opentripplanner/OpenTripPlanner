@@ -83,6 +83,8 @@ public class AdaptivePruningTest {
         Set.of(),
         graph,
         DataImportIssueStore.NOOP,
+        false,
+        false,
         false
       );
       osmModule.customNamer =

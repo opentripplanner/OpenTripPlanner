@@ -48,7 +48,9 @@ public class UnroutableTest {
       Set.of(),
       graph,
       DataImportIssueStore.NOOP,
-      true
+      true,
+      false,
+      false
     );
     osmBuilder.buildGraph();
   }
