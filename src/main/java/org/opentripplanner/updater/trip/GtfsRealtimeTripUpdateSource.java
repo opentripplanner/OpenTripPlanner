@@ -20,13 +20,6 @@ import org.slf4j.LoggerFactory;
 public class GtfsRealtimeTripUpdateSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeTripUpdateSource.class);
-  public static final HttpHeaders DEFAULT_HEADERS = HttpHeaders
-    .of()
-    .add(
-      "Accept",
-      "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
-    )
-    .build();
   /**
    * Feed id that is used to match trip ids in the TripUpdates
    */
@@ -39,7 +32,7 @@ public class GtfsRealtimeTripUpdateSource {
   public GtfsRealtimeTripUpdateSource(PollingTripUpdaterParameters config) {
     this.feedId = config.feedId();
     this.url = config.url();
-    this.headers = HttpHeaders.of(config.headers(), DEFAULT_HEADERS);
+    this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
     MfdzRealtimeExtensions.registerAllExtensions(registry);
   }
 

@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.spi;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -23,13 +22,6 @@ public class HttpHeaders {
 
   public static Builder of() {
     return new Builder();
-  }
-
-  public static HttpHeaders of(HttpHeaders... headers) {
-    Map<String, String> combined = MapUtils.combine(
-      Arrays.stream(headers).map(HttpHeaders::asMap).toArray(Map[]::new)
-    );
-    return HttpHeaders.of(combined);
   }
 
   public static HttpHeaders of(Map<String, String> map) {
@@ -78,8 +70,27 @@ public class HttpHeaders {
       return this;
     }
 
+    public Builder acceptProtobuf() {
+      headers.put(
+        "Accept",
+        "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
+      );
+      return this;
+    }
+
     public Builder add(String name, String value) {
       headers.put(name, value);
+      return this;
+    }
+
+    /**
+     * Merge another instance of {@link HttpHeaders} into this builder.
+     * <p>
+     * NOTE: if there are headers with the same name then the added ones override the
+     * already set ones!
+     */
+    public Builder add(HttpHeaders other) {
+      headers = new HashMap<>(MapUtils.combine(headers, other.headers));
       return this;
     }
 

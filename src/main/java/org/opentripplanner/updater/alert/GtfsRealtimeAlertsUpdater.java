@@ -22,13 +22,6 @@ import org.slf4j.LoggerFactory;
 public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements TransitAlertProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
-  public static final HttpHeaders DEFAULT_HEADERS = HttpHeaders
-    .of()
-    .add(
-      "Accept",
-      "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
-    )
-    .build();
 
   private final String url;
   private final AlertsUpdateHandler updateHandler;
@@ -43,7 +36,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   ) {
     super(config);
     this.url = config.url();
-    this.headers = HttpHeaders.of(config.headers(), DEFAULT_HEADERS);
+    this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
     TransitAlertService transitAlertService = new TransitAlertServiceImpl(transitModel);
 
     var fuzzyTripMatcher = config.fuzzyTripMatching()

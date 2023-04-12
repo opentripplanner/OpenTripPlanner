@@ -50,11 +50,29 @@ class HttpHeadersTest {
 
   @Test
   void testCombine() {
-    var h1 = HttpHeaders.of().add("test", "value").build();
+    var h1 = HttpHeaders.of().acceptProtobuf();
     var h2 = HttpHeaders.of().add("foo", "bar").build();
 
-    var combined = HttpHeaders.of(h1, h2).asMap();
+    var combined = h1.add(h2).build().asMap();
 
-    assertEquals(Map.of("test", "value", "foo", "bar"), combined);
+    assertEquals(
+      Map.of(
+        "Accept",
+        "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*",
+        "foo",
+        "bar"
+      ),
+      combined
+    );
+  }
+
+  @Test
+  void testOverride() {
+    var h1 = HttpHeaders.of().acceptProtobuf();
+    var h2 = HttpHeaders.of().add("Accept", "bar").build();
+
+    var combined = h1.add(h2).build().asMap();
+
+    assertEquals(Map.of("Accept", "bar"), combined);
   }
 }

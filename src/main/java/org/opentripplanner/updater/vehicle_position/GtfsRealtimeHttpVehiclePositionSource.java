@@ -27,19 +27,11 @@ public class GtfsRealtimeHttpVehiclePositionSource {
    */
   private final URI url;
 
-  private final HttpHeaders DEFAULT_HEADERS = HttpHeaders
-    .of()
-    .add(
-      "Accept",
-      "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
-    )
-    .build();
-
   private final HttpHeaders headers;
 
   public GtfsRealtimeHttpVehiclePositionSource(URI url, HttpHeaders headers) {
     this.url = url;
-    this.headers = HttpHeaders.of(headers, DEFAULT_HEADERS);
+    this.headers = HttpHeaders.of().acceptProtobuf().add(headers).build();
   }
 
   /**
