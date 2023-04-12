@@ -10,45 +10,15 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
-import java.time.Duration;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
 
 public class LegacyGraphQLScalars {
 
   private static final ObjectMapper geoJsonMapper = new ObjectMapper()
     .registerModule(new JtsModule(GeometryUtils.getGeometryFactory()));
-  public static GraphQLScalarType durationScalar = GraphQLScalarType
-    .newScalar()
-    .name("Duration")
-    .description("An ISO-8601-formatted time duration, i.e. `PT2H30M` for 2 hours and 30 minutes.")
-    .coercing(
-      new Coercing<Duration, String>() {
-        @Override
-        public String serialize(@Nonnull Object dataFetcherResult)
-          throws CoercingSerializeException {
-          if (dataFetcherResult instanceof Duration duration) {
-            return duration.toString();
-          } else {
-            throw new CoercingSerializeException(
-              "Cannot format %s as a ISO-8601 duration".formatted(dataFetcherResult)
-            );
-          }
-        }
-
-        @Override
-        public Duration parseValue(Object input) throws CoercingParseValueException {
-          return null;
-        }
-
-        @Override
-        public Duration parseLiteral(Object input) throws CoercingParseLiteralException {
-          return null;
-        }
-      }
-    )
-    .build();
+  public static GraphQLScalarType durationScalar = DurationScalarFactory.createDurationScalar();
 
   public static GraphQLScalarType polylineScalar = GraphQLScalarType
     .newScalar()
