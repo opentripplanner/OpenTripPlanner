@@ -4,6 +4,7 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.ridehailing.RideHailingDepartureTimeShifter;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
@@ -24,14 +25,7 @@ public class RideHailingServicesModule {
     return config
       .rideHailingServiceParameters()
       .stream()
-      .map(p -> {
-        // in Java 21 this can hopefully use a switch statement
-        if (p instanceof RideHailingServiceParameters.UberServiceParameters uberParams) {
-          return (RideHailingService) new UberService(uberParams);
-        } else {
-          throw new IllegalArgumentException("Unknown car hailing params %s".formatted(p));
-        }
-      })
+      .map(p -> (RideHailingService) new UberService(p))
       .toList();
   }
 

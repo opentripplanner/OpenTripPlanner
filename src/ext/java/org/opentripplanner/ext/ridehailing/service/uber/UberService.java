@@ -44,7 +44,7 @@ public class UberService extends CachingRideHailingService {
   private final String timeEstimateUri;
   private final String priceEstimateUri;
 
-  public UberService(RideHailingServiceParameters.UberServiceParameters config) {
+  public UberService(RideHailingServiceParameters config) {
     this(
       new UrlEncodedOAuthService(
         config.clientSecret(),
