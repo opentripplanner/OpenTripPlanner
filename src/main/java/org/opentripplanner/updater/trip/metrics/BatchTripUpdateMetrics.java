@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.model.UpdateSuccess;
-import org.opentripplanner.updater.UpdateResult;
+import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 /**

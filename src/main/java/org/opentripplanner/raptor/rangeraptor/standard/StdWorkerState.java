@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
@@ -19,6 +20,11 @@ public interface StdWorkerState<T extends RaptorTripSchedule> extends RaptorWork
    * return the overall best tim to reach the given stop.
    */
   int bestTimePreviousRound(int stop);
+
+  /**
+   * See {@link org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy#setAccessToStop(RaptorAccessEgress, int)}.
+   */
+  void setAccessToStop(RaptorAccessEgress accessPath, int departureTime);
 
   /**
    * Set the time at a transit stop iff it is optimal. This sets both the bestTime and the

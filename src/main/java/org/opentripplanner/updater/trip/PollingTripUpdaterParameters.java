@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip;
 
 import java.util.Map;
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public record PollingTripUpdaterParameters(
   String configRef,
@@ -20,12 +20,12 @@ public record PollingTripUpdaterParameters(
   }
 
   @Override
-  public String getUrl() {
+  public String url() {
     return httpSourceUrl;
   }
 
   @Override
-  public String getFeedId() {
+  public String feedId() {
     return feedId;
   }
 

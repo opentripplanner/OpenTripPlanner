@@ -10,7 +10,6 @@ import org.opentripplanner.raptor.api.debug.DebugTopic;
  */
 class DebugStopArrivalsStatistics {
 
-  private static boolean firstTime = true;
   private final DebugLogger debugLogger;
 
   DebugStopArrivalsStatistics(DebugLogger debugLogger) {
@@ -38,23 +37,17 @@ class DebugStopArrivalsStatistics {
     double avg = ((double) total) / numOfStops;
     double arrayLenAvg = ((double) arrayLen) / numOfStops;
 
-    if (firstTime) {
-      debugLogger.debug(
-        DebugTopic.STOP_ARRIVALS_STATISTICS,
-        "Debug stop arrivals statistics. The number logged are: \n" +
-        "  - For each stop the number of arrivals logged with:\n" +
-        "    - Avarage number of arrivals for stops visited.\n" +
-        "    - The maximum numbers of arrivals for any stop.\n" +
-        "    - The total number of stop arrivals.\n" +
-        "  - The capacity(array length) used.\n" +
-        "    - The avarage array length for stops visited.\n" +
-        "    - The total array length allocated.\n" +
-        "  - The number of stops:\n" +
-        "    - The number of stops visited.\n" +
-        "    - The total number of stops.\n"
-      );
-      firstTime = false;
-    }
+    // Debug stop arrivals statistics.
+    //  - For each stop the number of arrivals logged with:
+    //    - Avarage number of arrivals for stops visited.
+    //    - The maximum numbers of arrivals for any stop.
+    //    - The total number of stop arrivals.
+    //  - The capacity(array length) used:
+    //    - The average array length for stops visited.
+    //    - The total array length allocated.
+    //  - The number of stops:
+    //    - The number of stops visited.
+    //    - The total number of stops.
     debugLogger.debug(
       DebugTopic.STOP_ARRIVALS_STATISTICS,
       "Arrivals %5s %3s %6s (avg/max/tot)  -  Array Length: %5s %5s (avg/tot) -  Stops: %5s %5s (visited/tot)",

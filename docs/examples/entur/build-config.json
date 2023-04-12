@@ -15,7 +15,7 @@
   },
   "banDiscouragedWalking": false,
   "banDiscouragedBiking": false,
-  "maxTransferDurationSeconds": 1800,
+  "maxTransferDuration": "30m",
   "extraEdgesStopPlatformLink": true,
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,

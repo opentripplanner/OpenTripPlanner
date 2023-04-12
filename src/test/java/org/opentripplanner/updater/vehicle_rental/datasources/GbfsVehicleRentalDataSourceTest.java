@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
 /**
@@ -28,7 +28,7 @@ class GbfsVehicleRentalDataSourceTest {
         "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
         "nb",
         false,
-        new HashMap<>(),
+        HttpHeaders.empty(),
         null,
         false
       )
@@ -113,7 +113,7 @@ class GbfsVehicleRentalDataSourceTest {
         "file:src/test/resources/gbfs/tieroslo/gbfs.json",
         "en",
         false,
-        new HashMap<>(),
+        HttpHeaders.empty(),
         null,
         true
       )
@@ -153,7 +153,7 @@ class GbfsVehicleRentalDataSourceTest {
         "file:src/test/resources/gbfs/helsinki/gbfs.json",
         "en",
         false,
-        new HashMap<>(),
+        HttpHeaders.empty(),
         network,
         false
       )

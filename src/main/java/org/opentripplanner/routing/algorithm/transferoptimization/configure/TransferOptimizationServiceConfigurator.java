@@ -4,7 +4,7 @@ import java.util.function.IntFunction;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
@@ -107,7 +107,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     TransferGenerator<T> transferGenerator,
     MinCostFilterChain<OptimizedPathTail<T>> transferPointFilter,
     TransferWaitTimeCostCalculator transferWaitTimeCostCalculator,
-    CostCalculator<T> costCalculator
+    RaptorCostCalculator<T> costCalculator
   ) {
     return new OptimizePathDomainService<>(
       transferGenerator,

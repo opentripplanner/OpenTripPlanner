@@ -8,12 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -62,9 +65,37 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   TransitService transitService;
 
+  @Override
+  public String getFeedName() {
+    return "gtfs/interlining";
+  }
+
+  @BeforeEach
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
+
+    if (transitService == null) {
+      transitService = new DefaultTransitService(transitModel);
+      transitModel.setUpdaterManager(new GraphUpdaterManager(graph, transitModel, List.of()));
+    } else {
+      transitAlertService.getAllAlerts().clear();
+    }
+    if (alertsUpdateHandler == null) {
+      transitAlertService = new TransitAlertServiceImpl(transitModel);
+      alertsUpdateHandler =
+        new SiriAlertsUpdateHandler(
+          FEED_ID,
+          transitModel,
+          transitAlertService,
+          SiriFuzzyTripMatcher.of(transitService),
+          0
+        );
+    }
+  }
+
   @Test
   public void testSiriSxUpdateForStop() {
-    init();
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
@@ -169,29 +200,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(infoLinkLabel, alertUrl.label);
   }
 
-  public void init() {
-    if (transitService == null) {
-      transitService = new DefaultTransitService(transitModel);
-      transitModel.setUpdaterManager(new GraphUpdaterManager(graph, transitModel, List.of()));
-    } else {
-      transitAlertService.getAllAlerts().clear();
-    }
-    if (alertsUpdateHandler == null) {
-      transitAlertService = new TransitAlertServiceImpl(transitModel);
-      alertsUpdateHandler =
-        new SiriAlertsUpdateHandler(
-          FEED_ID,
-          transitModel,
-          transitAlertService,
-          SiriFuzzyTripMatcher.of(transitService),
-          0
-        );
-    }
-  }
-
   @Test
   public void testSiriSxUpdateForStopMultipleValidityPeriods() {
-    init();
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
@@ -250,7 +260,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForMultipleStops() {
-    init();
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
@@ -335,7 +344,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForTrip() {
-    init();
     final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
@@ -386,7 +394,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForTripWithoutSpecificDate() {
-    init();
     final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
@@ -446,14 +453,14 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForTripByVehicleJourney() {
-    init();
     final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
 
-    final String situationNumber = "TST:SituationNumber:1234";
-    final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
-    final ZonedDateTime endTime = ZonedDateTime.parse("2014-01-01T23:59:59+01:00");
+    var modelZoneId = transitModel.getTimeZone();
+    var situationNumber = "TST:SituationNumber:1234";
+    var startTime = LocalDateTime.parse("2014-01-01T00:00:00").atZone(modelZoneId);
+    var endTime = LocalDateTime.parse("2014-01-01T23:59:59").atZone(modelZoneId);
 
     PtSituationElement ptSituation = createPtSituationElement(
       situationNumber,
@@ -483,17 +490,16 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForTripAndStopByVehicleJourney() {
-    init();
-
     final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
     final FeedScopedId stopId0 = new FeedScopedId(FEED_ID, "stop0");
     final FeedScopedId stopId1 = new FeedScopedId(FEED_ID, "stop1");
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
 
+    ZoneId zoneId = transitModel.getTimeZone();
     final String situationNumber = "TST:SituationNumber:1234";
-    final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
-    final ZonedDateTime endTime = ZonedDateTime.parse("2014-01-01T23:59:59+01:00");
+    final ZonedDateTime startTime = LocalDateTime.parse("2014-01-01T00:00:00").atZone(zoneId);
+    final ZonedDateTime endTime = LocalDateTime.parse("2014-01-01T23:59:59").atZone(zoneId);
 
     PtSituationElement ptSituation = createPtSituationElement(
       situationNumber,
@@ -532,7 +538,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForTripByDatedVehicleJourney() {
-    init();
     final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
@@ -569,7 +574,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForLine() {
-    init();
     final FeedScopedId lineRef = new FeedScopedId(FEED_ID, "route0");
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
@@ -616,7 +620,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForLineThenExpiry() {
-    init();
     final FeedScopedId lineRef = new FeedScopedId(FEED_ID, "route0");
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
@@ -665,7 +668,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForTripAndStop() {
-    init();
     final FeedScopedId tripId = new FeedScopedId(FEED_ID, "route0-trip1");
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
@@ -722,7 +724,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForLineAndStop() {
-    init();
     final String routeId = "route0";
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
@@ -751,7 +752,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForLineAndExternallyDefinedStopPoint() {
-    init();
     final String routeId = "route0";
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
@@ -776,8 +776,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxWithOpenEndedValidity() {
-    init();
-
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
@@ -825,7 +823,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForLineAndExternallyDefinedStopPlace() {
-    init();
     final String routeId = "route0";
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
@@ -849,7 +846,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   @Test
   public void testSiriSxUpdateForUnknownEntity() {
-    init();
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
@@ -867,11 +863,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(1, alerts.size());
     TransitAlert transitAlert = alerts.iterator().next();
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Unknown.class));
-  }
-
-  @Override
-  public String getFeedName() {
-    return "gtfs/interlining";
   }
 
   private PtSituationElement createPtSituationElement(

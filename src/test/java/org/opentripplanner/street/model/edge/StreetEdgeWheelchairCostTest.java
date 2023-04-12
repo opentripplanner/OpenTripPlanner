@@ -2,7 +2,6 @@ package org.opentripplanner.street.model.edge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.routing.api.request.preference.AccessibilityPreferences.ofOnlyAccessible;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import java.util.stream.Stream;
@@ -85,15 +84,16 @@ class StreetEdgeWheelchairCostTest {
     req.withWheelchair(true);
     req.withPreferences(preferences ->
       preferences.withWheelchair(
-        new WheelchairPreferences(
-          ofOnlyAccessible(),
-          ofOnlyAccessible(),
-          ofOnlyAccessible(),
-          25,
-          0.09,
-          reluctance,
-          10
-        )
+        WheelchairPreferences
+          .of()
+          .withTripOnlyAccessible()
+          .withStopOnlyAccessible()
+          .withElevatorOnlyAccessible()
+          .withInaccessibleStreetReluctance(25)
+          .withMaxSlope(0.09)
+          .withSlopeExceededReluctance(reluctance)
+          .withStairsReluctance(10)
+          .build()
       )
     );
     State result = traverse(edge, req.build());
@@ -120,15 +120,16 @@ class StreetEdgeWheelchairCostTest {
     req.withWheelchair(true);
     req.withPreferences(preferences ->
       preferences.withWheelchair(
-        new WheelchairPreferences(
-          ofOnlyAccessible(),
-          ofOnlyAccessible(),
-          ofOnlyAccessible(),
-          25,
-          0,
-          1.1f,
-          stairsReluctance
-        )
+        WheelchairPreferences
+          .of()
+          .withTripOnlyAccessible()
+          .withStopOnlyAccessible()
+          .withElevatorOnlyAccessible()
+          .withInaccessibleStreetReluctance(25)
+          .withMaxSlope(0)
+          .withSlopeExceededReluctance(1.1)
+          .withStairsReluctance(stairsReluctance)
+          .build()
       )
     );
 
@@ -161,15 +162,16 @@ class StreetEdgeWheelchairCostTest {
     req.withWheelchair(true);
     req.withPreferences(preferences ->
       preferences.withWheelchair(
-        new WheelchairPreferences(
-          ofOnlyAccessible(),
-          ofOnlyAccessible(),
-          ofOnlyAccessible(),
-          inaccessibleStreetReluctance,
-          0,
-          1.1f,
-          25
-        )
+        WheelchairPreferences
+          .of()
+          .withTripOnlyAccessible()
+          .withStopOnlyAccessible()
+          .withElevatorOnlyAccessible()
+          .withInaccessibleStreetReluctance(inaccessibleStreetReluctance)
+          .withMaxSlope(0)
+          .withSlopeExceededReluctance(1.1)
+          .withStairsReluctance(25)
+          .build()
       )
     );
 

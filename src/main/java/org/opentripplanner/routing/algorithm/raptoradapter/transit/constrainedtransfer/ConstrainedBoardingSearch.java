@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
@@ -35,9 +35,16 @@ public final class ConstrainedBoardingSearch
   private final ConstrainedBoardingSearchStrategy searchStrategy;
 
   /**
+   * List of transfers used for boarding for each stop position in pattern
+   */
+  @Nullable
+  private final TransferForPatternByStopPos transfersToTargetStop;
+
+  /**
    * List of transfers for each stop position in pattern
    */
-  private final TransferForPatternByStopPos transfers;
+  @Nullable
+  private final TransferForPatternByStopPos transfersFromSourceStop;
 
   private List<TransferForPattern> currentTransfers;
   private int currentTargetStopPos;
@@ -49,18 +56,29 @@ public final class ConstrainedBoardingSearch
 
   public ConstrainedBoardingSearch(
     boolean forwardSearch,
-    @Nonnull TransferForPatternByStopPos transfers
+    @Nullable TransferForPatternByStopPos transfersFromSourceStop,
+    @Nullable TransferForPatternByStopPos transfersToTargetStop
   ) {
-    this.transfers = transfers;
+    this.transfersToTargetStop = transfersToTargetStop;
+    this.transfersFromSourceStop = transfersFromSourceStop;
     this.searchStrategy = forwardSearch ? FORWARD_STRATEGY : REVERSE_STRATEGY;
   }
 
   @Override
-  public boolean transferExist(int targetStopPos) {
+  public boolean transferExistTargetStop(int targetStopPos) {
+    if (transfersToTargetStop == null) {
+      return false;
+    }
+
     // Get all guaranteed transfers for the target pattern at the target stop position
-    this.currentTransfers = transfers.get(targetStopPos);
+    this.currentTransfers = transfersToTargetStop.get(targetStopPos);
     this.currentTargetStopPos = targetStopPos;
     return currentTransfers != null;
+  }
+
+  @Override
+  public boolean transferExistSourceStop(int sourceStopPos) {
+    return transfersFromSourceStop != null && transfersFromSourceStop.get(sourceStopPos) != null;
   }
 
   @Override
@@ -204,7 +222,12 @@ public final class ConstrainedBoardingSearch
     implements RaptorConstrainedBoardingSearch<TripSchedule> {
 
     @Override
-    public boolean transferExist(int targetStopPos) {
+    public boolean transferExistTargetStop(int targetStopPos) {
+      return false;
+    }
+
+    @Override
+    public boolean transferExistSourceStop(int targetStopPos) {
       return false;
     }
 

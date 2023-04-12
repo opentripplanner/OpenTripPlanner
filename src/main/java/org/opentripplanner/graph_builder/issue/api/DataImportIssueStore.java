@@ -19,15 +19,26 @@ public interface DataImportIssueStore {
   /** Add an issue to the issue report. */
   void add(DataImportIssue issue);
 
-  /** Add an issue to the issue report without the need of creating a issue class. */
+  /** Add an issue to the issue report without the need of creating an issue class. */
   void add(String type, String message);
 
   /**
-   * Add an issue to the issue report without the need of creating a issue class.
+   * Add an issue to the issue report without the need of creating an issue class.
    * The given list of {@code arguments} is injected into the message using
    * {@link String#format(String, Object...)}.
    */
   void add(String type, String message, Object... arguments);
+
+  /**
+   * Starts processing a {@code source}. This will add the source to all created issues until the
+   * processing is stopped or a new source is processed.
+   */
+  void startProcessingSource(String source);
+
+  /**
+   * Stops the processing of the current source.
+   */
+  void stopProcessingSource();
 
   /** List all issues added */
   List<DataImportIssue> listIssues();

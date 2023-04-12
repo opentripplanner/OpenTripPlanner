@@ -52,6 +52,12 @@ public class NodeAdapter {
    */
   private final Map<String, NodeInfo> parameters = new HashMap<>();
 
+  /**
+   * All warnings are collected during the file parsing and printed as one block at the
+   * end.
+   */
+  private final List<String> warnings = new ArrayList<>();
+
   private boolean usedAsRaw = false;
 
   private final int level;
@@ -155,12 +161,15 @@ public class NodeAdapter {
   }
 
   /**
-   * Log unused parameters for the entire configuration file/node tree. Only call this method for the
-   * root adapter, once for each config file read.
+   * Log unused parameters and other warnings for the entire configuration file/node tree. Only
+   * call this method for the root adapter, once for each config file read.
    */
-  public void logAllUnusedParameters(Consumer<String> logger) {
+  public void logAllWarnings(Consumer<String> logger) {
     for (String p : unusedParams()) {
       logger.accept("Unexpected config parameter: '" + p + "' in '" + source + "'");
+    }
+    for (String warning : warnings) {
+      logger.accept(warning);
     }
   }
 
@@ -259,6 +268,16 @@ public class NodeAdapter {
 
   String concatPath(String a, String b) {
     return a + "." + b;
+  }
+
+  /**
+   * Add a warning to the list of warnings logged after parsing a config file is
+   * complete.
+   */
+  public void addWarning(String message, String paramName) {
+    message += " Parameter: " + fullPath(paramName) + ".";
+    message += " Source: " + source + ".";
+    warnings.add(message);
   }
 
   /**

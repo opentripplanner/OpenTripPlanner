@@ -3,7 +3,7 @@ package org.opentripplanner.updater.vehicle_position;
 import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public record VehiclePositionsUpdaterParameters(
   String configRef,

@@ -17,7 +17,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.DebugHandler;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private final RaptorTransitCalculator<T> transitCalculator;
 
   @Nullable
-  private final CostCalculator<T> costCalculator;
+  private final RaptorCostCalculator<T> costCalculator;
 
   private final SlackProvider slackProvider;
   private final PathMapper<T> pathMapper;
@@ -58,7 +58,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   public DestinationArrivalPaths(
     ParetoComparator<RaptorPath<T>> paretoComparator,
     RaptorTransitCalculator<T> transitCalculator,
-    @Nullable CostCalculator<T> costCalculator,
+    @Nullable RaptorCostCalculator<T> costCalculator,
     SlackProvider slackProvider,
     PathMapper<T> pathMapper,
     DebugHandlerFactory<T> debugHandlerFactory,
@@ -204,11 +204,11 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     DestinationArrival<T> destArrival,
     RaptorPath<T> path
   ) {
-    if (path.generalizedCost() != destArrival.cost()) {
+    if (path.c1() != destArrival.c1()) {
       // TODO - Bug: Cost mismatch stop-arrivals and paths #3623
       LOG_MISS_MATCH.warn(
         "Cost mismatch - Mapper: {}, stop-arrivals: {}, path: {}",
-        OtpNumberFormat.formatCostCenti(path.generalizedCost()),
+        OtpNumberFormat.formatCostCenti(path.c1()),
         raptorCostsAsString(destArrival),
         path.toStringDetailed(stopNameResolver)
       );
@@ -224,7 +224,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     var arrivalCosts = new ArrayList<String>();
     ArrivalView<?> it = destArrival;
     while (it != null) {
-      arrivalCosts.add(OtpNumberFormat.formatCostCenti(it.cost()));
+      arrivalCosts.add(OtpNumberFormat.formatCostCenti(it.c1()));
       it = it.previous();
     }
     // Remove decimals if zero

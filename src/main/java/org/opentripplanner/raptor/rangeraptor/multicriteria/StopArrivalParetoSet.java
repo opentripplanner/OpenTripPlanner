@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
@@ -18,13 +18,13 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetWithMarker;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 class StopArrivalParetoSet<T extends RaptorTripSchedule>
-  extends ParetoSetWithMarker<AbstractStopArrival<T>> {
+  extends ParetoSetWithMarker<McStopArrival<T>> {
 
   /**
    * Use the factory methods in this class to create a new instance.
    */
   private StopArrivalParetoSet(
-    ParetoComparator<AbstractStopArrival<T>> comparator,
+    ParetoComparator<McStopArrival<T>> comparator,
     ParetoSetEventListener<ArrivalView<T>> listener
   ) {
     super(comparator, listener);
@@ -33,45 +33,12 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
   /**
    * Create a stop arrivals pareto set and attach an optional {@code paretoSetEventListener}
    * (debug handler).
-   * <p>
-   * The comparator used compare:
-   * <ul>
-   *   <li>arrival-time</li>
-   *   <li>round</li>
-   *   <li>generalized-cost</li>
-   *   <li><b>But not on-board-arrival</b></li>
-   * </ul>
    */
   static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createStopArrivalSet(
+    ParetoComparator<McStopArrival<T>> comparator,
     @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
   ) {
-    return new StopArrivalParetoSet<>(
-      AbstractStopArrival.compareArrivalTimeRoundAndCost(),
-      paretoSetEventListener
-    );
-  }
-
-  /**
-   * Create a stop arrivals pareto set and attach an optional {@code paretoSetEventListener}
-   * (debug handler).
-   * <p>
-   * The comparator used compare:
-   * <ul>
-   *   <li>arrival-time</li>
-   *   <li>round</li>
-   *   <li>generalized-cost</li>
-   *   <li>on-board-arrival</li>
-   * </ul>
-   */
-  static <
-    T extends RaptorTripSchedule
-  > StopArrivalParetoSet<T> createStopArrivalSetWithOnBoardCriteria(
-    @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
-  ) {
-    return new StopArrivalParetoSet<>(
-      AbstractStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(),
-      paretoSetEventListener
-    );
+    return new StopArrivalParetoSet<>(comparator, paretoSetEventListener);
   }
 
   /**
@@ -80,6 +47,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
    * accepted egress stop arrival.
    */
   static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(
+    ParetoComparator<McStopArrival<T>> comparator,
     List<RaptorAccessEgress> egressPaths,
     DestinationArrivalPaths<T> destinationArrivals,
     @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
@@ -92,9 +60,6 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
       listener = new ParetoSetEventListenerComposite<>(paretoSetEventListener, listener);
     }
 
-    return new StopArrivalParetoSet<>(
-      AbstractStopArrival.compareArrivalTimeRoundCostAndOnBoardArrival(),
-      listener
-    );
+    return new StopArrivalParetoSet<>(comparator, listener);
   }
 }

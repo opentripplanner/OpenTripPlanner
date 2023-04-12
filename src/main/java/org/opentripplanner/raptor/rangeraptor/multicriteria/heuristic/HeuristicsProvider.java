@@ -6,7 +6,7 @@ import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 
 /**
@@ -43,7 +43,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
   /**
    * This is a very effective optimization, enabled by the {@link Optimization#PARETO_CHECK_AGAINST_DESTINATION}.
    */
-  public boolean rejectDestinationArrivalBasedOnHeuristic(AbstractStopArrival<T> arrival) {
+  public boolean rejectDestinationArrivalBasedOnHeuristic(McStopArrival<T> arrival) {
     if (heuristics == null || paths.isEmpty()) {
       return false;
     }
@@ -51,7 +51,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
       arrival.stop(),
       arrival.arrivalTime(),
       arrival.travelDuration(),
-      arrival.cost()
+      arrival.c1()
     );
 
     if (rejected) {
@@ -62,7 +62,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
 
   /* private methods */
 
-  private void debugRejectByOptimization(AbstractStopArrival<T> arrival) {
+  private void debugRejectByOptimization(McStopArrival<T> arrival) {
     if (debugHandlerFactory.isDebugStopArrival(arrival.stop())) {
       String details = rejectErrorMessage(arrival.stop()) + ", Existing paths: " + paths;
 

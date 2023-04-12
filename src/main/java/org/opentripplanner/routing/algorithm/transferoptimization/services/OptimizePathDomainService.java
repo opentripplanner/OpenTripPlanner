@@ -11,7 +11,7 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
@@ -67,7 +67,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTr
 public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
   private final TransferGenerator<T> transferGenerator;
-  private final CostCalculator<T> costCalculator;
+  private final RaptorCostCalculator<T> costCalculator;
   private final RaptorSlackProvider slackProvider;
   private final MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain;
   private final RaptorStopNameResolver stopNameTranslator;
@@ -82,7 +82,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
   public OptimizePathDomainService(
     TransferGenerator<T> transferGenerator,
-    CostCalculator<T> costCalculator,
+    RaptorCostCalculator<T> costCalculator,
     RaptorSlackProvider slackProvider,
     @Nullable TransferWaitTimeCostCalculator waitTimeCostCalculator,
     int[] stopBoardAlightCosts,

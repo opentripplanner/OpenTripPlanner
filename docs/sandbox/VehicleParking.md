@@ -34,7 +34,7 @@ All updaters have the following parameters in common:
 
 | Config Parameter                |     Type    | Summary                                      |  Req./Opt. | Default Value | Since |
 |---------------------------------|:-----------:|----------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_PARKING"        |    `enum`   | The type of the updater.                     | *Required* |               |  1.5  |
+| type = "vehicle-parking"        |    `enum`   | The type of the updater.                     | *Required* |               |  1.5  |
 | facilitiesFrequencySec          |  `integer`  | How often the facilities should be updated.  | *Optional* | `3600`        |  2.2  |
 | facilitiesUrl                   |   `string`  | URL of the facilities.                       | *Optional* |               |  2.2  |
 | [feedId](#u__2__feedId)         |   `string`  | The name of the data source.                 | *Optional* |               |  2.2  |
@@ -103,16 +103,16 @@ Used for converting abstract opening hours into concrete points in time.
 <!-- park-api BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                |       Type      | Summary                            |  Req./Opt. | Default Value | Since |
-|---------------------------------|:---------------:|------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_PARKING"        |      `enum`     | The type of the updater.           | *Required* |               |  1.5  |
-| [feedId](#u__3__feedId)         |     `string`    | The name of the data source.       | *Optional* |               |  2.2  |
-| frequencySec                    |    `integer`    | How often to update the source.    | *Optional* | `60`          |  2.2  |
-| [sourceType](#u__3__sourceType) |      `enum`     | The source of the vehicle updates. | *Required* |               |  2.2  |
-| [timeZone](#u__3__timeZone)     |   `time-zone`   | The time zone of the feed.         | *Optional* |               |  2.2  |
-| url                             |     `string`    | URL of the resource.               | *Optional* |               |  2.2  |
-| [headers](#u__3__headers)       | `map of string` | HTTP headers to add.               | *Optional* |               |  2.2  |
-| [tags](#u__3__tags)             |    `string[]`   | Tags to add to the parking lots.   | *Optional* |               |  2.2  |
+| Config Parameter                |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
+|---------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "vehicle-parking"        |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| [feedId](#u__3__feedId)         |     `string`    | The name of the data source.                                               | *Optional* |               |  2.2  |
+| frequencySec                    |    `integer`    | How often to update the source.                                            | *Optional* | `60`          |  2.2  |
+| [sourceType](#u__3__sourceType) |      `enum`     | The source of the vehicle updates.                                         | *Required* |               |  2.2  |
+| [timeZone](#u__3__timeZone)     |   `time-zone`   | The time zone of the feed.                                                 | *Optional* |               |  2.2  |
+| url                             |     `string`    | URL of the resource.                                                       | *Optional* |               |  2.2  |
+| [headers](#u__3__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.2  |
+| [tags](#u__3__tags)             |    `string[]`   | Tags to add to the parking lots.                                           | *Optional* |               |  2.2  |
 
 
 #### Details
@@ -148,7 +148,7 @@ Used for converting abstract opening hours into concrete points in time.
 **Since version:** `2.2` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[3] 
 
-HTTP headers to add.
+HTTP headers to add to the request. Any header key, value can be inserted.
 
 <h4 id="u__3__tags">tags</h4>
 
@@ -190,14 +190,14 @@ Tags to add to the parking lots.
 <!-- bikely BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                |       Type      | Summary                            |  Req./Opt. | Default Value | Since |
-|---------------------------------|:---------------:|------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_PARKING"        |      `enum`     | The type of the updater.           | *Required* |               |  1.5  |
-| [feedId](#u__4__feedId)         |     `string`    | The name of the data source.       | *Optional* |               |  2.2  |
-| frequencySec                    |    `integer`    | How often to update the source.    | *Optional* | `60`          |  2.3  |
-| [sourceType](#u__4__sourceType) |      `enum`     | The source of the vehicle updates. | *Required* |               |  2.2  |
-| url                             |     `string`    | URL of the locations endpoint.     | *Optional* |               |  2.3  |
-| [headers](#u__4__headers)       | `map of string` | HTTP headers to add.               | *Optional* |               |  2.3  |
+| Config Parameter                |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
+|---------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "vehicle-parking"        |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| [feedId](#u__4__feedId)         |     `string`    | The name of the data source.                                               | *Optional* |               |  2.2  |
+| frequencySec                    |    `integer`    | How often to update the source.                                            | *Optional* | `60`          |  2.3  |
+| [sourceType](#u__4__sourceType) |      `enum`     | The source of the vehicle updates.                                         | *Required* |               |  2.2  |
+| url                             |     `string`    | URL of the locations endpoint.                                             | *Optional* |               |  2.3  |
+| [headers](#u__4__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
 
 
 #### Details
@@ -224,7 +224,7 @@ The source of the vehicle updates.
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[4] 
 
-HTTP headers to add.
+HTTP headers to add to the request. Any header key, value can be inserted.
 
 
 

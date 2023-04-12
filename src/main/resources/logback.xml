@@ -1,9 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <configuration>
+
+  <!-- by default we use the plain log format -->
+  <variable name="format" value="${otp.logging.format:-plain}" />
 
   <!--
     This suppresses the meta-log entries about Logback configuration (how Java).
     This is a stopgap measure.
-    The right solution is to make sure there are not logback.xml files from our dependency libraries on the classpath.
+    The right solution is to make sure there are no logback.xml files from our dependency libraries on the classpath.
    -->
   <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
@@ -11,16 +15,35 @@
        for logging and debug log messages will never make it to slf4j. -->
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
 
-  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+  <appender name="plain" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <!-- print out file and line number in parenthesis, which Eclipse and IDEA will link -->
       <pattern>%d{HH:mm:ss.SSS} %level \(%F:%L\) %msg%n</pattern>
     </encoder>
   </appender>
 
+
+  <!-- JSON format in the standard Logstash format understood by many log parsing tools  -->
+  <appender name="json" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <timestamp/>
+        <mdc/>
+        <context/>
+        <logLevel/>
+        <loggerName/>
+        <threadName/>
+        <message/>
+        <logstashMarkers/>
+        <arguments/>
+        <stackTrace/>
+      </providers>
+    </encoder>
+  </appender>
+
   <!-- Change this to debug to let more messages through. -->
   <root level="info">
-    <appender-ref ref="stdout" />
+    <appender-ref ref="${format}" />
   </root>
 
   <!-- OTP LOGGERS -->

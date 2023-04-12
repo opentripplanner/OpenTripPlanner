@@ -59,7 +59,7 @@ of this type:
 - `boardTimes` to `routingDefaults.boardSlackForMode`. Since v2.0
 - `htmlAnnotations` to `dataImportReport`. Since v2.0
 - `maxHtmlAnnotationsPerFile` to `maxDataImportIssuesPerFile`. Since v2.0
-- `maxTransferDistance` to `maxTransferDurationSeconds`. Since v2.1
+- `maxTransferDistance` to `maxTransferDuration`. Since v2.1
 
 #### These parameters are no longer supported
 
@@ -181,7 +181,7 @@ permanently from OTP2, but may require some development to support valid importa
 - `preferredAgencies`, `unpreferredAgencies`, `bannedAgencies` and `whiteListedAgencies` use
   feed-scoped ids. If you are using the ids directly from the Index API, no changes are needed.
   Since 2.0
-- `maxTransferDistance`, replaced by `maxTransferDurationSeconds` Since 2.1
+- `maxTransferDistance`, replaced by `maxTransferDuration` Since 2.1
 - `bannedTrips` no longer allows specifying stop indices, but only allows banning complete trips.
   Since 2.2
 

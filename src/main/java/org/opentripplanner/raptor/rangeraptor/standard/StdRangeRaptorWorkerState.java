@@ -8,10 +8,10 @@ import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
+import org.opentripplanner.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;
-import org.opentripplanner.raptor.util.BitSetIterator;
 
 /**
  * Tracks the state of a standard Range Raptor search, specifically the best arrival times at each
@@ -44,6 +44,11 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   private final StopArrivalsState<T> stopArrivalsState;
 
   /**
+   * Used to extract the best number-of-transfers as part of the result.
+   */
+  private final BestNumberOfTransfers bestNumberOfTransfers;
+
+  /**
    * The list of egress stops, can be used to terminate the search when the stops are reached.
    */
   private final ArrivedAtDestinationCheck arrivedAtDestinationCheck;
@@ -60,11 +65,13 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     RaptorTransitCalculator<T> calculator,
     BestTimes bestTimes,
     StopArrivalsState<T> stopArrivalsState,
+    BestNumberOfTransfers bestNumberOfTransfers,
     ArrivedAtDestinationCheck arrivedAtDestinationCheck
   ) {
     this.calculator = calculator;
     this.bestTimes = bestTimes;
     this.stopArrivalsState = stopArrivalsState;
+    this.bestNumberOfTransfers = bestNumberOfTransfers;
     this.arrivedAtDestinationCheck = arrivedAtDestinationCheck;
   }
 
@@ -79,7 +86,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public BitSetIterator stopsTouchedByTransitCurrentRound() {
+  public IntIterator stopsTouchedByTransitCurrentRound() {
     return bestTimes.reachedByTransitCurrentRound();
   }
 
@@ -203,7 +210,11 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
   @Override
   public RaptorWorkerResult<T> results() {
-    return new StdRaptorWorkerResult<>(bestTimes, stopArrivalsState);
+    return new StdRaptorWorkerResult<>(
+      bestTimes,
+      stopArrivalsState::extractPaths,
+      bestNumberOfTransfers::extractBestNumberOfTransfers
+    );
   }
 
   /* private methods */

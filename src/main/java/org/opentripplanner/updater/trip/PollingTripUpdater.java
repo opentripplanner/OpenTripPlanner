@@ -7,9 +7,9 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.UpdateResult;
-import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.BatchTripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
   ) {
     super(parameters);
     // Create update streamer from preferences
-    this.feedId = parameters.getFeedId();
+    this.feedId = parameters.feedId();
     this.updateSource = createSource(parameters);
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
     this.snapshotSource = snapshotSource;

@@ -15,6 +15,7 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,8 @@ public class TransmodelGraphQLPlanner {
     try {
       request = ViaRequestMapper.createRouteViaRequest(environment);
       response = ctx.getRoutingService().route(request);
+    } catch (RoutingValidationException e) {
+      response = new ViaRoutingResponse(Map.of(), List.of(), e.getRoutingErrors());
     } catch (Exception e) {
       LOG.error("System error: " + e.getMessage(), e);
       response =

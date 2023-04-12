@@ -23,8 +23,8 @@ import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.GraphUpdater;
-import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +62,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     this.topicName = config.getTopicName();
     this.dataInitializationUrl = config.getDataInitializationUrl();
     this.timeout = config.getTimeout();
-    this.feedId = config.getFeedId();
+    this.feedId = config.feedId();
     TransitService transitService = new DefaultTransitService(transitModel);
     this.entityResolver = new EntityResolver(transitService, feedId);
     this.fuzzyTripMatcher =
