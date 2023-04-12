@@ -5,6 +5,7 @@ import graphql.relay.Connection;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
+import java.util.Currency;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -273,6 +274,13 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Double> lon();
   }
 
+  /** An amount of money. */
+  public interface LegacyGraphQLCurrency {
+    public DataFetcher<String> code();
+
+    public DataFetcher<Integer> digits();
+  }
+
   /**
    * Departure row is a location, which lists departures of a certain pattern from a
    * stop. Departure rows are identified with the pattern, so querying departure rows
@@ -419,7 +427,7 @@ public class LegacyGraphQLDataFetchers {
   public interface LegacyGraphQLMoney {
     public DataFetcher<Integer> cents();
 
-    public DataFetcher<String> currency();
+    public DataFetcher<Currency> currency();
   }
 
   /** An object with an ID */

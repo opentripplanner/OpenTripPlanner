@@ -64,11 +64,17 @@
                     }
                     name
                     minPrice {
-                        currency
+                        currency {
+                            code
+                            digits
+                        }
                         cents
                     }
                     maxPrice {
-                        currency
+                        currency {
+                            code
+                            digits
+                        }
                         cents
                     }
                     arrival

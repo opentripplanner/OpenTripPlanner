@@ -119,11 +119,17 @@
                 },
                 "name" : "UberX",
                 "minPrice" : {
-                  "currency" : "EUR",
+                  "currency" : {
+                    "code" : "EUR",
+                    "digits" : 2
+                  },
                   "cents" : 1000
                 },
                 "maxPrice" : {
-                  "currency" : "EUR",
+                  "currency" : {
+                    "code" : "EUR",
+                    "digits" : 2
+                  },
                   "cents" : 2000
                 },
                 "arrival" : "PT10M"

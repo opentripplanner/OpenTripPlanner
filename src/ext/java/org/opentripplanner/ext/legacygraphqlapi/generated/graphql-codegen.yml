@@ -101,3 +101,4 @@ config:
     RideHailingEstimate: org.opentripplanner.ext.ridehailing.model.RideEstimate#RideEstimate
     RideHailingProvider: org.opentripplanner.ext.legacygraphqlapi.model.RideHailingProvider#RideHailingProvider
     Money: org.opentripplanner.transit.model.basic.Money#Money
+    Currency: java.util.Currency#Currency

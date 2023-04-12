@@ -1339,11 +1339,18 @@ type Itinerary {
     """
     systemNotices: [SystemNotice]!
 }
+"An amount of money."
+type Currency {
+    "ISO-4217 currency code"
+    code: String!
+    "Fractional digits"
+    digits: Int!
+}
 
 "An amount of money."
 type Money {
-    "ISO-4217 currency code"
-    currency: String!
+    "The currency of this money amount."
+    currency: Currency!
     """
     Money amount in cents. **Note:** this value is dependent on the currency used,
     as one cent is not necessarily ¹/₁₀₀ of the basic monetary unit.
