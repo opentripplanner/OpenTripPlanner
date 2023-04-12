@@ -4,6 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.model.RideHailingProvider;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.transit.model.basic.Money;
 
@@ -31,8 +32,8 @@ public class LegacyGraphQLRideHailingEstimateImpl
   }
 
   @Override
-  public DataFetcher<String> provider() {
-    return env -> getSource(env).provider().toString();
+  public DataFetcher<RideHailingProvider> provider() {
+    return env -> new RideHailingProvider(getSource(env).provider().name().toLowerCase());
   }
 
   private RideEstimate getSource(DataFetchingEnvironment environment) {

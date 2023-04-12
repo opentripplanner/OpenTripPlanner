@@ -59,7 +59,9 @@
                     }
                 }
                 rideHailingEstimate {
-                    provider
+                    provider {
+                        id
+                    }
                     name
                     minPrice {
                         currency

@@ -18,6 +18,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.Leg
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLTransitMode;
+import org.opentripplanner.ext.legacygraphqlapi.model.RideHailingProvider;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
@@ -672,7 +673,11 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> name();
 
-    public DataFetcher<String> provider();
+    public DataFetcher<RideHailingProvider> provider();
+  }
+
+  public interface LegacyGraphQLRideHailingProvider {
+    public DataFetcher<String> id();
   }
 
   /**

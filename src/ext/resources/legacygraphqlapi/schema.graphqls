@@ -1356,10 +1356,15 @@ An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
 """
 scalar Duration
 
+type RideHailingProvider {
+    "The ID of the ride hailing provider."
+    id: String!
+}
+
 "An estimate for a ride on a hailed vehicle, like an Uber car."
 type RideHailingEstimate {
     "The provider of the ride hailing service."
-    provider: String!
+    provider: RideHailingProvider!
     "The lower bound of the price estimate of this ride."
     minPrice: Money!
     "The upper bound of the price estimate of this ride."

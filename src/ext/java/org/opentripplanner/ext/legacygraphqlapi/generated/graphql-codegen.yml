@@ -99,4 +99,5 @@ config:
     RentalVehicleType: org.opentripplanner.service.vehiclerental.model.RentalVehicleType#RentalVehicleType
     OpeningHours: org.opentripplanner.model.calendar.openinghours.OHCalendar#OHCalendar
     RideHailingEstimate: org.opentripplanner.ext.ridehailing.model.RideEstimate#RideEstimate
+    RideHailingProvider: org.opentripplanner.ext.legacygraphqlapi.model.RideHailingProvider#RideHailingProvider
     Money: org.opentripplanner.transit.model.basic.Money#Money

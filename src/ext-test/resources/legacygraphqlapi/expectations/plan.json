@@ -114,7 +114,9 @@
               "generalizedCost" : 1000,
               "alerts" : [ ],
               "rideHailingEstimate" : {
-                "provider" : "UBER",
+                "provider" : {
+                  "id" : "uber"
+                },
                 "name" : "UberX",
                 "minPrice" : {
                   "currency" : "EUR",
