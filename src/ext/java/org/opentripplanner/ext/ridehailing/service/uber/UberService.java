@@ -141,15 +141,15 @@ public class UberService extends CachingRideHailingService {
       .prices()
       .stream()
       .map(price -> {
-        var currency = Currency.getInstance(price.currency_code);
+        var currency = Currency.getInstance(price.currency_code());
         return new RideEstimate(
           RideHailingProvider.UBER,
-          Duration.ofSeconds(price.duration),
-          new Money(currency, price.low_estimate * 100),
-          new Money(currency, price.high_estimate * 100),
-          price.product_id,
-          price.display_name,
-          productIsWheelchairAccessible(price.product_id)
+          Duration.ofSeconds(price.duration()),
+          new Money(currency, price.low_estimate() * 100),
+          new Money(currency, price.high_estimate() * 100),
+          price.product_id(),
+          price.display_name(),
+          productIsWheelchairAccessible(price.product_id())
         );
       })
       .toList();
