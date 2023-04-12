@@ -9,7 +9,6 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,13 +29,6 @@ public class ServiceDateUtils {
   );
 
   /**
-   * Calculate the start of the service day for the given {@link ZonedDateTime}
-   */
-  public static ZonedDateTime asStartOfService(ZonedDateTime date) {
-    return date.truncatedTo(ChronoUnit.HOURS).withHour(12).minusHours(12);
-  }
-
-  /**
    * Calculate the start of the service day for the given {@link Instant} at the given
    * {@link ZoneId}
    */
@@ -51,6 +43,15 @@ public class ServiceDateUtils {
    */
   public static ZonedDateTime asStartOfService(LocalDate localDate, ZoneId zoneId) {
     return ZonedDateTime.of(localDate, LocalTime.NOON, zoneId).minusHours(12);
+  }
+
+  /**
+   * Calculate the service day from start of the service day. On days with daylight saving
+   * time adjustments this may not be the same as {@code startOfService.toLocalDate()}.
+   * Adding 12 hours is necessary.
+   */
+  public static LocalDate asServiceDay(ZonedDateTime startOfService) {
+    return startOfService.plusHours(12).toLocalDate();
   }
 
   /**

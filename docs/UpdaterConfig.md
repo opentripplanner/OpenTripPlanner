@@ -38,7 +38,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 
 | Config Parameter          |       Type      | Summary                                                                      |  Req./Opt. | Default Value | Since |
 |---------------------------|:---------------:|------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "REAL_TIME_ALERTS" |      `enum`     | The type of the updater.                                                     | *Required* |               |  1.5  |
+| type = "real-time-alerts" |      `enum`     | The type of the updater.                                                     | *Required* |               |  1.5  |
 | earlyStartSec             |    `integer`    | How long before the posted start of an event it should be displayed to users | *Optional* | `0`           |  1.5  |
 | feedId                    |     `string`    | The id of the feed to apply the alerts to.                                   | *Optional* |               |  1.5  |
 | frequencySec              |    `integer`    | How often the URL should be fetched.                                         | *Optional* | `60`          |  1.5  |
@@ -91,7 +91,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 
 | Config Parameter                                                      |       Type      | Summary                                                                    |  Req./Opt. | Default Value        | Since |
 |-----------------------------------------------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|----------------------|:-----:|
-| type = "STOP_TIME_UPDATER"                                            |      `enum`     | The type of the updater.                                                   | *Required* |                      |  1.5  |
+| type = "stop-time-updater"                                            |      `enum`     | The type of the updater.                                                   | *Required* |                      |  1.5  |
 | [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |      `enum`     | How backwards propagation should be handled.                               | *Optional* | `"required-no-data"` |  2.2  |
 | feedId                                                                |     `string`    | Which feed the updates apply to.                                           | *Optional* |                      |  1.5  |
 | frequencySec                                                          |    `integer`    | How often the data should be downloaded in seconds.                        | *Optional* | `60`                 |  1.5  |
@@ -179,7 +179,7 @@ file.
 
 | Config Parameter                                                      |    Type   | Summary                  |  Req./Opt. | Default Value        | Since |
 |-----------------------------------------------------------------------|:---------:|--------------------------|:----------:|----------------------|:-----:|
-| type = "WEBSOCKET_GTFS_RT_UPDATER"                                    |   `enum`  | The type of the updater. | *Required* |                      |  1.5  |
+| type = "websocket-gtfs-rt-updater"                                    |   `enum`  | The type of the updater. | *Required* |                      |  1.5  |
 | [backwardsDelayPropagationType](#u__7__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |  1.5  |
 | feedId                                                                |  `string` | TODO                     | *Optional* |                      |  1.5  |
 | reconnectPeriodSec                                                    | `integer` | TODO                     | *Optional* | `60`                 |  1.5  |
@@ -225,7 +225,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 
 | Config Parameter           |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
 |----------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_POSITIONS" |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| type = "vehicle-positions" |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
 | feedId                     |     `string`    | Feed ID to which the update should be applied.                             | *Required* |               |  2.2  |
 | frequencySec               |    `integer`    | How often the positions should be updated.                                 | *Optional* | `60`          |  2.2  |
 | url                        |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from.  | *Required* |               |  2.2  |
@@ -279,7 +279,7 @@ partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.
 
 | Config Parameter                                                                      |       Type      | Summary                                                                         |  Req./Opt. | Default Value | Since |
 |---------------------------------------------------------------------------------------|:---------------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_RENTAL"                                                               |      `enum`     | The type of the updater.                                                        | *Required* |               |  1.5  |
+| type = "vehicle-rental"                                                               |      `enum`     | The type of the updater.                                                        | *Required* |               |  1.5  |
 | [allowKeepingRentedBicycleAtDestination](#u_1_allowKeepingRentedBicycleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental. | *Optional* | `false`       |  2.1  |
 | frequencySec                                                                          |    `integer`    | How often the data should be updated in seconds.                                | *Optional* | `60`          |  1.5  |
 | [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                 | *Optional* | `false`       |  2.3  |

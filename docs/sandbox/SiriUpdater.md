@@ -29,7 +29,7 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 
 | Config Parameter               |       Type      | Summary                                                                                                |  Req./Opt. | Default Value | Since |
 |--------------------------------|:---------------:|--------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "SIRI_ET_UPDATER"       |      `enum`     | The type of the updater.                                                                               | *Required* |               |  1.5  |
+| type = "siri-et-updater"       |      `enum`     | The type of the updater.                                                                               | *Required* |               |  1.5  |
 | blockReadinessUntilInitialized |    `boolean`    | Whether catching up with the updates should block the readiness check from returning a 'ready' result. | *Optional* | `false`       |  2.0  |
 | feedId                         |     `string`    | The ID of the feed to apply the updates to.                                                            | *Required* |               |  2.0  |
 | frequencySec                   |    `integer`    | How often the updates should be retrieved.                                                             | *Optional* | `60`          |  2.0  |
