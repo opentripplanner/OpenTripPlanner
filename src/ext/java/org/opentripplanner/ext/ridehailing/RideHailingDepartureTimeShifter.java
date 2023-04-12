@@ -50,7 +50,7 @@ public class RideHailingDepartureTimeShifter {
           shiftingResult.failureValue()
         );
         return Result.failure(
-          new RoutingError(RoutingErrorCode.SYSTEM_ERROR, InputField.FROM_PLACE)
+          new RoutingError(RoutingErrorCode.SYSTEM_ERROR, InputField.DATE_TIME)
         );
       }
     } else {
