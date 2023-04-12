@@ -61,9 +61,9 @@ import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
-import org.opentripplanner.updater.ResultLogger;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
-import org.opentripplanner.updater.UpdateResult;
+import org.opentripplanner.updater.spi.ResultLogger;
+import org.opentripplanner.updater.spi.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

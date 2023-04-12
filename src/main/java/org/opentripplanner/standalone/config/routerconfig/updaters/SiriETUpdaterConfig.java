@@ -33,7 +33,7 @@ public class SiriETUpdaterConfig {
         .since(V2_0)
         .summary("If the fuzzy trip matcher should be used to match trips.")
         .asBoolean(false),
-      c.of("headers").since(V2_3).summary("HTTP headers to add to the request").asStringMap()
+      HttpHeadersConfig.headers(c, V2_3)
     );
   }
 }

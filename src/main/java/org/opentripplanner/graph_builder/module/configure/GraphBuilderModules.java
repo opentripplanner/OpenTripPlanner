@@ -6,7 +6,6 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import java.io.File;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.datastore.api.DataSource;
@@ -203,12 +202,11 @@ public class GraphBuilderModules {
     TransitModel transitModel,
     DataImportIssueStore issueStore
   ) {
-    var maxTransferDuration = Duration.ofSeconds((long) config.maxTransferDurationSeconds);
     return new DirectTransferGenerator(
       graph,
       transitModel,
       issueStore,
-      maxTransferDuration,
+      config.maxTransferDuration,
       config.transferRequests
     );
   }
@@ -225,7 +223,7 @@ public class GraphBuilderModules {
       graph,
       transitModel,
       issueStore,
-      config.maxTransferDurationSeconds * WalkPreferences.DEFAULT.speed()
+      config.maxTransferDuration.toSeconds() * WalkPreferences.DEFAULT.speed()
     );
   }
 

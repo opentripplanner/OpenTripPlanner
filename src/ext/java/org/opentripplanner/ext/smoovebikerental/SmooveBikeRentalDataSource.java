@@ -7,7 +7,8 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.updater.GenericJsonDataSource;
+import org.opentripplanner.updater.spi.DataSource;
+import org.opentripplanner.updater.spi.GenericJsonDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of a VehicleRentalDataSource for the Smoove GIR SabiWeb used in Helsinki.
  *
- * @see org.opentripplanner.updater.DataSource
+ * @see DataSource
  */
 public class SmooveBikeRentalDataSource
   extends GenericJsonDataSource<VehicleRentalPlace>

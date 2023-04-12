@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
@@ -43,7 +44,7 @@ class RaptorRoutingRequestTransitDataCreator {
     ZonedDateTime transitSearchTimeZero
   ) {
     this.transitLayer = transitLayer;
-    this.departureDate = transitSearchTimeZero.toLocalDate();
+    this.departureDate = ServiceDateUtils.asServiceDay(transitSearchTimeZero);
     this.transitSearchTimeZero = transitSearchTimeZero;
   }
 

@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
-import java.util.Map;
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 public record SiriETUpdaterParameters(
@@ -14,7 +14,7 @@ public record SiriETUpdaterParameters(
   int timeoutSec,
   int previewIntervalMinutes,
   boolean fuzzyTripMatching,
-  Map<String, String> headers
+  HttpHeaders headers
 )
   implements PollingGraphUpdaterParameters, UrlUpdaterParameters {
   public SiriETHttpTripUpdateSource.Parameters sourceParameters() {
@@ -45,7 +45,7 @@ public record SiriETUpdaterParameters(
       }
 
       @Override
-      public Map<String, String> headers() {
+      public HttpHeaders httpRequestHeaders() {
         return headers;
       }
     };

@@ -1,4 +1,4 @@
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.spi;
 
 /**
  * This is named PollingGraphUpdaterConfig instead of Config in order to not conflict with the
