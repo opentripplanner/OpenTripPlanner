@@ -2,13 +2,10 @@
 package org.opentripplanner.ext.legacygraphqlapi.generated;
 
 import graphql.relay.Connection;
-import graphql.relay.Connection;
-import graphql.relay.Edge;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
 import java.util.Currency;
-import java.util.Map;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -22,10 +19,6 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.Leg
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLTransitMode;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.RideHailingProvider;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -43,8 +36,6 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
@@ -52,7 +43,6 @@ import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePositio
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Money;
@@ -689,7 +679,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Money> minPrice();
 
-    public DataFetcher<String> name();
+    public DataFetcher<String> productName();
 
     public DataFetcher<RideHailingProvider> provider();
   }

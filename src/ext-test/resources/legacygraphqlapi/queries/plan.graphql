@@ -62,7 +62,7 @@
                     provider {
                         id
                     }
-                    name
+                    productName
                     minPrice {
                         currency {
                             code

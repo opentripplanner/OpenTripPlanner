@@ -117,7 +117,7 @@
                 "provider" : {
                   "id" : "uber"
                 },
-                "name" : "UberX",
+                "productName" : "UberX",
                 "minPrice" : {
                   "currency" : {
                     "code" : "EUR",
