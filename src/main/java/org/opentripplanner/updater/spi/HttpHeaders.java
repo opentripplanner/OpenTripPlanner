@@ -3,7 +3,6 @@ package org.opentripplanner.updater.spi;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer;
 
 /**
@@ -90,7 +89,7 @@ public class HttpHeaders {
      * already set ones!
      */
     public Builder add(HttpHeaders other) {
-      headers = new HashMap<>(MapUtils.combine(headers, other.headers));
+      headers.putAll(other.asMap());
       return this;
     }
 
