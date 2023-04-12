@@ -19,7 +19,7 @@ The supported ride-hailing providers are listed below.
 
 | Config Parameter             |   Type   | Summary                                                  |  Req./Opt. | Default Value | Since |
 |------------------------------|:--------:|----------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "UBER_CAR_HAILING"    |  `enum`  | The type of the service.                                 | *Required* |               |  2.3  |
+| type = "uber-car-hailing"    |  `enum`  | The type of the service.                                 | *Required* |               |  2.3  |
 | clientId                     | `string` | OAuth client id to access the API.                       | *Required* |               |  2.3  |
 | clientSecret                 | `string` | OAuth client secret to access the API.                   | *Required* |               |  2.3  |
 | wheelchairAccessibleRideType | `string` | The id of the requested wheelchair accessible ride type. | *Required* |               |  2.3  |
