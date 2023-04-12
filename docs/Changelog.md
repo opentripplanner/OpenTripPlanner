@@ -111,6 +111,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Encapsulate updater http headers [#5009](https://github.com/opentripplanner/OpenTripPlanner/pull/5009)
 - Bugs related to DST and service date [#5004](https://github.com/opentripplanner/OpenTripPlanner/pull/5004)
 - Fix validation of running period for NeTEx flexible lines [#5007](https://github.com/opentripplanner/OpenTripPlanner/pull/5007)
+- JSON logging [#5023](https://github.com/opentripplanner/OpenTripPlanner/pull/5023)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
