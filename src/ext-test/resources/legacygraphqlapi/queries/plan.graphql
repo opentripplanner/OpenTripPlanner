@@ -68,14 +68,14 @@
                             code
                             digits
                         }
-                        cents
+                        value
                     }
                     maxPrice {
                         currency {
                             code
                             digits
                         }
-                        cents
+                        value
                     }
                     arrival
                 }

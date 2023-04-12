@@ -1341,9 +1341,9 @@ type Itinerary {
 }
 "An amount of money."
 type Currency {
-    "ISO-4217 currency code"
+    "ISO-4217 currency code, for example `USD` or `EUR`."
     code: String!
-    "Fractional digits"
+    "Fractional digits of this currency."
     digits: Int!
 }
 
@@ -1355,7 +1355,7 @@ type Money {
     Money amount in cents. **Note:** this value is dependent on the currency used,
     as one cent is not necessarily ¹/₁₀₀ of the basic monetary unit.
     """
-    cents: Int!
+    value: Int!
 }
 
 """"
