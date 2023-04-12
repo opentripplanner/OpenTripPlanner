@@ -61,12 +61,13 @@ nav:
         - Introduction: 'Configuration.md'
         - Build: 'BuildConfiguration.md'
         - "Boarding Locations": 'BoardingLocations.md'
+        - "Street Graph Pruning": 'IslandPruning.md'
         - Router: 'RouterConfiguration.md'
         - Accessibility: 'Accessibility.md'
         - "Route Request": 'RouteRequest.md'
         - "Realtime Updaters" : 'UpdaterConfig.md'
         - "Routing Modes" : "RoutingModes.md"
-        - "Street Graph Pruning": 'IslandPruning.md'
+        - "Logging" : "Logging.md"
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'
