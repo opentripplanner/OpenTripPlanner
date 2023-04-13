@@ -70,7 +70,22 @@ public record FareProduct(
    * passenger has to buy two of them.
    */
   public String uniqueInstanceId(ZonedDateTime startTime) {
-    var input = toString() + startTime.toEpochSecond();
-    return UUID.nameUUIDFromBytes(input.getBytes(StandardCharsets.UTF_8)).toString();
+    var buf = new StringBuilder();
+    buf
+      .append(startTime.toEpochSecond())
+      .append(id)
+      .append(amount.currency().getCurrencyCode())
+      .append(amount.cents());
+
+    if (duration != null) {
+      buf.append(duration.toSeconds());
+    }
+    if (medium != null) {
+      buf.append(medium.id()).append(medium.name());
+    }
+    if (category != null) {
+      buf.append(category.id()).append(category.name());
+    }
+    return UUID.nameUUIDFromBytes(buf.toString().getBytes(StandardCharsets.UTF_8)).toString();
   }
 }

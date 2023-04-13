@@ -26,21 +26,21 @@ class FareProductTest {
   static FareMedium MEDIUM = new FareMedium(new FeedScopedId("1", "app"), "App");
 
   static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(fareProduct(null, null, null), ZDT, "72c415fb-ef6d-3b12-a8ce-36eb7895c43f"),
+    Arguments.of(fareProduct(null, null, null), ZDT, "b18a083d-ee82-3c83-af07-2b8bb11bff9e"),
     Arguments.of(
       fareProduct(null, null, null),
       ZDT.plusHours(1),
-      "32c72720-b983-3148-bcec-d4d099ed202a"
+      "2a60adcf-3e56-338a-ab7d-8407a3bc529b"
     ),
     Arguments.of(
       fareProduct(Duration.ofHours(2), CATEGORY, null),
       ZDT,
-      "9c5f4abf-ffce-3f89-bf93-e7f900bea286"
+      "ca4a45b5-b837-34d8-b987-4e06fa5a3317"
     ),
     Arguments.of(
       fareProduct(Duration.ofHours(2), CATEGORY, MEDIUM),
       ZDT,
-      "0cc60b70-b4a7-3082-a89d-5c5d73c7b2c7"
+      "b59e7eef-c118-37b1-8f53-bf2a97c5dae9"
     )
   );
 
@@ -54,7 +54,7 @@ class FareProductTest {
 
   @Nonnull
   private static FareProduct fareProduct(Duration duration, RiderCategory cat, FareMedium medium) {
-    var fp = new FareProduct(
+    return new FareProduct(
       new FeedScopedId("fares", "daypass"),
       "day pass",
       Money.euros(1_000),
@@ -62,6 +62,5 @@ class FareProductTest {
       cat,
       medium
     );
-    return fp;
   }
 }
