@@ -6,6 +6,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -16,6 +17,7 @@ import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.api.mapping.TripPlanMapper;
 import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 public class PlannerResource extends RoutingResource {
 
   private static final Logger LOG = LoggerFactory.getLogger(PlannerResource.class);
+  private static final int STATUS_UNPROCESSABLE_ENTITY = 422;
 
   /**
    * @deprecated The support for multiple routers are removed from OTP2. See
@@ -50,7 +53,7 @@ public class PlannerResource extends RoutingResource {
   // Jersey uses @Context to inject internal types and @InjectParam or @Resource for DI objects.
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public TripPlannerResponse plan(@Context UriInfo uriInfo, @Context Request grizzlyRequest) {
+  public Response plan(@Context UriInfo uriInfo, @Context Request grizzlyRequest) {
     /*
      * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
      * TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords
@@ -93,16 +96,21 @@ public class PlannerResource extends RoutingResource {
       response.elevationMetadata.geoidElevation = request.preferences().system().geoidElevation();
 
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
+    } catch (OTPRequestTimeoutException e) {
+      PlannerError error = new PlannerError(Message.PROCESSING_TIMEOUT);
+      response.setError(error);
+      return Response.status(STATUS_UNPROCESSABLE_ENTITY).entity(response).build();
     } catch (Exception e) {
       LOG.error("System error", e);
       PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
       response.setError(error);
+      return Response.serverError().entity(response).build();
     }
 
     /* Log this request if such logging is enabled. */
     logRequest(grizzlyRequest, request, serverContext, res);
 
-    return response;
+    return Response.ok().entity(response).build();
   }
 
   private void logRequest(

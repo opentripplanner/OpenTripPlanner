@@ -33,6 +33,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 
 | Config Parameter                                                                          |          Type         | Summary                                                                                           |  Req./Opt. | Default Value | Since |
 |-------------------------------------------------------------------------------------------|:---------------------:|---------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| [apiProcessingTimeout](#apiProcessingTimeout)                                             |       `duration`      | Maximum processing time for an API request                                                        | *Optional* | `"PT-1S"`     |  2.3  |
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                   | *Optional* |               |  2.1  |
 | [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
 | [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |  2.2  |
@@ -77,6 +78,18 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 
 <!-- PARAMETERS-DETAILS BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+<h3 id="apiProcessingTimeout">apiProcessingTimeout</h3>
+
+**Since version:** `2.3` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT-1S"`   
+**Path:** / 
+
+Maximum processing time for an API request
+
+This timeout limits the server-side processing time for a given API request.
+This does not include network latency nor waiting time in the HTTP server thread pool.
+The default value is -1s (infinite timeout).
+
 
 <h3 id="configVersion">configVersion</h3>
 

@@ -15,6 +15,7 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 import org.opentripplanner.standalone.config.routerconfig.RideHailingServicesConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
@@ -52,6 +53,7 @@ public class RouterConfig implements Serializable {
   private final RideHailingServicesConfig rideHailingConfig;
   private final VectorTileConfig vectorTileLayers;
   private final FlexConfig flexConfig;
+  private final Duration apiProcessingTimeout;
 
   public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
     this(new NodeAdapter(node, source), logUnusedParams);
@@ -120,6 +122,20 @@ number of transit vehicles used in that itinerary.
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig = new FlexConfig(root, "flex");
 
+    this.apiProcessingTimeout =
+      root
+        .of("apiProcessingTimeout")
+        .since(OtpVersion.V2_3)
+        .summary("Maximum processing time for an API request")
+        .description(
+          """
+       This timeout limits the server-side processing time for a given API request.
+       This does not include network latency nor waiting time in the HTTP server thread pool.
+       The default value is -1s (infinite timeout).
+        """
+        )
+        .asDuration(Duration.ofSeconds(-1));
+
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllWarnings(LOG::warn);
     }
@@ -172,6 +188,10 @@ number of transit vehicles used in that itinerary.
 
   public FlexConfig flexConfig() {
     return flexConfig;
+  }
+
+  public Duration apiProcessingTimeout() {
+    return apiProcessingTimeout;
   }
 
   public NodeAdapter asNodeAdapter() {
