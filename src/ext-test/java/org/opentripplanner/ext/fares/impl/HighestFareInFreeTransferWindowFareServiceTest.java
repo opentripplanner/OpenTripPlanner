@@ -44,7 +44,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     var fares = fareService.getCost(i);
     assertEquals(Money.usDollars(Math.round(expectedFare * 100)), fares.getFare(FareType.regular));
 
-    for (var type : fares.getFaresV1Types()) {
+    for (var type : fares.getFareTypes()) {
       assertTrue(fares.getComponents(type).isEmpty());
     }
   }

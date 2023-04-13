@@ -4,26 +4,26 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareProductInstance;
 import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * ItineraryFares is a set of fares for different legs, rider categories or fare media.
  */
 public class ItineraryFares {
 
-  private static final String FARES_V1_FEED_ID = "faresv1";
+  public static final String FARES_V1_FEED_ID = "faresv1";
 
   /**
    * The fare products that are valid for all legs of an itinerary, like a day pass.
@@ -50,6 +50,9 @@ public class ItineraryFares {
    */
   @Deprecated
   private final Multimap<FareType, FareComponent> components = LinkedHashMultimap.create();
+
+  @Deprecated
+  private final Map<FareType, Money> fares = new HashMap<>();
 
   public ItineraryFares(ItineraryFares aFare) {
     if (aFare != null) {
@@ -87,16 +90,7 @@ public class ItineraryFares {
    */
   @Deprecated
   public void addFare(FareType fareType, Money money) {
-    itineraryProducts.add(
-      new FareProduct(
-        faresV1Id(fareType),
-        "Itinerary fare for type %s".formatted(fareType.name()),
-        money,
-        null,
-        null,
-        null
-      )
-    );
+    fares.put(fareType, money);
   }
 
   /**
@@ -138,6 +132,7 @@ public class ItineraryFares {
   }
 
   /**
+   *
    * Get the "fare" for a specific fare type.
    * <p>
    * It is ill-defined what this actually means (entire itinerary?, some legs?).
@@ -145,13 +140,9 @@ public class ItineraryFares {
    * Use {@link ItineraryFares#getItineraryProducts()} or {@link ItineraryFares#getLegProducts()}
    * instead.
    */
+  @Nullable
   public Money getFare(FareType type) {
-    return itineraryProducts
-      .stream()
-      .filter(f -> faresV1Id(type).equals(f.id()))
-      .findAny()
-      .map(FareProduct::amount)
-      .orElse(null);
+    return fares.get(type);
   }
 
   /**
@@ -169,13 +160,8 @@ public class ItineraryFares {
    * Return the set of {@link FareType}s that are contained in this instance.
    */
   @Deprecated
-  public Set<FareType> getFaresV1Types() {
-    return itineraryProducts
-      .stream()
-      .filter(fp -> fp.id().getFeedId().equals(FARES_V1_FEED_ID))
-      .map(fp -> fp.id().getId())
-      .map(FareType::valueOf)
-      .collect(Collectors.toSet());
+  public Set<FareType> getFareTypes() {
+    return fares.keySet();
   }
 
   @Override
@@ -227,10 +213,5 @@ public class ItineraryFares {
         leg,
         new FareProductInstance(fareProduct.uniqueInstanceId(leg.getStartTime()), fareProduct)
       );
-  }
-
-  @Nonnull
-  private static FeedScopedId faresV1Id(FareType fareType) {
-    return new FeedScopedId(FARES_V1_FEED_ID, fareType.name());
   }
 }

@@ -7,21 +7,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
       "elevationLost": 16.15,
       "endTime": "2009-10-21T23:32:25.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {
@@ -522,21 +507,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
       "elevationLost": 3.93,
       "endTime": "2009-10-21T23:40:10.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {
@@ -889,21 +859,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
       "elevationLost": 13.43,
       "endTime": "2009-10-21T23:45:25.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {
@@ -1256,21 +1211,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
       "elevationLost": 16.15,
       "endTime": "2009-10-21T23:45:25.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {
@@ -1771,21 +1711,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
       "elevationLost": 13.43,
       "endTime": "2009-10-21T23:54:25.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {
@@ -2138,21 +2063,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
       "elevationLost": 16.15,
       "endTime": "2009-10-21T23:54:25.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {
@@ -3187,21 +3097,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
       "elevationLost": 4.23,
       "endTime": "2009-10-21T23:31:21.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {
@@ -3606,21 +3501,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
       "elevationLost": 23.58,
       "endTime": "2009-10-21T23:35:04.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {
@@ -4051,21 +3931,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
       "elevationLost": 1.09,
       "endTime": "2009-10-21T23:37:44.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {
@@ -4470,21 +4335,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
       "elevationLost": 4.76,
       "endTime": "2009-10-21T23:46:18.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {
@@ -4967,21 +4817,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
       "elevationLost": 4.23,
       "endTime": "2009-10-21T23:46:21.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {
@@ -5386,21 +5221,6 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
       "elevationLost": 23.58,
       "endTime": "2009-10-21T23:51:04.000+00:00",
       "fare": {
-        "coveringItinerary": [
-          {
-            "amount": {
-              "cents": 200,
-              "currency": {
-                "currency": "USD",
-                "currencyCode": "USD",
-                "defaultFractionDigits": 2,
-                "symbol": "$"
-              }
-            },
-            "id": "faresv1:regular",
-            "name": "Itinerary fare for type regular"
-          }
-        ],
         "details": {
           "regular": [
             {

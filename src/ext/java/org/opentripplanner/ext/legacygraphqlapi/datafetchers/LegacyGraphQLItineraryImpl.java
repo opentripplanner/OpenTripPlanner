@@ -47,7 +47,7 @@ public class LegacyGraphQLItineraryImpl
         return null;
       }
       return fare
-        .getFaresV1Types()
+        .getFareTypes()
         .stream()
         .map(fareKey -> {
           Map<String, Object> result = new HashMap<>();
