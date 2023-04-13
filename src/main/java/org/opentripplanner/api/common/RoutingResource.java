@@ -21,6 +21,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
@@ -853,15 +854,17 @@ public abstract class RoutingResource {
 
   /**
    * This method return the configured default routing request with modifications passed in by the
-   * `config` parameter.
+   * `config` parameter. Only if {@code OTPFeature.RestAPIPAssInDefaultConfigAsJson.isOn()}.
    */
   private RouteRequest defaultRouteRequest() {
     RouteRequest request = serverContext.defaultRouteRequest();
-    if(config == null || config.isBlank()) {
+
+    if (OTPFeature.RestAPIPassInDefaultConfigAsJson.isOn() && StringUtils.hasValue(config)) {
+      var source = "Request.config";
+      var root = ConfigFileLoader.nodeFromString(config, source);
+      return RouteRequestConfig.mapRouteRequest(new NodeAdapter(root, source), request);
+    } else {
       return request;
     }
-    var source = "Request.config";
-    var root = ConfigFileLoader.nodeFromString(config, source);
-    return RouteRequestConfig.mapRouteRequest(new NodeAdapter(root, source), request);
   }
 }
