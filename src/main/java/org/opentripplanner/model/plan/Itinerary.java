@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.ext.fares.model.FareProductInstance;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.SystemNotice;
@@ -548,20 +546,6 @@ public class Itinerary {
 
   public void setFare(ItineraryFares fare) {
     this.fare = fare;
-
-    var itineraryInstances = fare
-      .getItineraryProducts()
-      .stream()
-      .map(fp -> {
-        var instanceId = fp.uniqueInstanceId(firstLeg().getStartTime());
-        return new FareProductInstance(instanceId, fp);
-      })
-      .toList();
-
-    this.legs.forEach(l -> {
-        var legInstances = fare.getLegProducts().get(l);
-        l.addFareProducts(ListUtils.combine(itineraryInstances, legInstances));
-      });
   }
 
   public List<ScheduledTransitLeg> getScheduledTransitLegs() {

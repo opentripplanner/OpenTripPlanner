@@ -33,6 +33,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.fares.model.FareMedium;
 import org.opentripplanner.ext.fares.model.FareProduct;
@@ -133,15 +134,18 @@ class GraphQLIntegrationTest {
         new FareComponent(id("AB"), "Fare component for AB", Money.euros(310), List.of(busLeg))
       )
     );
-    i1.setFare(fares);
 
     var dayPass = fareProduct("day-pass");
     fares.addItineraryProducts(List.of(dayPass));
+
 
     var singleTicket = fareProduct("single-ticket");
     fares.addFareProduct(railLeg, singleTicket);
     fares.addFareProduct(busLeg, singleTicket);
     i1.setFare(fares);
+
+    i1.setFare(fares);
+    FaresToItineraryMapper.addFaresToLegs(fares, i1);
 
     var alert = TransitAlert
       .of(id("an-alert"))
