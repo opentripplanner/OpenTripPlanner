@@ -23,6 +23,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -209,6 +210,16 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     ItineraryFares fare = new ItineraryFares();
     atlFareService.populateFare(fare, USD, FareType.electronicRegular, rides, null);
     assertEquals(expectedFareInCents, fare.getFare(FareType.electronicRegular).cents());
+
+    var fareProducts = fare
+      .getItineraryProducts()
+      .stream()
+      .filter(fp -> fp.id().getId().equals(FareType.electronicRegular.name()))
+      .toList();
+
+    assertEquals(1, fareProducts.size());
+    var fp = fareProducts.get(0);
+    assertEquals(Money.usDollars((int) expectedFareInCents), fp.amount());
   }
 
   private static Leg getLeg(String agencyId, long startTimeMins) {
