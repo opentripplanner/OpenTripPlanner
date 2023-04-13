@@ -106,7 +106,7 @@ msgstr ""
 #: src/client/js/otp/config.js:331
 #, fuzzy
 msgid "Transit & Rented Scooter"
-msgstr "ÖPNV und Fahrradverleih"
+msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:333
