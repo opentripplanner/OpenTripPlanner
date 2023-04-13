@@ -100,13 +100,13 @@ msgstr "Transporte Público y Alquiler de bicicleta"
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:329
 msgid "Rented Scooter"
-msgstr ""
+msgstr "Patinete de alquiler"
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:331
 #, fuzzy
 msgid "Transit & Rented Scooter"
-msgstr ""
+msgstr "Transporte Público y Patinete de alquiler"
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:333
