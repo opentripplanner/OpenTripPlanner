@@ -425,9 +425,9 @@ public class LegacyGraphQLDataFetchers {
 
   /** An amount of money. */
   public interface LegacyGraphQLMoney {
-    public DataFetcher<Currency> currency();
+    public DataFetcher<Integer> amount();
 
-    public DataFetcher<Integer> value();
+    public DataFetcher<Currency> currency();
   }
 
   /** An object with an ID */

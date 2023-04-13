@@ -1339,11 +1339,20 @@ type Itinerary {
     """
     systemNotices: [SystemNotice]!
 }
-"An amount of money."
+
+"A currency"
 type Currency {
     "ISO-4217 currency code, for example `USD` or `EUR`."
     code: String!
-    "Fractional digits of this currency."
+    """Fractional digits of this currency. A value of 2 would express that in this currency
+    100 minor units make up one major unit.
+
+    Expressed more concretely: 100 Euro-cents make up one Euro.
+
+    Note: Some currencies don't even have any fractional digits, for example the Japanese Yen.
+
+    See also https://en.wikipedia.org/wiki/ISO_4217#Minor_unit_fractions
+    """
     digits: Int!
 }
 
@@ -1355,7 +1364,7 @@ type Money {
     Money amount in cents. **Note:** this value is dependent on the currency used,
     as one cent is not necessarily ¹/₁₀₀ of the basic monetary unit.
     """
-    value: Int!
+    amount: Int!
 }
 
 """"

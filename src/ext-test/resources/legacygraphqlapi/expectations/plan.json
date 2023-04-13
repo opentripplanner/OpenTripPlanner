@@ -123,14 +123,14 @@
                     "code" : "EUR",
                     "digits" : 2
                   },
-                  "value" : 1000
+                  "amount" : 1000
                 },
                 "maxPrice" : {
                   "currency" : {
                     "code" : "EUR",
                     "digits" : 2
                   },
-                  "value" : 2000
+                  "amount" : 2000
                 },
                 "arrival" : "PT10M"
               }
