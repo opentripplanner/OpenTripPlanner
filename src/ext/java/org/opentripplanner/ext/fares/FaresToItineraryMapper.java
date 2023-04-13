@@ -10,7 +10,6 @@ import org.opentripplanner.routing.core.ItineraryFares;
  */
 public class FaresToItineraryMapper {
 
-
   public static void addFaresToLegs(ItineraryFares fares, Itinerary i) {
     var itineraryInstances = fares
       .getItineraryProducts()

@@ -138,7 +138,6 @@ class GraphQLIntegrationTest {
     var dayPass = fareProduct("day-pass");
     fares.addItineraryProducts(List.of(dayPass));
 
-
     var singleTicket = fareProduct("single-ticket");
     fares.addFareProduct(railLeg, singleTicket);
     fares.addFareProduct(busLeg, singleTicket);

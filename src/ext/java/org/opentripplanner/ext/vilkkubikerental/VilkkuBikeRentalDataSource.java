@@ -29,6 +29,8 @@ public class VilkkuBikeRentalDataSource
 
   private final String network;
 
+  private final boolean overloadingAllowed;
+
   /**
    * Initialize VilkkuBikeRentalDataSource.
    *
@@ -37,6 +39,7 @@ public class VilkkuBikeRentalDataSource
   public VilkkuBikeRentalDataSource(VilkkuBikeRentalDataSourceParameters config) {
     super(config.url(), stationXpath);
     network = config.network();
+    overloadingAllowed = config.overloadingAllowed();
   }
 
   @Override
@@ -65,6 +68,7 @@ public class VilkkuBikeRentalDataSource
       Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), station.spacesAvailable);
     station.spacesDisabled = 0;
     station.capacity = 0;
+    station.overloadingAllowed = overloadingAllowed;
 
     // all stations in feed are considered operational
     station.isInstalled = true;

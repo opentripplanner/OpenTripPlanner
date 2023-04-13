@@ -30,6 +30,7 @@ class GbfsVehicleRentalDataSourceTest {
         false,
         HttpHeaders.empty(),
         null,
+        false,
         false
       )
     );
@@ -69,6 +70,10 @@ class GbfsVehicleRentalDataSourceTest {
         .noneMatch(vehicleRentalStation ->
           vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed()
         )
+    );
+
+    assertTrue(
+      stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.overloadingAllowed())
     );
   }
 
@@ -115,7 +120,8 @@ class GbfsVehicleRentalDataSourceTest {
         false,
         HttpHeaders.empty(),
         null,
-        true
+        true,
+        false
       )
     );
 
@@ -155,7 +161,8 @@ class GbfsVehicleRentalDataSourceTest {
         false,
         HttpHeaders.empty(),
         network,
-        false
+        false,
+        true
       )
     );
 
@@ -196,6 +203,9 @@ class GbfsVehicleRentalDataSourceTest {
         .noneMatch(vehicleRentalStation ->
           vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed()
         )
+    );
+    assertTrue(
+      stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.overloadingAllowed())
     );
   }
 
