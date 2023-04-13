@@ -1107,6 +1107,10 @@ public class StreetEdge
       }
     }
 
+    if (isEscalator() && traverseMode == TraverseMode.WALK && walkingBike) {
+      return null;
+    }
+
     var s1 = createEditor(s0, this, traverseMode, walkingBike);
 
     if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, s1)) {
@@ -1332,11 +1336,7 @@ public class StreetEdge
           (1 - preferences.walk().safetyFactor());
         weight /= speed;
       }
-      if (isEscalator()) {
-        //weight = Double.POSITIVE_INFINITY;
-        permission = StreetTraversalPermission.PEDESTRIAN;
-        System.out.println("isEscalator()");
-      }
+      
       weight *=
         StreetEdgeReluctanceCalculator.computeReluctance(
           preferences,
