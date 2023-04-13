@@ -128,16 +128,7 @@ public class OSMWay extends OSMWithTags {
   }
 
   public boolean isEscalator() {
-    var res =
-      "steps".equals(getTag("highway")) &&
-      (
-        "yes".equals(getTag("conveying")) //||
-        //        "forward".equals(getTag("conveying")) ||
-        //        "backward".equals(getTag("conveying")) ||
-        //        "reversible".equals(getTag("conveying"))
-      );
-    if (res) System.out.println("isEscalator");
-    return res;
+    return "steps".equals(getTag("highway")) && "yes".equals(getTag("conveying"));
   }
 
   @Override

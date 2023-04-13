@@ -1244,16 +1244,6 @@ public class StreetEdge
         isStairs(),
         isEscalator()
       );
-    if (isEscalator()) System.out.println(
-      "Escalator reluctance" +
-      StreetEdgeReluctanceCalculator.computeReluctance(
-        preferences,
-        traverseMode,
-        walkingBike,
-        isStairs(),
-        isEscalator()
-      )
-    );
     return new TraversalCosts(time, weight);
   }
 
@@ -1336,7 +1326,7 @@ public class StreetEdge
           (1 - preferences.walk().safetyFactor());
         weight /= speed;
       }
-      
+
       weight *=
         StreetEdgeReluctanceCalculator.computeReluctance(
           preferences,
