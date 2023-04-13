@@ -11,7 +11,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * </p>
  */
 @Deprecated
-public record FareComponent(FeedScopedId fareId, String name, Money price, List<Leg> legs) {
+public record FareComponent(FeedScopedId fareId, Money price, List<Leg> legs) {
   public List<FeedScopedId> routes() {
     return legs.stream().map(l -> l.getRoute().getId()).toList();
   }

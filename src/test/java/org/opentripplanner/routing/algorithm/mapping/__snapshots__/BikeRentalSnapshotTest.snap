@@ -14,7 +14,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -510,7 +509,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -964,7 +962,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -1314,7 +1311,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -1810,7 +1806,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -2306,7 +2301,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -3331,7 +3325,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -3879,7 +3872,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -4307,7 +4299,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -4709,7 +4700,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -5257,7 +5247,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -5685,7 +5674,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {

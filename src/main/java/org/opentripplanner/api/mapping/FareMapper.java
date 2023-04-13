@@ -141,6 +141,6 @@ public class FareMapper {
   }
 
   private ApiFareComponent toApiFareComponent(FareComponent m) {
-    return new ApiFareComponent(m.fareId(), m.name(), toApiMoney(m.price()), m.routes());
+    return new ApiFareComponent(m.fareId(), null, toApiMoney(m.price()), m.routes());
   }
 }

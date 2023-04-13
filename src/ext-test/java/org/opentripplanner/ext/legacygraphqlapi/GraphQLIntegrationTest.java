@@ -130,9 +130,7 @@ class GraphQLIntegrationTest {
     fares.addFare(FareType.regular, Money.euros(310));
     fares.addFareComponent(
       FareType.regular,
-      List.of(
-        new FareComponent(id("AB"), "Fare component for AB", Money.euros(310), List.of(busLeg))
-      )
+      List.of(new FareComponent(id("AB"), Money.euros(310), List.of(busLeg)))
     );
 
     var dayPass = fareProduct("day-pass");

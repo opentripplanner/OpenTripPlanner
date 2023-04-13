@@ -242,7 +242,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -735,7 +734,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -1293,7 +1291,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -1786,7 +1783,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -2344,7 +2340,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -3105,7 +3100,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -3601,7 +3595,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -4097,7 +4090,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -4593,7 +4585,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
@@ -5133,7 +5124,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "feedId": "prt",
                 "id": "8"
               },
-              "name": "Fares V1 itinerary fare for 8",
               "price": {
                 "cents": 200,
                 "currency": {
