@@ -23,8 +23,6 @@ import org.opentripplanner.transit.model.basic.Money;
  */
 public class ItineraryFares {
 
-  public static final String FARES_V1_FEED_ID = "faresv1";
-
   /**
    * The fare products that are valid for all legs of an itinerary, like a day pass.
    * <p>
@@ -51,6 +49,10 @@ public class ItineraryFares {
   @Deprecated
   private final Multimap<FareType, FareComponent> components = LinkedHashMultimap.create();
 
+  /**
+   * Holds the "fares" for the entire itinerary. The definition of a fare is not clear so
+   * this is deprecated.
+   */
   @Deprecated
   private final Map<FareType, Money> fares = new HashMap<>();
 
