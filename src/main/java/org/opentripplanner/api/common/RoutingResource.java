@@ -29,6 +29,9 @@ import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilt
 import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -667,6 +670,15 @@ public abstract class RoutingResource {
   private String debugRaptorPath;
 
   /**
+   * This takes a RouteRequest as JSON and uses it as the default before applying other
+   * parameters. This is intended for debugging only! The RouteRequest is a internal OTP
+   * class and will change without notice. The JSON is the same as the one in the
+   * router-config for the "routingDefaults" parameter.
+   */
+  @QueryParam("config")
+  private String config;
+
+  /**
    * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones.
    * this should ideally be done when setting the routing context, but at present departure/ arrival
    * time is stored in the request as an epoch time with the TZ already resolved, and other code
@@ -683,7 +695,7 @@ public abstract class RoutingResource {
    * @param queryParameters incoming request parameters
    */
   protected RouteRequest buildRequest(MultivaluedMap<String, String> queryParameters) {
-    RouteRequest request = serverContext.defaultRouteRequest();
+    final RouteRequest request = defaultRouteRequest();
 
     // The routing request should already contain defaults, which are set when it is initialized or
     // in the JSON router configuration and cloned. We check whether each parameter was supplied
@@ -837,5 +849,19 @@ public abstract class RoutingResource {
       }
     });
     return request;
+  }
+
+  /**
+   * This method return the configured default routing request with modifications passed in by the
+   * `config` parameter.
+   */
+  private RouteRequest defaultRouteRequest() {
+    RouteRequest request = serverContext.defaultRouteRequest();
+    if(config == null || config.isBlank()) {
+      return request;
+    }
+    var source = "Request.config";
+    var root = ConfigFileLoader.nodeFromString(config, source);
+    return RouteRequestConfig.mapRouteRequest(new NodeAdapter(root, source), request);
   }
 }
