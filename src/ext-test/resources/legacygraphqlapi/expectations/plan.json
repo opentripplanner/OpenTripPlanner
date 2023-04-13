@@ -51,19 +51,6 @@
               "alerts" : [ ],
               "fareProducts" : [
                 {
-                  "instanceId" : "26433fdf-0fe0-32ed-992b-2d1fb4e189e4",
-                  "product" : {
-                    "id" : "faresv1:regular",
-                    "name" : "Itinerary fare for type regular",
-                    "price" : {
-                      "currency" : "EUR",
-                      "cents" : 310
-                    },
-                    "riderCategory" : null,
-                    "medium" : null
-                  }
-                },
-                {
                   "instanceId" : "2c50a9d9-df41-35ea-870f-85663769f187",
                   "product" : {
                     "id" : "F:day-pass",
@@ -157,19 +144,6 @@
                 }
               ],
               "fareProducts" : [
-                {
-                  "instanceId" : "26433fdf-0fe0-32ed-992b-2d1fb4e189e4",
-                  "product" : {
-                    "id" : "faresv1:regular",
-                    "name" : "Itinerary fare for type regular",
-                    "price" : {
-                      "currency" : "EUR",
-                      "cents" : 310
-                    },
-                    "riderCategory" : null,
-                    "medium" : null
-                  }
-                },
                 {
                   "instanceId" : "2c50a9d9-df41-35ea-870f-85663769f187",
                   "product" : {
