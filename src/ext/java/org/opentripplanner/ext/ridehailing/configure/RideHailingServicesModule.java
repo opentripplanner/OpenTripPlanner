@@ -4,12 +4,8 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.opentripplanner.ext.ridehailing.RideHailingDepartureTimeShifter;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
-import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.ridehailing.service.uber.UberService;
-import org.opentripplanner.routing.service.RequestModifier;
 import org.opentripplanner.standalone.config.RouterConfig;
 
 /**
@@ -27,15 +23,5 @@ public class RideHailingServicesModule {
       .stream()
       .map(p -> (RideHailingService) new UberService(p))
       .toList();
-  }
-
-  @Provides
-  @Singleton
-  RequestModifier requestModifier(List<RideHailingService> services) {
-    if (services.isEmpty()) {
-      return RequestModifier.NOOP;
-    } else {
-      return RideHailingDepartureTimeShifter::modifyRequest;
-    }
   }
 }

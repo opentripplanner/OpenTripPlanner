@@ -22,7 +22,6 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
-import org.opentripplanner.routing.service.RequestModifier;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.OtpStartupInfo;
@@ -116,7 +115,6 @@ public class SpeedTest {
         TestServerContext.createVehicleRentalService(),
         config.flexConfig,
         List.of(),
-        RequestModifier.NOOP,
         null,
         null
       );
