@@ -52,7 +52,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
   public Instant lastReported;
 
   // OTP internal data
-  public boolean allowOverloading = false;
+  public boolean overloadingAllowed = false;
   public boolean isArrivingInRentalVehicleAtDestinationAllowed = false;
   public boolean realTimeData = true;
 
@@ -107,8 +107,8 @@ public class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   @Override
-  public boolean isAllowOverloading() {
-    return allowOverloading;
+  public boolean overloadingAllowed() {
+    return overloadingAllowed;
   }
 
   @Override
@@ -121,7 +121,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   public boolean allowDropoffNow() {
-    return isReturning && (spacesAvailable > 0 || allowOverloading);
+    return isReturning && (spacesAvailable > 0 || overloadingAllowed);
   }
 
   @Override
@@ -151,7 +151,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     return vehicleSpacesAvailable
       .entrySet()
       .stream()
-      .filter(e -> !includeRealtimeAvailability || e.getValue() > 0)
+      .filter(e -> !includeRealtimeAvailability || overloadingAllowed || e.getValue() > 0)
       .map(e -> e.getKey().formFactor)
       .collect(Collectors.toSet());
   }
