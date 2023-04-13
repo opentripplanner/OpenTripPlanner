@@ -1395,9 +1395,9 @@ type Itinerary {
 
     """
     Information about the fares for this itinerary. This is primarily a GTFS Fares V1 interface
-    will be deprecated in the near future.
+    will be removed in the future.
     """
-    fares: [fare]
+    fares: [fare] @deprecated(reason: "Use the leg's `fareProduct`.")
 
     """
     How much elevation is gained, in total, over the course of the itinerary, in meters.
