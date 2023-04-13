@@ -112,6 +112,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Bugs related to DST and service date [#5004](https://github.com/opentripplanner/OpenTripPlanner/pull/5004)
 - Fix validation of running period for NeTEx flexible lines [#5007](https://github.com/opentripplanner/OpenTripPlanner/pull/5007)
 - JSON logging [#5023](https://github.com/opentripplanner/OpenTripPlanner/pull/5023)
+- Add allowOverloading parameter to GBFS updaters and fix use of it in routing [#5024](https://github.com/opentripplanner/OpenTripPlanner/pull/5024)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
