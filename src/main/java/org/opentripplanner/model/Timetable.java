@@ -258,8 +258,8 @@ public class Timetable implements Serializable {
             } else {
               LOG.debug(
                 "Arrival time at index {} of trip {} has neither a delay nor a time.",
-                feedScopedTripId,
-                i
+                i,
+                feedScopedTripId
               );
               return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME, i));
             }
@@ -285,8 +285,8 @@ public class Timetable implements Serializable {
             } else {
               LOG.debug(
                 "Departure time at index {} of trip {} has neither a delay nor a time.",
-                feedScopedTripId,
-                i
+                i,
+                feedScopedTripId
               );
               return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME, i));
             }
