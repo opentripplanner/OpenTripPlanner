@@ -13,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ext.fares.model.FareAttribute;
+import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
@@ -42,10 +43,19 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     float expectedFare
   ) {
     var fares = fareService.getCost(i);
-    assertEquals(Money.usDollars(Math.round(expectedFare * 100)), fares.getFare(FareType.regular));
+    final Money expected = Money.usDollars(Math.round(expectedFare * 100));
+    assertEquals(expected, fares.getFare(FareType.regular));
 
     for (var type : fares.getFareTypes()) {
       assertTrue(fares.getComponents(type).isEmpty());
+
+      var prices = fares
+        .getItineraryProducts()
+        .stream()
+        .filter(fp -> fp.name().equals(type.name()))
+        .map(FareProduct::amount)
+        .toList();
+      assertEquals(List.of(expected), prices);
     }
   }
 
