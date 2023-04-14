@@ -88,6 +88,11 @@ public class TripUpdateBuilder {
     return addStopTime(null, -1, stopSequence, NO_VALUE, NO_VALUE, scheduleRelationship, null);
   }
 
+  public TripUpdateBuilder addRawStopTime(StopTimeUpdate stopTime) {
+    tripUpdateBuilder.addStopTimeUpdate(stopTime);
+    return this;
+  }
+
   private TripUpdateBuilder addStopTime(
     String stopId,
     int minutes,
