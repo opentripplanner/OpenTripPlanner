@@ -5,6 +5,7 @@ import graphql.relay.Connection;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
+import java.util.Currency;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -22,6 +23,8 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.Leg
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLTransitMode;
+import org.opentripplanner.ext.legacygraphqlapi.model.RideHailingProvider;
+import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -275,6 +278,13 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Double> lon();
   }
 
+  /** An amount of money. */
+  public interface LegacyGraphQLCurrency {
+    public DataFetcher<String> code();
+
+    public DataFetcher<Integer> digits();
+  }
+
   /**
    * Departure row is a location, which lists departures of a certain pattern from a
    * stop. Departure rows are identified with the pattern, so querying departure rows
@@ -413,6 +423,8 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Boolean> rentedBike();
 
+    public DataFetcher<RideEstimate> rideHailingEstimate();
+
     public DataFetcher<Route> route();
 
     public DataFetcher<String> serviceDate();
@@ -446,9 +458,9 @@ public class LegacyGraphQLDataFetchers {
 
   /** An amount of money. */
   public interface LegacyGraphQLMoney {
-    public DataFetcher<Integer> cents();
+    public DataFetcher<Integer> amount();
 
-    public DataFetcher<String> currency();
+    public DataFetcher<Currency> currency();
   }
 
   /** An object with an ID */
@@ -690,6 +702,23 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor> formFactor();
 
     public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType> propulsionType();
+  }
+
+  /** An estimate for a ride on a hailed vehicle, like an Uber car. */
+  public interface LegacyGraphQLRideHailingEstimate {
+    public DataFetcher<java.time.Duration> arrival();
+
+    public DataFetcher<Money> maxPrice();
+
+    public DataFetcher<Money> minPrice();
+
+    public DataFetcher<String> productName();
+
+    public DataFetcher<RideHailingProvider> provider();
+  }
+
+  public interface LegacyGraphQLRideHailingProvider {
+    public DataFetcher<String> id();
   }
 
   /** Category of riders a fare product applies to, for example students or pensioners. */

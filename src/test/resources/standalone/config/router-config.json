@@ -293,5 +293,13 @@
         "timeout": 300000
       }
     }
+  ],
+  "rideHailingServices": [
+    {
+      "type": "uber-car-hailing",
+      "clientId": "secret-id",
+      "clientSecret": "very-secret",
+      "wheelchairAccessibleRideType": "car"
+    }
   ]
 }

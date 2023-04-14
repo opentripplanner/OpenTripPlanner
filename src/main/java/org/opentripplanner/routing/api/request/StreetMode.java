@@ -54,6 +54,11 @@ public enum StreetMode {
   CAR_RENTAL(true, true, true, true, false, true, true, false, false),
 
   /**
+   * Using a car hailing app like Uber or Lyft to get to a train station or all the way to the destination.
+   */
+  CAR_HAILING(true, false, true, false, false, true, false, false, true),
+
+  /**
    * Encompasses all types of on-demand and flexible transportation.
    */
   FLEXIBLE(true, false, true, true, false, false, false, false, false);

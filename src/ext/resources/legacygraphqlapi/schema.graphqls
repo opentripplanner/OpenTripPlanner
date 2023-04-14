@@ -1279,17 +1279,6 @@ type RoutingError {
     description: String!
 }
 
-"An amount of money."
-type Money {
-    "ISO-4217 currency code"
-    currency: String!
-    """
-    Money amount in cents. **Note:** this value is dependent on the currency used,
-    as one cent is not necessarily ¹/₁₀₀ of the basic monetary unit.
-    """
-    cents: Int
-}
-
 "Category of riders a fare product applies to, for example students or pensioners."
 type RiderCategory {
     "ID of the category"
@@ -1421,6 +1410,57 @@ type Itinerary {
     This make it possible to inspect the itinerary-filter-chain.
     """
     systemNotices: [SystemNotice]!
+}
+
+"A currency"
+type Currency {
+    "ISO-4217 currency code, for example `USD` or `EUR`."
+    code: String!
+    """Fractional digits of this currency. A value of 2 would express that in this currency
+    100 minor units make up one major unit.
+
+    Expressed more concretely: 100 Euro-cents make up one Euro.
+
+    Note: Some currencies don't even have any fractional digits, for example the Japanese Yen.
+
+    See also https://en.wikipedia.org/wiki/ISO_4217#Minor_unit_fractions
+    """
+    digits: Int!
+}
+
+"An amount of money."
+type Money {
+    "The currency of this money amount."
+    currency: Currency!
+    """
+    Money amount in cents. **Note:** this value is dependent on the currency used,
+    as one cent is not necessarily ¹/₁₀₀ of the basic monetary unit.
+    """
+    amount: Int!
+}
+
+""""
+An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
+"""
+scalar Duration
+
+type RideHailingProvider {
+    "The ID of the ride hailing provider."
+    id: String!
+}
+
+"An estimate for a ride on a hailed vehicle, like an Uber car."
+type RideHailingEstimate {
+    "The provider of the ride hailing service."
+    provider: RideHailingProvider!
+    "The lower bound of the price estimate of this ride."
+    minPrice: Money!
+    "The upper bound of the price estimate of this ride."
+    maxPrice: Money!
+    "The estimated time it takes for the vehicle to arrive."
+    arrival: Duration!
+    "The name of the ride, ie. UberX"
+    productName: String
 }
 
 type Leg {
@@ -1571,6 +1611,9 @@ type Leg {
 
         ): [Leg!]
 
+    "Estimate of a hailed ride like Uber."
+    rideHailingEstimate: RideHailingEstimate
+
     """
     Fare products are purchasable tickets which may have an optional fare container or rider
     category that limits who can buy them or how.
@@ -1608,7 +1651,6 @@ enum LocationType {
     STATION
     ENTRANCE
 }
-
 """Long type"""
 scalar Long
 
@@ -2160,7 +2202,10 @@ enum Qualifier {
     EGRESS,
 
     """The mode is used for the direct street search."""
-    DIRECT
+    DIRECT,
+
+    """Hailing a ride, for example via an app like Uber."""
+    HAIL
 }
 
 type QueryType {

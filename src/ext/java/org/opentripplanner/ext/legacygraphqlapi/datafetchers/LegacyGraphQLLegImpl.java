@@ -11,6 +11,8 @@ import org.opentripplanner.ext.fares.model.FareProductInstance;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.ridehailing.model.RideEstimate;
+import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
@@ -181,6 +183,18 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<Boolean> rentedBike() {
     return environment -> getSource(environment).getRentedVehicle();
+  }
+
+  @Override
+  public DataFetcher<RideEstimate> rideHailingEstimate() {
+    return environment -> {
+      Leg leg = getSource(environment);
+      if (leg instanceof RideHailingLeg rhl) {
+        return rhl.rideEstimate();
+      } else {
+        return null;
+      }
+    };
   }
 
   @Override

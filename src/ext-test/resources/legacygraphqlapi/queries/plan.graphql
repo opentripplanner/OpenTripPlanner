@@ -8,12 +8,19 @@
             unpreferredCost: 555,
             preferred: [{ not: [{tags: ["a", "b", "c"]}] }],
             filters: [{ select: [{tags:["e"]}] }]
-        }) {
+        },
+        transportModes: [
+            {
+                mode: CAR,
+                qualifier: HAIL
+            }
+        ]) {
         itineraries {
             startTime
             endTime
             generalizedCost
             legs {
+                mode
                 from {
                     name
                     lat
@@ -50,6 +57,27 @@
                             lon
                         }
                     }
+                }
+                rideHailingEstimate {
+                    provider {
+                        id
+                    }
+                    productName
+                    minPrice {
+                        currency {
+                            code
+                            digits
+                        }
+                        amount
+                    }
+                    maxPrice {
+                        currency {
+                            code
+                            digits
+                        }
+                        amount
+                    }
+                    arrival
                 }
                 fareProducts {
                     instanceId

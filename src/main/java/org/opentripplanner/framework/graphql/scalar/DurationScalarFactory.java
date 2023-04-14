@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.transmodelapi.model.scalars;
+package org.opentripplanner.framework.graphql.scalar;
 
 import graphql.language.StringValue;
 import graphql.schema.Coercing;

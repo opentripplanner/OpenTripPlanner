@@ -5,6 +5,7 @@ import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_HAILING;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_PICKUP;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
@@ -56,7 +57,9 @@ class StateTest {
     of(CAR_TO_PARK, false, NULL_RENTAL_STATES, Set.of(CAR)),
     of(FLEXIBLE, false, NULL_RENTAL_STATES, Set.of(WALK)),
     of(CAR_PICKUP, false, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
-    of(CAR_PICKUP, true, NULL_RENTAL_STATES, Set.of(CAR, WALK))
+    of(CAR_PICKUP, true, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
+    of(CAR_HAILING, false, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
+    of(CAR_HAILING, true, NULL_RENTAL_STATES, Set.of(CAR, WALK))
   );
 
   @ParameterizedTest(
