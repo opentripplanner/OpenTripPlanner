@@ -2,7 +2,7 @@ package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.ext.siri.mapper.PickDropMapper;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -21,7 +20,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.updater.TripTimesValidationMapper;
+import org.opentripplanner.updater.spi.TripTimesValidationMapper;
+import org.opentripplanner.updater.spi.UpdateError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedVehicleJourney;

@@ -2,7 +2,7 @@ package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.ext.siri.mapper.SiriTransportModeMapper.mapTransitMainMode;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -15,7 +15,6 @@ import org.opentripplanner.ext.siri.mapper.PickDropMapper;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -28,7 +27,8 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.TripTimesValidationMapper;
+import org.opentripplanner.updater.spi.TripTimesValidationMapper;
+import org.opentripplanner.updater.spi.UpdateError;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;

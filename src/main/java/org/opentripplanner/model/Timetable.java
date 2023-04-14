@@ -1,12 +1,12 @@
 package org.opentripplanner.model;
 
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
@@ -29,7 +29,8 @@ import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
-import org.opentripplanner.updater.TripTimesValidationMapper;
+import org.opentripplanner.updater.spi.TripTimesValidationMapper;
+import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +148,7 @@ public class Timetable implements Serializable {
    * @param updateServiceDate             service date of trip update
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag
-   * @return {@link Result<TripTimesPatch,  UpdateError >} contains either a new copy of updated
+   * @return {@link Result<TripTimesPatch,   UpdateError  >} contains either a new copy of updated
    * TripTimes after TripUpdate has been applied on TripTimes of trip with the id specified in the
    * trip descriptor of the TripUpdate and a list of stop indices that have been skipped with the
    * realtime update; or an error if something went wrong

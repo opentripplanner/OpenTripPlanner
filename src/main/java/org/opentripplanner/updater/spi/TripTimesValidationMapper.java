@@ -1,9 +1,9 @@
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.spi;
 
-import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.updater.spi.UpdateError;
 
 /**
  * Converts the result of a {@link TripTimes} to the model of the updater ready to be consumed

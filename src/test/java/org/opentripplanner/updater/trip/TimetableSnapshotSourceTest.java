@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.NotSame;
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.Same;
@@ -40,7 +40,6 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.UpdateSuccess.WarningType;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -51,6 +50,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.spi.UpdateSuccess.WarningType;
 
 public class TimetableSnapshotSourceTest {
 

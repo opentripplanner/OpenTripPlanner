@@ -14,10 +14,8 @@ import java.util.Optional;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
