@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
-import static org.opentripplanner.transit.model.timetable.TripTimes.ValidationErrorType.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.transit.model.timetable.TripTimes.ValidationErrorType.NEGATIVE_HOP_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ValidationErrorType.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ValidationErrorType.NEGATIVE_HOP_TIME;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -373,13 +373,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   public void setRealTimeState(final RealTimeState realTimeState) {
     this.realTimeState = realTimeState;
   }
-
-  public enum ValidationErrorType {
-    NEGATIVE_DWELL_TIME,
-    NEGATIVE_HOP_TIME,
-  }
-
-  public record ValidationError(ValidationErrorType type, int stopIndex) {}
 
   /**
    * When creating a scheduled TripTimes or wrapping it in updates, we could potentially imply

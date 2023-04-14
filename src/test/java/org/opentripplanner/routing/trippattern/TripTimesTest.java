@@ -3,8 +3,8 @@ package org.opentripplanner.routing.trippattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model.timetable.TripTimes.ValidationErrorType.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.transit.model.timetable.TripTimes.ValidationErrorType.NEGATIVE_HOP_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ValidationErrorType.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ValidationErrorType.NEGATIVE_HOP_TIME;
 
 import java.util.LinkedList;
 import java.util.List;
