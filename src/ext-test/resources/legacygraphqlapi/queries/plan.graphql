@@ -85,8 +85,11 @@
                         id
                         name
                         price {
-                            currency
-                            cents
+                            currency {
+                                digits
+                                code
+                            }
+                            amount
                         }
                         riderCategory {
                             id
