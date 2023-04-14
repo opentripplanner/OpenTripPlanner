@@ -29,6 +29,7 @@ import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
+import org.opentripplanner.updater.TripTimesValidationMapper;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -328,14 +329,14 @@ public class Timetable implements Serializable {
       }
     }
 
-    var result = newTimes.validateNonIncreasingTimes();
-    if (result.isFailure()) {
+    var error = newTimes.validateNonIncreasingTimes();
+    if (error.isPresent()) {
       LOG.debug(
         "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {} after stop index {}.",
         tripId,
-        result.failureValue().stopIndex()
+        error.get().stopIndex()
       );
-      return Result.failure(result.failureValue());
+      return TripTimesValidationMapper.toResult(newTimes.getTrip().getId(), error.get());
     }
 
     if (tripUpdate.hasVehicle()) {

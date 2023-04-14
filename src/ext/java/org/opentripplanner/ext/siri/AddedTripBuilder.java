@@ -28,6 +28,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.TripTimesValidationMapper;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
@@ -214,8 +215,8 @@ class AddedTripBuilder {
 
     /* Validate */
     var validityResult = updatedTripTimes.validateNonIncreasingTimes();
-    if (validityResult.isFailure()) {
-      return validityResult.toFailureResult();
+    if (validityResult.isPresent()) {
+      return TripTimesValidationMapper.toResult(tripId, validityResult.get());
     }
 
     // Adding trip to index necessary to include values in graphql-queries
