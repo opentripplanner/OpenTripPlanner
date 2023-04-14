@@ -672,7 +672,7 @@ public abstract class RoutingResource {
 
   /**
    * This takes a RouteRequest as JSON and uses it as the default before applying other
-   * parameters. This is intended for debugging only! The RouteRequest is a internal OTP
+   * parameters. This is intended for debugging only! The RouteRequest is an internal OTP
    * class and will change without notice. The JSON is the same as the one in the
    * router-config for the "routingDefaults" parameter.
    */
@@ -853,7 +853,7 @@ public abstract class RoutingResource {
   }
 
   /**
-   * This method return the configured default routing request with modifications passed in by the
+   * This method returns the configured default routing request with modifications passed in by the
    * `config` parameter. Only if {@code OTPFeature.RestAPIPAssInDefaultConfigAsJson.isOn()}.
    */
   private RouteRequest defaultRouteRequest() {
