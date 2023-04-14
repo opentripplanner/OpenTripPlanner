@@ -139,14 +139,23 @@ class StationMapper {
           }
         }
       }
-      /* FIXME there are "sub"stopPlace with Quays that have no coordinates, but a ParentStopPlaceReference to a parentStop with a coordinate.... */
+      /* FIXME there are "sub"stopPlace with Quays that have no coordinates, but a ParentStopPlaceReference to a parentStop with a coordinate....
+       * per Transmodel Spec this is one way to model MultiModalStations
+       * The "null island" location gets replaced in the mapper for MultiModalStations
+       * @see MultiModalStationMapper.map()
+       */
       if (coordinates.isEmpty()) {
-        issueStore.add(
-          "StationWithoutCoordinates2",
-          "Station without any related coordinates. Station id: %s",
-          stopPlace.getId()
-        );
-        return new WgsCoordinate(0f, 0f);
+        /* assumption: parent sites are processed before processing subordinate stopPlaces */
+        if (stopPlace.getParentSiteRef() != null) {
+          Station parentSite = stationsById.get(
+            idFactory.createId(stopPlace.getParentSiteRef().getRef())
+          );
+          if (parentSite != null) {
+            if (parentSite.getCoordinate() != null) {
+              coordinates.add(parentSite.getCoordinate());
+            }
+          }
+        }
       }
       return WgsCoordinate.mean(coordinates);
     }
