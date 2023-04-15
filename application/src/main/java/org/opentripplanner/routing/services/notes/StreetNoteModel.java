@@ -28,7 +28,9 @@ public class StreetNoteModel implements Serializable {
    * write access (no notes for temporary edges, we use notes from parent).
    */
   private final SetMultimap<Edge, StreetNoteAndMatcher> notesForEdge =
-    Multimaps.synchronizedSetMultimap(HashMultimap.create());
+    Multimaps.synchronizedSetMultimap(
+    HashMultimap.create()
+  );
 
   /**
    * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
