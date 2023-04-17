@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class VilkkuBikeRentalDataSourceTest {
 
@@ -20,8 +20,8 @@ public class VilkkuBikeRentalDataSourceTest {
         new VilkkuBikeRentalDataSourceParameters(
           "file:src/ext-test/resources/vilkkubikerental/vilkku.xml",
           null,
-          false,
-          Map.of()
+          true,
+          HttpHeaders.empty()
         )
       );
   }
@@ -41,6 +41,7 @@ public class VilkkuBikeRentalDataSourceTest {
 
     assertEquals(8, station.getVehiclesAvailable());
     assertTrue(station.getSpacesAvailable() > 0);
+    assertTrue(station.overloadingAllowed());
     assertTrue(station.isAllowDropoff());
     assertTrue(station.isAllowPickup());
     assertTrue(station.allowDropoffNow());

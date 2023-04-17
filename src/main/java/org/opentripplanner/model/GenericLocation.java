@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
@@ -53,6 +54,7 @@ public class GenericLocation {
   /**
    * Returns this as a Coordinate object.
    */
+  @Nullable
   public Coordinate getCoordinate() {
     if (this.lat == null || this.lng == null) {
       return null;

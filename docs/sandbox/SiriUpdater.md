@@ -29,7 +29,7 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 
 | Config Parameter               |       Type      | Summary                                                                                                |  Req./Opt. | Default Value | Since |
 |--------------------------------|:---------------:|--------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "SIRI_ET_UPDATER"       |      `enum`     | The type of the updater.                                                                               | *Required* |               |  1.5  |
+| type = "siri-et-updater"       |      `enum`     | The type of the updater.                                                                               | *Required* |               |  1.5  |
 | blockReadinessUntilInitialized |    `boolean`    | Whether catching up with the updates should block the readiness check from returning a 'ready' result. | *Optional* | `false`       |  2.0  |
 | feedId                         |     `string`    | The ID of the feed to apply the updates to.                                                            | *Required* |               |  2.0  |
 | frequencySec                   |    `integer`    | How often the updates should be retrieved.                                                             | *Optional* | `60`          |  2.0  |
@@ -38,7 +38,7 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 | requestorRef                   |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
 | timeoutSec                     |    `integer`    | The HTTP timeout to download the updates.                                                              | *Optional* | `15`          |  2.0  |
 | url                            |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |
-| [headers](#u__8__headers)      | `map of string` | HTTP headers to add to the request                                                                     | *Optional* |               |  2.3  |
+| [headers](#u__8__headers)      | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                             | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
@@ -48,7 +48,7 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[8] 
 
-HTTP headers to add to the request
+HTTP headers to add to the request. Any header key, value can be inserted.
 
 
 

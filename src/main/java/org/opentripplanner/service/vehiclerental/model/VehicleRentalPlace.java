@@ -44,7 +44,7 @@ public interface VehicleRentalPlace {
   boolean isAllowDropoff();
 
   /** Does the place allow overloading (ignore available spaces) */
-  boolean isAllowOverloading();
+  boolean overloadingAllowed();
 
   /** Can a vehicle be rented here */
   boolean isAllowPickup();

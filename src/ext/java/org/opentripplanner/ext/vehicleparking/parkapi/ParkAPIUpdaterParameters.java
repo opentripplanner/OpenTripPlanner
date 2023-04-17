@@ -2,8 +2,7 @@ package org.opentripplanner.ext.vehicleparking.parkapi;
 
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
-import javax.annotation.Nonnull;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
@@ -16,7 +15,7 @@ public record ParkAPIUpdaterParameters(
   String url,
   String feedId,
   int frequencySec,
-  @Nonnull Map<String, String> httpHeaders,
+  HttpHeaders httpHeaders,
   List<String> tags,
   VehicleParkingSourceType sourceType,
   ZoneId timeZone

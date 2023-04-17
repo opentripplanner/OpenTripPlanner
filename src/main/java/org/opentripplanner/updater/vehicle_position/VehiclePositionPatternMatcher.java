@@ -38,8 +38,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.updater.ResultLogger;
-import org.opentripplanner.updater.UpdateResult;
+import org.opentripplanner.updater.spi.ResultLogger;
+import org.opentripplanner.updater.spi.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

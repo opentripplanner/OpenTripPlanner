@@ -77,7 +77,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   }
 
   @Override
-  public boolean isAllowOverloading() {
+  public boolean overloadingAllowed() {
     return false;
   }
 

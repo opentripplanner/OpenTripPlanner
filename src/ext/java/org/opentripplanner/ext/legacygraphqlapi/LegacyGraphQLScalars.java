@@ -12,11 +12,13 @@ import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
 
 public class LegacyGraphQLScalars {
 
   private static final ObjectMapper geoJsonMapper = new ObjectMapper()
     .registerModule(new JtsModule(GeometryUtils.getGeometryFactory()));
+  public static GraphQLScalarType durationScalar = DurationScalarFactory.createDurationScalar();
 
   public static GraphQLScalarType polylineScalar = GraphQLScalarType
     .newScalar()

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.updater.UpdateResult;
+import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 public class TripUpdateMetrics {

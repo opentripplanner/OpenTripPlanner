@@ -5,5 +5,12 @@
   },
   "osmDefaults": {
     "osmTagMapping": "houston"
-  }
+  },
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "feedId": "ridemetro",
+      "source": "https://ridemetro-api.ibi-transit.com/download/liveGTFS.zip"
+    }
+  ]
 }
