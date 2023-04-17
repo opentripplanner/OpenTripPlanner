@@ -138,7 +138,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
         url,
         sxServiceRequest,
         timeout,
-        requestHeaders.headers()
+        requestHeaders.asMap()
       );
 
       fetching = System.currentTimeMillis() - t1;
