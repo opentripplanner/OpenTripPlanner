@@ -9,6 +9,7 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
 import gnu.trove.set.hash.TIntHashSet;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZonedDateTime;
@@ -20,6 +21,9 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
+import org.opentripplanner.ext.ridehailing.model.RideEstimate;
+import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
+import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -28,6 +32,7 @@ import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -359,6 +364,31 @@ public class TestItineraryBuilder implements PlanTestConstants {
     );
   }
 
+  public TestItineraryBuilder carHail(int duration, Place to) {
+    var streetLeg = streetLeg(CAR, lastEndTime, lastEndTime + duration, to, 1000);
+
+    var rhl = new RideHailingLeg(
+      streetLeg,
+      RideHailingProvider.UBER,
+      new RideEstimate(
+        RideHailingProvider.UBER,
+        Duration.ofSeconds(duration),
+        Money.euros(1000),
+        Money.euros(2000),
+        "VW",
+        "UberX",
+        true
+      )
+    );
+    // the removal is necessary because the call to streetLeg() also adds a leg to the list
+    // since we want to override this and there is no replace() method we remove the last leg
+    // and re-add another one
+    legs.remove(legs.size() - 1);
+    legs.add(rhl);
+
+    return this;
+  }
+
   /* private methods */
 
   /** Create a dummy trip */
@@ -470,7 +500,13 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return this;
   }
 
-  private Leg streetLeg(TraverseMode mode, int startTime, int endTime, Place to, int legCost) {
+  private StreetLeg streetLeg(
+    TraverseMode mode,
+    int startTime,
+    int endTime,
+    Place to,
+    int legCost
+  ) {
     StreetLeg leg = StreetLeg
       .create()
       .withMode(mode)

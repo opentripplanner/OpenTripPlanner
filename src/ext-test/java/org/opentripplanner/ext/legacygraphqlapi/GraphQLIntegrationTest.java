@@ -6,6 +6,8 @@ import static org.opentripplanner.model.plan.PlanTestConstants.A;
 import static org.opentripplanner.model.plan.PlanTestConstants.B;
 import static org.opentripplanner.model.plan.PlanTestConstants.C;
 import static org.opentripplanner.model.plan.PlanTestConstants.D;
+import static org.opentripplanner.model.plan.PlanTestConstants.D10m;
+import static org.opentripplanner.model.plan.PlanTestConstants.E;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_01;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_15;
@@ -109,6 +111,7 @@ class GraphQLIntegrationTest {
       .walk(20, B)
       .bus(122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
+      .carHail(D10m, E)
       .build();
 
     var railLeg = i1.getTransitLeg(2);
