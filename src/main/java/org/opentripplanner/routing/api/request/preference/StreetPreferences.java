@@ -53,7 +53,7 @@ public final class StreetPreferences implements Serializable {
     this.drivingDirection = requireNonNull(builder.drivingDirection);
     this.elevator = requireNonNull(builder.elevator);
     this.intersectionTraversalModel = requireNonNull(builder.intersectionTraversalModel);
-    this.maxDirectDuration = requireNonNull(builder.maxDirectDuration);
+    this.maxDirectDuration = requireNonNull(builder.maxDirectDuration.build());
     this.maxAccessEgressDuration = requireNonNull(builder.maxAccessEgressDuration.build());
     this.routingTimeout = requireNonNull(builder.routingTimeout);
   }
@@ -159,7 +159,7 @@ public final class StreetPreferences implements Serializable {
     private ElevatorPreferences elevator;
     private IntersectionTraversalModel intersectionTraversalModel;
     private DurationForEnum.Builder<StreetMode> maxAccessEgressDuration;
-    private DurationForEnum<StreetMode> maxDirectDuration;
+    private DurationForEnum.Builder<StreetMode> maxDirectDuration;
     private Duration routingTimeout;
 
     public Builder(StreetPreferences original) {
@@ -169,7 +169,7 @@ public final class StreetPreferences implements Serializable {
       this.elevator = original.elevator;
       this.intersectionTraversalModel = original.intersectionTraversalModel;
       this.maxAccessEgressDuration = original.maxAccessEgressDuration.copyOf();
-      this.maxDirectDuration = original.maxDirectDuration;
+      this.maxDirectDuration = original.maxDirectDuration.copyOf();
       this.routingTimeout = original.routingTimeout;
     }
 
@@ -210,12 +210,16 @@ public final class StreetPreferences implements Serializable {
       return this;
     }
 
+    public Builder withMaxDirectDuration(StreetMode mode, Duration duration) {
+      this.maxDirectDuration.with(mode, duration);
+      return this;
+    }
+
     public Builder withMaxDirectDuration(
       Duration defaultValue,
       Map<StreetMode, Duration> valuePerMode
     ) {
-      this.maxDirectDuration =
-        this.maxDirectDuration.copyOf().withDefault(defaultValue).withValues(valuePerMode).build();
+      this.maxDirectDuration.withDefault(defaultValue).withValues(valuePerMode).build();
       return this;
     }
 

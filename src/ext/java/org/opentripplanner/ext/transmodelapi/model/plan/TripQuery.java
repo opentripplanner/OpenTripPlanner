@@ -515,6 +515,14 @@ public class TripQuery {
           .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
           .build()
       )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name("maxDirectDurationForMode")
+          .description("Maximum duration for direct street searchers per respective mode")
+          .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
+          .build()
+      )
       .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))
       .build();
   }

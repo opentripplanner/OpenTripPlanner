@@ -32,8 +32,8 @@ class PreferencesMapper {
       }
     );
 
-    if (GqlUtil.hasArgument(environment, "maxAccessEgressDurationForMode")) {
-      preferences.withStreet(street -> {
+    preferences.withStreet(street -> {
+      if (GqlUtil.hasArgument(environment, "maxAccessEgressDurationForMode")) {
         for (var entry : (List<Map<String, ?>>) environment.getArgument(
           "maxAccessEgressDurationForMode"
         )) {
@@ -42,8 +42,18 @@ class PreferencesMapper {
             (Duration) entry.get("duration")
           );
         }
-      });
-    }
+      }
+      if (GqlUtil.hasArgument(environment, "maxDirectDurationForMode")) {
+        for (var entry : (List<Map<String, ?>>) environment.getArgument(
+          "maxDirectDurationForMode"
+        )) {
+          street.withMaxDirectDuration(
+            (StreetMode) entry.get("streetMode"),
+            (Duration) entry.get("duration")
+          );
+        }
+      }
+    });
 
     preferences.withBike(bike -> {
       callWith.argument("bikeSpeed", bike::withSpeed);
