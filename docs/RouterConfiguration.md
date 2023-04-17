@@ -725,7 +725,12 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "type" : "uber-car-hailing",
       "clientId" : "secret-id",
       "clientSecret" : "very-secret",
-      "wheelchairAccessibleRideType" : "car"
+      "wheelchairAccessibleRideType" : "car",
+      "bannedRideTypes" : [
+        "type1",
+        "type2",
+        "type3"
+      ]
     }
   ]
 }

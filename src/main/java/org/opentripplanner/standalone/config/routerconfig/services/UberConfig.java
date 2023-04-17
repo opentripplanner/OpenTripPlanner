@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.routerconfig.services;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
+import java.util.List;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -15,7 +16,12 @@ public class UberConfig {
         .of("wheelchairAccessibleRideType")
         .since(V2_3)
         .summary("The id of the requested wheelchair accessible ride type.")
-        .asString()
+        .asString(),
+      c
+        .of("bannedRideTypes")
+        .since(V2_3)
+        .summary("The IDs of those ride types that should not be used for estimates.")
+        .asStringList(List.of())
     );
   }
 }

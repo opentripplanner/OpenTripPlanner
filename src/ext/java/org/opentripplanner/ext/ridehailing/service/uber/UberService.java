@@ -43,6 +43,7 @@ public class UberService extends CachingRideHailingService {
   private final OAuthService oauthService;
   private final String timeEstimateUri;
   private final String priceEstimateUri;
+  private final List<String> bannedTypes;
 
   public UberService(RideHailingServiceParameters config) {
     this(
@@ -53,14 +54,21 @@ public class UberService extends CachingRideHailingService {
         UriBuilder.fromUri("https://login.uber.com/oauth/v2/token").build()
       ),
       DEFAULT_PRICE_ESTIMATE_URI,
-      DEFAULT_TIME_ESTIMATE_URI
+      DEFAULT_TIME_ESTIMATE_URI,
+      config.bannedRideTypes()
     );
   }
 
-  UberService(OAuthService oauthService, String priceEstimateUri, String timeEstimateUri) {
+  UberService(
+    OAuthService oauthService,
+    String priceEstimateUri,
+    String timeEstimateUri,
+    List<String> bannedTypes
+  ) {
     this.oauthService = oauthService;
     this.priceEstimateUri = priceEstimateUri;
     this.timeEstimateUri = timeEstimateUri;
+    this.bannedTypes = bannedTypes;
   }
 
   @Override
@@ -101,6 +109,7 @@ public class UberService extends CachingRideHailingService {
           productIsWheelchairAccessible(time.product_id())
         )
       )
+      .filter(a -> !bannedTypes.contains(a.rideType()))
       .toList();
 
     if (arrivalTimes.isEmpty()) {
@@ -152,6 +161,7 @@ public class UberService extends CachingRideHailingService {
           productIsWheelchairAccessible(price.product_id())
         );
       })
+      .filter(re -> !bannedTypes.contains(re.rideType()))
       .toList();
   }
 

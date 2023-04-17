@@ -15,7 +15,7 @@ public class RideHailingServicesConfigTest {
     var node = jsonNodeFromResource("standalone/config/router-config.json");
     var c = new RouterConfig(node, this.getClass().getSimpleName(), false);
     assertEquals(
-      List.of(new RideHailingServiceParameters("secret-id", "very-secret", "car")),
+      List.of(new RideHailingServiceParameters("secret-id", "very-secret", "car", List.of())),
       c.rideHailingServiceParameters()
     );
   }
