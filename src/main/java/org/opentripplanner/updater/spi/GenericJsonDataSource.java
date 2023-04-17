@@ -16,7 +16,7 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
   public GenericJsonDataSource(String url, String jsonParsePath, HttpHeaders headers) {
     this.url = url;
     jsonDataListDownloader =
-      new JsonDataListDownloader<>(url, jsonParsePath, this::parseElement, headers.headers());
+      new JsonDataListDownloader<>(url, jsonParsePath, this::parseElement, headers.asMap());
   }
 
   @Override

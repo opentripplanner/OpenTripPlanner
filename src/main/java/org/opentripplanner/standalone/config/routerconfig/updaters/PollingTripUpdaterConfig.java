@@ -4,7 +4,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
-import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
@@ -12,27 +11,16 @@ import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
 public class PollingTripUpdaterConfig {
 
   public static PollingTripUpdaterParameters create(String configRef, NodeAdapter c) {
-    String file = null;
-    String url = null;
+    var url = c
+      .of("url")
+      .since(V1_5)
+      .summary("The URL of the GTFS-RT resource.")
+      .description(
+        "`file:` URLs are also supported if you want to read a file from the local disk."
+      )
+      .asString();
 
-    if (c.exist("file")) {
-      file = c.of("file").since(V1_5).summary("The path of the GTFS-RT file.").asString();
-    } else if (c.exist("url")) {
-      url = c.of("url").since(V1_5).summary("The URL of the GTFS-RT resource.").asString();
-    } else {
-      throw new OtpAppException(
-        "Need either 'url' or 'file' properties to configure " +
-        configRef +
-        " but received: " +
-        c.asText()
-      );
-    }
-
-    var headers = c
-      .of("headers")
-      .since(V2_3)
-      .summary("Extra headers to add to the HTTP request fetching the data.")
-      .asStringMap();
+    var headers = HttpHeadersConfig.headers(c, V2_3);
 
     return new PollingTripUpdaterParameters(
       configRef,
@@ -69,7 +57,6 @@ public class PollingTripUpdaterConfig {
         .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA),
       c.of("feedId").since(V1_5).summary("Which feed the updates apply to.").asString(null),
       url,
-      file,
       headers
     );
   }

@@ -67,7 +67,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
         url,
         etServiceRequest,
         timeout,
-        requestHeaders.headers()
+        requestHeaders.asMap()
       );
       if (is != null) {
         // Decode message

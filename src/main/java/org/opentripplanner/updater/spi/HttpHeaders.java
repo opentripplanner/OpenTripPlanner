@@ -38,7 +38,7 @@ public class HttpHeaders {
     return of().build();
   }
 
-  public Map<String, String> headers() {
+  public Map<String, String> asMap() {
     return headers;
   }
 
@@ -69,8 +69,27 @@ public class HttpHeaders {
       return this;
     }
 
+    public Builder acceptProtobuf() {
+      headers.put(
+        "Accept",
+        "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
+      );
+      return this;
+    }
+
     public Builder add(String name, String value) {
       headers.put(name, value);
+      return this;
+    }
+
+    /**
+     * Merge another instance of {@link HttpHeaders} into this builder.
+     * <p>
+     * NOTE: if there are headers with the same name then the added ones override the
+     * already set ones!
+     */
+    public Builder add(HttpHeaders other) {
+      headers.putAll(other.asMap());
       return this;
     }
 

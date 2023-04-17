@@ -24,11 +24,7 @@ public class VehiclePositionsUpdaterConfig {
       .since(V2_2)
       .summary("The URL of GTFS-RT protobuf HTTP resource to download the positions from.")
       .asUri();
-    var headers = c
-      .of("headers")
-      .since(V2_3)
-      .summary("Extra headers to add to the HTTP request fetching the data.")
-      .asStringMap();
+    var headers = HttpHeadersConfig.headers(c, V2_3);
     return new VehiclePositionsUpdaterParameters(updaterRef, feedId, url, frequencySec, headers);
   }
 }

@@ -44,7 +44,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 | frequencySec              |    `integer`    | How often the URL should be fetched.                                         | *Optional* | `60`          |  1.5  |
 | fuzzyTripMatching         |    `boolean`    | Whether to match trips fuzzily.                                              | *Optional* | `false`       |  1.5  |
 | url                       |     `string`    | URL to fetch the GTFS-RT feed from.                                          | *Required* |               |  1.5  |
-| [headers](#u_0_headers)   | `map of string` | Extra headers to add to the HTTP request fetching the data.                  | *Optional* |               |  2.3  |
+| [headers](#u_0_headers)   | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.   | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
@@ -54,7 +54,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[0] 
 
-Extra headers to add to the HTTP request fetching the data.
+HTTP headers to add to the request. Any header key, value can be inserted.
 
 
 
@@ -89,15 +89,15 @@ The information is downloaded in a single HTTP request and polled regularly.
 <!-- stop-time-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                                      |       Type      | Summary                                                     |  Req./Opt. | Default Value        | Since |
-|-----------------------------------------------------------------------|:---------------:|-------------------------------------------------------------|:----------:|----------------------|:-----:|
-| type = "stop-time-updater"                                            |      `enum`     | The type of the updater.                                    | *Required* |                      |  1.5  |
-| [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |      `enum`     | How backwards propagation should be handled.                | *Optional* | `"required-no-data"` |  2.2  |
-| feedId                                                                |     `string`    | Which feed the updates apply to.                            | *Optional* |                      |  1.5  |
-| frequencySec                                                          |    `integer`    | How often the data should be downloaded in seconds.         | *Optional* | `60`                 |  1.5  |
-| fuzzyTripMatching                                                     |    `boolean`    | If the trips should be matched fuzzily.                     | *Optional* | `false`              |  1.5  |
-| url                                                                   |     `string`    | The URL of the GTFS-RT resource.                            | *Required* |                      |  1.5  |
-| [headers](#u__5__headers)                                             | `map of string` | Extra headers to add to the HTTP request fetching the data. | *Optional* |                      |  2.3  |
+| Config Parameter                                                      |       Type      | Summary                                                                    |  Req./Opt. | Default Value        | Since |
+|-----------------------------------------------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|----------------------|:-----:|
+| type = "stop-time-updater"                                            |      `enum`     | The type of the updater.                                                   | *Required* |                      |  1.5  |
+| [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |      `enum`     | How backwards propagation should be handled.                               | *Optional* | `"required-no-data"` |  2.2  |
+| feedId                                                                |     `string`    | Which feed the updates apply to.                                           | *Optional* |                      |  1.5  |
+| frequencySec                                                          |    `integer`    | How often the data should be downloaded in seconds.                        | *Optional* | `60`                 |  1.5  |
+| fuzzyTripMatching                                                     |    `boolean`    | If the trips should be matched fuzzily.                                    | *Optional* | `false`              |  1.5  |
+| [url](#u__5__url)                                                     |     `string`    | The URL of the GTFS-RT resource.                                           | *Required* |                      |  1.5  |
+| [headers](#u__5__headers)                                             | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |                      |  2.3  |
 
 
 ##### Parameter details
@@ -124,12 +124,21 @@ How backwards propagation should be handled.
   The updated times are exposed through APIs.
 
 
+<h4 id="u__5__url">url</h4>
+
+**Since version:** `1.5` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[5] 
+
+The URL of the GTFS-RT resource.
+
+`file:` URLs are also supported if you want to read a file from the local disk.
+
 <h4 id="u__5__headers">headers</h4>
 
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[5] 
 
-Extra headers to add to the HTTP request fetching the data.
+HTTP headers to add to the request. Any header key, value can be inserted.
 
 
 
@@ -214,13 +223,13 @@ The information is downloaded in a single HTTP request and polled regularly.
 <!-- vehicle-positions BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter           |       Type      | Summary                                                                   |  Req./Opt. | Default Value | Since |
-|----------------------------|:---------------:|---------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "vehicle-positions" |      `enum`     | The type of the updater.                                                  | *Required* |               |  1.5  |
-| feedId                     |     `string`    | Feed ID to which the update should be applied.                            | *Required* |               |  2.2  |
-| frequencySec               |    `integer`    | How often the positions should be updated.                                | *Optional* | `60`          |  2.2  |
-| url                        |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from. | *Required* |               |  2.2  |
-| [headers](#u__6__headers)  | `map of string` | Extra headers to add to the HTTP request fetching the data.               | *Optional* |               |  2.3  |
+| Config Parameter           |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
+|----------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "vehicle-positions" |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| feedId                     |     `string`    | Feed ID to which the update should be applied.                             | *Required* |               |  2.2  |
+| frequencySec               |    `integer`    | How often the positions should be updated.                                 | *Optional* | `60`          |  2.2  |
+| url                        |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from.  | *Required* |               |  2.2  |
+| [headers](#u__6__headers)  | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
@@ -230,7 +239,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[6] 
 
-Extra headers to add to the HTTP request fetching the data.
+HTTP headers to add to the request. Any header key, value can be inserted.
 
 
 
