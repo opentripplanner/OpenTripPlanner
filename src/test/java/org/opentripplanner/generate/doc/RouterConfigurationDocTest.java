@@ -35,6 +35,7 @@ public class RouterConfigurationDocTest {
     .skip("updaters", "UpdaterConfig.md")
     .skip("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
     .skipNestedElements("transferCacheRequests", "RouteRequest.md")
+    .skip("rideHailingServices", "sandbox/RideHailing.md")
     .build();
 
   /**

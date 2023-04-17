@@ -40,11 +40,13 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLBookin
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLCarParkImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLContactInfoImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLCoordinatesImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLCurrencyImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLDepartureRowImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFeedImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLGeometryImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLItineraryImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLLegImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLMoneyImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLNodeTypeResolver;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLOpeningHoursImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLPatternImpl;
@@ -54,6 +56,7 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLPlanIm
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLQueryTypeImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLRentalVehicleImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLRentalVehicleTypeImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLRideHailingEstimateImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLRouteImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLRouteTypeImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLRoutingErrorImpl;
@@ -102,6 +105,7 @@ class LegacyGraphQLIndex {
       IntrospectionTypeWiring typeWiring = new IntrospectionTypeWiring(typeRegistry);
       RuntimeWiring runtimeWiring = RuntimeWiring
         .newRuntimeWiring()
+        .scalar(LegacyGraphQLScalars.durationScalar)
         .scalar(LegacyGraphQLScalars.polylineScalar)
         .scalar(LegacyGraphQLScalars.geoJsonScalar)
         .scalar(LegacyGraphQLScalars.graphQLIDScalar)
@@ -160,6 +164,9 @@ class LegacyGraphQLIndex {
         .type(typeWiring.build(LegacyGraphQLVehiclePositionImpl.class))
         .type(typeWiring.build(LegacyGraphQLStopRelationshipImpl.class))
         .type(typeWiring.build(LegacyGraphQLOpeningHoursImpl.class))
+        .type(typeWiring.build(LegacyGraphQLRideHailingEstimateImpl.class))
+        .type(typeWiring.build(LegacyGraphQLMoneyImpl.class))
+        .type(typeWiring.build(LegacyGraphQLCurrencyImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

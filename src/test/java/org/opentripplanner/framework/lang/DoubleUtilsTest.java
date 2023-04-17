@@ -40,6 +40,14 @@ class DoubleUtilsTest {
   }
 
   @Test
+  void roundTo4Decimals() {
+    assertEquals(0.7125, DoubleUtils.roundTo4Decimals(0.7124999999999));
+    assertEquals(0.7125, DoubleUtils.roundTo4Decimals(0.7125));
+    assertEquals(0.7126, DoubleUtils.roundTo4Decimals(0.71255));
+    assertEquals(0.7125, DoubleUtils.roundTo4Decimals(0.71254));
+  }
+
+  @Test
   void roundTo7Decimals() {
     assertEquals(0.1234567, DoubleUtils.roundTo7Decimals(0.12345674999));
     assertEquals(0.1234567, DoubleUtils.roundTo7Decimals(0.12345665));

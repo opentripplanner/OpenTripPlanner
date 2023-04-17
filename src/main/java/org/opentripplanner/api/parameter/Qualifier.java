@@ -25,4 +25,8 @@ public enum Qualifier {
    * The mode is used for the direct street search.
    */
   DIRECT,
+  /**
+   * Hailing a car from a taxi-like service like Uber or Lyft
+   */
+  HAIL,
 }
