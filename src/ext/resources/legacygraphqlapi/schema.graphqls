@@ -898,37 +898,37 @@ type elevationProfileComponent {
 }
 
 type fare {
-    type: String
+    type: String @deprecated
 
     """ISO 4217 currency code"""
-    currency: String
+    currency: String @deprecated
 
     """
     Fare price in cents. **Note:** this value is dependent on the currency used,
     as one cent is not necessarily ¹/₁₀₀ of the basic monerary unit.
     """
-    cents: Int
+    cents: Int @deprecated
 
     """Components which this fare is composed of"""
-    components: [fareComponent]
+    components: [fareComponent] @deprecated
 }
 
 """Component of the fare (i.e. ticket) for a part of the itinerary"""
 type fareComponent {
     """ID of the ticket type. Corresponds to `fareId` in **TicketType**."""
-    fareId: String
+    fareId: String @deprecated
 
     """ISO 4217 currency code"""
-    currency: String
+    currency: String @deprecated
 
     """
     Fare price in cents. **Note:** this value is dependent on the currency used,
     as one cent is not necessarily ¹/₁₀₀ of the basic monerary unit.
     """
-    cents: Int
+    cents: Int @deprecated
 
     """List of routes which use this fare component"""
-    routes: [Route]
+    routes: [Route] @deprecated
 }
 
 """
@@ -1386,7 +1386,7 @@ type Itinerary {
     Information about the fares for this itinerary. This is primarily a GTFS Fares V1 interface
     will be removed in the future.
     """
-    fares: [fare] @deprecated(reason: "Use the leg's `fareProduct`.")
+    fares: [fare] @deprecated(reason: "Use the leg's `fareProducts`.")
 
     """
     How much elevation is gained, in total, over the course of the itinerary, in meters.
