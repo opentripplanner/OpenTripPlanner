@@ -114,6 +114,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - JSON logging [#5023](https://github.com/opentripplanner/OpenTripPlanner/pull/5023)
 - Add allowOverloading parameter to GBFS updaters and fix use of it in routing [#5024](https://github.com/opentripplanner/OpenTripPlanner/pull/5024)
 - Fix precedence rules for NeTEx flexible line booking information [#5021](https://github.com/opentripplanner/OpenTripPlanner/pull/5021)
+- Uber ride hailing [#4979](https://github.com/opentripplanner/OpenTripPlanner/pull/4979)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
