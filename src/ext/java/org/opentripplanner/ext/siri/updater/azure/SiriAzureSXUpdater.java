@@ -93,7 +93,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       // Maybe put this in the config?
       HttpHeaders rh = HttpHeaders.of().acceptApplicationXML().build();
 
-      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.headers());
+      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.asMap());
       final long t2 = System.currentTimeMillis();
 
       if (data == null) {

@@ -93,7 +93,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       HttpHeaders rh = HttpHeaders.of().acceptApplicationXML().build();
 
       final long t1 = System.currentTimeMillis();
-      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.headers());
+      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.asMap());
       final long t2 = System.currentTimeMillis();
 
       if (data == null) {

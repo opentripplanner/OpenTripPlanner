@@ -10,7 +10,8 @@ public record GbfsVehicleRentalDataSourceParameters(
   boolean allowKeepingRentedVehicleAtDestination,
   HttpHeaders httpHeaders,
   String network,
-  boolean geofencingZones
+  boolean geofencingZones,
+  boolean overloadingAllowed
 )
   implements VehicleRentalDataSourceParameters {
   @Nonnull

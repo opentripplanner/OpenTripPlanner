@@ -22,6 +22,10 @@ public class EnumMapper {
   }
 
   public static String toString(Enum<?> en) {
-    return en.name().toLowerCase().replace('_', '-');
+    return kebabCase(en.name());
+  }
+
+  public static String kebabCase(String input) {
+    return input.toLowerCase().replace('_', '-');
   }
 }

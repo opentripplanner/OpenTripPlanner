@@ -134,7 +134,7 @@ public record NodeInfo(
    */
   public String toMarkdownString(Object value) {
     if (enumType != null) {
-      value = EnumMapper.mapToEnum2((String) value, enumType).orElseThrow();
+      value = EnumMapper.kebabCase(value.toString());
     }
     return type.quote(value);
   }

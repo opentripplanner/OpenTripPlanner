@@ -28,11 +28,7 @@ public class GtfsRealtimeAlertsUpdaterConfig {
         .summary("Whether to match trips fuzzily.")
         .asBoolean(false),
       c.of("frequencySec").since(V1_5).summary("How often the URL should be fetched.").asInt(60),
-      c
-        .of("headers")
-        .since(V2_3)
-        .summary("Extra headers to add to the HTTP request fetching the data.")
-        .asStringMap()
+      HttpHeadersConfig.headers(c, V2_3)
     );
   }
 }

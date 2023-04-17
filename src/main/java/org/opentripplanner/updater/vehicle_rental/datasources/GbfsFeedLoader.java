@@ -125,7 +125,7 @@ public class GbfsFeedLoader {
   /* private static methods */
 
   private static <T> T fetchFeed(URI uri, HttpHeaders httpHeaders, Class<T> clazz) {
-    try (InputStream is = HttpUtils.openInputStream(uri, httpHeaders.headers());) {
+    try (InputStream is = HttpUtils.openInputStream(uri, httpHeaders.asMap());) {
       if (is == null) {
         LOG.warn("Failed to get data from url {}", uri);
         return null;
