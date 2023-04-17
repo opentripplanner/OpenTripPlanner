@@ -17,23 +17,23 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility method to shift the start of the journey to the earliest time that a vehicle can arrive.
  */
-public class RideHailingDepartureTimeShifter {
+public class RideHailingAccessShifter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RideHailingDepartureTimeShifter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RideHailingAccessShifter.class);
   /**
    * When is a start time far enough in the future so that we don't need to check the service and
    * simply presume that a vehicle can arrive on time.
    */
   private static final Duration MAX_DURATION_FROM_NOW = Duration.ofMinutes(30);
 
-  public static Result<Duration, Error> arrivalShift(
+  public static Result<Duration, Error> arrivalDelay(
     OtpServerRequestContext serverContext,
     RouteRequest request
   ) {
     // we have to shift the start time of a car hailing request because often we cannot leave right
     // away
-    if (RideHailingDepartureTimeShifter.shouldShift(request, Instant.now())) {
-      var shiftingResult = RideHailingDepartureTimeShifter.arrivalDelay(
+    if (RideHailingAccessShifter.shouldShift(request, Instant.now())) {
+      var shiftingResult = RideHailingAccessShifter.arrivalDelay(
         request,
         serverContext.rideHailingServices(),
         Instant.now()

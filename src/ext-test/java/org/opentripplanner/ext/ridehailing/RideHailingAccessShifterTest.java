@@ -18,7 +18,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.test.support.VariableSource;
 
-class RideHailingDepartureTimeShifterTest {
+class RideHailingAccessShifterTest {
 
   private static final Instant NOW = OffsetDateTime.parse("2023-03-23T17:13:46+01:00").toInstant();
 
@@ -49,7 +49,7 @@ class RideHailingDepartureTimeShifterTest {
     req.setDateTime(searchTime);
     req.journey().setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build());
 
-    var result = RideHailingDepartureTimeShifter.arrivalDelay(req, List.of(service), NOW);
+    var result = RideHailingAccessShifter.arrivalDelay(req, List.of(service), NOW);
 
     assertTrue(result.isSuccess());
     var actualArrival = result.successValue();

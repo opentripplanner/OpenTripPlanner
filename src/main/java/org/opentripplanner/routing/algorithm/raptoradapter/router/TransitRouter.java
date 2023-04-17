@@ -4,11 +4,12 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessAdapter;
-import org.opentripplanner.ext.ridehailing.RideHailingDepartureTimeShifter;
+import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
@@ -224,6 +225,7 @@ public class TransitRouter {
       accessRequest.preferences().street().maxAccessEgressDuration().valueOf(streetRequest.mode())
     );
 
+    var isAccess = !isEgress;
     List<DefaultAccessEgress> results = new ArrayList<>(
       accessEgressMapper.mapNearbyStops(nearbyStops, isEgress)
     );
@@ -232,15 +234,22 @@ public class TransitRouter {
         results
           .stream()
           .map(ae -> {
-            // if it is an egress leg, we pretend that it arrives on time,
-            // and we don't need to time-shift
-            if (isEgress) {
-              return ae;
+            // only time-shift access legs on a car
+            // (there could be walk-only accesses if you're close to the stop)
+            if (isAccess && ae.containsDriving()) {
+              var duration = RideHailingAccessShifter.arrivalDelay(serverContext, request);
+              if (duration.isSuccess()) {
+                return new RideHailingAccessAdapter(ae, duration.successValue());
+              } else {
+                return null;
+              }
+              // if it is an egress leg, we pretend that it arrives on time,
+              // and we don't need to time-shift
             } else {
-              var duration = RideHailingDepartureTimeShifter.arrivalShift(serverContext, request);
-              return new RideHailingAccessAdapter(ae, duration.successValue());
+              return ae;
             }
           })
+          .filter(Objects::nonNull)
           .collect(Collectors.toList());
     }
 
