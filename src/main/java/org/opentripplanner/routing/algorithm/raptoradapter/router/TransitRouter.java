@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
+import org.opentripplanner.ext.ridehailing.RideHailingAccessAdapter;
+import org.opentripplanner.ext.ridehailing.RideHailingDepartureTimeShifter;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
@@ -221,7 +224,25 @@ public class TransitRouter {
       accessRequest.preferences().street().maxAccessEgressDuration().valueOf(streetRequest.mode())
     );
 
-    var results = new ArrayList<>(accessEgressMapper.mapNearbyStops(nearbyStops, isEgress));
+    List<DefaultAccessEgress> results = new ArrayList<>(
+      accessEgressMapper.mapNearbyStops(nearbyStops, isEgress)
+    );
+    if (streetRequest.mode() == StreetMode.CAR_HAILING) {
+      results =
+        results
+          .stream()
+          .map(ae -> {
+            // if it is an egress leg, we pretend that it arrives on time,
+            // and we don't need to time-shift
+            if (isEgress) {
+              return ae;
+            } else {
+              var duration = RideHailingDepartureTimeShifter.arrivalShift(serverContext, request);
+              return new RideHailingAccessAdapter(ae, duration.successValue());
+            }
+          })
+          .collect(Collectors.toList());
+    }
 
     // Special handling of flex accesses
     if (OTPFeature.FlexRouting.isOn() && streetRequest.mode() == StreetMode.FLEXIBLE) {
