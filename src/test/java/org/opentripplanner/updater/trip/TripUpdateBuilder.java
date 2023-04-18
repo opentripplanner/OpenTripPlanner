@@ -88,6 +88,10 @@ public class TripUpdateBuilder {
     return addStopTime(null, -1, stopSequence, NO_VALUE, NO_VALUE, scheduleRelationship, null);
   }
 
+  /**
+   * As opposed to the other convenience methods, this one takes a raw {@link StopTimeUpdate} and
+   * adds it to the trip. This is useful if you want to test invalid ones.
+   */
   public TripUpdateBuilder addRawStopTime(StopTimeUpdate stopTime) {
     tripUpdateBuilder.addStopTimeUpdate(stopTime);
     return this;
