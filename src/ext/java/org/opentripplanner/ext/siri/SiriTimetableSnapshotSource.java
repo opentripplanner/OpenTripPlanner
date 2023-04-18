@@ -8,6 +8,7 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_TRIP_ID;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -74,7 +75,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
    */
-  private final int maxSnapshotFrequency;
+  private final Duration maxSnapshotFrequency;
 
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
@@ -95,7 +96,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     this.timeZone = transitModel.getTimeZone();
     this.transitService = new DefaultTransitService(transitModel);
     this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
-    this.maxSnapshotFrequency = parameters.maxSnapshotFrequencyMs();
+    this.maxSnapshotFrequency = parameters.maxSnapshotFrequency();
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.tripPatternCache =
       new SiriTripPatternCache(tripPatternIdGenerator, transitService::getPatternForTrip);
@@ -251,7 +252,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
     final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
+    if (force || now - lastSnapshotTime > maxSnapshotFrequency.toMillis()) {
       if (force || buffer.isDirty()) {
         LOG.debug("Committing {}", buffer);
         snapshot = buffer.commit(transitLayerUpdater, force);
