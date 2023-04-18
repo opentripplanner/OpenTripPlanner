@@ -57,7 +57,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   protected final LocalDate serviceDate;
   protected final ZoneId zoneId;
   private double distanceMeters;
-  private double directDistanceMeters;
+  private final double directDistanceMeters;
   private final Float accessibilityScore;
 
   public ScheduledTransitLeg(
