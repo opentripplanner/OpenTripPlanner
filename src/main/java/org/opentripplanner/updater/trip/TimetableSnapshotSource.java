@@ -334,18 +334,17 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     var updateResult = UpdateResult.ofResults(results);
 
     if (fullDataset) {
-      logUpdateResult(feedId, updates.size(), failuresByRelationship, updateResult);
+      logUpdateResult(feedId, failuresByRelationship, updateResult);
     }
     return updateResult;
   }
 
   private static void logUpdateResult(
     String feedId,
-    int updates,
     Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship,
     UpdateResult updateResult
   ) {
-    ResultLogger.logUpdateResult(feedId, "trip-updates", updates, updateResult);
+    ResultLogger.logUpdateResult(feedId, "gtfs-rt-trip-updates", updateResult);
 
     if (!failuresByRelationship.isEmpty()) {
       LOG.info("[feedId: {}] Failures by scheduleRelationship {}", feedId, failuresByRelationship);
