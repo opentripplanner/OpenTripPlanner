@@ -458,7 +458,7 @@ public interface Leg {
     return Stream.of(intermediate, start, end).flatMap(s -> s).collect(Collectors.toSet());
   }
 
-  void addFareProducts(List<FareProductInstance> products);
+  void setFareProducts(List<FareProductInstance> products);
   List<FareProductInstance> fareProducts();
 
   private static Stream<FareZone> getFareZones(Place place) {

@@ -84,7 +84,7 @@ public class UnknownTransitPathLeg implements Leg {
   }
 
   @Override
-  public void addFareProducts(List<FareProductInstance> products) {}
+  public void setFareProducts(List<FareProductInstance> products) {}
 
   @Override
   public List<FareProductInstance> fareProducts() {

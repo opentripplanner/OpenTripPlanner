@@ -24,7 +24,7 @@ public class FaresToItineraryMapper {
       .getLegs()
       .forEach(l -> {
         var legInstances = fares.getLegProducts().get(l);
-        l.addFareProducts(ListUtils.combine(itineraryInstances, legInstances));
+        l.setFareProducts(ListUtils.combine(itineraryInstances, legInstances));
       });
   }
 }

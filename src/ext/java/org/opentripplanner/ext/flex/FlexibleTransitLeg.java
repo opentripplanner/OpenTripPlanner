@@ -206,7 +206,7 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
-  public void addFareProducts(List<FareProductInstance> products) {
+  public void setFareProducts(List<FareProductInstance> products) {
     this.fareProducts = List.copyOf(products);
   }
 
