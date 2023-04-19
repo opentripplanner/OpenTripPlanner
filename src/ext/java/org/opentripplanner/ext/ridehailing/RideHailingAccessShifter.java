@@ -12,7 +12,6 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +36,9 @@ public class RideHailingAccessShifter {
   public static List<DefaultAccessEgress> shiftAccesses(
     boolean isAccess,
     List<DefaultAccessEgress> results,
-    OtpServerRequestContext serverContext,
-    RouteRequest request
+    List<RideHailingService> services,
+    RouteRequest request,
+    Instant now
   ) {
     return results
       .stream()
@@ -46,7 +46,7 @@ public class RideHailingAccessShifter {
         // only time-shift access legs on a car
         // (there could be walk-only accesses if you're close to the stop)
         if (isAccess && ae.containsDriving()) {
-          var duration = RideHailingAccessShifter.arrivalDelay(serverContext, request);
+          var duration = RideHailingAccessShifter.arrivalDelay(services, request, now);
           if (duration.isSuccess()) {
             return new RideHailingAccessAdapter(ae, duration.successValue());
           } else {
@@ -83,17 +83,14 @@ public class RideHailingAccessShifter {
   }
 
   private static Result<Duration, Error> arrivalDelay(
-    OtpServerRequestContext serverContext,
-    RouteRequest request
+    List<RideHailingService> services,
+    RouteRequest request,
+    Instant now
   ) {
     // we have to shift the start time of a car hailing request because often we cannot leave right
     // away
     if (RideHailingAccessShifter.shouldShift(request, Instant.now())) {
-      var shiftingResult = RideHailingAccessShifter.arrivalDelay(
-        request,
-        serverContext.rideHailingServices(),
-        Instant.now()
-      );
+      var shiftingResult = RideHailingAccessShifter.arrivalDelay(request, services, now);
       if (shiftingResult.isSuccess()) {
         return Result.success(shiftingResult.successValue());
       } else {
@@ -111,8 +108,8 @@ public class RideHailingAccessShifter {
   private static boolean shouldShift(RouteRequest req, Instant now) {
     return (
       req.journey().modes().accessMode == StreetMode.CAR_HAILING &&
-        req.dateTime().isBefore(now.plus(MAX_DURATION_FROM_NOW)) &&
-        !req.arriveBy()
+      req.dateTime().isBefore(now.plus(MAX_DURATION_FROM_NOW)) &&
+      !req.arriveBy()
     );
   }
 

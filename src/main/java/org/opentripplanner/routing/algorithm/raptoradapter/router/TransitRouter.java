@@ -1,14 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.stream.Collectors;
-import org.opentripplanner.ext.ridehailing.RideHailingAccessAdapter;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
@@ -230,7 +228,14 @@ public class TransitRouter {
       accessEgressMapper.mapNearbyStops(nearbyStops, isEgress)
     );
     if (streetRequest.mode() == StreetMode.CAR_HAILING) {
-      results = RideHailingAccessShifter.shiftAccesses(isAccess, results, serverContext, request);
+      results =
+        RideHailingAccessShifter.shiftAccesses(
+          isAccess,
+          results,
+          serverContext.rideHailingServices(),
+          request,
+          Instant.now()
+        );
     }
 
     // Special handling of flex accesses
