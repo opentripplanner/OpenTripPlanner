@@ -10,6 +10,6 @@ public record ArrivalTime(
   RideHailingProvider provider,
   String rideType,
   String displayName,
-  Duration duration,
-  boolean wheelchairAccessible
-) {}
+  Duration duration
+)
+  implements Ride {}

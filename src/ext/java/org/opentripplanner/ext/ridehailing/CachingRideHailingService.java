@@ -28,39 +28,41 @@ public abstract class CachingRideHailingService implements RideHailingService {
     .expireAfterWrite(CACHE_DURATION)
     .build();
 
-  protected String wheelchairAccessibleRideType;
-
   /**
    * Get the next arrivals for a specific location.
    */
   @Override
-  public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) throws ExecutionException {
+  public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate, boolean wheelchairAccessible)
+    throws ExecutionException {
     return arrivalTimeCache.get(
       coordinate.roundToApproximate10m(),
-      () -> queryArrivalTimes(coordinate)
+      () -> queryArrivalTimes(coordinate, wheelchairAccessible)
     );
   }
 
-  protected abstract List<ArrivalTime> queryArrivalTimes(WgsCoordinate position) throws IOException;
+  protected abstract List<ArrivalTime> queryArrivalTimes(
+    WgsCoordinate position,
+    boolean wheelchair
+  ) throws IOException;
 
   /**
    * Get the ride estimate for a specific start and end pair.
    */
   @Override
-  public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end)
-    throws ExecutionException {
+  public List<RideEstimate> rideEstimates(
+    WgsCoordinate start,
+    WgsCoordinate end,
+    boolean wheelchairAccessible
+  ) throws ExecutionException {
     // Truncate lat/lon values in order to reduce the number of API requests made.
     var request = new RideEstimateRequest(
       start.roundToApproximate10m(),
-      end.roundToApproximate10m()
+      end.roundToApproximate10m(),
+      wheelchairAccessible
     );
     return rideEstimateCache.get(request, () -> queryRideEstimates(request));
   }
 
   protected abstract List<RideEstimate> queryRideEstimates(RideEstimateRequest request)
     throws IOException;
-
-  protected boolean productIsWheelchairAccessible(String productId) {
-    return productId.equals(wheelchairAccessibleRideType);
-  }
 }

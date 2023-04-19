@@ -15,12 +15,13 @@ public class FailingRideHailingService implements RideHailingService {
   }
 
   @Override
-  public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) throws ExecutionException {
+  public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate, boolean b)
+    throws ExecutionException {
     throw new ExecutionException(new RuntimeException());
   }
 
   @Override
-  public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end)
+  public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end, boolean b)
     throws ExecutionException {
     throw new ExecutionException(new RuntimeException());
   }

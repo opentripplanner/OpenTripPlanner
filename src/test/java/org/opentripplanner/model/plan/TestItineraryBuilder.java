@@ -376,8 +376,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
         Money.euros(1000),
         Money.euros(2000),
         "VW",
-        "UberX",
-        true
+        "UberX"
       )
     );
     // the removal is necessary because the call to streetLeg() also adds a leg to the list

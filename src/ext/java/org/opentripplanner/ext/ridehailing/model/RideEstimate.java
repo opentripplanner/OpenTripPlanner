@@ -14,6 +14,6 @@ public record RideEstimate(
   Money minPrice,
   Money maxPrice,
   String rideType,
-  String productName,
-  boolean wheelchairAccessible
-) {}
+  String productName
+)
+  implements Ride {}

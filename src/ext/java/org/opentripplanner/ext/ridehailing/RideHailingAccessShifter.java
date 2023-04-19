@@ -121,7 +121,7 @@ public class RideHailingAccessShifter {
     try {
       var service = services.get(0);
       var arrivalTimeOpt = service
-        .arrivalTimes(new WgsCoordinate(req.from().getCoordinate()))
+        .arrivalTimes(new WgsCoordinate(req.from().getCoordinate()), req.wheelchair())
         .stream()
         .min(Comparator.comparing(ArrivalTime::duration));
 
