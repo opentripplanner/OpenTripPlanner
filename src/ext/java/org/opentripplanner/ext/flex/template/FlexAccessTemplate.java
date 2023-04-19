@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -60,21 +61,17 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
       state = e.traverse(state);
     }
 
-    int[] flexTimes = getFlexTimes(flexEdge, state);
-
-    int preFlexTime = flexTimes[0];
-    int flexTime = flexTimes[1];
-    int postFlexTime = flexTimes[2];
+    var flexDurations = calculateFlexPathDurations(flexEdge, state);
 
     int timeShift;
 
     if (arriveBy) {
-      int lastStopArrivalTime = departureTime - postFlexTime - secondsFromStartOfTime;
+      int lastStopArrivalTime = flexDurations.mapToFlexTripArrivalTime(departureTime);
       int latestArrivalTime = trip.latestArrivalTime(
         lastStopArrivalTime,
         fromStopIndex,
         toStopIndex,
-        flexTime
+        flexDurations.trip()
       );
 
       if (latestArrivalTime == MISSING_VALUE) {
@@ -82,21 +79,20 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
       }
 
       // Shift from departing at departureTime to arriving at departureTime
-      timeShift = secondsFromStartOfTime + latestArrivalTime - flexTime - preFlexTime;
+      timeShift = flexDurations.mapToRouterArrivalTime(latestArrivalTime) - flexDurations.total();
     } else {
-      int firstStopDepartureTime = departureTime + preFlexTime - secondsFromStartOfTime;
+      int firstStopDepartureTime = flexDurations.mapToFlexTripDepartureTime(departureTime);
       int earliestDepartureTime = trip.earliestDepartureTime(
         firstStopDepartureTime,
         fromStopIndex,
         toStopIndex,
-        flexTime
+        flexDurations.trip()
       );
 
       if (earliestDepartureTime == MISSING_VALUE) {
         return null;
       }
-
-      timeShift = secondsFromStartOfTime + earliestDepartureTime - preFlexTime;
+      timeShift = flexDurations.mapToRouterDepartureTime(earliestDepartureTime);
     }
 
     ZonedDateTime startTime = startOfTime.plusSeconds(timeShift);
@@ -122,11 +118,16 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     return edge.getFromVertex();
   }
 
-  protected int[] getFlexTimes(FlexTripEdge flexEdge, State state) {
+  protected FlexPathDurations calculateFlexPathDurations(FlexTripEdge flexEdge, State state) {
     int preFlexTime = (int) accessEgress.state.getElapsedTimeSeconds();
     int edgeTimeInSeconds = flexEdge.getTimeInSeconds();
     int postFlexTime = (int) state.getElapsedTimeSeconds() - preFlexTime - edgeTimeInSeconds;
-    return new int[] { preFlexTime, edgeTimeInSeconds, postFlexTime };
+    return new FlexPathDurations(
+      preFlexTime,
+      edgeTimeInSeconds,
+      postFlexTime,
+      secondsFromStartOfTime
+    );
   }
 
   protected FlexTripEdge getFlexEdge(Vertex flexToVertex, StopLocation transferStop) {

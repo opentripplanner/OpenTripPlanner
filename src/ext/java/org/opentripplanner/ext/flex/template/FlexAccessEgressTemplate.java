@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -147,9 +148,12 @@ public abstract class FlexAccessEgressTemplate {
   protected abstract Vertex getFlexVertex(Edge edge);
 
   /**
-   * Get the times in seconds, before during and after the flex ride.
+   * Braek down the time spent on flex ride/path in access, trip and egress.
    */
-  protected abstract int[] getFlexTimes(FlexTripEdge flexEdge, State state);
+  protected abstract FlexPathDurations calculateFlexPathDurations(
+    FlexTripEdge flexEdge,
+    State state
+  );
 
   /**
    * Get the FlexTripEdge for the flex ride.
@@ -177,16 +181,13 @@ public abstract class FlexAccessEgressTemplate {
       }
     }
 
-    int[] times = getFlexTimes(flexEdge, state);
+    var durations = calculateFlexPathDurations(flexEdge, state);
 
     return new FlexAccessEgress(
       stop,
-      times[0],
-      times[1],
-      times[2],
+      durations,
       fromStopIndex,
       toStopIndex,
-      secondsFromStartOfTime,
       trip,
       state,
       transferEdges.isEmpty()
