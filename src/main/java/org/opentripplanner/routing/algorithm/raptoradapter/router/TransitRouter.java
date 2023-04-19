@@ -230,27 +230,7 @@ public class TransitRouter {
       accessEgressMapper.mapNearbyStops(nearbyStops, isEgress)
     );
     if (streetRequest.mode() == StreetMode.CAR_HAILING) {
-      results =
-        results
-          .stream()
-          .map(ae -> {
-            // only time-shift access legs on a car
-            // (there could be walk-only accesses if you're close to the stop)
-            if (isAccess && ae.containsDriving()) {
-              var duration = RideHailingAccessShifter.arrivalDelay(serverContext, request);
-              if (duration.isSuccess()) {
-                return new RideHailingAccessAdapter(ae, duration.successValue());
-              } else {
-                return null;
-              }
-              // if it is an egress leg, we pretend that it arrives on time,
-              // and we don't need to time-shift
-            } else {
-              return ae;
-            }
-          })
-          .filter(Objects::nonNull)
-          .collect(Collectors.toList());
+      results = RideHailingAccessShifter.shiftAccesses(isAccess, results, serverContext, request);
     }
 
     // Special handling of flex accesses

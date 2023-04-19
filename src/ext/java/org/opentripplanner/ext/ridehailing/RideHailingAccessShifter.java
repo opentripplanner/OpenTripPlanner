@@ -4,9 +4,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -26,7 +29,60 @@ public class RideHailingAccessShifter {
    */
   private static final Duration MAX_DURATION_FROM_NOW = Duration.ofMinutes(30);
 
-  public static Result<Duration, Error> arrivalDelay(
+  /**
+   * Given a list of {@link DefaultAccessEgress} shift the access ones which contain driving
+   * so that they only start at the time when the ride hailing vehicle can actually be there
+   * to pick up passengers.
+   */
+  public static List<DefaultAccessEgress> shiftAccesses(
+    boolean isAccess,
+    List<DefaultAccessEgress> results,
+    OtpServerRequestContext serverContext,
+    RouteRequest request
+  ) {
+    return results
+      .stream()
+      .map(ae -> {
+        // only time-shift access legs on a car
+        // (there could be walk-only accesses if you're close to the stop)
+        if (isAccess && ae.containsDriving()) {
+          var duration = RideHailingAccessShifter.arrivalDelay(serverContext, request);
+          if (duration.isSuccess()) {
+            return new RideHailingAccessAdapter(ae, duration.successValue());
+          } else {
+            return null;
+          }
+          // if it is an egress leg, we pretend that it arrives on time,
+          // and we don't need to time-shift
+        } else {
+          return ae;
+        }
+      })
+      .filter(Objects::nonNull)
+      .collect(Collectors.toList());
+  }
+
+  /**
+   * When you start a car hailing search for right now (which is common) you cannot assume to leave
+   * straight away but have to take into account the duration it takes for the hailing vehicle to
+   * arrive.
+   * <p>
+   * This method shifts the departure time by the appropriate amount so that the correct
+   * access/egresses can be calculated.
+   */
+  protected static Result<Duration, Error> arrivalDelay(
+    RouteRequest req,
+    List<RideHailingService> services,
+    Instant now
+  ) {
+    if (shouldShift(req, now)) {
+      return shiftTime(req, services, now);
+    } else {
+      return Result.success(Duration.ZERO);
+    }
+  }
+
+  private static Result<Duration, Error> arrivalDelay(
     OtpServerRequestContext serverContext,
     RouteRequest request
   ) {
@@ -52,31 +108,11 @@ public class RideHailingAccessShifter {
     }
   }
 
-  /**
-   * When you start a car hailing search for right now (which is common) you cannot assume to leave
-   * straight away but have to take into account the duration it takes for the hailing vehicle to
-   * arrive.
-   * <p>
-   * This method shifts the departure time by the appropriate amount so that the correct
-   * access/egresses can be calculated.
-   */
-  public static Result<Duration, Error> arrivalDelay(
-    RouteRequest req,
-    List<RideHailingService> services,
-    Instant now
-  ) {
-    if (shouldShift(req, now)) {
-      return shiftTime(req, services, now);
-    } else {
-      return Result.success(Duration.ZERO);
-    }
-  }
-
-  public static boolean shouldShift(RouteRequest req, Instant now) {
+  private static boolean shouldShift(RouteRequest req, Instant now) {
     return (
       req.journey().modes().accessMode == StreetMode.CAR_HAILING &&
-      req.dateTime().isBefore(now.plus(MAX_DURATION_FROM_NOW)) &&
-      !req.arriveBy()
+        req.dateTime().isBefore(now.plus(MAX_DURATION_FROM_NOW)) &&
+        !req.arriveBy()
     );
   }
 
