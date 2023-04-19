@@ -182,7 +182,7 @@ The driving direction to use in the intersection traversal calculation
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"simple"`   
 **Path:** /routingDefaults   
-**Enum values:** `norway` | `simple`
+**Enum values:** `norway` | `simple` | `constant`
 
 The model that computes the costs of turns.
 
