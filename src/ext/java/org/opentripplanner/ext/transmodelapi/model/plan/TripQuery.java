@@ -510,7 +510,7 @@ public class TripQuery {
           .newArgument()
           .name("maxAccessEgressDurationForMode")
           .description(
-            "Maximum duration for access/egress for street searches per respective mode."
+            "Maximum duration for access/egress for street searches per respective mode. Cannot be higher than default value"
           )
           .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
           .build()
@@ -519,7 +519,9 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("maxDirectDurationForMode")
-          .description("Maximum duration for direct street searchers per respective mode")
+          .description(
+            "Maximum duration for direct street searchers per respective mode Cannot be higher than default value"
+          )
           .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
           .build()
       )
