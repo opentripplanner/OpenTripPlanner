@@ -777,9 +777,9 @@ type QueryType {
     itineraryFilters: ItineraryFilters,
     "The preferable language to use for text targeted the end user. Note! The data quality is limited, only stop and quay names are translates, and not in all places of the API."
     locale: Locale = no,
-    "Maximum duration for access/egress for street searches per respective mode."
+    "Maximum duration for access/egress for street searches per respective mode. Cannot be higher than default value"
     maxAccessEgressDurationForMode: [StreetModeDurationInput!],
-    "Maximum duration for direct street searchers per respective mode"
+    "Maximum duration for direct street searchers per respective mode Cannot be higher than default value"
     maxDirectDurationForMode: [StreetModeDurationInput!],
     "Maximum number of additional transfers compared to the best number of transfers allowed. Note! The best way to reduce the number of transfers is to set the `transferPenalty` parameter."
     maximumAdditionalTransfers: Int = 5,
