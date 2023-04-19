@@ -4,6 +4,7 @@ import static graphql.Assert.assertTrue;
 import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMinutes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.ext.ridehailing.TestRideHailingService.DEFAULT_ARRIVAL_DURATION;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -20,6 +21,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccess
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.test.support.VariableSource;
 
@@ -28,6 +30,11 @@ class RideHailingAccessShifterTest {
   private static final Instant TIME = OffsetDateTime.parse("2023-03-23T17:00:00+01:00").toInstant();
   private static final GenericLocation FROM = new GenericLocation(0d, 0d);
   private static final GenericLocation TO = new GenericLocation(1d, 1d);
+  private static final State DRIVING_STATE = TestStateBuilder
+    .ofDriving()
+    .streetEdge()
+    .streetEdge()
+    .build();
 
   RideHailingService service = new TestRideHailingService(
     TestRideHailingService.DEFAULT_ARRIVAL_TIMES,
@@ -36,7 +43,7 @@ class RideHailingAccessShifterTest {
 
   static Stream<Arguments> testCases = Stream.of(
     // leave now, so shift by 10 minutes
-    Arguments.of(TIME, TestRideHailingService.DEFAULT_ARRIVAL_DURATION),
+    Arguments.of(TIME, DEFAULT_ARRIVAL_DURATION),
     // only shift by 9 minutes because we are wanting to leave in 1 minute
     Arguments.of(TIME.plus(ofMinutes(1)), ofMinutes(9)),
     // only shift by 7 minutes because we are wanting to leave in 3 minutes
@@ -65,16 +72,19 @@ class RideHailingAccessShifterTest {
     assertEquals(expectedArrival, actualArrival);
   }
 
-  @Test
-  void shiftAccesses() {
+  static Stream<Arguments> accessShiftCases = Stream.of(
+    // leave now, so shift by 10 minutes
+    Arguments.of(TIME, TIME.plus(DEFAULT_ARRIVAL_DURATION)),
+    Arguments.of(TIME.plus(Duration.ofHours(4)), TIME)
+  );
+
+  @ParameterizedTest
+  @VariableSource("accessShiftCases")
+  void shiftAccesses(Instant startTime, Instant expectedStartTime) {
     var drivingState = TestStateBuilder.ofDriving().streetEdge().streetEdge().build();
     var access = new DefaultAccessEgress(0, drivingState);
 
-    var req = new RouteRequest();
-    req.setDateTime(TIME);
-    req.setFrom(FROM);
-    req.setFrom(TO);
-    req.journey().setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build());
+    RouteRequest req = routeRequest(startTime);
 
     var shifted = RideHailingAccessShifter.shiftAccesses(
       true,
@@ -92,6 +102,31 @@ class RideHailingAccessShifterTest {
 
     var earliestStartTime = LocalTime.ofSecondOfDay(shiftedStart);
 
-    assertEquals(LocalTime.of(17, 10), earliestStartTime);
+    assertEquals(expectedStartTime.atZone(ZoneIds.BERLIN).toLocalTime(), earliestStartTime);
+  }
+
+  @Test
+  void failingService() {
+    var access = new DefaultAccessEgress(0, DRIVING_STATE);
+    RouteRequest req = routeRequest(TIME);
+
+    var shifted = RideHailingAccessShifter.shiftAccesses(
+      true,
+      List.of(access),
+      List.of(new FailingRideHailingService()),
+      req,
+      TIME
+    );
+
+    assertEquals(List.of(), shifted);
+  }
+
+  private static RouteRequest routeRequest(Instant time) {
+    var req = new RouteRequest();
+    req.setDateTime(time);
+    req.setFrom(FROM);
+    req.setFrom(TO);
+    req.journey().setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build());
+    return req;
   }
 }
