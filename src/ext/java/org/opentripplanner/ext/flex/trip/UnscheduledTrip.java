@@ -3,7 +3,6 @@ package org.opentripplanner.ext.flex.trip;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +38,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   // unscheduled trips can contain one or two stop_times
   private static final Set<Integer> N_STOPS = Set.of(1, 2);
 
-  private final UnscheduledStopTime[] stopTimes;
+  private final StopTimeWindow[] stopTimes;
 
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
@@ -52,12 +51,12 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     }
 
     var size = stopTimes.size();
-    this.stopTimes = new UnscheduledStopTime[size];
+    this.stopTimes = new StopTimeWindow[size];
     this.dropOffBookingInfos = new BookingInfo[size];
     this.pickupBookingInfos = new BookingInfo[size];
 
     for (int i = 0; i < size; i++) {
-      this.stopTimes[i] = new UnscheduledStopTime(stopTimes.get(i));
+      this.stopTimes[i] = new StopTimeWindow(stopTimes.get(i));
       this.dropOffBookingInfos[i] = stopTimes.get(0).getDropOffBookingInfo();
       this.pickupBookingInfos[i] = stopTimes.get(0).getPickupBookingInfo();
     }
@@ -99,7 +98,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
     ArrayList<FlexAccessTemplate> res = new ArrayList<>();
 
-    for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
+    for (StopLocation stop : expandStops(stopTimes[toIndex].stop())) {
       res.add(
         new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, date, calculator, config)
       );
@@ -128,7 +127,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
     ArrayList<FlexEgressTemplate> res = new ArrayList<>();
 
-    for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
+    for (StopLocation stop : expandStops(stopTimes[fromIndex].stop())) {
       res.add(
         new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, date, calculator, config)
       );
@@ -144,14 +143,14 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     int toStopIndex,
     int flexTime
   ) {
-    UnscheduledStopTime fromStopTime = stopTimes[fromStopIndex];
-    UnscheduledStopTime toStopTime = stopTimes[toStopIndex];
+    StopTimeWindow fromStopTime = stopTimes[fromStopIndex];
+    StopTimeWindow toStopTime = stopTimes[toStopIndex];
 
-    int earliestDepartureTime = Math.max(requestedDepartureTime, fromStopTime.flexWindowStart);
+    int earliestDepartureTime = Math.max(requestedDepartureTime, fromStopTime.start());
 
     if (
-      fromStopTime.flexWindowEnd < earliestDepartureTime ||
-      toStopTime.flexWindowEnd < (earliestDepartureTime + flexTime)
+      fromStopTime.end() < earliestDepartureTime ||
+      toStopTime.end() < (earliestDepartureTime + flexTime)
     ) {
       return MISSING_VALUE;
     }
@@ -161,19 +160,19 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   @Override
   public int earliestDepartureTime(int stopIndex) {
-    return stopTimes[stopIndex].flexWindowStart;
+    return stopTimes[stopIndex].start();
   }
 
   @Override
   public int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime) {
-    UnscheduledStopTime fromStopTime = stopTimes[fromStopIndex];
-    UnscheduledStopTime toStopTime = stopTimes[toStopIndex];
+    StopTimeWindow fromStopTime = stopTimes[fromStopIndex];
+    StopTimeWindow toStopTime = stopTimes[toStopIndex];
 
-    int latestArrivalTime = Math.min(arrivalTime, toStopTime.flexWindowEnd);
+    int latestArrivalTime = Math.min(arrivalTime, toStopTime.end());
 
     if (
-      toStopTime.flexWindowStart > latestArrivalTime ||
-      fromStopTime.flexWindowStart > (latestArrivalTime - flexTime)
+      toStopTime.start() > latestArrivalTime ||
+      fromStopTime.start() > (latestArrivalTime - flexTime)
     ) {
       return MISSING_VALUE;
     }
@@ -183,15 +182,12 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   @Override
   public int latestArrivalTime(int stopIndex) {
-    return stopTimes[stopIndex].flexWindowEnd;
+    return stopTimes[stopIndex].end();
   }
 
   @Override
   public Set<StopLocation> getStops() {
-    return Arrays
-      .stream(stopTimes)
-      .map(scheduledDeviatedStopTime -> scheduledDeviatedStopTime.stop)
-      .collect(Collectors.toSet());
+    return Arrays.stream(stopTimes).map(StopTimeWindow::stop).collect(Collectors.toSet());
   }
 
   @Override
@@ -206,12 +202,12 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   @Override
   public PickDrop getBoardRule(int i) {
-    return stopTimes[i].pickupType;
+    return stopTimes[i].pickupType();
   }
 
   @Override
   public PickDrop getAlightRule(int i) {
-    return stopTimes[i].dropOffType;
+    return stopTimes[i].dropOffType();
   }
 
   @Override
@@ -225,11 +221,11 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   public PickDrop getPickupType(int i) {
-    return stopTimes[i].pickupType;
+    return stopTimes[i].pickupType();
   }
 
   public PickDrop getDropOffType(int i) {
-    return stopTimes[i].dropOffType;
+    return stopTimes[i].dropOffType();
   }
 
   @Override
@@ -259,7 +255,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       if (getPickupType(i).isNotRoutable()) {
         continue;
       }
-      StopLocation stop = stopTimes[i].stop;
+      StopLocation stop = stopTimes[i].stop();
       if (stop instanceof GroupStop groupStop) {
         if (groupStop.getLocations().contains(accessEgress.stop)) {
           return i;
@@ -278,7 +274,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       if (getDropOffType(i).isNotRoutable()) {
         continue;
       }
-      StopLocation stop = stopTimes[i].stop;
+      StopLocation stop = stopTimes[i].stop();
       if (stop instanceof GroupStop groupStop) {
         if (groupStop.getLocations().contains(accessEgress.stop)) {
           return i;
@@ -290,42 +286,5 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       }
     }
     return -1;
-  }
-
-  private static class UnscheduledStopTime implements Serializable {
-
-    private final StopLocation stop;
-
-    private final int flexWindowStart;
-    private final int flexWindowEnd;
-
-    private final PickDrop pickupType;
-    private final PickDrop dropOffType;
-
-    private UnscheduledStopTime(StopTime st) {
-      stop = st.getStop();
-
-      // Fallback to what times are available
-      final int earliestPossibleDepartureTime = st.getEarliestPossibleDepartureTime();
-      final int latestPossibleArrivalTime = st.getLatestPossibleArrivalTime();
-
-      // We need to make sure that both start and end times are set, if either is set.
-      flexWindowStart = getAvailableTime(earliestPossibleDepartureTime, latestPossibleArrivalTime);
-      flexWindowEnd = getAvailableTime(latestPossibleArrivalTime, earliestPossibleDepartureTime);
-
-      // Do not allow for pickup/dropoff if times are not available
-      pickupType = flexWindowStart == MISSING_VALUE ? PickDrop.NONE : st.getPickupType();
-      dropOffType = flexWindowEnd == MISSING_VALUE ? PickDrop.NONE : st.getDropOffType();
-    }
-
-    private static int getAvailableTime(int... times) {
-      for (var time : times) {
-        if (time != MISSING_VALUE) {
-          return time;
-        }
-      }
-
-      return MISSING_VALUE;
-    }
   }
 }
