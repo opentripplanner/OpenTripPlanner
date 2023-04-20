@@ -1,9 +1,12 @@
 package org.opentripplanner.model;
 
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
@@ -18,7 +21,10 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
@@ -30,11 +36,13 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 public class TimetableTest {
 
-  private static final ZoneId timeZone = ZoneIds.NEW_YORK;
-  private static final LocalDate serviceDate = LocalDate.of(2009, 8, 7);
+  private static final ZoneId TIME_ZONE = ZoneIds.NEW_YORK;
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2009, 8, 7);
+  private static final String TRIP_ID = "1.1";
   private static Map<FeedScopedId, TripPattern> patternIndex;
   private static Timetable timetable;
   private static String feedId;
@@ -52,9 +60,9 @@ public class TimetableTest {
       pattern.scheduledTripsAsStream().forEach(trip -> patternIndex.put(trip.getId(), pattern));
     }
 
-    TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
+    TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, TRIP_ID));
     timetable = pattern.getScheduledTimetable();
-    trip_1_1_index = timetable.getTripIndex(new FeedScopedId(feedId, "1.1"));
+    trip_1_1_index = timetable.getTripIndex(new FeedScopedId(feedId, TRIP_ID));
   }
 
   @Test
@@ -74,8 +82,8 @@ public class TimetableTest {
 
     Result<TripTimesPatch, UpdateError> result = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     assertTrue(result.isFailure());
@@ -93,7 +101,7 @@ public class TimetableTest {
     StopTimeUpdate.Builder stopTimeUpdateBuilder;
 
     // update trip with bad data
-    var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
     tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -102,8 +110,8 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     var result = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     assertTrue(result.isFailure());
@@ -114,7 +122,7 @@ public class TimetableTest {
   @Test
   public void nonIncreasingTimes() {
     // update trip with non-increasing data
-    var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
     var tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -126,16 +134,13 @@ public class TimetableTest {
     );
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setTime(
-      LocalDateTime
-        .of(2009, Month.AUGUST, 7, 0, 10, 0, 0)
-        .atZone(ZoneId.of("America/New_York"))
-        .toEpochSecond()
+      LocalDateTime.of(2009, Month.AUGUST, 7, 0, 10, 0, 0).atZone(TIME_ZONE).toEpochSecond()
     );
     var tripUpdate = tripUpdateBuilder.build();
     var result = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     assertTrue(result.isFailure());
@@ -146,7 +151,7 @@ public class TimetableTest {
   @Test
   public void update() {
     // update trip
-    var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
 
     var tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
@@ -168,8 +173,8 @@ public class TimetableTest {
     assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
     var result = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -183,7 +188,7 @@ public class TimetableTest {
     });
 
     // update trip arrival time incorrectly
-    tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
     tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -195,8 +200,8 @@ public class TimetableTest {
     result =
       timetable.createUpdatedTripTimes(
         tripUpdate,
-        timeZone,
-        serviceDate,
+        TIME_ZONE,
+        SERVICE_DATE,
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
       );
 
@@ -210,8 +215,8 @@ public class TimetableTest {
 
     // update trip arrival time only
     tripDescriptorBuilder = TripDescriptor.newBuilder();
-    tripDescriptorBuilder.setTripId("1.1");
-    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
+    tripDescriptorBuilder.setTripId(TRIP_ID);
+    tripDescriptorBuilder.setScheduleRelationship(SCHEDULED);
     tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -224,8 +229,8 @@ public class TimetableTest {
     result =
       timetable.createUpdatedTripTimes(
         tripUpdate,
-        timeZone,
-        serviceDate,
+        TIME_ZONE,
+        SERVICE_DATE,
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
       );
 
@@ -239,7 +244,7 @@ public class TimetableTest {
 
     // update trip departure time only
     tripDescriptorBuilder = tripDescriptorBuilder();
-    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setTripId(TRIP_ID);
     tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -251,8 +256,8 @@ public class TimetableTest {
     result =
       timetable.createUpdatedTripTimes(
         tripUpdate,
-        timeZone,
-        serviceDate,
+        TIME_ZONE,
+        SERVICE_DATE,
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
       );
 
@@ -265,7 +270,7 @@ public class TimetableTest {
     });
 
     // update trip using stop id
-    tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
     tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -277,8 +282,8 @@ public class TimetableTest {
     result =
       timetable.createUpdatedTripTimes(
         tripUpdate,
-        timeZone,
-        serviceDate,
+        TIME_ZONE,
+        SERVICE_DATE,
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
       );
 
@@ -294,7 +299,7 @@ public class TimetableTest {
   @Test
   public void fixIncoherentTimes() {
     // update trip arrival time at first stop and make departure time incoherent at second stop
-    var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
     var tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -311,8 +316,8 @@ public class TimetableTest {
 
     var result = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     assertTrue(result.isFailure());
@@ -320,7 +325,7 @@ public class TimetableTest {
 
   @Test
   public void testUpdateWithNoData() {
-    var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
 
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
@@ -336,8 +341,8 @@ public class TimetableTest {
     TripUpdate tripUpdate = tripUpdateBuilder.build();
     var result = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -360,7 +365,7 @@ public class TimetableTest {
 
   @Test
   public void testUpdateWithAlwaysDelayPropagationFromSecondStop() {
-    var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
 
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
@@ -379,8 +384,8 @@ public class TimetableTest {
     TripUpdate tripUpdate = tripUpdateBuilder.build();
     var result = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.ALWAYS
     );
 
@@ -405,7 +410,7 @@ public class TimetableTest {
 
   @Test
   public void testUpdateWithAlwaysDelayPropagationFromThirdStop() {
-    TripDescriptor.Builder tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    TripDescriptor.Builder tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -417,8 +422,8 @@ public class TimetableTest {
 
     var result = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.ALWAYS
     );
 
@@ -438,7 +443,7 @@ public class TimetableTest {
 
   @Test
   public void testUpdateWithRequiredNoDataDelayPropagationWhenItsNotRequired() {
-    TripDescriptor.Builder tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    TripDescriptor.Builder tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -449,8 +454,8 @@ public class TimetableTest {
     TripUpdate tripUpdate = tripUpdateBuilder.build();
     var patch = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -477,7 +482,7 @@ public class TimetableTest {
 
   @Test
   public void testUpdateWithRequiredNoDataDelayPropagationWhenItsRequired() {
-    var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -488,8 +493,8 @@ public class TimetableTest {
     TripUpdate tripUpdate = tripUpdateBuilder.build();
     var patch = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -516,7 +521,7 @@ public class TimetableTest {
 
   @Test
   public void testUpdateWithRequiredNoDataDelayPropagationOnArrivalTime() {
-    var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -532,8 +537,8 @@ public class TimetableTest {
     TripUpdate tripUpdate = tripUpdateBuilder.build();
     var result = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     // if arrival time is not defined but departure time is not and the arrival time is greater
@@ -548,7 +553,7 @@ public class TimetableTest {
 
   @Test
   public void testUpdateWithRequiredDelayPropagationWhenItsRequired() {
-    var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
     var tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
@@ -560,8 +565,8 @@ public class TimetableTest {
 
     var result = timetable.createUpdatedTripTimes(
       tripUpdate,
-      timeZone,
-      serviceDate,
+      TIME_ZONE,
+      SERVICE_DATE,
       BackwardsDelayPropagationType.REQUIRED
     );
 
@@ -586,10 +591,60 @@ public class TimetableTest {
     });
   }
 
+  @Nested
+  class InvalidStopEvent {
+
+    @Test
+    public void testInvalidDeparture() {
+      testInvalidStopTime(StopTimeUpdate.Builder::setDeparture, INVALID_DEPARTURE_TIME);
+    }
+
+    @Test
+    public void testInvalidArrival() {
+      testInvalidStopTime(StopTimeUpdate.Builder::setArrival, INVALID_ARRIVAL_TIME);
+    }
+
+    private static void testInvalidStopTime(
+      BiConsumer<TripUpdate.StopTimeUpdate.Builder, StopTimeEvent> setEmptyEvent,
+      UpdateError.UpdateErrorType expectedError
+    ) {
+      var builder = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE);
+      builder.addRawStopTime(emptyStopTime(1, setEmptyEvent));
+      builder.addRawStopTime(emptyStopTime(2, setEmptyEvent));
+      TripUpdate tripUpdate = builder.build();
+
+      var result = timetable.createUpdatedTripTimes(
+        tripUpdate,
+        TIME_ZONE,
+        SERVICE_DATE,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
+
+      assertTrue(result.isFailure());
+
+      result.ifFailure(p -> {
+        assertEquals(expectedError, p.errorType());
+        assertEquals(0, p.stopIndex());
+      });
+    }
+
+    @Nonnull
+    private static StopTimeUpdate emptyStopTime(
+      int sequence,
+      BiConsumer<TripUpdate.StopTimeUpdate.Builder, StopTimeEvent> setEmptyEvent
+    ) {
+      var emptyEvent = StopTimeEvent.newBuilder().build();
+      var stopTime = StopTimeUpdate.newBuilder();
+      stopTime.setStopSequence(sequence);
+      setEmptyEvent.accept(stopTime, emptyEvent);
+      return stopTime.build();
+    }
+  }
+
   private static TripDescriptor.Builder tripDescriptorBuilder() {
     TripDescriptor.Builder tripDescriptorBuilder;
     tripDescriptorBuilder = TripDescriptor.newBuilder();
-    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
+    tripDescriptorBuilder.setScheduleRelationship(SCHEDULED);
     return tripDescriptorBuilder;
   }
 

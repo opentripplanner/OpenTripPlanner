@@ -123,7 +123,7 @@ public class UpdatersConfig implements UpdatersParameters {
           "Throttles the potentially resource-consuming task of duplicating a TripPattern → Timetable map and indexing the new Timetables. " +
           "Applies to GTFS-RT and Siri updates."
         )
-        .asInt(dflt.maxSnapshotFrequencyMs()),
+        .asDuration(dflt.maxSnapshotFrequency()),
       c
         .of("purgeExpiredData")
         .since(V2_2)

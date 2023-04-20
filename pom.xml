@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>97</otp.serialization.version.id>
+        <otp.serialization.version.id>99</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>29.0</geotools.version>
         <google.dagger.version>2.45</google.dagger.version>
@@ -66,7 +66,7 @@
         <micrometer.version>1.10.6</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
-        <logback.version>1.4.6</logback.version>
+        <logback.version>1.4.7</logback.version>
         <lucene.version>9.5.0</lucene.version>
         <slf4j.version>2.0.7</slf4j.version>
         <netex-java-model.version>2.0.14</netex-java-model.version>
@@ -311,7 +311,6 @@
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>true</disableXmlReport>
-                    <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
             <!-- code coverage report -->

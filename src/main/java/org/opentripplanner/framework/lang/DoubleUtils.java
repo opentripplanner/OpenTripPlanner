@@ -42,6 +42,13 @@ public class DoubleUtils {
   }
 
   /**
+   * Round to a decimal number with 4 digits precision
+   */
+  public static double roundTo4Decimals(double value) {
+    return roundToNDecimals(value, 4);
+  }
+
+  /**
    * Useful for coordinates, round of to ~ 1 cm.
    */
   public static Double roundTo7Decimals(@Nullable Double value) {

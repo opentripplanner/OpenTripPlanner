@@ -55,6 +55,13 @@ public class RoutingResponse {
     return routingErrors;
   }
 
+  /**
+   * Generate empty result with just an error.
+   */
+  public static RoutingResponse ofError(RoutingError error) {
+    return new RoutingResponse(null, null, null, null, List.of(error), new DebugTimingAggregator());
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder
