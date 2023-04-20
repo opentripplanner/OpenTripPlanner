@@ -5,9 +5,9 @@ export default {
   },
   website: {
     template: 'carbon-multi-page',
-    output: 'target/mkdocs/api/graphql-gtfs/v1/',
+    output: 'target/magidocs/api/graphql-gtfs/v1/',
     options: {
-      siteRoot: '/api/graphql-gtfs/v1',
+      siteRoot: '/api/dev-2.x/graphql-gtfs/v1',
       pages: [{
         title: 'Introduction',
         content: `

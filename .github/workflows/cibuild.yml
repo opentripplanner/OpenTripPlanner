@@ -117,6 +117,17 @@ jobs:
         run: |
           npm install -g @magidoc/cli
           magidoc generate
+          
+          git config --global user.name 'OTP Bot'
+          git config --global user.email 'bot@opentripplanner.org'
+          
+          git fetch origin gh-pages
+          git checkout gh-pages
+          mkdir -p api
+          mv target/magidocs/api/ api/dev-2.x/
+          git add api
+          git commit -am "Add Magidoc documentation"
+          git push
 
       - name: Deploy docs to Github pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
