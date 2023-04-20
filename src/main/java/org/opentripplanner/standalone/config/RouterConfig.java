@@ -1,17 +1,20 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.time.Duration;
+import java.util.List;
+import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerconfig.RideHailingServicesConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
@@ -45,6 +48,7 @@ public class RouterConfig implements Serializable {
   private final RouteRequest routingRequestDefaults;
   private final TransitRoutingConfig transitConfig;
   private final UpdatersParameters updatersParameters;
+  private final RideHailingServicesConfig rideHailingConfig;
   private final VectorTileConfig vectorTileLayers;
   private final FlexConfig flexConfig;
 
@@ -99,7 +103,7 @@ number of transit vehicles used in that itinerary.
       new TransmodelAPIConfig(
         root
           .of("transmodelApi")
-          .since(NA)
+          .since(V2_1)
           .summary("Configuration for the Transmodel GraphQL API.")
           .asObject()
       );
@@ -107,6 +111,7 @@ number of transit vehicles used in that itinerary.
       RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
     this.transitConfig = new TransitRoutingConfig("transit", root, routingRequestDefaults);
     this.updatersParameters = new UpdatersConfig(root);
+    this.rideHailingConfig = new RideHailingServicesConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig = new FlexConfig(root, "flex");
 
@@ -158,6 +163,10 @@ number of transit vehicles used in that itinerary.
     return updatersParameters;
   }
 
+  public List<RideHailingServiceParameters> rideHailingServiceParameters() {
+    return rideHailingConfig.rideHailingServiceParameters();
+  }
+
   public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
     return vectorTileLayers;
   }
@@ -195,7 +204,7 @@ number of transit vehicles used in that itinerary.
   static Duration parseStreetRoutingTimeout(NodeAdapter adapter, Duration defaultValue) {
     return adapter
       .of("streetRoutingTimeout")
-      .since(NA)
+      .since(V2_2)
       .summary(
         "The maximum time a street routing request is allowed to take before returning a timeout."
       )

@@ -8,9 +8,10 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.UpdateResult;
-import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.ResultLogger;
+import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,13 +102,13 @@ public class SiriETUpdater extends PollingGraphUpdater {
         if (etds != null) {
           saveResultOnGraph.execute((graph, transitModel) -> {
             var result = snapshotSource.applyEstimatedTimetable(
-              transitModel,
               fuzzyTripMatcher,
               entityResolver,
               feedId,
               fullDataset,
               etds
             );
+            ResultLogger.logUpdateResult(feedId, "siri-et", result);
             recordMetrics.accept(result);
             if (markPrimed) primed = true;
           });

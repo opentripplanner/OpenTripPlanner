@@ -114,6 +114,7 @@ public class SpeedTest {
         TestServerContext.createVehiclePositionService(),
         TestServerContext.createVehicleRentalService(),
         config.flexConfig,
+        List.of(),
         null,
         null
       );
@@ -304,9 +305,9 @@ public class SpeedTest {
   }
 
   /**
-   * Save the result for the last sample run for each profile. Nothing happens if not all
-   * test-cases are run. This prevents the excluded tests-cases in the result file to
-   * deleted, and the result to be copied to the expected-result by a mistake.
+   * Save the result for the last sample run for each profile. Nothing happens if not all test-cases
+   * are run. This prevents the excluded tests-cases in the result file to be deleted, and the result
+   * to be copied to the expected-results file by mistake.
    */
   private void saveTestCasesToResultFile() {
     var currentTestCases = lastSampleResult.get(profile);
@@ -339,9 +340,9 @@ public class SpeedTest {
   }
 
   /**
-   * Trim itineraries down to requested size ({@link SpeedTestCmdLineOpts#numOfItineraries()}).
-   * This is also done by the itinerary filter, but if the itinerary filter is not run/in debug
-   * mode - then this is needed.
+   * Trim itineraries down to requested size ({@link SpeedTestCmdLineOpts#numOfItineraries()}). This
+   * is also done by the itinerary filter, but if the itinerary filter is not run/in debug mode -
+   * then this is needed.
    */
   private List<Itinerary> trimItineraries(RoutingResponse routingResponse) {
     var stream = routingResponse.getTripPlan().itineraries.stream();

@@ -168,27 +168,14 @@ OTP users in Helsinki have documented their best practices for coding railway pl
 OpenStreetMap. These guidelines are
 available [in the OSM Wiki.](https://wiki.openstreetmap.org/wiki/Digitransit#Editing_railway_platforms)
 
-## Debug logging
-
-OTP use [logback](http://logback.qos.ch/) and [slj4j](http://www.slf4j.org/) as a logging framework.
-Logging is configured in the _logback.xml_ file inside the OTP jar file. See these frameworks for
-more documentation on log configuration.
-
-For developers, starting OTP using the `InteractiveOtpMain` is an easy way to configure debug
-logging.
-
-Some useful loggers
-
-- `TRANSFERS_EXPORT` Dump transfers to _transfers-debug.csv_ file.
-- `DATA_IMPORT_ISSUES` Write issues to debug lag as well as to the issue report.
-- `REQ_LOG` Router request log. Enable with `requestLogFile` config parameter in build config.
-- `org.opentripplanner.raptor.RaptorService` Debug Raptor request and response
 
 ### Transit search
 
 The Raptor implementation support instrumentation of ACCEPT, REJECT, and DROP events for
 stop-arrivals and trip boardings. Use the SpeedTest to pass in a set of stops and/or a specific path
 to debug. This is useful when debugging why you do (not) get a particular result.
+
+Read the [logging page](Logging.md) for more information.
 
 ### GTFS Transfers.txt and NeTEx Interchange import
 

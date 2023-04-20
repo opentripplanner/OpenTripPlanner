@@ -7,19 +7,19 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Locale;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model.basic.Locales;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class BikelyUpdaterTest {
 
   @Test
   void parseBikeBoxes() {
     var url = "file:src/ext-test/resources/vehicleparking/bikely/bikely.json";
-    var parameters = new BikelyUpdaterParameters("", url, "bikely", 30, Map.of());
+    var parameters = new BikelyUpdaterParameters("", url, "bikely", 30, HttpHeaders.empty());
     var updater = new BikelyUpdater(parameters);
 
     assertTrue(updater.update());

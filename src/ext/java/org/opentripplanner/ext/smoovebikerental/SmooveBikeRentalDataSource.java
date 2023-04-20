@@ -7,7 +7,8 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.updater.GenericJsonDataSource;
+import org.opentripplanner.updater.spi.DataSource;
+import org.opentripplanner.updater.spi.GenericJsonDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of a VehicleRentalDataSource for the Smoove GIR SabiWeb used in Helsinki.
  *
- * @see org.opentripplanner.updater.DataSource
+ * @see DataSource
  */
 public class SmooveBikeRentalDataSource
   extends GenericJsonDataSource<VehicleRentalPlace>
@@ -25,7 +26,7 @@ public class SmooveBikeRentalDataSource
 
   public static final String DEFAULT_NETWORK_NAME = "smoove";
 
-  private final boolean allowOverloading;
+  private final boolean overloadingAllowed;
 
   private final String networkName;
   private final RentalVehicleType vehicleType;
@@ -34,7 +35,7 @@ public class SmooveBikeRentalDataSource
     super(config.url(), "result", config.httpHeaders());
     networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
     vehicleType = RentalVehicleType.getDefaultType(networkName);
-    allowOverloading = config.isAllowOverloading();
+    overloadingAllowed = config.overloadingAllowed();
   }
 
   /**
@@ -83,7 +84,7 @@ public class SmooveBikeRentalDataSource
     }
     station.vehicleTypesAvailable = Map.of(vehicleType, station.vehiclesAvailable);
     station.vehicleSpacesAvailable = Map.of(vehicleType, station.spacesAvailable);
-    station.allowOverloading = allowOverloading;
+    station.overloadingAllowed = overloadingAllowed;
     return station;
   }
 }

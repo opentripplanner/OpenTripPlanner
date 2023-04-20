@@ -56,7 +56,7 @@ public class AddingMultipleFareService implements FareService, Serializable {
 
           if (cost != null && subCost != null) {
             // Add sub cost to cost
-            newFare.addFare(fareType, new Money(cost.currency(), cost.cents() + subCost.cents()));
+            newFare.addFare(fareType, new Money(cost.currency(), cost.amount() + subCost.amount()));
           } else if (cost == null && subCost != null) {
             // Add new cost
             // Note: this should not happen often: only if a fare

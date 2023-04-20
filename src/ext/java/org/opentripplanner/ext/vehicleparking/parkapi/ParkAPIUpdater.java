@@ -19,7 +19,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.updater.GenericJsonDataSource;
+import org.opentripplanner.updater.spi.GenericJsonDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

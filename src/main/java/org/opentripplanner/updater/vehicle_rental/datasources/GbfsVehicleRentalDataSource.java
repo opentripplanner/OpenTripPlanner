@@ -87,7 +87,8 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
       GbfsStationInformationMapper stationInformationMapper = new GbfsStationInformationMapper(
         system,
         vehicleTypes,
-        params.allowKeepingRentedVehicleAtDestination()
+        params.allowKeepingRentedVehicleAtDestination(),
+        params.overloadingAllowed()
       );
 
       // Iterate over all known stations, and if we have any status information add it to those station objects.
