@@ -256,8 +256,12 @@ public class Timetable implements Serializable {
               newTimes.updateArrivalTime(i, (int) (arrival.getTime() - today));
               delay = newTimes.getArrivalDelay(i);
             } else {
-              LOG.error("Arrival time at index {} is erroneous.", i);
-              return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME));
+              LOG.debug(
+                "Arrival time at index {} of trip {} has neither a delay nor a time.",
+                i,
+                feedScopedTripId
+              );
+              return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME, i));
             }
           } else if (delay != null) {
             newTimes.updateArrivalDelay(i, delay);
@@ -279,8 +283,12 @@ public class Timetable implements Serializable {
               newTimes.updateDepartureTime(i, (int) (departure.getTime() - today));
               delay = newTimes.getDepartureDelay(i);
             } else {
-              LOG.error("Departure time at index {} is erroneous.", i);
-              return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME));
+              LOG.debug(
+                "Departure time at index {} of trip {} has neither a delay nor a time.",
+                i,
+                feedScopedTripId
+              );
+              return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME, i));
             }
           } else if (delay != null) {
             newTimes.updateDepartureDelay(i, delay);

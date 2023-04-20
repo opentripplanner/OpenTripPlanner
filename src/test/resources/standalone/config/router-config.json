@@ -86,7 +86,7 @@
       },
       "inaccessibleStreetReluctance": 25,
       "maxSlope": 0.083,
-      "slopeExceededReluctance":  1,
+      "slopeExceededReluctance": 1,
       "stairsReluctance": 100
     }
   },
@@ -182,6 +182,10 @@
       "expansionFactor": 0.25
     }
   ],
+  "timetableUpdates": {
+    "purgeExpiredData": false,
+    "maxSnapshotFrequency": "2s"
+  },
   "updaters": [
     // GTFS-RT service alerts (frequent polling)
     {
@@ -255,7 +259,7 @@
         "Authorization": "A-Token"
       }
     },
-    // Polling for GTFS-RT Vehicle Positions - output can be fetched via trip pattern GraphQL APIss
+    // Polling for GTFS-RT Vehicle Positions - output can be fetched via trip pattern GraphQL API
     {
       "type": "vehicle-positions",
       "url": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",

@@ -40,6 +40,8 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [rideHailingServices](sandbox/RideHailing.md)                                             |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                         | *Optional* |               |  2.3  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
+|    [maxSnapshotFrequency](#timetableUpdates_maxSnapshotFrequency)                         |       `duration`      | How long a snapshot should be cached.                                                             | *Optional* | `"PT1S"`      |  2.2  |
+|    purgeExpiredData                                                                       |       `boolean`       | Should expired realtime data be purged from the graph. Apply to GTFS-RT and Siri updates.         | *Optional* | `true`        |  2.2  |
 | [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                   | *Optional* |               |   na  |
 |    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)            |       `integer`       | Step for departure times between each RangeRaptor iterations.                                     | *Optional* | `60`          |   na  |
 |    [maxNumberOfTransfers](#transit_maxNumberOfTransfers)                                  |       `integer`       | This parameter is used to allocate enough memory space for Raptor.                                | *Optional* | `12`          |   na  |
@@ -144,6 +146,15 @@ search-window.
 
 The search aborts after this duration and any paths found are returned to the client.
 
+
+<h3 id="timetableUpdates_maxSnapshotFrequency">maxSnapshotFrequency</h3>
+
+**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT1S"`   
+**Path:** /timetableUpdates 
+
+How long a snapshot should be cached.
+
+If a timetable snapshot is requested less than this number of milliseconds after the previous snapshot, then return the same instance. Throttles the potentially resource-consuming task of duplicating a TripPattern → Timetable map and indexing the new Timetables. Applies to GTFS-RT and Siri updates.
 
 <h3 id="transit">transit</h3>
 
@@ -601,6 +612,10 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "expansionFactor" : 0.25
     }
   ],
+  "timetableUpdates" : {
+    "purgeExpiredData" : false,
+    "maxSnapshotFrequency" : "2s"
+  },
   "updaters" : [
     {
       "type" : "real-time-alerts",
