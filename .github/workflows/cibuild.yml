@@ -9,6 +9,7 @@ on:
       - master
       - dev-1.x
       - dev-2.x
+      - graphq-docs
   pull_request:
     branches:
       - master
@@ -104,10 +105,19 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r docs/requirements.txt
         
-      - name: Build documentation
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Build main documentation
         if: github.event_name == 'pull_request'
         run: mkdocs build
-        
+
+      - name: Build GTFS GraphQL documentation
+        run: |
+          npm install -g @magidoc/cli
+          magidoc generate
+
       - name: Deploy docs to Github pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
         run: |
