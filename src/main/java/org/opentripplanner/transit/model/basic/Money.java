@@ -29,6 +29,14 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
     return amount - m.amount;
   }
 
+  /**
+   * The amount in the major currency unit, so USD 3.10 is represented as 3.1 (not 310!).
+   */
+  public double fractionalAmount() {
+    int fractionDigits = currency.getDefaultFractionDigits();
+    return Math.round(amount / Math.pow(10, fractionDigits));
+  }
+
   public String localize(Locale loc) {
     NumberFormat nf = NumberFormat.getCurrencyInstance(loc);
     nf.setCurrency(currency);

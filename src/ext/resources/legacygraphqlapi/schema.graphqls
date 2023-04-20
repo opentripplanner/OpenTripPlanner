@@ -1433,10 +1433,9 @@ type Money {
     "The currency of this money amount."
     currency: Currency!
     """
-    Money amount in cents. **Note:** this value is dependent on the currency used,
-    as one cent is not necessarily ¹/₁₀₀ of the basic monetary unit.
+    Money as a fractional amount, so 3.10 USD is represented as `3.1`.
     """
-    amount: Int!
+    amount: Float!
 }
 
 """"

@@ -278,7 +278,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Double> lon();
   }
 
-  /** An amount of money. */
+  /** A currency */
   public interface LegacyGraphQLCurrency {
     public DataFetcher<String> code();
 
@@ -458,7 +458,7 @@ public class LegacyGraphQLDataFetchers {
 
   /** An amount of money. */
   public interface LegacyGraphQLMoney {
-    public DataFetcher<Integer> amount();
+    public DataFetcher<Double> amount();
 
     public DataFetcher<Currency> currency();
   }

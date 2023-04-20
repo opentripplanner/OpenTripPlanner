@@ -62,7 +62,7 @@
                         "digits" : 2,
                         "code" : "EUR"
                       },
-                      "amount" : 1000
+                      "amount" : 10.0
                     },
                     "riderCategory" : {
                       "id" : "F:senior-citizens",
@@ -84,7 +84,7 @@
                         "digits" : 2,
                         "code" : "EUR"
                       },
-                      "amount" : 310
+                      "amount" : 3.0
                     },
                     "riderCategory" : null,
                     "medium" : null
@@ -100,7 +100,7 @@
                         "digits" : 2,
                         "code" : "EUR"
                       },
-                      "amount" : 1000
+                      "amount" : 10.0
                     },
                     "riderCategory" : {
                       "id" : "F:senior-citizens",
@@ -166,7 +166,7 @@
                         "digits" : 2,
                         "code" : "EUR"
                       },
-                      "amount" : 1000
+                      "amount" : 10.0
                     },
                     "riderCategory" : {
                       "id" : "F:senior-citizens",
@@ -188,7 +188,7 @@
                         "digits" : 2,
                         "code" : "EUR"
                       },
-                      "amount" : 1000
+                      "amount" : 10.0
                     },
                     "riderCategory" : {
                       "id" : "F:senior-citizens",
@@ -232,14 +232,14 @@
                     "code" : "EUR",
                     "digits" : 2
                   },
-                  "amount" : 1000
+                  "amount" : 10.0
                 },
                 "maxPrice" : {
                   "currency" : {
                     "code" : "EUR",
                     "digits" : 2
                   },
-                  "amount" : 2000
+                  "amount" : 20.0
                 },
                 "arrival" : "PT10M"
               },
