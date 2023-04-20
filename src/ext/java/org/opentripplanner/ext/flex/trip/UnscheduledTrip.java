@@ -141,7 +141,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     int requestedDepartureTime,
     int fromStopIndex,
     int toStopIndex,
-    int flexTime
+    int flexTripDurationSeconds
   ) {
     StopTimeWindow fromStopTime = stopTimes[fromStopIndex];
     StopTimeWindow toStopTime = stopTimes[toStopIndex];
@@ -150,7 +150,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
     if (
       fromStopTime.end() < earliestDepartureTime ||
-      toStopTime.end() < (earliestDepartureTime + flexTime)
+      toStopTime.end() < (earliestDepartureTime + flexTripDurationSeconds)
     ) {
       return MISSING_VALUE;
     }
@@ -164,7 +164,12 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   @Override
-  public int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime) {
+  public int latestArrivalTime(
+    int arrivalTime,
+    int fromStopIndex,
+    int toStopIndex,
+    int flexTripDurationSeconds
+  ) {
     StopTimeWindow fromStopTime = stopTimes[fromStopIndex];
     StopTimeWindow toStopTime = stopTimes[toStopIndex];
 
@@ -172,7 +177,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
     if (
       toStopTime.start() > latestArrivalTime ||
-      fromStopTime.start() > (latestArrivalTime - flexTime)
+      fromStopTime.start() > (latestArrivalTime - flexTripDurationSeconds)
     ) {
       return MISSING_VALUE;
     }
