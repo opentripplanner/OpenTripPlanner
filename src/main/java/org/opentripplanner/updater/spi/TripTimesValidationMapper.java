@@ -15,7 +15,7 @@ public class TripTimesValidationMapper {
     ValidationError validationError
   ) {
     var type =
-      switch (validationError.type()) {
+      switch (validationError.code()) {
         case NEGATIVE_DWELL_TIME -> UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
         case NEGATIVE_HOP_TIME -> UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME;
       };

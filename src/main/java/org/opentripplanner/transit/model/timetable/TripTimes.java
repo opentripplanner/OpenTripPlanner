@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
-import static org.opentripplanner.transit.model.timetable.ValidationError.ValidationErrorType.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.transit.model.timetable.ValidationError.ValidationErrorType.NEGATIVE_HOP_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
 import java.io.Serializable;
 import java.time.Duration;

@@ -3,8 +3,8 @@ package org.opentripplanner.routing.trippattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model.timetable.ValidationError.ValidationErrorType.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.transit.model.timetable.ValidationError.ValidationErrorType.NEGATIVE_HOP_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -98,7 +98,7 @@ public class TripTimesTest {
     var error = updatedTripTimesA.validateNonIncreasingTimes();
     assertTrue(error.isPresent());
     assertEquals(1, error.get().stopIndex());
-    assertEquals(NEGATIVE_DWELL_TIME, error.get().type());
+    assertEquals(NEGATIVE_DWELL_TIME, error.get().code());
   }
 
   @Test
@@ -111,7 +111,7 @@ public class TripTimesTest {
     var error = updatedTripTimesB.validateNonIncreasingTimes();
     assertTrue(error.isPresent());
     assertEquals(7, error.get().stopIndex());
-    assertEquals(NEGATIVE_HOP_TIME, error.get().type());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
   }
 
   @Test
@@ -191,6 +191,6 @@ public class TripTimesTest {
     var validationResult = updatedTripTimesA.validateNonIncreasingTimes();
     assertTrue(validationResult.isPresent());
     assertEquals(2, validationResult.get().stopIndex());
-    assertEquals(NEGATIVE_DWELL_TIME, validationResult.get().type());
+    assertEquals(NEGATIVE_DWELL_TIME, validationResult.get().code());
   }
 }
