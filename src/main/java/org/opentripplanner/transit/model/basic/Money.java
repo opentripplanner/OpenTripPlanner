@@ -41,7 +41,7 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
     NumberFormat nf = NumberFormat.getCurrencyInstance(loc);
     nf.setCurrency(currency);
     nf.setMaximumFractionDigits(currency.getDefaultFractionDigits());
-    return nf.format(amount / (Math.pow(10, currency.getDefaultFractionDigits())));
+    return nf.format(fractionalAmount());
   }
 
   @Override
