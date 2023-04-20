@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -91,21 +92,25 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   /**
    * Whether ways tagged foot/bicycle=discouraged should be marked as inaccessible
    */
-  public boolean banDiscouragedWalking = false;
-  public boolean banDiscouragedBiking = false;
+  private final boolean banDiscouragedWalking;
+  private final boolean banDiscouragedBiking;
 
   public OpenStreetMapModule(
     Collection<OpenStreetMapProvider> providers,
     Set<String> boardingAreaRefTags,
     Graph graph,
     DataImportIssueStore issueStore,
-    boolean areaVisibility
+    boolean areaVisibility,
+    boolean banDiscouragedWalking,
+    boolean banDiscouragedBiking
   ) {
     this.providers = List.copyOf(providers);
     this.boardingAreaRefTags = boardingAreaRefTags;
     this.graph = graph;
     this.issueStore = issueStore;
     this.areaVisibility = areaVisibility;
+    this.banDiscouragedWalking = banDiscouragedWalking;
+    this.banDiscouragedBiking = banDiscouragedBiking;
   }
 
   public OpenStreetMapModule(
@@ -115,20 +120,40 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Graph graph,
     DataImportIssueStore issueStore
   ) {
-    this(List.copyOf(providers), boardingAreaRefTags, graph, issueStore, config.areaVisibility);
+    this(
+      List.copyOf(providers),
+      boardingAreaRefTags,
+      graph,
+      issueStore,
+      config.areaVisibility,
+      config.banDiscouragedWalking,
+      config.banDiscouragedBiking
+    );
     this.customNamer = config.customNamer;
     this.platformEntriesLinking = config.platformEntriesLinking;
     this.staticBikeParkAndRide = config.staticBikeParkAndRide;
     this.staticParkAndRide = config.staticParkAndRide;
-    this.banDiscouragedWalking = config.banDiscouragedWalking;
-    this.banDiscouragedBiking = config.banDiscouragedBiking;
     this.maxAreaNodes = config.maxAreaNodes;
   }
 
   @Override
   public void buildGraph() {
     OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
-    Handler handler = new Handler(graph, osmdb);
+    Handler handler = new Handler(
+      graph,
+      osmdb,
+      issueStore,
+      () -> staticParkAndRide,
+      () -> staticBikeParkAndRide,
+      () -> platformEntriesLinking,
+      () -> customNamer,
+      () -> maxAreaNodes,
+      areaVisibility,
+      boardingAreaRefTags,
+      banDiscouragedWalking,
+      banDiscouragedBiking,
+      elevationData
+    );
     for (OpenStreetMapProvider provider : providers) {
       LOG.info("Gathering OSM from provider: {}", provider);
       LOG.info(
@@ -157,7 +182,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   private record StreetEdgePair(StreetEdge main, StreetEdge back) {}
 
-  protected class Handler {
+  protected static class Handler {
 
     private static final String nodeLabelFormat = "osm:node:%d";
 
@@ -166,6 +191,18 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     private final Graph graph;
 
     private final OSMDatabase osmdb;
+    private final DataImportIssueStore issueStore;
+    private final Supplier<Boolean> staticParkAndRide;
+    private final Supplier<Boolean> staticBikeParkAndRide;
+    private final Supplier<Boolean> platformEntriesLinking;
+    private final Supplier<CustomNamer> customNamer;
+    private final Supplier<Integer> maxAreaNodes;
+    private final boolean areaVisibility;
+    private final Set<String> boardingAreaRefTags;
+    private final boolean banDiscouragedWalking;
+    private final boolean banDiscouragedBiking;
+    private final Map<Vertex, Double> elevationData;
+
     // track OSM nodes which are decomposed into multiple graph vertices because they are
     // elevators. later they will be iterated over to build ElevatorEdges between them.
     private final HashMap<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
@@ -180,9 +217,35 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      */
     private float bestWalkSafety = 1.0f;
 
-    public Handler(Graph graph, OSMDatabase osmdb) {
+    // TODO Decouple this class further, decrease the number of constructor parameters.
+    public Handler(
+      Graph graph,
+      OSMDatabase osmdb,
+      DataImportIssueStore issueStore,
+      Supplier<Boolean> staticParkAndRide,
+      Supplier<Boolean> staticBikeParkAndRide,
+      Supplier<Boolean> platformEntriesLinking,
+      Supplier<CustomNamer> customNamer,
+      Supplier<Integer> maxAreaNodes,
+      boolean areaVisibility,
+      Set<String> boardingAreaRefTags,
+      boolean banDiscouragedWalking,
+      boolean banDiscouragedBiking,
+      Map<Vertex, Double> elevationData
+    ) {
       this.graph = graph;
       this.osmdb = osmdb;
+      this.issueStore = issueStore;
+      this.staticParkAndRide = staticParkAndRide;
+      this.staticBikeParkAndRide = staticBikeParkAndRide;
+      this.platformEntriesLinking = platformEntriesLinking;
+      this.customNamer = customNamer;
+      this.maxAreaNodes = maxAreaNodes;
+      this.areaVisibility = areaVisibility;
+      this.boardingAreaRefTags = boardingAreaRefTags;
+      this.banDiscouragedWalking = banDiscouragedWalking;
+      this.banDiscouragedBiking = banDiscouragedBiking;
+      this.elevationData = elevationData;
     }
 
     public void buildGraph() {
@@ -190,14 +253,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
       var parkingLots = new ArrayList<VehicleParking>();
 
-      if (staticParkAndRide) {
+      if (staticParkAndRide.get()) {
         var carParkingNodes = parkingProcessor.buildParkAndRideNodes(
           osmdb.getCarParkingNodes(),
           true
         );
         parkingLots.addAll(carParkingNodes);
       }
-      if (staticBikeParkAndRide) {
+      if (staticBikeParkAndRide.get()) {
         var bikeParkingNodes = parkingProcessor.buildParkAndRideNodes(
           osmdb.getBikeParkingNodes(),
           false
@@ -215,15 +278,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       initIntersectionNodes();
 
       buildBasicGraph();
-      buildWalkableAreas(!areaVisibility, platformEntriesLinking);
+      buildWalkableAreas(!areaVisibility, platformEntriesLinking.get());
 
-      if (staticParkAndRide) {
+      if (staticParkAndRide.get()) {
         List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
         var carParkingAreas = parkingProcessor.buildParkAndRideAreas(areaGroups);
         parkingLots.addAll(carParkingAreas);
         LOG.info("Created {} car P+R areas.", carParkingAreas.size());
       }
-      if (staticBikeParkAndRide) {
+      if (staticBikeParkAndRide.get()) {
         List<AreaGroup> areaGroups = groupAreas(osmdb.getBikeParkingAreas());
         var bikeParkingAreas = parkingProcessor.buildBikeParkAndRideAreas(areaGroups);
         parkingLots.addAll(bikeParkingAreas);
@@ -244,8 +307,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
       unifyTurnRestrictions();
 
-      if (customNamer != null) {
-        customNamer.postprocess(graph);
+      if (customNamer.get() != null) {
+        customNamer.get().postprocess(graph);
       }
 
       applySafetyFactors(graph);
@@ -315,8 +378,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     protected I18NString getNameForWay(OSMWithTags way, String id) {
       I18NString name = way.getAssumedName();
 
-      if (customNamer != null && name != null) {
-        name = new NonLocalizedString(customNamer.name(way, name.toString()));
+      if (customNamer.get() != null && name != null) {
+        name = new NonLocalizedString(customNamer.get().name(way, name.toString()));
       }
 
       if (name == null) {
@@ -439,7 +502,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         osmdb,
         this,
         issueStore,
-        maxAreaNodes,
+        maxAreaNodes.get(),
         platformEntriesLinking,
         boardingAreaRefTags
       );
@@ -977,8 +1040,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         issueStore.add(new StreetCarSpeedZero(way));
       }
 
-      if (customNamer != null) {
-        customNamer.nameWithEdge(way, street);
+      if (customNamer.get() != null) {
+        customNamer.get().nameWithEdge(way, street);
       }
 
       return street;

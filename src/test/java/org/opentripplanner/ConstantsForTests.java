@@ -160,6 +160,8 @@ public class ConstantsForTests {
           // Need to use a mutable set here, since it is used
           graph,
           DataImportIssueStore.NOOP,
+          false,
+          false,
           false
         );
         osmModule.staticBikeParkAndRide = true;
@@ -209,6 +211,8 @@ public class ConstantsForTests {
         Set.of(),
         graph,
         DataImportIssueStore.NOOP,
+        false,
+        false,
         false
       );
       osmModule.buildGraph();
@@ -267,6 +271,8 @@ public class ConstantsForTests {
           Set.of(),
           graph,
           DataImportIssueStore.NOOP,
+          false,
+          false,
           false
         );
         osmModule.buildGraph();

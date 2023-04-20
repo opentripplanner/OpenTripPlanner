@@ -62,7 +62,9 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       gg,
       DataImportIssueStore.NOOP,
-      true
+      true,
+      false,
+      false
     );
 
     osmModule.buildGraph();
@@ -129,7 +131,9 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       gg,
       DataImportIssueStore.NOOP,
-      true
+      true,
+      false,
+      false
     );
 
     osmModule.buildGraph();
@@ -330,6 +334,8 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       graph,
       DataImportIssueStore.NOOP,
+      false,
+      false,
       false
     );
     module.staticParkAndRide = true;
@@ -364,7 +370,9 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       graph,
       DataImportIssueStore.NOOP,
-      !skipVisibility
+      !skipVisibility,
+      false,
+      false
     );
 
     loader.buildGraph();
