@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
+import org.opentripplanner.framework.lang.IntRange;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -141,21 +143,22 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     int requestedDepartureTime,
     int fromStopIndex,
     int toStopIndex,
-    int flexTripDurationSeconds
+    int tripDurationSeconds
   ) {
-    StopTimeWindow fromStopTime = stopTimes[fromStopIndex];
-    StopTimeWindow toStopTime = stopTimes[toStopIndex];
+    var optionalDepartureTimeWindow = departureTimeWindow(
+      fromStopIndex,
+      toStopIndex,
+      tripDurationSeconds
+    );
 
-    int earliestDepartureTime = Math.max(requestedDepartureTime, fromStopTime.start());
-
-    if (
-      fromStopTime.end() < earliestDepartureTime ||
-      toStopTime.end() < (earliestDepartureTime + flexTripDurationSeconds)
-    ) {
+    if (optionalDepartureTimeWindow.isEmpty()) {
       return MISSING_VALUE;
     }
-
-    return earliestDepartureTime;
+    var win = optionalDepartureTimeWindow.get();
+    if (win.endInclusive() < requestedDepartureTime) {
+      return MISSING_VALUE;
+    }
+    return Math.max(requestedDepartureTime, win.startInclusive());
   }
 
   @Override
@@ -165,24 +168,25 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   @Override
   public int latestArrivalTime(
-    int arrivalTime,
+    int requestedArrivalTime,
     int fromStopIndex,
     int toStopIndex,
-    int flexTripDurationSeconds
+    int tripDurationSeconds
   ) {
-    StopTimeWindow fromStopTime = stopTimes[fromStopIndex];
-    StopTimeWindow toStopTime = stopTimes[toStopIndex];
+    var optionalArrivalTimeWindow = arrivalTimeWindow(
+      fromStopIndex,
+      toStopIndex,
+      tripDurationSeconds
+    );
 
-    int latestArrivalTime = Math.min(arrivalTime, toStopTime.end());
-
-    if (
-      toStopTime.start() > latestArrivalTime ||
-      fromStopTime.start() > (latestArrivalTime - flexTripDurationSeconds)
-    ) {
+    if (optionalArrivalTimeWindow.isEmpty()) {
       return MISSING_VALUE;
     }
-
-    return latestArrivalTime;
+    var win = optionalArrivalTimeWindow.get();
+    if (win.startInclusive() > requestedArrivalTime) {
+      return MISSING_VALUE;
+    }
+    return Math.min(requestedArrivalTime, win.endInclusive());
   }
 
   @Override
@@ -291,5 +295,33 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       }
     }
     return -1;
+  }
+
+  private Optional<IntRange> departureTimeWindow(
+    int fromStopIndex,
+    int toStopIndex,
+    int tripDurationSeconds
+  ) {
+    // Align the from and to time-windows by subtracting the trip-duration from the to-time-window.
+    var fromTime = stopTimes[fromStopIndex].timeWindow();
+    var toTimeShifted = stopTimes[toStopIndex].timeWindow().minus(tripDurationSeconds);
+
+    // Then take the intersection of the aligned windows to find the window where the
+    // requested-departure-time must be within
+    return fromTime.intersect(toTimeShifted);
+  }
+
+  private Optional<IntRange> arrivalTimeWindow(
+    int fromStopIndex,
+    int toStopIndex,
+    int tripDurationSeconds
+  ) {
+    // Align the from and to time-windows by adding the trip-duration to the from-time-window.
+    var fromTimeShifted = stopTimes[fromStopIndex].timeWindow().plus(tripDurationSeconds);
+    var toTime = stopTimes[toStopIndex].timeWindow();
+
+    // Then take the intersection of the aligned windows to find the window where the
+    // requested-arrival-time must be within
+    return toTime.intersect(fromTimeShifted);
   }
 }

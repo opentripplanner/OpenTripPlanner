@@ -148,7 +148,7 @@ public abstract class FlexAccessEgressTemplate {
   protected abstract Vertex getFlexVertex(Edge edge);
 
   /**
-   * Braek down the time spent on flex ride/path in access, trip and egress.
+   * Break down the time spent on flex ride/path in access, trip and egress.
    */
   protected abstract FlexPathDurations calculateFlexPathDurations(
     FlexTripEdge flexEdge,
