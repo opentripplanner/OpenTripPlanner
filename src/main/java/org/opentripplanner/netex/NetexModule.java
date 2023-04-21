@@ -6,9 +6,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
-import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -79,8 +77,6 @@ public class NetexModule implements GraphBuilderModule {
             .addAll(FlexTripsMapper.createFlexTrips(transitBuilder, issueStore));
         }
 
-        validateStopTimesForEachTrip(transitBuilder.getStopTimesSortedByTrip());
-
         OtpTransitService otpService = transitBuilder.build();
 
         // if this or previously processed netex bundle has transit that has not been filtered out
@@ -106,10 +102,6 @@ public class NetexModule implements GraphBuilderModule {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private void validateStopTimesForEachTrip(TripStopTimes stopTimesByTrip) {
-    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, false, false, issueStore).run();
   }
 
   @Override

@@ -455,7 +455,7 @@ public class NetexMapper {
       .localValues()) {
       TripPatternMapperResult result = tripPatternMapper.mapTripPattern(journeyPattern);
 
-      for (Map.Entry<Trip, List<StopTime>> it : result.tripStopTimes.entrySet()) {
+      for (Map.Entry<Trip, List<StopTime>> it : result.tripStopTimes.asImmutableMap().entrySet()) {
         transitBuilder.getStopTimesSortedByTrip().put(it.getKey(), it.getValue());
         transitBuilder.getTripsById().add(it.getKey());
       }

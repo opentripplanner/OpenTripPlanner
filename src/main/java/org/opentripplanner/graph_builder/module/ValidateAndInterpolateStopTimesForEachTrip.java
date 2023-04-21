@@ -8,7 +8,6 @@ import java.util.List;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.HopSpeedFast;
@@ -23,18 +22,12 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for making sure, that all trips have arrival and departure times for
  * all stops. It also removes all stop times for trips, which have invalid stop times.
  */
 public class ValidateAndInterpolateStopTimesForEachTrip {
-
-  private static final Logger LOG = LoggerFactory.getLogger(
-    ValidateAndInterpolateStopTimesForEachTrip.class
-  );
 
   /** Do not report zero-time hops less than 1km */
   private static final double MIN_ZERO_TIME_HOP_DISTANCE_METERS = 1000.0;
@@ -57,10 +50,6 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
   }
 
   public void run() {
-    final int tripSize = stopTimesByTrip.size();
-    var progress = ProgressTracker.track("Validate StopTimes", 100_000, tripSize);
-    LOG.info(progress.startMessage());
-
     for (Trip trip : stopTimesByTrip.keys()) {
       // Fetch the stop times for this trip. Copy the list since it's immutable.
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
@@ -85,12 +74,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
         stopTimes.removeIf(st -> !st.isArrivalTimeSet() || !st.isDepartureTimeSet());
         stopTimesByTrip.replace(trip, stopTimes);
       }
-
-      //noinspection Convert2MethodRef
-      progress.step(m -> LOG.info(m));
     }
-
-    LOG.info(progress.completeMessage());
   }
 
   /**
