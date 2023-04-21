@@ -71,7 +71,9 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
         interpolateStopTimes(stopTimes);
         stopTimesByTrip.replace(trip, stopTimes);
       } else {
-        stopTimes.removeIf(st -> !st.isArrivalTimeSet() || !st.isDepartureTimeSet());
+        stopTimes.removeIf(st ->
+          (!st.isArrivalTimeSet() || !st.isDepartureTimeSet()) && !st.isFlexWindowSet()
+        );
         stopTimesByTrip.replace(trip, stopTimes);
       }
     }

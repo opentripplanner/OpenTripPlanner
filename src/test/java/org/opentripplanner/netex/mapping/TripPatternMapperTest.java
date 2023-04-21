@@ -140,6 +140,42 @@ class TripPatternMapperTest {
   }
 
   @Test
+  void testMapTripPatternWithFlexibleTrip() {
+    NetexTestDataSample sample = new NetexTestDataSample();
+
+    HierarchicalMapById<ServiceJourney> serviceJourneyById = sample.getServiceJourneyById();
+    ServiceJourney serviceJourney = serviceJourneyById
+      .localValues()
+      .stream()
+      .findFirst()
+      .orElseThrow();
+    // remove arrival time and departure time and add flex window
+    TimetabledPassingTime timetabledPassingTime = serviceJourney
+      .getPassingTimes()
+      .getTimetabledPassingTime()
+      .get(0);
+    timetabledPassingTime
+      .withArrivalTime(null)
+      .withDepartureTime(null)
+      .withEarliestDepartureTime(LocalTime.MIDNIGHT)
+      .withLatestArrivalTime(LocalTime.MIDNIGHT.plusMinutes(1));
+
+    DataImportIssueStore issueStore = new DefaultDataImportIssueStore();
+    TripPatternMapper tripPatternMapper = tripPatternMapper(sample, serviceJourneyById, issueStore);
+
+    TripPatternMapperResult r = tripPatternMapper.mapTripPattern(sample.getJourneyPattern());
+
+    assertEquals(1, r.tripPatterns.size());
+    TripPattern tripPattern = r.tripPatterns.values().stream().findFirst().orElseThrow();
+    assertEquals(4, tripPattern.numberOfStops());
+    assertEquals(
+      1,
+      tripPattern.scheduledTripsAsStream().count(),
+      "Flexible trips should not be filtered out"
+    );
+  }
+
+  @Test
   void testMapTripPatternWithDatedServiceJourney() {
     NetexTestDataSample sample = new NetexTestDataSample();
 
