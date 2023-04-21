@@ -510,7 +510,8 @@ public class TripQuery {
           .newArgument()
           .name("maxAccessEgressDurationForMode")
           .description(
-            "Maximum duration for access/egress for street searches per respective mode. Cannot be higher than default value"
+            Maximum duration for access/egress for street searches per respective mode. Cannot be higher than
+            default value. This is a performance optimisation parameter, avoid using it to limit the search.
           )
           .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
           .build()
