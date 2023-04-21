@@ -116,6 +116,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix precedence rules for NeTEx flexible line booking information [#5021](https://github.com/opentripplanner/OpenTripPlanner/pull/5021)
 - Uber ride hailing [#4979](https://github.com/opentripplanner/OpenTripPlanner/pull/4979)
 - Add 'config' parameter to REST API [#5049](https://github.com/opentripplanner/OpenTripPlanner/pull/5049)
+- Fix transferCacheRequests when custom streetRoutingTimeout is set [#5039](https://github.com/opentripplanner/OpenTripPlanner/pull/5039)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
