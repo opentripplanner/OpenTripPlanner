@@ -510,8 +510,8 @@ public class TripQuery {
           .newArgument()
           .name("maxAccessEgressDurationForMode")
           .description(
-            Maximum duration for access/egress for street searches per respective mode. Cannot be higher than
-            default value. This is a performance optimisation parameter, avoid using it to limit the search.
+            "Maximum duration for access/egress for street searches per respective mode. " +
+            "Cannot be higher than default value. This is a performance optimisation parameter, avoid using it to limit the search. "
           )
           .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
           .build()
@@ -521,8 +521,8 @@ public class TripQuery {
           .newArgument()
           .name("maxDirectDurationForMode")
           .description(
-            Maximum duration for direct street searchers per respective mode. Cannot be higher than default value.
-            This is a performance optimisation parameter, avoid using it to limit the search.
+            "Maximum duration for direct street searchers per respective mode. " +
+            "Cannot be higher than default value. This is a performance optimisation parameter, avoid using it to limit the search."
           )
           .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
           .build()
