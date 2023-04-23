@@ -2767,7 +2767,6 @@ public class LegacyGraphQLTypes {
     OUTSIDE_SERVICE_PERIOD,
     SYSTEM_ERROR,
     WALKING_BETTER_THAN_TRANSIT,
-    PROCESSING_TIMEOUT,
   }
 
   public static class LegacyGraphQLStopAlertsArgs {
