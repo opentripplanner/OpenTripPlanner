@@ -167,20 +167,20 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
    * @throws DestinationNotReachedException if destination is not reached
    */
   private void runHeuristicsInParallel() {
-    Future<?> f = null;
+    fwdHeuristics.withRequest(originalRequest);
+    revHeuristics.withRequest(originalRequest);
+    Future<?> asyncResult = null;
     try {
-      fwdHeuristics.withRequest(originalRequest);
-      revHeuristics.withRequest(originalRequest);
-
-      f = config.threadPool().submit(fwdHeuristics::run);
+      asyncResult = config.threadPool().submit(fwdHeuristics::run);
       revHeuristics.run();
-      f.get();
+      asyncResult.get();
       LOG.debug(
         "Route using RangeRaptor - " + "REVERSE and FORWARD heuristic search performed in parallel."
       );
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       // propagate interruption to the running task.
-      f.cancel(true);
+      asyncResult.cancel(true);
       throw new OTPRequestTimeoutException();
     } catch (ExecutionException e) {
       if (e.getCause() instanceof DestinationNotReachedException) {

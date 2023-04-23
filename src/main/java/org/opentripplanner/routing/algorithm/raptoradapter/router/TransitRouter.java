@@ -4,8 +4,9 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import org.opentripplanner.ext.parallelrouting.ParallelRouting;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
@@ -177,16 +178,11 @@ public class TransitRouter {
     };
 
     if (OTPFeature.ParallelRouting.isOn()) {
-      try {
-        CompletableFuture
-          .allOf(
-            CompletableFuture.runAsync(accessCalculator),
-            CompletableFuture.runAsync(egressCalculator)
-          )
-          .join();
-      } catch (CompletionException e) {
-        RoutingValidationException.unwrapAndRethrowCompletionException(e);
-      }
+      List<Callable<Object>> tasks = List.of(
+        Executors.callable(accessCalculator),
+        Executors.callable(egressCalculator)
+      );
+      ParallelRouting.execute(tasks);
     } else {
       accessCalculator.run();
       egressCalculator.run();
