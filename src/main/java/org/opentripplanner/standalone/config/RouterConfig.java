@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.List;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -110,12 +111,12 @@ number of transit vehicles used in that itinerary.
           .summary("Configuration for the Transmodel GraphQL API.")
           .asObject()
       );
+    Duration streetRoutingTimeout = parseStreetRoutingTimeout(
+      root,
+      StreetPreferences.DEFAULT.routingTimeout()
+    );
     this.routingRequestDefaults =
-      RouteRequestConfig.mapDefaultRouteRequest(
-        root,
-        "routingDefaults",
-        parseStreetRoutingTimeout(root, StreetPreferences.DEFAULT.routingTimeout())
-      );
+      RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults", streetRoutingTimeout);
     this.transitConfig = new TransitRoutingConfig("transit", root, routingRequestDefaults);
     this.updatersParameters = new UpdatersConfig(root);
     this.rideHailingConfig = new RideHailingServicesConfig(root);
@@ -135,6 +136,18 @@ number of transit vehicles used in that itinerary.
         """
         )
         .asDuration(Duration.ofSeconds(-1));
+
+    if (
+      !apiProcessingTimeout.isNegative() && apiProcessingTimeout.compareTo(streetRoutingTimeout) < 0
+    ) {
+      throw new OtpAppException(
+        "streetRoutingTimeout (" +
+        streetRoutingTimeout +
+        ") must be shorter than apiProcessingTimeout (" +
+        apiProcessingTimeout +
+        ')'
+      );
+    }
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllWarnings(LOG::warn);
