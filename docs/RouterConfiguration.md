@@ -88,7 +88,8 @@ Maximum processing time for an API request
 
 This timeout limits the server-side processing time for a given API request.
 This does not include network latency nor waiting time in the HTTP server thread pool.
-The default value is -1s (infinite timeout).
+The default value is -1s (no timeout).
+The timeout is applied to all APIs (REST, Transmodel , Legacy GraphQL).
 
 
 <h3 id="configVersion">configVersion</h3>
