@@ -1046,6 +1046,9 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+                                    <keyname>74ED86891C2BCCD1352D928460B7785172A9FE89</keyname>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
