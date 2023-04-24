@@ -10,9 +10,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
-import org.opentripplanner.ext.parallelrouting.ParallelRouting;
+import java.util.concurrent.ExecutionException;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.concurrent.InterruptibleExecutor;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
@@ -105,7 +106,11 @@ public class RoutingWorker {
         () -> routeDirectFlex(itineraries, routingErrors),
         () -> routeTransit(itineraries, routingErrors)
       );
-      ParallelRouting.execute(tasks);
+      try {
+        InterruptibleExecutor.execute(tasks);
+      } catch (ExecutionException e) {
+        RoutingValidationException.unwrapAndRethrowExecutionException(e);
+      }
     } else {
       // Direct street routing
       routeDirectStreet(itineraries, routingErrors);

@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.parallelrouting;
+package org.opentripplanner.framework.concurrent;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -8,17 +8,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.routing.error.RoutingValidationException;
 
 /**
- * Support class for the Parallel Routing feature.
+ * Task Executor that provides support for interruption propagation.
  */
-public class ParallelRouting {
+public class InterruptibleExecutor {
 
-  private ParallelRouting() {}
+  private InterruptibleExecutor() {}
 
   /**
-   * Executor service for parallel routing. Similarly to {@link ForkJoinPool#commonPool()}, its size
+   * Executor service for interruptible tasks. Similarly to {@link ForkJoinPool#commonPool()}, its size
    * is the number of available processors minus 1.
    */
   private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(
@@ -26,12 +25,13 @@ public class ParallelRouting {
   );
 
   /**
-   * Execute a list of cancellable tasks in parallel. When the calling thread is interrupted, tasks
+   * Execute a list of tasks in parallel. When the calling thread is interrupted, tasks
    * that are still running are cancelled and their interrupted flag is set.
    */
-  public static void execute(List<Callable<Object>> tasks) {
+  public static void execute(List<Callable<Object>> tasks) throws ExecutionException {
     try {
-      // when interrupted, ExecutorService#invokeAll() cancels the tasks that are still running.
+      // when interrupted, ExecutorService#invokeAll() cancels the tasks that are still running
+      // and set the interrupted flag in the executing thread.
       List<Future<Object>> asyncResults = EXECUTOR_SERVICE.invokeAll(tasks);
       // retrieve the completed tasks to trigger ExecutionExceptions, if any.
       for (Future<Object> asyncResult : asyncResults) {
@@ -40,8 +40,6 @@ public class ParallelRouting {
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new OTPRequestTimeoutException();
-    } catch (ExecutionException e) {
-      RoutingValidationException.unwrapAndRethrowExecutionException(e);
     }
   }
 
