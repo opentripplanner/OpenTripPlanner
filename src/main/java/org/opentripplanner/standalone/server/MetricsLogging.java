@@ -93,8 +93,8 @@ public class MetricsLogging {
     if (OTPFeature.ParallelRouting.isOn()) {
       new ExecutorServiceMetrics(
         InterruptibleExecutor.threadPool(),
-        "parallelRouting",
-        List.of(Tag.of("pool", "parallelRouting"))
+        "interruptibleExecutor",
+        List.of(Tag.of("pool", "interruptibleExecutor"))
       )
         .bindTo(Metrics.globalRegistry);
     }
