@@ -94,21 +94,15 @@ class TransmodelGraph {
       maxResolves,
       tracingTags
     );
-    Object data = result.getData();
     List<GraphQLError> errors = result.getErrors();
-    if (errors.isEmpty()) {
-      return Response
-        .status(Response.Status.OK)
-        .entity(GraphQLResponseSerializer.serialize(result))
-        .build();
-    } else if (errors.stream().anyMatch(OTPProcessingTimeoutGraphQLException.class::isInstance)) {
+    if (errors.stream().anyMatch(OTPProcessingTimeoutGraphQLException.class::isInstance)) {
       return Response
         .status(OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY.statusCode())
         .entity(GraphQLResponseSerializer.serialize(result))
         .build();
     } else {
       return Response
-        .status(Response.Status.INTERNAL_SERVER_ERROR)
+        .status(Response.Status.OK)
         .entity(GraphQLResponseSerializer.serialize(result))
         .build();
     }

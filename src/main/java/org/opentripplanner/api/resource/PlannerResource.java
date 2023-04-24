@@ -107,7 +107,6 @@ public class PlannerResource extends RoutingResource {
       LOG.error("System error", e);
       PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
       response.setError(error);
-      return Response.serverError().entity(response).build();
     }
 
     /* Log this request if such logging is enabled. */
