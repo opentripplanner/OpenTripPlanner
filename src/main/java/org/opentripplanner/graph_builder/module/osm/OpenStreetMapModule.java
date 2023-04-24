@@ -71,41 +71,48 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private final Graph graph;
 
   private final boolean areaVisibility;
-  // Members that can be set by clients.
-  public boolean platformEntriesLinking = false;
+  private final boolean platformEntriesLinking;
   /**
    * Allows for arbitrary custom naming of edges.
    */
-  public CustomNamer customNamer;
+  private final CustomNamer customNamer;
   /**
    * Whether we should create car P+R stations from OSM data. The default value is true. In normal
    * operation it is set by the JSON graph build configuration, but it is also initialized to "true"
    * here to provide the default behavior in tests.
    */
-  public boolean staticParkAndRide = true;
+  private final boolean staticParkAndRide;
   /**
    * Whether we should create bike P+R stations from OSM data. (default false)
    */
-  public boolean staticBikeParkAndRide;
+  private final boolean staticBikeParkAndRide;
   public int maxAreaNodes = 500;
   /**
    * Whether ways tagged foot/bicycle=discouraged should be marked as inaccessible
    */
-  public boolean banDiscouragedWalking = false;
-  public boolean banDiscouragedBiking = false;
+  private boolean banDiscouragedWalking = false;
+  private boolean banDiscouragedBiking = false;
 
   public OpenStreetMapModule(
     Collection<OpenStreetMapProvider> providers,
     Set<String> boardingAreaRefTags,
     Graph graph,
     DataImportIssueStore issueStore,
-    boolean areaVisibility
+    CustomNamer customNamer,
+    boolean areaVisibility,
+    boolean platformEntriesLinking,
+    boolean staticParkAndRide,
+    boolean staticBikeParkAndRide
   ) {
     this.providers = List.copyOf(providers);
     this.boardingAreaRefTags = boardingAreaRefTags;
     this.graph = graph;
     this.issueStore = issueStore;
+    this.customNamer = customNamer;
     this.areaVisibility = areaVisibility;
+    this.platformEntriesLinking = platformEntriesLinking;
+    this.staticParkAndRide = staticParkAndRide;
+    this.staticBikeParkAndRide = staticBikeParkAndRide;
   }
 
   public OpenStreetMapModule(
@@ -115,11 +122,17 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Graph graph,
     DataImportIssueStore issueStore
   ) {
-    this(List.copyOf(providers), boardingAreaRefTags, graph, issueStore, config.areaVisibility);
-    this.customNamer = config.customNamer;
-    this.platformEntriesLinking = config.platformEntriesLinking;
-    this.staticBikeParkAndRide = config.staticBikeParkAndRide;
-    this.staticParkAndRide = config.staticParkAndRide;
+    this(
+      List.copyOf(providers),
+      boardingAreaRefTags,
+      graph,
+      issueStore,
+      config.customNamer,
+      config.areaVisibility,
+      config.platformEntriesLinking,
+      config.staticParkAndRide,
+      config.staticBikeParkAndRide
+    );
     this.banDiscouragedWalking = config.banDiscouragedWalking;
     this.banDiscouragedBiking = config.banDiscouragedBiking;
     this.maxAreaNodes = config.maxAreaNodes;

@@ -11,13 +11,11 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -57,13 +55,10 @@ public class TriangleInequalityTest {
       )
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
-    OpenStreetMapModule osmModule = new OpenStreetMapModule(
-      List.of(provider),
-      Set.of(),
-      graph,
-      DataImportIssueStore.NOOP,
-      true
-    );
+    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(provider, graph)
+      .withAreaVisibility(true)
+      .withStaticParkAndRide(false)
+      .build();
     osmModule.buildGraph();
   }
 

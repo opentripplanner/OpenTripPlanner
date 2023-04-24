@@ -157,15 +157,12 @@ public class UnconnectedAreasTest {
     File file = new File(fileUrl.getFile());
 
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
-    OpenStreetMapModule loader = new OpenStreetMapModule(
-      List.of(provider),
-      Set.of(),
-      graph,
-      issueStore,
-      true
-    );
-    loader.staticParkAndRide = true;
-    loader.staticBikeParkAndRide = true;
+    OpenStreetMapModule loader = OpenStreetMapModuleBuilder.of(provider, graph)
+      .setIssueStore(issueStore)
+      .withAreaVisibility(true)
+      .withStaticParkAndRide(true)
+      .withStaticBikeParkAndRide(true)
+      .build();
 
     loader.buildGraph();
 

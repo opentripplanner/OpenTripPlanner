@@ -9,6 +9,7 @@ import java.util.Set;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModuleBuilder;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -43,13 +44,8 @@ public class FakeGraph {
     File file = getFileForResource("columbus.osm.pbf");
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
 
-    OpenStreetMapModule osmModule = new OpenStreetMapModule(
-      List.of(provider),
-      Set.of(),
-      gg,
-      DataImportIssueStore.NOOP,
-      true
-    );
+    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(provider, gg)
+      .build();
 
     osmModule.buildGraph();
     return new TestOtpModel(gg, transitModel);

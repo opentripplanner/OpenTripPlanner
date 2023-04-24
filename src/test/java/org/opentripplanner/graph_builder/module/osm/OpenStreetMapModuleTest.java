@@ -57,13 +57,9 @@ public class OpenStreetMapModuleTest {
 
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
 
-    OpenStreetMapModule osmModule = new OpenStreetMapModule(
-      List.of(provider),
-      Set.of(),
-      gg,
-      DataImportIssueStore.NOOP,
-      true
-    );
+    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(provider, gg)
+      .withAreaVisibility(true)
+      .build();
 
     osmModule.buildGraph();
 
@@ -124,13 +120,10 @@ public class OpenStreetMapModuleTest {
       )
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
-    OpenStreetMapModule osmModule = new OpenStreetMapModule(
-      List.of(provider),
-      Set.of(),
-      gg,
-      DataImportIssueStore.NOOP,
-      true
-    );
+    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(provider, gg)
+      .setIssueStore(DataImportIssueStore.NOOP)
+      .withAreaVisibility(true)
+      .build();
 
     osmModule.buildGraph();
 
@@ -325,15 +318,11 @@ public class OpenStreetMapModuleTest {
       .map(f -> new File(getClass().getResource(f).getFile()))
       .map(f -> new OpenStreetMapProvider(f, false))
       .toList();
-    var module = new OpenStreetMapModule(
-      providers,
-      Set.of(),
-      graph,
-      DataImportIssueStore.NOOP,
-      false
-    );
-    module.staticParkAndRide = true;
-    module.staticBikeParkAndRide = true;
+    var module = OpenStreetMapModuleBuilder.of(providers, graph)
+      .withAreaVisibility(false)
+      .withStaticParkAndRide(true)
+      .withStaticBikeParkAndRide(true)
+      .build();
     module.buildGraph();
     return graph;
   }
@@ -359,13 +348,9 @@ public class OpenStreetMapModuleTest {
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
 
-    OpenStreetMapModule loader = new OpenStreetMapModule(
-      List.of(provider),
-      Set.of(),
-      graph,
-      DataImportIssueStore.NOOP,
-      !skipVisibility
-    );
+    OpenStreetMapModule loader = OpenStreetMapModuleBuilder.of(provider, graph)
+      .withAreaVisibility(!skipVisibility)
+      .build();
 
     loader.buildGraph();
 

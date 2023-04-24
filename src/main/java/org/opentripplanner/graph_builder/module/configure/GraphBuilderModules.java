@@ -27,6 +27,7 @@ import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryIm
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModuleBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
@@ -66,13 +67,18 @@ public class GraphBuilderModules {
       );
     }
 
-    return new OpenStreetMapModule(
-      config,
-      providers,
-      config.boardingLocationTags,
-      graph,
-      issueStore
-    );
+    return OpenStreetMapModuleBuilder.of(providers, graph)
+      .withCustomNamer(config.customNamer)
+      .withAreaVisibility(config.areaVisibility)
+      .withPlatformEntriesLinking(config.platformEntriesLinking)
+      .withStaticBikeParkAndRide(config.staticParkAndRide)
+      .withStaticBikeParkAndRide(config.staticBikeParkAndRide)
+    /*this.banDiscouragedWalking = config.banDiscouragedWalking;
+    this.banDiscouragedBiking = config.banDiscouragedBiking;
+    this.maxAreaNodes = config.maxAreaNodes;*/
+      .withBoardingAreaRefTags(config.boardingLocationTags)
+      .setIssueStore(issueStore)
+      .build();
   }
 
   @Provides
