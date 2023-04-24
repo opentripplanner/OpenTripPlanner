@@ -21,11 +21,10 @@ import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.ext.transmodelapi.support.OTPProcessingTimeoutGraphQLException;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.http.OtpHttpStatus;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 class TransmodelGraph {
-
-  private static final int STATUS_UNPROCESSABLE_ENTITY = 422;
 
   private final GraphQLSchema indexSchema;
 
@@ -104,7 +103,7 @@ class TransmodelGraph {
         .build();
     } else if (errors.stream().anyMatch(OTPProcessingTimeoutGraphQLException.class::isInstance)) {
       return Response
-        .status(STATUS_UNPROCESSABLE_ENTITY)
+        .status(OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY.statusCode())
         .entity(GraphQLResponseSerializer.serialize(result))
         .build();
     } else {

@@ -18,6 +18,7 @@ import org.opentripplanner.api.mapping.TripPlanMapper;
 import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
+import org.opentripplanner.framework.http.OtpHttpStatus;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -38,7 +39,6 @@ import org.slf4j.LoggerFactory;
 public class PlannerResource extends RoutingResource {
 
   private static final Logger LOG = LoggerFactory.getLogger(PlannerResource.class);
-  private static final int STATUS_UNPROCESSABLE_ENTITY = 422;
 
   /**
    * @deprecated The support for multiple routers are removed from OTP2. See
@@ -99,7 +99,10 @@ public class PlannerResource extends RoutingResource {
     } catch (OTPRequestTimeoutException e) {
       PlannerError error = new PlannerError(Message.PROCESSING_TIMEOUT);
       response.setError(error);
-      return Response.status(STATUS_UNPROCESSABLE_ENTITY).entity(response).build();
+      return Response
+        .status(OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY.statusCode())
+        .entity(response)
+        .build();
     } catch (Exception e) {
       LOG.error("System error", e);
       PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
