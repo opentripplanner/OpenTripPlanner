@@ -17,9 +17,15 @@ class RideHailingAccessAdapterTest {
     assertNotNull(state);
     var access = new DefaultAccessEgress(0, state);
     var adapter = new RideHailingAccessAdapter(access, Duration.ofMinutes(10));
-    var localTime = LocalTime.of(13, 0);
-    var secondsOfDay = adapter.earliestDepartureTime(localTime.toSecondOfDay());
-    var shifted = LocalTime.ofSecondOfDay(secondsOfDay);
-    assertEquals(LocalTime.of(13, 10), shifted);
+    var requestedStartTime = LocalTime.of(13, 0);
+    var shiftedDeparture = LocalTime.ofSecondOfDay(
+      adapter.earliestDepartureTime(requestedStartTime.toSecondOfDay())
+    );
+    assertEquals(LocalTime.of(13, 10), shiftedDeparture);
+
+    var shiftedArrival = LocalTime.ofSecondOfDay(
+      adapter.latestArrivalTime(requestedStartTime.plusMinutes(20).toSecondOfDay())
+    );
+    assertEquals(LocalTime.of(13, 30), shiftedArrival);
   }
 }

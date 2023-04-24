@@ -27,14 +27,23 @@ public class TestStateBuilder {
       );
   }
 
+  /**
+   * Create an initial state that starts walking.
+   */
   public static TestStateBuilder ofWalking() {
     return new TestStateBuilder(StreetMode.WALK);
   }
 
+  /**
+   * Create an initial state that start in a car.
+   */
   public static TestStateBuilder ofDriving() {
     return new TestStateBuilder(StreetMode.CAR);
   }
 
+  /**
+   * Traverse a very plain street edge with no special characteristics.
+   */
   public TestStateBuilder streetEdge() {
     count++;
     var from = (StreetVertex) currentState.vertex;
