@@ -9,7 +9,6 @@ on:
       - master
       - dev-1.x
       - dev-2.x
-      - graphq-docs
   pull_request:
     branches:
       - master
@@ -105,41 +104,26 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r docs/requirements.txt
         
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
 
       - name: Build main documentation
         if: github.event_name == 'pull_request'
         run: mkdocs build
 
-      - name: Build GTFS GraphQL documentation
-        run: |
-          npm install -g @magidoc/cli
-          magidoc generate
-          
-          git config --global user.name 'OTP Bot'
-          git config --global user.email 'bot@opentripplanner.org'
-          
-          git fetch origin gh-pages
-          git checkout gh-pages
-          mkdir -p api
-          mv target/magidocs/api/ api/dev-2.x/
-          git add api
-          git commit -am "Add Magidoc documentation"
-          git push
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
-      - name: Deploy docs to Github pages
+      - name: Build GTFS GraphQL API documentation
+        run: |
+          npm install -g @magidoc/cli@3.6.4
+          magidoc generate
+
+      - name: Deploy compiled HTML to Github pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
         run: |
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
           
-          # mkdocs/mike generates a new sitemap.xml.gz for every commit even if the docs have not changed
-          # this configures the date of the change to be the date when the docs haven been changed last
-          # https://github.com/jimporter/mike/issues/103#issuecomment-1453878471
-          export SOURCE_DATE_EPOCH=`git log -1 --format=%ct docs`
-
           # mike, the versioning plugin for mkdocs, expects there to be a local branch to push to so
           # we are cloning one here and commit to it
           # mike has support for specifing the origin but then it tries to rebase the _local_ gh-pages
@@ -157,6 +141,14 @@ jobs:
           else
             mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
           fi
+          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
+          
+          # commit and push the GraphQL documentation
+          git checkout $LOCAL_BRANCH
+          mkdir -p api
+          mv target/magidoc/api/ api/dev-2.x/
+          git add api
+          git commit -am "Add Magidoc GraphQL documentation"
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
   graphql-code-generation:
