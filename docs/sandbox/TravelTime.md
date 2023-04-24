@@ -29,7 +29,7 @@ The feature must be enabled in otp-config.json as follows:
 ### API parameters
 
 - `location` Origin of the search, can be either `latitude,longitude` or a stop id
-- `time` Departure time as a ISO-8601 time and date. The dafault value is the current time.
+- `time` Departure time as a ISO-8601 time and date (example `2023-04-24T15:40:12+02:00`). The default value is the current time.
 - `cutoff` The maximum travel duration as a ISO-8601 duration. The `PT` can be dropped to simplify the value. 
   This parameter can be given multiple times to include multiple isochrones in a single request.
   The default value is one hour.
@@ -52,4 +52,6 @@ travel time in seconds.
 
 ### Example Request
 
-```http://192.168.2.200:8080/otp/traveltime/isochrone?batch=true&location=52.49995911358581,13.388803470777475&time=2023-04-12T10:19:03%2B02:00&modes=WALK,TRANSIT&arriveBy=false&cutoff=0H30M17S```
+```
+http://localhost:8080/otp/traveltime/isochrone?batch=true&location=52.499959,13.388803&time=2023-04-12T10:19:03%2B02:00&modes=WALK,TRANSIT&arriveBy=false&cutoff=30M17S
+```
