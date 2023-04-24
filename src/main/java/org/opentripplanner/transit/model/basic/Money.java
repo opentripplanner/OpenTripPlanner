@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.model.basic;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.Locale;
@@ -34,7 +36,11 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
    */
   public double fractionalAmount() {
     int fractionDigits = currency.getDefaultFractionDigits();
-    return Math.round(amount / Math.pow(10, fractionDigits));
+    var divisor = BigDecimal.valueOf(Math.pow(10, fractionDigits));
+    return new BigDecimal(amount)
+      .setScale(fractionDigits, RoundingMode.HALF_UP)
+      .divide(divisor, RoundingMode.HALF_UP)
+      .doubleValue();
   }
 
   public String localize(Locale loc) {
