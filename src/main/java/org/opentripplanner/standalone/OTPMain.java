@@ -202,7 +202,7 @@ public class OTPMain {
             throwable
           );
         }
-        logLocationOfRequestLog(app.routerConfig().requestLogFile());
+        logLocationOfRequestLog(app.routerConfig().server().requestLogFile());
       }
     }
   }

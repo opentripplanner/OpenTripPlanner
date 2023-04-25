@@ -1,6 +1,8 @@
 {
   "configVersion": "v2.2.0-EN000121",
-  "streetRoutingTimeout": "5s",
+  "server": {
+    "apiProcessingTimeout" : "7s"
+  },
   "routingDefaults": {
     "walkSpeed": 1.3,
     "bikeSpeed": 5,
@@ -61,6 +63,7 @@
       "routes": ["HSL:456"]
     },
     "unpreferredCost": "600 + 2.0 x",
+    "streetRoutingTimeout": "5s",
     "transferOptimization": {
       "optimizeTransferWaitTime": true,
       "minSafeWaitTimeFactor": 5.0,
