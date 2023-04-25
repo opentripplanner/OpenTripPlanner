@@ -67,13 +67,14 @@ public class GraphBuilderModules {
       );
     }
 
-    return OpenStreetMapModuleBuilder.of(providers, graph)
+    return OpenStreetMapModuleBuilder
+      .of(providers, graph)
       .withCustomNamer(config.customNamer)
       .withAreaVisibility(config.areaVisibility)
       .withPlatformEntriesLinking(config.platformEntriesLinking)
-      .withStaticBikeParkAndRide(config.staticParkAndRide)
+      .withStaticParkAndRide(config.staticParkAndRide)
       .withStaticBikeParkAndRide(config.staticBikeParkAndRide)
-    /*this.banDiscouragedWalking = config.banDiscouragedWalking;
+      /*this.banDiscouragedWalking = config.banDiscouragedWalking;
     this.banDiscouragedBiking = config.banDiscouragedBiking;
     this.maxAreaNodes = config.maxAreaNodes;*/
       .withBoardingAreaRefTags(config.boardingLocationTags)

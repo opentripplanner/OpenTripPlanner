@@ -57,7 +57,8 @@ public class OpenStreetMapModuleTest {
 
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
 
-    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(provider, gg)
+    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
+      .of(provider, gg)
       .withAreaVisibility(true)
       .build();
 
@@ -120,7 +121,8 @@ public class OpenStreetMapModuleTest {
       )
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
-    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(provider, gg)
+    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
+      .of(provider, gg)
       .setIssueStore(DataImportIssueStore.NOOP)
       .withAreaVisibility(true)
       .build();
@@ -318,7 +320,8 @@ public class OpenStreetMapModuleTest {
       .map(f -> new File(getClass().getResource(f).getFile()))
       .map(f -> new OpenStreetMapProvider(f, false))
       .toList();
-    var module = OpenStreetMapModuleBuilder.of(providers, graph)
+    var module = OpenStreetMapModuleBuilder
+      .of(providers, graph)
       .withAreaVisibility(false)
       .withStaticParkAndRide(true)
       .withStaticBikeParkAndRide(true)
@@ -348,7 +351,8 @@ public class OpenStreetMapModuleTest {
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
 
-    OpenStreetMapModule loader = OpenStreetMapModuleBuilder.of(provider, graph)
+    OpenStreetMapModule loader = OpenStreetMapModuleBuilder
+      .of(provider, graph)
       .withAreaVisibility(!skipVisibility)
       .build();
 

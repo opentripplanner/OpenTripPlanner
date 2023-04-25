@@ -154,7 +154,8 @@ public class ConstantsForTests {
       {
         File osmFile = new File(PORTLAND_CENTRAL_OSM);
         OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, false);
-        OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(osmProvider, graph)
+        OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
+          .of(osmProvider, graph)
           .withStaticParkAndRide(true)
           .withStaticBikeParkAndRide(true)
           .build();
@@ -198,8 +199,7 @@ public class ConstantsForTests {
       // Add street data from OSM
       File osmFile = new File(osmPath);
       OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, true);
-      OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(osmProvider, graph)
-        .build();
+      OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(osmProvider, graph).build();
       osmModule.buildGraph();
       return new TestOtpModel(graph, transitModel);
     } catch (Exception e) {
@@ -251,8 +251,7 @@ public class ConstantsForTests {
         File osmFile = new File(OSLO_EAST_OSM);
 
         OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, false);
-        OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(osmProvider, graph)
-          .build();
+        OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(osmProvider, graph).build();
         osmModule.buildGraph();
       }
       // Add transit data from Netex

@@ -9,6 +9,7 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 
 public class OpenStreetMapModuleBuilder {
+
   private final Collection<OpenStreetMapProvider> providers;
   private final Graph graph;
   private Set<String> boardingAreaRefTags = Set.of();
@@ -16,17 +17,24 @@ public class OpenStreetMapModuleBuilder {
   private CustomNamer customNamer;
   private boolean areaVisibility = false;
   private boolean platformEntriesLinking = false;
-  private boolean staticParkAndRide =false;
+  private boolean staticParkAndRide = false;
   private boolean staticBikeParkAndRide = false;
+  private boolean banDiscouragedWalking = false;
+  private boolean banDiscouragedBiking = false;
+  private int maxAreaNodes;
 
-  private OpenStreetMapModuleBuilder(Collection<OpenStreetMapProvider> providers, Graph graph){
+  private OpenStreetMapModuleBuilder(Collection<OpenStreetMapProvider> providers, Graph graph) {
     this.providers = providers;
     this.graph = graph;
   }
 
-  public static OpenStreetMapModuleBuilder of(Collection<OpenStreetMapProvider> providers, Graph graph) {
+  public static OpenStreetMapModuleBuilder of(
+    Collection<OpenStreetMapProvider> providers,
+    Graph graph
+  ) {
     return new OpenStreetMapModuleBuilder(providers, graph);
   }
+
   public static OpenStreetMapModuleBuilder of(OpenStreetMapProvider provider, Graph graph) {
     return new OpenStreetMapModuleBuilder(List.of(provider), graph);
   }
@@ -73,10 +81,13 @@ public class OpenStreetMapModuleBuilder {
       graph,
       issueStore,
       customNamer,
+      maxAreaNodes,
       areaVisibility,
       platformEntriesLinking,
       staticParkAndRide,
-      staticBikeParkAndRide
+      staticBikeParkAndRide,
+      banDiscouragedWalking,
+      banDiscouragedBiking
     );
   }
 }

@@ -86,8 +86,8 @@ class OsmBoardingLocationsModuleTest {
       new NonLocalizedString("bus stop not connected to street network"),
       Set.of(floatingBusVertex.getStop().getId().getId())
     );
-    var osmModule = OpenStreetMapModuleBuilder.of(
-      provider, graph)
+    var osmModule = OpenStreetMapModuleBuilder
+      .of(provider, graph)
       .withBoardingAreaRefTags(Set.of("ref", "ref:IFOPT"))
       .withAreaVisibility(areaVisibility)
       .build();

@@ -43,7 +43,8 @@ public class UnroutableTest {
     URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
     File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), StandardCharsets.UTF_8));
     OpenStreetMapProvider provider = new OpenStreetMapProvider(osmDataFile, true);
-    OpenStreetMapModule osmBuilder = OpenStreetMapModuleBuilder.of(provider, graph)
+    OpenStreetMapModule osmBuilder = OpenStreetMapModuleBuilder
+      .of(provider, graph)
       .withAreaVisibility(true)
       .withStaticParkAndRide(false)
       .build();

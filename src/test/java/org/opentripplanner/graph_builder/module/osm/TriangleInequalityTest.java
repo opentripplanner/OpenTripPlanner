@@ -55,7 +55,8 @@ public class TriangleInequalityTest {
       )
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
-    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(provider, graph)
+    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
+      .of(provider, graph)
       .withAreaVisibility(true)
       .withStaticParkAndRide(false)
       .build();

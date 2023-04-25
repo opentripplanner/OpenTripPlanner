@@ -89,7 +89,8 @@ public class PruneNoThruIslandsTest {
         @Override
         public void configure() {}
       };
-      OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(osmProvider, graph)
+      OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
+        .of(osmProvider, graph)
         .withCustomNamer(customNamer)
         .build();
 

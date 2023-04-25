@@ -44,8 +44,7 @@ public class FakeGraph {
     File file = getFileForResource("columbus.osm.pbf");
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
 
-    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(provider, gg)
-      .build();
+    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(provider, gg).build();
 
     osmModule.buildGraph();
     return new TestOtpModel(gg, transitModel);
