@@ -132,7 +132,7 @@ number of transit vehicles used in that itinerary.
           """
        This timeout limits the server-side processing time for a given API request.
        This does not include network latency nor waiting time in the HTTP server thread pool.
-       The default value is -1s (no timeout).
+       The default value is `-1s` (no timeout).
        The timeout is applied to all APIs (REST, Transmodel , Legacy GraphQL).
         """
         )

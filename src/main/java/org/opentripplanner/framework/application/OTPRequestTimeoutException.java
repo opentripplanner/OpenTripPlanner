@@ -1,7 +1,7 @@
 package org.opentripplanner.framework.application;
 
 /**
- * This Exception is used to signal that the current (HTTP) request has timeout.
+ * This Exception is used to signal that the current (HTTP) request has timed out.
  */
 public class OTPRequestTimeoutException extends RuntimeException {
 
@@ -11,9 +11,9 @@ public class OTPRequestTimeoutException extends RuntimeException {
   }
 
   /**
-   * The Grizzly web server is configured with a transaction timeout. The Grizzly server
-   * will set the interrupt flag on the current thread. OTP do not have many blocking operations
-   * witch check the interrupted flag, so instead we need to do the check manually. The check has
+   * The Grizzly web server is configured with a transaction timeout and
+   * will set the interrupt flag on the current thread. OTP does not have many blocking operations
+   * which check the interrupted flag, so instead we need to do the check manually. The check has
    * a small performance overhead so try to place the check in the beginning of significantly big
    * finite block of calculations.
    */

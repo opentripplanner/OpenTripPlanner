@@ -31,7 +31,7 @@ public class InterruptibleExecutor {
   public static void execute(List<Callable<Object>> tasks) throws ExecutionException {
     try {
       // when interrupted, ExecutorService#invokeAll() cancels the tasks that are still running
-      // and set the interrupted flag in the executing thread.
+      // and sets the interrupted flag in the executing thread.
       List<Future<Object>> asyncResults = EXECUTOR_SERVICE.invokeAll(tasks);
       // retrieve the completed tasks to trigger ExecutionExceptions, if any.
       for (Future<Object> asyncResult : asyncResults) {
