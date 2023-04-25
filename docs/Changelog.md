@@ -5,6 +5,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 ## 2.4.0 (in progress)
 
+- Generate static documentation for GTFS GraphQL API [#5069](https://github.com/opentripplanner/OpenTripPlanner/pull/5069)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
