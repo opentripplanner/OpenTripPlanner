@@ -7,7 +7,7 @@ export default {
     template: 'carbon-multi-page',
     output: 'target/magidoc/api/graphql-gtfs/',
     options: {
-      siteRoot: '/api/dev-2.x/graphql-gtfs/',
+      siteRoot: '/api/dev-2.x/graphql-gtfs',
       appLogo: 'https://docs.opentripplanner.org/en/dev-2.x/images/otp-logo.svg',
       pages: [{
         title: 'Introduction',
