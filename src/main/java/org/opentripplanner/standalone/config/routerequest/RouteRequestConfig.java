@@ -35,14 +35,21 @@ public class RouteRequestConfig {
 
   private static final String WHEELCHAIR_ACCESSIBILITY = "wheelchairAccessibility";
 
-  public static RouteRequest mapDefaultRouteRequest(NodeAdapter root, String parameterName) {
+  public static RouteRequest mapDefaultRouteRequest(
+    NodeAdapter root,
+    String parameterName,
+    Duration streetRoutingTimeout
+  ) {
     var c = root
       .of(parameterName)
       .since(V2_0)
       .summary("The default parameters for the routing query.")
       .description("Most of these are overridable through the various API endpoints.")
       .asObject();
-    return mapRouteRequest(c);
+    var routeRequest = mapRouteRequest(c);
+    routeRequest.withPreferences(p -> p.withStreet(s -> s.withRoutingTimeout(streetRoutingTimeout))
+    );
+    return routeRequest;
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c) {

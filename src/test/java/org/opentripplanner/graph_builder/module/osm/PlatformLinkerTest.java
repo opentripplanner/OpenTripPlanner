@@ -43,7 +43,9 @@ public class PlatformLinkerTest {
       Set.of(),
       gg,
       DataImportIssueStore.NOOP,
-      true
+      true,
+      false,
+      false
     );
     osmModule.platformEntriesLinking = true;
 

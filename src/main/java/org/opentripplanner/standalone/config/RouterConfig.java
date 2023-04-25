@@ -13,6 +13,7 @@ import java.util.List;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.RideHailingServicesConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
@@ -108,18 +109,16 @@ number of transit vehicles used in that itinerary.
           .asObject()
       );
     this.routingRequestDefaults =
-      RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
+      RouteRequestConfig.mapDefaultRouteRequest(
+        root,
+        "routingDefaults",
+        parseStreetRoutingTimeout(root, StreetPreferences.DEFAULT.routingTimeout())
+      );
     this.transitConfig = new TransitRoutingConfig("transit", root, routingRequestDefaults);
     this.updatersParameters = new UpdatersConfig(root);
     this.rideHailingConfig = new RideHailingServicesConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig = new FlexConfig(root, "flex");
-
-    this.routingRequestDefaults.withPreferences(p ->
-        p.withStreet(s ->
-          s.withRoutingTimeout(parseStreetRoutingTimeout(root, s.original().routingTimeout()))
-        )
-      );
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllWarnings(LOG::warn);

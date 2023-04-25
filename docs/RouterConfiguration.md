@@ -423,7 +423,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 ```JSON
 // router-config.json
 {
-  "configVersion" : "v2.2.0-EN000121",
+  "configVersion" : "v2.3.0-EN000121",
   "streetRoutingTimeout" : "5s",
   "routingDefaults" : {
     "walkSpeed" : 1.3,

@@ -162,7 +162,9 @@ public class UnconnectedAreasTest {
       Set.of(),
       graph,
       issueStore,
-      true
+      true,
+      false,
+      false
     );
     loader.staticParkAndRide = true;
     loader.staticBikeParkAndRide = true;
