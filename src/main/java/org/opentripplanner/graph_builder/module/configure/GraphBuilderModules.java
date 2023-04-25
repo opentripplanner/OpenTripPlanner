@@ -77,7 +77,7 @@ public class GraphBuilderModules {
       .withBanDiscouragedBiking(config.banDiscouragedBiking)
       .withMaxAreaNodes(config.maxAreaNodes)
       .withBoardingAreaRefTags(config.boardingLocationTags)
-      .setIssueStore(issueStore)
+      .withIssueStore(issueStore)
       .build();
   }
 

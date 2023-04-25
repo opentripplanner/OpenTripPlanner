@@ -158,7 +158,7 @@ public class UnconnectedAreasTest {
     OsmProvider provider = new OsmProvider(file, false);
     OsmModule loader = OsmModule
       .of(provider, graph)
-      .setIssueStore(issueStore)
+      .withIssueStore(issueStore)
       .withAreaVisibility(true)
       .withStaticParkAndRide(true)
       .withStaticBikeParkAndRide(true)

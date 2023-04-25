@@ -35,7 +35,7 @@ public class OsmModuleBuilder {
     return this;
   }
 
-  public OsmModuleBuilder setIssueStore(DataImportIssueStore issueStore) {
+  public OsmModuleBuilder withIssueStore(DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
     return this;
   }
