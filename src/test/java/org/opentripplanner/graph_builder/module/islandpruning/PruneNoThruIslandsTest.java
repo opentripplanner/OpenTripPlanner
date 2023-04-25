@@ -79,6 +79,8 @@ public class PruneNoThruIslandsTest {
         Set.of(),
         graph,
         DataImportIssueStore.NOOP,
+        false,
+        false,
         false
       );
       osmModule.customNamer =

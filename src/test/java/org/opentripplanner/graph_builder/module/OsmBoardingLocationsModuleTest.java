@@ -93,7 +93,9 @@ class OsmBoardingLocationsModuleTest {
       Set.of("ref", "ref:IFOPT"),
       graph,
       DataImportIssueStore.NOOP,
-      areaVisibility
+      areaVisibility,
+      false,
+      false
     );
 
     osmModule.buildGraph();
