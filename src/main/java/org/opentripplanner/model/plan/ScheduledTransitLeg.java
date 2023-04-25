@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.ext.fares.model.FareProductInstance;
+import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -60,7 +60,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   private double distanceMeters;
   private final double directDistanceMeters;
   private final Float accessibilityScore;
-  private List<FareProductInstance> fareProducts = List.of();
+  private List<FareProductUse> fareProducts = List.of();
 
   public ScheduledTransitLeg(
     TripTimes tripTimes,
@@ -359,12 +359,12 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public void setFareProducts(List<FareProductInstance> products) {
+  public void setFareProducts(List<FareProductUse> products) {
     this.fareProducts = List.copyOf(products);
   }
 
   @Override
-  public List<FareProductInstance> fareProducts() {
+  public List<FareProductUse> fareProducts() {
     return fareProducts;
   }
 

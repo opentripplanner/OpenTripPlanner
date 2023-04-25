@@ -28,7 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.fares.model.FareProductInstance;
+import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -77,7 +77,7 @@ public class OrcaFareServiceTest {
 
     var rideCost = legFareProducts
       .stream()
-      .map(FareProductInstance::product)
+      .map(FareProductUse::product)
       .filter(fp ->
         fp.medium().name().equals("electronic") &&
         fp.category().name().equals("regular") &&
@@ -91,7 +91,7 @@ public class OrcaFareServiceTest {
 
     var transfer = legFareProducts
       .stream()
-      .map(FareProductInstance::product)
+      .map(FareProductUse::product)
       .filter(fp ->
         fp.medium().name().equals("electronic") &&
         fp.category().name().equals("regular") &&

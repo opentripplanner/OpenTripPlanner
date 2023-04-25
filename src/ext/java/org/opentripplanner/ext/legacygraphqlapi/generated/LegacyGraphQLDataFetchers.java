@@ -12,7 +12,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.fares.model.FareMedium;
 import org.opentripplanner.ext.fares.model.FareProduct;
-import org.opentripplanner.ext.fares.model.FareProductInstance;
+import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection;
@@ -325,8 +325,8 @@ public class LegacyGraphQLDataFetchers {
   }
 
   /** A container for both a fare product (a ticket) and its relationship to the itinerary. */
-  public interface LegacyGraphQLFareProductInstance {
-    public DataFetcher<String> instanceId();
+  public interface LegacyGraphQLFareProductUse {
+    public DataFetcher<String> id();
 
     public DataFetcher<FareProduct> product();
   }
@@ -393,7 +393,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Long> endTime();
 
-    public DataFetcher<Iterable<FareProductInstance>> fareProducts();
+    public DataFetcher<Iterable<FareProductUse>> fareProducts();
 
     public DataFetcher<StopArrival> from();
 

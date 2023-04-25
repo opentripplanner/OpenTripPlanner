@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.ext.fares.model.FareProductInstance;
+import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
@@ -43,7 +43,7 @@ public class FlexibleTransitLeg implements TransitLeg {
   private final Set<TransitAlert> transitAlerts = new HashSet<>();
 
   private final int generalizedCost;
-  private List<FareProductInstance> fareProducts;
+  private List<FareProductUse> fareProducts;
 
   public FlexibleTransitLeg(
     FlexTripEdge flexTripEdge,
@@ -206,12 +206,12 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
-  public void setFareProducts(List<FareProductInstance> products) {
+  public void setFareProducts(List<FareProductUse> products) {
     this.fareProducts = List.copyOf(products);
   }
 
   @Override
-  public List<FareProductInstance> fareProducts() {
+  public List<FareProductUse> fareProducts() {
     return fareProducts;
   }
 

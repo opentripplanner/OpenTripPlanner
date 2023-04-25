@@ -102,7 +102,7 @@ config:
     RideHailingProvider: org.opentripplanner.ext.legacygraphqlapi.model.RideHailingProvider#RideHailingProvider
     Currency: java.util.Currency#Currency
     Money: org.opentripplanner.transit.model.basic.Money#Money
-    FareProductInstance: org.opentripplanner.ext.fares.model.FareProductInstance#FareProductInstance
+    FareProductUse: org.opentripplanner.ext.fares.model.FareProductUse#FareProductUse
     FareProduct: org.opentripplanner.ext.fares.model.FareProduct#FareProduct
     FareMedium: org.opentripplanner.ext.fares.model.FareMedium#FareMedium
     RiderCategory: org.opentripplanner.ext.fares.model.RiderCategory#RiderCategory

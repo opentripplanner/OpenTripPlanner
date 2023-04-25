@@ -1298,17 +1298,17 @@ type FareMedium {
 }
 
 "A container for both a fare product (a ticket) and its relationship to the itinerary."
-type FareProductInstance {
+type FareProductUse {
     """
-    Identifier local to the itinerary that allows to cross-reference fare products that span
-    more than one leg.
+    Identifier local to the itinerary that allows to cross-reference and deduplicate
+    fare products that span more than one leg.
 
-    If you want to uniquely identify the fare product itself (not its instance) use the product's `id`.
+    If you want to uniquely identify the fare product itself (not its use) use the product's `id`.
 
     ### Example: Day pass
 
     When a day pass is valid for all three legs in the itinerary it will appear
-    for each leg but with the same `instanceId`.
+    for each leg but with the same use-`id`.
 
     *It is the responsibility of the API consumers to display the day pass as a product for the
     entire itinerary rather than three day passes!*
@@ -1316,9 +1316,9 @@ type FareProductInstance {
     ### Example: Several single tickets
 
     If you have two legs and need to buy two single tickets they will appear in each leg with the
-    same `product.id` but different `instanceId`.
+    same `product.id` but different use-`id`.
     """
-    instanceId: String!
+    id: String!
 
     "The purchasable fare product"
     product: FareProduct
@@ -1617,10 +1617,10 @@ type Leg {
     Fare products are purchasable tickets which may have an optional fare container or rider
     category that limits who can buy them or how.
 
-    Please read the documentation of `instanceId` very carefully to learn how a single fare product
+    Please read the documentation of `id` very carefully to learn how a single fare product
     that applies to multiple legs can appear several times.
     """
-    fareProducts: [FareProductInstance]
+    fareProducts: [FareProductUse]
 }
 
 """A span of time."""

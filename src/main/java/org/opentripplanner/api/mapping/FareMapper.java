@@ -19,7 +19,7 @@ import org.opentripplanner.api.model.ApiLegProducts;
 import org.opentripplanner.api.model.ApiMoney;
 import org.opentripplanner.ext.fares.model.FareMedium;
 import org.opentripplanner.ext.fares.model.FareProduct;
-import org.opentripplanner.ext.fares.model.FareProductInstance;
+import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -50,7 +50,7 @@ public class FareMapper {
 
   private List<ApiLegProducts> toApiLegProducts(
     Itinerary itinerary,
-    Multimap<Leg, FareProductInstance> legProducts
+    Multimap<Leg, FareProductUse> legProducts
   ) {
     if (legProducts.isEmpty()) {
       return null;
@@ -84,8 +84,8 @@ public class FareMapper {
       .orElse(null);
   }
 
-  private List<ApiFareProduct> instancesToApiFareProducts(Collection<FareProductInstance> product) {
-    return toApiFareProducts(product.stream().map(FareProductInstance::product).toList());
+  private List<ApiFareProduct> instancesToApiFareProducts(Collection<FareProductUse> product) {
+    return toApiFareProducts(product.stream().map(FareProductUse::product).toList());
   }
 
   private List<ApiFareProduct> toApiFareProducts(Collection<FareProduct> product) {

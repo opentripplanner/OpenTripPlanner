@@ -43,7 +43,7 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLCoordi
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLCurrencyImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLDepartureRowImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFareProductImpl;
-import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFareProductInstanceImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFareProductUseImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFeedImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLGeometryImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLItineraryImpl;
@@ -169,7 +169,7 @@ class LegacyGraphQLIndex {
         .type(typeWiring.build(LegacyGraphQLRideHailingEstimateImpl.class))
         .type(typeWiring.build(LegacyGraphQLMoneyImpl.class))
         .type(typeWiring.build(LegacyGraphQLCurrencyImpl.class))
-        .type(typeWiring.build(LegacyGraphQLFareProductInstanceImpl.class))
+        .type(typeWiring.build(LegacyGraphQLFareProductUseImpl.class))
         .type(typeWiring.build(LegacyGraphQLFareProductImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();

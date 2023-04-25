@@ -7,7 +7,7 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.model.FareProduct;
-import org.opentripplanner.ext.fares.model.FareProductInstance;
+import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -48,7 +48,7 @@ public class FaresFilterTest implements PlanTestConstants {
     var busLeg = filtered.get(0).getTransitLeg(1);
 
     assertEquals(
-      List.of(new FareProductInstance("c1a04702-1fb6-32d4-ba02-483bf68111ed", fp)),
+      List.of(new FareProductUse("c1a04702-1fb6-32d4-ba02-483bf68111ed", fp)),
       busLeg.fareProducts()
     );
   }

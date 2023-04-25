@@ -80,7 +80,7 @@
                     arrival
                 }
                 fareProducts {
-                    instanceId
+                    id
                     product {
                         id
                         name

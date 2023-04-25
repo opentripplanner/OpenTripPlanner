@@ -3,15 +3,15 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.fares.model.FareProduct;
-import org.opentripplanner.ext.fares.model.FareProductInstance;
+import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 
-public class LegacyGraphQLFareProductInstanceImpl
-  implements LegacyGraphQLDataFetchers.LegacyGraphQLFareProductInstance {
+public class LegacyGraphQLFareProductUseImpl
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLFareProductUse {
 
   @Override
-  public DataFetcher<String> instanceId() {
-    return env -> getSource(env).instanceId();
+  public DataFetcher<String> id() {
+    return env -> getSource(env).id();
   }
 
   @Override
@@ -19,7 +19,7 @@ public class LegacyGraphQLFareProductInstanceImpl
     return env -> getSource(env).product();
   }
 
-  private FareProductInstance getSource(DataFetchingEnvironment environment) {
+  private FareProductUse getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

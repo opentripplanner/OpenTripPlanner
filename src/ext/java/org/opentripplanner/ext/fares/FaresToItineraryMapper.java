@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.fares;
 
-import org.opentripplanner.ext.fares.model.FareProductInstance;
+import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.core.ItineraryFares;
@@ -16,7 +16,7 @@ public class FaresToItineraryMapper {
       .stream()
       .map(fp -> {
         var instanceId = fp.uniqueInstanceId(i.firstLeg().getStartTime());
-        return new FareProductInstance(instanceId, fp);
+        return new FareProductUse(instanceId, fp);
       })
       .toList();
 

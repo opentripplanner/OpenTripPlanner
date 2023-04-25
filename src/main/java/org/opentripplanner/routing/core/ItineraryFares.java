@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareProduct;
-import org.opentripplanner.ext.fares.model.FareProductInstance;
+import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Leg;
@@ -35,7 +35,7 @@ public class ItineraryFares {
    * <p>
    * Note: LinkedHashMultimap keeps the insertion order
    */
-  private final Multimap<Leg, FareProductInstance> legProducts = LinkedHashMultimap.create();
+  private final Multimap<Leg, FareProductUse> legProducts = LinkedHashMultimap.create();
 
   /**
    * The fares V1 fare "components" that apply to individual legs (not the entire price of the
@@ -78,7 +78,7 @@ public class ItineraryFares {
   /**
    * Get those fare products that are valid for a subset of legs but not the entire itinerary.
    */
-  public Multimap<Leg, FareProductInstance> getLegProducts() {
+  public Multimap<Leg, FareProductUse> getLegProducts() {
     return ImmutableMultimap.copyOf(legProducts);
   }
 
@@ -120,7 +120,7 @@ public class ItineraryFares {
         );
         legProducts.put(
           leg,
-          new FareProductInstance(fareProduct.uniqueInstanceId(firstLegStartTime), fareProduct)
+          new FareProductUse(fareProduct.uniqueInstanceId(firstLegStartTime), fareProduct)
         );
       }
     }
@@ -201,7 +201,7 @@ public class ItineraryFares {
         .products()
         .stream()
         .map(LegProducts.ProductWithTransfer::product)
-        .map(fp -> new FareProductInstance(fp.uniqueInstanceId(time), fp))
+        .map(fp -> new FareProductUse(fp.uniqueInstanceId(time), fp))
         .toList();
       this.legProducts.putAll(lp.leg(), products);
     });
@@ -213,7 +213,7 @@ public class ItineraryFares {
   public void addFareProduct(Leg leg, FareProduct fareProduct) {
     this.legProducts.put(
         leg,
-        new FareProductInstance(fareProduct.uniqueInstanceId(leg.getStartTime()), fareProduct)
+        new FareProductUse(fareProduct.uniqueInstanceId(leg.getStartTime()), fareProduct)
       );
   }
 }

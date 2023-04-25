@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.ext.fares.model.FareProductInstance;
+import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
@@ -458,8 +458,8 @@ public interface Leg {
     return Stream.of(intermediate, start, end).flatMap(s -> s).collect(Collectors.toSet());
   }
 
-  void setFareProducts(List<FareProductInstance> products);
-  List<FareProductInstance> fareProducts();
+  void setFareProducts(List<FareProductUse> products);
+  List<FareProductUse> fareProducts();
 
   private static Stream<FareZone> getFareZones(Place place) {
     if (place.stop == null) {
