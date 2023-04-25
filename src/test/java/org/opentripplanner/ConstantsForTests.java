@@ -155,6 +155,8 @@ public class ConstantsForTests {
         File osmFile = new File(PORTLAND_CENTRAL_OSM);
         OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, false);
         OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(osmProvider, graph)
+          .withStaticParkAndRide(true)
+          .withStaticBikeParkAndRide(true)
           .build();
         osmModule.buildGraph();
       }
