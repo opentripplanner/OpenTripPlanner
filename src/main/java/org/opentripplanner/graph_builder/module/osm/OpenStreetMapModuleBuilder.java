@@ -93,16 +93,18 @@ public class OpenStreetMapModuleBuilder {
     return new OpenStreetMapModule(
       providers,
       graph,
-      boardingAreaRefTags,
       issueStore,
-      customNamer,
-      maxAreaNodes,
-      areaVisibility,
-      platformEntriesLinking,
-      staticParkAndRide,
-      staticBikeParkAndRide,
-      banDiscouragedWalking,
-      banDiscouragedBiking
+      new OpenStreetMapOptions(
+        boardingAreaRefTags,
+        customNamer,
+        maxAreaNodes,
+        areaVisibility,
+        platformEntriesLinking,
+        staticParkAndRide,
+        staticBikeParkAndRide,
+        banDiscouragedWalking,
+        banDiscouragedBiking
+      )
     );
   }
 }

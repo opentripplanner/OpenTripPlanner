@@ -45,15 +45,17 @@ public class WalkableAreaBuilderTest {
       graph,
       osmdb,
       DataImportIssueStore.NOOP,
-      false,
-      false,
-      false,
-      null,
-      maxAreaNodes,
-      false,
-      boardingAreaRefTags,
-      false,
-      false,
+      new OpenStreetMapOptions(
+        boardingAreaRefTags,
+        null,
+        maxAreaNodes,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ),
       new HashMap<>()
     );
 
