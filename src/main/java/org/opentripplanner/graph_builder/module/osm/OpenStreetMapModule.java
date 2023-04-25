@@ -94,8 +94,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   public OpenStreetMapModule(
     Collection<OpenStreetMapProvider> providers,
-    Set<String> boardingAreaRefTags,
     Graph graph,
+    Set<String> boardingAreaRefTags,
     DataImportIssueStore issueStore,
     CustomNamer customNamer,
     int maxAreaNodes,

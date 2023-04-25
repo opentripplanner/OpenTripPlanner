@@ -6,13 +6,10 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -46,7 +43,6 @@ public class UnroutableTest {
     OpenStreetMapModule osmBuilder = OpenStreetMapModuleBuilder
       .of(provider, graph)
       .withAreaVisibility(true)
-      .withStaticParkAndRide(false)
       .build();
     osmBuilder.buildGraph();
   }

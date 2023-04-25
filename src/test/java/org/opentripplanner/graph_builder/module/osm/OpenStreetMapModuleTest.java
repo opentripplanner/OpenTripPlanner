@@ -123,7 +123,6 @@ public class OpenStreetMapModuleTest {
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
     OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
       .of(provider, gg)
-      .setIssueStore(DataImportIssueStore.NOOP)
       .withAreaVisibility(true)
       .build();
 
@@ -322,7 +321,6 @@ public class OpenStreetMapModuleTest {
       .toList();
     var module = OpenStreetMapModuleBuilder
       .of(providers, graph)
-      .withAreaVisibility(false)
       .withStaticParkAndRide(true)
       .withStaticBikeParkAndRide(true)
       .build();

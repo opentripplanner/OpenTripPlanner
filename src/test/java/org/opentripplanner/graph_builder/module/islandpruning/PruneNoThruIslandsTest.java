@@ -10,9 +10,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModuleBuilder;
-import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -74,24 +72,9 @@ public class PruneNoThruIslandsTest {
       // Add street data from OSM
       File osmFile = new File(osmPath);
       OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, true);
-      var customNamer = new CustomNamer() {
-        @Override
-        public String name(OSMWithTags way, String defaultName) {
-          return String.valueOf(way.getId());
-        }
-
-        @Override
-        public void nameWithEdge(OSMWithTags way, StreetEdge edge) {}
-
-        @Override
-        public void postprocess(Graph graph) {}
-
-        @Override
-        public void configure() {}
-      };
       OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
         .of(osmProvider, graph)
-        .withCustomNamer(customNamer)
+        .withCustomNamer(new TestCustomNamer())
         .build();
 
       osmModule.buildGraph();

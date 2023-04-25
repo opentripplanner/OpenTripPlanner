@@ -38,7 +38,6 @@ public class PlatformLinkerTest {
     OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
       .of(provider, gg)
       .withPlatformEntriesLinking(true)
-      .withStaticParkAndRide(false)
       .build();
 
     osmModule.buildGraph();

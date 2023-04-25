@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.routing.graph.Graph;
@@ -41,17 +40,16 @@ public class WalkableAreaBuilderTest {
 
     final Set<String> boardingAreaRefTags = Set.of();
     final OSMDatabase osmdb = new OSMDatabase(DataImportIssueStore.NOOP, boardingAreaRefTags);
-    final CustomNamer customNamer = null;
 
     final OpenStreetMapModule.Handler handler = new OpenStreetMapModule.Handler(
       graph,
       osmdb,
       DataImportIssueStore.NOOP,
-       false,
-       false,
-       false,
-       customNamer,
-       maxAreaNodes,
+      false,
+      false,
+      false,
+      null,
+      maxAreaNodes,
       false,
       boardingAreaRefTags,
       false,
@@ -80,8 +78,8 @@ public class WalkableAreaBuilderTest {
     final List<AreaGroup> areaGroups = AreaGroup.groupAreas(areasLevels);
 
     final Consumer<AreaGroup> build = visibility
-      ? ag -> walkableAreaBuilder.buildWithVisibility(ag)
-      : ag -> walkableAreaBuilder.buildWithoutVisibility(ag);
+      ? walkableAreaBuilder::buildWithVisibility
+      : walkableAreaBuilder::buildWithoutVisibility;
 
     areaGroups.forEach(build);
   }

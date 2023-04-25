@@ -74,11 +74,26 @@ public class OpenStreetMapModuleBuilder {
     return this;
   }
 
+  public OpenStreetMapModuleBuilder withBanDiscouragedWalking(boolean banDiscouragedWalking) {
+    this.banDiscouragedWalking = banDiscouragedWalking;
+    return this;
+  }
+
+  public OpenStreetMapModuleBuilder withBanDiscouragedBiking(boolean banDiscouragedBiking) {
+    this.banDiscouragedBiking = banDiscouragedBiking;
+    return this;
+  }
+
+  public OpenStreetMapModuleBuilder withMaxAreaNodes(int maxAreaNodes) {
+    this.maxAreaNodes = maxAreaNodes;
+    return this;
+  }
+
   public OpenStreetMapModule build() {
     return new OpenStreetMapModule(
       providers,
-      boardingAreaRefTags,
       graph,
+      boardingAreaRefTags,
       issueStore,
       customNamer,
       maxAreaNodes,
