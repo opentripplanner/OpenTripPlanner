@@ -146,7 +146,7 @@ jobs:
           # commit and push the GraphQL documentation
           git checkout $LOCAL_BRANCH
           mkdir -p api
-          mv target/magidoc/api/* api/dev-2.x/
+          mv target/magidoc/api api/dev-2.x/
           git add api
           git commit -am "Add Magidoc GraphQL documentation"
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
